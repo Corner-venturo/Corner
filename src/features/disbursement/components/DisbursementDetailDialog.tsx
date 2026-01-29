@@ -28,18 +28,12 @@ import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { DisbursementPrintDialog } from './DisbursementPrintDialog'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
+import { DISBURSEMENT_STATUS } from '../constants'
 
 interface DisbursementDetailDialogProps {
   order: DisbursementOrder | null
   open: boolean
   onOpenChange: (open: boolean) => void
-}
-
-// 出納單狀態
-const DISBURSEMENT_STATUS = {
-  pending: { label: '待出帳', color: 'bg-morandi-gold' },
-  confirmed: { label: '已確認', color: 'bg-status-info' },
-  paid: { label: '已出帳', color: 'bg-morandi-green' },
 }
 
 export function DisbursementDetailDialog({
@@ -202,7 +196,7 @@ export function DisbursementDetailDialog({
     {/* 主 Dialog：子 Dialog 開啟時完全不渲染（避免多重遮罩） */}
     {!isPrintDialogOpen && (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+      <DialogContent level={1} className="max-w-3xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div>

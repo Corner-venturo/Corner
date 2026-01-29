@@ -206,7 +206,7 @@ export function ReceiptConfirmDialog({
                   {receipt.receipt_account || '-'}
                 </td>
                 <td className="py-3 px-3 border-b border-r border-border text-sm text-muted-foreground">
-                  {receipt.note || '-'}
+                  {receipt.notes || '-'}
                 </td>
                 <td className="py-3 px-3 border-b border-r border-border text-sm text-right font-medium">
                   NT$ {(receipt.receipt_amount || 0).toLocaleString()}

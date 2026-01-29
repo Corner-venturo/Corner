@@ -193,7 +193,7 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
 
       {/* 新增成員對話框 */}
       <Dialog open={showAddMemberDialog} onOpenChange={setShowAddMemberDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent level={1} className="max-w-md">
           <DialogHeader>
             <DialogTitle className="text-morandi-primary">新增成員到頻道</DialogTitle>
           </DialogHeader>

@@ -61,7 +61,7 @@ export default function BoxSelector({ boxes, onSelect, onClose, timeInterval }: 
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent level={1} className="max-w-md">
         <DialogHeader>
           <DialogTitle>選擇箱子</DialogTitle>
         </DialogHeader>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { logger } from '@/lib/utils/logger'
 import { Univer, LocaleType, UniverInstanceType, merge } from '@univerjs/core'
 import { defaultTheme } from '@univerjs/design'
 import { UniverRenderEnginePlugin } from '@univerjs/engine-render'
@@ -93,7 +94,7 @@ export function UniverSlides({ className }: UniverSlidesProps) {
         // 在簡報建立後註冊返回列表 plugin
         univer.registerPlugin(UniverBackToListSlidesPlugin)
       } catch (error) {
-        console.error('Univer Slides 初始化失敗:', error)
+        logger.error('Univer Slides 初始化失敗:', error)
       }
     }, 100)
 

@@ -42,7 +42,7 @@ export function EsimSearchDialog({ open, onOpenChange, onSearch }: EsimSearchDia
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent level={1} className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>詳細搜尋</DialogTitle>
         </DialogHeader>

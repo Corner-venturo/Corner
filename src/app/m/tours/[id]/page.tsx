@@ -61,7 +61,7 @@ interface DbMember {
 interface DbPayment {
   id: string
   code: string
-  note: string | null
+  notes: string | null
   amount: number
   status: string | null
   supplier_name: string | null
@@ -334,14 +334,14 @@ export default function TourDetailPage() {
     async function loadPayments() {
       const { data } = await supabase
         .from('payment_requests')
-        .select('id, code, note, amount, status, supplier_name, tour_code, created_at, paid_at')
+        .select('id, code, notes, amount, status, supplier_name, tour_code, created_at, paid_at')
         .eq('tour_id', tourId)
         .order('created_at', { ascending: false })
 
       const formatted: DisplayPayment[] = ((data || []) as DbPayment[]).map((p) => ({
         id: p.id,
         code: p.code,
-        description: p.note || '無說明',
+        description: p.notes || '無說明',
         amount: p.amount,
         status: (p.status || 'pending') as DisplayPayment['status'],
         supplier_name: p.supplier_name,

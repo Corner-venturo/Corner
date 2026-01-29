@@ -290,7 +290,7 @@ function MobileNavSettings({ availableItems, selectedItemIds, onSave, onClose }:
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 w-full max-w-full md:max-w-md md:left-[50%] md:top-[50%] md:translate-x-[-50%] md:translate-y-[-50%] md:bottom-auto rounded-t-xl md:rounded-xl p-0 gap-0">
+      <DialogContent level={1} className="fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 w-full max-w-full md:max-w-md md:left-[50%] md:top-[50%] md:translate-x-[-50%] md:translate-y-[-50%] md:bottom-auto rounded-t-xl md:rounded-xl p-0 gap-0">
         {/* 標題列 */}
         <DialogHeader className="p-4 border-b border-border">
           <DialogTitle className="text-lg font-bold text-morandi-primary">自訂底部導航欄</DialogTitle>

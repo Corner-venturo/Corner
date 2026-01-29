@@ -53,7 +53,8 @@ const menuItems: MenuItem[] = [
   { href: '/', label: '首頁', icon: Home },
   { href: '/calendar', label: '行事曆', icon: Calendar, requiredPermission: 'calendar' },
   { href: '/workspace', label: '工作空間', icon: Building2, requiredPermission: 'workspace' },
-  { href: '/mail', label: '郵件', icon: Mail, requiredPermission: 'workspace' },
+  // 郵件系統暫時隱藏（目前使用 Google Workspace）
+  // { href: '/mail', label: '郵件', icon: Mail, requiredPermission: 'workspace' },
   // 旅伴通訊已整合到工作頻道中，此路由暫時隱藏
   // { href: '/traveler-chat', label: '旅伴通訊', icon: MessageCircle, requiredPermission: 'workspace' },
   { href: '/todos', label: '待辦事項', icon: CheckSquare, requiredPermission: 'todos' },

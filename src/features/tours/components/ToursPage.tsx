@@ -30,6 +30,7 @@ import { ContractDialog } from '@/components/contracts/ContractDialog'
 import { TourClosingDialog } from './TourClosingDialog'
 import { TourControlDialogWrapper } from './TourControlDialogWrapper'
 import { TourRequirementsDialog } from './TourRequirementsDialog'
+import { TourEditDialog } from '@/components/tours/tour-edit-dialog'
 import { ProposalsTableContent } from '@/features/proposals/components/ProposalsTableContent'
 import { convertToTour } from '@/services/proposal.service'
 import { alert } from '@/lib/ui/alert-dialog'
@@ -57,6 +58,9 @@ export const ToursPage: React.FC = () => {
 
   const [tourControlDialogTour, setTourControlDialogTour] = useState<Tour | null>(null)
   const [requirementsDialogTour, setRequirementsDialogTour] = useState<Tour | null>(null)
+
+  // Edit dialog state (using TourEditDialog instead of TourForm for edit mode)
+  const [editDialogTour, setEditDialogTour] = useState<Tour | null>(null)
 
   // 🔧 TOUR-01 重構：使用 useProposalOperations hook 管理提案相關狀態和操作
   const proposalOps = useProposalOperations()
@@ -155,23 +159,30 @@ export const ToursPage: React.FC = () => {
 
   const {
     handleOpenCreateDialog,
-    handleOpenEditDialog,
     resetForm,
-    handleEditDialogEffect,
     handleNavigationEffect,
     proposalConvertData,
     clearProposalConvertData,
-  } = useToursForm({ state, openDialog, dialog: dialogState })
+  } = useToursForm({ state, openDialog })
+
+  // Handler for opening edit dialog (now uses TourEditDialog instead of TourForm)
+  const handleOpenEditDialog = useCallback((tour: Tour) => {
+    setEditDialogTour(tour)
+  }, [])
+
+  // Handler for closing edit dialog
+  const handleCloseEditDialog = useCallback(() => {
+    setEditDialogTour(null)
+  }, [])
 
   // 🔧 優化：useTourOperations 不再需要外部傳入 quotes/itineraries/addOrder 等
+  // 🔧 編輯模式已移至 TourEditDialog + useTourEdit hook
   const operations = useTourOperations({
     actions,
     resetForm,
     closeDialog,
     setSubmitting,
     setFormError,
-    dialogType: dialogState.type || 'create',
-    dialogData: (dialogState.data && Object.keys(dialogState.data).length > 0 ? dialogState.data : null) as Tour | null,
     workspaceId: user?.workspace_id,
   })
 
@@ -323,10 +334,6 @@ export const ToursPage: React.FC = () => {
     handleNavigationEffect()
   }, [handleNavigationEffect])
 
-  useEffect(() => {
-    handleEditDialogEffect()
-  }, [handleEditDialogEffect])
-
   // 移除完整頁面載入阻擋，改為讓表格結構先顯示
   // loading 狀態由 TourTable 內部處理
 
@@ -363,8 +370,9 @@ export const ToursPage: React.FC = () => {
         )}
       </div>
 
+      {/* TourForm only for create mode */}
       <TourForm
-        isOpen={dialogState.isOpen}
+        isOpen={dialogState.isOpen && dialogState.type === 'create'}
         onClose={() => {
           resetForm()
           closeDialog()
@@ -373,7 +381,7 @@ export const ToursPage: React.FC = () => {
             clearProposalConvertData()
           }
         }}
-        mode={dialogState.type === 'edit' ? 'edit' : 'create'}
+        mode="create"
         newTour={newTour}
         setNewTour={setNewTour}
         newOrder={newOrder}
@@ -383,6 +391,18 @@ export const ToursPage: React.FC = () => {
         onSubmit={handleAddTour}
         isFromProposal={!!proposalConvertData}
       />
+
+      {/* TourEditDialog for edit mode */}
+      {editDialogTour && (
+        <TourEditDialog
+          isOpen={!!editDialogTour}
+          onClose={handleCloseEditDialog}
+          tour={editDialogTour}
+          onSuccess={() => {
+            // Refresh is handled by SWR mutate in the hook
+          }}
+        />
+      )}
 
       <DeleteConfirmDialog
         isOpen={deleteConfirm.isOpen}

@@ -57,7 +57,7 @@ export interface PaymentRequest {
   status?: string | null // pending, approved, paid
   is_special_billing?: boolean | null // 是否為特殊出帳
   batch_id?: string | null // 批次 ID：同一批建立的請款單共用此 ID
-  note?: string | null // 備註（使用 note 單數形式，與資料庫一致）
+  notes?: string | null // 備註（統一使用 notes）
   approved_at?: string | null
   approved_by?: string | null
   paid_at?: string | null
@@ -101,7 +101,7 @@ export interface PaymentRequestItem {
   unit_price: number
   quantity: number
   subtotal: number
-  note?: string // 項目備註
+  notes?: string // 項目備註
   sort_order: number // 排序
   created_at: string
   updated_at: string
@@ -123,8 +123,7 @@ export interface DisbursementOrder {
   payment_request_ids: string[] | null // 關聯的請款單ID陣列
   amount: number // 總金額 (自動加總)
   status: string | null // pending, confirmed, paid, cancelled
-  note?: string | null // 出納備註
-  notes?: string | null // 出納備註（資料庫實際欄位名）
+  notes?: string | null // 出納備註
   code?: string | null // 出納單代碼
   created_by?: string | null // 建立者ID
   confirmed_by?: string | null // 確認者ID
@@ -162,7 +161,7 @@ export interface ReceiptOrder {
   payment_items: ReceiptPaymentItem[] // 收款項目
   total_amount: number // 總收款金額
   status: 'received' | 'confirmed' | 'rejected' // 收款狀態
-  note?: string // 收款備註
+  notes?: string // 收款備註
   created_by: string // 建立者ID
   confirmed_by?: string // 確認者ID
   confirmed_at?: string // 確認時間
@@ -195,7 +194,7 @@ export interface ReceiptPaymentItem {
   transaction_date: string // 交易日期
   handler_name?: string // 經手人 (現金用)
   fees?: number // 手續費
-  note?: string // 備註
+  notes?: string // 備註
   created_at: string
   updated_at: string
 }
@@ -239,7 +238,7 @@ export interface Visa {
   vendor?: string // 代辦商名稱（送件時填寫）
 
   // 其他
-  note?: string // 備註
+  notes?: string // 備註
   created_by?: string // 建立者ID
   created_at: string
   updated_at: string

@@ -97,7 +97,7 @@ export default function ReminderDialog({ scheduledBox, box, onClose }: ReminderD
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg">
+      <DialogContent level={1} className="max-w-lg">
         <DialogHeader>
           <DialogTitle>
             {box.name} - {formatDateTime(scheduledBox.day_of_week, scheduledBox.start_time)}

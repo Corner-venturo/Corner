@@ -183,7 +183,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
         description: newItem.description,
         unit_price: newItem.unit_price,
         quantity: newItem.quantity,
-        note: '',
+        notes: '',
         sort_order: items.length + 1,
       })
 
@@ -579,10 +579,10 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
           </div>
 
           {/* 備註 */}
-          {currentRequest.note && (
+          {currentRequest.notes && (
             <div className="p-4 bg-morandi-background/50 rounded-lg">
               <h3 className="text-sm font-semibold text-morandi-primary mb-2">備註</h3>
-              <p className="text-sm text-morandi-secondary whitespace-pre-wrap">{currentRequest.note}</p>
+              <p className="text-sm text-morandi-secondary whitespace-pre-wrap">{currentRequest.notes}</p>
             </div>
           )}
 

@@ -36,7 +36,7 @@ export interface Company {
   vip_level: number // 0: 普通, 1-5: VIP等級
 
   // 備註
-  note: string | null
+  notes: string | null
 
   // 系統欄位
   created_at: string
@@ -60,7 +60,7 @@ export interface CompanyContact {
   is_primary: boolean
 
   // 備註
-  note: string | null
+  notes: string | null
 
   // 系統欄位
   created_at: string

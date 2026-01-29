@@ -207,8 +207,8 @@ export function PaymentItemRow({
         <td className="py-2 px-3 border-b border-r border-border">
           <input
             type="text"
-            value={item.note || ''}
-            onChange={e => onUpdate(item.id, { note: e.target.value })}
+            value={item.notes || ''}
+            onChange={e => onUpdate(item.id, { notes: e.target.value })}
             placeholder="備註（選填）"
             className="input-no-focus w-full bg-transparent text-sm"
           />

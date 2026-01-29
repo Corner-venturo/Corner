@@ -200,7 +200,7 @@ export function AirportImageLibrary({
 
       {/* 新增圖片對話框 */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent level={1} className="max-w-md">
           <DialogHeader>
             <DialogTitle>新增圖片到 {airportCode}</DialogTitle>
           </DialogHeader>

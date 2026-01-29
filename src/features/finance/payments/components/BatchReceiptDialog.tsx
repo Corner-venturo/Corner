@@ -36,7 +36,7 @@ interface OrderAllocationWithNote {
   tour_name: string
   contact_person: string
   allocated_amount: number
-  note: string
+  notes: string
 }
 import { Plus, DollarSign, AlertCircle, X, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -94,8 +94,8 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
       setPaymentMethod('transfer')
       setTotalAmount(0)
       setOrderAllocations([
-        { order_id: '', order_number: '', tour_id: '', code: '', tour_name: '', contact_person: '', allocated_amount: 0, note: '' },
-        { order_id: '', order_number: '', tour_id: '', code: '', tour_name: '', contact_person: '', allocated_amount: 0, note: '' },
+        { order_id: '', order_number: '', tour_id: '', code: '', tour_name: '', contact_person: '', allocated_amount: 0, notes: '' },
+        { order_id: '', order_number: '', tour_id: '', code: '', tour_name: '', contact_person: '', allocated_amount: 0, notes: '' },
       ])
     }
   }, [open])
@@ -104,7 +104,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
   const addOrderAllocation = () => {
     setOrderAllocations(prev => [
       ...prev,
-      { order_id: '', order_number: '', tour_id: '', code: '', tour_name: '', contact_person: '', allocated_amount: 0, note: '' },
+      { order_id: '', order_number: '', tour_id: '', code: '', tour_name: '', contact_person: '', allocated_amount: 0, notes: '' },
     ])
   }
 
@@ -158,8 +158,8 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
     setPaymentMethod('transfer')
     setTotalAmount(0)
     setOrderAllocations([
-      { order_id: '', order_number: '', tour_id: '', code: '', tour_name: '', contact_person: '', allocated_amount: 0, note: '' },
-      { order_id: '', order_number: '', tour_id: '', code: '', tour_name: '', contact_person: '', allocated_amount: 0, note: '' },
+      { order_id: '', order_number: '', tour_id: '', code: '', tour_name: '', contact_person: '', allocated_amount: 0, notes: '' },
+      { order_id: '', order_number: '', tour_id: '', code: '', tour_name: '', contact_person: '', allocated_amount: 0, notes: '' },
     ])
   }
 
@@ -230,7 +230,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
           amount: allocation.allocated_amount,
           actual_amount: 0,
           status: '0',
-          note: allocation.note || null,
+          notes: allocation.notes || null,
           created_by: user.id,
           updated_by: user.id,
           link: null,
@@ -369,8 +369,8 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
                         <td className="py-2 px-3 border-b border-r border-border">
                           <input
                             type="text"
-                            value={allocation.note || ''}
-                            onChange={e => updateOrderAllocation(index, { note: e.target.value })}
+                            value={allocation.notes || ''}
+                            onChange={e => updateOrderAllocation(index, { notes: e.target.value })}
                             className="input-no-focus w-full bg-transparent text-sm"
                           />
                         </td>

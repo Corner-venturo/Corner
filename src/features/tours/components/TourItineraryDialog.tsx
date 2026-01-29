@@ -1,34 +1,19 @@
 /**
- * TourItineraryDialog - 旅遊團行程表選擇對話框
- * 讓用戶選擇建立「快速行程表」或「時間軸行程表」
+ * TourItineraryDialog - 旅遊團行程表對話框
+ * 統一入口：直接開啟 PackageItineraryDialog（與提案版本一致）
  */
 
 'use client'
 
-import React, { useState, useMemo, useCallback } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog'
-import {
-  FileText,
-  Loader2,
-  Zap,
-  Clock,
-  Eye,
-} from 'lucide-react'
+import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import type { Tour } from '@/stores/types'
-import type { ProposalPackage, TimelineItineraryData, Proposal } from '@/types/proposal.types'
+import type { ProposalPackage, Proposal } from '@/types/proposal.types'
 import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
 import { dynamicFrom } from '@/lib/supabase/typed-client'
-import { syncTimelineToQuote } from '@/lib/utils/itinerary-quote-sync'
-import { ItineraryDialog } from '@/features/proposals/components/ItineraryDialog'
 import { PackageItineraryDialog } from '@/features/proposals/components/PackageItineraryDialog'
 import { toast } from 'sonner'
+import { Loader2 } from 'lucide-react'
 
 interface TourItineraryDialogProps {
   isOpen: boolean
@@ -41,26 +26,8 @@ export function TourItineraryDialog({
   onClose,
   tour,
 }: TourItineraryDialogProps) {
-  // 狀態
-  const [isCreatingPackage, setIsCreatingPackage] = useState(false)
-  const [timelineDialogOpen, setTimelineDialogOpen] = useState(false)
-  const [packageItineraryDialogOpen, setPackageItineraryDialogOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [tourProposalPackage, setTourProposalPackage] = useState<ProposalPackage | null>(null)
-
-  // 🔧 優化：不在打開時查詢，只有用戶點擊時才載入
-  // 對話框只是顯示兩個選項按鈕，不需要等資料
-
-  // 🔧 簡化：只用 tour.proposal_package_id 判斷是否已有行程資料
-  // 不需要載入整個 package 來判斷
-  const hasExistingPackage = !!tour.proposal_package_id
-
-  // 這些只有在 tourProposalPackage 載入後才有意義（用於子 Dialog）
-  const itineraryType = tourProposalPackage?.itinerary_type || null
-  const hasTimelineData = itineraryType === 'timeline' &&
-    tourProposalPackage?.timeline_data &&
-    typeof tourProposalPackage.timeline_data === 'object' &&
-    Object.keys(tourProposalPackage.timeline_data).length > 0
-  const hasQuickItinerary = itineraryType === 'simple' || !!tourProposalPackage?.itinerary_id
 
   // 為 PackageItineraryDialog 建立模擬 Proposal 物件（使用 Tour 資料）
   const fakeProposal = useMemo((): Proposal => ({
@@ -79,10 +46,7 @@ export function TourItineraryDialog({
   }), [tour])
 
   // 為旅遊團建立或取得 proposal_package
-  const getOrCreatePackageForTour = async (): Promise<ProposalPackage | null> => {
-    // 🔧 修正：每次都從資料庫查詢以確保資料是最新的
-    // 避免使用過時的快取資料（例如之前 package 還沒有 itinerary_id 時的快取）
-
+  const getOrCreatePackageForTour = useCallback(async (): Promise<ProposalPackage | null> => {
     // 如果 tour 有 proposal_package_id，直接查詢
     if (tour.proposal_package_id) {
       const { data: existingPkg, error: pkgError } = await supabase
@@ -92,13 +56,11 @@ export function TourItineraryDialog({
         .single()
 
       if (!pkgError && existingPkg) {
-        setTourProposalPackage(existingPkg as ProposalPackage)
         return existingPkg as ProposalPackage
       }
     }
 
     // 沒有現有 package，建立新的
-    setIsCreatingPackage(true)
     try {
       let days = 5
       if (tour.departure_date && tour.return_date) {
@@ -125,7 +87,6 @@ export function TourItineraryDialog({
         workspace_id: tour.workspace_id,
       }
 
-       
       const { data: newPackage, error } = await dynamicFrom('proposal_packages')
         .insert(newPackageData)
         .select()
@@ -146,48 +107,35 @@ export function TourItineraryDialog({
         logger.error('更新旅遊團關聯失敗:', updateError)
       }
 
-      setTourProposalPackage(newPackage as ProposalPackage)
       return newPackage as ProposalPackage
     } catch (err) {
       logger.error('建立 package 錯誤:', err)
       toast.error('建立行程表失敗')
       return null
-    } finally {
-      setIsCreatingPackage(false)
     }
-  }
+  }, [tour])
 
-  // 選擇快速行程表（PackageItineraryDialog）
-  const handleSelectQuickItinerary = async () => {
-    setIsCreatingPackage(true)
-    try {
-      const pkg = await getOrCreatePackageForTour()
-      if (pkg) {
-        // 🔧 確保 state 更新後再打開 Dialog
-        setTourProposalPackage(pkg)
-        // 使用 setTimeout 確保 state 已更新
-        setTimeout(() => setPackageItineraryDialogOpen(true), 0)
-      }
-    } finally {
-      setIsCreatingPackage(false)
+  // 當對話框開啟時，自動載入或建立 package
+  useEffect(() => {
+    if (isOpen && !tourProposalPackage) {
+      setIsLoading(true)
+      getOrCreatePackageForTour()
+        .then(pkg => {
+          setTourProposalPackage(pkg)
+        })
+        .finally(() => {
+          setIsLoading(false)
+        })
     }
-  }
+  }, [isOpen, tourProposalPackage, getOrCreatePackageForTour])
 
-  // 選擇時間軸行程表
-  const handleSelectTimelineItinerary = async () => {
-    setIsCreatingPackage(true)
-    try {
-      const pkg = await getOrCreatePackageForTour()
-      if (pkg) {
-        setTourProposalPackage(pkg)
-        setTimeout(() => setTimelineDialogOpen(true), 0)
-      }
-    } finally {
-      setIsCreatingPackage(false)
-    }
-  }
+  // 關閉時重置狀態
+  const handleClose = useCallback(() => {
+    setTourProposalPackage(null)
+    onClose()
+  }, [onClose])
 
-  // 刷新當前 package 資料
+  // 刷新 package 資料
   const refreshPackage = useCallback(async () => {
     if (!tourProposalPackage?.id) return
     const { data, error } = await supabase
@@ -200,132 +148,28 @@ export function TourItineraryDialog({
     }
   }, [tourProposalPackage?.id])
 
-  // 儲存時間軸資料
-  const handleSaveTimeline = useCallback(async (timelineData: TimelineItineraryData) => {
-    if (!tourProposalPackage) return
+  // 載入中顯示
+  if (isOpen && isLoading) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div className="bg-white rounded-lg p-6 flex items-center gap-3">
+          <Loader2 className="w-5 h-5 animate-spin text-morandi-gold" />
+          <span className="text-sm text-morandi-secondary">載入行程表...</span>
+        </div>
+      </div>
+    )
+  }
 
-    try {
-      const jsonData = JSON.parse(JSON.stringify(timelineData))
-
-      const { error } = await supabase
-        .from('proposal_packages')
-        .update({
-          itinerary_type: 'timeline',
-          timeline_data: jsonData,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', tourProposalPackage.id)
-
-      if (error) throw error
-
-      if (tourProposalPackage.quote_id) {
-        await syncTimelineToQuote(tourProposalPackage.quote_id, timelineData)
-      }
-
-      refreshPackage()
-    } catch (error) {
-      logger.error('儲存時間軸資料失敗:', error)
-      throw error
-    }
-  }, [tourProposalPackage, refreshPackage])
-
-  // 注意：已移除 hasChildDialogOpen 模式，改用 Dialog level 系統處理多重遮罩
-
+  // 直接開啟 PackageItineraryDialog（與提案版本一致）
   return (
     <>
-      {/* 主對話框：使用 level={1} */}
-      <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-          <DialogContent level={1} className="max-w-md">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-morandi-gold" />
-                <span>行程表</span>
-              </DialogTitle>
-              <DialogDescription>
-                為「{tour.name}」選擇行程表類型
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="py-4">
-              {isCreatingPackage ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-6 h-6 animate-spin text-morandi-secondary" />
-                  <span className="ml-2 text-sm text-morandi-secondary">處理中...</span>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {/* 已有行程資料時顯示 */}
-                  {hasExistingPackage && (
-                    <div className="p-3 rounded-lg border border-morandi-gold/30 bg-morandi-gold/5 mb-4">
-                      <div className="flex items-center gap-2 text-sm text-morandi-primary">
-                        <Eye className="w-4 h-4 text-morandi-gold" />
-                        <span>已有行程資料，點擊下方按鈕查看或編輯</span>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-2 gap-3">
-                    {/* 快速行程表 */}
-                    <button
-                      onClick={handleSelectQuickItinerary}
-                      className="p-4 rounded-lg border-2 border-border hover:border-morandi-gold/50 hover:bg-morandi-gold/5 transition-all text-left group"
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-10 h-10 rounded-full bg-morandi-gold/10 flex items-center justify-center group-hover:bg-morandi-gold/20 transition-colors">
-                          <Zap className="w-5 h-5 text-morandi-gold" />
-                        </div>
-                      </div>
-                      <span className="font-medium text-morandi-primary block mb-1">
-                        快速行程表
-                      </span>
-                      <p className="text-xs text-morandi-secondary">
-                        完整的行程編輯器，支援景點、餐食、住宿等詳細設定
-                      </p>
-                    </button>
-
-                    {/* 時間軸行程表 */}
-                    <button
-                      onClick={handleSelectTimelineItinerary}
-                      disabled={isCreatingPackage}
-                      className="p-4 rounded-lg border-2 border-border hover:border-morandi-gold/50 hover:bg-morandi-gold/5 transition-all text-left group disabled:opacity-50"
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-10 h-10 rounded-full bg-morandi-container flex items-center justify-center group-hover:bg-morandi-container/80 transition-colors">
-                          <Clock className="w-5 h-5 text-morandi-secondary" />
-                        </div>
-                      </div>
-                      <span className="font-medium text-morandi-primary block mb-1">
-                        時間軸行程表
-                      </span>
-                      <p className="text-xs text-morandi-secondary">
-                        以時間軸方式編輯每日行程，適合快速建立
-                      </p>
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
-
-      {/* 快速行程表對話框（level={2}） */}
       {tourProposalPackage && (
         <PackageItineraryDialog
-          isOpen={packageItineraryDialogOpen}
-          onClose={() => setPackageItineraryDialogOpen(false)}
+          isOpen={isOpen}
+          onClose={handleClose}
           pkg={tourProposalPackage}
           proposal={fakeProposal}
           onItineraryCreated={refreshPackage}
-        />
-      )}
-
-      {/* 行程表對話框 */}
-      {tourProposalPackage && (
-        <ItineraryDialog
-          isOpen={timelineDialogOpen}
-          onClose={() => setTimelineDialogOpen(false)}
-          pkg={tourProposalPackage}
-          onSave={handleSaveTimeline}
         />
       )}
     </>

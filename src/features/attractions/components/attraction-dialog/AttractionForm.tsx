@@ -43,8 +43,8 @@ export function AttractionForm({
         <div>
           <label className="text-sm font-medium">英文名稱</label>
           <Input
-            value={formData.name_en}
-            onChange={e => setFormData(prev => ({ ...prev, name_en: e.target.value }))}
+            value={formData.english_name}
+            onChange={e => setFormData(prev => ({ ...prev, english_name: e.target.value }))}
             placeholder="例如: Dazaifu Tenmangu"
           />
         </div>

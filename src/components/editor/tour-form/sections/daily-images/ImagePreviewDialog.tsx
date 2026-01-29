@@ -54,7 +54,7 @@ export function ImagePreviewModal({
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl p-0 bg-black/95 border-none">
+      <DialogContent level={1} className="max-w-5xl p-0 bg-black/95 border-none">
         <VisuallyHidden>
           <DialogTitle>圖片預覽</DialogTitle>
           <DialogDescription>預覽每日圖片，可使用左右鍵切換</DialogDescription>

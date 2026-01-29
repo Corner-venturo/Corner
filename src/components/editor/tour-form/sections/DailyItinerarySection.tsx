@@ -258,7 +258,7 @@ export function DailyItinerarySection({
           }
         }}
       >
-        <DialogContent className="sm:max-w-md">
+        <DialogContent level={1} className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FolderPlus size={20} className="text-morandi-gold" />

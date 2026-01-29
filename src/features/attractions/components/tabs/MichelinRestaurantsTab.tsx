@@ -21,7 +21,7 @@ import { Input } from '@/components/ui/input'
 interface MichelinRestaurant {
   id: string
   name: string
-  name_en?: string
+  english_name?: string
   michelin_stars: number
   country_id: string
   city_id: string
@@ -199,8 +199,8 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
         render: (_: unknown, restaurant: MichelinRestaurant) => (
           <div className="min-w-[180px]">
             <div className="font-medium text-morandi-primary line-clamp-1">{restaurant.name}</div>
-            {restaurant.name_en && (
-              <div className="text-xs text-morandi-muted line-clamp-1">{restaurant.name_en}</div>
+            {restaurant.english_name && (
+              <div className="text-xs text-morandi-muted line-clamp-1">{restaurant.english_name}</div>
             )}
           </div>
         ),
@@ -357,7 +357,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
 
       {/* 編輯對話框 */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent level={1} className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>編輯米其林餐廳</DialogTitle>
           </DialogHeader>
@@ -376,9 +376,9 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
                 <div>
                   <label className="text-sm font-medium">英文名稱</label>
                   <Input
-                    value={editingRestaurant.name_en || ''}
+                    value={editingRestaurant.english_name || ''}
                     onChange={e =>
-                      setEditingRestaurant({ ...editingRestaurant, name_en: e.target.value })
+                      setEditingRestaurant({ ...editingRestaurant, english_name: e.target.value })
                     }
                   />
                 </div>

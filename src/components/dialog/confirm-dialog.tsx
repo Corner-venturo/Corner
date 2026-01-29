@@ -79,7 +79,7 @@ export function ConfirmDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="md">
+      <DialogContent level={1} size="md">
         <DialogHeader>
           <DialogTitle className={`flex items-center gap-2 ${config.titleColor}`}>
             <Icon size={20} className={config.iconColor} />

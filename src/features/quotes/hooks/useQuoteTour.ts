@@ -63,7 +63,7 @@ export const useQuoteTour = ({
       accommodation_days: accommodationDays,
       participant_counts: participantCounts,
       selling_prices: sellingPrices,
-      note: '轉為旅遊團前的版本',
+      notes: '轉為旅遊團前的版本',
       created_at: new Date().toISOString(),
     }
 

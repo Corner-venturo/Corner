@@ -158,7 +158,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       unitprice: itemData.unit_price, // 資料庫欄位名稱
       quantity: itemData.quantity,
       subtotal: itemData.unit_price * itemData.quantity,
-      note: itemData.note,
+      notes: itemData.notes,
       sort_order: itemData.sort_order,
       workspace_id: workspaceId, // RLS 需要
       created_at: now,

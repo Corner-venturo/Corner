@@ -186,7 +186,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={DIALOG_SIZES.md}>
+      <DialogContent level={1} className={DIALOG_SIZES.md}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Building2 size={20} className="text-morandi-gold" />

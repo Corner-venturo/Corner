@@ -317,7 +317,7 @@ export default function InvoiceDetailPage() {
 
       {/* 作廢對話框 */}
       <Dialog open={showVoidDialog} onOpenChange={setShowVoidDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent level={1} className="max-w-md">
           <DialogHeader>
             <DialogTitle>作廢發票</DialogTitle>
           </DialogHeader>

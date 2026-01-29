@@ -60,7 +60,7 @@ export function OrderSelectDialog({
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
-        nested
+        nested level={2}
         className="max-w-md"
         onInteractOutside={(e) => {
           const target = e.target as HTMLElement

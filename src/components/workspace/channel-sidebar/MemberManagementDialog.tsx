@@ -36,7 +36,7 @@ export function MemberManagementDialog({
         }
       }}
     >
-      <DialogContent>
+      <DialogContent level={1}>
         <DialogHeader>
           <DialogTitle>移除頻道成員</DialogTitle>
         </DialogHeader>
@@ -84,7 +84,7 @@ export function ChannelDeleteDialog({
         }
       }}
     >
-      <DialogContent>
+      <DialogContent level={1}>
         <DialogHeader>
           <DialogTitle className="text-morandi-primary">刪除頻道</DialogTitle>
         </DialogHeader>
@@ -146,7 +146,7 @@ export function GroupDeleteDialog({
         }
       }}
     >
-      <DialogContent>
+      <DialogContent level={1}>
         <DialogHeader>
           <DialogTitle className="text-morandi-primary">刪除群組</DialogTitle>
         </DialogHeader>

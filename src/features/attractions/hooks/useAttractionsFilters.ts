@@ -50,7 +50,7 @@ export function useAttractionsFilters({
       if (searchTerm) {
         const matchSearch =
           attr.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          attr.name_en?.toLowerCase().includes(searchTerm.toLowerCase())
+          attr.english_name?.toLowerCase().includes(searchTerm.toLowerCase())
         if (!matchSearch) return false
       }
 

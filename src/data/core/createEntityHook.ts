@@ -167,9 +167,10 @@ export function createEntityHook<T extends BaseEntity>(
   // ============================================
   // useList - 列表 Hook
   // ============================================
-  function useList(): ListResult<T> {
+  function useList(options?: { enabled?: boolean }): ListResult<T> {
     const { isReady, hasHydrated } = useAuth()
-    const swrKey = isReady ? cacheKeyList : null
+    const enabled = options?.enabled !== false // 預設為 true
+    const swrKey = isReady && enabled ? cacheKeyList : null
 
     const { data, error, isLoading, mutate } = useSWR<T[]>(
       swrKey,
@@ -222,9 +223,10 @@ export function createEntityHook<T extends BaseEntity>(
   // ============================================
   // useListSlim - 精簡列表 Hook
   // ============================================
-  function useListSlim(): ListResult<Partial<T>> {
+  function useListSlim(options?: { enabled?: boolean }): ListResult<Partial<T>> {
     const { isReady, hasHydrated } = useAuth()
-    const swrKey = isReady ? cacheKeySlim : null
+    const enabled = options?.enabled !== false // 預設為 true
+    const swrKey = isReady && enabled ? cacheKeySlim : null
 
     const { data, error, isLoading, mutate } = useSWR<Partial<T>[]>(
       swrKey,

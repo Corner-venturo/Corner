@@ -94,7 +94,7 @@ export const useQuoteSave = ({
             accommodation_days: accommodationDays,
             participant_counts: participantCounts,
             selling_prices: sellingPrices,
-            note: '初始版本',
+            notes: '初始版本',
             created_at: new Date().toISOString(),
           }
 
@@ -206,7 +206,7 @@ export const useQuoteSave = ({
           accommodation_days: accommodationDays,
           participant_counts: participantCounts,
           selling_prices: sellingPrices,
-          note: '', // 版本備註
+          notes: '', // 版本備註
           created_at: new Date().toISOString(),
         }
 

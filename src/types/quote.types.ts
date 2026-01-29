@@ -102,7 +102,7 @@ export interface QuoteVersion extends BaseEntity {
   total_amount: number // 總金額
   total_cost?: number // 總成本
   changes?: string // 變更說明
-  note?: string // 備註說明
+  notes?: string // 備註說明
   created_by?: string // 建立人 ID
   created_by_name?: string // 建立人姓名
   snapshot?: string // 快照資料（JSON 格式）

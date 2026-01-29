@@ -103,7 +103,7 @@ export function ImportActivitiesDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="max-w-md">
+      <DialogContent level={1} className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <MapPin className="w-5 h-5 text-[var(--morandi-gold)]" />

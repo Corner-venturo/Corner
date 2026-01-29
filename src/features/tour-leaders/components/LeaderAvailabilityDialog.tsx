@@ -161,7 +161,7 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className={cn(DIALOG_SIZES.lg, 'max-h-[85vh] overflow-hidden flex flex-col')}>
+      <DialogContent level={1} className={cn(DIALOG_SIZES.lg, 'max-h-[85vh] overflow-hidden flex flex-col')}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-morandi-gold" />

@@ -18,6 +18,13 @@ export const DISBURSEMENT_STATUS_COLORS = {
   paid: 'bg-morandi-primary',
 } as const
 
+// 出納單狀態設定（合併 label + color）
+export const DISBURSEMENT_STATUS = {
+  pending: { label: '待出帳', color: 'bg-morandi-gold' },
+  confirmed: { label: '已確認', color: 'bg-status-info' },
+  paid: { label: '已出帳', color: 'bg-morandi-green' },
+} as const
+
 // 請款單狀態標籤（Payment Request）
 export const PAYMENT_REQUEST_STATUS_LABELS = {
   pending: '待處理',

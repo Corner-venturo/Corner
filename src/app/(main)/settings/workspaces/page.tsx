@@ -200,7 +200,7 @@ export default function WorkspacesPage() {
 
       {/* 新增對話框 */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent level={1} className="max-w-md">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-morandi-primary">新增工作空間</DialogTitle>
           </DialogHeader>

@@ -9,6 +9,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react'
+import { logger } from '@/lib/utils/logger'
 import { Icon } from '@iconify/react'
 import { Search, X, Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -148,7 +149,7 @@ export function ColorfulIconPicker({ onSelectIcon }: ColorfulIconPickerProps) {
         setDisplayIcons([])
       }
     } catch (error) {
-      console.error('Failed to search icons:', error)
+      logger.error('Failed to search icons:', error)
       setDisplayIcons([])
     } finally {
       setIsLoading(false)
@@ -185,7 +186,7 @@ export function ColorfulIconPicker({ onSelectIcon }: ColorfulIconPickerProps) {
       const uniqueResults = [...new Set(allResults)]
       setDisplayIcons(uniqueResults.slice(0, 60))
     } catch (error) {
-      console.error('Failed to search by category:', error)
+      logger.error('Failed to search by category:', error)
     } finally {
       setIsLoading(false)
     }

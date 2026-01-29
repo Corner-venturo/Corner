@@ -21,6 +21,7 @@ import { Combobox } from '@/components/ui/combobox'
 import { usePaymentData } from '@/app/(main)/finance/payments/hooks/usePaymentData'
 import type { ReceiptItem } from '@/stores'
 import { alert } from '@/lib/ui/alert-dialog'
+import { ReceiptType, RECEIPT_TYPE_OPTIONS } from '@/types/receipt.types'
 
 interface QuickReceiptProps {
   onSubmit?: () => void
@@ -30,22 +31,8 @@ interface QuickReceiptProps {
   defaultOrderId?: string
 }
 
-const RECEIPT_TYPES = {
-  BANK_TRANSFER: 0,
-  CASH: 1,
-  CREDIT_CARD: 2,
-  CHECK: 3,
-  LINK_PAY: 4,
-} as const
-
-// 收款方式選項
-const paymentMethods = [
-  { value: RECEIPT_TYPES.CASH, label: '現金' },
-  { value: RECEIPT_TYPES.BANK_TRANSFER, label: '匯款' },
-  { value: RECEIPT_TYPES.CREDIT_CARD, label: '刷卡' },
-  { value: RECEIPT_TYPES.CHECK, label: '支票' },
-  { value: RECEIPT_TYPES.LINK_PAY, label: 'LinkPay' },
-]
+// 收款方式選項（使用統一定義）
+const paymentMethods = RECEIPT_TYPE_OPTIONS
 
 export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickReceiptProps) {
   const { items: orders } = useOrders()
@@ -67,7 +54,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
   // 使用 ReceiptItem 格式
   const [paymentItem, setPaymentItem] = useState<Partial<ReceiptItem>>({
     id: '1',
-    receipt_type: RECEIPT_TYPES.CASH,
+    receipt_type: ReceiptType.CASH,
     amount: 0,
     transaction_date: getTodayString(),
   })
@@ -94,7 +81,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
     setSelectedOrderId('')
     setPaymentItem({
       id: '1',
-      receipt_type: RECEIPT_TYPES.CASH,
+      receipt_type: ReceiptType.CASH,
       amount: 0,
       transaction_date: getTodayString(),
     })
@@ -242,15 +229,15 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
           <Label className="text-sm font-medium text-morandi-primary">備註</Label>
           <Input
             placeholder="選填"
-            value={paymentItem.note || ''}
-            onChange={e => updatePaymentItem({ note: e.target.value })}
+            value={paymentItem.notes || ''}
+            onChange={e => updatePaymentItem({ notes: e.target.value })}
             className="mt-1 border-morandi-container/30"
           />
         </div>
       </div>
 
       {/* 第二排：根據收款方式顯示專屬欄位 */}
-      {paymentItem.receipt_type === RECEIPT_TYPES.CASH && (
+      {paymentItem.receipt_type === ReceiptType.CASH && (
         <div className="pt-3 border-t">
           <Label className="text-sm font-medium text-morandi-primary">經手人</Label>
           <Input
@@ -262,7 +249,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
         </div>
       )}
 
-      {paymentItem.receipt_type === RECEIPT_TYPES.BANK_TRANSFER && (
+      {paymentItem.receipt_type === ReceiptType.BANK_TRANSFER && (
         <div className="grid grid-cols-2 gap-3 pt-3 border-t">
           <div>
             <Label className="text-sm font-medium text-morandi-primary">匯入帳戶 *</Label>
@@ -292,7 +279,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
         </div>
       )}
 
-      {paymentItem.receipt_type === RECEIPT_TYPES.CREDIT_CARD && (
+      {paymentItem.receipt_type === ReceiptType.CREDIT_CARD && (
         <div className="grid grid-cols-3 gap-3 pt-3 border-t">
           <div>
             <Label className="text-sm font-medium text-morandi-primary">卡號後四碼</Label>
@@ -328,7 +315,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
         </div>
       )}
 
-      {paymentItem.receipt_type === RECEIPT_TYPES.CHECK && (
+      {paymentItem.receipt_type === ReceiptType.CHECK && (
         <div className="grid grid-cols-2 gap-3 pt-3 border-t">
           <div>
             <Label className="text-sm font-medium text-morandi-primary">支票號碼</Label>
@@ -351,7 +338,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
         </div>
       )}
 
-      {paymentItem.receipt_type === RECEIPT_TYPES.LINK_PAY && (
+      {paymentItem.receipt_type === ReceiptType.LINK_PAY && (
         <div className="space-y-3 pt-3 border-t">
           <div>
             <Label className="text-sm font-medium text-morandi-primary">Email *</Label>

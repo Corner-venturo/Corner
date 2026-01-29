@@ -64,7 +64,7 @@ export function VoucherDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent level={1} className="max-w-3xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             傳票明細 - {voucher.voucher_no}

@@ -75,7 +75,7 @@ export function EditEventDialog({
 
   return (
     <Dialog open={dialog.open} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="max-w-md">
+      <DialogContent level={1} className="max-w-md">
         <DialogHeader>
           <DialogTitle>編輯行事曆事項</DialogTitle>
         </DialogHeader>

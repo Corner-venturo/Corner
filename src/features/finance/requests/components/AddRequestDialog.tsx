@@ -386,7 +386,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
               request_date: batchDate,
               amount: 0,
               status: 'pending',
-              note: batchNote,
+              notes: batchNote,
               request_type: '供應商支出',
               request_category: 'tour',
               batch_id: batchId, // 批次 ID：同批請款單共用此 ID
@@ -400,7 +400,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
               description: batchDescription || batchCategory,
               unit_price: allocation.allocated_amount,
               quantity: 1,
-              note: '',
+              notes: '',
               sort_order: 1,
             })
             successCount++
@@ -536,7 +536,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
               <div>
                 <label className="text-sm font-medium text-morandi-primary">備註</label>
                 <Input
-                  value={formData.note}
+                  value={formData.notes}
                   onChange={e => setFormData(prev => ({ ...prev, note: e.target.value }))}
                   placeholder="輸入備註（可選）"
                   className="mt-1"
@@ -786,7 +786,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                 <div>
                   <label className="text-sm font-medium text-morandi-primary">備註</label>
                   <Input
-                    value={formData.note}
+                    value={formData.notes}
                     onChange={e => setFormData(prev => ({ ...prev, note: e.target.value }))}
                     placeholder="輸入備註（可選）"
                     className="mt-1"

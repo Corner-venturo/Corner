@@ -219,7 +219,7 @@ export async function generateReceiptPDF(data: ReceiptPDFData): Promise<void> {
   }
 
   // ========== 備註 ==========
-  if (receipt.note) {
+  if (receipt.notes) {
     doc.setFontSize(11)
     doc.setFont('ChironHeiHK', 'bold')
     doc.text('Note / 備註', infoLeft, yPos)
@@ -227,7 +227,7 @@ export async function generateReceiptPDF(data: ReceiptPDFData): Promise<void> {
 
     doc.setFontSize(9)
     doc.setFont('ChironHeiHK', 'normal')
-    const noteLines = doc.splitTextToSize(receipt.note, 170)
+    const noteLines = doc.splitTextToSize(receipt.notes || '', 170)
     doc.text(noteLines, infoLeft, yPos)
     yPos += noteLines.length * 5
   }

@@ -315,7 +315,7 @@ export function ManagedDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className={`${maxWidthClasses[maxWidth]} ${contentClassName}`}>
+        <DialogContent level={1} className={`${maxWidthClasses[maxWidth]} ${contentClassName}`}>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               {title}
@@ -370,7 +370,7 @@ export function ManagedDialog({
 
       {/* 確認關閉對話框（嵌套 Dialog，使用透明遮罩避免背景過黑） */}
       <Dialog open={showConfirmClose} onOpenChange={setShowConfirmClose}>
-        <DialogContent nested className="max-w-md">
+        <DialogContent nested level={2} className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-status-warning">
               <AlertTriangle size={20} />

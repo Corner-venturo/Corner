@@ -20,7 +20,7 @@ export interface CustomerGroup {
   workspace_id: string
   name: string
   type: CustomerGroupType
-  note: string | null
+  notes: string | null
   created_by: string | null
   created_at: string
   updated_at: string
@@ -57,7 +57,7 @@ export interface CustomerGroupMember {
 export interface CreateCustomerGroupData {
   name: string
   type: CustomerGroupType
-  note?: string
+  notes?: string
   created_by?: string
 }
 
@@ -67,7 +67,7 @@ export interface CreateCustomerGroupData {
 export interface UpdateCustomerGroupData {
   name?: string
   type?: CustomerGroupType
-  note?: string
+  notes?: string
 }
 
 /**

@@ -1,12 +1,9 @@
 'use client'
 
-import { useCallback, useEffect, useState, useRef } from 'react'
+import { useCallback, useState, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { Tour } from '@/stores/types'
 import { useTourPageState } from './useTourPageState'
 import { useEmployees } from '@/hooks/cloud-hooks'
-import { useQuotesListSlim } from '@/hooks/useListSlim'
-import { useTourDestinations } from './useTourDestinations'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import type { Proposal, ProposalPackage } from '@/types/proposal.types'
@@ -20,9 +17,7 @@ const isTaiwanCountry = (country: string | undefined | null): boolean => {
 
 interface UseToursFormReturn {
   handleOpenCreateDialog: (fromQuoteId?: string) => Promise<void>
-  handleOpenEditDialog: (tour: Tour) => Promise<void>
   resetForm: () => void
-  handleEditDialogEffect: () => void
   handleNavigationEffect: () => void
   /** 從提案轉開團的資料 */
   proposalConvertData: { proposal: Proposal; package: ProposalPackage } | null
@@ -32,17 +27,12 @@ interface UseToursFormReturn {
 interface UseToursFormParams {
   state: ReturnType<typeof useTourPageState>
   openDialog: (type: string, data?: unknown, meta?: unknown) => void
-  dialog: { type: string | null; data: unknown }
 }
 
-export function useToursForm({ state, openDialog, dialog }: UseToursFormParams): UseToursFormReturn {
+export function useToursForm({ state, openDialog }: UseToursFormParams): UseToursFormReturn {
   const searchParams = useSearchParams()
   const router = useRouter()
   const { items: employees, fetchAll: fetchEmployees } = useEmployees()
-  const { items: quotes } = useQuotesListSlim()
-  // 只在 Dialog 開啟時才載入目的地資料
-  const isDialogOpen = dialog.type === 'create' || dialog.type === 'edit'
-  const { destinations, loading: destinationsLoading } = useTourDestinations({ enabled: isDialogOpen })
 
   // 從提案轉開團的資料
   const [proposalConvertData, setProposalConvertData] = useState<{ proposal: Proposal; package: ProposalPackage } | null>(null)
@@ -115,74 +105,6 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
     // 重置導航處理標記（允許下次轉開團重新填入）
     navigationProcessedRef.current = false
   }, [setNewTour, setAvailableCities, setNewOrder, setFormError])
-
-  // 打開編輯對話框
-  const handleOpenEditDialog = useCallback(
-    async (tour: Tour) => {
-      if (employees.length === 0) {
-        await fetchEmployees()
-      }
-      // 打開對話框，handleEditDialogEffect 會處理資料填入
-      openDialog('edit', tour)
-    },
-    [employees.length, fetchEmployees, openDialog]
-  )
-
-  // Handle edit mode: load tour data when dialog opens in edit mode
-  const handleEditDialogEffect = useCallback(() => {
-    if (dialog.type !== 'edit' || !dialog.data || destinationsLoading) return
-
-    const tour = dialog.data as Tour
-
-    let countryCode = ''
-    let cityCode = ''
-
-    // 用 location（城市名稱）在 tour_destinations 中查找
-    if (tour.location) {
-      const matchedDest = destinations.find(d => d.city === tour.location)
-      if (matchedDest) {
-        countryCode = matchedDest.country
-        cityCode = matchedDest.airport_code
-      }
-    }
-
-    // 如果找不到，嘗試從團號提取城市代碼
-    if (!countryCode && tour.code) {
-      const codePrefix = tour.code.substring(0, 3)
-      const matchedDest = destinations.find(d => d.airport_code === codePrefix)
-      if (matchedDest) {
-        countryCode = matchedDest.country
-        cityCode = matchedDest.airport_code
-      }
-    }
-
-    // Extract flight info
-    const outboundFlight = tour.outbound_flight as { airline?: string; flightNumber?: string; departureTime?: string; arrivalTime?: string } | null
-    const returnFlight = tour.return_flight as { airline?: string; flightNumber?: string; departureTime?: string; arrivalTime?: string } | null
-
-    setNewTour({
-      name: tour.name,
-      countryCode,
-      cityCode,
-      cityName: tour.location || '',
-      departure_date: tour.departure_date || '',
-      return_date: tour.return_date || '',
-      price: tour.price ?? 0,
-      status: (tour.status || '提案'),
-      isSpecial: tour.status === '特殊團',
-      max_participants: tour.max_participants || 20,
-      description: tour.description || '',
-      outbound_flight_number: outboundFlight?.flightNumber || '',
-      outbound_flight_text: outboundFlight
-        ? `${outboundFlight.airline || ''} ${outboundFlight.flightNumber || ''} ${outboundFlight.departureTime || ''}-${outboundFlight.arrivalTime || ''}`.trim()
-        : '',
-      return_flight_number: returnFlight?.flightNumber || '',
-      return_flight_text: returnFlight
-        ? `${returnFlight.airline || ''} ${returnFlight.flightNumber || ''} ${returnFlight.departureTime || ''}-${returnFlight.arrivalTime || ''}`.trim()
-        : '',
-      enable_checkin: tour.enable_checkin || false,
-    })
-  }, [dialog.type, dialog.data, destinations, destinationsLoading, setNewTour])
 
   // 處理從提案轉開團的 URL 參數
   const handleNavigationEffect = useCallback(async () => {
@@ -273,9 +195,7 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
 
   return {
     handleOpenCreateDialog,
-    handleOpenEditDialog,
     resetForm,
-    handleEditDialogEffect,
     handleNavigationEffect,
     proposalConvertData,
     clearProposalConvertData,

@@ -21,7 +21,7 @@ export async function exportReceiptsToExcel(receipts: Receipt[], filename?: stri
     '狀態': RECEIPT_STATUS_LABELS[parseInt(r.status, 10) as ReceiptStatus] || r.status,
     '經手人': r.handler_name || '-',
     '帳戶資訊': r.account_info || '-',
-    '備註': r.note || '-',
+    '備註': r.notes || '-',
     '建立時間': formatDate(r.created_at),
   }))
 

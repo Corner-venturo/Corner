@@ -164,7 +164,7 @@ export function AddVisaDialog({
         documents_returned_date: applicant.documents_returned_date || undefined,
         pickup_date: applicant.pickup_date || undefined,
         vendor: applicant.vendor || undefined,
-        note: applicant.note || undefined,
+        notes: applicant.notes || undefined,
         status: (applicant.status as Visa['status']) || 'pending',
         contact_person: contact_info.contact_person,
         contact_phone: contact_info.contact_phone,
@@ -503,8 +503,8 @@ export function AddVisaDialog({
           <div>
             <label className="text-sm font-medium text-morandi-primary">備註</label>
             <textarea
-              value={applicants[0].note || ''}
-              onChange={e => updateApplicant(applicants[0].id, 'note', e.target.value)}
+              value={applicants[0].notes || ''}
+              onChange={e => updateApplicant(applicants[0].id, 'notes', e.target.value)}
               className="w-full mt-1 p-2 border border-border rounded-md bg-card text-sm min-h-[80px]"
               placeholder="輸入備註..."
             />

@@ -24,7 +24,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { usePaymentForm } from '../hooks/usePaymentForm'
 import { PaymentItemRow } from './PaymentItemRow'
-import { RECEIPT_TYPES } from '../types'
+import { RECEIPT_TYPES, type ReceiptType } from '../types'
 import { Input } from '@/components/ui/input'
 import type { Receipt } from '@/stores'
 
@@ -100,32 +100,63 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
         invalidateOrders(),
       ])
 
-      // 編輯模式：載入收款單資料
+      // 編輯模式：載入收款單資料和項目
       if (editingReceipt) {
         setFormData({
           tour_id: editingReceipt.tour_id || '',
           order_id: editingReceipt.order_id || '',
           receipt_date: editingReceipt.receipt_date || getTodayString(),
         })
-        // 載入收款項目
-        setPaymentItems([{
-          id: editingReceipt.id,
-          receipt_type: editingReceipt.receipt_type ?? 0,
-          transaction_date: editingReceipt.receipt_date || getTodayString(),
-          receipt_account: editingReceipt.receipt_account || '',
-          note: editingReceipt.note || '',
-          amount: editingReceipt.receipt_amount || 0,
-          email: editingReceipt.email || '',
-          payment_name: editingReceipt.payment_name || '',
-          pay_dateline: editingReceipt.pay_dateline || '',
-          handler_name: editingReceipt.handler_name || '',
-          account_info: editingReceipt.account_info || '',
-          fees: editingReceipt.fees || 0,
-          card_last_four: editingReceipt.card_last_four || '',
-          auth_code: editingReceipt.auth_code || '',
-          check_number: editingReceipt.check_number || '',
-          check_bank: editingReceipt.check_bank || '',
-        }])
+        
+        // 從 receipt_items 載入項目
+        const { data: receiptItems } = await supabase
+          .from('receipt_items')
+          .select('*')
+          .eq('receipt_id', editingReceipt.id)
+          .is('deleted_at', null)
+          .order('created_at', { ascending: true })
+
+        if (receiptItems && receiptItems.length > 0) {
+          // 有 receipt_items，用新的結構
+          setPaymentItems(receiptItems.map(item => ({
+            id: item.id,
+            receipt_type: (item.receipt_type ?? 0) as ReceiptType,
+            transaction_date: item.created_at?.split('T')[0] || getTodayString(),
+            receipt_account: item.receipt_account || '',
+            notes: item.notes || '',
+            amount: Number(item.amount) || 0,
+            email: item.email || '',
+            payment_name: item.payment_name || '',
+            pay_dateline: item.pay_dateline || '',
+            handler_name: item.handler_name || '',
+            account_info: item.account_info || '',
+            fees: item.fees || 0,
+            card_last_four: item.card_last_four || '',
+            auth_code: item.auth_code || '',
+            check_number: item.check_number || '',
+            check_bank: item.check_bank || '',
+          })))
+        } else {
+          // 舊資料：從 receipt 主表載入（向下相容）
+          setPaymentItems([{
+            id: editingReceipt.id,
+            receipt_type: editingReceipt.receipt_type ?? 0,
+            transaction_date: editingReceipt.receipt_date || getTodayString(),
+            receipt_account: editingReceipt.receipt_account || '',
+            notes: editingReceipt.notes || '',
+            amount: editingReceipt.receipt_amount || 0,
+            email: editingReceipt.email || '',
+            payment_name: editingReceipt.payment_name || '',
+            pay_dateline: editingReceipt.pay_dateline || '',
+            handler_name: editingReceipt.handler_name || '',
+            account_info: editingReceipt.account_info || '',
+            fees: editingReceipt.fees || 0,
+            card_last_four: editingReceipt.card_last_four || '',
+            auth_code: editingReceipt.auth_code || '',
+            check_number: editingReceipt.check_number || '',
+            check_bank: editingReceipt.check_bank || '',
+          }])
+        }
         return
       }
 
@@ -184,11 +215,41 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
     setIsSubmitting(true)
 
     try {
-      // 編輯模式：呼叫 onUpdate
+      // 編輯模式：更新收款單主表 + 管理收款項目
       if (isEditMode && editingReceipt && onUpdate) {
-        const item = paymentItems[0] // 編輯模式只有一個項目
+        const { createReceiptItem, updateReceiptItem, deleteReceiptItem } = await import('@/data')
+        const { supabase } = await import('@/lib/supabase/client')
+        const { useAuthStore } = await import('@/stores')
 
-        // 收款方式轉換為 payment_method 字串
+        const authStore = useAuthStore.getState()
+        const user = authStore.user
+
+        if (!user?.workspace_id) {
+          throw new Error('無法取得 workspace ID')
+        }
+
+        // 計算總金額
+        const totalAmount = paymentItems.reduce((sum, item) => sum + (item.amount || 0), 0)
+
+        // 1. 更新收款單主表
+        await onUpdate(editingReceipt.id, {
+          tour_id: formData.tour_id || null,
+          order_id: formData.order_id,
+          receipt_amount: totalAmount,
+          amount: totalAmount,
+          total_amount: totalAmount,
+        })
+
+        // 2. 取得現有的 receipt_items
+        const { data: existingItems } = await supabase
+          .from('receipt_items')
+          .select('id')
+          .eq('receipt_id', editingReceipt.id)
+          .is('deleted_at', null)
+
+        const existingItemIds = new Set(existingItems?.map(i => i.id) || [])
+
+        // 收款方式轉換
         const paymentMethodMap: Record<number, string> = {
           0: 'transfer',
           1: 'cash',
@@ -196,34 +257,61 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
           3: 'check',
           4: 'linkpay',
         }
-        const paymentMethod = paymentMethodMap[item.receipt_type] || 'transfer'
 
-        await onUpdate(editingReceipt.id, {
-          tour_id: formData.tour_id || null,
-          order_id: formData.order_id,
-          payment_date: item.transaction_date,
-          payment_method: paymentMethod,
-          receipt_date: item.transaction_date,
-          receipt_type: item.receipt_type,
-          receipt_amount: item.amount,
-          amount: item.amount,
-          receipt_account: item.receipt_account || null,
-          email: item.email || null,
-          payment_name: item.payment_name || null,
-          pay_dateline: item.pay_dateline || null,
-          handler_name: item.handler_name || null,
-          account_info: item.account_info || null,
-          fees: item.fees || null,
-          card_last_four: item.card_last_four || null,
-          auth_code: item.auth_code || null,
-          check_number: item.check_number || null,
-          check_bank: item.check_bank || null,
-          note: item.note || null,
-        })
+        // 3. 處理每個項目
+        for (const item of paymentItems) {
+          const paymentMethod = paymentMethodMap[item.receipt_type] || 'transfer'
+          const itemData = {
+            tour_id: formData.tour_id || null,
+            order_id: formData.order_id,
+            customer_id: selectedOrder?.customer_id || null,
+            amount: item.amount,
+            payment_method: paymentMethod,
+            receipt_type: item.receipt_type,
+            receipt_account: item.receipt_account || null,
+            handler_name: item.handler_name || null,
+            account_info: item.account_info || null,
+            fees: item.fees || null,
+            card_last_four: item.card_last_four || null,
+            auth_code: item.auth_code || null,
+            check_number: item.check_number || null,
+            check_bank: item.check_bank || null,
+            email: item.email || null,
+            payment_name: item.payment_name || null,
+            pay_dateline: item.pay_dateline || null,
+            notes: item.notes || null,
+            updated_by: user.id,
+          }
+
+          if (item.id && existingItemIds.has(item.id)) {
+            // 更新現有項目
+            await updateReceiptItem(item.id, itemData)
+            existingItemIds.delete(item.id)
+          } else {
+            // 新增項目
+            await createReceiptItem({
+              receipt_id: editingReceipt.id,
+              workspace_id: user.workspace_id,
+              ...itemData,
+              actual_amount: 0,
+              status: '0',
+              created_by: user.id,
+              deleted_at: null,
+              link: null,
+              linkpay_order_number: null,
+              check_date: null,
+            })
+          }
+        }
+
+        // 4. 刪除被移除的項目
+        for (const itemId of existingItemIds) {
+          await deleteReceiptItem(itemId)
+        }
 
         toast({
           title: '收款單更新成功',
-          description: `已更新收款單 ${editingReceipt.receipt_number}`,
+          description: `已更新收款單 ${editingReceipt.receipt_number}（${paymentItems.length} 個項目）`,
         })
         resetForm()
         onOpenChange(false)
@@ -231,9 +319,10 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
         return
       }
 
-      // 新增模式：原有邏輯
+      // 新增模式：建立一張收款單 + 多個收款項目
       const { useAuthStore } = await import('@/stores')
       const { createReceipt, updateReceipt } = await import('@/data')
+      const { createReceiptItem } = await import('@/data')
       const { generateReceiptNumber } = await import('@/lib/utils/receipt-number-generator')
       const { supabase } = await import('@/lib/supabase/client')
 
@@ -252,64 +341,89 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
         throw new Error('無法取得團號，請確認訂單已關聯旅遊團')
       }
 
-      // 為每個收款項目建立收款單
-      const newLinkPayResults: LinkPayResult[] = []
-
       // 查詢已存在的收款單編號（用於生成編號）
       const { data: existingReceipts } = await supabase
         .from('receipts')
         .select('receipt_number')
         .like('receipt_number', `${tourCode}-R%`)
 
-      // 追蹤本次新建的收款單編號
-      const createdReceiptNumbers: string[] = []
+      // 生成收款單號
+      const receiptNumber = generateReceiptNumber(
+        tourCode,
+        existingReceipts?.filter(r => r.receipt_number?.startsWith(`${tourCode}-R`)) || []
+      )
+
+      // 計算總金額
+      const totalAmount = paymentItems.reduce((sum, item) => sum + (item.amount || 0), 0)
+
+      // 1. 建立收款單主表（基本資訊）
+      const createdReceipt = await createReceipt({
+        receipt_number: receiptNumber,
+        workspace_id: user.workspace_id,
+        order_id: formData.order_id,
+        tour_id: tourId || null,
+        customer_id: selectedOrder?.customer_id || null,
+        order_number: selectedOrder?.order_number || '',
+        tour_name: selectedOrder?.tour_name || tour?.name || '',
+        // 主表用第一個項目的日期
+        payment_date: paymentItems[0]?.transaction_date || new Date().toISOString().split('T')[0],
+        payment_method: 'transfer', // 主表預設
+        receipt_date: paymentItems[0]?.transaction_date || new Date().toISOString().split('T')[0],
+        receipt_type: 0,
+        receipt_amount: totalAmount,
+        amount: totalAmount,
+        total_amount: totalAmount,
+        actual_amount: 0,
+        status: '0',
+        // 主表不存項目詳細資料，這些移到 receipt_items
+        receipt_account: null,
+        email: null,
+        payment_name: null,
+        pay_dateline: null,
+        handler_name: null,
+        account_info: null,
+        fees: null,
+        card_last_four: null,
+        auth_code: null,
+        check_number: null,
+        check_bank: null,
+        notes: null,
+        check_date: null,
+        created_by: user.id,
+        updated_by: user.id,
+        deleted_at: null,
+        link: null,
+        linkpay_order_number: null,
+      })
+
+      if (!createdReceipt?.id) {
+        throw new Error('建立收款單失敗')
+      }
+
+      // 2. 為每個項目建立 receipt_item
+      const newLinkPayResults: LinkPayResult[] = []
+      const paymentMethodMap: Record<number, string> = {
+        0: 'transfer',
+        1: 'cash',
+        2: 'card',
+        3: 'check',
+        4: 'linkpay',
+      }
 
       for (const item of paymentItems) {
-        // 生成收款單號（新格式：{團號}-R{2位數}）
-        // 合併已存在的和本次新建的收款單
-        const allExistingReceipts = [
-          ...(existingReceipts || []),
-          ...createdReceiptNumbers.map(rn => ({ receipt_number: rn }))
-        ]
-        const receiptNumber = generateReceiptNumber(
-          tourCode,
-          allExistingReceipts.filter(r => r.receipt_number?.startsWith(`${tourCode}-R`))
-        )
-        createdReceiptNumbers.push(receiptNumber)
-
-        // 建立收款單
-        // 收款方式轉換為 payment_method 字串（符合資料庫 CHECK 約束）
-        const paymentMethodMap: Record<number, string> = {
-          0: 'transfer',  // 匯款
-          1: 'cash',      // 現金
-          2: 'card',      // 刷卡（資料庫用 'card' 不是 'credit_card'）
-          3: 'check',     // 支票
-          4: 'linkpay',   // LinkPay
-        }
         const paymentMethod = paymentMethodMap[item.receipt_type] || 'transfer'
 
-        // 建立收款單
-        const createdReceipt = await createReceipt({
-          receipt_number: receiptNumber,
+        const createdItem = await createReceiptItem({
+          receipt_id: createdReceipt.id,
           workspace_id: user.workspace_id,
-          order_id: formData.order_id,
           tour_id: tourId || null,
-          customer_id: selectedOrder?.customer_id || null,  // 付款人不一定是訂單客戶
-          order_number: selectedOrder?.order_number || '',
-          tour_name: selectedOrder?.tour_name || tour?.name || '',
-          // 資料庫必填欄位
-          payment_date: item.transaction_date,  // 資料庫期望 payment_date
-          payment_method: paymentMethod,        // 資料庫期望 payment_method (string)
-          receipt_date: item.transaction_date,
-          receipt_type: item.receipt_type,
-          receipt_amount: item.amount,
+          order_id: formData.order_id,
+          customer_id: selectedOrder?.customer_id || null,
           amount: item.amount,
           actual_amount: 0,
-          status: '0',  // 資料庫存的是字串: '0'=待確認, '1'=已確認
+          payment_method: paymentMethod,
+          receipt_type: item.receipt_type,
           receipt_account: item.receipt_account || null,
-          email: item.email || null,
-          payment_name: item.payment_name || null,
-          pay_dateline: item.pay_dateline || null,
           handler_name: item.handler_name || null,
           account_info: item.account_info || null,
           fees: item.fees || null,
@@ -317,17 +431,21 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
           auth_code: item.auth_code || null,
           check_number: item.check_number || null,
           check_bank: item.check_bank || null,
-          note: item.note || null,
           check_date: null,
+          email: item.email || null,
+          payment_name: item.payment_name || null,
+          pay_dateline: item.pay_dateline || null,
+          link: null,
+          linkpay_order_number: null,
+          notes: item.notes || null,
+          status: '0',
           created_by: user.id,
           updated_by: user.id,
           deleted_at: null,
-          link: null,
-          linkpay_order_number: null,
         })
 
         // 如果是 LinkPay，呼叫 API 產生付款連結
-        if (item.receipt_type === RECEIPT_TYPES.LINK_PAY) {
+        if (item.receipt_type === RECEIPT_TYPES.LINK_PAY && createdItem?.id) {
           try {
             const response = await fetch('/api/linkpay', {
               method: 'POST',
@@ -348,14 +466,12 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
                 receiptNumber,
                 link: data.data.payment_link
               })
-              // 更新收款單的 link 欄位
-              if (createdReceipt?.id) {
-                await updateReceipt(createdReceipt.id, { link: data.data.payment_link })
-              }
+              // 更新 receipt_item 的 link 欄位
+              const { updateReceiptItem } = await import('@/data')
+              await updateReceiptItem(createdItem.id, { link: data.data.payment_link })
             }
           } catch (linkPayError) {
             logger.error('LinkPay API 錯誤:', linkPayError)
-            // 不阻止流程，繼續處理其他收款項目
           }
         }
       }
@@ -657,10 +773,13 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
         <div className="flex-1 flex flex-col overflow-hidden pt-4 border-t border-morandi-container/30">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-medium text-morandi-primary">收款項目</h3>
-            <Button onClick={addPaymentItem} size="sm" variant="ghost" className="text-morandi-gold hover:bg-morandi-gold/10">
-              <Plus size={14} className="mr-2" />
-              新增項目
-            </Button>
+            {/* 未確認的收款單都可以新增/刪除項目 */}
+            {!isConfirmed && (
+              <Button onClick={addPaymentItem} size="sm" variant="ghost" className="text-morandi-gold hover:bg-morandi-gold/10">
+                <Plus size={14} className="mr-2" />
+                新增項目
+              </Button>
+            )}
           </div>
 
           <div className="flex-1 overflow-auto">

@@ -91,7 +91,7 @@ interface QuoteItem {
   serviceDate: string | null
   quantity: number
   key: string
-  note?: string
+  notes?: string
   resourceType?: string | null
   resourceId?: string | null
   latitude?: number | null
@@ -220,7 +220,7 @@ export function RequirementsList({
         // 載入現有需求單
         const { data: requests } = await supabase
           .from('tour_requests')
-          .select('id, code, category, supplier_name, title, service_date, quantity, note, status, quoted_cost, hidden, resource_id, resource_type')
+          .select('id, code, category, supplier_name, title, service_date, quantity, notes, status, quoted_cost, hidden, resource_id, resource_type')
           .eq('tour_id', tourId)
           .order('created_at', { ascending: true })
         setExistingRequests((requests as TourRequest[]) || [])
@@ -252,7 +252,7 @@ export function RequirementsList({
         // 載入現有需求單
         const { data: requests } = await supabase
           .from('tour_requests')
-          .select('id, code, category, supplier_name, title, service_date, quantity, note, status, quoted_cost, hidden, resource_id, resource_type')
+          .select('id, code, category, supplier_name, title, service_date, quantity, notes, status, quoted_cost, hidden, resource_id, resource_type')
           .eq('proposal_package_id', proposalPackageId)
           .order('created_at', { ascending: true })
         setExistingRequests((requests as TourRequest[]) || [])
@@ -337,7 +337,7 @@ export function RequirementsList({
               serviceDate: startDate,
               quantity: 1,
               key: 'transport-機票',
-              note: flightInfos.join('\n'),
+              notes: flightInfos.join('\n'),
             })
           }
         }
@@ -478,7 +478,7 @@ export function RequirementsList({
       title: string
       serviceDate: string | null
       quantity: number
-      note?: string
+      notes?: string
       resourceId?: string | null
       resourceType?: string | null
     }
@@ -512,7 +512,7 @@ export function RequirementsList({
           title: itemData.title,
           service_date: itemData.serviceDate || null,
           quantity: itemData.quantity,
-          note: itemData.note || null,
+          notes: itemData.notes || null,
           status: 'draft',
           hidden: true,
           resource_id: itemData.resourceId || null,
@@ -524,7 +524,7 @@ export function RequirementsList({
         const { data: newRequest, error } = await supabase
           .from('tour_requests')
           .insert(insertData)
-          .select('id, code, category, supplier_name, title, service_date, quantity, note, status, quoted_cost, hidden, resource_id, resource_type')
+          .select('id, code, category, supplier_name, title, service_date, quantity, notes, status, quoted_cost, hidden, resource_id, resource_type')
           .single()
 
         if (error) throw error
@@ -583,7 +583,7 @@ export function RequirementsList({
         service_date: item.serviceDate,
         title: item.title,
         quantity: item.quantity,
-        note: item.note,
+        notes: item.notes,
       }))
 
       const snapshotData: ConfirmedRequirementsSnapshot = {
@@ -699,7 +699,7 @@ export function RequirementsList({
           serviceDate: 'serviceDate' in itemData ? itemData.serviceDate : itemData.service_date,
           title: itemData.title,
           quantity: 'quantity' in itemData ? itemData.quantity : 1,
-          note: itemData.note,
+          notes: itemData.notes,
         }
       })
 
@@ -823,7 +823,7 @@ export function RequirementsList({
         <tr>
           <td class="cancelled">${formatDateStr(item.service_date)}</td>
           <td class="cancelled">${CATEGORIES.find(c => c.key === item.category)?.label || item.category}</td>
-          <td class="cancelled">${item.title}${item.note ? `<br><small>${item.note}</small>` : ''}</td>
+          <td class="cancelled">${item.title}${item.notes ? `<br><small>${item.notes}</small>` : ''}</td>
           <td class="cancelled">${item.quantity}</td>
         </tr>
       `).join('')}
@@ -996,7 +996,7 @@ export function RequirementsList({
                     const supplierName = 'supplierName' in itemData ? itemData.supplierName : itemData.supplier_name
                     const serviceDate = 'serviceDate' in itemData ? itemData.serviceDate : itemData.service_date
                     const title = itemData.title
-                    const note = itemData.note
+                    const notes = itemData.notes
                     const quantity = 'quantity' in itemData ? itemData.quantity : 1
                     const resourceId = 'resourceId' in itemData ? itemData.resourceId : undefined
 
@@ -1048,9 +1048,9 @@ export function RequirementsList({
                         <td className="px-3 py-2.5">
                           <div className={cn(isCancelled && 'line-through text-morandi-muted')}>
                             <span>{title}</span>
-                            {note && (
+                            {notes && (
                               <div className="text-xs mt-0.5 text-morandi-secondary whitespace-pre-line">
-                                {note}
+                                {notes}
                               </div>
                             )}
                           </div>
@@ -1081,7 +1081,7 @@ export function RequirementsList({
                                       title,
                                       serviceDate,
                                       quantity,
-                                      note: note || undefined,
+                                      notes: notes || undefined,
                                       resourceId,
                                       resourceType: cat.key === 'hotel' ? 'hotel' : cat.key === 'restaurant' ? 'restaurant' : cat.key === 'activity' ? 'attraction' : undefined,
                                     } : undefined

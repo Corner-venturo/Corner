@@ -7,7 +7,7 @@ import { Attraction, AttractionFormData } from '../types'
 
 const initialFormData: AttractionFormData = {
   name: '',
-  name_en: '',
+  english_name: '',
   description: '',
   country_id: '',
   region_id: '',

@@ -3,57 +3,7 @@ import { logger } from '@/lib/utils/logger'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { getServerAuth } from '@/lib/auth/server-auth'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
-
-/**
- * 提案轉開團 API
- * 🔒 安全修復 2026-01-12：使用 getServerAuth() 驗證用戶身份
- */
-
-// 生成團號（格式：城市代碼 + YYMMDD + A-Z）
-function generateTourCode(cityCode: string, departureDate: string, existingCodes: string[]): string {
-  const date = new Date(departureDate)
-  const yy = String(date.getFullYear()).slice(-2)
-  const mm = String(date.getMonth() + 1).padStart(2, '0')
-  const dd = String(date.getDate()).padStart(2, '0')
-  const dateStr = `${yy}${mm}${dd}`
-  const prefix = `${cityCode}${dateStr}`
-
-  // 找出已使用的字母
-  const usedLetters = new Set<string>()
-  existingCodes.forEach(code => {
-    if (code.startsWith(prefix) && code.length === prefix.length + 1) {
-      usedLetters.add(code.slice(-1))
-    }
-  })
-
-  // 找下一個可用字母
-  for (let i = 0; i < 26; i++) {
-    const letter = String.fromCharCode(65 + i) // A-Z
-    if (!usedLetters.has(letter)) {
-      return `${prefix}${letter}`
-    }
-  }
-
-  throw new Error('已達當日最大團數限制 (26團)')
-}
-
-// 生成訂單編號（格式：團號-O01, O02...）
-function generateOrderCode(tourCode: string, existingCodes: string[]): string {
-  const prefix = `${tourCode}-O`
-  let maxNum = 0
-
-  existingCodes.forEach(code => {
-    if (code.startsWith(prefix)) {
-      const numStr = code.slice(prefix.length)
-      const num = parseInt(numStr, 10)
-      if (!isNaN(num) && num > maxNum) {
-        maxNum = num
-      }
-    }
-  })
-
-  return `${prefix}${String(maxNum + 1).padStart(2, '0')}`
-}
+import { generateTourCode, generateOrderCode } from '@/stores/utils/code-generator'
 
 interface ConvertToTourRequest {
   proposal_id: string
@@ -121,8 +71,8 @@ export async function POST(request: NextRequest) {
       .select('code')
       .like('code', `${city_code}%`)
 
-    const existingTourCodes = (existingTours || []).map(t => t.code).filter(Boolean) as string[]
-    const tourCode = generateTourCode(city_code, pkgData.start_date || departure_date, existingTourCodes)
+    // 使用共用的編號生成器（workspaceCode 參數已棄用，傳空字串）
+    const tourCode = generateTourCode('', city_code, pkgData.start_date || departure_date, existingTours || [])
 
     // 4. 建立 Tour
     const daysCount = pkgData.days || 1
@@ -268,11 +218,12 @@ export async function POST(request: NextRequest) {
       .select('order_number')
       .like('order_number', `${tourCode}%`)
 
-    const existingOrderCodes = (existingOrdersRaw || [])
-      .map(o => o.order_number)
-      .filter(Boolean) as string[]
+    // 轉換成共用編號生成器需要的格式
+    const existingOrders = (existingOrdersRaw || [])
+      .filter(o => o.order_number)
+      .map(o => ({ code: o.order_number as string }))
 
-    const orderCode = generateOrderCode(tourCode, existingOrderCodes)
+    const orderCode = generateOrderCode(tourCode, existingOrders)
     const orderData = {
       id: crypto.randomUUID(),
       order_number: orderCode,

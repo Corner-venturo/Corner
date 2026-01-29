@@ -182,7 +182,7 @@ export function QuickMessages({ onSend, disabled }: QuickMessagesProps) {
 
       {/* 編輯對話框 */}
       <Dialog open={!!selectedMessage} onOpenChange={(open) => !open && handleCloseDialog()}>
-        <DialogContent className="sm:max-w-md bg-[#1e1b2e] border-violet-500/30">
+        <DialogContent level={1} className="sm:max-w-md bg-[#1e1b2e] border-violet-500/30">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-violet-200">
               {selectedMessage?.icon}

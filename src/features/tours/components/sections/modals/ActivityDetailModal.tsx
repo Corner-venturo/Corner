@@ -21,7 +21,7 @@ export function ActivityDetailModal({
 }: ActivityDetailModalProps) {
   return (
     <Dialog open={!!activity} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-lg p-0 overflow-hidden rounded-2xl">
+      <DialogContent level={1} className="max-w-lg p-0 overflow-hidden rounded-2xl">
         {activity?.image && (
           <div className="relative h-48">
             <img

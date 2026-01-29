@@ -202,7 +202,7 @@ export default function BoxManager() {
 
       {/* 編輯/新增對話框 */}
       <Dialog open={!!selectedBox || isCreating} onOpenChange={(open) => !open && closeDialog()}>
-        <DialogContent className="max-w-md">
+        <DialogContent level={1} className="max-w-md">
           <DialogHeader>
             <DialogTitle>
               {selectedBox ? '編輯箱子' : '新增箱子'}

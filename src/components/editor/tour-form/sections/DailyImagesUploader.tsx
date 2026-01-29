@@ -197,7 +197,7 @@ export function DailyImagesUploader({
       {/* 位置編輯 Modal */}
       {editingIndex !== null && (
         <Dialog open onOpenChange={() => setEditingIndex(null)}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent level={1} className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>調整圖片顯示位置</DialogTitle>
             </DialogHeader>

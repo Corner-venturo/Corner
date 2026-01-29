@@ -48,7 +48,7 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
   return (
     <>
       <Dialog open={open} onOpenChange={open => !open && onClose()}>
-        <DialogContent className="max-w-md">
+        <DialogContent level={1} className="max-w-md">
           <DialogHeader>
             <DialogTitle>事件詳情</DialogTitle>
           </DialogHeader>

@@ -167,7 +167,7 @@ export function useAttractionSearch({
             `
             id,
             name,
-            name_en,
+            english_name,
             category,
             description,
             thumbnail,
@@ -199,7 +199,7 @@ export function useAttractionSearch({
         const formatted = (data || []).map((item: {
           id: string
           name: string
-          name_en: string | null
+          english_name: string | null
           category: string | null
           description: string | null
           thumbnail: string | null
@@ -214,7 +214,7 @@ export function useAttractionSearch({
         }): AttractionWithCity => ({
           id: item.id,
           name: item.name,
-          name_en: item.name_en ?? undefined,
+          english_name: item.english_name ?? undefined,
           category: item.category ?? undefined,
           description: item.description ?? undefined,
           thumbnail: item.thumbnail ?? undefined,
@@ -283,7 +283,7 @@ export function useAttractionSearch({
       results = results.filter(
         a =>
           a.name.toLowerCase().includes(query) ||
-          a.name_en?.toLowerCase().includes(query) ||
+          a.english_name?.toLowerCase().includes(query) ||
           a.city_name?.toLowerCase().includes(query) ||
           a.category?.toLowerCase().includes(query)
       )

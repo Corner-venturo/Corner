@@ -1109,6 +1109,7 @@ export type Database = {
           description: string | null
           display_order: number | null
           duration_minutes: number | null
+          english_name: string | null
           google_maps_url: string | null
           id: string
           images: string[] | null
@@ -1116,7 +1117,6 @@ export type Database = {
           latitude: number | null
           longitude: number | null
           name: string
-          name_en: string | null
           notes: string | null
           opening_hours: Json | null
           phone: string | null
@@ -1139,6 +1139,7 @@ export type Database = {
           description?: string | null
           display_order?: number | null
           duration_minutes?: number | null
+          english_name?: string | null
           google_maps_url?: string | null
           id?: string
           images?: string[] | null
@@ -1146,7 +1147,6 @@ export type Database = {
           latitude?: number | null
           longitude?: number | null
           name: string
-          name_en?: string | null
           notes?: string | null
           opening_hours?: Json | null
           phone?: string | null
@@ -1169,6 +1169,7 @@ export type Database = {
           description?: string | null
           display_order?: number | null
           duration_minutes?: number | null
+          english_name?: string | null
           google_maps_url?: string | null
           id?: string
           images?: string[] | null
@@ -1176,7 +1177,6 @@ export type Database = {
           latitude?: number | null
           longitude?: number | null
           name?: string
-          name_en?: string | null
           notes?: string | null
           opening_hours?: Json | null
           phone?: string | null
@@ -3112,7 +3112,7 @@ export type Database = {
           created_by: string | null
           id: string
           name: string
-          note: string | null
+          notes: string | null
           type: string
           updated_at: string | null
           workspace_id: string
@@ -3122,7 +3122,7 @@ export type Database = {
           created_by?: string | null
           id?: string
           name: string
-          note?: string | null
+          notes?: string | null
           type?: string
           updated_at?: string | null
           workspace_id: string
@@ -3132,7 +3132,7 @@ export type Database = {
           created_by?: string | null
           id?: string
           name?: string
-          note?: string | null
+          notes?: string | null
           type?: string
           updated_at?: string | null
           workspace_id?: string
@@ -4029,7 +4029,6 @@ export type Database = {
           avatar: string | null
           avatar_url: string | null
           birth_date: string | null
-          birthday: string | null
           chinese_name: string | null
           contracts: Json | null
           created_at: string | null
@@ -4064,7 +4063,6 @@ export type Database = {
           avatar?: string | null
           avatar_url?: string | null
           birth_date?: string | null
-          birthday?: string | null
           chinese_name?: string | null
           contracts?: Json | null
           created_at?: string | null
@@ -4099,7 +4097,6 @@ export type Database = {
           avatar?: string | null
           avatar_url?: string | null
           birth_date?: string | null
-          birthday?: string | null
           chinese_name?: string | null
           contracts?: Json | null
           created_at?: string | null
@@ -7970,7 +7967,7 @@ export type Database = {
           description: string
           id: string
           item_number: string | null
-          note: string | null
+          notes: string | null
           payment_method: string | null
           quantity: number | null
           request_id: string | null
@@ -7992,7 +7989,7 @@ export type Database = {
           description: string
           id?: string
           item_number?: string | null
-          note?: string | null
+          notes?: string | null
           payment_method?: string | null
           quantity?: number | null
           request_id?: string | null
@@ -8014,7 +8011,7 @@ export type Database = {
           description?: string
           id?: string
           item_number?: string | null
-          note?: string | null
+          notes?: string | null
           payment_method?: string | null
           quantity?: number | null
           request_id?: string | null
@@ -8060,7 +8057,7 @@ export type Database = {
           id: string
           is_special_billing: boolean | null
           items: Json | null
-          note: string | null
+          notes: string | null
           order_id: string | null
           order_number: string | null
           paid_at: string | null
@@ -8094,7 +8091,7 @@ export type Database = {
           id?: string
           is_special_billing?: boolean | null
           items?: Json | null
-          note?: string | null
+          notes?: string | null
           order_id?: string | null
           order_number?: string | null
           paid_at?: string | null
@@ -8128,7 +8125,7 @@ export type Database = {
           id?: string
           is_special_billing?: boolean | null
           items?: Json | null
-          note?: string | null
+          notes?: string | null
           order_id?: string | null
           order_number?: string | null
           paid_at?: string | null
@@ -10059,7 +10056,7 @@ export type Database = {
           nights: number | null
           notes: string | null
           participant_counts: Json | null
-          proposal_id: string
+          proposal_id: string | null
           quote_id: string | null
           start_date: string | null
           timeline_data: Json | null
@@ -10088,7 +10085,7 @@ export type Database = {
           nights?: number | null
           notes?: string | null
           participant_counts?: Json | null
-          proposal_id: string
+          proposal_id?: string | null
           quote_id?: string | null
           start_date?: string | null
           timeline_data?: Json | null
@@ -10117,7 +10114,7 @@ export type Database = {
           nights?: number | null
           notes?: string | null
           participant_counts?: Json | null
-          proposal_id?: string
+          proposal_id?: string | null
           quote_id?: string | null
           start_date?: string | null
           timeline_data?: Json | null
@@ -10802,6 +10799,172 @@ export type Database = {
           },
         ]
       }
+      receipt_items: {
+        Row: {
+          account_info: string | null
+          actual_amount: number | null
+          amount: number
+          auth_code: string | null
+          card_last_four: string | null
+          check_bank: string | null
+          check_date: string | null
+          check_number: string | null
+          created_at: string | null
+          created_by: string | null
+          customer_id: string | null
+          deleted_at: string | null
+          email: string | null
+          fees: number | null
+          handler_name: string | null
+          id: string
+          link: string | null
+          linkpay_order_number: string | null
+          notes: string | null
+          order_id: string | null
+          pay_dateline: string | null
+          payment_method: string
+          payment_name: string | null
+          receipt_account: string | null
+          receipt_id: string
+          receipt_type: number
+          status: string | null
+          tour_id: string | null
+          updated_at: string | null
+          updated_by: string | null
+          workspace_id: string
+        }
+        Insert: {
+          account_info?: string | null
+          actual_amount?: number | null
+          amount?: number
+          auth_code?: string | null
+          card_last_four?: string | null
+          check_bank?: string | null
+          check_date?: string | null
+          check_number?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          customer_id?: string | null
+          deleted_at?: string | null
+          email?: string | null
+          fees?: number | null
+          handler_name?: string | null
+          id?: string
+          link?: string | null
+          linkpay_order_number?: string | null
+          notes?: string | null
+          order_id?: string | null
+          pay_dateline?: string | null
+          payment_method?: string
+          payment_name?: string | null
+          receipt_account?: string | null
+          receipt_id: string
+          receipt_type?: number
+          status?: string | null
+          tour_id?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          workspace_id: string
+        }
+        Update: {
+          account_info?: string | null
+          actual_amount?: number | null
+          amount?: number
+          auth_code?: string | null
+          card_last_four?: string | null
+          check_bank?: string | null
+          check_date?: string | null
+          check_number?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          customer_id?: string | null
+          deleted_at?: string | null
+          email?: string | null
+          fees?: number | null
+          handler_name?: string | null
+          id?: string
+          link?: string | null
+          linkpay_order_number?: string | null
+          notes?: string | null
+          order_id?: string | null
+          pay_dateline?: string | null
+          payment_method?: string
+          payment_name?: string | null
+          receipt_account?: string | null
+          receipt_id?: string
+          receipt_type?: number
+          status?: string | null
+          tour_id?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "receipt_items_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receipt_items_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receipt_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receipt_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_invoice_summary"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "receipt_items_receipt_id_fkey"
+            columns: ["receipt_id"]
+            isOneToOne: false
+            referencedRelation: "receipts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receipt_items_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receipt_items_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receipt_items_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receipt_items_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       receipt_orders: {
         Row: {
           amount: number
@@ -10924,7 +11087,6 @@ export type Database = {
           id: string
           link: string | null
           linkpay_order_number: string | null
-          note: string | null
           notes: string | null
           order_id: string
           order_number: string | null
@@ -10939,6 +11101,7 @@ export type Database = {
           receipt_type: number
           status: string
           sync_status: string | null
+          total_amount: number | null
           tour_id: string | null
           tour_name: string | null
           transaction_id: string | null
@@ -10970,7 +11133,6 @@ export type Database = {
           id?: string
           link?: string | null
           linkpay_order_number?: string | null
-          note?: string | null
           notes?: string | null
           order_id: string
           order_number?: string | null
@@ -10985,6 +11147,7 @@ export type Database = {
           receipt_type?: number
           status?: string
           sync_status?: string | null
+          total_amount?: number | null
           tour_id?: string | null
           tour_name?: string | null
           transaction_id?: string | null
@@ -11016,7 +11179,6 @@ export type Database = {
           id?: string
           link?: string | null
           linkpay_order_number?: string | null
-          note?: string | null
           notes?: string | null
           order_id?: string
           order_number?: string | null
@@ -11031,6 +11193,7 @@ export type Database = {
           receipt_type?: number
           status?: string
           sync_status?: string | null
+          total_amount?: number | null
           tour_id?: string | null
           tour_name?: string | null
           transaction_id?: string | null
@@ -14016,7 +14179,7 @@ export type Database = {
           longitude: number | null
           member_data: Json | null
           member_ids: string[] | null
-          note: string | null
+          notes: string | null
           order_id: string | null
           priority: string | null
           proposal_package_id: string | null
@@ -14081,7 +14244,7 @@ export type Database = {
           longitude?: number | null
           member_data?: Json | null
           member_ids?: string[] | null
-          note?: string | null
+          notes?: string | null
           order_id?: string | null
           priority?: string | null
           proposal_package_id?: string | null
@@ -14146,7 +14309,7 @@ export type Database = {
           longitude?: number | null
           member_data?: Json | null
           member_ids?: string[] | null
-          note?: string | null
+          notes?: string | null
           order_id?: string | null
           priority?: string | null
           proposal_package_id?: string | null
@@ -16947,7 +17110,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           is_urgent: boolean | null
-          note: string | null
+          notes: string | null
           order_id: string
           order_number: string
           pickup_date: string | null
@@ -16979,7 +17142,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_urgent?: boolean | null
-          note?: string | null
+          notes?: string | null
           order_id: string
           order_number: string
           pickup_date?: string | null
@@ -17011,7 +17174,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_urgent?: boolean | null
-          note?: string | null
+          notes?: string | null
           order_id?: string
           order_number?: string
           pickup_date?: string | null
@@ -18049,6 +18212,19 @@ export type Database = {
         Returns: undefined
       }
       sync_my_tours: { Args: never; Returns: Json }
+      sync_passport_to_order_members: {
+        Args: {
+          p_birth_date?: string
+          p_customer_id: string
+          p_gender?: string
+          p_id_number?: string
+          p_passport_expiry?: string
+          p_passport_image_url?: string
+          p_passport_name?: string
+          p_passport_number?: string
+        }
+        Returns: number
+      }
       toggle_tour_conversation: {
         Args: {
           p_is_open: boolean

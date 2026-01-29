@@ -106,7 +106,7 @@ export function useTourPayments({
         tour_id: tour.id,
         order_id: receipt.order_id || undefined,
         amount: receipt.actual_amount,
-        description: receipt.note || '',
+        description: receipt.notes || '',
         status: receipt.status === '1' ? 'confirmed' : 'pending',
         method:
           ['bank_transfer', 'cash', 'credit_card', 'check', 'linkpay'][receipt.receipt_type] ||
@@ -219,7 +219,7 @@ export function useTourPayments({
         receipt_amount: data.amount,
         actual_amount: data.amount,
         status: data.status === '已確認' ? '1' : '0',
-        note: data.description,
+        notes: data.description,
         receipt_account: order?.contact_person || null,
       }
 

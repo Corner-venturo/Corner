@@ -526,7 +526,7 @@ export default function TodosPage() {
 
       {/* 新增待辦事項對話框 */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent level={1} className="max-w-md">
           <DialogHeader>
             <DialogTitle>新增待辦事項</DialogTitle>
             <DialogDescription>建立新的待辦任務，設定優先級和截止日期</DialogDescription>

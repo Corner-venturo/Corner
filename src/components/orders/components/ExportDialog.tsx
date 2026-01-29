@@ -246,7 +246,7 @@ export function ExportDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent nested className="max-w-md">
+      <DialogContent nested level={2} className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Printer size={18} />

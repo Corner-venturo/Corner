@@ -99,7 +99,7 @@ export function TourUnlockDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent level={1} className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg">
             <Unlock className="h-5 w-5 text-morandi-gold" />

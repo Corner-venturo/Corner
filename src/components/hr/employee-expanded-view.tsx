@@ -131,7 +131,7 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
 
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-6xl h-[90vh] flex flex-col overflow-hidden p-0">
+      <DialogContent level={1} className="max-w-6xl h-[90vh] flex flex-col overflow-hidden p-0">
         {/* 標題列 */}
         <DialogHeader className="flex-shrink-0 p-6 pb-0">
           <div className="flex items-center gap-4">

@@ -16,6 +16,69 @@ interface LocationData {
   name: string
 }
 
+// Supabase 查詢結果型別（一般餐廳）
+interface RestaurantQueryResult {
+  id: string
+  name: string
+  name_en: string | null
+  country_id: string
+  region_id: string | null
+  city_id: string
+  cuisine_type: string[] | null
+  category: string | null
+  meal_type: string[] | null
+  description: string | null
+  specialties: string[] | null
+  price_range: string | null
+  avg_price_lunch: number | null
+  avg_price_dinner: number | null
+  group_friendly: boolean | null
+  max_group_size: number | null
+  group_menu_available: boolean | null
+  private_room: boolean | null
+  thumbnail: string | null
+  images: string[] | null
+  rating: number | null
+  is_active: boolean | null
+  is_featured: boolean | null
+  latitude: number | null
+  longitude: number | null
+  address: string | null
+  phone: string | null
+  google_maps_url: string | null
+  regions: { name: string } | null
+  cities: { name: string } | null
+}
+
+// Supabase 查詢結果型別（米其林餐廳）
+interface MichelinQueryResult {
+  id: string
+  name: string
+  name_en: string | null
+  country_id: string
+  city_id: string
+  michelin_stars: number | null
+  bib_gourmand: boolean | null
+  green_star: boolean | null
+  cuisine_type: string[] | null
+  description: string | null
+  signature_dishes: string[] | null
+  price_range: string | null
+  avg_price_lunch: number | null
+  avg_price_dinner: number | null
+  max_group_size: number | null
+  group_menu_available: boolean | null
+  thumbnail: string | null
+  images: string[] | null
+  is_active: boolean | null
+  latitude: number | null
+  longitude: number | null
+  address: string | null
+  phone: string | null
+  google_maps_url: string | null
+  cities: { name: string } | null
+}
+
 // 保存篩選狀態
 let savedCountryId = ''
 let savedRegionId = ''
@@ -219,8 +282,8 @@ export function useRestaurantSelector({
           const { data: restaurantData } = await restaurantQuery
 
           if (restaurantData) {
-
-            restaurantData.forEach((item: any) => {
+            // 透過 unknown 中轉處理 Supabase 的複雜型別
+            (restaurantData as unknown as RestaurantQueryResult[]).forEach((item) => {
               results.push({
                 id: item.id,
                 name: item.name,
@@ -285,8 +348,8 @@ export function useRestaurantSelector({
           const { data: michelinData } = await michelinQuery
 
           if (michelinData) {
-
-            michelinData.forEach((item: any) => {
+            // 透過 unknown 中轉處理 Supabase 的複雜型別
+            (michelinData as unknown as MichelinQueryResult[]).forEach((item) => {
               results.push({
                 id: item.id,
                 name: item.name,

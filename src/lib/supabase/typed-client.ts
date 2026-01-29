@@ -76,7 +76,7 @@ export function typedFrom<T extends SupabaseTableName>(tableName: T) {
  */
 export function dynamicFrom(tableName: string) {
   // 使用 any 是處理 Supabase 動態表名的標準做法
-   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return supabase.from(tableName as SupabaseTableName) as any
 }
 

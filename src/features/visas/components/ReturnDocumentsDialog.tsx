@@ -42,7 +42,7 @@ export function ReturnDocumentsDialog({
     try {
       for (const visa of selectedVisas) {
         // 更新證件歸還時間，備註加到 note 欄位
-        const existingNote = visa.note || ''
+        const existingNote = visa.notes || ''
         const newNote = returnNote
           ? existingNote
             ? `${existingNote}\n[證件歸還] ${returnNote}`
@@ -52,7 +52,7 @@ export function ReturnDocumentsDialog({
         await updateVisa(visa.id, {
           status: 'returned',
           documents_returned_date: returnDate,
-          note: newNote,
+          notes: newNote,
         })
       }
 

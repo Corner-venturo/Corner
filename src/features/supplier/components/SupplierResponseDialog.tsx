@@ -208,7 +208,7 @@ export function SupplierResponseDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className={cn(DIALOG_SIZES['2xl'], 'max-h-[85vh] overflow-hidden flex flex-col')}>
+      <DialogContent level={1} className={cn(DIALOG_SIZES['2xl'], 'max-h-[85vh] overflow-hidden flex flex-col')}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ResourceIcon className="h-5 w-5 text-morandi-gold" />

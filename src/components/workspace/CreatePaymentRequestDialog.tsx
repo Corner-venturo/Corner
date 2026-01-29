@@ -86,7 +86,7 @@ export function CreatePaymentRequestDialog({
         amount: totalAmount,
         supplier_name: supplier,
         status: 'pending',
-        note: itemsArray.map((item, i) =>
+        notes: itemsArray.map((item, i) =>
           `${i + 1}. ${item.name} - ${item.description} (NT$ ${item.amount.toLocaleString()})`
         ).join('\n'),
       })

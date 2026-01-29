@@ -60,11 +60,11 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">英文姓名</label>
+              <label className="text-sm font-medium text-morandi-primary">英文姓名（護照拼音）</label>
               <Input
-                value={formData.name_en}
-                onChange={e => onFormFieldChange('name_en', e.target.value)}
-                placeholder="輸入英文姓名"
+                value={formData.english_name}
+                onChange={e => onFormFieldChange('english_name', e.target.value)}
+                placeholder="輸入護照拼音"
                 className="mt-1"
               />
             </div>

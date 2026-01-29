@@ -150,7 +150,7 @@ export const QuickQuoteVersionPanel: React.FC<QuickQuoteVersionPanelProps> = ({
 
       {/* 另存新版本對話框 */}
       <Dialog open={isSaveVersionDialogOpen} onOpenChange={onSetSaveVersionDialogOpen}>
-        <DialogContent>
+        <DialogContent level={1}>
           <DialogHeader>
             <DialogTitle>另存新版本</DialogTitle>
             <DialogDescription>

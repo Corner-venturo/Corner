@@ -75,7 +75,7 @@ export function ReverseVoucherDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent level={1}>
         <DialogHeader>
           <DialogTitle>反沖傳票</DialogTitle>
         </DialogHeader>

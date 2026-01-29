@@ -5,6 +5,30 @@ import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import type { LuxuryHotel } from '../../HotelSelector'
 
+// Supabase 查詢結果的型別（包含 join 的 regions 和 cities）
+interface HotelQueryResult {
+  id: string
+  name: string
+  name_en: string | null
+  brand: string | null
+  country_id: string
+  region_id: string | null
+  city_id: string
+  star_rating: number | null
+  hotel_class: string | null
+  category: string | null
+  description: string | null
+  highlights: string[] | null
+  price_range: string | null
+  avg_price_per_night: number | null
+  thumbnail: string | null
+  images: string[] | null
+  is_active: boolean | null
+  is_featured: boolean | null
+  regions: { name: string } | null
+  cities: { name: string } | null
+}
+
 // 使用 localStorage 保存篩選狀態（避免全域變數導致的狀態不一致）
 const STORAGE_KEY = 'hotel-selector-filters'
 
@@ -183,8 +207,8 @@ export function useHotelSearch({ isOpen, tourCountryName = '' }: UseHotelSearchP
 
         if (error) throw error
 
-         
-        const formatted = (data || []).map((item: any): LuxuryHotel => ({
+        // 透過 unknown 中轉處理 Supabase 的複雜型別
+        const formatted = ((data || []) as unknown as HotelQueryResult[]).map((item): LuxuryHotel => ({
           id: item.id,
           name: item.name,
           name_en: item.name_en,

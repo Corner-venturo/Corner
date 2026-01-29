@@ -1,10 +1,11 @@
 /**
- * 批量確認收款單對話框
+ * 批量確認收款品項對話框
  *
  * 功能：
- * 1. 顯示所有待確認的收款單
- * 2. 允許會計輸入實收金額
- * 3. 批量確認收款單狀態
+ * 1. 顯示所有待確認的收款品項（而非收款單）
+ * 2. 允許會計輸入每個品項的實收金額
+ * 3. 批量確認收款品項狀態
+ * 4. 每筆獨立處理，失敗不影響其他
  */
 
 'use client'
@@ -20,14 +21,22 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
-import { useOrders, updateOrder, useReceipts, updateReceipt, invalidateReceipts } from '@/data'
+import {
+  useOrders,
+  updateOrder,
+  useReceipts,
+  updateReceipt,
+  invalidateReceipts,
+  useReceiptItems,
+  updateReceiptItem,
+  invalidateReceiptItems,
+} from '@/data'
 import { CheckCircle, AlertCircle, DollarSign, Check, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { alert } from '@/lib/ui/alert-dialog'
-import { RECEIPT_TYPE_LABELS, ReceiptStatus } from '@/types/receipt.types'
+import { RECEIPT_TYPE_LABELS, ReceiptType } from '@/types/receipt.types'
 import { CurrencyCell } from '@/components/table-cells'
-import { formatDate } from '@/lib/utils/format-date'
-import type { Receipt } from '@/types/receipt.types'
+import type { DbReceiptItem } from '@/types/receipt.types'
 import { logger } from '@/lib/utils/logger'
 
 interface BatchConfirmReceiptDialogProps {
@@ -37,7 +46,10 @@ interface BatchConfirmReceiptDialogProps {
 }
 
 interface ConfirmItem {
-  receipt: Receipt
+  item: DbReceiptItem
+  receiptNumber: string
+  orderNumber: string | null
+  tourName: string | null
   actualAmount: number
   selected: boolean
 }
@@ -47,39 +59,57 @@ export function BatchConfirmReceiptDialog({
   onOpenChange,
   onSuccess,
 }: BatchConfirmReceiptDialogProps) {
+  const { items: receiptItems } = useReceiptItems()
   const { items: receipts } = useReceipts()
   const { items: orders } = useOrders()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [confirmItems, setConfirmItems] = useState<Map<string, ConfirmItem>>(new Map())
 
-  // 篩選待確認的收款單 (status = 0)
-  const pendingReceipts = useMemo(() => {
-    // Debug: 顯示所有收款單的 status 值
-    if (open && receipts.length > 0) {
-      logger.log('📋 所有收款單 status:', receipts.map(r => ({
+  // 建立收款單 ID 到收款單資訊的 Map
+  const receiptMap = useMemo(() => {
+    const map = new Map<string, { receipt_number: string; order_number: string | null; tour_name: string | null; order_id: string | null }>()
+    receipts.forEach(r => {
+      map.set(r.id, {
         receipt_number: r.receipt_number,
+        order_number: r.order_number ?? null,
+        tour_name: r.tour_name ?? null,
+        order_id: r.order_id ?? null,
+      })
+    })
+    return map
+  }, [receipts])
+
+  // 篩選待確認的收款品項 (status = '0' 或 null)
+  const pendingItems = useMemo(() => {
+    if (open && receiptItems.length > 0) {
+      logger.log('📋 所有收款品項 status:', receiptItems.slice(0, 5).map(r => ({
+        id: r.id,
+        receipt_id: r.receipt_id,
         status: r.status,
-        status_type: typeof r.status
+        amount: r.amount,
       })))
     }
-    // 使用數值比較，避免 enum vs number 類型問題
-    return receipts.filter(r => Number(r.status) === 0)
-  }, [receipts, open])
+    return receiptItems.filter(r => r.status === '0' || r.status === null)
+  }, [receiptItems, open])
 
   // 初始化確認項目
   useMemo(() => {
-    if (open && pendingReceipts.length > 0) {
+    if (open && pendingItems.length > 0) {
       const items = new Map<string, ConfirmItem>()
-      pendingReceipts.forEach(receipt => {
-        items.set(receipt.id, {
-          receipt,
-          actualAmount: receipt.receipt_amount, // 預設為應收金額
+      pendingItems.forEach(item => {
+        const receiptInfo = receiptMap.get(item.receipt_id)
+        items.set(item.id, {
+          item,
+          receiptNumber: receiptInfo?.receipt_number || '-',
+          orderNumber: receiptInfo?.order_number || item.order_id || null,
+          tourName: receiptInfo?.tour_name || null,
+          actualAmount: item.amount, // 預設為應收金額
           selected: false,
         })
       })
       setConfirmItems(items)
     }
-  }, [open, pendingReceipts])
+  }, [open, pendingItems, receiptMap])
 
   // 更新單一項目
   const updateItem = useCallback((id: string, updates: Partial<ConfirmItem>) => {
@@ -121,7 +151,7 @@ export function BatchConfirmReceiptDialog({
     const selectedItems = Array.from(confirmItems.values()).filter(item => item.selected)
 
     if (selectedItems.length === 0) {
-      void alert('請至少選擇一筆收款單', 'warning')
+      void alert('請至少選擇一筆收款品項', 'warning')
       return
     }
 
@@ -134,34 +164,84 @@ export function BatchConfirmReceiptDialog({
 
     setIsSubmitting(true)
 
-    try {
-      // 按訂單分組，用於更新訂單的已收款金額
-      const orderUpdates = new Map<string, number>()
+    // 追蹤每筆處理結果
+    const successItems: ConfirmItem[] = []
+    const failedItems: { item: ConfirmItem; error: string }[] = []
+    const orderUpdates = new Map<string, number>()
+    const receiptUpdates = new Map<string, { totalActual: number; allConfirmed: boolean }>()
 
-      for (const item of selectedItems) {
-        // 更新收款單狀態（保留原始備註不變）
-        await updateReceipt(item.receipt.id, {
-          actual_amount: item.actualAmount,
+    // 逐筆處理，失敗不影響其他
+    for (const confirmItem of selectedItems) {
+      try {
+        // 更新收款品項狀態
+        await updateReceiptItem(confirmItem.item.id, {
+          actual_amount: confirmItem.actualAmount,
           status: '1', // 已確認
         })
 
-        // 累計每個訂單的確認金額
-        if (item.receipt.order_id) {
-          const currentAmount = orderUpdates.get(item.receipt.order_id) || 0
-          orderUpdates.set(item.receipt.order_id, currentAmount + item.actualAmount)
-        }
-      }
+        successItems.push(confirmItem)
 
-      // 更新訂單的已收款金額和狀態
-      for (const [orderId, confirmedAmount] of orderUpdates) {
+        // 累計每個收款單的確認金額
+        const receiptId = confirmItem.item.receipt_id
+        const current = receiptUpdates.get(receiptId) || { totalActual: 0, allConfirmed: true }
+        receiptUpdates.set(receiptId, {
+          totalActual: current.totalActual + confirmItem.actualAmount,
+          allConfirmed: current.allConfirmed, // 稍後檢查
+        })
+
+        // 累計每個訂單的確認金額
+        const orderId = confirmItem.item.order_id
+        if (orderId) {
+          const currentAmount = orderUpdates.get(orderId) || 0
+          orderUpdates.set(orderId, currentAmount + confirmItem.actualAmount)
+        }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : '未知錯誤'
+        failedItems.push({ item: confirmItem, error: errorMessage })
+        logger.error(`確認收款品項 ${confirmItem.receiptNumber} 失敗:`, error)
+      }
+    }
+
+    // 更新收款單主表（檢查是否所有品項都已確認）
+    for (const [receiptId, data] of receiptUpdates) {
+      try {
+        // 檢查該收款單的所有品項是否都已確認
+        const allItemsForReceipt = receiptItems.filter(ri => ri.receipt_id === receiptId)
+        const confirmedCount = allItemsForReceipt.filter(ri => 
+          ri.status === '1' || successItems.some(s => s.item.id === ri.id)
+        ).length
+
+        const allConfirmed = confirmedCount === allItemsForReceipt.length
+
+        // 計算總實收金額
+        const totalActual = allItemsForReceipt.reduce((sum, ri) => {
+          const successItem = successItems.find(s => s.item.id === ri.id)
+          if (successItem) {
+            return sum + successItem.actualAmount
+          }
+          return sum + (ri.actual_amount || 0)
+        }, 0)
+
+        await updateReceipt(receiptId, {
+          actual_amount: totalActual,
+          status: allConfirmed ? '1' : '0', // 所有品項確認才更新主表狀態
+        })
+      } catch (error) {
+        logger.error(`更新收款單 ${receiptId} 失敗:`, error)
+      }
+    }
+
+    // 更新訂單的已收款金額和狀態
+    for (const [orderId, confirmedAmount] of orderUpdates) {
+      try {
         const order = orders.find(o => o.id === orderId)
         if (order) {
-          // 計算該訂單所有已確認收款的總金額
-          const allConfirmedReceipts = receipts.filter(
-            r => r.order_id === orderId && Number(r.status) === 1
+          // 計算該訂單所有已確認收款品項的總金額
+          const allConfirmedItems = receiptItems.filter(
+            ri => ri.order_id === orderId && ri.status === '1'
           )
-          const previousConfirmed = allConfirmedReceipts.reduce(
-            (sum, r) => sum + (r.actual_amount || 0),
+          const previousConfirmed = allConfirmedItems.reduce(
+            (sum, ri) => sum + (ri.actual_amount || 0),
             0
           )
           const newPaidAmount = previousConfirmed + confirmedAmount
@@ -181,19 +261,36 @@ export function BatchConfirmReceiptDialog({
             payment_status: paymentStatus,
           })
         }
+      } catch (error) {
+        logger.error(`更新訂單 ${orderId} 付款狀態失敗:`, error)
       }
+    }
 
-      await invalidateReceipts()
+    await invalidateReceiptItems()
+    await invalidateReceipts()
 
-      await alert(`成功確認 ${selectedItems.length} 筆收款單`, 'success')
+    // 顯示結果摘要
+    if (failedItems.length === 0) {
+      // 全部成功
+      await alert(`成功確認 ${successItems.length} 筆收款品項`, 'success')
       onOpenChange(false)
       onSuccess?.()
-    } catch (error) {
-      logger.error('批量確認收款單失敗:', error)
-      void alert('確認失敗，請稍後再試', 'error')
-    } finally {
-      setIsSubmitting(false)
+    } else if (successItems.length === 0) {
+      // 全部失敗
+      const failedNumbers = failedItems.map(f => f.item.receiptNumber).join('、')
+      void alert(`確認失敗：${failedNumbers}`, 'error')
+    } else {
+      // 部分成功
+      const failedNumbers = failedItems.map(f => f.item.receiptNumber).join('、')
+      await alert(
+        `成功確認 ${successItems.length} 筆\n失敗 ${failedItems.length} 筆：${failedNumbers}`,
+        'warning'
+      )
+      onSuccess?.()
+      // 不關閉對話框，讓用戶可以重試失敗的項目
     }
+
+    setIsSubmitting(false)
   }
 
   return (
@@ -207,12 +304,12 @@ export function BatchConfirmReceiptDialog({
         </DialogHeader>
 
         <div className="flex-1 overflow-hidden flex flex-col">
-          {pendingReceipts.length === 0 ? (
+          {pendingItems.length === 0 ? (
             <div className="flex-1 flex items-center justify-center text-morandi-secondary">
               <div className="text-center">
                 <CheckCircle className="h-12 w-12 mx-auto mb-4 text-morandi-green" />
-                <p className="text-lg font-medium">沒有待確認的收款單</p>
-                <p className="text-sm mt-1">所有收款單都已確認完成</p>
+                <p className="text-lg font-medium">沒有待確認的收款品項</p>
+                <p className="text-sm mt-1">所有收款品項都已確認完成</p>
               </div>
             </div>
           ) : (
@@ -263,54 +360,54 @@ export function BatchConfirmReceiptDialog({
                     </tr>
                   </thead>
                   <tbody>
-                    {Array.from(confirmItems.values()).map(item => (
+                    {Array.from(confirmItems.values()).map(confirmItem => (
                       <tr
-                        key={item.receipt.id}
+                        key={confirmItem.item.id}
                         className={cn(
                           'border-b border-border/30 hover:bg-morandi-container/10',
-                          item.selected && 'bg-morandi-gold/5'
+                          confirmItem.selected && 'bg-morandi-gold/5'
                         )}
                       >
                         <td className="py-3 px-3">
                           <Checkbox
-                            checked={item.selected}
+                            checked={confirmItem.selected}
                             onCheckedChange={checked =>
-                              updateItem(item.receipt.id, { selected: !!checked })
+                              updateItem(confirmItem.item.id, { selected: !!checked })
                             }
                           />
                         </td>
                         <td className="py-3 px-3 text-morandi-primary font-medium">
-                          {item.receipt.receipt_number}
+                          {confirmItem.receiptNumber}
                         </td>
                         <td className="py-3 px-3 text-morandi-primary">
-                          {item.receipt.order_number || '-'}
+                          {confirmItem.orderNumber || '-'}
                         </td>
                         <td className="py-3 px-3 text-morandi-primary max-w-[200px] truncate">
-                          {item.receipt.tour_name || '-'}
+                          {confirmItem.tourName || '-'}
                         </td>
                         <td className="py-3 px-3">
                           <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-morandi-container text-morandi-primary">
-                            {RECEIPT_TYPE_LABELS[item.receipt.receipt_type] || '未知'}
+                            {RECEIPT_TYPE_LABELS[confirmItem.item.receipt_type as ReceiptType] || '未知'}
                           </span>
                         </td>
                         <td className="py-3 px-3 text-right text-morandi-primary">
-                          <CurrencyCell amount={item.receipt.receipt_amount} />
+                          <CurrencyCell amount={confirmItem.item.amount} />
                         </td>
                         <td className="py-3 px-3 text-right">
                           <Input
                             type="number"
-                            value={item.actualAmount || ''}
+                            value={confirmItem.actualAmount || ''}
                             onChange={e =>
-                              updateItem(item.receipt.id, {
+                              updateItem(confirmItem.item.id, {
                                 actualAmount: parseFloat(e.target.value) || 0,
                               })
                             }
                             className={cn(
                               'w-32 text-right h-8',
-                              item.actualAmount !== item.receipt.receipt_amount &&
+                              confirmItem.actualAmount !== confirmItem.item.amount &&
                                 'border-morandi-gold'
                             )}
-                            disabled={!item.selected}
+                            disabled={!confirmItem.selected}
                           />
                         </td>
                       </tr>
@@ -321,12 +418,12 @@ export function BatchConfirmReceiptDialog({
 
               {/* 金額差異提醒 */}
               {Array.from(confirmItems.values()).some(
-                item => item.selected && item.actualAmount !== item.receipt.receipt_amount
+                item => item.selected && item.actualAmount !== item.item.amount
               ) && (
                 <div className="flex items-center gap-2 p-3 mt-4 border border-morandi-gold/20 rounded-lg bg-morandi-gold/5 text-sm">
                   <AlertCircle className="h-4 w-4 text-morandi-gold flex-shrink-0" />
                   <span className="text-morandi-gold">
-                    部分收款單的實收金額與應收金額不同，請確認
+                    部分收款品項的實收金額與應收金額不同，請確認
                   </span>
                 </div>
               )}

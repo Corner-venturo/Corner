@@ -32,8 +32,21 @@ import { TourNavigation } from '@/features/tours/components/sections/TourNavigat
 import { COMPANY } from '@/lib/constants/company'
 
 interface TourPageProps {
-   
-  data: any // TourData 結構複雜且被多個組件共用，暫時保留 any
+  /**
+   * TourPage 資料結構
+   * 
+   * 此 data prop 來自多個 API 的複合資料，包含：
+   * - 基本行程資訊（title, coverImage, coverStyle 等）
+   * - 每日行程（dailyItinerary）
+   * - 定價資訊（pricingDetails, priceTiers）
+   * - 航班、飯店、領隊等多個區塊的資料
+   * 
+   * 由於資料結構複雜且跨多個組件共用，無法建立統一型別。
+   * 各子組件各自定義所需的 props 型別。
+   * TODO: 建立統一的 TourPageData 型別，整合所有區塊的型別定義
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any
   isPreview?: boolean
   viewMode?: 'desktop' | 'mobile'
 }

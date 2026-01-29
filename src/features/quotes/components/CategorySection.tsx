@@ -494,7 +494,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
 
       {/* 選擇國家對話框 */}
       <Dialog open={isCountryDialogOpen} onOpenChange={setIsCountryDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent level={1} className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>選擇國家</DialogTitle>
           </DialogHeader>

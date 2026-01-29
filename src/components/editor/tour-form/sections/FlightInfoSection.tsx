@@ -231,7 +231,7 @@ export function FlightInfoSection({
 
       {/* 航班設定 Modal */}
       <Dialog open={showFlightSettings} onOpenChange={setShowFlightSettings}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-hidden p-0">
+        <DialogContent level={1} className="max-w-[95vw] max-h-[95vh] overflow-hidden p-0">
           <div className="flex h-full">
             {/* 左側：設定表單 */}
             <div className="w-1/2 p-6 overflow-y-auto max-h-[90vh] border-r border-morandi-container">

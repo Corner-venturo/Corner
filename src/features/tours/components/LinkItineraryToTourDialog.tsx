@@ -112,7 +112,7 @@ export function LinkItineraryToTourDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="max-w-md">
+      <DialogContent level={1} className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Palette className="w-5 h-5 text-morandi-gold" />

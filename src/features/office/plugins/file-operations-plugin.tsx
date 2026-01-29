@@ -5,9 +5,11 @@ import {
   ICommandService,
   Inject,
   Injector,
+  IUniverInstanceService,
   Plugin,
   UniverInstanceType,
 } from '@univerjs/core'
+import { SetRangeValuesCommand, getSheetCommandTarget, SheetsSelectionsService } from '@univerjs/sheets'
 import {
   ComponentManager,
   IMenuManagerService,
@@ -22,6 +24,7 @@ import type { IMenuButtonItem } from '@univerjs/ui'
 const SAVE_COMMAND_ID = 'office.command.save'
 const SAVE_AS_COMMAND_ID = 'office.command.save-as'
 const EXPORT_EXCEL_COMMAND_ID = 'office.command.export-excel'
+const AUTO_SUM_COMMAND_ID = 'office.command.auto-sum'
 
 // ============================================
 // 全域回調函數（由 React 組件設定）
@@ -87,6 +90,15 @@ function ExportExcelIcon() {
   )
 }
 
+function AutoSumIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 4H6l6 6-6 6h12"/>
+    </svg>
+  )
+}
+
+
 // ============================================
 // Commands
 // ============================================
@@ -119,6 +131,75 @@ const ExportExcelCommand: ICommand = {
     if (onExportExcelCallback) {
       onExportExcelCallback()
     }
+    return true
+  },
+}
+
+// 將欄位索引轉換為 Excel 欄位名稱 (0 -> A, 1 -> B, 26 -> AA)
+function columnIndexToLetter(index: number): string {
+  let result = ''
+  let i = index
+  while (i >= 0) {
+    result = String.fromCharCode((i % 26) + 65) + result
+    i = Math.floor(i / 26) - 1
+  }
+  return result
+}
+
+// 自動加總命令：選取範圍後，在下方插入 SUM 公式
+const AutoSumCommand: ICommand = {
+  id: AUTO_SUM_COMMAND_ID,
+  type: CommandType.COMMAND,
+  handler: (accessor: IAccessor) => {
+    const univerInstanceService = accessor.get(IUniverInstanceService)
+    const selectionService = accessor.get(SheetsSelectionsService)
+    const commandService = accessor.get(ICommandService)
+
+    // 取得當前選取範圍
+    const selections = selectionService.getCurrentSelections()
+    if (!selections || selections.length === 0) {
+      return false
+    }
+
+    const selection = selections[0]
+    const range = selection.range
+    if (!range) return false
+
+    // 取得目標 sheet
+    const target = getSheetCommandTarget(univerInstanceService)
+    if (!target) return false
+
+    const { unitId, subUnitId } = target
+
+    // 計算 SUM 公式的範圍字串
+    const startCol = columnIndexToLetter(range.startColumn)
+    const endCol = columnIndexToLetter(range.endColumn)
+    const startRow = range.startRow + 1 // Excel 行號從 1 開始
+    const endRow = range.endRow + 1
+
+    // 建立公式字串
+    const formula = `=SUM(${startCol}${startRow}:${endCol}${endRow})`
+
+    // 在選取範圍的下一行插入 SUM 公式
+    const targetRow = range.endRow + 1
+    const targetCol = range.startColumn
+
+    // 執行設定儲存格值的命令
+    commandService.executeCommand(SetRangeValuesCommand.id, {
+      unitId,
+      subUnitId,
+      range: {
+        startRow: targetRow,
+        endRow: targetRow,
+        startColumn: targetCol,
+        endColumn: targetCol,
+      },
+      value: {
+        v: null,
+        f: formula,
+      },
+    })
+
     return true
   },
 }
@@ -156,6 +237,17 @@ function ExportExcelMenuItemFactory(): IMenuButtonItem<string> {
   }
 }
 
+function AutoSumMenuItemFactory(): IMenuButtonItem<string> {
+  return {
+    id: AUTO_SUM_COMMAND_ID,
+    type: MenuItemType.BUTTON,
+    title: 'Σ 加總',
+    tooltip: '選取範圍後，在下方自動插入 SUM 公式',
+    icon: 'AutoSumIcon',
+  }
+}
+
+
 // ============================================
 // Controller
 // ============================================
@@ -175,12 +267,14 @@ class FileOperationsController extends Disposable {
     this.disposeWithMe(this._commandService.registerCommand(SaveCommand))
     this.disposeWithMe(this._commandService.registerCommand(SaveAsCommand))
     this.disposeWithMe(this._commandService.registerCommand(ExportExcelCommand))
+    this.disposeWithMe(this._commandService.registerCommand(AutoSumCommand))
   }
 
   private _registerComponents(): void {
     this._componentManager.register('SaveIcon', SaveIcon)
     this._componentManager.register('SaveAsIcon', SaveAsIcon)
     this._componentManager.register('ExportExcelIcon', ExportExcelIcon)
+    this._componentManager.register('AutoSumIcon', AutoSumIcon)
   }
 
   private _initMenus(): void {
@@ -197,6 +291,10 @@ class FileOperationsController extends Disposable {
         [EXPORT_EXCEL_COMMAND_ID]: {
           order: -1,
           menuItemFactory: ExportExcelMenuItemFactory,
+        },
+        [AUTO_SUM_COMMAND_ID]: {
+          order: 10, // 放在右邊
+          menuItemFactory: AutoSumMenuItemFactory,
         },
       },
     })

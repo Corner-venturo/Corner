@@ -367,7 +367,7 @@ export function TourFeaturesSection({ data, viewMode, coverStyle = 'original', f
 
       {/* Lightbox 圖片放大檢視 */}
       <Dialog open={lightboxImages.length > 0} onOpenChange={(open) => !open && closeLightbox()}>
-        <DialogContent className="max-w-5xl bg-black/90 border-none p-0">
+        <DialogContent level={1} className="max-w-5xl bg-black/90 border-none p-0">
           <div className="relative flex items-center justify-center min-h-[60vh]">
             {/* 左箭頭 */}
             {lightboxImages.length > 1 && (

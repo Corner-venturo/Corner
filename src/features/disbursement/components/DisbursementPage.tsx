@@ -31,13 +31,7 @@ import { DisbursementDetailDialog } from './DisbursementDetailDialog'
 import { DisbursementPrintDialog } from './DisbursementPrintDialog'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
-
-// 出納單狀態
-const DISBURSEMENT_STATUS = {
-  pending: { label: '待出帳', color: 'bg-morandi-gold' },
-  confirmed: { label: '已確認', color: 'bg-status-info' },
-  paid: { label: '已出帳', color: 'bg-morandi-green' },
-}
+import { DISBURSEMENT_STATUS } from '../constants'
 
 export function DisbursementPage() {
   // 使用 @/data hooks（SWR 自動載入）

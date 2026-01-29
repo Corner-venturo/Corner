@@ -107,9 +107,9 @@ function SortableAttractionItem({
               <h3 className="font-medium text-morandi-primary line-clamp-1">
                 {attraction.name}
               </h3>
-              {attraction.name_en && (
+              {attraction.english_name && (
                 <p className="text-sm text-morandi-muted line-clamp-1 mt-0.5">
-                  {attraction.name_en}
+                  {attraction.english_name}
                 </p>
               )}
               <div className="flex items-center gap-4 mt-2">

@@ -55,7 +55,7 @@ export function AddMemberDialog({
 }: AddMemberDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent nested className="max-w-lg">
+      <DialogContent nested level={2} className="max-w-lg">
         <DialogHeader>
           <DialogTitle>新增成員</DialogTitle>
         </DialogHeader>

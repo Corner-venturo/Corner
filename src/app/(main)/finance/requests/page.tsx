@@ -22,7 +22,7 @@ const RequestDetailDialog = dynamic(
   {
     loading: () => (
       <Dialog open>
-        <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center">
+        <DialogContent level={1} className="bg-transparent border-none shadow-none flex items-center justify-center">
           <VisuallyHidden>
             <DialogTitle>載入中</DialogTitle>
           </VisuallyHidden>

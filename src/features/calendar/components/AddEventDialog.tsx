@@ -80,7 +80,7 @@ export function AddEventDialog({
 
   return (
     <Dialog open={dialog.open} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="max-w-[600px] p-0 rounded-2xl border-[#E8E4E0] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] overflow-hidden [&>button:last-child]:hidden">
+      <DialogContent level={1} className="max-w-[600px] p-0 rounded-2xl border-[#E8E4E0] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] overflow-hidden [&>button:last-child]:hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-6 pb-2">
           <h2 className="text-2xl font-bold tracking-tight text-[#333333]">新增行事曆事項</h2>

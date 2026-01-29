@@ -95,7 +95,7 @@ export function CreateDesignDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent level={1} className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>新增設計</DialogTitle>
         </DialogHeader>

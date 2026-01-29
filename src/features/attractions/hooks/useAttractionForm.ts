@@ -48,7 +48,7 @@ export function useAttractionForm({ attraction, initialFormData, open }: UseAttr
     if (attraction) {
       setFormData({
         name: attraction.name || '',
-        name_en: attraction.name_en || '',
+        english_name: attraction.english_name || '',
         description: attraction.description || '',
         country_id: attraction.country_id || '',
         region_id: attraction.region_id || '',

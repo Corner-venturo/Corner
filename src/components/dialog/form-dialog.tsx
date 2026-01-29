@@ -124,6 +124,7 @@ export function FormDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        level={1}
         className={`${maxWidthClasses[maxWidth]} ${contentClassName}`}
         onDragOver={handleDragOver}
         onDrop={handleDrop}

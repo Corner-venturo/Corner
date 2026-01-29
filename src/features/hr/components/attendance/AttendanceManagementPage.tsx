@@ -388,7 +388,7 @@ export function AttendanceManagementPage() {
 
       {/* 編輯 Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className={DIALOG_SIZES.md}>
+        <DialogContent level={1} className={DIALOG_SIZES.md}>
           <DialogHeader>
             <DialogTitle>{editingRecord ? '編輯出勤紀錄' : '新增出勤紀錄'}</DialogTitle>
           </DialogHeader>

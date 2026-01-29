@@ -97,7 +97,7 @@ export function EditWorkspaceDialog({ open, onOpenChange, workspace, onSuccess }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={DIALOG_SIZES.sm}>
+      <DialogContent level={1} className={DIALOG_SIZES.sm}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Settings size={20} className="text-morandi-gold" />

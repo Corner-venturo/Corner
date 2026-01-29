@@ -104,7 +104,7 @@ export default function TransportationRatesPage() {
 
       {/* 新增國家 Dialog */}
       <Dialog open={isAddingNewCountry} onOpenChange={setIsAddingNewCountry}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent level={1} className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>新增國家</DialogTitle>
           </DialogHeader>

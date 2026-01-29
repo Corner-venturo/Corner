@@ -26,7 +26,7 @@ export function MemberPayments({
 }: MemberPaymentsProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl p-0">
+      <DialogContent level={1} className="max-w-4xl p-0">
         <DialogHeader className="p-4 pb-2">
           <DialogTitle className="text-base">
             {matchType === 'name'

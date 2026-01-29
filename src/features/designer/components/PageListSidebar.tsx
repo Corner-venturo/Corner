@@ -300,7 +300,7 @@ export function PageListSidebar({
 
       {/* 新增頁面對話框 */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="max-w-sm">
+        <DialogContent level={1} className="max-w-sm">
           <DialogHeader>
             <DialogTitle>新增頁面</DialogTitle>
           </DialogHeader>
@@ -347,7 +347,7 @@ export function PageListSidebar({
 
       {/* 備忘錄項目選擇對話框 */}
       <Dialog open={showMemoDialog} onOpenChange={setShowMemoDialog}>
-        <DialogContent className="max-w-lg max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogContent level={1} className="max-w-lg max-h-[80vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle>選擇備忘錄內容</DialogTitle>
           </DialogHeader>

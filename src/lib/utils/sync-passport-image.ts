@@ -33,6 +33,92 @@ export async function syncPassportImageToMembers(
   return syncPassportDataToMembers(customerId, { passport_image_url: passportImageUrl })
 }
 
+// 衝突成員資訊
+interface ConflictMember {
+  id: string
+  orderId: string
+  orderCode?: string
+  tourName?: string
+  memberName?: string
+  conflictFields: string[]
+}
+
+/**
+ * 檢查是否有衝突的訂單成員
+ *
+ * @param customerId - 顧客 ID
+ * @param passportData - 要同步的護照資料
+ * @returns 有衝突的成員列表
+ */
+export async function checkMemberConflicts(
+  customerId: string,
+  passportData: PassportData
+): Promise<ConflictMember[]> {
+  try {
+    // 查詢關聯的 order_members
+    const { data: members, error } = await supabase
+      .from('order_members')
+      .select(`
+        id,
+        order_id,
+        chinese_name,
+        passport_number,
+        passport_name,
+        passport_expiry,
+        birth_date,
+        gender,
+        id_number,
+        orders!inner(code, tour_name)
+      `)
+      .eq('customer_id', customerId)
+
+    if (error || !members) {
+      return []
+    }
+
+    const conflicts: ConflictMember[] = []
+
+    for (const member of members) {
+      const conflictFields: string[] = []
+
+      // 檢查每個欄位是否有衝突（成員有值且與新值不同）
+      if (passportData.passport_number && member.passport_number &&
+          member.passport_number !== passportData.passport_number) {
+        conflictFields.push('護照號碼')
+      }
+      if (passportData.passport_expiry && member.passport_expiry &&
+          member.passport_expiry !== passportData.passport_expiry) {
+        conflictFields.push('護照效期')
+      }
+      if (passportData.passport_name && member.passport_name &&
+          member.passport_name !== passportData.passport_name) {
+        conflictFields.push('護照拼音')
+      }
+      if (passportData.birth_date && member.birth_date &&
+          member.birth_date !== passportData.birth_date) {
+        conflictFields.push('生日')
+      }
+
+      if (conflictFields.length > 0) {
+        const order = member.orders as { code?: string; tour_name?: string } | null
+        conflicts.push({
+          id: member.id,
+          orderId: member.order_id,
+          orderCode: order?.code,
+          tourName: order?.tour_name,
+          memberName: member.chinese_name || undefined,
+          conflictFields,
+        })
+      }
+    }
+
+    return conflicts
+  } catch (error) {
+    logger.error('檢查成員衝突失敗:', error)
+    return []
+  }
+}
+
 /**
  * 同步顧客所有護照資料到所有關聯的訂單成員
  *
@@ -45,50 +131,27 @@ export async function syncPassportDataToMembers(
   passportData: PassportData
 ): Promise<number> {
   try {
-    // 建立更新資料，只包含有值的欄位
-    const updateData: Record<string, string | null> = {}
-
-    if (passportData.passport_number !== undefined) {
-      updateData.passport_number = passportData.passport_number
-    }
-    if (passportData.passport_name !== undefined) {
-      updateData.passport_name = passportData.passport_name
-    }
-    if (passportData.passport_expiry !== undefined) {
-      updateData.passport_expiry = passportData.passport_expiry
-    }
-    if (passportData.passport_image_url !== undefined) {
-      updateData.passport_image_url = passportData.passport_image_url
-    }
-    if (passportData.birth_date !== undefined) {
-      updateData.birth_date = passportData.birth_date
-    }
-    if (passportData.gender !== undefined) {
-      updateData.gender = passportData.gender
-    }
-    if (passportData.national_id !== undefined) {
-      updateData.id_number = passportData.national_id  // 對應 order_members 的欄位名
-    }
-
-    if (Object.keys(updateData).length === 0) {
-      return 0
-    }
-
-    // 更新所有關聯的 order_members
-    const { data, error } = await supabase
-      .from('order_members')
-      .update(updateData)
-      .eq('customer_id', customerId)
-      .select('id')
+    // 使用 RPC 函數處理 uuid/text 類型轉換
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.rpc as any)('sync_passport_to_order_members', {
+      p_customer_id: customerId,
+      p_passport_number: passportData.passport_number ?? null,
+      p_passport_name: passportData.passport_name ?? null,
+      p_passport_expiry: passportData.passport_expiry ?? null,
+      p_passport_image_url: passportData.passport_image_url ?? null,
+      p_birth_date: passportData.birth_date ?? null,
+      p_gender: passportData.gender ?? null,
+      p_id_number: passportData.national_id ?? null,
+    })
 
     if (error) {
       logger.error('同步護照資料到成員失敗:', error)
       return 0
     }
 
-    const updatedCount = data?.length || 0
+    const updatedCount = (data as number) || 0
     if (updatedCount > 0) {
-      logger.info(`已同步護照資料到 ${updatedCount} 個訂單成員`, Object.keys(updateData))
+      logger.info(`已同步護照資料到 ${updatedCount} 個訂單成員`)
     }
 
     return updatedCount

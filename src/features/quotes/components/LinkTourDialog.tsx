@@ -76,7 +76,7 @@ export function LinkTourDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="max-w-lg">
+      <DialogContent level={1} className="max-w-lg">
         {step === 'select' ? (
           <>
             <DialogHeader>

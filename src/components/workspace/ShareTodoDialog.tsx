@@ -105,7 +105,7 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+      <DialogContent level={1} className="max-w-2xl max-h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>共享代辦事項到頻道</DialogTitle>
           <DialogDescription>選擇要分享的代辦事項，可選擇指派對象</DialogDescription>

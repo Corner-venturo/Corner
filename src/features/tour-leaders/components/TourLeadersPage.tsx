@@ -17,7 +17,7 @@ import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 const emptyFormData: TourLeaderFormData = {
   name: '',
-  name_en: '',
+  english_name: '',
   phone: '',
   email: '',
   address: '',
@@ -49,7 +49,7 @@ export const TourLeadersPage: React.FC = () => {
     const query = searchQuery.toLowerCase()
     return (
       item.name?.toLowerCase().includes(query) ||
-      item.name_en?.toLowerCase().includes(query) ||
+      item.english_name?.toLowerCase().includes(query) ||
       item.phone?.toLowerCase().includes(query) ||
       item.code?.toLowerCase().includes(query)
     )
@@ -67,7 +67,7 @@ export const TourLeadersPage: React.FC = () => {
     setEditingItem(item)
     setFormData({
       name: item.name || '',
-      name_en: item.name_en || '',
+      english_name: item.english_name || '',
       phone: item.phone || '',
       email: item.email || '',
       address: item.address || '',
@@ -130,7 +130,7 @@ export const TourLeadersPage: React.FC = () => {
     try {
       const data = {
         name: formData.name,
-        name_en: formData.name_en || null,
+        english_name: formData.english_name || null,
         phone: formData.phone || null,
         email: formData.email || null,
         address: formData.address || null,

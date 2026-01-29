@@ -50,7 +50,7 @@ export function CustomerMatchDialog({
 }: CustomerMatchDialogProps) {
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onSkipAll()}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent level={1} className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <UserPlus className="h-5 w-5 text-morandi-gold" />
@@ -196,7 +196,7 @@ export function AddCustomerFormDialog({
 }: AddCustomerFormDialogProps) {
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onBack()}>
-      <DialogContent className="sm:max-w-4xl">
+      <DialogContent level={1} className="sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <UserPlus className="h-5 w-5 text-morandi-gold" />

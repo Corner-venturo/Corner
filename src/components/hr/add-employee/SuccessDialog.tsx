@@ -31,7 +31,7 @@ export function SuccessDialog({
 }: SuccessDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent level={1} className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-morandi-gold">✅ 員工創建成功</DialogTitle>
           <DialogDescription>員工資料已成功建立，請記錄以下登入資訊</DialogDescription>

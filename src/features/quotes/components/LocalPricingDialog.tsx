@@ -128,7 +128,7 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent level={1} className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <MapPin size={18} className="text-morandi-gold" />

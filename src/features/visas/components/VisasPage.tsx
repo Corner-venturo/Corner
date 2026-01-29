@@ -221,7 +221,7 @@ export default function VisasPage() {
           tour_id: selectedTour.id,
           code: selectedTour.code,
           created_by: user.id,
-          note: '',
+          notes: '',
         })
       }
 

@@ -555,7 +555,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
           booking_status: req.status === 'confirmed' ? 'confirmed' : 'pending',
           type_data: null,
           sort_order: 0,
-          notes: req.note || null,
+          notes: req.notes || null,
           workspace_id: workspaceId,
           // 關聯需求單
           request_id: req.id,

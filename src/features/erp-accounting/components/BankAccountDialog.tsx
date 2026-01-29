@@ -98,7 +98,7 @@ export function BankAccountDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent level={1}>
         <DialogHeader>
           <DialogTitle>{account ? '編輯銀行帳戶' : '新增銀行帳戶'}</DialogTitle>
         </DialogHeader>

@@ -101,7 +101,7 @@ function TicketStatusDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent level={1} className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Ticket size={20} className="text-morandi-gold" />
@@ -338,7 +338,7 @@ export function DialogsContainer({
 
       {/* Settings Dialog */}
       <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
-        <DialogContent>
+        <DialogContent level={1}>
           <DialogHeader>
             <DialogTitle>頻道設定</DialogTitle>
             <DialogDescription>管理 #{selectedChannel?.name} 的設定</DialogDescription>
@@ -382,7 +382,7 @@ export function DialogsContainer({
 
       {/* Share Quote Dialog */}
       <Dialog open={showShareQuoteDialog} onOpenChange={setShowShareQuoteDialog}>
-        <DialogContent>
+        <DialogContent level={1}>
           <DialogHeader>
             <DialogTitle>分享報價單</DialogTitle>
             <DialogDescription>選擇要分享到頻道的報價單</DialogDescription>
@@ -412,7 +412,7 @@ export function DialogsContainer({
 
       {/* Share Tour Dialog */}
       <Dialog open={showShareTourDialog} onOpenChange={setShowShareTourDialog}>
-        <DialogContent>
+        <DialogContent level={1}>
           <DialogHeader>
             <DialogTitle>分享團況</DialogTitle>
             <DialogDescription>選擇要分享到頻道的團況資訊</DialogDescription>
@@ -442,7 +442,7 @@ export function DialogsContainer({
 
       {/* New Payment Dialog */}
       <Dialog open={showNewPaymentDialog} onOpenChange={setShowNewPaymentDialog}>
-        <DialogContent>
+        <DialogContent level={1}>
           <DialogHeader>
             <DialogTitle>新增請款單</DialogTitle>
             <DialogDescription>建立新請款單並分享到頻道</DialogDescription>
@@ -476,7 +476,7 @@ export function DialogsContainer({
 
       {/* New Receipt Dialog */}
       <Dialog open={showNewReceiptDialog} onOpenChange={setShowNewReceiptDialog}>
-        <DialogContent>
+        <DialogContent level={1}>
           <DialogHeader>
             <DialogTitle>新增收款單</DialogTitle>
             <DialogDescription>建立新收款單並分享到頻道</DialogDescription>
@@ -531,7 +531,7 @@ export function DialogsContainer({
       {/* Bot: 復盤 Dialog */}
       {showTourReviewDialog && setShowTourReviewDialog && (
         <Dialog open={showTourReviewDialog} onOpenChange={setShowTourReviewDialog}>
-          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogContent level={1} className="max-w-3xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Calendar size={20} className="text-morandi-primary" />

@@ -273,7 +273,7 @@ function CreateItineraryDialog({
 }: CreateItineraryDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl h-[90vh] overflow-hidden p-0">
+      <DialogContent level={1} className="max-w-5xl h-[90vh] overflow-hidden p-0">
         <div className="flex h-full">
           {/* 左側：基本資訊 */}
           <div className="w-1/2 p-6 overflow-y-auto">
@@ -716,7 +716,7 @@ interface PasswordDialogProps {
 function PasswordDialog({ isOpen, onOpenChange, passwordInput, onPasswordChange, onSubmit }: PasswordDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm">
+      <DialogContent level={1} className="max-w-sm">
         <DialogHeader>
           <DialogTitle>編輯進行中行程</DialogTitle>
         </DialogHeader>
@@ -776,7 +776,7 @@ function DuplicateDialog({
 }: DuplicateDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent level={1} className="max-w-md">
         <DialogHeader>
           <DialogTitle>複製行程</DialogTitle>
         </DialogHeader>

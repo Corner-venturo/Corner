@@ -185,7 +185,7 @@ export function DisbursementPrintDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] max-w-[1200px] h-[90vh] overflow-hidden flex flex-col p-0">
+      <DialogContent level={1} className="w-[95vw] max-w-[1200px] h-[90vh] overflow-hidden flex flex-col p-0">
         {/* 標題列 */}
         <DialogHeader className="flex-shrink-0 px-6 py-4 border-b bg-morandi-background">
           <div className="flex items-center justify-between">

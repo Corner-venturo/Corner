@@ -55,8 +55,8 @@ export function AttractionPreview({
       {/* 基本資訊 */}
       <div className="space-y-2">
         <h4 className="text-base font-medium">{formData.name || '未命名景點'}</h4>
-        {formData.name_en && (
-          <div className="text-sm text-morandi-muted">{formData.name_en}</div>
+        {formData.english_name && (
+          <div className="text-sm text-morandi-muted">{formData.english_name}</div>
         )}
       </div>
 

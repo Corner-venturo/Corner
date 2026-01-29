@@ -207,7 +207,7 @@ export function TourConfirmationWizard({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent level={1} className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg">
             <Lock className="h-5 w-5 text-morandi-gold" />

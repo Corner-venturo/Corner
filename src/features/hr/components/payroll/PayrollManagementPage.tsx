@@ -358,7 +358,7 @@ export function PayrollManagementPage() {
 
       {/* 建立期間 Dialog */}
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent className={DIALOG_SIZES.sm}>
+        <DialogContent level={1} className={DIALOG_SIZES.sm}>
           <DialogHeader>
             <DialogTitle>建立薪資期間</DialogTitle>
           </DialogHeader>
@@ -413,7 +413,7 @@ export function PayrollManagementPage() {
 
       {/* 薪資紀錄 Dialog */}
       <Dialog open={showRecordsDialog} onOpenChange={setShowRecordsDialog}>
-        <DialogContent className={DIALOG_SIZES['2xl']}>
+        <DialogContent level={1} className={DIALOG_SIZES['2xl']}>
           <DialogHeader>
             <DialogTitle>
               {selectedPeriod ? `${selectedPeriod.year}年${selectedPeriod.month}月 薪資明細` : '薪資明細'}
@@ -475,7 +475,7 @@ export function PayrollManagementPage() {
 
       {/* 薪資單 Dialog */}
       <Dialog open={showPayslipDialog} onOpenChange={setShowPayslipDialog}>
-        <DialogContent className={DIALOG_SIZES.md}>
+        <DialogContent level={1} className={DIALOG_SIZES.md}>
           <DialogHeader>
             <DialogTitle>薪資單</DialogTitle>
           </DialogHeader>

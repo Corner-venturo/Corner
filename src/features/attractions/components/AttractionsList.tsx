@@ -82,8 +82,8 @@ export function AttractionsList({
             )}
             <div>
               <div className="font-medium text-morandi-primary line-clamp-1">{attraction.name}</div>
-              {attraction.name_en && (
-                <div className="text-xs text-morandi-muted line-clamp-1">{attraction.name_en}</div>
+              {attraction.english_name && (
+                <div className="text-xs text-morandi-muted line-clamp-1">{attraction.english_name}</div>
               )}
             </div>
           </div>

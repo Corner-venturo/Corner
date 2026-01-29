@@ -68,7 +68,7 @@ export function useRequestOperations() {
           request_date: formData.request_date,
           amount: 0,
           status: 'pending',
-          note: formData.note,
+          notes: formData.notes,
           request_type: expenseTypeName,
           request_category: 'company',
           expense_type: expenseType,
@@ -87,7 +87,7 @@ export function useRequestOperations() {
             description: item.description,
             unit_price: item.unit_price,
             quantity: item.quantity,
-            note: '',
+            notes: '',
             sort_order: i + 1,
           })
         }
@@ -112,7 +112,7 @@ export function useRequestOperations() {
           request_date: formData.request_date,
           amount: 0,
           status: 'pending',
-          note: formData.note,
+          notes: formData.notes,
           request_type: '供應商支出',
           request_category: 'tour',
           created_by: formData.created_by || undefined,
@@ -130,7 +130,7 @@ export function useRequestOperations() {
             description: item.description,
             unit_price: item.unit_price,
             quantity: item.quantity,
-            note: '',
+            notes: '',
             sort_order: i + 1,
           })
         }
@@ -171,7 +171,7 @@ export function useRequestOperations() {
           request_date: formData.request_date,
           amount: 0,
           status: 'pending',
-          note: formData.note,
+          notes: formData.notes,
           request_type: '供應商支出', // Default value for now
         })
 
@@ -185,7 +185,7 @@ export function useRequestOperations() {
             description: item.description,
             unit_price: item.unit_price,
             quantity: item.quantity,
-            note: '',
+            notes: '',
             sort_order: i + 1,
           })
         }

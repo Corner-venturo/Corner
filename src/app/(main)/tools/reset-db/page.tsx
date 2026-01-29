@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { logger } from '@/lib/utils/logger'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { AlertCircle, CheckCircle2, Database, Trash2, RefreshCw } from 'lucide-react'
@@ -14,17 +15,17 @@ export default function ResetDBPage() {
       const deleteRequest = indexedDB.deleteDatabase(dbName)
 
       deleteRequest.onsuccess = () => {
-        console.log(`✅ ${dbName} 刪除成功`)
+        logger.log(`✅ ${dbName} 刪除成功`)
         resolve()
       }
 
       deleteRequest.onerror = () => {
-        console.error(`❌ ${dbName} 刪除失敗:`, deleteRequest.error)
+        logger.error(`❌ ${dbName} 刪除失敗:`, deleteRequest.error)
         reject(deleteRequest.error)
       }
 
       deleteRequest.onblocked = () => {
-        console.warn(`⚠️ ${dbName} 被鎖定`)
+        logger.warn(`⚠️ ${dbName} 被鎖定`)
         reject(new Error(`${dbName} 被其他連線鎖定`))
       }
     })
@@ -44,17 +45,17 @@ export default function ResetDBPage() {
           await new Promise<void>((resolve) => {
             openRequest.onsuccess = () => {
               const db = openRequest.result
-              console.log(`🔌 關閉 ${dbName} 連線...`)
+              logger.log(`🔌 關閉 ${dbName} 連線...`)
               db.close()
               resolve()
             }
             openRequest.onerror = () => {
-              console.log(`⚠️ ${dbName} 沒有連線需要關閉`)
+              logger.log(`⚠️ ${dbName} 沒有連線需要關閉`)
               resolve()
             }
           })
         } catch (e) {
-          console.log(`⚠️ 無法關閉 ${dbName} 連線，繼續執行刪除...`)
+          logger.log(`⚠️ 無法關閉 ${dbName} 連線，繼續執行刪除...`)
         }
       }
 
@@ -71,9 +72,9 @@ export default function ResetDBPage() {
             setTimeout(() => reject(new Error('timeout')), 5000)
           )
         ])
-        console.log('✅ 舊資料庫已刪除')
+        logger.log('✅ 舊資料庫已刪除')
       } catch (e) {
-        console.log('⚠️ 舊資料庫刪除失敗或不存在，繼續...')
+        logger.log('⚠️ 舊資料庫刪除失敗或不存在，繼續...')
       }
 
       // Step 4: 刪除當前資料庫 (VenturoOfflineDB)
@@ -98,7 +99,7 @@ export default function ResetDBPage() {
       } else {
         setMessage('❌ 執行失敗：' + (error as Error).message)
       }
-      console.error('❌ 執行失敗：', error)
+      logger.error('❌ 執行失敗：', error)
     }
   }
 

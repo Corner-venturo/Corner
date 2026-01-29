@@ -113,7 +113,7 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[95vw] h-[90vh] flex flex-col">
+      <DialogContent level={1} className="max-w-[95vw] h-[90vh] flex flex-col">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="flex items-center gap-2">

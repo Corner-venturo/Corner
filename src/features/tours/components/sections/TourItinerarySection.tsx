@@ -696,7 +696,7 @@ export function TourItinerarySection({
 
       {/* 懸浮視窗 Modal - 桌面版景點詳情 */}
       <Dialog open={selectedActivity !== null} onOpenChange={(open) => !open && setSelectedActivity(null)}>
-        <DialogContent className="max-w-[85vw] max-h-[70vh] w-auto p-0 overflow-hidden">
+        <DialogContent level={1} className="max-w-[85vw] max-h-[70vh] w-auto p-0 overflow-hidden">
           <AnimatePresence mode="wait">
             {selectedActivity && (
               <motion.div

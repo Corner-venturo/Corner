@@ -35,9 +35,9 @@
  * 注意：台北和台中員工都使用相同的編號範圍，入口需選擇公司
  *
  * === 提案編號格式 ===
- * PR{6位數}
- * 例如：PR000001, PR000002...
- * 注意：提案無團號，永遠為草稿狀態。使用 PR 前綴避免與出納單 P{日期} 衝突
+ * P{6位數}
+ * 例如：P000001, P000002...
+ * 注意：提案用純數字 6 位數，出納單用日期格式（P250128A），兩者可區分
  *
  * === 公司請款單編號格式 ===
  * {費用類型}-{YYYYMM}-{3位數}
@@ -174,6 +174,7 @@ export function generateCode(
 /**
  * 生成客戶編號
  *
+ * @deprecated 目前未使用，客戶編號由後端自動生成
  * @param existingCustomers - 現有客戶列表
  * @returns 客戶編號（如 C000001）
  *
@@ -217,6 +218,7 @@ export function generateCustomerCode(existingCustomers: BaseEntity[]): string {
 /**
  * 生成員工編號
  *
+ * @deprecated 目前未使用，員工編號由後端自動生成
  * @param workspaceCode - 辦公室代碼（忽略，保留參數以維持 API 相容性）
  * @param existingEmployees - 現有員工列表（同 workspace）
  * @returns 員工編號（如 E001）
@@ -296,6 +298,7 @@ export function generateOrderCode(
 /**
  * 生成請款單編號
  *
+ * @deprecated 目前未使用，請款單編號由後端自動生成
  * @param tourCode - 團號（如 CNX250128A）
  * @param existingPaymentRequests - 現有請款單列表（同團）
  * @returns 請款單編號（如 CNX250128A-I01）
@@ -327,41 +330,9 @@ export function generatePaymentRequestCode(
 }
 
 /**
- * 生成收款單編號
- *
- * @param tourCode - 團號（如 CNX250128A）
- * @param existingReceiptOrders - 現有收款單列表（同團）
- * @returns 收款單編號（如 CNX250128A-R01）
- *
- * @example
- * generateReceiptOrderCode('CNX250128A', existingReceiptOrders)
- * // => 'CNX250128A-R01', 'CNX250128A-R02'...
- */
-export function generateReceiptOrderCode(
-  tourCode: string,
-  existingReceiptOrders: { code?: string }[]
-): string {
-  const prefix = `${tourCode}-R`
-  let maxNumber = 0
-
-  existingReceiptOrders.forEach(ro => {
-    const code = ro.code
-    if (code?.startsWith(prefix)) {
-      const numberPart = code.substring(prefix.length)
-      const number = parseInt(numberPart, 10)
-      if (!isNaN(number) && number > maxNumber) {
-        maxNumber = number
-      }
-    }
-  })
-
-  const nextNumber = (maxNumber + 1).toString().padStart(2, '0')
-  return `${prefix}${nextNumber}`
-}
-
-/**
  * 生成出納單編號
  *
+ * @deprecated 目前未使用，出納單編號由後端自動生成
  * @param disbursementDate - 出帳日期 (ISO 8601 格式)
  * @param existingDisbursementOrders - 現有出納單列表
  * @returns 出納單編號（如 P250128A）

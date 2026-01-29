@@ -32,7 +32,7 @@ export const SuppliersPage: React.FC = () => {
     name: '',
     bank_name: '',
     bank_account: '',
-    note: '',
+    notes: '',
   })
 
   // 過濾供應商
@@ -57,7 +57,7 @@ export const SuppliersPage: React.FC = () => {
       name: supplier.name || '',
       bank_name: supplier.bank_name || '',
       bank_account: supplier.bank_account || '',
-      note: supplier.notes || '',
+      notes: supplier.notes || '',
     })
     setIsAddDialogOpen(true)
   }, [])
@@ -86,7 +86,7 @@ export const SuppliersPage: React.FC = () => {
       name: '',
       bank_name: '',
       bank_account: '',
-      note: '',
+      notes: '',
     })
   }, [])
 
@@ -105,7 +105,7 @@ export const SuppliersPage: React.FC = () => {
           name: formData.name,
           bank_name: formData.bank_name,
           bank_account: formData.bank_account,
-          notes: formData.note,
+          notes: formData.notes,
         })
         await alert('供應商更新成功', 'success')
       } else {
@@ -114,7 +114,7 @@ export const SuppliersPage: React.FC = () => {
           name: formData.name,
           bank_name: formData.bank_name || null,
           bank_account: formData.bank_account || null,
-          notes: formData.note || null,
+          notes: formData.notes || null,
           type: 'other', // 預設型別
         })
         await alert('供應商建立成功', 'success')

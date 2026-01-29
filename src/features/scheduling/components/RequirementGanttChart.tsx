@@ -36,7 +36,7 @@ interface TourRequest {
   status: string
   handler_type: string
   description: string | null
-  note: string | null
+  notes: string | null
   assigned_vehicle_id?: string | null
   assigned_leader_id?: string | null
   // 跨公司需求欄位

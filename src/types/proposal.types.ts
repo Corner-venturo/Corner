@@ -110,7 +110,7 @@ export interface ConfirmedRequirementItem {
   service_date: string | null
   title: string
   quantity: number
-  note?: string
+  notes?: string
 }
 
 export interface ProposalPackage {

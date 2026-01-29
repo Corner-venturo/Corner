@@ -47,7 +47,7 @@ export function ArchiveReasonDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && handleClose()}>
-      <DialogContent className="max-w-md" aria-describedby={undefined}>
+      <DialogContent level={1} className="max-w-md" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-morandi-gold">
             <Archive size={20} />

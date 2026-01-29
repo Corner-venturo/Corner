@@ -14,7 +14,7 @@ import { useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
-import { syncPassportDataToMembers } from '@/lib/utils/sync-passport-image'
+// 不再自動同步到訂單成員，讓訂單那邊手動處理
 import type { Customer } from '@/types/customer.types'
 
 // 常用簡體→繁體對照表（人名常用字）
@@ -285,8 +285,8 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
             const passportNumber = ocrData.passport_number
             const nationalId = ocrData.national_id
             const birthDate = ocrData.birth_date
-            // 轉換簡體為繁體
-            const rawName = ocrData.name?.replace(/[⚠️()（）]/g, '').split('/')[0]?.trim()
+            // 轉換簡體為繁體（移除括號和警告符號）
+            const rawName = ocrData.name?.replace(/[()（）]/g, '').replace(/⚠️/g, '').split('/')[0]?.trim()
             const chineseName = toTraditional(rawName)
 
             // 檢查本次批次內重複
@@ -494,11 +494,6 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
           })
           autoUpdateSuccessCount++
 
-          // 同步到訂單成員
-          await syncPassportDataToMembers(item.existingCustomer!.id, {
-            passport_image_url: item.imageUrl,
-          })
-
           // 刪除舊照片
           if (oldPassportUrl && oldPassportUrl.includes('passport-images')) {
             const match = oldPassportUrl.match(/passport-images\/(.+)$/)
@@ -507,8 +502,9 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
             }
           }
         } catch (error) {
-          logger.error(`自動更新失敗: ${item.existingCustomer?.name}`, error)
-          failedItems.push(`${item.fileName} (更新失敗)`)
+          const errMsg = error instanceof Error ? error.message : JSON.stringify(error)
+          logger.error(`自動更新失敗: ${item.existingCustomer?.name}`, errMsg, error)
+          failedItems.push(`${item.fileName} (更新失敗: ${errMsg})`)
         }
       }
 
@@ -535,9 +531,6 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
             verification_status: 'unverified',
           })
           confirmedUpdateSuccessCount++
-
-          // 同步到訂單成員
-          await syncPassportDataToMembers(item.existingCustomer!.id, updatedData)
 
           // 刪除舊照片
           if (oldPassportUrl && oldPassportUrl.includes('passport-images')) {

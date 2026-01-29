@@ -52,7 +52,7 @@ export function WidgetSettingsDialog({ activeWidgets, onToggleWidget }: WidgetSe
           小工具設定
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md border-morandi-gold/20 shadow-lg rounded-2xl">
+      <DialogContent level={1} className="sm:max-w-md border-morandi-gold/20 shadow-lg rounded-2xl">
         <DialogHeader>
           <DialogTitle className="text-xl text-morandi-primary">選擇要顯示的小工具</DialogTitle>
           <p className="text-sm text-morandi-muted mt-1">勾選你想在首頁顯示的小工具</p>

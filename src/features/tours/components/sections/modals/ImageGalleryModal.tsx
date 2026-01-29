@@ -27,7 +27,7 @@ export function ImageGalleryModal({
   return (
     <Dialog open={!!imageGallery} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
-        className="max-w-5xl w-full bg-black/90 border-none p-0 gap-0"
+        level={1} className="max-w-5xl w-full bg-black/90 border-none p-0 gap-0"
         aria-describedby={undefined}
       >
         <div className="relative flex items-center justify-center min-h-[60vh]">

@@ -101,6 +101,15 @@ export interface EntityConfig {
 }
 
 // ============================================
+// Hook 選項
+// ============================================
+
+export interface ListOptions {
+  /** 是否啟用載入（false 時不會發送請求） */
+  enabled?: boolean
+}
+
+// ============================================
 // Hook 回傳型別
 // ============================================
 
@@ -147,10 +156,10 @@ export interface DictionaryResult<T> {
 // ============================================
 
 export interface EntityHook<T extends BaseEntity> {
-  /** 列表 hook */
-  useList: () => ListResult<T>
-  /** 精簡列表 hook */
-  useListSlim: () => ListResult<Partial<T>>
+  /** 列表 hook（支援 enabled 選項控制是否載入） */
+  useList: (options?: ListOptions) => ListResult<T>
+  /** 精簡列表 hook（支援 enabled 選項控制是否載入） */
+  useListSlim: (options?: ListOptions) => ListResult<Partial<T>>
   /** 單筆 hook（支援 skip pattern）*/
   useDetail: (id: string | null) => DetailResult<T>
   /** 分頁 hook */

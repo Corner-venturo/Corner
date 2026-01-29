@@ -1,25 +1,22 @@
 /**
  * Payment Receipt Types
  * 收款單相關型別定義
+ *
+ * 注意：RECEIPT_TYPES, ReceiptType, RECEIPT_TYPE_OPTIONS 從 @/types/receipt.types re-export
  */
 
+// Re-export 統一的收款類型定義
+export { ReceiptType, RECEIPT_TYPE_OPTIONS } from '@/types/receipt.types'
+
+// 相容性別名（建議逐步遷移到 ReceiptType enum）
+import { ReceiptType } from '@/types/receipt.types'
 export const RECEIPT_TYPES = {
-  BANK_TRANSFER: 0, // 匯款
-  CASH: 1, // 現金
-  CREDIT_CARD: 2, // 刷卡
-  CHECK: 3, // 支票
-  LINK_PAY: 4, // LinkPay
+  BANK_TRANSFER: ReceiptType.BANK_TRANSFER,
+  CASH: ReceiptType.CASH,
+  CREDIT_CARD: ReceiptType.CREDIT_CARD,
+  CHECK: ReceiptType.CHECK,
+  LINK_PAY: ReceiptType.LINK_PAY,
 } as const
-
-export type ReceiptType = (typeof RECEIPT_TYPES)[keyof typeof RECEIPT_TYPES]
-
-export const RECEIPT_TYPE_OPTIONS = [
-  { value: RECEIPT_TYPES.BANK_TRANSFER, label: '匯款' },
-  { value: RECEIPT_TYPES.CASH, label: '現金' },
-  { value: RECEIPT_TYPES.CREDIT_CARD, label: '刷卡' },
-  { value: RECEIPT_TYPES.CHECK, label: '支票' },
-  { value: RECEIPT_TYPES.LINK_PAY, label: 'LinkPay' },
-] as const
 
 export const BANK_ACCOUNTS = [
   { value: '國泰', label: '國泰銀行' },
@@ -37,7 +34,7 @@ export interface PaymentItem {
 
   // 通用欄位
   receipt_account?: string // 付款人姓名
-  note?: string // 備註
+  notes?: string // 備註
 
   // LinkPay 專屬
   email?: string
@@ -68,5 +65,5 @@ export interface PaymentFormData {
   tour_id: string
   order_id: string
   receipt_date: string
-  note?: string
+  notes?: string
 }

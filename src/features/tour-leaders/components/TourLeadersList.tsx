@@ -49,8 +49,8 @@ export const TourLeadersList: React.FC<TourLeadersListProps> = ({
         return (
           <div>
             <span className="font-medium text-morandi-primary">{String(value || '')}</span>
-            {item.name_en && (
-              <span className="ml-2 text-sm text-morandi-muted">({item.name_en})</span>
+            {item.english_name && (
+              <span className="ml-2 text-sm text-morandi-muted">({item.english_name})</span>
             )}
           </div>
         )

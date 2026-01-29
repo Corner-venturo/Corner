@@ -348,7 +348,7 @@ export default function ModulesManagementPage() {
 
       {/* 啟用模組對話框 */}
       <Dialog open={showEnableDialog} onOpenChange={setShowEnableDialog}>
-        <DialogContent>
+        <DialogContent level={1}>
           <DialogHeader>
             <DialogTitle>
               啟用 {selectedModule && MODULE_INFO[selectedModule].name}

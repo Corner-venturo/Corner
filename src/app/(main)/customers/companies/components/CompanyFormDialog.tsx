@@ -55,7 +55,7 @@ export function CompanyFormDialog({
     registered_address: null,
     mailing_address: null,
     vip_level: 0,
-    note: null,
+    notes: null,
   })
 
   // 編輯模式：填入現有資料
@@ -80,7 +80,7 @@ export function CompanyFormDialog({
         registered_address: company.registered_address,
         mailing_address: company.mailing_address,
         vip_level: company.vip_level,
-        note: company.note,
+        notes: company.notes,
       })
     } else {
       // 重置表單
@@ -103,7 +103,7 @@ export function CompanyFormDialog({
         registered_address: null,
         mailing_address: null,
         vip_level: 0,
-        note: null,
+        notes: null,
       })
     }
   }, [company, workspaceId])
@@ -325,8 +325,8 @@ export function CompanyFormDialog({
           <Label htmlFor="note">備註</Label>
           <Textarea
             id="note"
-            value={formData.note || ''}
-            onChange={e => setFormData({ ...formData, note: e.target.value || null })}
+            value={formData.notes || ''}
+            onChange={e => setFormData({ ...formData, notes: e.target.value || null })}
             placeholder="其他備註資訊..."
             rows={3}
           />

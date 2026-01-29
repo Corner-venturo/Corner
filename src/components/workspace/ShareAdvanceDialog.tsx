@@ -108,7 +108,7 @@ export function ShareAdvanceDialog({
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="max-w-[800px] max-h-[80vh] overflow-hidden flex flex-col">
+      <DialogContent level={1} className="max-w-[800px] max-h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader className="pb-3 border-b border-morandi-gold/20">
           <DialogTitle>記錄代墊項目</DialogTitle>
         </DialogHeader>

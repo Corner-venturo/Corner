@@ -30,7 +30,7 @@ export function BatchPickupDialog({
 }: BatchPickupDialogProps) {
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onCancel()}>
-      <DialogContent className="max-w-sm">
+      <DialogContent level={1} className="max-w-sm">
         <DialogHeader>
           <DialogTitle>批次取件</DialogTitle>
         </DialogHeader>
@@ -85,7 +85,7 @@ export function BatchRejectDialog({
 }: BatchRejectDialogProps) {
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onCancel()}>
-      <DialogContent className="max-w-sm">
+      <DialogContent level={1} className="max-w-sm">
         <DialogHeader>
           <DialogTitle>批次退件</DialogTitle>
         </DialogHeader>

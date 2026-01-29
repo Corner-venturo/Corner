@@ -340,7 +340,7 @@ export default function HRPage() {
         expense_type: 'SAL', // 薪資
         amount: totalAmount,
         is_special_billing: data.is_special_billing,
-        note: data.note || `${data.employee_salaries.length} 位員工薪資`,
+        notes: data.notes || `${data.employee_salaries.length} 位員工薪資`,
         status: 'pending',
         created_by: currentUser?.id,
         created_by_name: currentUser?.display_name || currentUser?.chinese_name,
@@ -452,7 +452,7 @@ export default function HRPage() {
 
       {/* 新增員工對話框 */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent level={1} className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>新增員工</DialogTitle>
           </DialogHeader>

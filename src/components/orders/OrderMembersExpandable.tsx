@@ -11,7 +11,8 @@
 'use client'
 
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react'
-import { Plus, Printer, Hotel, Bus, Coins, Settings, Pencil, Plane } from 'lucide-react'
+import { Plus, Printer, Hotel, Bus, Coins, Settings, Pencil, Plane, RefreshCw } from 'lucide-react'
+import { toast } from 'sonner'
 import { prompt } from '@/lib/ui/alert-dialog'
 import {
   DropdownMenu,
@@ -160,6 +161,7 @@ export function OrderMembersExpandable({
     return localStorage.getItem('memberListShowIdentity') === 'true'
   })
   const [isAllEditMode, setIsAllEditMode] = useState(false)
+  const [isSyncingFromCustomers, setIsSyncingFromCustomers] = useState(false)
   const [isComposing, setIsComposing] = useState(false)
   const [previewMember, setPreviewMember] = useState<OrderMember | null>(null)
   const [customCostFields, setCustomCostFields] = useState<CustomCostField[]>([])
@@ -231,6 +233,100 @@ export function OrderMembersExpandable({
     })
     setPnrValues(initialPnrValues)
   }, [membersData.members])
+
+  // 從顧客主檔批次同步所有成員資料
+  const handleBulkSyncFromCustomers = useCallback(async () => {
+    // 找出有關聯顧客的成員
+    const membersWithCustomer = membersData.members.filter(m => m.customer_id)
+    logger.info(`[同步] 找到 ${membersWithCustomer.length} 位有關聯顧客的成員`)
+
+    if (membersWithCustomer.length === 0) {
+      toast.info('沒有成員關聯顧客')
+      return
+    }
+
+    setIsSyncingFromCustomers(true)
+    try {
+      // 獲取所有關聯的顧客資料
+      const customerIds = [...new Set(membersWithCustomer.map(m => m.customer_id).filter((id): id is string => !!id))]
+      logger.info(`[同步] 查詢 ${customerIds.length} 位顧客`, customerIds)
+
+      const { data: customers, error } = await supabase
+        .from('customers')
+        .select('*')
+        .in('id', customerIds)
+
+      if (error) {
+        logger.error('[同步] 取得顧客資料失敗:', error)
+        toast.error('取得顧客資料失敗')
+        return
+      }
+
+      logger.info(`[同步] 取得 ${customers?.length || 0} 位顧客資料`)
+
+      if (!customers || customers.length === 0) {
+        toast.info('找不到關聯的顧客資料')
+        return
+      }
+
+      // 建立 customerId -> customer 的對照表
+      const customerMap = new Map(customers.map(c => [c.id, c]))
+
+      // 批次更新成員資料
+      let updatedCount = 0
+      let skippedCount = 0
+      for (const member of membersWithCustomer) {
+        const customer = customerMap.get(member.customer_id!)
+        if (!customer) {
+          logger.warn(`[同步] 成員 ${member.chinese_name} 的顧客 ${member.customer_id} 不存在`)
+          skippedCount++
+          continue
+        }
+
+        // 準備更新資料（只更新有值的欄位）
+        const updateData: Record<string, string | null> = {}
+        if (customer.passport_name) updateData.passport_name = customer.passport_name
+        if (customer.passport_number) updateData.passport_number = customer.passport_number
+        if (customer.passport_expiry) updateData.passport_expiry = customer.passport_expiry
+        if (customer.birth_date) updateData.birth_date = customer.birth_date
+        if (customer.national_id) updateData.id_number = customer.national_id
+        if (customer.gender) updateData.gender = customer.gender
+        if (customer.passport_image_url) updateData.passport_image_url = customer.passport_image_url
+
+        logger.info(`[同步] 成員 ${member.chinese_name} 更新資料:`, updateData)
+
+        if (Object.keys(updateData).length > 0) {
+          const { error: updateError } = await supabase
+            .from('order_members')
+            .update(updateData)
+            .eq('id', member.id)
+
+          if (updateError) {
+            logger.error(`[同步] 更新成員 ${member.chinese_name} 失敗:`, updateError)
+          } else {
+            updatedCount++
+          }
+        } else {
+          logger.info(`[同步] 成員 ${member.chinese_name} 的顧客沒有護照資料`)
+          skippedCount++
+        }
+      }
+
+      logger.info(`[同步] 完成: 更新 ${updatedCount} 位，跳過 ${skippedCount} 位`)
+
+      if (updatedCount > 0) {
+        toast.success(`已同步 ${updatedCount} 位成員資料`)
+        membersData.loadMembers() // 重新載入成員資料
+      } else {
+        toast.info('顧客主檔沒有額外的護照資料可同步')
+      }
+    } catch (err) {
+      logger.error('[同步] 發生錯誤:', err)
+      toast.error('同步失敗')
+    } finally {
+      setIsSyncingFromCustomers(false)
+    }
+  }, [membersData])
 
   // Handlers
   const handleUpdateField = useCallback(async (memberId: string, field: keyof OrderMember, value: string | number | null) => {
@@ -312,6 +408,17 @@ export function OrderMembersExpandable({
           >
             <Pencil size={14} />
             {isAllEditMode ? '關閉編輯' : '全部編輯'}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 px-2 gap-1"
+            onClick={handleBulkSyncFromCustomers}
+            disabled={isSyncingFromCustomers}
+            title="從顧客主檔同步所有成員的護照資料"
+          >
+            <RefreshCw size={14} className={isSyncingFromCustomers ? 'animate-spin' : ''} />
+            {isSyncingFromCustomers ? '同步中...' : '從顧客同步'}
           </Button>
           <Button variant="ghost" size="sm" className={`h-8 px-2 ${showIdentityColumn ? 'text-morandi-gold' : ''}`} onClick={() => setShowIdentityColumn(!showIdentityColumn)}>
             身份
@@ -508,7 +615,7 @@ export function OrderMembersExpandable({
       {/* Dialogs */}
       {/* 護照照片預覽 */}
       <Dialog open={!!previewMember} onOpenChange={(open) => !open && setPreviewMember(null)}>
-        <DialogContent nested className="max-w-2xl">
+        <DialogContent nested level={2} className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
               {previewMember?.chinese_name || previewMember?.passport_name || '護照照片'}

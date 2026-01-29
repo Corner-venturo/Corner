@@ -136,7 +136,7 @@ export default function RegionsTab() {
 
       {/* 城市管理視窗 */}
       <Dialog open={isCitiesDialogOpen} onOpenChange={setIsCitiesDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent level={1} className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{selectedCountry?.name} - 城市列表</DialogTitle>
           </DialogHeader>

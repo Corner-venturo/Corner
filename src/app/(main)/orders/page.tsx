@@ -179,7 +179,7 @@ export default function OrdersPage() {
 
       {/* 新增訂單對話框 */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent level={1} className="max-w-lg">
           <DialogHeader>
             <DialogTitle>新增訂單</DialogTitle>
           </DialogHeader>
@@ -189,7 +189,7 @@ export default function OrdersPage() {
 
       {/* 🔥 快速收款對話框 */}
       <Dialog open={isReceiptDialogOpen} onOpenChange={setIsReceiptDialogOpen}>
-        <DialogContent className="max-w-xl">
+        <DialogContent level={1} className="max-w-xl">
           <DialogHeader>
             <DialogTitle>快速收款</DialogTitle>
           </DialogHeader>

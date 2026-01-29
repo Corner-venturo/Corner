@@ -18,12 +18,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+// DropdownMenu 已移除 - 統一使用 PackageItineraryDialog 入口
 import {
   Plus,
   FileText,
@@ -379,26 +374,12 @@ export function LinkDocumentsToTourDialog({
     }
   }
 
-  // 選擇行程表類型（快速行程表）
-  const handleSelectTimelineItinerary = async () => {
-    const pkg = await getOrCreatePackageForTour()
-    if (pkg) {
-      setTimelineDialogOpen(true)
-    }
-  }
-
-  // 選擇行程表類型（快速行程表 - PackageItineraryDialog）
+  // 新增行程表（統一入口 - PackageItineraryDialog）
   const handleSelectSimpleItinerary = async () => {
     const pkg = await getOrCreatePackageForTour()
     if (pkg) {
       setPackageItineraryDialogOpen(true)
     }
-  }
-
-  // 選擇行程表類型（網頁行程表）
-  const handleSelectWebItinerary = async () => {
-    onClose()
-    router.push(`/itinerary/new?tour_id=${tour.id}`)
   }
 
   // 開啟行程表對話框（根據類型選擇）
@@ -488,7 +469,7 @@ export function LinkDocumentsToTourDialog({
       {/* 主對話框 */}
       {mainDialogOpen && (
         <Dialog open={mainDialogOpen} onOpenChange={open => !open && onClose()} modal={true}>
-          <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col overflow-hidden">
+          <DialogContent level={1} className="max-w-4xl max-h-[85vh] flex flex-col overflow-hidden">
             <DialogHeader className="flex-shrink-0">
               <DialogTitle>管理文件</DialogTitle>
               <DialogDescription>
@@ -504,45 +485,19 @@ export function LinkDocumentsToTourDialog({
                     <FileText className="w-4 h-4 text-morandi-gold" />
                     <span className="font-medium text-sm text-morandi-primary">行程</span>
                   </div>
-                  {/* 新增行程表下拉選單 */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button
-                        disabled={isCreatingPackage}
-                        className="p-1 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors disabled:opacity-50"
-                        title="新增行程表"
-                      >
-                        {isCreatingPackage ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Plus className="w-4 h-4" />
-                        )}
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-44">
-                      <DropdownMenuItem
-                        onClick={handleSelectTimelineItinerary}
-                        className="gap-2 cursor-pointer"
-                      >
-                        <Clock size={16} className="text-morandi-gold" />
-                        <span>時間軸行程表</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={handleSelectSimpleItinerary}
-                        className="gap-2 cursor-pointer"
-                      >
-                        <Zap size={16} className="text-morandi-gold" />
-                        <span>快速行程表</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={handleSelectWebItinerary}
-                        className="gap-2 cursor-pointer"
-                      >
-                        <FileText size={16} className="text-morandi-secondary" />
-                        <span>網頁行程表</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  {/* 新增行程表按鈕（統一入口，直接開 PackageItineraryDialog） */}
+                  <button
+                    onClick={handleSelectSimpleItinerary}
+                    disabled={isCreatingPackage}
+                    className="p-1 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors disabled:opacity-50"
+                    title="新增行程表"
+                  >
+                    {isCreatingPackage ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Plus className="w-4 h-4" />
+                    )}
+                  </button>
                 </div>
                 <div className="flex-1 overflow-auto mt-2">
                   {hasTimelineData ? (

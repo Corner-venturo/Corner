@@ -326,7 +326,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
 
       {/* 業務確認對話框 */}
       <Dialog open={showStaffConfirmDialog} onOpenChange={setShowStaffConfirmDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent level={1} className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <UserCheck size={20} className="text-morandi-gold" />
@@ -375,7 +375,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
 
       {/* 確認歷史對話框 */}
       <Dialog open={showLogsDialog} onOpenChange={setShowLogsDialog}>
-        <DialogContent className="max-w-lg">
+        <DialogContent level={1} className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <History size={20} className="text-morandi-gold" />

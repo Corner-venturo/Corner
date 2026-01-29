@@ -142,7 +142,7 @@ export function AttractionSelector({
     const manualAttraction: AttractionWithCity = {
       id: `manual_${Date.now()}`,
       name: manualAttractionName.trim(),
-      name_en: undefined,
+      english_name: undefined,
       category: undefined,
       description: undefined,
       thumbnail: undefined,
@@ -167,7 +167,7 @@ export function AttractionSelector({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleCancel}>
-      <DialogContent className="w-[1200px] h-[700px] max-w-[95vw] max-h-[90vh] flex flex-col p-0 gap-0">
+      <DialogContent level={1} className="w-[1200px] h-[700px] max-w-[95vw] max-h-[90vh] flex flex-col p-0 gap-0">
         <DialogHeader className="px-6 py-4 border-b bg-gradient-to-r from-morandi-gold/10 to-transparent">
           <DialogTitle className="flex items-center gap-2 text-lg">
             <MapPin className="text-morandi-gold" size={22} />

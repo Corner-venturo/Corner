@@ -406,7 +406,7 @@ export function TourControlFormDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className={DIALOG_SIZES.full} nested>
+      <DialogContent level={2} className={DIALOG_SIZES.full} nested>
         {/* 標題區 */}
         <div className="text-center pb-3 border-b-2 border-black mb-3">
           <h2 className="text-lg font-bold tracking-widest">勁揚國際／原昇旅行社有限公司</h2>

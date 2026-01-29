@@ -65,7 +65,7 @@ export function CompanyDetailDialog({
       {/* 主 Dialog：子 Dialog 開啟時完全不渲染（避免多重遮罩） */}
       {!isEditDialogOpen && (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent level={1} className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Building2 className="h-5 w-5 text-morandi-gold" />
@@ -251,14 +251,14 @@ export function CompanyDetailDialog({
             )}
 
             {/* 備註 */}
-            {company.note && (
+            {company.notes && (
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base">備註</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-morandi-primary whitespace-pre-wrap">
-                    {company.note}
+                    {company.notes}
                   </p>
                 </CardContent>
               </Card>

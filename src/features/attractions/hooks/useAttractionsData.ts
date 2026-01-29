@@ -49,7 +49,7 @@ export function useAttractionsData() {
         // 轉換表單資料為 Attraction 格式（只傳送資料庫需要的欄位）
         const attractionData: Partial<Attraction> = {
           name: formData.name,
-          name_en: formData.name_en || undefined,
+          english_name: formData.english_name || undefined,
           description: formData.description || undefined,
           country_id: formData.country_id,
           region_id: formData.region_id || undefined,

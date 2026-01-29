@@ -167,7 +167,7 @@ export function MobileActivityCarousel({ activities, className = '' }: MobileAct
 
       {/* 懸浮視窗 Modal - 使用標準 Dialog 組件 */}
       <Dialog open={selectedIndex !== null} onOpenChange={(open) => !open && setSelectedIndex(null)}>
-        <DialogContent className="max-w-[85vw] sm:max-w-md p-0 overflow-hidden gap-0">
+        <DialogContent level={1} className="max-w-[85vw] sm:max-w-md p-0 overflow-hidden gap-0">
           <AnimatePresence mode="wait">
             {selectedIndex !== null && (
               <motion.div

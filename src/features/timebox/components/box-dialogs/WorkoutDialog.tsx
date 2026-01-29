@@ -318,7 +318,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
 
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+      <DialogContent level={1} className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <Dumbbell className="h-5 w-5" />

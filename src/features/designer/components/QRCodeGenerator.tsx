@@ -8,6 +8,7 @@
  */
 
 import { useState, useCallback } from 'react'
+import { logger } from '@/lib/utils/logger'
 import QRCode from 'qrcode'
 import { QrCode, Link, FileText, Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -49,7 +50,7 @@ export function QRCodeGenerator({ onGenerate }: QRCodeGeneratorProps) {
       })
       setPreviewUrl(url)
     } catch (error) {
-      console.error('Failed to generate QR preview:', error)
+      logger.error('Failed to generate QR preview:', error)
       setPreviewUrl(null)
     }
   }, [])
@@ -80,7 +81,7 @@ export function QRCodeGenerator({ onGenerate }: QRCodeGeneratorProps) {
       setContent('')
       setPreviewUrl(null)
     } catch (error) {
-      console.error('Failed to generate QR code:', error)
+      logger.error('Failed to generate QR code:', error)
     } finally {
       setIsGenerating(false)
     }

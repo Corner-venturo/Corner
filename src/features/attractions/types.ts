@@ -5,7 +5,7 @@
 export interface Attraction {
   id: string
   name: string
-  name_en?: string
+  english_name?: string
   description?: string
   country_id: string
   region_id?: string
@@ -46,7 +46,7 @@ export type SortDirection = 'asc' | 'desc' | null
 
 export interface AttractionFormData {
   name: string
-  name_en: string
+  english_name: string
   description: string
   country_id: string
   region_id: string

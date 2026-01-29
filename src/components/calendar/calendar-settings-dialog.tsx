@@ -34,7 +34,7 @@ export function CalendarSettingsDialog() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-md">
+      <DialogContent level={1} className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>行事曆顯示設定</DialogTitle>
         </DialogHeader>

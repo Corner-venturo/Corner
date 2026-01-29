@@ -13,7 +13,7 @@ type SupplierFormData = {
   name: string
   bank_name: string
   bank_account: string
-  note: string
+  notes: string
 }
 
 interface SuppliersDialogProps {
@@ -90,8 +90,8 @@ export const SuppliersDialog: React.FC<SuppliersDialogProps> = ({
         <div>
           <label className="text-sm font-medium text-morandi-primary">備註</label>
           <Textarea
-            value={formData.note}
-            onChange={e => onFormFieldChange('note', e.target.value)}
+            value={formData.notes}
+            onChange={e => onFormFieldChange('notes', e.target.value)}
             placeholder="供應商備註資訊（選填）"
             rows={3}
             className="mt-1"

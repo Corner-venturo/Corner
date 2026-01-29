@@ -39,7 +39,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
 
   return (
     <Dialog open={!!todo} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-full max-w-[95vw] sm:max-w-[600px] max-h-[95vh] sm:max-h-[85vh] flex flex-col p-0 gap-0">
+      <DialogContent level={1} className="w-full max-w-[95vw] sm:max-w-[600px] max-h-[95vh] sm:max-h-[85vh] flex flex-col p-0 gap-0">
         <VisuallyHidden>
           <DialogTitle>{todo.title || '待辦事項詳情'}</DialogTitle>
         </VisuallyHidden>

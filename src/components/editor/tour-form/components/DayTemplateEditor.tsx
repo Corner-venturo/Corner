@@ -75,7 +75,7 @@ export function DayTemplateEditor({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden p-0">
+      <DialogContent level={1} className="max-w-3xl max-h-[90vh] overflow-hidden p-0">
         {/* 隱藏的檔案上傳 input */}
         <input
           type="file"

@@ -131,7 +131,7 @@ export function MobileNav() {
 
       {/* 工作台彈出面板 - 使用 Dialog 作為底部抽屜 */}
       <Dialog open={showWorkbench} onOpenChange={setShowWorkbench}>
-        <DialogContent className="fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 max-w-none w-full rounded-t-2xl rounded-b-none max-h-[80vh] overflow-auto p-0 data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom">
+        <DialogContent level={1} className="fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 max-w-none w-full rounded-t-2xl rounded-b-none max-h-[80vh] overflow-auto p-0 data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom">
           {/* 標題列 */}
           <div className="sticky top-0 bg-card border-b border-border px-4 py-3 flex items-center justify-between">
             <h2 className="text-lg font-bold text-morandi-primary">工作台</h2>

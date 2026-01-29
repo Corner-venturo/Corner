@@ -32,7 +32,7 @@ export function EditChannelDialog({
 }: EditChannelDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-[400px]">
+      <DialogContent level={1} className="w-[400px]">
         <DialogHeader>
           <DialogTitle className="text-morandi-primary">編輯頻道</DialogTitle>
         </DialogHeader>

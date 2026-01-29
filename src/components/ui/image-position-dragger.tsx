@@ -312,7 +312,7 @@ export function ImagePositionDialog({
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className={DIALOG_SIZES.lg}>
+      <DialogContent level={1} className={DIALOG_SIZES.lg}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>

@@ -17,7 +17,7 @@ export function MemberInfoCard({ open, member, onClose }: MemberInfoCardProps) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden [&>button:last-child]:hidden">
+      <DialogContent level={1} className="max-w-3xl max-h-[90vh] overflow-hidden [&>button:last-child]:hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ImageIcon size={20} />

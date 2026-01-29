@@ -95,7 +95,7 @@ export default function TourClosingReportPage() {
       // 2. 平行批量查詢：成本、團員、獎金
       const paymentsByOrder = new Map<string, Array<{ amount: number | null }>>()
       const memberCountByOrder = new Map<string, number>()
-      const bonusByOrder = new Map<string, Array<{ supplier_name: string | null; amount: number | null; note: string | null }>>()
+      const bonusByOrder = new Map<string, Array<{ supplier_name: string | null; amount: number | null; notes: string | null }>>()
 
       if (allOrderIds.length > 0) {
         const [paymentsRes, membersRes, bonusRes] = await Promise.all([
@@ -114,7 +114,7 @@ export default function TourClosingReportPage() {
           // 獎金
           supabase
             .from('payment_requests')
-            .select('order_id, supplier_name, amount, note')
+            .select('order_id, supplier_name, amount, notes')
             .in('order_id', allOrderIds)
             .eq('supplier_type', 'bonus'),
         ])
@@ -138,7 +138,7 @@ export default function TourClosingReportPage() {
         bonusRes.data?.forEach(b => {
           if (!b.order_id) return
           const list = bonusByOrder.get(b.order_id) || []
-          list.push({ supplier_name: b.supplier_name, amount: b.amount, note: b.note })
+          list.push({ supplier_name: b.supplier_name, amount: b.amount, notes: b.notes })
           bonusByOrder.set(b.order_id, list)
         })
       }
@@ -180,18 +180,18 @@ export default function TourClosingReportPage() {
           bonuses.forEach(bonus => {
             if (!bonus.supplier_name || bonus.amount === undefined) return
 
-            const percentageMatch = bonus.note?.match(/(\d+\.?\d*)%/)
+            const percentageMatch = bonus.notes?.match(/(\d+\.?\d*)%/)
             const percentage = percentageMatch ? parseFloat(percentageMatch[1]) : 0
 
             if (bonus.supplier_name === '業務業績') {
               salesBonuses.push({
-                employee_name: bonus.note?.replace(/業務業績\s*\d+\.?\d*%/, '').trim() || '未知',
+                employee_name: bonus.notes?.replace(/業務業績\s*\d+\.?\d*%/, '').trim() || '未知',
                 percentage,
                 amount: bonus.amount || 0,
               })
             } else if (bonus.supplier_name === 'OP 獎金') {
               opBonuses.push({
-                employee_name: bonus.note?.replace(/OP 獎金\s*\d+\.?\d*%/, '').trim() || '未知',
+                employee_name: bonus.notes?.replace(/OP 獎金\s*\d+\.?\d*%/, '').trim() || '未知',
                 percentage,
                 amount: bonus.amount || 0,
               })

@@ -1923,9 +1923,16 @@ export default function DesignerPage() {
 
         // 縮放 elements（如果有的話）
         const scaledElements = shouldScale
-          ? page.elements.map(el => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const scaled: any = { ...el }
+          ? page.elements.map((el): CanvasElement => {
+              // 使用 spread + 類型斷言來處理 union type 的動態屬性修改
+              const scaled = { ...el } as CanvasElement & {
+                width?: number
+                height?: number
+                style?: { fontSize: number; [key: string]: unknown }
+                size?: number
+                cornerRadius?: number
+                strokeWidth?: number
+              }
               scaled.x = el.x * scaleFactor
               scaled.y = el.y * scaleFactor
               // 縮放有寬高的元素
@@ -1933,18 +1940,18 @@ export default function DesignerPage() {
               if ('height' in el && el.height) scaled.height = el.height * scaleFactor
               // 縮放文字元素的字體大小
               if (el.type === 'text' && 'style' in el) {
-                scaled.style = { ...scaled.style, fontSize: scaled.style.fontSize * scaleFactor }
+                scaled.style = { ...el.style, fontSize: el.style.fontSize * scaleFactor }
               }
               // 縮放圖標元素的尺寸
               if (el.type === 'icon' && 'size' in el) {
-                scaled.size = scaled.size * scaleFactor
+                scaled.size = el.size * scaleFactor
               }
               // 縮放形狀元素的圓角和邊框
               if (el.type === 'shape') {
-                if (scaled.cornerRadius) scaled.cornerRadius = scaled.cornerRadius * scaleFactor
-                if (scaled.strokeWidth) scaled.strokeWidth = scaled.strokeWidth * scaleFactor
+                if ('cornerRadius' in el && el.cornerRadius) scaled.cornerRadius = el.cornerRadius * scaleFactor
+                if ('strokeWidth' in el && el.strokeWidth) scaled.strokeWidth = el.strokeWidth * scaleFactor
               }
-              return scaled
+              return scaled as CanvasElement
             })
           : page.elements
 

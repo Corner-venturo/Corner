@@ -20,7 +20,7 @@ export interface TourLeader extends SyncableEntity {
 
   // 基本資料
   name: string // 中文姓名
-  name_en?: string | null // 英文姓名
+  english_name?: string | null // 英文姓名（護照拼音）
   phone?: string | null
   email?: string | null
   address?: string | null
@@ -47,7 +47,7 @@ export interface TourLeader extends SyncableEntity {
 
 export interface TourLeaderFormData {
   name: string
-  name_en: string
+  english_name: string
   phone: string
   email: string
   address: string

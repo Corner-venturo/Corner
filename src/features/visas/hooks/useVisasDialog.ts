@@ -22,7 +22,7 @@ export interface VisaApplicant {
   documents_returned_date?: string // 證件歸還
   pickup_date?: string // 取件時間
   vendor?: string // 送件單位
-  note?: string // 備註
+  notes?: string // 備註
   status?: string // 狀態
 }
 
@@ -320,7 +320,7 @@ export function useVisasDialog(tours: Tour[]) {
         documents_returned_date: visa.documents_returned_date || '',
         pickup_date: visa.pickup_date || '',
         vendor: visa.vendor || '',
-        note: visa.note || '',
+        notes: visa.notes || '',
         status: visa.status || 'pending',
       },
     ])

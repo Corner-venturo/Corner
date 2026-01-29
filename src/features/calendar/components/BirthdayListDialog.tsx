@@ -116,7 +116,7 @@ export function BirthdayListDialog({ open, onClose, initialMonth }: BirthdayList
 
   return (
     <Dialog open={open} onOpenChange={o => !o && onClose()}>
-      <DialogContent className="max-w-md">
+      <DialogContent level={1} className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Cake size={20} className="text-morandi-gold" />

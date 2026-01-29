@@ -210,7 +210,7 @@ export async function POST(request: NextRequest) {
       .select(`
         id,
         name,
-        name_en,
+        english_name,
         description,
         country_id,
         region_id,

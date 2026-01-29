@@ -89,7 +89,7 @@ export function AccountDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent level={1}>
         <DialogHeader>
           <DialogTitle>{account ? '編輯科目' : '新增科目'}</DialogTitle>
         </DialogHeader>

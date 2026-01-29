@@ -309,7 +309,7 @@ export default function FitnessPage() {
         setShowExercisePicker(open)
         if (!open) setSelectedCategory(null)
       }}>
-        <DialogContent className="max-w-lg max-h-[80vh] overflow-hidden p-0 rounded-t-3xl sm:rounded-xl">
+        <DialogContent level={1} className="max-w-lg max-h-[80vh] overflow-hidden p-0 rounded-t-3xl sm:rounded-xl">
           <div className="sticky top-0 bg-background/95 backdrop-blur-sm border-b border-border px-4 py-4">
             <DialogHeader className="flex-row items-center justify-between">
               <DialogTitle className="text-lg font-bold text-foreground">選擇訓練動作</DialogTitle>

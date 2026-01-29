@@ -68,7 +68,7 @@ export const useQuoteVersion = ({
       accommodation_days: accommodationDays,
       participant_counts: participantCounts,
       selling_prices: sellingPrices,
-      note: '轉為最終版本前的狀態',
+      notes: '轉為最終版本前的狀態',
       created_at: new Date().toISOString(),
     }
 

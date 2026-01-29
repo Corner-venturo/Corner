@@ -19,7 +19,7 @@ export function useRequestForm() {
     order_id: '',
     expense_type: '', // 公司請款時使用
     request_date: '',
-    note: '',
+    notes: '',
     is_special_billing: false,
     created_by: currentUser?.id || '',
   })
@@ -143,7 +143,7 @@ export function useRequestForm() {
       order_id: '',
       expense_type: '',
       request_date: '',
-      note: '',
+      notes: '',
       is_special_billing: false,
       created_by: currentUser?.id || '',
     })

@@ -62,11 +62,11 @@ export default function CustomerGroupsPage() {
   const [formData, setFormData] = useState<{
     name: string
     type: CustomerGroupType
-    note: string
+    notes: string
   }>({
     name: '',
     type: 'other',
-    note: '',
+    notes: '',
   })
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>('')
 
@@ -105,12 +105,12 @@ export default function CustomerGroupsPage() {
       await createGroup({
         name: formData.name.trim(),
         type: formData.type,
-        note: formData.note.trim() || null,
+        notes: formData.notes.trim() || null,
         created_by: user?.id || null,
       } as Omit<CustomerGroup, 'id' | 'created_at' | 'updated_at'>)
 
       setAddDialogOpen(false)
-      setFormData({ name: '', type: 'other', note: '' })
+      setFormData({ name: '', type: 'other', notes: '' })
     } catch (error) {
       await alert('建立群組失敗', 'error')
     }
@@ -127,12 +127,12 @@ export default function CustomerGroupsPage() {
       await updateGroup(selectedGroup.id, {
         name: formData.name.trim(),
         type: formData.type,
-        note: formData.note.trim() || null,
+        notes: formData.notes.trim() || null,
       })
 
       setEditDialogOpen(false)
       setSelectedGroup(null)
-      setFormData({ name: '', type: 'other', note: '' })
+      setFormData({ name: '', type: 'other', notes: '' })
     } catch (error) {
       await alert('更新群組失敗', 'error')
     }
@@ -169,7 +169,7 @@ export default function CustomerGroupsPage() {
     setFormData({
       name: group.name,
       type: group.type,
-      note: group.note || '',
+      notes: group.notes || '',
     })
     setEditDialogOpen(true)
   }, [])
@@ -303,10 +303,10 @@ export default function CustomerGroupsPage() {
         },
       },
       {
-        key: 'note',
+        key: 'notes',
         label: '備註',
         render: (_, group) => (
-          <span className="text-sm text-morandi-secondary">{group.note || '-'}</span>
+          <span className="text-sm text-morandi-secondary">{group.notes || '-'}</span>
         ),
       },
       {
@@ -410,7 +410,7 @@ export default function CustomerGroupsPage() {
         ]}
         data={groups}
         columns={columns}
-        searchFields={['name', 'note']}
+        searchFields={['name', 'notes']}
         searchPlaceholder="搜尋群組名稱..."
         statusTabs={statusTabs}
         statusField="type"
@@ -422,7 +422,7 @@ export default function CustomerGroupsPage() {
         onToggleExpand={toggleExpand}
         bordered={true}
         onAdd={() => {
-          setFormData({ name: '', type: 'other', note: '' })
+          setFormData({ name: '', type: 'other', notes: '' })
           setAddDialogOpen(true)
         }}
         addLabel="新增群組"
@@ -467,8 +467,8 @@ export default function CustomerGroupsPage() {
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-2 block">備註</label>
             <Input
-              value={formData.note}
-              onChange={e => setFormData(prev => ({ ...prev, note: e.target.value }))}
+              value={formData.notes}
+              onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
               placeholder="選填"
             />
           </div>
@@ -514,8 +514,8 @@ export default function CustomerGroupsPage() {
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-2 block">備註</label>
             <Input
-              value={formData.note}
-              onChange={e => setFormData(prev => ({ ...prev, note: e.target.value }))}
+              value={formData.notes}
+              onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
               placeholder="選填"
             />
           </div>

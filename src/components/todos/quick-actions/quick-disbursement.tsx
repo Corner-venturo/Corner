@@ -161,7 +161,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
         <Textarea
           placeholder="請款相關說明..."
           rows={2}
-          value={formData.note}
+          value={formData.notes}
           onChange={e => setFormData(prev => ({ ...prev, note: e.target.value }))}
           className="border-morandi-container/30"
         />

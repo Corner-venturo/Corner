@@ -50,6 +50,7 @@ export function ThreeDPhotoWall({ images, onClose, className, open = true }: Pho
       <DialogPortal>
         <DialogOverlay className="bg-black z-[99999]" />
         <DialogContent
+          level={1}
           className={cn(
             'fixed inset-0 flex items-center justify-center bg-transparent border-none shadow-none p-0 max-w-none w-full h-full translate-x-0 translate-y-0 left-0 top-0 rounded-none overflow-hidden',
             className

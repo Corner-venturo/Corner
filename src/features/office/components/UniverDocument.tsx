@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { logger } from '@/lib/utils/logger'
 import { createUniver, LocaleType, merge } from '@univerjs/presets'
 import { UniverDocsCorePreset } from '@univerjs/presets/preset-docs-core'
 import PresetDocsZhTW from '@univerjs/presets/preset-docs-core/locales/zh-TW'
@@ -49,7 +50,7 @@ export function UniverDocument({ className }: UniverDocumentProps) {
         // 在文件建立後註冊返回列表 plugin
         univer.registerPlugin(UniverBackToListDocPlugin)
       } catch (error) {
-        console.error('Univer Document 初始化失敗:', error)
+        logger.error('Univer Document 初始化失敗:', error)
       }
     }, 100)
 

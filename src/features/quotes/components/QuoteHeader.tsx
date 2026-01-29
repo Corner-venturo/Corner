@@ -352,7 +352,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
 
       {/* 聯絡資訊對話框 */}
       <Dialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent level={1} className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Contact size={20} className="text-morandi-gold" />

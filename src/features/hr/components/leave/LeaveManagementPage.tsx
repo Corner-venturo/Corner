@@ -447,7 +447,7 @@ export function LeaveManagementPage() {
 
       {/* 駁回原因 Dialog */}
       <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
-        <DialogContent className={DIALOG_SIZES.sm}>
+        <DialogContent level={1} className={DIALOG_SIZES.sm}>
           <DialogHeader>
             <DialogTitle>駁回請假申請</DialogTitle>
           </DialogHeader>
@@ -547,7 +547,7 @@ function LeaveTypeDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={DIALOG_SIZES.md}>
+      <DialogContent level={1} className={DIALOG_SIZES.md}>
         <DialogHeader>
           <DialogTitle>{editingType ? '編輯假別' : '新增假別'}</DialogTitle>
         </DialogHeader>

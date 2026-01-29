@@ -18,14 +18,13 @@ interface TourActions {
 }
 
 // 🔧 優化：移除不必要的外部依賴，改成內部直接查詢
+// 🔧 編輯模式已移至 TourEditDialog + useTourEdit hook
 interface UseTourOperationsParams {
   actions: TourActions
   resetForm: () => void
   closeDialog: () => void
   setSubmitting: (value: boolean) => void
   setFormError: (error: string | null) => void
-  dialogType: string
-  dialogData: Tour | null
   workspaceId?: string
   // 🔧 保留 fromQuoteId 更新功能（可選）
   onQuoteLinked?: (quoteId: string, tourId: string) => void
@@ -57,8 +56,6 @@ export function useTourOperations(params: UseTourOperationsParams) {
     closeDialog,
     setSubmitting,
     setFormError,
-    dialogType,
-    dialogData,
     workspaceId,
     onQuoteLinked,
   } = params
@@ -120,28 +117,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
           return
         }
 
-        // Edit mode: update existing tour
-        if (dialogType === 'edit' && dialogData) {
-          const tourData = {
-            name: newTour.name,
-            location: cityName,
-            departure_date: newTour.departure_date,
-            return_date: newTour.return_date,
-            status: newTour.status,
-            price: newTour.price,
-            max_participants: newTour.max_participants,
-            description: newTour.description,
-            enable_checkin: newTour.enable_checkin || false,
-            controller_id: newTour.controller_id || null,
-          }
-
-          await actions.update(dialogData.id, tourData)
-          resetForm()
-          closeDialog()
-          return
-        }
-
-        // Create mode: create new tour
+        // Create new tour (edit mode now uses TourEditDialog with useTourEdit hook)
         const code = await tourService.generateTourCode(cityCode, departure_date, newTour.isSpecial)
 
         // 解析航班文字為 FlightInfo（簡單格式：航空公司 班次 時間）
@@ -242,14 +218,9 @@ export function useTourOperations(params: UseTourOperationsParams) {
         resetForm()
         closeDialog()
       } catch (err) {
-        const errorMessage =
-          err instanceof Error
-            ? err.message
-            : dialogType === 'edit'
-              ? '更新旅遊團失敗'
-              : '建立旅遊團失敗'
+        const errorMessage = err instanceof Error ? err.message : '建立旅遊團失敗'
         setFormError(errorMessage)
-        logger.error('Failed to create/update tour:', err)
+        logger.error('Failed to create tour:', err)
       } finally {
         setSubmitting(false)
       }
@@ -260,8 +231,6 @@ export function useTourOperations(params: UseTourOperationsParams) {
       closeDialog,
       setSubmitting,
       setFormError,
-      dialogType,
-      dialogData,
       router,
       incrementCountryUsage,
       incrementCityUsage,

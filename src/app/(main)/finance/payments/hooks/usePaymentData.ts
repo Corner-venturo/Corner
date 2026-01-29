@@ -12,14 +12,7 @@ import { generateReceiptNumber } from '@/lib/utils/receipt-number-generator'
 import { generateVoucherFromPayment, generateVoucherFromCardPayment } from '@/services/voucher-auto-generator'
 import { useAccountingModule } from '@/hooks/use-accounting-module'
 import type { ReceiptItem } from '@/stores'
-
-const RECEIPT_TYPES = {
-  BANK_TRANSFER: 0,
-  CASH: 1,
-  CREDIT_CARD: 2,
-  CHECK: 3,
-  LINK_PAY: 4,
-} as const
+import { ReceiptType } from '@/types/receipt.types'
 
 export function usePaymentData() {
   const { items: orders } = useOrders()
@@ -124,7 +117,7 @@ export function usePaymentData() {
         check_date: null, // 支票兌現日期
         link: null, // LinkPay 連結（建立後由 API 填入）
         linkpay_order_number: null, // LinkPay 訂單號
-        note: item.note || null,
+        notes: item.notes || null,
         deleted_at: null,
         created_by: user.id,
         updated_by: user.id,
@@ -134,7 +127,7 @@ export function usePaymentData() {
       if (hasAccounting && !isExpired && user.workspace_id) {
         try {
           // 判斷收款方式
-          if (item.receipt_type === RECEIPT_TYPES.CREDIT_CARD) {
+          if (item.receipt_type === ReceiptType.CREDIT_CARD) {
             // V2: 刷卡收款使用 4 筆分錄
             // 預設費率：銀行實扣 1.68%，團成本固定 2%
             const feeRateDeducted = item.fees ? item.fees / item.amount : 0.0168
@@ -155,7 +148,7 @@ export function usePaymentData() {
             })
           } else {
             // 現金/匯款收款使用傳統 2 筆分錄
-            const paymentMethod = item.receipt_type === RECEIPT_TYPES.CASH ? 'cash' : 'bank'
+            const paymentMethod = item.receipt_type === ReceiptType.CASH ? 'cash' : 'bank'
 
             await generateVoucherFromPayment({
               workspace_id: user.workspace_id,
@@ -175,7 +168,7 @@ export function usePaymentData() {
       }
 
       // 如果是 LinkPay，呼叫 API 生成付款連結
-      if (item.receipt_type === RECEIPT_TYPES.LINK_PAY) {
+      if (item.receipt_type === ReceiptType.LINK_PAY) {
         await handleCreateLinkPay(receiptNumber, item)
       }
     }
@@ -201,7 +194,7 @@ export function usePaymentData() {
     await updateReceipt(receiptId, {
       actual_amount: actualAmount,
       status: '1', // 已確認
-      note: abnormalNote ? `${receipt?.note || ''} ${abnormalNote}`.trim() : receipt?.note,
+      notes: abnormalNote ? `${receipt?.notes || ''} ${abnormalNote}`.trim() : receipt?.notes,
       updated_by: user.id,
     })
 

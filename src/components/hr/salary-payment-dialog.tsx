@@ -31,7 +31,7 @@ export interface SalaryPaymentData {
     employee_name: string
     amount: number
   }>
-  note: string
+  notes: string
 }
 
 export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }: SalaryPaymentDialogProps) {
@@ -111,7 +111,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
       request_date: requestDate,
       is_special_billing: isSpecialBilling,
       employee_salaries: employeeSalaries,
-      note,
+      notes: note,
     })
 
     // Reset form
@@ -125,7 +125,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent level={1} className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>薪資請款</DialogTitle>
           <p className="text-sm text-morandi-secondary">為員工建立薪資請款單</p>

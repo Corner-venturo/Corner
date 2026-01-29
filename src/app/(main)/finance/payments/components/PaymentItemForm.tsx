@@ -17,22 +17,7 @@ import { Trash2 } from 'lucide-react'
 import type { ReceiptItem } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
 import { isFeatureAvailable } from '@/lib/feature-restrictions'
-
-const RECEIPT_TYPES = {
-  BANK_TRANSFER: 0,
-  CASH: 1,
-  CREDIT_CARD: 2,
-  CHECK: 3,
-  LINK_PAY: 4,
-} as const
-
-const ALL_RECEIPT_TYPE_OPTIONS = [
-  { value: RECEIPT_TYPES.BANK_TRANSFER, label: '匯款' },
-  { value: RECEIPT_TYPES.CASH, label: '現金' },
-  { value: RECEIPT_TYPES.CREDIT_CARD, label: '刷卡' },
-  { value: RECEIPT_TYPES.CHECK, label: '支票' },
-  { value: RECEIPT_TYPES.LINK_PAY, label: 'LinkPay' },
-]
+import { ReceiptType, RECEIPT_TYPE_OPTIONS } from '@/types/receipt.types'
 
 const BANK_ACCOUNTS = [
   { value: '國泰', label: '國泰銀行' },
@@ -57,11 +42,11 @@ export function PaymentItemForm({
   const { user } = useAuthStore()
 
   // 根據 workspace 過濾收款方式選項（非 TP/TC 隱藏 LinkPay）
-  const RECEIPT_TYPE_OPTIONS = useMemo(() => {
+  const filteredReceiptTypeOptions = useMemo(() => {
     if (isFeatureAvailable('linkpay', user?.workspace_code)) {
-      return ALL_RECEIPT_TYPE_OPTIONS
+      return RECEIPT_TYPE_OPTIONS
     }
-    return ALL_RECEIPT_TYPE_OPTIONS.filter(opt => opt.value !== RECEIPT_TYPES.LINK_PAY)
+    return RECEIPT_TYPE_OPTIONS.filter(opt => opt.value !== ReceiptType.LINK_PAY)
   }, [user?.workspace_code])
 
   return (
@@ -92,7 +77,7 @@ export function PaymentItemForm({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {RECEIPT_TYPE_OPTIONS.map(option => (
+              {filteredReceiptTypeOptions.map(option => (
                 <SelectItem key={option.value} value={option.value.toString()}>
                   {option.label}
                 </SelectItem>
@@ -130,15 +115,15 @@ export function PaymentItemForm({
         <div className="col-span-3">
           <label className="text-sm font-medium text-morandi-primary mb-2 block">備註</label>
           <Input
-            value={item.note || ''}
-            onChange={e => onUpdate(item.id, { note: e.target.value })}
+            value={item.notes || ''}
+            onChange={e => onUpdate(item.id, { notes: e.target.value })}
             placeholder="選填"
           />
         </div>
       </div>
 
       {/* 第二排：LinkPay 專屬欄位 */}
-      {item.receipt_type === RECEIPT_TYPES.LINK_PAY && (
+      {item.receipt_type === ReceiptType.LINK_PAY && (
         <div className="grid grid-cols-12 gap-3 pt-3 border-t">
           <div className="col-span-4">
             <label className="text-sm font-medium text-morandi-primary mb-2 block">Email *</label>
@@ -174,7 +159,7 @@ export function PaymentItemForm({
       )}
 
       {/* 第二排：現金專屬欄位 */}
-      {item.receipt_type === RECEIPT_TYPES.CASH && (
+      {item.receipt_type === ReceiptType.CASH && (
         <div className="grid grid-cols-12 gap-3 pt-3 border-t">
           <div className="col-span-4">
             <label className="text-sm font-medium text-morandi-primary mb-2 block">經手人</label>
@@ -188,7 +173,7 @@ export function PaymentItemForm({
       )}
 
       {/* 第二排：匯款專屬欄位 */}
-      {item.receipt_type === RECEIPT_TYPES.BANK_TRANSFER && (
+      {item.receipt_type === ReceiptType.BANK_TRANSFER && (
         <div className="grid grid-cols-12 gap-3 pt-3 border-t">
           <div className="col-span-4">
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
@@ -224,7 +209,7 @@ export function PaymentItemForm({
       )}
 
       {/* 第二排：刷卡專屬欄位 */}
-      {item.receipt_type === RECEIPT_TYPES.CREDIT_CARD && (
+      {item.receipt_type === ReceiptType.CREDIT_CARD && (
         <div className="grid grid-cols-12 gap-3 pt-3 border-t">
           <div className="col-span-3">
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
@@ -262,7 +247,7 @@ export function PaymentItemForm({
       )}
 
       {/* 第二排：支票專屬欄位 */}
-      {item.receipt_type === RECEIPT_TYPES.CHECK && (
+      {item.receipt_type === ReceiptType.CHECK && (
         <div className="grid grid-cols-12 gap-3 pt-3 border-t">
           <div className="col-span-4">
             <label className="text-sm font-medium text-morandi-primary mb-2 block">支票號碼</label>

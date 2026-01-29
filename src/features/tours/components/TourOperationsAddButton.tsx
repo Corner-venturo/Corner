@@ -172,7 +172,7 @@ function TourOperationsAddDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="max-w-md" aria-describedby={undefined}>
+      <DialogContent level={1} className="max-w-md" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>新增項目</DialogTitle>
         </DialogHeader>

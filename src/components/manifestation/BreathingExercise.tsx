@@ -65,7 +65,7 @@ export function BreathingExercise({ onComplete, onSkip }: BreathingExerciseProps
 
   return (
     <Dialog open onOpenChange={(open) => !open && onSkip()}>
-      <DialogContent className="max-w-none w-screen h-screen bg-black/80 border-none flex items-center justify-center p-0">
+      <DialogContent level={1} className="max-w-none w-screen h-screen bg-black/80 border-none flex items-center justify-center p-0">
         <div className="text-center">
           <motion.div
             className="w-64 h-64 mx-auto mb-8 rounded-full bg-gradient-to-br from-morandi-gold/30 to-morandi-gold/10 border-2 border-morandi-gold/20"

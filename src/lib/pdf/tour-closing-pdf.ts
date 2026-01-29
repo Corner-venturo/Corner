@@ -220,7 +220,7 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
 
   const bonusRows = bonuses.map(b => [
     b.request_type || '-',
-    b.note || '-',
+    b.notes || '-',
     formatCurrency(b.amount || 0),
   ])
 

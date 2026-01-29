@@ -192,7 +192,7 @@ export default function TimeboxPage() {
 
       {/* 管理箱子對話框 */}
       <Dialog open={showBoxManager} onOpenChange={setShowBoxManager}>
-        <DialogContent className="max-w-sm max-h-[80vh]">
+        <DialogContent level={1} className="max-w-sm max-h-[80vh]">
           <DialogHeader>
             <DialogTitle>管理箱子</DialogTitle>
           </DialogHeader>
@@ -211,7 +211,7 @@ export default function TimeboxPage() {
 
       {/* 顯化筆記本對話框 */}
       <Dialog open={showManifestation} onOpenChange={setShowManifestation}>
-        <DialogContent className="max-w-md max-h-[85vh]">
+        <DialogContent level={1} className="max-w-md max-h-[85vh]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-morandi-gold" />

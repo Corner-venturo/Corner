@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useCallback } from 'react'
+import { logger } from '@/lib/utils/logger'
 import { createUniver, LocaleType, merge } from '@univerjs/presets'
 import { UniverSheetsCorePreset } from '@univerjs/presets/preset-sheets-core'
 import PresetSheetsZhTW from '@univerjs/presets/preset-sheets-core/locales/zh-TW'
@@ -54,11 +55,11 @@ export function UniverSpreadsheet({
       const workbook = univerRef.current.univerAPI.getActiveWorkbook()
       if (!workbook) return null
 
-      // 使用 getSnapshot 取得完整資料
-      const snapshot = workbook.getSnapshot()
+      // 使用 save 取得完整資料
+      const snapshot = workbook.save()
       return snapshot as IWorkbookData
     } catch (error) {
-      console.error('取得 workbook 資料失敗:', error)
+      logger.error('取得 workbook 資料失敗:', error)
       return null
     }
   }, [])
@@ -93,7 +94,7 @@ export function UniverSpreadsheet({
         lastSavedDataRef.current = dataStr
         onSaveStatusChange?.('saved')
       } catch (error) {
-        console.error('自動儲存失敗:', error)
+        logger.error('自動儲存失敗:', error)
         onSaveStatusChange?.('unsaved')
       }
     }, autoSaveDelay)
@@ -188,7 +189,7 @@ export function UniverSpreadsheet({
         }
 
       } catch (error) {
-        console.error('Univer Spreadsheet 初始化失敗:', error)
+        logger.error('Univer Spreadsheet 初始化失敗:', error)
       }
     }, 100)
 

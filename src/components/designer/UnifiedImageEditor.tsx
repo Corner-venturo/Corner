@@ -211,7 +211,7 @@ export function UnifiedImageEditor({
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
+      <DialogContent level={1} className="max-w-3xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>編輯圖片</DialogTitle>
         </DialogHeader>

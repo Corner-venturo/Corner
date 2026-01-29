@@ -125,7 +125,7 @@ export default function BasicDialog({ scheduledBox, box, onClose }: BasicDialogP
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent level={1} className="max-w-md">
         <DialogHeader>
           <DialogTitle>
             {box.name} - {formatDateTime(scheduledBox.day_of_week, scheduledBox.start_time)}

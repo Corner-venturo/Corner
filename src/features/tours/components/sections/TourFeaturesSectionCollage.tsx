@@ -595,7 +595,7 @@ export function TourFeaturesSectionCollage({
 
       {/* Lightbox */}
       <Dialog open={lightboxImages.length > 0} onOpenChange={(open) => !open && closeLightbox()}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black/90 border-none">
+        <DialogContent level={1} className="max-w-[95vw] max-h-[95vh] p-0 bg-black/90 border-none">
           <div className="relative flex items-center justify-center min-h-[60vh]">
             {/* 左箭頭 */}
             {lightboxImages.length > 1 && (

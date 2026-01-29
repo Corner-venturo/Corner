@@ -10,11 +10,11 @@ export interface Receipt {
   id: string
   receipt_number: string // R2501280001
   workspace_id: string
-  order_id: string | null
+  order_id: string | null | undefined
   tour_id: string | null // 直接關聯團號，方便查詢
   customer_id: string | null // 付款人（客戶）ID
-  order_number: string | null
-  tour_name: string | null
+  order_number: string | null | undefined
+  tour_name: string | null | undefined
 
   // 收款資訊
   receipt_date: string // ISO date
@@ -22,6 +22,7 @@ export interface Receipt {
   payment_method: string // 付款方式（資料庫用 string: transfer/cash/card/check/linkpay）
   receipt_type: ReceiptType // 0:匯款 1:現金 2:刷卡 3:支票 4:LinkPay
   receipt_amount: number // 應收金額
+  total_amount?: number // 所有項目金額加總
   amount: number // 金額（與 receipt_amount 同義）
   actual_amount: number // 實收金額
   status: string // '0':待確認 '1':已確認 '2':異常（資料庫存字串）
@@ -46,14 +47,14 @@ export interface Receipt {
   link: string | null // 付款連結
   linkpay_order_number: string | null // LinkPay 訂單號
 
-  note: string | null
+  notes: string | null | undefined
 
   // 系統欄位
   created_at: string
-  created_by: string | null
+  created_by: string | null | undefined
   updated_at: string
-  updated_by: string | null
-  deleted_at: string | null
+  updated_by: string | null | undefined
+  deleted_at: string | null | undefined
 }
 
 // ============================================
@@ -73,13 +74,13 @@ export interface LinkPayLog {
   end_date: string | null // ISO date
   link: string | null // 付款連結
   status: LinkPayStatus // 0:待付款 1:已付款 2:失敗 3:過期
-  payment_name: string | null
+  payment_name: string | null | undefined
 
   // 系統欄位
   created_at: string
-  created_by: string | null
+  created_by: string | null | undefined
   updated_at: string
-  updated_by: string | null
+  updated_by: string | null | undefined
 }
 
 // ============================================
@@ -104,6 +105,15 @@ export const RECEIPT_TYPE_LABELS: Record<ReceiptType, string> = {
   [ReceiptType.CHECK]: '支票',
   [ReceiptType.LINK_PAY]: 'LinkPay',
 }
+
+/** 收款方式選項（for Select/Dropdown） */
+export const RECEIPT_TYPE_OPTIONS = [
+  { value: ReceiptType.BANK_TRANSFER, label: '匯款' },
+  { value: ReceiptType.CASH, label: '現金' },
+  { value: ReceiptType.CREDIT_CARD, label: '刷卡' },
+  { value: ReceiptType.CHECK, label: '支票' },
+  { value: ReceiptType.LINK_PAY, label: 'LinkPay' },
+] as const
 
 /**
  * 收款狀態
@@ -210,7 +220,7 @@ export interface CreateReceiptData {
   auth_code?: string
   check_number?: string
   check_bank?: string
-  note?: string
+  notes?: string
 }
 
 /**
@@ -219,7 +229,7 @@ export interface CreateReceiptData {
 export interface UpdateReceiptData {
   actual_amount?: number
   status?: ReceiptStatus
-  note?: string
+  notes?: string
 }
 
 /**
@@ -243,10 +253,65 @@ export interface ReceiptItem {
   auth_code?: string
   check_number?: string
   check_bank?: string
-  note?: string
+  notes?: string
 
   // LinkPay 相關（儲存後才有）
   linkpay_order_number?: string
   link?: string
   linkpay_status?: LinkPayStatus
 }
+
+// ============================================
+// DB 收款項目 (Receipt Item from database)
+// ============================================
+
+export interface DbReceiptItem {
+  id: string
+  receipt_id: string // 關聯的收款單
+
+  // 關聯（可獨立移動）
+  tour_id: string | null | undefined
+  order_id: string | null | undefined
+  customer_id: string | null | undefined
+
+  // 金額
+  amount: number
+  actual_amount: number | null | undefined
+
+  // 收款方式
+  payment_method: string
+  receipt_type: number // 0:匯款 1:現金 2:刷卡 3:支票 4:LinkPay
+
+  // 收款方式相關欄位
+  receipt_account: string | null | undefined
+  handler_name: string | null | undefined
+  account_info: string | null | undefined
+  fees: number | null | undefined
+  card_last_four: string | null | undefined
+  auth_code: string | null | undefined
+  check_number: string | null | undefined
+  check_bank: string | null | undefined
+  check_date: string | null | undefined
+
+  // LinkPay 相關
+  email: string | null | undefined
+  payment_name: string | null | undefined
+  pay_dateline: string | null | undefined
+  link: string | null | undefined
+  linkpay_order_number: string | null | undefined
+
+  // 備註與狀態
+  notes: string | null | undefined
+  status: string | null // '0':待確認 '1':已確認 '2':異常
+
+  // 系統欄位
+  workspace_id: string
+  created_at: string | null | undefined
+  updated_at: string | null | undefined
+  created_by: string | null | undefined
+  updated_by: string | null | undefined
+  deleted_at: string | null | undefined
+}
+
+// 建立收款項目用
+export type CreateReceiptItemData = Omit<DbReceiptItem, 'id' | 'created_at' | 'updated_at'>

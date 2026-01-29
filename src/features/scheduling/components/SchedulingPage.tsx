@@ -63,7 +63,7 @@ interface TourRequest {
   status: string
   handler_type: string
   description: string | null
-  note: string | null
+  notes: string | null
   created_at: string | null
   // 分配相關欄位
   assigned_vehicle_id: string | null

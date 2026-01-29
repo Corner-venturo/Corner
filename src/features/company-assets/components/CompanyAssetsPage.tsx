@@ -305,7 +305,7 @@ export const CompanyAssetsPage: React.FC = () => {
 
       {/* 預覽彈窗 */}
       <Dialog open={!!previewAsset} onOpenChange={(open) => !open && setPreviewAsset(null)}>
-        <DialogContent className="max-w-lg">
+        <DialogContent level={1} className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-morandi-primary truncate">
               {previewAsset?.name}

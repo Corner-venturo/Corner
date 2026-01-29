@@ -131,7 +131,7 @@ export default function FlightItineraryPage() {
     <>
       <style>{PRINT_STYLES}</style>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-[900px] max-h-[90vh] overflow-y-auto p-0 print:max-w-full print:rounded-none print:max-h-none print:overflow-visible print:shadow-none" id="flight-itinerary-printable">
+        <DialogContent level={1} className="max-w-[900px] max-h-[90vh] overflow-y-auto p-0 print:max-w-full print:rounded-none print:max-h-none print:overflow-visible print:shadow-none" id="flight-itinerary-printable">
           {/* 控制面板 - 只在螢幕上顯示 */}
           <div className="print:hidden sticky top-0 bg-background border-b border-border px-6 py-4 flex items-center justify-between z-10 rounded-t-xl">
             <DialogHeader className="flex-row items-center gap-2">

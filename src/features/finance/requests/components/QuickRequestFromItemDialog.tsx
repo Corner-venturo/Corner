@@ -98,7 +98,7 @@ export function QuickRequestFromItemDialog({
           order_id: '',
           expense_type: '',
           request_date: requestDate,
-          note: note || `${item.category} - ${item.title}`,
+          notes: note || `${item.category} - ${item.title}`,
           is_special_billing: false,
           created_by: user?.id || '',
         },

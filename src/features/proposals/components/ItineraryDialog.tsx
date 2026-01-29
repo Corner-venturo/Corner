@@ -220,7 +220,7 @@ export function ItineraryDialog({
   }, [])
 
   // 從景點庫選擇後新增
-  const handleAttractionSelect = useCallback((selectedAttractions: { id: string; name: string; name_en?: string; description?: string; thumbnail?: string; images?: string[] }[]) => {
+  const handleAttractionSelect = useCallback((selectedAttractions: { id: string; name: string; english_name?: string; description?: string; thumbnail?: string; images?: string[] }[]) => {
     const newAttractions = selectedAttractions.map((a) => {
       // 優先使用 images 陣列，否則用 thumbnail
       let imageList: { id: string; url: string }[] = []

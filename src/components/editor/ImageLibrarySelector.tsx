@@ -98,7 +98,7 @@ export function ImageLibrarySelector({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh]">
+      <DialogContent level={1} className="max-w-4xl max-h-[80vh]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ImageIcon size={20} className="text-morandi-gold" />

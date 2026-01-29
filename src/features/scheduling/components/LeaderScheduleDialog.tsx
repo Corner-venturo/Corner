@@ -42,7 +42,7 @@ export const LeaderScheduleDialog: React.FC<LeaderScheduleDialogProps> = ({
       open={isOpen}
       onOpenChange={open => !open && onClose()}
       title={isEditMode ? '編輯領隊調度' : '新增領隊調度'}
-      subtitle={selectedLeader ? `${selectedLeader.name}${selectedLeader.name_en ? ` (${selectedLeader.name_en})` : ''}` : '選擇領隊'}
+      subtitle={selectedLeader ? `${selectedLeader.name}${selectedLeader.english_name ? ` (${selectedLeader.english_name})` : ''}` : '選擇領隊'}
       onSubmit={onSubmit}
       submitLabel={isEditMode ? '儲存變更' : '新增調度'}
       submitDisabled={!formData.leader_id || !formData.start_date || !formData.end_date}
@@ -67,7 +67,7 @@ export const LeaderScheduleDialog: React.FC<LeaderScheduleDialogProps> = ({
                 <SelectContent>
                   {leaders.filter(l => l.status === 'active').map(leader => (
                     <SelectItem key={leader.id} value={leader.id}>
-                      {leader.name} {leader.name_en ? `(${leader.name_en})` : ''}
+                      {leader.name} {leader.english_name ? `(${leader.english_name})` : ''}
                     </SelectItem>
                   ))}
                 </SelectContent>

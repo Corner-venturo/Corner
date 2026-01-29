@@ -20,14 +20,7 @@ import { Combobox } from '@/components/ui/combobox'
 import { useTours } from '@/data'
 import { CurrencyCell } from '@/components/table-cells'
 import type { ReceiptItem, Order } from '@/stores'
-
-const RECEIPT_TYPES = {
-  BANK_TRANSFER: 0,
-  CASH: 1,
-  CREDIT_CARD: 2,
-  CHECK: 3,
-  LINK_PAY: 4,
-} as const
+import { ReceiptType } from '@/types/receipt.types'
 
 interface CreateReceiptDialogProps {
   isOpen: boolean
@@ -48,7 +41,7 @@ export function CreateReceiptDialog({
   const [paymentItems, setPaymentItems] = useState<ReceiptItem[]>([
     {
       id: '1',
-      receipt_type: RECEIPT_TYPES.BANK_TRANSFER,
+      receipt_type: ReceiptType.BANK_TRANSFER,
       amount: 0,
       transaction_date: getTodayString(),
     },
@@ -68,7 +61,7 @@ export function CreateReceiptDialog({
   const addPaymentItem = () => {
     const newItem: ReceiptItem = {
       id: Date.now().toString(),
-      receipt_type: RECEIPT_TYPES.BANK_TRANSFER,
+      receipt_type: ReceiptType.BANK_TRANSFER,
       amount: 0,
       transaction_date: getTodayString(),
     }
@@ -91,7 +84,7 @@ export function CreateReceiptDialog({
     setPaymentItems([
       {
         id: '1',
-        receipt_type: RECEIPT_TYPES.BANK_TRANSFER,
+        receipt_type: ReceiptType.BANK_TRANSFER,
         amount: 0,
         transaction_date: getTodayString(),
       },

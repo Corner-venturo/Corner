@@ -138,7 +138,7 @@ export interface QuoteVersion {
   mode: 'detailed' | 'simple' // 版本模式：詳細（成本分析）或 簡易（請款單）
   name?: string // 版本名稱（如：客戶名稱、報價單名稱）- 可選以向下兼容
   version_name?: string // 版本顯示名稱（用於版本選擇器）
-  note?: string // 修改說明
+  notes?: string // 修改說明
   total_amount?: number // 版本總金額
   created_at: string
   updated_at?: string // 版本更新時間（選填）
@@ -188,7 +188,7 @@ export interface QuoteItem {
   quantity: number | null
   unit_price: number | null
   total: number
-  note?: string
+  notes?: string
   day?: number // 住宿專用：第幾天
   room_type?: string // 住宿專用：房型名稱
   is_group_cost?: boolean // 交通和領隊導遊專用：團體分攤

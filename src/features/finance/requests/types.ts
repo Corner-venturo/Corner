@@ -10,14 +10,14 @@ export interface RequestFormData {
   order_id: string // 團體請款使用
   expense_type: CompanyExpenseType | '' // 公司請款使用
   request_date: string
-  note: string
+  notes: string
   is_special_billing: boolean
   created_by: string
 }
 
 export interface BatchRequestFormData {
   request_date: string
-  note: string
+  notes: string
   is_special_billing: boolean
   created_by: string
 }

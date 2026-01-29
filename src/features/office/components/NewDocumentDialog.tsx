@@ -73,7 +73,7 @@ export function NewDocumentDialog({ open, onOpenChange }: NewDocumentDialogProps
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent level={1} className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>新增文件</DialogTitle>
         </DialogHeader>

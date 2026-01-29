@@ -1,5 +1,6 @@
 -- 同步顧客護照資料到訂單成員
 -- 當 customers 表的護照資料更新時，自動同步到關聯的 order_members
+-- 注意：只填充空值，不覆蓋已有的不同資料（衝突由前端處理）
 
 BEGIN;
 
@@ -17,15 +18,16 @@ BEGIN
     OLD.gender IS DISTINCT FROM NEW.gender OR
     OLD.national_id IS DISTINCT FROM NEW.national_id
   ) THEN
+    -- 只更新成員資料為空的欄位（不覆蓋已有資料）
     UPDATE public.order_members
     SET
-      passport_number = COALESCE(NEW.passport_number, passport_number),
-      passport_name = COALESCE(NEW.passport_name, passport_name),
-      passport_expiry = COALESCE(NEW.passport_expiry, passport_expiry),
-      passport_image_url = COALESCE(NEW.passport_image_url, passport_image_url),
-      birth_date = COALESCE(NEW.birth_date, birth_date),
-      gender = COALESCE(NEW.gender, gender),
-      id_number = COALESCE(NEW.national_id, id_number)
+      passport_number = CASE WHEN passport_number IS NULL THEN NEW.passport_number ELSE passport_number END,
+      passport_name = CASE WHEN passport_name IS NULL THEN NEW.passport_name ELSE passport_name END,
+      passport_expiry = CASE WHEN passport_expiry IS NULL THEN NEW.passport_expiry ELSE passport_expiry END,
+      passport_image_url = CASE WHEN passport_image_url IS NULL THEN NEW.passport_image_url ELSE passport_image_url END,
+      birth_date = CASE WHEN birth_date IS NULL THEN NEW.birth_date ELSE birth_date END,
+      gender = CASE WHEN gender IS NULL THEN NEW.gender ELSE gender END,
+      id_number = CASE WHEN id_number IS NULL THEN NEW.national_id ELSE id_number END
     WHERE customer_id = NEW.id;
   END IF;
 

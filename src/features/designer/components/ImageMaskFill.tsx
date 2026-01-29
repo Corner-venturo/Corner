@@ -117,7 +117,7 @@ export function ImageMaskFillDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent level={1} className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>圖片遮罩填充</DialogTitle>
         </DialogHeader>

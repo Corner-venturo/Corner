@@ -120,7 +120,7 @@ export function TourClosingDialog({
           request_type: '業務獎金',
           amount: salesBonus,
           status: 'pending',
-          note: `${tour.code} 結案獎金 - 業務 ${salesBonusPercent}%`,
+          notes: `${tour.code} 結案獎金 - 業務 ${salesBonusPercent}%`,
         })
       }
 
@@ -136,7 +136,7 @@ export function TourClosingDialog({
           request_type: 'OP獎金',
           amount: opBonus,
           status: 'pending',
-          note: `${tour.code} 結案獎金 - OP ${opBonusPercent}%`,
+          notes: `${tour.code} 結案獎金 - OP ${opBonusPercent}%`,
         })
       }
 
@@ -201,7 +201,7 @@ export function TourClosingDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent level={1} className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calculator size={20} className="text-morandi-gold" />

@@ -284,7 +284,7 @@ export interface LeaderSchedule {
 
 export interface LeaderScheduleWithLeader extends LeaderSchedule {
   leader_name: string
-  leader_name_en: string | null
+  leader_english_name: string | null
   leader_phone: string | null
   languages: string[] | null
   specialties: string[] | null

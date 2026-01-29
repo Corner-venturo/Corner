@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useState, useEffect, useCallback, Suspense } from 'react'
+import { logger } from '@/lib/utils/logger'
 import { useAuthStore } from '@/stores/auth-store'
 import { cn } from '@/lib/utils'
 import { MobileHeader } from '@/components/layout/mobile-header'
@@ -293,7 +294,7 @@ function EditorContent() {
 
       void alert('匯出成功', 'success')
     } catch (error) {
-      console.error('匯出 Excel 失敗:', error)
+      logger.error('匯出 Excel 失敗:', error)
       void alert('匯出失敗', 'error')
     }
   }, [currentDocName])

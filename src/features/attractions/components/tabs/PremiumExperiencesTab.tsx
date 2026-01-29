@@ -22,7 +22,7 @@ import { Input } from '@/components/ui/input'
 interface PremiumExperience {
   id: string
   name: string
-  name_en?: string
+  english_name?: string
   category: string
   country_id: string
   city_id: string
@@ -242,8 +242,8 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
         render: (_: unknown, experience: PremiumExperience) => (
           <div className="min-w-[180px]">
             <div className="font-medium text-morandi-primary line-clamp-1">{experience.name}</div>
-            {experience.name_en && (
-              <div className="text-xs text-morandi-muted line-clamp-1">{experience.name_en}</div>
+            {experience.english_name && (
+              <div className="text-xs text-morandi-muted line-clamp-1">{experience.english_name}</div>
             )}
           </div>
         ),
@@ -444,7 +444,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
 
       {/* 編輯對話框 */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent level={1} className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>編輯頂級體驗</DialogTitle>
           </DialogHeader>
@@ -463,9 +463,9 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
                 <div>
                   <label className="text-sm font-medium">英文名稱</label>
                   <Input
-                    value={editingExperience.name_en || ''}
+                    value={editingExperience.english_name || ''}
                     onChange={e =>
-                      setEditingExperience({ ...editingExperience, name_en: e.target.value })
+                      setEditingExperience({ ...editingExperience, english_name: e.target.value })
                     }
                   />
                 </div>

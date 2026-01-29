@@ -23,10 +23,6 @@ import { alert } from '@/lib/ui/alert-dialog'
 import { DateCell, StatusCell, ActionCell, CurrencyCell } from '@/components/table-cells'
 
 // Dynamic imports for dialogs (reduce initial bundle)
-const ReceiptSearchDialog = dynamic(
-  () => import('./components').then(m => m.ReceiptSearchDialog),
-  { loading: () => null }
-)
 const BatchConfirmReceiptDialog = dynamic(
   () => import('./components').then(m => m.BatchConfirmReceiptDialog),
   { loading: () => null }
@@ -53,9 +49,7 @@ import { useAuthStore } from '@/stores'
 import { exportReceiptsToExcel } from '@/lib/excel/receipt-excel'
 
 // Types
-import type { Receipt } from '@/stores'
-import type { ReceiptSearchFilters } from './components/ReceiptSearchDialog'
-import type { ReceiptItem } from '@/stores'
+import type { Receipt, ReceiptItem } from '@/stores'
 
 export default function PaymentsPage() {
   const searchParams = useSearchParams()
@@ -77,11 +71,10 @@ export default function PaymentsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isBatchDialogOpen, setIsBatchDialogOpen] = useState(false)
   const [isBatchConfirmDialogOpen, setIsBatchConfirmDialogOpen] = useState(false)
-  const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false)
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
   const [selectedReceipt, setSelectedReceipt] = useState<Receipt | null>(null)
   const [editingReceipt, setEditingReceipt] = useState<Receipt | null>(null)
-  const [searchFilters, setSearchFilters] = useState<ReceiptSearchFilters>({})
+  const [searchQuery, setSearchQuery] = useState('')
 
   // SWR 自動載入資料，不需要手動 fetch
 
@@ -110,44 +103,8 @@ export default function PaymentsPage() {
     setIsDialogOpen(true)
   }, [])
 
-  // 篩選後的收款單
-  const filteredReceipts = useMemo(() => {
-    let filtered = [...receipts]
-
-    if (searchFilters.receiptNumber) {
-      filtered = filtered.filter(r =>
-        r.receipt_number.toLowerCase().includes(searchFilters.receiptNumber!.toLowerCase())
-      )
-    }
-
-    if (searchFilters.orderNumber) {
-      filtered = filtered.filter(r =>
-        r.order_number?.toLowerCase().includes(searchFilters.orderNumber!.toLowerCase())
-      )
-    }
-
-    if (searchFilters.dateFrom) {
-      filtered = filtered.filter(r => r.receipt_date >= searchFilters.dateFrom!)
-    }
-
-    if (searchFilters.dateTo) {
-      filtered = filtered.filter(r => r.receipt_date <= searchFilters.dateTo!)
-    }
-
-    if (searchFilters.receiptTypes && searchFilters.receiptTypes.length > 0) {
-      filtered = filtered.filter(r => searchFilters.receiptTypes!.includes(r.receipt_type))
-    }
-
-    if (searchFilters.statuses && searchFilters.statuses.length > 0) {
-      filtered = filtered.filter(r => searchFilters.statuses!.includes(r.status))
-    }
-
-    if (searchFilters.limit && filtered.length > searchFilters.limit) {
-      filtered = filtered.slice(0, searchFilters.limit)
-    }
-
-    return filtered
-  }, [receipts, searchFilters])
+  // 收款單資料（搜尋由 EnhancedTable 處理）
+  const filteredReceipts = receipts
 
   // 事件處理（會計確認對話框用）
   const handleViewDetail = useCallback((receipt: Receipt) => {
@@ -170,11 +127,6 @@ export default function PaymentsPage() {
     }
   }
 
-  const handleSearch = (filters: ReceiptSearchFilters) => {
-    setSearchFilters(filters)
-    setIsSearchDialogOpen(false)
-  }
-
   const handleExportExcel = () => {
     exportReceiptsToExcel(filteredReceipts)
   }
@@ -195,17 +147,12 @@ export default function PaymentsPage() {
     <div className="h-full flex flex-col">
       <ResponsiveHeader
         title="收款管理"
+        showSearch={true}
+        searchTerm={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="搜尋收款單號、訂單編號、團名..."
         actions={
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsSearchDialogOpen(true)}
-              className="text-morandi-secondary"
-            >
-              <Search size={16} className="mr-2" />
-              進階搜尋
-            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -247,31 +194,13 @@ export default function PaymentsPage() {
       />
 
       <div className="flex-1 overflow-auto">
-        {Object.keys(searchFilters).length > 0 && (
-          <div className="bg-morandi-gold/10 border border-morandi-gold/20 rounded-lg p-3 mb-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-morandi-secondary">
-                已套用進階搜尋 • 顯示 {filteredReceipts.length} 筆結果
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSearchFilters({})}
-                className="text-morandi-secondary hover:text-morandi-primary"
-              >
-                清除篩選
-              </Button>
-            </div>
-          </div>
-        )}
-
         <EnhancedTable
           className="min-h-full"
           data={filteredReceipts}
           columns={columns as TableColumn[]}
           defaultSort={{ key: 'receipt_date', direction: 'desc' }}
-          searchable
-          searchPlaceholder="搜尋收款單號或訂單編號..."
+          searchTerm={searchQuery}
+          searchableFields={['receipt_number', 'order_number', 'tour_name']}
           onRowClick={handleRowClick}
         />
       </div>
@@ -285,14 +214,6 @@ export default function PaymentsPage() {
         editingReceipt={editingReceipt}
         onUpdate={handleUpdateReceipt}
         onDelete={handleDeleteReceipt}
-      />
-
-      {/* 進階搜尋對話框 */}
-      <ReceiptSearchDialog
-        isOpen={isSearchDialogOpen}
-        onClose={() => setIsSearchDialogOpen(false)}
-        onSearch={handleSearch}
-        currentFilters={searchFilters}
       />
 
       {/* 批量收款對話框 */}

@@ -59,7 +59,7 @@ export async function GET(_request: NextRequest) {
     const { data: newAttractions } = await supabase
       .from('attractions')
       .select(`
-        id, name, name_en, description, category, address,
+        id, name, english_name, description, category, address,
         ticket_price, duration_minutes, notes,
         cities(name),
         countries(name)
@@ -212,7 +212,7 @@ export async function GET(_request: NextRequest) {
 function formatAttractionContent(
   attraction: {
     name: string
-    name_en?: string | null
+    english_name?: string | null
     description?: string | null
     category?: string | null
     address?: string | null
@@ -224,7 +224,7 @@ function formatAttractionContent(
   countryName: string
 ): string {
   const parts = [
-    `${attraction.name}${attraction.name_en ? ` (${attraction.name_en})` : ''}`,
+    `${attraction.name}${attraction.english_name ? ` (${attraction.english_name})` : ''}`,
     `位於${countryName}${cityName}`,
   ]
 
@@ -242,7 +242,7 @@ function formatAttractionContent(
 function formatRestaurantContent(
   restaurant: {
     name: string
-    name_en?: string | null
+    english_name?: string | null
     description?: string | null
     category?: string | null
     cuisine_type?: string[] | null
@@ -257,7 +257,7 @@ function formatRestaurantContent(
   countryName: string
 ): string {
   const parts = [
-    `${restaurant.name}${restaurant.name_en ? ` (${restaurant.name_en})` : ''}`,
+    `${restaurant.name}${restaurant.english_name ? ` (${restaurant.english_name})` : ''}`,
     `位於${countryName}${cityName}`,
   ]
 
@@ -278,7 +278,7 @@ function formatRestaurantContent(
 function formatMichelinContent(
   restaurant: {
     name: string
-    name_en?: string | null
+    english_name?: string | null
     description?: string | null
     cuisine_type?: string[] | null
     michelin_stars?: number | null
@@ -295,7 +295,7 @@ function formatMichelinContent(
   countryName: string
 ): string {
   const parts = [
-    `${restaurant.name}${restaurant.name_en ? ` (${restaurant.name_en})` : ''}`,
+    `${restaurant.name}${restaurant.english_name ? ` (${restaurant.english_name})` : ''}`,
   ]
 
   // 米其林評等

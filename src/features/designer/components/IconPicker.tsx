@@ -8,6 +8,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react'
+import { logger } from '@/lib/utils/logger'
 import { Icon } from '@iconify/react'
 import { Search, X, Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -1325,7 +1326,7 @@ export function IconPicker({ onSelectIcon }: IconPickerProps) {
 
         setIcons(allIcons.length > 0 ? allIcons : [])
       } catch (error) {
-        console.error('搜尋圖示失敗:', error)
+        logger.error('搜尋圖示失敗:', error)
         setIcons([])
       } finally {
         setIsLoading(false)

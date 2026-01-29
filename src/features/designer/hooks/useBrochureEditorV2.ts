@@ -1082,7 +1082,7 @@ export function useBrochureEditorV2(
         canvas.renderAll()
       })
     } catch (error) {
-      console.error('Failed to add icon:', error)
+      logger.error('Failed to add icon:', error)
     }
   }, [width, height])
 
@@ -1123,7 +1123,7 @@ export function useBrochureEditorV2(
         canvas.renderAll()
       })
     } catch (error) {
-      console.error('Failed to add illustration:', error)
+      logger.error('Failed to add illustration:', error)
     }
   }, [width, height])
 

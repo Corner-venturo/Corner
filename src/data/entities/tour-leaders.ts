@@ -14,7 +14,7 @@ export const tourLeaderEntity = createEntityHook<TourLeader>('tour_leaders', {
     orderBy: { column: 'name', ascending: true },
   },
   slim: {
-    select: 'id,name,name_en,phone,status,languages,specialties',
+    select: 'id,name,english_name,phone,status,languages,specialties',
   },
   detail: { select: '*' },
   cache: CACHE_PRESETS.low,
