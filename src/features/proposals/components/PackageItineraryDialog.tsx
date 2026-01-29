@@ -26,7 +26,7 @@ import {
 import { DatePicker } from '@/components/ui/date-picker'
 import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
 import { useAuthStore } from '@/stores'
-import { useItineraries } from '@/hooks/cloud-hooks'
+import { useItineraries } from '@/hooks/cloudHooks'
 import { supabase } from '@/lib/supabase/client'
 import { dynamicFrom } from '@/lib/supabase/typed-client'
 import type { Json } from '@/lib/supabase/types'

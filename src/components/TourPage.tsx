@@ -45,7 +45,7 @@ interface TourPageProps {
    * 各子組件各自定義所需的 props 型別。
    * TODO: 建立統一的 TourPageData 型別，整合所有區塊的型別定義
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   data: any
   isPreview?: boolean
   viewMode?: 'desktop' | 'mobile'

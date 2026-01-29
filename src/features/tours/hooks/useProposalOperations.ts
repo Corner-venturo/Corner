@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { useAuthStore } from '@/stores/auth-store'
-import { useProposals } from '@/hooks/cloud-hooks'
+import { useProposals } from '@/hooks/cloudHooks'
 import {
   createProposal,
   createPackage,

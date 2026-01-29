@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase/client'
 import { Tour } from '@/types/tour.types'
 import { toast } from 'sonner'
-import { QUOTE_STATUS_LABELS } from '@/constants/quote-status'
+import { QUOTE_STATUS_LABELS } from '@/lib/constants/quote-status'
 import {
   Lock,
   FileText,

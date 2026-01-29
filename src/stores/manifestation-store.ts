@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { ManifestationEntry, ManifestationProgress } from '@/types/manifestation'
+import { ManifestationEntry, ManifestationProgress } from '@/types/manifestation.types'
 import { dynamicFrom, castRows, castRow } from '@/lib/supabase/typed-client'
 import { useAuthStore } from './auth-store'
 

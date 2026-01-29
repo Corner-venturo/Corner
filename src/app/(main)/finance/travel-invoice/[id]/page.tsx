@@ -18,7 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useTravelInvoiceStore } from '@/stores/useTravelInvoiceStore'
+import { useTravelInvoiceStore } from '@/stores/travel-invoice-store'
 import { alert } from '@/lib/ui/alert-dialog'
 
 export default function InvoiceDetailPage() {

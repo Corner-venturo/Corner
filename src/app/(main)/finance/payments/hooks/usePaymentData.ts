@@ -10,7 +10,7 @@ import { useOrders, useTourDictionary, useEmployeeDictionary, useReceipts, creat
 import { sendPaymentAbnormalNotification } from '@/lib/utils/bot-notification'
 import { generateReceiptNumber } from '@/lib/utils/receipt-number-generator'
 import { generateVoucherFromPayment, generateVoucherFromCardPayment } from '@/services/voucher-auto-generator'
-import { useAccountingModule } from '@/hooks/use-accounting-module'
+import { useAccountingModule } from '@/hooks/useAccountingModule'
 import type { ReceiptItem } from '@/stores'
 import { ReceiptType } from '@/types/receipt.types'
 

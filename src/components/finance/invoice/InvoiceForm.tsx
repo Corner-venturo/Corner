@@ -4,7 +4,7 @@ import React from 'react'
 import { Plus } from 'lucide-react'
 import { Combobox, ComboboxOption } from '@/components/ui/combobox'
 import { DatePicker } from '@/components/ui/date-picker'
-import { TravelInvoiceItem, BuyerInfo } from '@/stores/useTravelInvoiceStore'
+import { TravelInvoiceItem, BuyerInfo } from '@/stores/travel-invoice-store'
 import type { Order } from '@/types/order.types'
 import type { Tour } from '@/types/tour.types'
 

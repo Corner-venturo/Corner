@@ -273,7 +273,7 @@ export function Combobox<T = unknown>({
           : Math.min(dropdownMaxHeight, spaceBelow - 8),
       })
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [isOpen])
 
   // 預設選項渲染

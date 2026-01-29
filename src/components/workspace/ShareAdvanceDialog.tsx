@@ -5,7 +5,7 @@ import { Plus, Trash2, X, Check } from 'lucide-react'
 import { useWorkspaceWidgets } from '@/stores/workspace-store'
 import { useEmployees } from '@/data'
 import { Combobox } from '@/components/ui/combobox'
-import type { Employee } from '@/types/models'
+import type { Employee } from '@/types/models.types'
 import { alert } from '@/lib/ui/alert-dialog'
 import {
   Dialog,

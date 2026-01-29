@@ -1,11 +1,111 @@
 // ============================
-// Types 子目錄入口檔案
+// 集中 re-export 所有類型定義
 // ============================
-// 此檔案提供對內部模組的便捷存取
-// 對外仍應該從 '@/stores/types' 匯入
 
-export * from './base.types'
-export * from './user.types'
-export * from './tour.types'
-export * from './quote.types'
-export * from './finance.types'
+// 基礎型別
+export type {
+  PaymentMethod,
+  VisaStatus,
+  Todo,
+  Payment,
+  Company,
+  CompanyContact,
+  AirportImage,
+  AirportImageSeason,
+} from './base.types'
+
+// 使用者相關型別
+export type { User, Employee } from './user.types'
+
+// 行程相關型別
+export type {
+  FlightInfo,
+  Tour,
+  Member,
+  TourAddOn,
+  TourRefund,
+  ItineraryFeature,
+  FocusCard,
+  LeaderInfo,
+  MeetingInfo,
+  HotelInfo,
+  DailyActivity,
+  DailyMeals,
+  DailyImage,
+  DailyItineraryDay,
+  PricingItem,
+  PricingDetails,
+  ItineraryVersionRecord,
+  Itinerary,
+  PriceTier,
+  FAQ,
+} from './tour.types'
+
+// 報價相關型別
+export type {
+  Order,
+  Customer,
+  QuoteRegion,
+  Quote,
+  QuickQuoteItem,
+  QuoteVersion,
+  QuoteCategory,
+  QuoteItem,
+  Supplier,
+  TierPricing,
+} from './quote.types'
+
+// 財務相關型別
+export type {
+  PaymentRequest,
+  PaymentRequestCategory,
+  CompanyExpenseType,
+  PaymentItemCategory,
+  PaymentRequestItem,
+  TourAllocation,
+  DisbursementOrder,
+  ReceiptOrder,
+  OrderAllocation,
+  ReceiptPaymentItem,
+  Visa,
+  VendorCost,
+} from './finance.types'
+
+// 財務常數
+export { EXPENSE_TYPE_CONFIG } from './finance.types'
+
+// 客戶群組相關型別
+export type {
+  CustomerGroupType,
+  CustomerGroupMemberRole,
+  CustomerGroup,
+  CustomerGroupMember,
+  CreateCustomerGroupData,
+  UpdateCustomerGroupData,
+  CreateCustomerGroupMemberData,
+} from './customer-group.types'
+
+// 系統功能權限清單 - 從統一配置自動生成
+export { SYSTEM_PERMISSIONS, FEATURE_PERMISSIONS } from '@/lib/permissions'
+
+// Store 工具型別（重新導出）
+export type { CreateInput, UpdateInput } from './core/types'
+
+// 提案相關型別
+export type {
+  ProposalStatus,
+  ArchiveReason,
+  ParticipantCounts,
+  Proposal,
+  ProposalPackage,
+  CreateProposalData,
+  UpdateProposalData,
+  CreatePackageData,
+  UpdatePackageData,
+  ConvertToTourData,
+  ConvertToTourResult,
+  ProposalFilters,
+  ProposalListItem,
+} from './proposal.types'
+
+export { PROPOSAL_STATUS_CONFIG, ARCHIVE_REASON_CONFIG } from './proposal.types'

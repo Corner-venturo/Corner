@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { Users, Edit2, Trash2, Plus, UserPlus, ChevronDown, ChevronRight } from 'lucide-react'
-import { useCustomerGroups, useCustomerGroupMembers, useCustomers } from '@/hooks/cloud-hooks'
+import { useCustomerGroups, useCustomerGroupMembers, useCustomers } from '@/hooks/cloudHooks'
 import { useAuthStore } from '@/stores'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { TableColumn } from '@/components/ui/enhanced-table'

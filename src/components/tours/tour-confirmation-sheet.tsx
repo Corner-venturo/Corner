@@ -27,9 +27,9 @@ import {
   Package,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useItineraries } from '@/hooks/cloud-hooks'
+import { useItineraries } from '@/hooks/cloudHooks'
 import { useTourRequests } from '@/stores/tour-request-store'
-import { useTours } from '@/hooks/cloud-hooks'
+import { useTours } from '@/hooks/cloudHooks'
 import { useAuthStore } from '@/stores/auth-store'
 import { useToast } from '@/components/ui/use-toast'
 import { QuickRequestFromItemDialog } from '@/features/finance/requests/components/QuickRequestFromItemDialog'

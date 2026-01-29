@@ -9,7 +9,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { FileText, Plus, Trash2, X } from 'lucide-react'
-import { TravelInvoiceItem, BuyerInfo } from '@/stores/useTravelInvoiceStore'
+import { TravelInvoiceItem, BuyerInfo } from '@/stores/travel-invoice-store'
 import { CurrencyCell } from '@/components/table-cells'
 
 interface InvoiceDialogProps {

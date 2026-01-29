@@ -14,7 +14,7 @@
  * await createTour({ ... })
  *
  * // ⚠️ 舊架構（向後相容）
- * import { useTours } from '@/hooks/cloud-hooks'
+ * import { useTours } from '@/hooks/cloudHooks'
  * const { items, isLoading, create, update } = useTours()
  * ```
  */

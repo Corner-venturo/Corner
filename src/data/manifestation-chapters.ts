@@ -1,4 +1,4 @@
-import { Chapter } from '@/types/manifestation'
+import { Chapter } from '@/types/manifestation.types'
 
 export const chapters: Chapter[] = [
   {

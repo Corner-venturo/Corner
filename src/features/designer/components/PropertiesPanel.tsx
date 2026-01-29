@@ -119,7 +119,7 @@ export function PropertiesPanel({
       selectedObject.off('moving', updateProperties)
       selectedObject.off('rotating', updateProperties)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [selectedObject])
 
   // 更新物件屬性（支援多選）

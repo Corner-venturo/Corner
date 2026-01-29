@@ -132,7 +132,7 @@ export async function syncPassportDataToMembers(
 ): Promise<number> {
   try {
     // 使用 RPC 函數處理 uuid/text 類型轉換
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { data, error } = await (supabase.rpc as any)('sync_passport_to_order_members', {
       p_customer_id: customerId,
       p_passport_number: passportData.passport_number ?? null,

@@ -267,7 +267,7 @@ export function createCloudHook<T extends BaseEntity>(
         if (needsCodeGeneration) {
           // 從資料庫查詢最大 code，確保唯一性
           // tableName 是泛型變數，Supabase 的複雜型別推導會導致 "Type instantiation is excessively deep"
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           
           const { data: maxCodeResults } = await (supabase as any)
             .from(tableName)
             .select('code')

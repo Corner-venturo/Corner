@@ -11,7 +11,7 @@ import { QuotationInfo } from './QuotationInfo'
 import { QuotationPricingTable } from './QuotationPricingTable'
 import { QuotationInclusions } from './QuotationInclusions'
 import { QuotationTerms } from './QuotationTerms'
-import { Quote } from '@/types/models'
+import { Quote } from '@/types/models.types'
 
 interface TierPricingForPrint {
   participant_count: number

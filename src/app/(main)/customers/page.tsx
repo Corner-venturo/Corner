@@ -23,7 +23,7 @@ import {
   CustomerSearchDialog,
   CustomerSearchParams,
 } from '@/components/customers/customer-search-dialog'
-import { useCustomers } from '@/hooks/cloud-hooks'
+import { useCustomers } from '@/hooks/cloudHooks'
 import type { Customer, CreateCustomerData } from '@/types/customer.types'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'

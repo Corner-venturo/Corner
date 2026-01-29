@@ -34,7 +34,7 @@ export function calculateExpression(expression: string): number | null {
 
   try {
     // 使用 Function 而非 eval，更安全
-    // eslint-disable-next-line @typescript-eslint/no-implied-eval
+     
     const result = new Function(`return (${cleaned})`)()
 
     if (typeof result !== 'number' || !isFinite(result)) {

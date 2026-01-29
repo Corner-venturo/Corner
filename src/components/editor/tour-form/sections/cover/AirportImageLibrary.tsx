@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useMemo, useCallback } from 'react'
-import { useAirportImages } from '@/hooks/cloud-hooks'
+import { useAirportImages } from '@/hooks/cloudHooks'
 import { ImageUploader } from '@/components/ui/image-uploader'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'

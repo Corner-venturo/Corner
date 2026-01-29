@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useCustomers } from '@/data'
 import { Member } from '@/stores/types'
-import { useMembers } from '@/hooks/use-members'
+import { useMembers } from '@/hooks/useMembers'
 import type { Customer } from '@/types/customer.types'
 import { getGenderFromIdNumber, calculateAge } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'

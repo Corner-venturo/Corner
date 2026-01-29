@@ -3,7 +3,7 @@
 import { useCallback, useState, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useTourPageState } from './useTourPageState'
-import { useEmployees } from '@/hooks/cloud-hooks'
+import { useEmployees } from '@/hooks/cloudHooks'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import type { Proposal, ProposalPackage } from '@/types/proposal.types'

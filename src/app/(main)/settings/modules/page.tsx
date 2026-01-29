@@ -34,7 +34,7 @@ import { DateCell } from '@/components/table-cells'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import type { Workspace } from '@/types/models'
+import type { Workspace } from '@/types/models.types'
 
 const MODULE_INFO = {
   accounting: {

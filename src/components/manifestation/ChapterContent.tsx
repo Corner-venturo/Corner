@@ -3,7 +3,7 @@
 import { UI_DELAYS, SYNC_DELAYS } from '@/lib/constants/timeouts'
 
 import { useState, useEffect } from 'react'
-import { Chapter } from '@/types/manifestation'
+import { Chapter } from '@/types/manifestation.types'
 import { useManifestationStore } from '@/stores/manifestation-store'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'

@@ -291,7 +291,7 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
           const { data: { user } } = await supabase.auth.getUser()
           if (!user) throw new Error('未登入')
 
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           
           const { data: member } = await (supabase as any)
             .from('workspace_members')
             .select('workspace_id')
@@ -312,7 +312,7 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
           }
           const { data: folder, error } = await supabase
             .from('folders')
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             
             .insert(insertData as any)
             .select()
             .single()

@@ -4,7 +4,7 @@ import { getTodayString } from '@/lib/utils/format-date'
 
 import { useState, useEffect, useMemo } from 'react'
 import { useToast } from '@/components/ui/use-toast'
-import { useTravelInvoiceStore, TravelInvoiceItem, BuyerInfo } from '@/stores/useTravelInvoiceStore'
+import { useTravelInvoiceStore, TravelInvoiceItem, BuyerInfo } from '@/stores/travel-invoice-store'
 import { useOrders, useTours, invalidateOrders, invalidateTours } from '@/data'
 import type { Order } from '@/types/order.types'
 import type { Tour } from '@/types/tour.types'

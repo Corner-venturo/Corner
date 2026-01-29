@@ -6,7 +6,7 @@ import {
   Trash2,
   Archive,
 } from 'lucide-react'
-import { useProposals, useProposalPackages } from '@/hooks/cloud-hooks'
+import { useProposals, useProposalPackages } from '@/hooks/cloudHooks'
 import { useAuthStore } from '@/stores'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'

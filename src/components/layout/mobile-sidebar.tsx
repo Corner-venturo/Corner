@@ -33,7 +33,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
-import { isMenuItemHidden } from '@/constants/menu-items'
+import { isMenuItemHidden } from '@/lib/constants/menu-items'
 import { isFeatureAvailable, RestrictedFeature } from '@/lib/feature-restrictions'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 

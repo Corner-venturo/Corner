@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // Export formatDate from utils
-export { formatDate } from './utils/format-date'
+export { formatDate } from './format-date'
 
 /**
  * 格式化日期為 input[type="date"] 的格式 (YYYY-MM-DD)

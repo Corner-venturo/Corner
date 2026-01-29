@@ -4,7 +4,7 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { FileSignature, Edit2, Trash2, Eye, Mail, Plus } from 'lucide-react'
-import { useTours } from '@/hooks/cloud-hooks'
+import { useTours } from '@/hooks/cloudHooks'
 // 🔧 優化：移除 useOrdersListSlim/useMembersCountSlim，改用 tour.current_participants
 import { useToast } from '@/components/ui/use-toast'
 import { confirm } from '@/lib/ui/alert-dialog'

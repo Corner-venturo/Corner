@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useItineraries, useEmployees, useQuotes, useTours } from '@/hooks/cloud-hooks'
+import { useItineraries, useEmployees, useQuotes, useTours } from '@/hooks/cloudHooks'
 import { useCountries, useCities } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores'
