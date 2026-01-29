@@ -83,7 +83,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
         channelState.memberToRemove.id
       )
       channelState.closeRemoveMemberDialog()
-    } catch (error) {
+    } catch {
       // Error handled by service
     } finally {
       channelState.setIsRemovingMember(false)
