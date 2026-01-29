@@ -45,6 +45,18 @@ export default function WorkspacePage() {
 
   }, [currentWorkspace?.id])
 
+  // 載入中顯示 loading
+  if (!hasLoaded) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-morandi-gold mx-auto"></div>
+          <p className="mt-3 text-sm text-morandi-muted">載入工作空間...</p>
+        </div>
+      </div>
+    )
+  }
+
   // 工作空間頁面使用自訂 layout，最大化聊天區域
   return (
     <>
