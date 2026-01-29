@@ -17,9 +17,9 @@ interface OcrCustomerData {
   english_name?: string
   passport_romanization?: string
   passport_number?: string
-  passport_expiry_date?: string | null
+  passport_expiry?: string | null
   national_id?: string
-  date_of_birth?: string | null
+  birth_date?: string | null
   sex?: string
 }
 
@@ -108,7 +108,7 @@ export function usePassportOcr(): UsePassportOcrReturn {
   ): DuplicateCheckResult => {
     const passportNumber = customer.passport_number || ''
     const idNumber = customer.national_id || ''
-    const birthDate = customer.date_of_birth || null
+    const birthDate = customer.birth_date || null
     const chineseName = customer.name || ''
     const cleanChineseName = chineseName.replace(/\([^)]+\)$/, '').trim()
     const nameBirthKey = cleanChineseName && birthDate ? `${cleanChineseName}|${birthDate}` : ''

@@ -18,21 +18,21 @@ import { logger } from '@/lib/utils/logger'
 export interface OcrParsedData {
   name?: string
   passport_romanization?: string
-  date_of_birth?: string
+  birth_date?: string
   gender?: string
   passport_number?: string
-  passport_expiry_date?: string
+  passport_expiry?: string
   national_id?: string
 }
 
 interface OcrResult {
   name?: string
   passport_romanization?: string
-  date_of_birth?: string
+  birth_date?: string
   sex?: string
   gender?: string
   passport_number?: string
-  passport_expiry_date?: string
+  passport_expiry?: string
   national_id?: string
 }
 
@@ -98,10 +98,10 @@ export function useOcrRecognition() {
         const recognizedData: OcrParsedData = {
           name: ocrData.name,
           passport_romanization: ocrData.passport_romanization,
-          date_of_birth: ocrData.date_of_birth,
+          birth_date: ocrData.birth_date,
           gender,
           passport_number: ocrData.passport_number,
-          passport_expiry_date: ocrData.passport_expiry_date,
+          passport_expiry: ocrData.passport_expiry,
           national_id: ocrData.national_id,
         }
 
