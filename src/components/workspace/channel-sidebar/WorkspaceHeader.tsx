@@ -137,6 +137,7 @@ export function WorkspaceHeader({
               >
                 已加星號
               </DropdownMenuItem>
+              {/* TODO: 實現 unread/muted 功能後再開放
               <DropdownMenuItem
                 onClick={() => onFilterChange('unread')}
                 className="dropdown-item-morandi"
@@ -149,6 +150,7 @@ export function WorkspaceHeader({
               >
                 已靜音
               </DropdownMenuItem>
+              */}
             </DropdownMenuContent>
           </DropdownMenu>
           <DropdownMenu>

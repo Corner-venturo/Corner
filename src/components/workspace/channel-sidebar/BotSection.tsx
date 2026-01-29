@@ -25,11 +25,29 @@ export function BotSection({
   const { items: employees } = useEmployeesSlim()
   const [aiAvailable, setAiAvailable] = useState(false)
 
-  // 檢查 AI 是否可用
+  // 檢查 AI 是否可用（使用 sessionStorage 快取 5 分鐘）
   useEffect(() => {
+    const cacheKey = 'logan-ai-available'
+    const cached = sessionStorage.getItem(cacheKey)
+    
+    if (cached) {
+      const { available, timestamp } = JSON.parse(cached)
+      // 5 分鐘內用快取
+      if (Date.now() - timestamp < 5 * 60 * 1000) {
+        setAiAvailable(available)
+        return
+      }
+    }
+    
     fetch('/api/logan/chat')
       .then(res => res.json())
-      .then(data => setAiAvailable(data.available))
+      .then(data => {
+        setAiAvailable(data.available)
+        sessionStorage.setItem(cacheKey, JSON.stringify({
+          available: data.available,
+          timestamp: Date.now()
+        }))
+      })
       .catch(() => setAiAvailable(false))
   }, [])
 
