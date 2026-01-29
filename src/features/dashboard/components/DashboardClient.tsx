@@ -55,7 +55,7 @@ export function DashboardClient() {
   const t = useI18n()
   const { isAuthenticated, _hasHydrated, user } = useAuthStore()
   const [isLoading, setIsLoading] = useState(true)
-  const { activeWidgets, toggleWidget, reorderWidgets } = useWidgets()
+  const { activeWidgets, toggleWidget, reorderWidgets, isLoading: widgetsLoading } = useWidgets()
 
   // 是否為超級管理員
   const userRoles = user?.roles || []
@@ -117,7 +117,7 @@ export function DashboardClient() {
     }
   }, [isAuthenticated, _hasHydrated, router])
 
-  if (isLoading) {
+  if (isLoading || widgetsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
