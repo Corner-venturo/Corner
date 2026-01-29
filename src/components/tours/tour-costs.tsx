@@ -10,7 +10,7 @@ import { Tour, Payment } from '@/stores/types'
 import {
   useOrders,
   usePaymentRequests,
-  useSuppliers,
+  useSuppliersSlim,
   createPaymentRequest as createPaymentRequestApi,
   invalidatePaymentRequests,
 } from '@/data'
@@ -51,7 +51,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
   const { items: orders } = useOrders()
   // 使用 @/data hooks（SWR 自動載入）
   const { items: paymentRequests } = usePaymentRequests()
-  const { items: suppliers } = useSuppliers()
+  const { items: suppliers } = useSuppliersSlim()
   const { toast } = useToast()
 
   // 更新 tour 的成本財務欄位

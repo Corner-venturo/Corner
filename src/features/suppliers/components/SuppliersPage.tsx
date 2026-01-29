@@ -11,7 +11,7 @@ import { Building2 } from 'lucide-react'
 import { SuppliersList } from './SuppliersList'
 import { SuppliersDialog } from './SuppliersDialog'
 import {
-  useSuppliers,
+  useSuppliersSlim,
   createSupplier,
   updateSupplier,
   deleteSupplier as deleteSupplierApi,
@@ -25,7 +25,7 @@ export const SuppliersPage: React.FC = () => {
   const [isEditMode, setIsEditMode] = useState(false)
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null)
 
-  const { items: suppliers } = useSuppliers()
+  const { items: suppliers } = useSuppliersSlim()
 
   // 簡化的表單狀態
   const [formData, setFormData] = useState({

@@ -14,7 +14,7 @@ export const supplierEntity = createEntityHook<Supplier>('suppliers', {
     orderBy: { column: 'name', ascending: true },
   },
   slim: {
-    select: 'id,name,category,contact_name,phone,email',
+    select: 'id,name,category,contact_name,phone,email,bank_name,bank_account,notes,types',
   },
   detail: { select: '*' },
   cache: CACHE_PRESETS.low,
