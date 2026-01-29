@@ -33,19 +33,17 @@ import { COMPANY } from '@/lib/constants/company'
 
 interface TourPageProps {
   /**
-   * TourPage 資料結構
+   * 🔧 技術債：TourPageData 類型待統一
    * 
-   * 此 data prop 來自多個 API 的複合資料，包含：
-   * - 基本行程資訊（title, coverImage, coverStyle 等）
-   * - 每日行程（dailyItinerary）
-   * - 定價資訊（pricingDetails, priceTiers）
-   * - 航班、飯店、領隊等多個區塊的資料
+   * 目前問題：
+   * - 5+ 個子組件各自定義 TourDisplayData
+   * - 欄位散落在不同地方，難以統一
+   * - 需要重構所有 section 組件才能解決
    * 
-   * 由於資料結構複雜且跨多個組件共用，無法建立統一型別。
-   * 各子組件各自定義所需的 props 型別。
-   * TODO: 建立統一的 TourPageData 型別，整合所有區塊的型別定義
+   * 資料來源：編輯器產生的複合資料結構
+   * 包含：coverStyle, dailyItinerary, features, hotels, leader, pricing 等
    */
-   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any
   isPreview?: boolean
   viewMode?: 'desktop' | 'mobile'
