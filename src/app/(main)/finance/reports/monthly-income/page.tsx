@@ -10,6 +10,7 @@ import { CurrencyCell, DateCell } from '@/components/table-cells'
 import { ChevronLeft, ChevronRight, TrendingUp, Receipt, Users } from 'lucide-react'
 import { useReceiptOrders } from '@/data'
 import { ReceiptOrder } from '@/types'
+import { RECEIPT_PAYMENT_METHOD_LABELS } from '@/types/receipt.types'
 
 // 取得當前年月
 function getCurrentYearMonth(): string {
@@ -30,15 +31,6 @@ function getMonthRange(yearMonth: string): { startDate: string; endDate: string 
 function formatYearMonth(yearMonth: string): string {
   const [year, month] = yearMonth.split('-')
   return `${year} 年 ${parseInt(month)} 月`
-}
-
-// 付款方式對應
-const PAYMENT_METHOD_LABELS: Record<string, string> = {
-  cash: '現金',
-  transfer: '匯款',
-  card: '刷卡',
-  check: '支票',
-  linkpay: 'LinkPay',
 }
 
 // 月份選擇器
@@ -171,7 +163,7 @@ export default function MonthlyIncomeReportPage() {
         const method = String(value || '')
         return (
           <span className="text-sm">
-            {PAYMENT_METHOD_LABELS[method] || method || '-'}
+            {RECEIPT_PAYMENT_METHOD_LABELS[method] || method || '-'}
           </span>
         )
       },
@@ -248,7 +240,7 @@ export default function MonthlyIncomeReportPage() {
             {Object.entries(stats.byPaymentMethod).map(([method, data]) => (
               <div key={method} className="p-4 bg-morandi-container/30 rounded-lg">
                 <p className="text-sm text-morandi-secondary">
-                  {PAYMENT_METHOD_LABELS[method] || method}
+                  {RECEIPT_PAYMENT_METHOD_LABELS[method] || method}
                 </p>
                 <p className="text-lg font-semibold text-morandi-primary">
                   {data.count} 筆

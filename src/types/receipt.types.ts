@@ -115,6 +115,15 @@ export const RECEIPT_TYPE_OPTIONS = [
   { value: ReceiptType.LINK_PAY, label: 'LinkPay' },
 ] as const
 
+/** 收款單付款方式標籤（對應資料庫 payment_method 字串值） */
+export const RECEIPT_PAYMENT_METHOD_LABELS: Record<string, string> = {
+  transfer: '匯款',
+  cash: '現金',
+  card: '刷卡',
+  check: '支票',
+  linkpay: 'LinkPay',
+}
+
 /**
  * 收款狀態
  */
