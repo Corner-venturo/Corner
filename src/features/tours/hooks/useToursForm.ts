@@ -3,7 +3,7 @@
 import { useCallback, useState, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useTourPageState } from './useTourPageState'
-import { useEmployees } from '@/hooks/cloudHooks'
+import { useEmployeesSlim } from '@/data'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import type { Proposal, ProposalPackage } from '@/types/proposal.types'
@@ -32,7 +32,7 @@ interface UseToursFormParams {
 export function useToursForm({ state, openDialog }: UseToursFormParams): UseToursFormReturn {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const { items: employees, fetchAll: fetchEmployees } = useEmployees()
+  const { items: employees, refresh: fetchEmployees } = useEmployeesSlim()
 
   // 從提案轉開團的資料
   const [proposalConvertData, setProposalConvertData] = useState<{ proposal: Proposal; package: ProposalPackage } | null>(null)

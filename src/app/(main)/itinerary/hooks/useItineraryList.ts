@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useItineraries, useEmployees, useQuotes, useTours } from '@/hooks/cloudHooks'
+import { useItineraries, useEmployeesSlim, useQuotes, useToursSlim } from '@/data'
 import { useCountries, useCities } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores'
@@ -12,8 +12,8 @@ import { stripHtml } from '@/lib/utils/string-utils'
 export function useItineraryList() {
   const router = useRouter()
   const { items: itineraries } = useItineraries()
-  const { items: employees } = useEmployees()
-  const { items: tours } = useTours()
+  const { items: employees } = useEmployeesSlim()
+  const { items: tours } = useToursSlim()
   const { user } = useAuthStore()
   const { workspaces, loadWorkspaces } = useWorkspaceStore()
   const { items: countries } = useCountries()

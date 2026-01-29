@@ -27,9 +27,9 @@ import {
   Package,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useItineraries } from '@/hooks/cloudHooks'
+import { useItineraries } from '@/data'
 import { useTourRequests } from '@/stores/tour-request-store'
-import { useTours } from '@/hooks/cloudHooks'
+import { useToursSlim } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { useToast } from '@/components/ui/use-toast'
 import { QuickRequestFromItemDialog } from '@/features/finance/requests/components/QuickRequestFromItemDialog'
@@ -63,8 +63,8 @@ interface SupplierGroup<T> {
 }
 
 export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
-  const { items: tours } = useTours()
-  const { items: itineraries, isLoading: itineraryLoading } = useItineraries()
+  const { items: tours } = useToursSlim()
+  const { items: itineraries, loading: itineraryLoading } = useItineraries()
   const { items: existingRequests, fetchAll: refreshRequests } = useTourRequests()
   const { user: currentUser } = useAuthStore()
   const { toast } = useToast()
