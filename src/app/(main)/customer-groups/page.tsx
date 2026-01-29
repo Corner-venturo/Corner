@@ -3,7 +3,11 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { Users, Edit2, Trash2, Plus, UserPlus, ChevronDown, ChevronRight } from 'lucide-react'
-import { useCustomerGroups, useCustomerGroupMembers, useCustomers } from '@/hooks/cloudHooks'
+import {
+  useCustomerGroups, createCustomerGroup, updateCustomerGroup, deleteCustomerGroup,
+  useCustomerGroupMembers, createCustomerGroupMember, deleteCustomerGroupMember,
+  useCustomers,
+} from '@/data'
 import { useAuthStore } from '@/stores'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { TableColumn } from '@/components/ui/enhanced-table'
@@ -36,17 +40,13 @@ const GROUP_TYPE_COLORS: Record<CustomerGroupType, string> = {
 
 export default function CustomerGroupsPage() {
   const { user } = useAuthStore()
-  const {
-    items: groups,
-    create: createGroup,
-    update: updateGroup,
-    delete: deleteGroup,
-  } = useCustomerGroups()
-  const {
-    items: allMembers,
-    create: createMember,
-    delete: deleteMember,
-  } = useCustomerGroupMembers()
+  const { items: groups } = useCustomerGroups()
+  const createGroup = createCustomerGroup
+  const updateGroup = updateCustomerGroup
+  const deleteGroup = deleteCustomerGroup
+  const { items: allMembers } = useCustomerGroupMembers()
+  const createMember = createCustomerGroupMember
+  const deleteMember = deleteCustomerGroupMember
   const { items: customers } = useCustomers()
 
   // 展開狀態
