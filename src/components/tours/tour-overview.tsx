@@ -3,7 +3,7 @@
 import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Tour } from '@/stores/types'
-import { useOrders } from '@/data'
+import { useOrdersSlim } from '@/data'
 import {
   Calendar,
   MapPin,
@@ -33,7 +33,7 @@ export const TourOverview = React.memo(function TourOverview({
   onManageQuote,
   onManageItinerary,
 }: TourOverviewProps) {
-  const { items: orders } = useOrders()
+  const { items: orders } = useOrdersSlim()
 
   // 如果有 orderFilter，取得該訂單的資料
   const order = orderFilter ? orders.find(o => o.id === orderFilter) : null

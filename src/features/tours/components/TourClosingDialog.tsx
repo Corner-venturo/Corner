@@ -15,7 +15,7 @@ import {
 import { Tour } from '@/stores/types'
 import {
   usePaymentRequests,
-  useOrders,
+  useOrdersSlim,
   updateTour,
   createPaymentRequest as createPaymentRequestApi,
 } from '@/data'
@@ -46,7 +46,7 @@ export function TourClosingDialog({
 
   // 使用 @/data hooks（SWR 自動載入）
   const { items: paymentRequests } = usePaymentRequests()
-  const { items: orders } = useOrders()
+  const { items: orders } = useOrdersSlim()
 
   // 計算團的總收入（從訂單）
   const tourOrders = useMemo(() => {

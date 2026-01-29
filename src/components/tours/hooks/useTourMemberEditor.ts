@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { logger } from '@/lib/utils/logger'
 import { Tour } from '@/stores/types'
-import { useOrders, useMembersSlim, createMember, updateMember, deleteMember } from '@/data'
+import { useOrdersSlim, useMembersSlim, createMember, updateMember, deleteMember } from '@/data'
 import { getGenderFromIdNumber, calculateAge } from '@/lib/utils'
 import { supabase } from '@/lib/supabase/client'
 import { confirm } from '@/lib/ui/alert-dialog'
@@ -44,7 +44,7 @@ export function useTourMemberEditor(
   triggerAdd?: boolean,
   onTriggerAddComplete?: () => void
 ) {
-  const { items: orders } = useOrders()
+  const { items: orders } = useOrdersSlim()
   const { items: members } = useMembersSlim()
 
   const [tableMembers, setTableMembers] = useState<EditingMember[]>([])

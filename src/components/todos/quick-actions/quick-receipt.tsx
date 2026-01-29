@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { DateInput } from '@/components/ui/date-input'
-import { useOrders, useTours } from '@/data'
+import { useOrdersSlim, useTours } from '@/data'
 import { Combobox } from '@/components/ui/combobox'
 import { usePaymentData } from '@/app/(main)/finance/payments/hooks/usePaymentData'
 import type { ReceiptItem } from '@/stores'
@@ -35,7 +35,7 @@ interface QuickReceiptProps {
 const paymentMethods = RECEIPT_TYPE_OPTIONS
 
 export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickReceiptProps) {
-  const { items: orders } = useOrders()
+  const { items: orders } = useOrdersSlim()
   const { items: tours } = useTours()
   const { handleCreateReceipt } = usePaymentData()
 

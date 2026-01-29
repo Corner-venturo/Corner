@@ -22,7 +22,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
-  useOrders,
+  useOrdersSlim,
   updateOrder,
   useReceipts,
   updateReceipt,
@@ -61,7 +61,7 @@ export function BatchConfirmReceiptDialog({
 }: BatchConfirmReceiptDialogProps) {
   const { items: receiptItems } = useReceiptItems()
   const { items: receipts } = useReceipts()
-  const { items: orders } = useOrders()
+  const { items: orders } = useOrdersSlim()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [confirmItems, setConfirmItems] = useState<Map<string, ConfirmItem>>(new Map())
 

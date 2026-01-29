@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Tour, ContractTemplate } from '@/types/tour.types'
 import { Order, Member } from '@/types/order.types'
-import { useTours, updateTour, useOrders, useItineraries, useQuotes } from '@/data'
+import { useTours, updateTour, useOrdersSlim, useItineraries, useQuotes } from '@/data'
 import { prepareContractData, ContractData } from '@/lib/contract-utils'
 import { alert, alertSuccess, alertError } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'
@@ -27,7 +27,7 @@ interface OrderMember {
 }
 
 export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
-  const { items: orders, loading: ordersLoading } = useOrders()
+  const { items: orders, loading: ordersLoading } = useOrdersSlim()
   const { items: itineraries } = useItineraries()
   const { items: quotes } = useQuotes()
 

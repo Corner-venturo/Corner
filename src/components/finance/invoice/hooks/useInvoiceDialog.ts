@@ -5,7 +5,7 @@ import { getTodayString } from '@/lib/utils/format-date'
 import { useState, useEffect, useMemo } from 'react'
 import { useToast } from '@/components/ui/use-toast'
 import { useTravelInvoiceStore, TravelInvoiceItem, BuyerInfo } from '@/stores/travel-invoice-store'
-import { useOrders, useTours, invalidateOrders, invalidateTours } from '@/data'
+import { useOrdersSlim, useTours, invalidateOrders, invalidateTours } from '@/data'
 import type { Order } from '@/types/order.types'
 import type { Tour } from '@/types/tour.types'
 import { confirm } from '@/lib/ui/alert-dialog'
@@ -30,7 +30,7 @@ export function useInvoiceDialog({
 }: UseInvoiceDialogProps) {
   const { toast } = useToast()
   const { issueInvoice, invoices, isLoading, fetchInvoices } = useTravelInvoiceStore()
-  const { items: allOrders, loading: ordersLoading } = useOrders()
+  const { items: allOrders, loading: ordersLoading } = useOrdersSlim()
   const { items: allTours, loading: toursLoading } = useTours()
 
   const [dataLoaded, setDataLoaded] = useState(false)

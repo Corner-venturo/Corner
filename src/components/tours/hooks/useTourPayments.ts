@@ -5,7 +5,7 @@ import { getTodayString } from '@/lib/utils/format-date'
 import { logger } from '@/lib/utils/logger'
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { Tour, Payment } from '@/stores/types'
-import { useOrders, useReceipts, createReceipt, invalidateReceipts } from '@/data'
+import { useOrdersSlim, useReceipts, createReceipt, invalidateReceipts } from '@/data'
 import type { Receipt, ReceiptType } from '@/types/receipt.types'
 import { useToast } from '@/components/ui/use-toast'
 import { useTravelInvoiceStore, TravelInvoiceItem, BuyerInfo } from '@/stores/travel-invoice-store'
@@ -30,7 +30,7 @@ export function useTourPayments({
   triggerAdd,
   onTriggerAddComplete,
 }: UseTourPaymentsProps) {
-  const { items: orders } = useOrders()
+  const { items: orders } = useOrdersSlim()
   const { items: receipts } = useReceipts()
   const { issueInvoice, isLoading: isInvoiceLoading } = useTravelInvoiceStore()
   const { toast } = useToast()

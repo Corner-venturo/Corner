@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tour, Payment } from '@/stores/types'
 import {
-  useOrders,
+  useOrdersSlim,
   usePaymentRequests,
   useSuppliersSlim,
   createPaymentRequest as createPaymentRequestApi,
@@ -48,7 +48,7 @@ interface CostPayment extends Payment {
 }
 
 export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, showSummary = true, onChildDialogChange }: TourCostsProps) {
-  const { items: orders } = useOrders()
+  const { items: orders } = useOrdersSlim()
   // 使用 @/data hooks（SWR 自動載入）
   const { items: paymentRequests } = usePaymentRequests()
   const { items: suppliers } = useSuppliersSlim()
