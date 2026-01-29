@@ -3,21 +3,10 @@
 import { motion } from 'framer-motion'
 import { Plane } from 'lucide-react'
 import { ART } from './utils/art-theme'
+import type { FlightInfo } from '@/types/flight.types'
 
 // Brutalist 陰影
 const brutalistShadow = '6px 6px 0px 0px rgba(28,28,28,1)'
-
-interface FlightInfo {
-  airline?: string | null
-  flightNumber?: string | null
-  departureAirport?: string | null
-  departureTime?: string | null
-  departureDate?: string | null
-  arrivalAirport?: string | null
-  arrivalTime?: string | null
-  duration?: string | null
-  hasMeal?: boolean | null
-}
 
 interface TourFlightSectionArtProps {
   data: {

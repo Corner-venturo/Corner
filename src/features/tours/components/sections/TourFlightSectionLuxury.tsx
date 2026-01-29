@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { Plane } from 'lucide-react'
+import type { FlightInfo } from '@/types/flight.types'
 
 // Luxury 配色
 const LUXURY = {
@@ -12,17 +13,6 @@ const LUXURY = {
   surface: '#FFFFFF',
   text: '#2D3436',
   muted: '#636E72',
-}
-
-interface FlightInfo {
-  airline?: string | null
-  flightNumber?: string | null
-  departureAirport?: string | null
-  departureTime?: string | null
-  departureDate?: string | null
-  arrivalAirport?: string | null
-  arrivalTime?: string | null
-  duration?: string | null
 }
 
 interface TourFlightSectionLuxuryProps {

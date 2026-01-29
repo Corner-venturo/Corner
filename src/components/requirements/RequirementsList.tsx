@@ -42,6 +42,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { logger } from '@/lib/utils/logger'
 import { generateTourRequestCode } from '@/stores/utils/code-generator'
 import { getStatusConfig } from '@/lib/status-config'
+import type { FlightInfo } from '@/types/flight.types'
 
 // ============================================
 // Types
@@ -105,16 +106,7 @@ interface ChangeTrackItem {
   item: ConfirmedRequirementItem | QuoteItem
 }
 
-// 航班資訊
-interface FlightInfo {
-  airline?: string
-  flightNumber?: string
-  departureTime?: string
-  arrivalTime?: string
-  departureAirport?: string
-  arrivalAirport?: string
-  duration?: string
-}
+// FlightInfo 已移至 @/types/flight.types.ts
 
 // 分類配置
 type CategoryKey = 'transport' | 'hotel' | 'restaurant' | 'activity' | 'other'

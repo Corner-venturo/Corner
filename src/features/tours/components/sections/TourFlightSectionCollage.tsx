@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { Plane } from 'lucide-react'
 import { formatMonthShort } from '@/lib/utils/format-date'
+import type { FlightInfo } from '@/types/flight.types'
 
 // Collage 配色 (Pop Art)
 const POP = {
@@ -13,18 +14,6 @@ const POP = {
   lime: '#C6FF00',
   paper: '#fdfbf7',
   dark: '#121212',
-}
-
-interface FlightInfo {
-  airline?: string | null
-  flightNumber?: string | null
-  departureAirport?: string | null
-  departureTime?: string | null
-  departureDate?: string | null
-  arrivalAirport?: string | null
-  arrivalTime?: string | null
-  duration?: string | null
-  hasMeal?: boolean | null
 }
 
 interface TourFlightSectionCollageProps {

@@ -39,15 +39,7 @@ import { stripHtml } from '@/lib/utils/string-utils'
 import { syncItineraryToQuote } from '@/lib/utils/itinerary-quote-sync'
 import { isFeatureAvailable } from '@/lib/feature-restrictions'
 import { toast } from 'sonner'
-
-interface FlightInfo {
-  flightNumber: string
-  airline: string
-  departureAirport: string
-  arrivalAirport: string
-  departureTime: string
-  arrivalTime: string
-}
+import type { FlightInfo } from '@/types/flight.types'
 
 interface ItineraryFormData {
   title: string

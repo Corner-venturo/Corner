@@ -1,30 +1,10 @@
 'use client'
 
 import { getTodayString, formatDate } from '@/lib/utils/format-date'
-
 import { useState, useCallback } from 'react'
 import { searchFlightAction, type FlightData } from '@/features/dashboard/actions/flight-actions'
 import { alertError, alert } from '@/lib/ui/alert-dialog'
-
-interface FlightInfo {
-  flightNumber: string
-  airline: string
-  departureAirport: string
-  arrivalAirport: string
-  departureTime: string
-  arrivalTime: string
-  departureDate: string
-}
-
-// 航段資訊（供選擇用）
-export interface FlightSegmentInfo {
-  flightNumber: string
-  airline: string
-  departureAirport: string
-  arrivalAirport: string
-  departureTime: string
-  arrivalTime: string
-}
+import { FlightInfo, FlightSegmentInfo } from '@/types/flight.types'
 
 interface UseFlightSearchProps {
   outboundFlight: FlightInfo | null

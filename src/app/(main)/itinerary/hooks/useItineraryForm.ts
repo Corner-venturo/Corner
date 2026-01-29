@@ -6,16 +6,7 @@ import { alertError } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { formatDateCompact, formatWeekday, formatDateTW, formatDateCompactPadded } from '@/lib/utils/format-date'
 import type { Itinerary } from '@/stores/types'
-
-interface FlightInfo {
-  flightNumber: string
-  airline: string
-  departureAirport: string
-  arrivalAirport: string
-  departureTime: string
-  arrivalTime: string
-  departureDate: string
-}
+import type { FlightInfo } from '@/types/flight.types'
 
 interface DailyData {
   title: string
