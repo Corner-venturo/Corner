@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores'
-import { useTours, createItinerary, updateItinerary } from '@/data'
+import { useToursSlim, createItinerary, updateItinerary } from '@/data'
 import type { TourFormData } from '@/components/editor/tour-form/types'
 import type { ItineraryVersionRecord } from '@/stores/types'
 import { generateUUID } from '@/lib/utils/uuid'
@@ -39,7 +39,7 @@ export function usePublish({
   const [newFileName, setNewFileName] = useState('')
   const [copied, setCopied] = useState(false)
   const { user } = useAuthStore()
-  const { items: tours } = useTours()
+  const { items: tours } = useToursSlim()
   const router = useRouter()
 
   const versionRecords = data.version_records || []

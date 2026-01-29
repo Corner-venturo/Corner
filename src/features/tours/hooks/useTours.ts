@@ -18,7 +18,7 @@ import { logger } from '@/lib/utils/logger'
  * 使用 @/data hooks（SWR 自動載入）
  *
  * 使用範例：
- * const { tours, createTour, updateTour } = useTours();
+ * const { tours, createTour, updateTour } = useToursSlim();
  */
 export const useTours = () => {
   // 使用 @/data hooks（SWR 自動載入）

@@ -5,7 +5,7 @@ import { formatDate } from '@/lib/utils/format-date'
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useMemo } from 'react'
 import { Plus, X } from 'lucide-react'
-import { useTours, createPaymentRequest as createPaymentRequestApi } from '@/data'
+import { useToursSlim, createPaymentRequest as createPaymentRequestApi } from '@/data'
 import { useWorkspaceWidgets, AdvanceItem } from '@/stores/workspace-store'
 import { alert } from '@/lib/ui/alert-dialog'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -36,7 +36,7 @@ export function CreatePaymentRequestDialog({
   onOpenChange,
   onSuccess,
 }: CreatePaymentRequestDialogProps) {
-  const { items: tours } = useTours()
+  const { items: tours } = useToursSlim()
   const { processAdvanceItem } = useWorkspaceWidgets()
 
   const itemsArray = useMemo(() => (Array.isArray(items) ? items : [items]), [items])

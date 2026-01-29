@@ -5,7 +5,7 @@ import { getTodayString } from '@/lib/utils/format-date'
 import { useState, useEffect, useMemo } from 'react'
 import { useToast } from '@/components/ui/use-toast'
 import { useTravelInvoiceStore, TravelInvoiceItem, BuyerInfo } from '@/stores/travel-invoice-store'
-import { useOrdersSlim, useTours, invalidateOrders, invalidateTours } from '@/data'
+import { useOrdersSlim, useToursSlim, invalidateOrders, invalidateTours } from '@/data'
 import type { Order } from '@/types/order.types'
 import type { Tour } from '@/types/tour.types'
 import { confirm } from '@/lib/ui/alert-dialog'
@@ -31,7 +31,7 @@ export function useInvoiceDialog({
   const { toast } = useToast()
   const { issueInvoice, invoices, isLoading, fetchInvoices } = useTravelInvoiceStore()
   const { items: allOrders, loading: ordersLoading } = useOrdersSlim()
-  const { items: allTours, loading: toursLoading } = useTours()
+  const { items: allTours, loading: toursLoading } = useToursSlim()
 
   const [dataLoaded, setDataLoaded] = useState(false)
   const [selectedTourId, setSelectedTourId] = useState<string>(defaultTourId || '')
