@@ -10,7 +10,7 @@
  */
 
 import { useMemo, useCallback } from 'react'
-import { useMembers as useMembersCloud } from './cloud-hooks' // Renamed to avoid conflict
+import { useMembers as useMembersCloud } from './cloudHooks' // Renamed to avoid conflict
 import { useMemberActions } from './useMemberActions' // 使用有同步邏輯的 actions
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
@@ -69,7 +69,7 @@ interface UseMembersReturn {
  */
 export function useMembers({ orderId, tourId }: UseMembersOptions = {}): UseMembersReturn {
   // 使用 SWR-based cloud hook 取得所有成員
-  // 將 `useMembers` 從 `./cloud-hooks` 重新命名為 `useMembersCloud` 以避免名稱衝突
+  // 將 `useMembers` 從 `./cloudHooks` 重新命名為 `useMembersCloud` 以避免名稱衝突
   const {
     items: allMembers,
     isLoading,
