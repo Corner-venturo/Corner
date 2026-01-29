@@ -8,7 +8,7 @@ import {
   useAuthStore,
   useWorkspaceStore,
 } from '@/stores'
-import { useToursForCalendar, useCustomers, useEmployeesSlim, useCalendarEvents as useCalendarEventList, invalidateCalendarEvents } from '@/data'
+import { useToursForCalendar, useCustomersSlim, useEmployeesSlim, useCalendarEvents as useCalendarEventList, invalidateCalendarEvents } from '@/data'
 import { supabase } from '@/lib/supabase/client'
 import { FullCalendarEvent } from '../types'
 import type { CalendarEvent } from '@/types/calendar.types'
@@ -43,7 +43,7 @@ export function useCalendarEvents() {
 
   // 使用日期範圍載入團資料（只載入需要的月份）
   const { items: tours } = useToursForCalendar(dateRange)
-  const { items: customers } = useCustomers()
+  const { items: customers } = useCustomersSlim()
   const { settings } = useCalendarStore()
   const { items: calendarEvents } = useCalendarEventList()
   const { user } = useAuthStore()

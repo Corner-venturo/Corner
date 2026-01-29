@@ -16,7 +16,7 @@ export const customerEntity = createEntityHook<Customer>('customers', {
     orderBy: { column: 'created_at', ascending: false },
   },
   slim: {
-    select: 'id,code,name,phone,email',
+    select: 'id,code,name,phone,email,birth_date,gender,types,is_vip,passport_name,passport_number,passport_expiry,national_id',
   },
   detail: { select: '*' }, // 詳情頁才載入完整資料（包含 passport_image_url）
   cache: CACHE_PRESETS.medium,

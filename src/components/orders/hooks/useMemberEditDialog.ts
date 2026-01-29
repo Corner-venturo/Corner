@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
-import { useCustomers, updateCustomer, createCustomer } from '@/data'
+import { useCustomersSlim, updateCustomer, createCustomer } from '@/data'
 import { alert } from '@/lib/ui/alert-dialog'
 import { useImageEditor } from '@/hooks/image-editor'
 
@@ -61,7 +61,7 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
   const [isSaving, setIsSaving] = useState(false)
 
   const imageEditor = useImageEditor()
-  const { items: customers } = useCustomers()
+  const { items: customers } = useCustomersSlim()
 
   // 打開編輯/驗證彈窗
   const openEditDialog = (member: OrderMember, mode: 'verify' | 'edit') => {
