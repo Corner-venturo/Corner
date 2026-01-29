@@ -12,9 +12,13 @@ import { Building2, Plane, Search, CalendarDays, Loader2, X, Check } from 'lucid
 import { cn } from '@/lib/utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DatePicker } from '@/components/ui/date-picker'
-import { useItineraries, useEmployees, useQuotes, useTours } from '@/hooks/cloudHooks'
-// 🔧 優化：移除 useCountries/useCities，Itinerary 已有 denormalized 欄位
-import { useCountries } from '@/data'
+import {
+  useItineraries, createItinerary, updateItinerary, deleteItinerary,
+  useQuotes, createQuote, updateQuote,
+  useEmployeesSlim,
+  useToursSlim,
+  useCountries,
+} from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores'
 import type { Itinerary } from '@/stores/types'
@@ -31,10 +35,10 @@ const statusFilters = ['全部', '提案', '進行中', '公司範例', '結案'
 
 export default function ItineraryPage() {
   const router = useRouter()
-  const { items: itineraries, delete: deleteItinerary, update: updateItinerary, create: createItinerary } = useItineraries()
-  const { items: quotes, create: createQuote, update: updateQuote } = useQuotes()
-  const { items: employees } = useEmployees()
-  const { items: tours } = useTours()
+  const { items: itineraries } = useItineraries()
+  const { items: quotes } = useQuotes()
+  const { items: employees } = useEmployeesSlim()
+  const { items: tours } = useToursSlim()
   const { user } = useAuthStore()
   const { workspaces, loadWorkspaces } = useWorkspaceStore()
   // 🔧 優化：countries 只用於新增對話框，cities 已不需要（Itinerary 有 denormalized 欄位）
@@ -65,7 +69,7 @@ export default function ItineraryPage() {
 
   const actions = useItineraryActions({
     updateItinerary: updateItinerary as (id: string, data: Partial<Itinerary>) => Promise<Itinerary | void>,
-    deleteItinerary,
+    deleteItinerary: deleteItinerary as unknown as (id: string) => Promise<void>,
     createItinerary: createItinerary as (data: Partial<Itinerary>) => Promise<Itinerary | null>,
     createQuote: createQuote as (data: Partial<Quote>) => Promise<Quote | null>,
     updateQuote: updateQuote as (id: string, data: Partial<Quote>) => Promise<Quote | void>,
