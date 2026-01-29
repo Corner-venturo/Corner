@@ -67,6 +67,12 @@ export function useChannelSidebarState() {
     setIsCreatingDm(true)
     try {
       const dmChannel = await getOrCreateDmChannel(memberId)
+      
+      // 🔧 修復：DM 建立後刷新頻道列表，確保新頻道出現在 sidebar
+      if (dmChannel && currentWorkspace) {
+        await loadChannels(currentWorkspace.id)
+      }
+      
       return dmChannel as Channel | null
     } catch (error) {
       logger.error('Failed to create or get DM channel:', error)
