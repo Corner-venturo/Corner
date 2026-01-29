@@ -17,7 +17,7 @@ import {
 import { Plus, Save, X } from 'lucide-react'
 import { PaymentItemForm } from './PaymentItemForm'
 import { Combobox } from '@/components/ui/combobox'
-import { useTours } from '@/data'
+import { useToursSlim } from '@/data'
 import { CurrencyCell } from '@/components/table-cells'
 import type { ReceiptItem, Order } from '@/stores'
 import { ReceiptType } from '@/types/receipt.types'
@@ -35,7 +35,7 @@ export function CreateReceiptDialog({
   availableOrders,
   onSubmit,
 }: CreateReceiptDialogProps) {
-  const { items: tours } = useTours()
+  const { items: tours } = useToursSlim()
   const [selectedTourId, setSelectedTourId] = useState('')
   const [selectedOrderId, setSelectedOrderId] = useState('')
   const [paymentItems, setPaymentItems] = useState<ReceiptItem[]>([
@@ -124,8 +124,8 @@ export function CreateReceiptDialog({
                   選擇團體 *
                 </label>
                 <Combobox
-                  options={tours.map(tour => ({
-                    value: tour.id,
+                  options={tours.filter(t => t.id).map(tour => ({
+                    value: tour.id!,
                     label: `${tour.code || ''} - ${tour.name || ''}`,
                   }))}
                   value={selectedTourId}

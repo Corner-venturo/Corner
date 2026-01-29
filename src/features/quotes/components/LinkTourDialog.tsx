@@ -22,7 +22,7 @@ import {
   Calendar,
   Plane,
 } from 'lucide-react'
-import { useTours, invalidateTours } from '@/data'
+import { useToursSlim, invalidateTours } from '@/data'
 import type { Tour } from '@/stores/types'
 
 interface LinkTourDialogProps {
@@ -41,7 +41,7 @@ export function LinkTourDialog({
   onLinkExisting,
 }: LinkTourDialogProps) {
   const [step, setStep] = useState<DialogStep>('select')
-  const { items: tours, loading: loadingTours } = useTours()
+  const { items: tours, loading: loadingTours } = useToursSlim()
 
   // SWR 自動處理資料載入，在需要時手動刷新
   useEffect(() => {

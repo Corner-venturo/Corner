@@ -10,7 +10,7 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { Calculator, FileText, Calendar, MapPin, Users, LayoutList, CheckCircle, XCircle } from 'lucide-react'
 import { DocumentVersionPicker } from '@/components/documents'
-import { useTours, useQuotes } from '@/data'
+import { useToursSlim, useQuotes } from '@/data'
 import type { Tour } from '@/stores/types'
 import { cn } from '@/lib/utils'
 import { formatDateTW } from '@/lib/utils/format-date'
@@ -21,7 +21,7 @@ const STATUS_TABS = [
 ]
 
 export const QuotesPage: React.FC = () => {
-  const { items: tours, loading: toursLoading } = useTours()
+  const { items: tours, loading: toursLoading } = useToursSlim()
   const { items: quotes, loading: quotesLoading } = useQuotes()
 
   const [statusFilter, setStatusFilter] = useState('all')
@@ -42,7 +42,7 @@ export const QuotesPage: React.FC = () => {
   // 篩選旅遊團（只顯示有報價單的團）
   const filteredTours = useMemo(() => {
     // 只顯示有報價單的團
-    let result = tours.filter(tour => (tourQuoteCounts[tour.id] || 0) > 0)
+    let result = tours.filter(tour => tour.id && (tourQuoteCounts[tour.id] || 0) > 0)
 
     // 搜尋篩選
     if (searchTerm) {

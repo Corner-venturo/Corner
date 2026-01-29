@@ -10,7 +10,7 @@ import { useEffect, useState, Suspense } from 'react'
 import { Printer, ArrowLeft, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/stores'
-import { useItineraries, useTours } from '@/data'
+import { useItineraries, useToursSlim } from '@/data'
 import { formatDateTW } from '@/lib/utils/format-date'
 import type { Itinerary, Tour } from '@/stores/types'
 
@@ -20,7 +20,7 @@ function ItineraryPrintContent() {
   const itineraryId = searchParams.get('itinerary_id')
 
   const { items: itineraries } = useItineraries()
-  const { items: tours } = useTours()
+  const { items: tours } = useToursSlim()
   const { user } = useAuthStore()
 
   const [loading, setLoading] = useState(true)
