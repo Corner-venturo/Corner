@@ -6,7 +6,7 @@ import {
   Trash2,
   Archive,
 } from 'lucide-react'
-import { useProposals, useProposalPackages } from '@/hooks/cloudHooks'
+import { useProposals, useProposalPackages } from '@/data'
 import { useAuthStore } from '@/stores'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
@@ -46,9 +46,9 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
   const { user } = useAuthStore()
   const {
     items: proposals,
-    fetchAll: refreshProposals,
+    refresh: refreshProposals,
   } = useProposals()
-  const { items: allPackages, fetchAll: refreshPackages } = useProposalPackages()
+  const { items: allPackages, refresh: refreshPackages } = useProposalPackages()
 
   // 對話框狀態
   const [detailDialogOpen, setDetailDialogOpen] = useState(false)

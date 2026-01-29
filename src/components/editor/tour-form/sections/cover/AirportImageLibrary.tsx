@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useMemo, useCallback } from 'react'
-import { useAirportImages } from '@/hooks/cloudHooks'
+import { useAirportImages, createAirportImage, deleteAirportImage } from '@/data'
 import { ImageUploader } from '@/components/ui/image-uploader'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -31,7 +31,9 @@ export function AirportImageLibrary({
   onPositionChange,
 }: AirportImageLibraryProps) {
   const { user } = useAuthStore()
-  const { items: allImages, isLoading: loading, create, delete: deleteImage } = useAirportImages()
+  const { items: allImages, loading } = useAirportImages()
+  const create = createAirportImage
+  const deleteImage = deleteAirportImage
 
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [newImageUrl, setNewImageUrl] = useState('')

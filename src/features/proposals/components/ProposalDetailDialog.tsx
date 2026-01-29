@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
-import { useProposalPackages } from '@/hooks/cloudHooks'
+import { useProposalPackages } from '@/data'
 import { PackageListPanel } from './PackageListPanel'
 import { PackageItineraryDialog } from './PackageItineraryDialog'
 import type { Proposal, ProposalStatus, ProposalPackage } from '@/types/proposal.types'
@@ -46,7 +46,7 @@ export function ProposalDetailDialog({
   onPackagesChange,
   autoOpenAddVersion = false,
 }: ProposalDetailDialogProps) {
-  const { items: allPackages, fetchAll: refreshPackages } = useProposalPackages()
+  const { items: allPackages, refresh: refreshPackages } = useProposalPackages()
   const [showAddDialog, setShowAddDialog] = useState(false)
 
   // 當 autoOpenAddVersion 變為 true 時，開啟新增版本對話框

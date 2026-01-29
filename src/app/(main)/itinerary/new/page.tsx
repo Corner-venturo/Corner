@@ -14,7 +14,7 @@ import { useItineraryDataLoader } from './hooks/useItineraryDataLoader'
 import { ItineraryHeader } from './components/ItineraryHeader'
 import { ItineraryEditor } from './components/ItineraryEditor'
 import { ItineraryPreview } from './components/ItineraryPreview'
-import { useItineraries } from '@/hooks/cloudHooks'
+import { useItineraries } from '@/data'
 import type { ItineraryVersionRecord } from '@/stores/types'
 import { useSearchParams } from 'next/navigation'
 

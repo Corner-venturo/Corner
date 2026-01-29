@@ -25,7 +25,7 @@ interface ProposalDialogsWrapperProps {
   onCreateProposal: (data: CreateProposalWithPackageData | UpdateProposalData) => Promise<void>
   onUpdateProposal: (data: CreateProposalWithPackageData | UpdateProposalData) => Promise<void>
   onArchiveProposal: (reason: string) => Promise<void>
-  onRefreshProposals: () => Promise<Proposal[] | undefined> | void
+  onRefreshProposals: () => Promise<void> | void
 
   /** 新建提案後自動開啟新增版本對話框 */
   autoOpenAddVersion?: boolean

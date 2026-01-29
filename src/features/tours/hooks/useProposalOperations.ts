@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { useAuthStore } from '@/stores/auth-store'
-import { useProposals } from '@/hooks/cloudHooks'
+import { useProposals } from '@/data'
 import {
   createProposal,
   createPackage,
@@ -32,7 +32,7 @@ interface UseProposalOperationsReturn {
 
   // Proposals data
   proposals: Proposal[]
-  refreshProposals: () => Promise<Proposal[] | undefined>
+  refreshProposals: () => Promise<void>
 
   // Handlers
   handleEditProposal: (proposal: Proposal) => void
@@ -50,7 +50,7 @@ interface UseProposalOperationsReturn {
 
 export function useProposalOperations(): UseProposalOperationsReturn {
   const { user } = useAuthStore()
-  const { items: proposals, fetchAll: refreshProposals } = useProposals()
+  const { items: proposals, refresh: refreshProposals } = useProposals()
 
   // Dialog states
   const [proposalDialogOpen, setProposalDialogOpen] = useState(false)

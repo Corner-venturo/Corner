@@ -26,7 +26,7 @@ import {
 import { DatePicker } from '@/components/ui/date-picker'
 import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
 import { useAuthStore } from '@/stores'
-import { useItineraries } from '@/hooks/cloudHooks'
+import { useItineraries, createItinerary } from '@/data'
 import { supabase } from '@/lib/supabase/client'
 import { dynamicFrom } from '@/lib/supabase/typed-client'
 import type { Json } from '@/lib/supabase/types'
@@ -71,7 +71,8 @@ export function PackageItineraryDialog({
   proposal,
   onItineraryCreated,
 }: PackageItineraryDialogProps) {
-  const { items: itineraries, fetchAll, create } = useItineraries()
+  const { items: itineraries, refresh } = useItineraries()
+  const create = createItinerary
   const { user: currentUser } = useAuthStore()
 
   // 判斷是否為國內旅遊（台灣）- 國內旅遊不顯示航班資訊
@@ -129,7 +130,7 @@ export function PackageItineraryDialog({
   // 追蹤是否已初始化每日行程（防止無限迴圈）
   const hasInitializedDailyScheduleRef = React.useRef(false)
   // 追蹤是否已開始載入（防止重複載入）
-  const isLoadingRef = React.useRef(false)
+  const loadingRef = React.useRef(false)
   // 追蹤上次開啟的 dialog 狀態
   const prevIsOpenRef = React.useRef(false)
 
@@ -139,8 +140,8 @@ export function PackageItineraryDialog({
     const justOpened = isOpen && !prevIsOpenRef.current
     prevIsOpenRef.current = isOpen
 
-    if (justOpened && !isLoadingRef.current) {
-      isLoadingRef.current = true
+    if (justOpened && !loadingRef.current) {
+      loadingRef.current = true
       // 先重置狀態，顯示載入中
       setIsDataLoading(true)
       setCreateError(null)
@@ -179,15 +180,15 @@ export function PackageItineraryDialog({
           }
         }
         // 同時也更新 SWR 快取
-        await fetchAll()
+        await refresh()
         setIsDataLoading(false)
-        isLoadingRef.current = false
+        loadingRef.current = false
       }
 
       loadData()
     } else if (!isOpen) {
       // dialog 關閉時重置載入狀態
-      isLoadingRef.current = false
+      loadingRef.current = false
     }
    
   }, [isOpen])
