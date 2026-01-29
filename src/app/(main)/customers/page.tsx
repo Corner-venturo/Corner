@@ -23,7 +23,7 @@ import {
   CustomerSearchDialog,
   CustomerSearchParams,
 } from '@/components/customers/customer-search-dialog'
-import { useCustomers } from '@/hooks/cloudHooks'
+import { useCustomers, createCustomer, updateCustomer, deleteCustomer } from '@/data'
 import type { Customer, CreateCustomerData } from '@/types/customer.types'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'
@@ -41,7 +41,8 @@ import {
 
 export default function CustomersPage() {
   const router = useRouter()
-  const { items: customers, create: addCustomer, delete: deleteCustomer, update: updateCustomer } = useCustomers()
+  const { items: customers } = useCustomers()
+  const addCustomer = createCustomer
 
   // 搜尋 Hook
   const {
@@ -407,7 +408,7 @@ export default function CustomersPage() {
         onOpenChange={setIsAddDialogOpen}
         customers={customers}
         onAddCustomer={handleAddCustomer}
-        updateCustomer={updateCustomer}
+        updateCustomer={updateCustomer as unknown as (id: string, data: Partial<Customer>) => Promise<void>}
         addCustomer={addCustomer as (data: Partial<Customer>) => Promise<Customer>}
       />
 
@@ -418,7 +419,7 @@ export default function CustomersPage() {
           if (!open) customerVerify.closeDialog()
         }}
         customer={customerVerify.customer}
-        onUpdate={updateCustomer}
+        onUpdate={updateCustomer as unknown as (id: string, data: Partial<Customer>) => Promise<void>}
       />
 
       {/* 顧客詳情對話框 */}
