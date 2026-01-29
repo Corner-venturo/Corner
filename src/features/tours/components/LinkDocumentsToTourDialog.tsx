@@ -31,7 +31,7 @@ import {
   Zap,
   Clock,
 } from 'lucide-react'
-import { useQuotes, useTours, useOrders, createQuote, updateQuote, deleteQuote, invalidateQuotes, useProposalPackage } from '@/data'
+import { useQuotes, useTours, useOrdersSlim, createQuote, updateQuote, deleteQuote, invalidateQuotes, useProposalPackage } from '@/data'
 import { DEFAULT_CATEGORIES } from '@/features/quotes/constants'
 import type { Tour, Quote } from '@/stores/types'
 import type { ProposalPackage, TimelineItineraryData } from '@/types/proposal.types'
@@ -99,7 +99,7 @@ export function LinkDocumentsToTourDialog({
   const { items: tours } = useTours()
 
   // 訂單（用於取得業務人員）
-  const { items: orders } = useOrders()
+  const { items: orders } = useOrdersSlim()
 
   // Proposal Package（只取單筆，避免載入所有 80+ 筆資料）
   const { item: fetchedPackage, refresh: refreshPackage } = useProposalPackage(tour.proposal_package_id || null)

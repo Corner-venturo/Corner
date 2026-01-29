@@ -24,7 +24,7 @@ export const orderEntity = createEntityHook<Order>('orders', {
     },
   },
   slim: {
-    select: 'id,order_number,tour_id,tour_name,contact_person,sales_person,assistant,payment_status,paid_amount,remaining_amount,member_count,code,created_at',
+    select: 'id,order_number,tour_id,tour_name,contact_person,sales_person,assistant,payment_status,paid_amount,remaining_amount,total_amount,member_count,code,created_at,customer_id',
   },
   detail: {
     select: '*',

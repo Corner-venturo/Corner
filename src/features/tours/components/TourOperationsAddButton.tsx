@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react'
 import { Tour } from '@/stores/types'
-import { useOrders, useMembers } from '@/data'
+import { useOrdersSlim, useMembers } from '@/data'
 import { Plus, FileText, Package, RefreshCw, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -21,7 +21,7 @@ export function TourOperationsAddButton({
   tourExtraFields,
   setTourExtraFields,
 }: TourOperationsAddButtonProps) {
-  const { items: orders } = useOrders()
+  const { items: orders } = useOrdersSlim()
   const { items: members } = useMembers()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 

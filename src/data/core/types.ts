@@ -159,8 +159,8 @@ export interface DictionaryResult<T> {
 export interface EntityHook<T extends BaseEntity> {
   /** 列表 hook（支援 enabled 選項控制是否載入） */
   useList: (options?: ListOptions) => ListResult<T>
-  /** 精簡列表 hook（支援 enabled 選項控制是否載入） */
-  useListSlim: (options?: ListOptions) => ListResult<Partial<T>>
+  /** 精簡列表 hook（支援 enabled 選項控制是否載入）⚠️ 返回完整類型 T，但只 fetch slim.select 的欄位 */
+  useListSlim: (options?: ListOptions) => ListResult<T>
   /** 單筆 hook（支援 skip pattern）*/
   useDetail: (id: string | null) => DetailResult<T>
   /** 分頁 hook */

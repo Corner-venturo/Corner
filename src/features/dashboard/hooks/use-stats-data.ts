@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { useTours, useOrders } from '@/data'
+import { useTours, useOrdersSlim } from '@/data'
 import type { StatConfig, StatType } from '../types'
 import type { Tour, Order } from '@/stores/types'
 import { CheckSquare, TrendingUp, Briefcase, Calendar } from 'lucide-react'
@@ -64,7 +64,7 @@ function sumOrderAmountByTourDateRange(
  */
 export function useStatsData() {
   const { items: tours } = useTours()
-  const { items: orders } = useOrders()
+  const { items: orders } = useOrdersSlim()
 
   return useMemo(() => {
     const today = new Date()

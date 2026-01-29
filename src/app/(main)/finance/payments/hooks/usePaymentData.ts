@@ -6,7 +6,7 @@ import { logger } from '@/lib/utils/logger'
 import { useMemo } from 'react'
 import { useAuthStore } from '@/stores'
 import { alert } from '@/lib/ui/alert-dialog'
-import { useOrders, useTourDictionary, useEmployeeDictionary, useReceipts, createReceipt, updateReceipt, deleteReceipt, invalidateReceipts, useLinkPayLogs } from '@/data'
+import { useOrdersSlim, useTourDictionary, useEmployeeDictionary, useReceipts, createReceipt, updateReceipt, deleteReceipt, invalidateReceipts, useLinkPayLogs } from '@/data'
 import { sendPaymentAbnormalNotification } from '@/lib/utils/bot-notification'
 import { generateReceiptNumber } from '@/lib/utils/receipt-number-generator'
 import { generateVoucherFromPayment, generateVoucherFromCardPayment } from '@/services/voucher-auto-generator'
@@ -15,7 +15,7 @@ import type { ReceiptItem } from '@/stores'
 import { ReceiptType } from '@/types/receipt.types'
 
 export function usePaymentData() {
-  const { items: orders } = useOrders()
+  const { items: orders } = useOrdersSlim()
   const { items: receipts } = useReceipts()
   const { items: linkpayLogs } = useLinkPayLogs()
   const { get: getTour } = useTourDictionary()

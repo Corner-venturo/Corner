@@ -5,13 +5,13 @@
 
 import { getTodayString } from '@/lib/utils/format-date'
 import { useState, useCallback, useMemo } from 'react'
-import { useTours, useOrders } from '@/data'
+import { useTours, useOrdersSlim } from '@/data'
 import type { PaymentFormData, PaymentItem } from '../types'
 import { RECEIPT_TYPES } from '../types'
 
 export function usePaymentForm() {
   const { items: tours } = useTours()
-  const { items: orders } = useOrders()
+  const { items: orders } = useOrdersSlim()
 
   // 基本表單資料
   const [formData, setFormData] = useState<PaymentFormData>({
