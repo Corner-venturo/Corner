@@ -30,23 +30,7 @@ import { TourFAQSection } from '@/features/tours/components/sections/TourFAQSect
 import { TourNoticesSection } from '@/features/tours/components/sections/TourNoticesSection'
 import { TourNavigation } from '@/features/tours/components/sections/TourNavigation'
 import { COMPANY } from '@/lib/constants/company'
-
-interface TourPageProps {
-  /**
-   * 🔧 技術債：TourPageData 類型待統一
-   * 
-   * 目前問題：
-   * - 5+ 個子組件各自定義 TourDisplayData
-   * - 欄位散落在不同地方，難以統一
-   * - 需要重構所有 section 組件才能解決
-   * 
-   * 資料來源：編輯器產生的複合資料結構
-   * 包含：coverStyle, dailyItinerary, features, hotels, leader, pricing 等
-   */
-  data: any
-  isPreview?: boolean
-  viewMode?: 'desktop' | 'mobile'
-}
+import type { TourPageProps } from '@/features/tours'
 
 export default function TourPage({ data, isPreview = false, viewMode = 'desktop' }: TourPageProps) {
   const dailyItinerary = Array.isArray(data.dailyItinerary) ? data.dailyItinerary : []

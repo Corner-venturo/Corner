@@ -6,15 +6,19 @@ import { TourFlightSectionDreamscape } from './TourFlightSectionDreamscape'
 import { TourFlightSectionCollage } from './TourFlightSectionCollage'
 import {
   FlightStyleType,
-  TourDisplayData,
   CoverStyleType,
   OriginalFlightCard,
   ChineseFlightCard,
   JapaneseFlightCard,
 } from './flight-cards'
+import type { TourPageData } from '@/features/tours/types/tour-display.types'
 
+/**
+ * TourFlightSection 需要的欄位
+ * - outboundFlight, returnFlight, flightStyle, coverImage
+ */
 interface TourFlightSectionProps {
-  data: TourDisplayData
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
   coverStyle?: CoverStyleType
 }

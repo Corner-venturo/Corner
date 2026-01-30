@@ -139,11 +139,20 @@ export interface LeaderInfo {
   name: string
   domesticPhone: string
   overseasPhone: string
+  // 進階欄位（Art/Collage 風格使用）
+  lineId?: string | null
+  photo?: string | null
+  title?: string | null
+  description?: string | null
 }
 
 export interface MeetingInfo {
   time: string // ISO 8601 格式
   location: string
+  // 進階欄位（Art/Collage 風格使用）
+  date?: string | null
+  flightNo?: string | null
+  airline?: string | null
 }
 
 export interface HotelInfo {

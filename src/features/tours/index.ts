@@ -13,3 +13,6 @@ export { tourService } from './services/tour.service'
 
 // Types
 export type { NewTourData, TourExtraFields, DeleteConfirmState } from './types'
+
+// Display Types (TourPage, TourPreview)
+export * from './types/tour-display.types'

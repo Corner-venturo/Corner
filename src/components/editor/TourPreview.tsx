@@ -1,15 +1,9 @@
 'use client'
 
 import TourPage from '@/components/TourPage'
+import type { TourPreviewProps } from '@/features/tours'
 
-export function TourPreview({
-  data,
-  viewMode = 'desktop',
-}: {
-  /** 🔧 技術債：同 TourPage.data，待統一類型 */
-  data: any
-  viewMode?: 'desktop' | 'mobile'
-}) {
+export function TourPreview({ data, viewMode = 'desktop' }: TourPreviewProps) {
   return (
     <div
       style={{

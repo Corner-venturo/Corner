@@ -1,25 +1,15 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import type { TourPageData } from '@/features/tours/types/tour-display.types'
 
-interface TourDisplayData {
-  leader?: {
-    name?: string | null
-    domesticPhone?: string | null
-    overseasPhone?: string | null
-    lineId?: string | null
-    photo?: string | null
-    title?: string | null
-  } | null
-  meetingInfo?: {
-    time?: string | null
-    location?: string | null
-    date?: string | null
-  } | null
-}
-
+/**
+ * TourLeaderSectionCollage 需要的欄位
+ * - leader: { name, domesticPhone, overseasPhone, lineId?, photo?, title? }
+ * - meetingInfo: { time, location, date? }
+ */
 interface TourLeaderSectionCollageProps {
-  data: TourDisplayData
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
 }
 

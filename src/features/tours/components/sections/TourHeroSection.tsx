@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { isHtmlString, cleanTiptapHtml } from '@/lib/utils/rich-text'
+import type { TourPageData } from '@/features/tours/types/tour-display.types'
 
 // 渲染可能包含 HTML 的文字（保留內聯樣式）
 function RichText({ html, className }: { html: string | null | undefined; className?: string }) {
@@ -11,20 +12,13 @@ function RichText({ html, className }: { html: string | null | undefined; classN
   return <span className={className}>{html}</span>
 }
 
-interface TourDisplayData {
-  coverImage?: string | null
-  tagline?: string | null
-  title: string
-  subtitle?: string | null
-  description?: string | null
-  departureDate: string
-  tourCode: string
-  price?: string
-  priceNote?: string
-}
-
+/**
+ * TourHeroSection 需要的欄位
+ * - coverImage, tagline, title, subtitle, description
+ * - departureDate, tourCode, price, priceNote
+ */
 interface TourHeroSectionProps {
-  data: TourDisplayData
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
 }
 

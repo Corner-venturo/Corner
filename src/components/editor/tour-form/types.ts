@@ -96,6 +96,10 @@ export interface DailyItinerary {
 export interface MeetingPoint {
   time: string
   location: string
+  // 進階欄位（Art/Collage 風格使用）
+  date?: string | null
+  flightNo?: string | null
+  airline?: string | null
 }
 
 // HotelInfo 已從 stores/types/tour.types.ts 統一匯出

@@ -2,23 +2,15 @@ import { motion } from 'framer-motion'
 import { SectionTitle } from './SectionTitle'
 import { TourLeaderSectionArt } from './TourLeaderSectionArt'
 import { TourLeaderSectionCollage } from './TourLeaderSectionCollage'
+import type { TourPageData, CoverStyleType } from '@/features/tours/types/tour-display.types'
 
-interface TourDisplayData {
-  leader?: {
-    name?: string | null
-    domesticPhone?: string | null
-    overseasPhone?: string | null
-  } | null
-  meetingInfo?: {
-    time?: string | null
-    location?: string | null
-  } | null
-}
-
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
-
+/**
+ * TourLeaderSection 需要的欄位
+ * - leader: { name, domesticPhone, overseasPhone }
+ * - meetingInfo: { time, location }
+ */
 interface TourLeaderSectionProps {
-  data: TourDisplayData
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
   coverStyle?: CoverStyleType
 }

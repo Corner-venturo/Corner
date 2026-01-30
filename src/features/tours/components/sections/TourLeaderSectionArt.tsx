@@ -1,28 +1,18 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import type { TourPageData } from '@/features/tours/types/tour-display.types'
 
-interface TourDisplayData {
-  leader?: {
-    name?: string | null
-    domesticPhone?: string | null
-    overseasPhone?: string | null
-    lineId?: string | null
-    photo?: string | null
-    title?: string | null
-    description?: string | null
-  } | null
-  meetingInfo?: {
-    time?: string | null
-    location?: string | null
-    flightNo?: string | null
-    airline?: string | null
-    date?: string | null
-  } | null
-}
-
+/**
+ * TourLeaderSectionArt 需要的欄位
+ * - leader: { name, domesticPhone, overseasPhone, lineId?, photo?, title?, description? }
+ * - meetingInfo: { time, location, flightNo?, airline?, date? }
+ *
+ * 注意：Art 風格支援更多領隊欄位（photo、title 等）
+ * 這些欄位透過 index signature 存取
+ */
 interface TourLeaderSectionArtProps {
-  data: TourDisplayData
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
 }
 
