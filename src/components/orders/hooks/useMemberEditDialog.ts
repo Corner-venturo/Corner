@@ -5,7 +5,7 @@ import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
 import { useCustomersSlim, updateCustomer, createCustomer } from '@/data'
 import { alert } from '@/lib/ui/alert-dialog'
-import { useImageEditor } from '@/hooks/image-editor'
+// 2025-06-27: 移除 useImageEditor 依賴 (改用統一的 ImageEditor 元件)
 
 interface OrderMember {
   id: string
@@ -60,7 +60,6 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
   const [editFormData, setEditFormData] = useState<Partial<OrderMember>>({})
   const [isSaving, setIsSaving] = useState(false)
 
-  const imageEditor = useImageEditor()
   const { items: customers } = useCustomersSlim()
 
   // 打開編輯/驗證彈窗
@@ -78,8 +77,6 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
       special_meal: member.special_meal || '',
       remarks: member.remarks || '',
     })
-    // 重置圖片編輯狀態
-    imageEditor.reset()
     setIsEditDialogOpen(true)
   }
 

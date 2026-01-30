@@ -1,262 +1,217 @@
 /**
  * PassportSection - 護照圖片編輯區塊
- * 從 MemberEditDialog.tsx 拆分
+ * 
+ * 2025-06-27: 改用統一的 ImageEditor 元件
+ * 2025-06-27: 改用 i18n 多語系
  */
 
 'use client'
 
-import React from 'react'
-import {
-  Crop,
-  FlipHorizontal,
-  RefreshCw,
-  RotateCcw,
-  RotateCw,
-  Save,
-  Upload,
-  X,
-  ZoomIn,
-  ZoomOut,
-} from 'lucide-react'
+import React, { useState } from 'react'
+import { useTranslations } from 'next-intl'
+import { RefreshCw, Upload, Pencil } from 'lucide-react'
+import { ImageEditor, type ImageEditorSettings } from '@/components/ui/image-editor'
+import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
+import { toast } from 'sonner'
+import { syncPassportImageToMembers } from '@/lib/utils/sync-passport-image'
 import type { OrderMember } from '../../order-member.types'
 
-interface ImageEditorState {
-  zoom: number
-  rotation: number
-  flipH: boolean
-  isCropMode: boolean
-  isSaving: boolean
-  position: { x: number; y: number }
-  cropRect: { x: number; y: number; width: number; height: number }
-  containerRef: React.RefObject<HTMLDivElement | null>
-  zoomIn: () => void
-  zoomOut: () => void
-  reset: () => void
-  rotateLeft: () => void
-  rotateRight: () => void
-  toggleFlipH: () => void
-  startCrop: () => void
-  cancelCrop: () => void
-  handleWheel: (e: React.WheelEvent) => void
-  handleMouseDown: (e: React.MouseEvent, container: HTMLDivElement | null) => void
-  handleMouseMove: (e: React.MouseEvent, container: HTMLDivElement | null) => void
-  handleMouseUp: () => void
-  handleMouseLeave: (e: React.MouseEvent, container: HTMLDivElement | null) => void
+// 從 URL 提取檔名並刪除舊照片
+async function deleteOldPassportImage(oldUrl: string | null | undefined): Promise<void> {
+  if (!oldUrl) return
+  try {
+    const match = oldUrl.match(/passport-images\/(.+)$/)
+    if (match) {
+      const oldFileName = decodeURIComponent(match[1])
+      await supabase.storage.from('passport-images').remove([oldFileName])
+      logger.log(`Deleted old passport image: ${oldFileName}`)
+    }
+  } catch (error) {
+    logger.error('Failed to delete old passport image:', error)
+  }
 }
 
 interface PassportSectionProps {
   editingMember: OrderMember | null
   editMode: 'edit' | 'verify'
   isRecognizing: boolean
-  imageEditor: ImageEditorState
-  onSaveTransform: () => Promise<void>
-  onConfirmCrop: () => Promise<void>
-  onUploadPassport: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onMemberChange: (member: OrderMember) => void
   onRecognize: () => Promise<void>
+  onUploadPassport: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 export function PassportSection({
   editingMember,
   editMode,
   isRecognizing,
-  imageEditor,
-  onSaveTransform,
-  onConfirmCrop,
-  onUploadPassport,
+  onMemberChange,
   onRecognize,
+  onUploadPassport,
 }: PassportSectionProps) {
+  const t = useTranslations()
+  const [isEditorOpen, setIsEditorOpen] = useState(false)
+
+  // 圖片編輯器存檔（不做裁切）
+  const handleEditorSave = (_settings: ImageEditorSettings) => {
+    // 護照不需要保存位置設定
+  }
+
+  // 圖片編輯器裁切並存檔
+  const handleEditorCropAndSave = async (blob: Blob, _settings: ImageEditorSettings) => {
+    if (!editingMember) return
+
+    try {
+      const oldUrl = editingMember.passport_image_url
+
+      // 上傳裁切後的圖片
+      const random = Math.random().toString(36).substring(2, 8)
+      const fileName = `passport_${Date.now()}_${random}.jpg`
+      
+      const { error: uploadError } = await supabase.storage
+        .from('passport-images')
+        .upload(fileName, blob, { upsert: true })
+
+      if (uploadError) throw uploadError
+
+      const { data: urlData } = supabase.storage
+        .from('passport-images')
+        .getPublicUrl(fileName)
+
+      const newUrl = urlData.publicUrl
+
+      // 更新成員資料
+      await supabase
+        .from('order_members')
+        .update({ passport_image_url: newUrl })
+        .eq('id', editingMember.id)
+
+      // 如果成員有關聯顧客，同步護照照片
+      if (editingMember.customer_id) {
+        await supabase
+          .from('customers')
+          .update({ passport_image_url: newUrl })
+          .eq('id', editingMember.customer_id)
+        await syncPassportImageToMembers(editingMember.customer_id, newUrl)
+      }
+
+      // 刪除舊照片
+      await deleteOldPassportImage(oldUrl)
+
+      // 更新本地狀態
+      onMemberChange({ ...editingMember, passport_image_url: newUrl })
+
+      toast.success(t('passport.imageSaved'))
+      setIsEditorOpen(false)
+    } catch (error) {
+      logger.error('Failed to save edited image:', error)
+      toast.error(t('messages.saveFailed'))
+    }
+  }
+
   return (
-    <div className="space-y-3">
-      {/* 標題與縮放工具 */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-morandi-primary">護照照片</h3>
-        {editingMember?.passport_image_url && !imageEditor.isCropMode && (
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={() => imageEditor.zoomOut()}
-              className="p-1.5 hover:bg-muted rounded-md"
-              title="縮小"
+    <>
+      <div className="space-y-3">
+        {/* 標題與工具 */}
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-medium text-morandi-primary">{t('passport.image')}</h3>
+          {editingMember?.passport_image_url && (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsEditorOpen(true)}
+                className="flex items-center gap-1.5 px-2 py-1 text-xs bg-morandi-container hover:bg-morandi-gold/10 hover:text-morandi-gold rounded transition-colors"
+              >
+                <Pencil size={12} />
+                {t('passport.editImage')}
+              </button>
+              <button
+                type="button"
+                onClick={onRecognize}
+                disabled={isRecognizing}
+                className="flex items-center gap-1.5 px-2 py-1 text-xs bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded disabled:opacity-50 transition-colors"
+              >
+                <RefreshCw size={12} className={isRecognizing ? 'animate-spin' : ''} />
+                {isRecognizing ? t('passport.recognizing') : t('passport.reRecognize')}
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* 圖片容器 */}
+        {editingMember?.passport_image_url ? (
+          <div
+            className="relative overflow-hidden rounded-lg border bg-muted group cursor-pointer"
+            style={{ height: '320px' }}
+            onClick={() => setIsEditorOpen(true)}
+          >
+            <img
+              src={editingMember.passport_image_url}
+              alt={t('passport.image')}
+              className="w-full h-full object-contain"
+              draggable={false}
+            />
+            {/* 重新上傳按鈕 */}
+            <label
+              htmlFor="edit-passport-upload"
+              className="absolute bottom-2 right-2 p-2 bg-white/90 hover:bg-white rounded-lg cursor-pointer shadow-sm border"
+              title={t('passport.reupload')}
+              onClick={(e) => e.stopPropagation()}
             >
-              <ZoomOut size={16} className="text-morandi-secondary" />
-            </button>
-            <span className="text-xs text-morandi-secondary min-w-[3rem] text-center">
-              {Math.round(imageEditor.zoom * 100)}%
-            </span>
-            <button
-              type="button"
-              onClick={() => imageEditor.zoomIn()}
-              className="p-1.5 hover:bg-muted rounded-md"
-              title="放大"
-            >
-              <ZoomIn size={16} className="text-morandi-secondary" />
-            </button>
-            <button
-              type="button"
-              onClick={() => imageEditor.reset()}
-              className="p-1.5 hover:bg-muted rounded-md ml-1"
-              title="重置檢視"
-            >
-              <X size={16} className="text-morandi-secondary" />
-            </button>
+              <Upload size={16} className="text-morandi-gold" />
+              <input
+                id="edit-passport-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={onUploadPassport}
+              />
+            </label>
+            {/* 編輯提示 */}
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <span className="text-white text-sm font-medium">{t('passport.clickToEdit')}</span>
+            </div>
+          </div>
+        ) : (
+          <label
+            htmlFor="edit-passport-upload"
+            className="w-full h-48 bg-morandi-container/30 rounded-lg flex flex-col items-center justify-center text-morandi-primary border-2 border-dashed border-morandi-secondary/30 hover:border-morandi-gold hover:bg-morandi-gold/5 cursor-pointer transition-all"
+          >
+            <Upload size={32} className="mb-2 opacity-50" />
+            <span className="text-sm">{t('passport.upload')}</span>
+            <span className="text-xs mt-1 opacity-70">JPG, PNG</span>
+            <input
+              id="edit-passport-upload"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={onUploadPassport}
+            />
+          </label>
+        )}
+
+        {/* 驗證模式提示 */}
+        {editMode === 'verify' && (
+          <div className="bg-status-warning-bg border border-morandi-gold/30 rounded-lg p-3">
+            <p className="text-xs text-morandi-gold">
+              {t('order.verifyMemberNote')}
+            </p>
           </div>
         )}
       </div>
 
-      {/* 工具列 */}
-      {editingMember?.passport_image_url && !imageEditor.isCropMode && (
-        <div className="flex items-center justify-between bg-muted rounded-lg p-2">
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={() => imageEditor.rotateLeft()}
-              className="p-2 hover:bg-card rounded-md flex items-center gap-1 text-xs"
-            >
-              <RotateCcw size={16} className="text-morandi-gold" />
-              <span className="text-morandi-secondary hidden sm:inline">左轉</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => imageEditor.rotateRight()}
-              className="p-2 hover:bg-card rounded-md flex items-center gap-1 text-xs"
-            >
-              <RotateCw size={16} className="text-morandi-gold" />
-              <span className="text-morandi-secondary hidden sm:inline">右轉</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => imageEditor.toggleFlipH()}
-              className={`p-2 hover:bg-card rounded-md flex items-center gap-1 text-xs ${
-                imageEditor.flipH ? 'bg-status-info-bg' : ''
-              }`}
-            >
-              <FlipHorizontal size={16} className="text-morandi-gold" />
-              <span className="text-morandi-secondary hidden sm:inline">翻轉</span>
-            </button>
-            <div className="w-px h-6 bg-border mx-1" />
-            <button
-              type="button"
-              onClick={() => imageEditor.startCrop()}
-              className="p-2 hover:bg-card rounded-md flex items-center gap-1 text-xs"
-            >
-              <Crop size={16} className="text-morandi-blue" />
-              <span className="text-morandi-secondary hidden sm:inline">裁剪</span>
-            </button>
-          </div>
-          <div className="flex items-center gap-2">
-            {(imageEditor.rotation !== 0 || imageEditor.flipH) && (
-              <button
-                type="button"
-                onClick={onSaveTransform}
-                disabled={imageEditor.isSaving}
-                className="p-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md flex items-center gap-1 text-xs disabled:opacity-50"
-              >
-                <Save size={16} />
-                <span>{imageEditor.isSaving ? '儲存中...' : '儲存圖片'}</span>
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={onRecognize}
-              disabled={isRecognizing}
-              className="p-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md flex items-center gap-1 text-xs disabled:opacity-50"
-            >
-              <RefreshCw size={16} className={isRecognizing ? 'animate-spin' : ''} />
-              <span>{isRecognizing ? '辨識中...' : '再次辨識'}</span>
-            </button>
-          </div>
-        </div>
+      {/* 圖片編輯器 */}
+      {editingMember?.passport_image_url && (
+        <ImageEditor
+          open={isEditorOpen}
+          onClose={() => setIsEditorOpen(false)}
+          imageSrc={editingMember.passport_image_url}
+          aspectRatio={3 / 2}  // 護照比例
+          onSave={handleEditorSave}
+          onCropAndSave={handleEditorCropAndSave}
+          showAi={false}  // 護照不需要 AI 美化
+        />
       )}
-
-      {/* 裁剪模式工具列 */}
-      {editingMember?.passport_image_url && imageEditor.isCropMode && (
-        <div className="flex items-center justify-between bg-morandi-blue/10 rounded-lg p-2">
-          <span className="text-xs text-morandi-blue">拖曳框選要保留的區域</span>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => imageEditor.cancelCrop()}
-              className="px-3 py-1 text-xs text-morandi-secondary hover:bg-card rounded-md"
-            >
-              取消
-            </button>
-            <button
-              type="button"
-              onClick={onConfirmCrop}
-              disabled={imageEditor.cropRect.width < 20 || imageEditor.isSaving}
-              className="px-3 py-1 text-xs bg-morandi-blue text-white rounded-md hover:bg-morandi-blue/90 disabled:opacity-50"
-            >
-              {imageEditor.isSaving ? '處理中...' : '確認裁剪'}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 圖片容器 */}
-      {editingMember?.passport_image_url ? (
-        <div
-          ref={imageEditor.containerRef}
-          className={`relative overflow-hidden rounded-lg border bg-muted ${
-            imageEditor.isCropMode
-              ? 'border-morandi-blue cursor-crosshair'
-              : 'cursor-grab active:cursor-grabbing'
-          }`}
-          style={{ height: '320px' }}
-          onWheel={imageEditor.handleWheel}
-          onMouseDown={(e) => imageEditor.handleMouseDown(e, imageEditor.containerRef.current)}
-          onMouseMove={(e) => imageEditor.handleMouseMove(e, imageEditor.containerRef.current)}
-          onMouseUp={imageEditor.handleMouseUp}
-          onMouseLeave={(e) => imageEditor.handleMouseLeave(e, imageEditor.containerRef.current)}
-        >
-          <img
-            src={editingMember.passport_image_url}
-            alt="護照照片"
-            className="absolute w-full h-full object-contain transition-transform"
-            style={{
-              transform: `translate(${imageEditor.position.x}px, ${imageEditor.position.y}px) scale(${imageEditor.zoom}) rotate(${imageEditor.rotation}deg) ${imageEditor.flipH ? 'scaleX(-1)' : ''}`,
-              transformOrigin: 'center center',
-            }}
-            draggable={false}
-          />
-          {/* 裁剪框 */}
-          {imageEditor.isCropMode && imageEditor.cropRect.width > 0 && (
-            <div
-              className="absolute border-2 border-morandi-blue bg-morandi-blue/10"
-              style={{
-                left: imageEditor.cropRect.x,
-                top: imageEditor.cropRect.y,
-                width: imageEditor.cropRect.width,
-                height: imageEditor.cropRect.height,
-              }}
-            />
-          )}
-        </div>
-      ) : (
-        <label
-          htmlFor="edit-passport-upload"
-          className="w-full h-48 bg-morandi-container/30 rounded-lg flex flex-col items-center justify-center text-morandi-primary border-2 border-dashed border-morandi-secondary/30 hover:border-morandi-gold hover:bg-morandi-gold/5 cursor-pointer transition-all"
-        >
-          <Upload size={32} className="mb-2 opacity-50" />
-          <span className="text-sm">點擊上傳護照照片</span>
-          <span className="text-xs mt-1 opacity-70">支援 JPG、PNG</span>
-          <input
-            id="edit-passport-upload"
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={onUploadPassport}
-          />
-        </label>
-      )}
-
-      {/* 驗證模式提示 */}
-      {editMode === 'verify' && (
-        <div className="bg-status-warning-bg border border-morandi-gold/30 rounded-lg p-3">
-          <p className="text-xs text-morandi-gold">
-            請仔細核對護照照片與右邊的資料是否一致。驗證完成後，此成員的資料將被標記為「已驗證」。
-          </p>
-        </div>
-      )}
-    </div>
+    </>
   )
 }

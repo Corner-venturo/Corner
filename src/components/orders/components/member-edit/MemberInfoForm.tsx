@@ -6,7 +6,7 @@
 'use client'
 
 import React from 'react'
-import type { EditFormData } from './hooks/useMemberEdit'
+import type { EditFormData } from '../MemberEditDialog'
 
 interface MemberInfoFormProps {
   formData: EditFormData

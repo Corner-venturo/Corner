@@ -6,21 +6,25 @@
 'use client'
 
 import React, { useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
-import { Calculator, FileText, Calendar, MapPin, Users, LayoutList, CheckCircle, XCircle } from 'lucide-react'
+import { Calculator, FileText, Calendar, MapPin, Users, LayoutList, Archive } from 'lucide-react'
 import { DocumentVersionPicker } from '@/components/documents'
 import { useToursSlim, useQuotes } from '@/data'
-import type { Tour } from '@/stores/types'
+import type { Tour, Quote } from '@/stores/types'
 import { cn } from '@/lib/utils'
 import { formatDateTW } from '@/lib/utils/format-date'
+import { CurrencyCell } from '@/components/table-cells'
 
-// 狀態篩選（只顯示有報價單的團）
+// 狀態篩選
 const STATUS_TABS = [
-  { value: 'all', label: '全部', icon: LayoutList },
+  { value: 'all', label: '依團顯示', icon: LayoutList },
+  { value: 'standalone', label: '獨立報價單', icon: Archive },
 ]
 
 export const QuotesPage: React.FC = () => {
+  const router = useRouter()
   const { items: tours, loading: toursLoading } = useToursSlim()
   const { items: quotes, loading: quotesLoading } = useQuotes()
 
@@ -38,6 +42,30 @@ export const QuotesPage: React.FC = () => {
     })
     return counts
   }, [quotes])
+
+  // 獨立報價單（沒有關聯到任何團的報價單）
+  const standaloneQuotes = useMemo(() => {
+    let result = quotes.filter(quote => !quote.tour_id)
+
+    // 搜尋篩選
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase()
+      result = result.filter(quote =>
+        quote.code?.toLowerCase().includes(term) ||
+        quote.name?.toLowerCase().includes(term) ||
+        quote.customer_name?.toLowerCase().includes(term)
+      )
+    }
+
+    // 按建立時間排序（最新的在前）
+    result.sort((a, b) => {
+      const dateA = a.created_at ? new Date(a.created_at).getTime() : 0
+      const dateB = b.created_at ? new Date(b.created_at).getTime() : 0
+      return dateB - dateA
+    })
+
+    return result
+  }, [quotes, searchTerm])
 
   // 篩選旅遊團（只顯示有報價單的團）
   const filteredTours = useMemo(() => {
@@ -64,8 +92,8 @@ export const QuotesPage: React.FC = () => {
     return result
   }, [tours, searchTerm, tourQuoteCounts])
 
-  // 表格欄位定義
-  const columns = [
+  // 旅遊團表格欄位定義
+  const tourColumns = [
     {
       key: 'code',
       label: '團號',
@@ -141,6 +169,69 @@ export const QuotesPage: React.FC = () => {
     },
   ]
 
+  // 獨立報價單表格欄位定義
+  const standaloneColumns = [
+    {
+      key: 'code',
+      label: '編號',
+      width: '120px',
+      render: (_: unknown, row: Quote) => (
+        <span className="font-mono text-sm text-morandi-gold font-medium">
+          {row.code || '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'name',
+      label: '報價單名稱',
+      render: (_: unknown, row: Quote) => (
+        <span className="text-sm text-morandi-primary">
+          {row.name || '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'customer_name',
+      label: '客戶',
+      width: '150px',
+      render: (_: unknown, row: Quote) => (
+        <span className="text-sm text-morandi-secondary">
+          {row.customer_name || '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'group_size',
+      label: '人數',
+      width: '80px',
+      render: (_: unknown, row: Quote) => (
+        <div className="flex items-center gap-1 text-sm text-morandi-secondary">
+          <Users size={14} />
+          <span>{row.group_size || 0}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'total_amount',
+      label: '金額',
+      width: '140px',
+      render: (_: unknown, row: Quote) => (
+        <CurrencyCell amount={(row as Quote & { total_amount?: number }).total_amount || row.total_cost || 0} />
+      ),
+    },
+    {
+      key: 'created_at',
+      label: '建立日期',
+      width: '120px',
+      render: (_: unknown, row: Quote) => (
+        <div className="flex items-center gap-1 text-sm text-morandi-secondary">
+          <Calendar size={14} />
+          <span>{formatDateTW(row.created_at) || '-'}</span>
+        </div>
+      ),
+    },
+  ]
+
   const loading = toursLoading || quotesLoading
 
   return (
@@ -162,17 +253,36 @@ export const QuotesPage: React.FC = () => {
       />
 
       <div className="flex-1 overflow-hidden">
-        <EnhancedTable
-          columns={columns}
-          data={filteredTours as Tour[]}
-          loading={loading}
-          emptyMessage="尚無報價單資料"
-          onRowClick={(row) => setSelectedTour(row as Tour)}
-          rowClassName={() => "cursor-pointer hover:bg-morandi-gold/5"}
-        />
+        {statusFilter === 'standalone' ? (
+          <EnhancedTable
+            columns={standaloneColumns}
+            data={standaloneQuotes as Quote[]}
+            loading={loading}
+            emptyMessage="尚無獨立報價單"
+            onRowClick={(row) => {
+              const quote = row as Quote & { quote_type?: string }
+              // 根據報價單類型跳轉到不同頁面
+              if (quote.quote_type === 'quick') {
+                router.push(`/quotes/quick/${quote.id}`)
+              } else {
+                router.push(`/quotes/${quote.id}`)
+              }
+            }}
+            rowClassName={() => "cursor-pointer hover:bg-morandi-gold/5"}
+          />
+        ) : (
+          <EnhancedTable
+            columns={tourColumns}
+            data={filteredTours as Tour[]}
+            loading={loading}
+            emptyMessage="尚無報價單資料"
+            onRowClick={(row) => setSelectedTour(row as Tour)}
+            rowClassName={() => "cursor-pointer hover:bg-morandi-gold/5"}
+          />
+        )}
       </div>
 
-      {/* 報價單管理懸浮視窗 */}
+      {/* 報價單管理懸浮視窗（依團顯示） */}
       {selectedTour && (
         <DocumentVersionPicker
           isOpen={!!selectedTour}

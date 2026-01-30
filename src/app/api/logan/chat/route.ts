@@ -9,6 +9,14 @@ import { getServerAuth } from '@/lib/auth/server-auth'
 import { logger } from '@/lib/utils/logger'
 
 export async function POST(request: NextRequest) {
+  // 全局 AI 開關
+  if (process.env.NEXT_PUBLIC_DISABLE_AI === 'true') {
+    return NextResponse.json(
+      { success: false, error: 'AI 功能已停用' },
+      { status: 503 }
+    )
+  }
+
   try {
     // 驗證身份
     const auth = await getServerAuth()
@@ -72,6 +80,16 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
+  // 全局 AI 開關 - 設定 NEXT_PUBLIC_DISABLE_AI=true 可完全禁用 AI
+  if (process.env.NEXT_PUBLIC_DISABLE_AI === 'true') {
+    return NextResponse.json({
+      success: true,
+      available: false,
+      disabled: true,
+      model: null,
+    })
+  }
+
   try {
     const available = await isLoganAvailable()
     return NextResponse.json({

@@ -1,17 +1,13 @@
 /**
  * MemberEditDialog - 成員編輯/驗證對話框
- * 拆分後的主組件（< 300 行）
- *
+ * 
  * 功能：
  * - 編輯成員資料
  * - 驗證護照資料（OCR 後確認）
- * - 護照圖片編輯（縮放、旋轉、翻轉、裁剪）
+ * - 護照圖片編輯（使用統一的 ImageEditor 元件）
  * - 護照重新辨識
  *
- * 模組結構：
- * - MemberInfoForm: 基本資訊表單
- * - PassportSection: 護照圖片編輯區塊
- * - useMemberEdit: 狀態管理 Hook
+ * 2025-06-27: 改用統一的 ImageEditor 元件
  */
 
 'use client'
@@ -20,15 +16,73 @@ import React, { useState, useCallback } from 'react'
 import { AlertTriangle, Pencil, X, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { useMemberEdit } from './member-edit/hooks/useMemberEdit'
 import { MemberInfoForm } from './member-edit/MemberInfoForm'
 import { PassportSection } from './member-edit/PassportSection'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
+import { logger } from '@/lib/utils/logger'
 import type { OrderMember } from '../order-member.types'
-import type { EditFormData } from './member-edit/hooks/useMemberEdit'
 
 type EditMode = 'edit' | 'verify'
+
+export interface EditFormData {
+  chinese_name?: string
+  passport_name?: string
+  birth_date?: string
+  gender?: string
+  id_number?: string
+  passport_number?: string
+  passport_expiry?: string
+  special_meal?: string
+  remarks?: string
+}
+
+// 圖片壓縮函數
+async function compressImage(file: File): Promise<File> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = (ev) => {
+      const img = new Image()
+      img.src = ev.target?.result as string
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        let { width, height } = img
+        const maxDimension = 1200
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = (height / width) * maxDimension
+            width = maxDimension
+          } else {
+            width = (width / height) * maxDimension
+            height = maxDimension
+          }
+        }
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          reject(new Error('無法取得 canvas context'))
+          return
+        }
+        ctx.drawImage(img, 0, 0, width, height)
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(new File([blob], file.name, { type: 'image/jpeg' }))
+            } else {
+              reject(new Error('壓縮失敗'))
+            }
+          },
+          'image/jpeg',
+          0.8
+        )
+      }
+      img.onerror = reject
+    }
+    reader.onerror = reject
+  })
+}
 
 interface MemberEditDialogProps {
   isOpen: boolean
@@ -57,14 +111,6 @@ export function MemberEditDialog({
   onSave,
   onRecognize,
 }: MemberEditDialogProps) {
-  const {
-    imageEditor,
-    handleSaveTransform,
-    handleConfirmCrop,
-    handleUploadPassport,
-    handleRecognize,
-  } = useMemberEdit(editingMember, onMemberChange, onRecognize)
-
   const [isSyncing, setIsSyncing] = useState(false)
 
   // 從顧客主檔同步資料
@@ -114,14 +160,55 @@ export function MemberEditDialog({
     }
   }, [editingMember, editFormData, onFormDataChange, onMemberChange])
 
-  // 關閉時重置圖片編輯器
-  const handleClose = () => {
-    imageEditor.reset()
-    onClose()
-  }
+  // 上傳護照照片
+  const handleUploadPassport = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !editingMember) return
+
+    try {
+      const compressedFile = await compressImage(file)
+      const random = Math.random().toString(36).substring(2, 8)
+      const fileName = `passport_${Date.now()}_${random}.jpg`
+
+      const { error: uploadError } = await supabase.storage
+        .from('passport-images')
+        .upload(fileName, compressedFile, { upsert: true })
+
+      if (uploadError) throw uploadError
+
+      const { data: urlData } = supabase.storage
+        .from('passport-images')
+        .getPublicUrl(fileName)
+
+      onMemberChange({
+        ...editingMember,
+        passport_image_url: urlData.publicUrl,
+      })
+
+      toast.success('護照照片已上傳')
+
+      // 自動進行 OCR
+      if (onRecognize) {
+        try {
+          await onRecognize(urlData.publicUrl)
+        } catch {
+          // OCR 失敗不影響上傳
+        }
+      }
+    } catch (error) {
+      logger.error('上傳護照照片失敗:', error)
+      toast.error('上傳失敗，請稍後再試')
+    }
+  }, [editingMember, onMemberChange, onRecognize])
+
+  // 再次辨識
+  const handleRecognize = useCallback(async () => {
+    if (!editingMember?.passport_image_url) return
+    await onRecognize(editingMember.passport_image_url)
+  }, [editingMember, onRecognize])
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent nested level={2} className="max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
@@ -145,11 +232,9 @@ export function MemberEditDialog({
             editingMember={editingMember}
             editMode={editMode}
             isRecognizing={isRecognizing}
-            imageEditor={imageEditor}
-            onSaveTransform={handleSaveTransform}
-            onConfirmCrop={handleConfirmCrop}
-            onUploadPassport={handleUploadPassport}
+            onMemberChange={onMemberChange}
             onRecognize={handleRecognize}
+            onUploadPassport={handleUploadPassport}
           />
 
           {/* 右邊：表單 */}
@@ -179,26 +264,24 @@ export function MemberEditDialog({
 
           {/* 右邊：取消和儲存按鈕 */}
           <div className="flex gap-3">
-            <Button variant="outline" className="gap-1" onClick={handleClose} disabled={isSaving}>
+            <Button variant="outline" className="gap-1" onClick={onClose} disabled={isSaving}>
               <X size={16} />
               取消
             </Button>
             <Button
-            onClick={onSave}
-            disabled={isSaving}
-            size="lg"
-            className={editMode === 'verify'
-              ? 'bg-status-success hover:bg-morandi-green text-white px-8 font-medium'
-              : 'bg-morandi-gold hover:bg-morandi-gold-hover text-white px-8 font-medium'
-            }
-          >
-            {isSaving ? '儲存中...' : editMode === 'verify' ? '確認驗證' : '儲存變更'}
-          </Button>
+              onClick={onSave}
+              disabled={isSaving}
+              size="lg"
+              className={editMode === 'verify'
+                ? 'bg-status-success hover:bg-morandi-green text-white px-8 font-medium'
+                : 'bg-morandi-gold hover:bg-morandi-gold-hover text-white px-8 font-medium'
+              }
+            >
+              {isSaving ? '儲存中...' : editMode === 'verify' ? '確認驗證' : '儲存變更'}
+            </Button>
           </div>
         </div>
       </DialogContent>
     </Dialog>
   )
 }
-
-export type { EditFormData }

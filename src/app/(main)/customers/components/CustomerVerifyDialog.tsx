@@ -1,24 +1,22 @@
 /**
  * 顧客資料驗證對話框
  * 功能：護照圖片檢視、編輯、OCR 辨識、資料比對
+ * 
+ * 2025-06-27: 改用統一的 ImageEditor 元件
+ * 2025-06-27: 改用 i18n 多語系
  */
 'use client'
 
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import {
   Check,
   AlertTriangle,
-  ZoomIn,
-  ZoomOut,
-  RotateCcw,
-  RotateCw,
-  Crop,
   RefreshCw,
-  Save,
-  FlipHorizontal,
   X,
   Upload,
   ImageOff,
+  Pencil,
 } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -28,8 +26,8 @@ import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import type { Customer, UpdateCustomerData } from '@/types/customer.types'
-import { useImageEditor } from '@/hooks/image-editor'
 import { useOcrRecognition } from '@/hooks'
+import { ImageEditor, type ImageEditorSettings } from '@/components/ui/image-editor'
 
 // 從 URL 提取檔名並刪除舊照片
 async function deleteOldPassportImage(oldUrl: string | null | undefined): Promise<void> {
@@ -39,10 +37,10 @@ async function deleteOldPassportImage(oldUrl: string | null | undefined): Promis
     if (match) {
       const oldFileName = decodeURIComponent(match[1])
       await supabase.storage.from('passport-images').remove([oldFileName])
-      logger.log(`已刪除舊護照照片: ${oldFileName}`)
+      logger.log(`Deleted old passport image: ${oldFileName}`)
     }
   } catch (error) {
-    logger.error('刪除舊護照照片失敗:', error)
+    logger.error('Failed to delete old passport image:', error)
   }
 }
 
@@ -59,14 +57,15 @@ export function CustomerVerifyDialog({
   customer,
   onUpdate,
 }: CustomerVerifyDialogProps) {
+  const t = useTranslations()
+  
   // 表單資料
   const [formData, setFormData] = useState<Partial<UpdateCustomerData>>({})
   const [isSaving, setIsSaving] = useState(false)
   const [localImageUrl, setLocalImageUrl] = useState<string | null>(null)
-
-  // 圖片編輯 Hook
-  const imageEditor = useImageEditor()
-  const imageContainerRef = useRef<HTMLDivElement>(null)
+  
+  // 圖片編輯器狀態
+  const [isEditorOpen, setIsEditorOpen] = useState(false)
 
   // OCR Hook
   const { isRecognizing, recognizePassport } = useOcrRecognition()
@@ -75,9 +74,9 @@ export function CustomerVerifyDialog({
   const handleClose = useCallback(() => {
     setFormData({})
     setLocalImageUrl(null)
-    imageEditor.reset()
+    setIsEditorOpen(false)
     onOpenChange(false)
-  }, [imageEditor, onOpenChange])
+  }, [onOpenChange])
 
   // 上傳新照片
   const handleUploadPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,13 +100,10 @@ export function CustomerVerifyDialog({
 
       const newUrl = urlData.publicUrl
 
-      // 更新顧客資料
-      await onUpdate(customer.id, { passport_image_url: newUrl })
-
       // 更新本地顯示
       setLocalImageUrl(newUrl)
 
-      toast.success('護照照片已上傳')
+      toast.success(t('passport.uploadSuccess'))
 
       // 自動進行 OCR 辨識
       try {
@@ -121,8 +117,8 @@ export function CustomerVerifyDialog({
         // OCR 失敗不影響上傳成功
       }
     } catch (error) {
-      logger.error('上傳護照照片失敗:', error)
-      toast.error('上傳失敗，請稍後再試')
+      logger.error('Failed to upload passport photo:', error)
+      toast.error(t('passport.uploadFailed'))
     }
   }
 
@@ -144,6 +140,7 @@ export function CustomerVerifyDialog({
   useEffect(() => {
     if (open && customer) {
       initFormData()
+      setLocalImageUrl(null)
     }
   }, [open, customer, initFormData])
 
@@ -152,14 +149,24 @@ export function CustomerVerifyDialog({
     if (!customer) return
     setIsSaving(true)
     try {
-      await onUpdate(customer.id, {
+      // 如果有本地圖片URL（新上傳的），需要更新到資料庫
+      const updateData: Partial<UpdateCustomerData> = {
         ...formData,
         verification_status: 'verified',
-      })
-      toast.success('顧客資料已驗證')
+      }
+      
+      if (localImageUrl) {
+        updateData.passport_image_url = localImageUrl
+        // 刪除舊照片
+        await deleteOldPassportImage(customer.passport_image_url)
+      }
+
+      await onUpdate(customer.id, updateData)
+      toast.success(t('customer.customerVerified'))
       handleClose()
     } catch (error) {
-      toast.error('驗證失敗')
+      toast.error(t('messages.saveFailed'))
+      logger.error('Verification failed:', error)
     } finally {
       setIsSaving(false)
     }
@@ -167,57 +174,37 @@ export function CustomerVerifyDialog({
 
   // OCR 再次辨識
   const handleReOcr = async () => {
-    if (!customer?.passport_image_url) return
+    const imageUrl = localImageUrl || customer?.passport_image_url
+    if (!imageUrl) return
     try {
-      await recognizePassport(customer.passport_image_url, (result) => {
+      await recognizePassport(imageUrl, (result) => {
         setFormData(prev => ({
           ...prev,
           ...result,
         }))
       })
     } catch (error) {
-      toast.error('OCR 辨識失敗，請稍後再試')
+      toast.error(t('passport.recognizeFailed'))
     }
   }
 
-  // 儲存圖片變更
-  const handleSaveImageTransform = async () => {
-    if (!customer?.passport_image_url) return
-    imageEditor.setIsSaving(true)
-    const oldUrl = customer.passport_image_url
+  // 圖片編輯器存檔（不做裁切，只保存設定）
+  const handleEditorSave = (settings: ImageEditorSettings) => {
+    // 目前護照不需要保存位置設定
+    logger.log('ImageEditor settings saved:', settings)
+  }
+
+  // 圖片編輯器裁切並存檔
+  const handleEditorCropAndSave = async (blob: Blob, _settings: ImageEditorSettings) => {
+    if (!customer) return
+
     try {
-      // 創建 canvas 並應用變換
-      const img = new Image()
-      img.crossOrigin = 'anonymous'
-      await new Promise<void>((resolve, reject) => {
-        img.onload = () => resolve()
-        img.onerror = reject
-        img.src = customer.passport_image_url!
-      })
+      const oldUrl = localImageUrl || customer.passport_image_url
 
-      const canvas = document.createElement('canvas')
-      const ctx = canvas.getContext('2d')
-      if (!ctx) throw new Error('Canvas context error')
-
-      // 根據旋轉角度設定 canvas 大小
-      const isRotated90 = imageEditor.rotation === 90 || imageEditor.rotation === 270
-      canvas.width = isRotated90 ? img.height : img.width
-      canvas.height = isRotated90 ? img.width : img.height
-
-      // 應用變換
-      ctx.translate(canvas.width / 2, canvas.height / 2)
-      ctx.rotate((imageEditor.rotation * Math.PI) / 180)
-      if (imageEditor.flipH) ctx.scale(-1, 1)
-      ctx.drawImage(img, -img.width / 2, -img.height / 2)
-
-      // 上傳到 Supabase
-      const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob((b) => resolve(b!), 'image/jpeg', 0.9)
-      })
-
-      // 統一格式：passport_{timestamp}_{random}.jpg
+      // 上傳裁切後的圖片
       const random = Math.random().toString(36).substring(2, 8)
       const fileName = `passport_${Date.now()}_${random}.jpg`
+      
       const { error: uploadError } = await supabase.storage
         .from('passport-images')
         .upload(fileName, blob, { upsert: true })
@@ -228,281 +215,203 @@ export function CustomerVerifyDialog({
         .from('passport-images')
         .getPublicUrl(fileName)
 
-      await onUpdate(customer.id, {
-        passport_image_url: urlData.publicUrl,
-      })
+      // 更新本地顯示
+      setLocalImageUrl(urlData.publicUrl)
 
-      // 上傳成功後刪除舊照片
+      // 刪除舊照片
       await deleteOldPassportImage(oldUrl)
 
-      imageEditor.reset()
-      toast.success('圖片已儲存')
+      toast.success(t('passport.imageSaved'))
+      setIsEditorOpen(false)
     } catch (error) {
-      toast.error('儲存圖片失敗')
-    } finally {
-      imageEditor.setIsSaving(false)
+      logger.error('Failed to save edited image:', error)
+      toast.error(t('messages.saveFailed'))
     }
   }
 
   if (!customer) return null
 
+  const currentImageUrl = localImageUrl || customer.passport_image_url
+
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent level={1} className="max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
-        <DialogHeader className="flex-shrink-0">
-          <DialogTitle className="flex items-center gap-2">
-            {customer.verification_status === 'verified' ? (
-              <>
-                <Check className="text-status-success" size={20} />
-                顧客資料（已驗證）
-              </>
-            ) : (
-              <>
-                <AlertTriangle className="text-status-warning" size={20} />
-                驗證顧客資料
-              </>
-            )}
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="grid grid-cols-2 gap-6 py-4 flex-1 overflow-y-auto">
-          {/* 左邊：護照照片 */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium text-morandi-primary">護照照片</h3>
-              {(localImageUrl || customer.passport_image_url) && !imageEditor.isCropMode && (
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => imageEditor.zoomOut()}
-                    className="p-1.5 hover:bg-muted rounded-md"
-                    title="縮小"
-                  >
-                    <ZoomOut size={16} className="text-morandi-secondary" />
-                  </button>
-                  <span className="text-xs text-morandi-secondary min-w-[3rem] text-center">
-                    {Math.round(imageEditor.zoom * 100)}%
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => imageEditor.zoomIn()}
-                    className="p-1.5 hover:bg-muted rounded-md"
-                    title="放大"
-                  >
-                    <ZoomIn size={16} className="text-morandi-secondary" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => imageEditor.reset()}
-                    className="p-1.5 hover:bg-muted rounded-md ml-1"
-                    title="重置檢視"
-                  >
-                    <X size={16} className="text-morandi-secondary" />
-                  </button>
-                </div>
+    <>
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent level={1} className="max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+          <DialogHeader className="flex-shrink-0">
+            <DialogTitle className="flex items-center gap-2">
+              {customer.verification_status === 'verified' ? (
+                <>
+                  <Check className="text-status-success" size={20} />
+                  {t('customer.customerDetail')} ({t('customer.verified')})
+                </>
+              ) : (
+                <>
+                  <AlertTriangle className="text-status-warning" size={20} />
+                  {t('customer.verifyCustomer')}
+                </>
               )}
-            </div>
+            </DialogTitle>
+          </DialogHeader>
 
-            {/* 工具列 */}
-            {(localImageUrl || customer.passport_image_url) && !imageEditor.isCropMode && (
-              <div className="flex items-center justify-between bg-muted rounded-lg p-2">
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => imageEditor.rotateLeft()}
-                    className="p-2 hover:bg-card rounded-md flex items-center gap-1 text-xs"
-                  >
-                    <RotateCcw size={16} className="text-morandi-gold" />
-                    <span className="text-morandi-secondary hidden sm:inline">左轉</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => imageEditor.rotateRight()}
-                    className="p-2 hover:bg-card rounded-md flex items-center gap-1 text-xs"
-                  >
-                    <RotateCw size={16} className="text-morandi-gold" />
-                    <span className="text-morandi-secondary hidden sm:inline">右轉</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => imageEditor.toggleFlipH()}
-                    className={`p-2 hover:bg-card rounded-md flex items-center gap-1 text-xs ${imageEditor.flipH ? 'bg-morandi-gold/20' : ''}`}
-                  >
-                    <FlipHorizontal size={16} className="text-morandi-gold" />
-                    <span className="text-morandi-secondary hidden sm:inline">翻轉</span>
-                  </button>
-                  <div className="w-px h-6 bg-border mx-1" />
-                  <button
-                    type="button"
-                    onClick={() => imageEditor.startCrop()}
-                    className="p-2 hover:bg-card rounded-md flex items-center gap-1 text-xs"
-                  >
-                    <Crop size={16} className="text-morandi-gold" />
-                    <span className="text-morandi-secondary hidden sm:inline">裁剪</span>
-                  </button>
-                </div>
-                <div className="flex items-center gap-2">
-                  {(imageEditor.rotation !== 0 || imageEditor.flipH) && (
+          <div className="grid grid-cols-2 gap-6 py-4 flex-1 overflow-y-auto">
+            {/* 左邊：護照照片 */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-medium text-morandi-primary">{t('passport.image')}</h3>
+                {currentImageUrl && (
+                  <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={handleSaveImageTransform}
-                      disabled={imageEditor.isSaving}
-                      className="p-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md flex items-center gap-1 text-xs disabled:opacity-50"
+                      onClick={() => setIsEditorOpen(true)}
+                      className="flex items-center gap-1.5 px-2 py-1 text-xs bg-morandi-container hover:bg-morandi-gold/10 hover:text-morandi-gold rounded transition-colors"
                     >
-                      <Save size={16} />
-                      <span>{imageEditor.isSaving ? '儲存中...' : '儲存圖片'}</span>
+                      <Pencil size={12} />
+                      {t('passport.editImage')}
                     </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={handleReOcr}
-                    disabled={isRecognizing}
-                    className="p-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md flex items-center gap-1 text-xs disabled:opacity-50"
-                  >
-                    <RefreshCw size={16} className={isRecognizing ? 'animate-spin' : ''} />
-                    <span>{isRecognizing ? '辨識中...' : '再次辨識'}</span>
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* 圖片容器 */}
-            {(localImageUrl || customer.passport_image_url) ? (
-              <div
-                ref={imageContainerRef}
-                className={`relative overflow-hidden rounded-lg border bg-muted ${
-                  imageEditor.isCropMode
-                    ? 'border-morandi-gold cursor-crosshair'
-                    : 'cursor-grab active:cursor-grabbing'
-                }`}
-                style={{ height: '320px' }}
-                onWheel={imageEditor.handleWheel}
-                onMouseDown={(e) => imageEditor.handleMouseDown(e, imageContainerRef.current)}
-                onMouseMove={(e) => imageEditor.handleMouseMove(e, imageContainerRef.current)}
-                onMouseUp={imageEditor.handleMouseUp}
-                onMouseLeave={(e) => imageEditor.handleMouseLeave(e, imageContainerRef.current)}
-              >
-                <img
-                  src={localImageUrl || customer.passport_image_url!}
-                  alt="護照"
-                  className="absolute w-full h-full object-contain transition-transform"
-                  style={{
-                    transform: `translate(${imageEditor.position.x}px, ${imageEditor.position.y}px) scale(${imageEditor.zoom}) rotate(${imageEditor.rotation}deg) ${imageEditor.flipH ? 'scaleX(-1)' : ''}`,
-                    transformOrigin: 'center center',
-                  }}
-                  draggable={false}
-                />
-                {/* 裁剪框 */}
-                {imageEditor.isCropMode && imageEditor.cropRect.width > 0 && (
-                  <div
-                    className="absolute border-2 border-morandi-gold bg-morandi-gold/10"
-                    style={{
-                      left: imageEditor.cropRect.x,
-                      top: imageEditor.cropRect.y,
-                      width: imageEditor.cropRect.width,
-                      height: imageEditor.cropRect.height,
-                    }}
-                  />
+                    <button
+                      type="button"
+                      onClick={handleReOcr}
+                      disabled={isRecognizing}
+                      className="flex items-center gap-1.5 px-2 py-1 text-xs bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded disabled:opacity-50 transition-colors"
+                    >
+                      <RefreshCw size={12} className={isRecognizing ? 'animate-spin' : ''} />
+                      {isRecognizing ? t('passport.recognizing') : t('passport.reRecognize')}
+                    </button>
+                  </div>
                 )}
-                {/* 重新上傳按鈕 */}
-                <label
-                  htmlFor="customer-passport-reupload"
-                  className="absolute bottom-2 right-2 p-2 bg-white/90 hover:bg-white rounded-lg cursor-pointer shadow-sm border"
-                  title="更換照片"
+              </div>
+
+              {/* 圖片容器 */}
+              {currentImageUrl ? (
+                <div
+                  className="relative overflow-hidden rounded-lg border bg-muted group cursor-pointer"
+                  style={{ height: '320px' }}
+                  onClick={() => setIsEditorOpen(true)}
                 >
-                  <Upload size={16} className="text-morandi-gold" />
+                  <img
+                    src={currentImageUrl}
+                    alt={t('passport.title')}
+                    className="w-full h-full object-contain"
+                    draggable={false}
+                  />
+                  {/* 重新上傳按鈕 */}
+                  <label
+                    htmlFor="customer-passport-reupload"
+                    className="absolute bottom-2 right-2 p-2 bg-white/90 hover:bg-white rounded-lg cursor-pointer shadow-sm border"
+                    title={t('passport.reupload')}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Upload size={16} className="text-morandi-gold" />
+                    <input
+                      id="customer-passport-reupload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleUploadPhoto}
+                    />
+                  </label>
+                  {/* 編輯提示 */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <span className="text-white text-sm font-medium">{t('passport.clickToEdit')}</span>
+                  </div>
+                </div>
+              ) : (
+                <label
+                  htmlFor="customer-passport-upload"
+                  className="w-full h-80 bg-morandi-container/30 rounded-lg flex flex-col items-center justify-center text-morandi-primary border-2 border-dashed border-morandi-secondary/30 hover:border-morandi-gold hover:bg-morandi-gold/5 cursor-pointer transition-all"
+                >
+                  <ImageOff size={48} className="mb-3 text-morandi-muted" />
+                  <span className="text-sm font-medium">{t('passport.upload')}</span>
+                  <span className="text-xs mt-1 text-morandi-muted">JPG, PNG</span>
                   <input
-                    id="customer-passport-reupload"
+                    id="customer-passport-upload"
                     type="file"
                     accept="image/*"
                     className="hidden"
                     onChange={handleUploadPhoto}
                   />
                 </label>
-              </div>
-            ) : (
-              <label
-                htmlFor="customer-passport-upload"
-                className="w-full h-80 bg-morandi-container/30 rounded-lg flex flex-col items-center justify-center text-morandi-primary border-2 border-dashed border-morandi-secondary/30 hover:border-morandi-gold hover:bg-morandi-gold/5 cursor-pointer transition-all"
-              >
-                <ImageOff size={48} className="mb-3 text-morandi-muted" />
-                <span className="text-sm font-medium">點擊上傳護照照片</span>
-                <span className="text-xs mt-1 text-morandi-muted">支援 JPG、PNG</span>
-                <input
-                  id="customer-passport-upload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleUploadPhoto}
-                />
-              </label>
-            )}
-          </div>
+              )}
+            </div>
 
-          {/* 右邊：表單 */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-medium text-morandi-primary">客戶資料</h3>
-            <div className="space-y-3">
-              <div>
-                <label className="text-xs text-morandi-primary">中文姓名</label>
-                <Input
-                  value={formData.name || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                />
-              </div>
-              <div>
-                <label className="text-xs text-morandi-primary">護照英文名</label>
-                <Input
-                  value={formData.passport_name || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, passport_name: e.target.value }))}
-                />
-              </div>
-              <div>
-                <label className="text-xs text-morandi-primary">護照號碼</label>
-                <Input
-                  value={formData.passport_number || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, passport_number: e.target.value }))}
-                />
-              </div>
-              <div>
-                <label className="text-xs text-morandi-primary">護照效期</label>
-                <DatePicker
-                  value={formData.passport_expiry || ''}
-                  onChange={(date) => setFormData(prev => ({ ...prev, passport_expiry: date }))}
-                  placeholder="選擇日期"
-                />
-              </div>
-              <div>
-                <label className="text-xs text-morandi-primary">出生日期</label>
-                <DatePicker
-                  value={formData.birth_date || ''}
-                  onChange={(date) => setFormData(prev => ({ ...prev, birth_date: date }))}
-                  placeholder="選擇日期"
-                />
-              </div>
-              <div>
-                <label className="text-xs text-morandi-primary">身分證字號</label>
-                <Input
-                  value={formData.national_id || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, national_id: e.target.value }))}
-                />
+            {/* 右邊：表單 */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-morandi-primary">{t('customer.customerDetail')}</h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs text-morandi-primary">{t('customer.chineseName')}</label>
+                  <Input
+                    value={formData.name || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-morandi-primary">{t('customer.passportName')}</label>
+                  <Input
+                    value={formData.passport_name || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, passport_name: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-morandi-primary">{t('customer.passportNumber')}</label>
+                  <Input
+                    value={formData.passport_number || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, passport_number: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-morandi-primary">{t('customer.passportExpiry')}</label>
+                  <DatePicker
+                    value={formData.passport_expiry || ''}
+                    onChange={(date) => setFormData(prev => ({ ...prev, passport_expiry: date }))}
+                    placeholder={t('common.select')}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-morandi-primary">{t('customer.birthDate')}</label>
+                  <DatePicker
+                    value={formData.birth_date || ''}
+                    onChange={(date) => setFormData(prev => ({ ...prev, birth_date: date }))}
+                    placeholder={t('common.select')}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-morandi-primary">{t('customer.idNumber')}</label>
+                  <Input
+                    value={formData.national_id || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, national_id: e.target.value }))}
+                  />
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* 底部按鈕 */}
-        <div className="flex justify-end gap-2 pt-4 border-t">
-          <Button variant="outline" onClick={handleClose} className="gap-2">
-            <X size={16} />
-            取消
-          </Button>
-          <Button onClick={handleSave} disabled={isSaving} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
-            <Check size={16} />
-            {isSaving ? '儲存中...' : '確認驗證'}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+          {/* 底部按鈕 */}
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            <Button variant="outline" onClick={handleClose} className="gap-2">
+              <X size={16} />
+              {t('common.cancel')}
+            </Button>
+            <Button onClick={handleSave} disabled={isSaving} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+              <Check size={16} />
+              {isSaving ? t('common.saving') : t('common.confirm')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 圖片編輯器 */}
+      {currentImageUrl && (
+        <ImageEditor
+          open={isEditorOpen}
+          onClose={() => setIsEditorOpen(false)}
+          imageSrc={currentImageUrl}
+          aspectRatio={3 / 2}  // 護照比例
+          onSave={handleEditorSave}
+          onCropAndSave={handleEditorCropAndSave}
+          showAi={false}  // 護照不需要 AI 美化
+        />
+      )}
+    </>
   )
 }

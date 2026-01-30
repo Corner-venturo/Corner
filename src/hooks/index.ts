@@ -45,8 +45,8 @@ export {
   type ExecuteOptions,
 } from './useAsyncData'
 
-// 圖片編輯 Hook - 請直接從 '@/hooks/image-editor' 匯入
-// import { useImageEditor } from '@/hooks/image-editor'
+// 圖片編輯 - 請使用 '@/components/ui/image-editor' 的 ImageEditor 元件
+// (舊的 useImageEditor hook 已於 2025-06-27 移除)
 
 // 導航 Hooks
 export {

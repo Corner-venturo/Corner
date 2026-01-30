@@ -50,7 +50,7 @@ import {
 } from './components'
 import { TourPrintDialog } from '@/components/tours/TourPrintDialog'
 import type { OrderMember, OrderMembersExpandableProps, CustomCostField } from './order-member.types'
-import type { EditFormData } from './components/member-edit/hooks/useMemberEdit'
+import type { EditFormData } from './components/MemberEditDialog'
 
 // 可切換顯示的欄位定義
 export interface ColumnVisibility {

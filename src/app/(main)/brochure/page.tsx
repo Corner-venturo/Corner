@@ -42,7 +42,7 @@ import { supabase } from '@/lib/supabase/client'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { ImageUploader, ImagePickerDialog } from '@/components/ui/image-uploader'
-import { UnifiedImageEditor } from '@/components/designer/UnifiedImageEditor'
+import { ImageEditor, type ImageEditorSettings } from '@/components/ui/image-editor'
 import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
 import { cn } from '@/lib/utils'
@@ -368,16 +368,21 @@ export default function DesignerPage() {
   // ============================================
   // 封面圖片位置編輯完成 - 步驟2：套用圖片和位置
   // ============================================
-  const handleImagePositionSaved = useCallback(async (result: {
-    position?: ImagePositionSettings
-  }) => {
+  const handleImagePositionSaved = useCallback(async (settings: ImageEditorSettings) => {
     if (!selectedStyle || !pendingImageUrl) return
+
+    // 從 ImageEditorSettings 取出位置設定
+    const position: ImagePositionSettings = {
+      x: settings.x,
+      y: settings.y,
+      scale: settings.scale,
+    }
 
     // 更新 templateData 中的封面圖片和位置
     const newTemplateData = {
       ...templateData,
       coverImage: pendingImageUrl,
-      coverImagePosition: result.position || { x: 50, y: 50, scale: 1 },
+      coverImagePosition: position,
     }
     setTemplateData(newTemplateData)
 
@@ -400,7 +405,7 @@ export default function DesignerPage() {
             // 使用舊圖片的尺寸作為目標尺寸（已經是裁切後的正確尺寸）
             const targetWidth = coverImageElement.width ?? (canvasWidth - 64)
             const targetHeight = coverImageElement.height ?? 350
-            const position = result.position || { x: 50, y: 50, scale: 1 }
+            // position 已在函數開頭定義
 
             // 1. 載入原始圖片
             const htmlImg = new window.Image()
@@ -510,10 +515,15 @@ export default function DesignerPage() {
   // ============================================
   // 每日行程封面圖片位置編輯完成 - 步驟2：套用圖片和位置
   // ============================================
-  const handleDailyImagePositionSaved = useCallback(async (result: {
-    position?: ImagePositionSettings
-  }) => {
+  const handleDailyImagePositionSaved = useCallback(async (settings: ImageEditorSettings) => {
     if (!selectedStyle || !pendingImageUrl || currentDayIndex === undefined) return
+
+    // 從 ImageEditorSettings 取出位置設定
+    const position: ImagePositionSettings = {
+      x: settings.x,
+      y: settings.y,
+      scale: settings.scale,
+    }
 
     // 取得現有的 dailyDetails
     const dailyDetails = (templateData?.dailyDetails as Array<{
@@ -540,7 +550,7 @@ export default function DesignerPage() {
     newDailyDetails[currentDayIndex] = {
       ...newDailyDetails[currentDayIndex],
       coverImage: pendingImageUrl,
-      coverImagePosition: result.position || { x: 50, y: 50, scale: 1 },
+      coverImagePosition: position,
     }
 
     // 更新 templateData
@@ -567,7 +577,7 @@ export default function DesignerPage() {
           // 計算目標尺寸（封面高度是 42% 的頁面高度）
           const targetWidth = canvasWidth
           const targetHeight = Math.floor(canvasHeight * 0.42)
-          const position = result.position || { x: 50, y: 50, scale: 1 }
+          // position 已在函數開頭定義
 
           // 1. 載入原始圖片
           const htmlImg = new window.Image()
@@ -2805,9 +2815,9 @@ export default function DesignerPage() {
         aspectRatio={495 / 350}
       />
 
-      {/* 封面圖片位置編輯器 */}
+      {/* 封面圖片編輯器 */}
       {pendingImageUrl && (
-        <UnifiedImageEditor
+        <ImageEditor
           open={showImageEditor}
           onClose={() => {
             setShowImageEditor(false)
@@ -2815,10 +2825,9 @@ export default function DesignerPage() {
           }}
           imageSrc={pendingImageUrl}
           aspectRatio={495 / 350}
-          initialPosition={templateData?.coverImagePosition as ImagePositionSettings | undefined}
+          initialSettings={templateData?.coverImagePosition as ImageEditorSettings | undefined}
           onSave={handleImagePositionSaved}
-          defaultMode="position"
-          hideModes={['crop', 'adjust']}
+          showAi={false}
         />
       )}
 
@@ -2838,9 +2847,9 @@ export default function DesignerPage() {
         aspectRatio={16 / 9}
       />
 
-      {/* 每日行程封面圖片位置編輯器 */}
+      {/* 每日行程封面圖片編輯器 */}
       {pendingImageUrl && (
-        <UnifiedImageEditor
+        <ImageEditor
           open={showDailyImageEditor}
           onClose={() => {
             setShowDailyImageEditor(false)
@@ -2848,14 +2857,13 @@ export default function DesignerPage() {
           }}
           imageSrc={pendingImageUrl}
           aspectRatio={16 / 9}
-          initialPosition={
+          initialSettings={
             currentDayIndex !== undefined
-              ? ((templateData?.dailyDetails as Array<{ coverImagePosition?: ImagePositionSettings }>) || [])[currentDayIndex]?.coverImagePosition
+              ? ((templateData?.dailyDetails as Array<{ coverImagePosition?: ImageEditorSettings }>) || [])[currentDayIndex]?.coverImagePosition
               : undefined
           }
           onSave={handleDailyImagePositionSaved}
-          defaultMode="position"
-          hideModes={['crop', 'adjust']}
+          showAi={false}
         />
       )}
 
