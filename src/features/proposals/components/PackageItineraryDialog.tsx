@@ -24,8 +24,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { DatePicker } from '@/components/ui/date-picker'
-import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
 import { useAuthStore } from '@/stores'
+import { useFlightSearch } from '../hooks'
 import { useItineraries, createItinerary } from '@/data'
 import { supabase } from '@/lib/supabase/client'
 import { dynamicFrom } from '@/lib/supabase/typed-client'
@@ -82,17 +82,32 @@ export function PackageItineraryDialog({
     outboundFlight: null,
     returnFlight: null,
   })
-  // 航班查詢狀態
-  const [outboundFlightNumber, setOutboundFlightNumber] = useState('')
-  const [outboundFlightDate, setOutboundFlightDate] = useState('')
-  const [returnFlightNumber, setReturnFlightNumber] = useState('')
-  const [returnFlightDate, setReturnFlightDate] = useState('')
-  const [searchingOutbound, setSearchingOutbound] = useState(false)
-  const [searchingReturn, setSearchingReturn] = useState(false)
-  const [flightSearchError, setFlightSearchError] = useState<{ outbound?: string; return?: string }>({})
-  // 多航段選擇狀態
-  const [outboundSegments, setOutboundSegments] = useState<FlightInfo[]>([])
-  const [returnSegments, setReturnSegments] = useState<FlightInfo[]>([])
+  // 航班查詢（使用 hook）
+  const {
+    outboundFlightNumber,
+    outboundFlightDate,
+    searchingOutbound,
+    outboundSegments,
+    returnFlightNumber,
+    returnFlightDate,
+    searchingReturn,
+    returnSegments,
+    errors: flightSearchError,
+    setOutboundFlightNumber,
+    setOutboundFlightDate,
+    setReturnFlightNumber,
+    setReturnFlightDate,
+    searchOutbound: handleSearchOutboundFlight,
+    searchReturn: handleSearchReturnFlight,
+    selectOutboundSegment: handleSelectOutboundSegment,
+    selectReturnSegment: handleSelectReturnSegment,
+    clearOutboundSegments,
+    clearReturnSegments,
+    reset: resetFlightSearch,
+  } = useFlightSearch({
+    onOutboundFound: (flight) => setFormData(prev => ({ ...prev, outboundFlight: flight })),
+    onReturnFound: (flight) => setFormData(prev => ({ ...prev, returnFlight: flight })),
+  })
 
   // 版本控制狀態
   const [selectedVersionIndex, setSelectedVersionIndex] = useState(-1) // -1 = 主版本
@@ -147,12 +162,8 @@ export function PackageItineraryDialog({
         outboundFlight: null,
         returnFlight: null,
       })
-      // 設定預設航班日期
-      setOutboundFlightDate(pkg.start_date || '')
-      setReturnFlightDate(pkg.end_date || '')
-      setOutboundFlightNumber('')
-      setReturnFlightNumber('')
-      setFlightSearchError({})
+      // 重置航班搜索狀態
+      resetFlightSearch(pkg.start_date || '', pkg.end_date || '')
 
       // 如果有 itinerary_id，直接從資料庫載入
       const loadData = async () => {
@@ -421,96 +432,6 @@ export function PackageItineraryDialog({
       }
       return newSchedule
     })
-  }
-
-  // 將 FlightData 轉換為 FlightInfo
-  const flightDataToInfo = (data: { flightNumber: string; airline: string; departure: { iata: string; time: string }; arrival: { iata: string; time: string } }): FlightInfo => ({
-    flightNumber: data.flightNumber,
-    airline: data.airline,
-    departureAirport: data.departure.iata,
-    arrivalAirport: data.arrival.iata,
-    departureTime: data.departure.time,
-    arrivalTime: data.arrival.time,
-  })
-
-  // 查詢去程航班
-  const handleSearchOutboundFlight = useCallback(async () => {
-    if (!outboundFlightNumber.trim() || !outboundFlightDate) {
-      setFlightSearchError(prev => ({ ...prev, outbound: '請輸入航班號碼和日期' }))
-      return
-    }
-    setSearchingOutbound(true)
-    setFlightSearchError(prev => ({ ...prev, outbound: undefined }))
-    setOutboundSegments([]) // 清空之前的航段選擇
-    try {
-      const result = await searchFlightAction(outboundFlightNumber.trim(), outboundFlightDate)
-      if (result.error) {
-        setFlightSearchError(prev => ({ ...prev, outbound: result.error }))
-      } else if (result.segments && result.segments.length > 1) {
-        // 多航段：顯示選擇器
-        setOutboundSegments(result.segments.map(flightDataToInfo))
-      } else if (result.data) {
-        // 單一航段：直接設定
-        setFormData(prev => ({
-          ...prev,
-          outboundFlight: flightDataToInfo(result.data!),
-        }))
-        setOutboundFlightNumber('')
-        // 顯示警告（如果資料不完整）
-        if (result.warning) {
-          setFlightSearchError(prev => ({ ...prev, outbound: result.warning }))
-        }
-      }
-    } finally {
-      setSearchingOutbound(false)
-    }
-  }, [outboundFlightNumber, outboundFlightDate])
-
-  // 選擇去程航段
-  const handleSelectOutboundSegment = (segment: FlightInfo) => {
-    setFormData(prev => ({ ...prev, outboundFlight: segment }))
-    setOutboundSegments([])
-    setOutboundFlightNumber('')
-  }
-
-  // 查詢回程航班
-  const handleSearchReturnFlight = useCallback(async () => {
-    if (!returnFlightNumber.trim() || !returnFlightDate) {
-      setFlightSearchError(prev => ({ ...prev, return: '請輸入航班號碼和日期' }))
-      return
-    }
-    setSearchingReturn(true)
-    setFlightSearchError(prev => ({ ...prev, return: undefined }))
-    setReturnSegments([]) // 清空之前的航段選擇
-    try {
-      const result = await searchFlightAction(returnFlightNumber.trim(), returnFlightDate)
-      if (result.error) {
-        setFlightSearchError(prev => ({ ...prev, return: result.error }))
-      } else if (result.segments && result.segments.length > 1) {
-        // 多航段：顯示選擇器
-        setReturnSegments(result.segments.map(flightDataToInfo))
-      } else if (result.data) {
-        // 單一航段：直接設定
-        setFormData(prev => ({
-          ...prev,
-          returnFlight: flightDataToInfo(result.data!),
-        }))
-        setReturnFlightNumber('')
-        // 顯示警告（如果資料不完整）
-        if (result.warning) {
-          setFlightSearchError(prev => ({ ...prev, return: result.warning }))
-        }
-      }
-    } finally {
-      setSearchingReturn(false)
-    }
-  }, [returnFlightNumber, returnFlightDate])
-
-  // 選擇回程航段
-  const handleSelectReturnSegment = (segment: FlightInfo) => {
-    setFormData(prev => ({ ...prev, returnFlight: segment }))
-    setReturnSegments([])
-    setReturnFlightNumber('')
   }
 
   // 檢查住宿是否填寫完整（AI 排行程前置條件）
@@ -1437,7 +1358,7 @@ export function PackageItineraryDialog({
                         </div>
                         <button
                           type="button"
-                          onClick={() => setOutboundSegments([])}
+                          onClick={clearOutboundSegments}
                           className="text-xs text-morandi-secondary hover:text-morandi-primary"
                         >
                           取消
@@ -1532,7 +1453,7 @@ export function PackageItineraryDialog({
                         </div>
                         <button
                           type="button"
-                          onClick={() => setReturnSegments([])}
+                          onClick={clearReturnSegments}
                           className="text-xs text-morandi-secondary hover:text-morandi-primary"
                         >
                           取消

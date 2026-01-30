@@ -218,6 +218,15 @@ export function useFlightSearch({
     }))
   }, [])
 
+  // 清除航段選擇
+  const clearOutboundSegments = useCallback(() => {
+    setState(prev => ({ ...prev, outboundSegments: [] }))
+  }, [])
+
+  const clearReturnSegments = useCallback(() => {
+    setState(prev => ({ ...prev, returnSegments: [] }))
+  }, [])
+
   // 重置狀態
   const reset = useCallback((outboundDate?: string, returnDate?: string) => {
     setState({
@@ -254,6 +263,8 @@ export function useFlightSearch({
     searchReturn,
     selectOutboundSegment,
     selectReturnSegment,
+    clearOutboundSegments,
+    clearReturnSegments,
     clearError,
     reset,
   }
