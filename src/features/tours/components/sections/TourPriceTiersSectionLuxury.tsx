@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import type { TourPageData } from '@/features/tours/types/tour-display.types'
 
 // Luxury 配色
 const LUXURY = {
@@ -13,19 +14,8 @@ const LUXURY = {
   muted: '#636E72',
 }
 
-interface PriceTier {
-  label: string
-  sublabel?: string
-  price: string
-  priceNote?: string
-  addon?: string
-}
-
 interface TourPriceTiersSectionLuxuryProps {
-  data: {
-    showPriceTiers?: boolean
-    priceTiers?: PriceTier[] | null
-  }
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
 }
 

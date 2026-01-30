@@ -3,22 +3,10 @@
 import { cn } from '@/lib/utils'
 import { Users } from 'lucide-react'
 import { SectionTitle } from './SectionTitle'
-
-interface PriceTier {
-  label: string
-  sublabel?: string
-  price: string
-  priceNote?: string
-  addon?: string
-}
-
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
+import type { TourPageData, CoverStyleType } from '@/features/tours/types/tour-display.types'
 
 interface TourPriceTiersSectionProps {
-  data: {
-    showPriceTiers?: boolean
-    priceTiers?: PriceTier[]
-  }
+  data: TourPageData
   viewMode?: 'desktop' | 'mobile'
   coverStyle?: CoverStyleType
 }
