@@ -1,22 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-
-interface HotelData {
-  image?: string
-  images?: string[]
-  name?: string
-  description?: string
-  location?: string
-}
-
-interface TourData {
-  showHotels?: boolean
-  hotels?: HotelData[]
-}
+import type { TourPageData, HotelInfo } from '@/features/tours/types/tour-display.types'
 
 interface TourHotelsSectionCollageProps {
-  data: TourData
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
 }
 
@@ -28,7 +16,7 @@ const rotations = ['rotate-1', '-rotate-2', 'rotate-2', '-rotate-1']
 const hoverRotations = ['-rotate-1', 'rotate-1', 'rotate-0', 'rotate-2']
 
 // 取得飯店圖片
-function getHotelImage(hotel: HotelData): string | null {
+function getHotelImage(hotel: HotelInfo): string | null {
   if (hotel.images && hotel.images.length > 0) {
     return hotel.images[0]
   }

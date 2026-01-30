@@ -25,30 +25,26 @@ const SCRAPBOOK = {
   purple: '#bdb2ff',
 }
 
+import type { TourPageData, CoverStyleType } from '@/features/tours/types/tour-display.types'
+
 // 卡片風格類型
 export type FeatureCardStyle = 'polaroid' | 'diptych' | 'frame' | 'recipe'
 
+// Collage 專用的 Feature 擴展類型
 interface CollageFeature {
   icon?: string
   title: string
   description: string
   images?: string[]
-  cardStyle?: FeatureCardStyle // 大卡片可選風格
-  tags?: string[] // recipe 風格用的標籤
-}
-
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
-
-interface TourData {
-  features?: CollageFeature[]
-  [key: string]: unknown
+  cardStyle?: FeatureCardStyle
+  tags?: string[]
 }
 
 interface TourFeaturesSectionCollageProps {
-  data: TourData
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
   coverStyle?: CoverStyleType
-  displayMode?: 'large' | 'small' // large = 3 per row, small = 4 per row (recipe)
+  displayMode?: 'large' | 'small'
 }
 
 // ============================================

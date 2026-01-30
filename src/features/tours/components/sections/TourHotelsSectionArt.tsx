@@ -3,27 +3,15 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-
-interface HotelData {
-  image?: string
-  images?: string[]
-  name?: string
-  description?: string
-  location?: string
-}
-
-interface TourData {
-  showHotels?: boolean
-  hotels?: HotelData[]
-}
+import type { TourPageData, HotelInfo } from '@/features/tours/types/tour-display.types'
 
 interface TourHotelsSectionArtProps {
-  data: TourData
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
 }
 
 // 取得飯店圖片（相容新舊版）
-function getHotelImages(hotel: HotelData): string[] {
+function getHotelImages(hotel: HotelInfo): string[] {
   if (hotel.images && hotel.images.length > 0) {
     return hotel.images
   }

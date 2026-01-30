@@ -160,6 +160,7 @@ export interface HotelInfo {
   description: string
   image?: string // 舊版單張圖片（向後相容）
   images?: string[] // 新版多張圖片（最多4張）
+  location?: string // 飯店位置（Art/Collage 風格用）
 }
 
 export interface DailyActivity {

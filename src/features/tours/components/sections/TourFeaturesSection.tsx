@@ -6,31 +6,25 @@ import { morandiColors } from '@/lib/constants/morandi-colors'
 import { SectionTitle } from './SectionTitle'
 import { TourFeaturesSectionCollage, type FeatureCardStyle } from './TourFeaturesSectionCollage'
 import { TourFeaturesSectionArt } from './TourFeaturesSectionArt'
+import type { TourPageData, CoverStyleType, FeaturesStyleType } from '@/features/tours/types/tour-display.types'
 
+// 擴展 Feature 類型（增加 icon component 和 collage 專用欄位）
 interface TourFeature {
   icon: string
   title: string
   description: string
-  images?: string[] // 圖片陣列（支援任意數量）
+  images?: string[]
   iconComponent?: React.ComponentType<{ className?: string; style?: React.CSSProperties }>
-  cardStyle?: FeatureCardStyle // Collage 風格專用：polaroid | diptych | frame | recipe
-  tags?: string[] // Collage recipe 風格用的標籤
-}
-
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
-type FeaturesStyleType = 'original' | 'luxury' | 'collage' | 'art'
-
-interface TourData {
-  features?: TourFeature[]
-  [key: string]: unknown
+  cardStyle?: FeatureCardStyle
+  tags?: string[]
 }
 
 interface TourFeaturesSectionProps {
-  data: TourData
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
   coverStyle?: CoverStyleType
-  featuresStyle?: FeaturesStyleType // 優先使用此欄位決定風格
-  collageDisplayMode?: 'large' | 'small' // Collage 專用：large=3列大卡, small=4列小卡(recipe)
+  featuresStyle?: FeaturesStyleType
+  collageDisplayMode?: 'large' | 'small'
 }
 
 export function TourFeaturesSection({ data, viewMode, coverStyle = 'original', featuresStyle, collageDisplayMode = 'large' }: TourFeaturesSectionProps) {

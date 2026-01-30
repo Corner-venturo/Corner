@@ -1,22 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-
-interface TourFeature {
-  icon?: string
-  title: string
-  description: string
-  images?: string[]
-  date?: string
-}
-
-interface TourData {
-  features?: TourFeature[]
-  [key: string]: unknown
-}
+import type { TourPageData } from '@/features/tours/types/tour-display.types'
 
 interface TourFeaturesSectionArtProps {
-  data: TourData
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
 }
 

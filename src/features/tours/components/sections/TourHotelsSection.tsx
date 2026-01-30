@@ -4,29 +4,17 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { SectionTitle } from './SectionTitle'
 import { TourHotelsSectionArt } from './TourHotelsSectionArt'
 import { TourHotelsSectionCollage } from './TourHotelsSectionCollage'
-
-interface HotelData {
-  image?: string // 舊版單張圖片（向後相容）
-  images?: string[] // 新版多張圖片
-  name?: string
-  description?: string
-}
-
-interface TourData {
-  showHotels?: boolean
-  hotels?: HotelData[]
-}
-
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
+import type { TourPageData, CoverStyleType, HotelInfo } from '@/features/tours/types/tour-display.types'
 
 interface TourHotelsSectionProps {
-  data: TourData
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
   coverStyle?: CoverStyleType
 }
 
+
 // 取得飯店圖片（相容新舊版）
-function getHotelImages(hotel: HotelData): string[] {
+function getHotelImages(hotel: HotelInfo): string[] {
   if (hotel.images && hotel.images.length > 0) {
     return hotel.images
   }
