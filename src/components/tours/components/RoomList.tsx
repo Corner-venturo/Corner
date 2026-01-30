@@ -11,12 +11,10 @@ import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
 import { calculateRoomNumbers, getRoomDisplayName, getRoomTypeKey } from '../hooks/room-utils'
 import { CurrencyCell } from '@/components/table-cells'
+import type { OrderMember } from '@/components/orders/order-member.types'
 
-interface OrderMember {
-  id: string
-  chinese_name: string | null
-  passport_name: string | null
-}
+// 此元件只需要 OrderMember 的部分欄位
+type MemberBasic = Pick<OrderMember, 'id' | 'chinese_name' | 'passport_name'>
 
 interface RoomListProps {
   rooms: TourRoomStatus[]
@@ -24,7 +22,7 @@ interface RoomListProps {
   showFullRooms: boolean
   selectedRoomType: string | null
   continueFromPrevious: Set<number>
-  getRoomMembers: (roomId: string) => Array<{ assignment: { id: string }; member?: OrderMember }>
+  getRoomMembers: (roomId: string) => Array<{ assignment: { id: string }; member?: MemberBasic }>
   onToggleShowFull: () => void
   onToggleContinue: (night: number) => void
   onClearRoom: (roomId: string) => void

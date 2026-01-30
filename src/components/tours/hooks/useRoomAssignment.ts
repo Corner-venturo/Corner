@@ -5,17 +5,15 @@ import { useAuthStore } from '@/stores'
 import type { TourRoomStatus } from '@/types/room-vehicle.types'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
+import type { OrderMember } from '@/components/orders/order-member.types'
 
-interface OrderMember {
-  id: string
-  chinese_name: string | null
-  passport_name: string | null
-}
+// 此 hook 只需要 OrderMember 的部分欄位
+type MemberBasic = Pick<OrderMember, 'id' | 'chinese_name' | 'passport_name'>
 
 interface UseRoomAssignmentProps {
   rooms: TourRoomStatus[]
   assignments: Array<{ id: string; room_id: string; order_member_id: string }>
-  members: OrderMember[]
+  members: MemberBasic[]
   reload: () => void
 }
 

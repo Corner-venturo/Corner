@@ -6,6 +6,7 @@ import { prepareContractData, ContractData } from '@/lib/contract-utils'
 import { alert, alertSuccess, alertError } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import type { OrderMember } from '@/components/orders/order-member.types'
 
 interface UseContractFormProps {
   tour: Tour
@@ -13,16 +14,9 @@ interface UseContractFormProps {
   isOpen: boolean
 }
 
-// order_members 表的成員類型
-interface OrderMember {
-  id: string
-  order_id: string
-  chinese_name: string | null
-  id_number: string | null
-  passport_name: string | null
-  gender: string | null
-  birth_date: string | null
-  contract_created_at: string | null
+// 合約專用的成員類型（擴展標準 OrderMember）
+type ContractMember = Pick<OrderMember, 'id' | 'order_id' | 'chinese_name' | 'id_number' | 'passport_name' | 'gender' | 'birth_date'> & {
+  contract_created_at?: string | null
   name?: string // 兼容舊資料
 }
 
@@ -42,7 +36,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
   const [isCorporateContract, setIsCorporateContract] = useState(false)
 
   // 直接從 order_members 表載入的成員資料
-  const [orderMembers, setOrderMembers] = useState<OrderMember[]>([])
+  const [orderMembers, setOrderMembers] = useState<ContractMember[]>([])
   const [membersLoading, setMembersLoading] = useState(false)
 
   // 取得這個團的資料

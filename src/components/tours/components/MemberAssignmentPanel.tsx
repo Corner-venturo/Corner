@@ -6,17 +6,15 @@ import { Input } from '@/components/ui/input'
 import { ROOM_TYPES } from '@/types/room-vehicle.types'
 import type { TourRoomStatus } from '@/types/room-vehicle.types'
 import { calculateRoomNumbers } from '../hooks/room-utils'
+import type { OrderMember } from '@/components/orders/order-member.types'
 
-interface OrderMember {
-  id: string
-  chinese_name: string | null
-  passport_name: string | null
-}
+// 此元件只需要 OrderMember 的部分欄位
+type MemberForAssignment = Pick<OrderMember, 'id' | 'chinese_name' | 'passport_name'>
 
 interface MemberAssignmentPanelProps {
   rooms: TourRoomStatus[]
   selectedNight: number
-  unassignedMembers: OrderMember[]
+  unassignedMembers: MemberForAssignment[]
   totalAssigned: number
   totalCapacity: number
   onAssignMember: (roomId: string, memberId: string) => void

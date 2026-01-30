@@ -4,47 +4,7 @@ import { useState } from 'react'
 import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
 import type { Customer } from '@/types/customer.types'
-
-interface OrderMember {
-  id: string
-  order_id: string
-  customer_id?: string | null
-  identity?: string | null
-  chinese_name?: string | null
-  passport_name?: string | null
-  birth_date?: string | null
-  age?: number | null
-  id_number?: string | null
-  gender?: string | null
-  passport_number?: string | null
-  passport_expiry?: string | null
-  special_meal?: string | null
-  pnr?: string | null
-  flight_cost?: number | null
-  hotel_1_name?: string | null
-  hotel_1_checkin?: string | null
-  hotel_1_checkout?: string | null
-  hotel_2_name?: string | null
-  hotel_2_checkin?: string | null
-  hotel_2_checkout?: string | null
-  hotel_confirmation?: string | null
-  checked_in?: boolean | null
-  checked_in_at?: string | null
-  transport_cost?: number | null
-  misc_cost?: number | null
-  total_payable?: number | null
-  deposit_amount?: number | null
-  balance_amount?: number | null
-  deposit_receipt_no?: string | null
-  balance_receipt_no?: string | null
-  remarks?: string | null
-  cost_price?: number | null
-  selling_price?: number | null
-  profit?: number | null
-  passport_image_url?: string | null
-  customer_verification_status?: string | null
-  order_code?: string | null
-}
+import type { OrderMember } from '@/components/orders/order-member.types'
 
 export type MatchType = 'name' | 'id_number'
 

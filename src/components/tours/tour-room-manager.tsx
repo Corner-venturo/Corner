@@ -10,6 +10,7 @@ import { confirm } from '@/lib/ui/alert-dialog'
 import type { TourRoomStatus } from '@/types/room-vehicle.types'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
+import type { OrderMember } from '@/components/orders/order-member.types'
 
 // Hooks
 import { useRoomData } from './hooks/useRoomData'
@@ -22,11 +23,8 @@ import { MemberAssignmentPanel } from './components/MemberAssignmentPanel'
 import { AddRoomDialog } from './components/AddRoomDialog'
 import { EditRoomDialog } from './components/EditRoomDialog'
 
-interface OrderMember {
-  id: string
-  chinese_name: string | null
-  passport_name: string | null
-}
+// 此元件只需要 OrderMember 的部分欄位
+type MemberBasic = Pick<OrderMember, 'id' | 'chinese_name' | 'passport_name'>
 
 interface TourInfo {
   id: string
@@ -37,7 +35,7 @@ interface TourInfo {
 interface TourRoomManagerProps {
   tourId: string
   tour?: TourInfo
-  members: OrderMember[]
+  members: MemberBasic[]
   open: boolean
   onOpenChange: (open: boolean) => void
   onClose?: () => void
