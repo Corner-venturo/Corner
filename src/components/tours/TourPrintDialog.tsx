@@ -15,81 +15,18 @@ import { useReferenceData } from '@/lib/pnr'
 import type { Tour } from '@/stores/types'
 import type { OrderMember, ExportColumnsConfig } from '@/components/orders/order-member.types'
 import type { PNR, PNRSegment } from '@/types/pnr.types'
+import {
+  COLUMN_LABELS,
+  DEFAULT_COLUMNS,
+  CLASS_NAMES,
+  STATUS_NAMES,
+} from './tour-print-constants'
 
 interface TourPrintDialogProps {
   isOpen: boolean
   tour: Tour
   members: OrderMember[]
   onClose: () => void
-}
-
-// 成員名單欄位標籤
-const COLUMN_LABELS: Record<keyof ExportColumnsConfig, string> = {
-  identity: '身份',
-  chinese_name: '中文姓名',
-  passport_name: '護照姓名',
-  birth_date: '生日',
-  gender: '性別',
-  id_number: '身分證號',
-  passport_number: '護照號碼',
-  passport_expiry: '護照效期',
-  special_meal: '特殊餐食',
-  hotel_confirmation: '訂房代號',
-  remarks: '備註',
-  // 金額相關欄位放最後
-  total_payable: '應付金額',
-  deposit_amount: '已付訂金',
-  balance: '尾款',
-}
-
-// 預設欄位選擇
-const DEFAULT_COLUMNS: ExportColumnsConfig = {
-  identity: false,
-  chinese_name: true,
-  passport_name: true,
-  birth_date: true,
-  gender: true,
-  id_number: false,
-  passport_number: true,
-  passport_expiry: true,
-  special_meal: true,
-  hotel_confirmation: false,
-  remarks: false,
-  // 金額相關欄位預設顯示
-  total_payable: true,
-  deposit_amount: true,
-  balance: true,
-}
-
-// 艙等代碼對照表
-const CLASS_NAMES: Record<string, string> = {
-  F: '頭等艙',
-  C: '商務艙',
-  J: '商務艙',
-  W: '豪華經濟艙',
-  Y: '經濟艙',
-  B: '經濟艙',
-  M: '經濟艙',
-  H: '經濟艙',
-  K: '經濟艙',
-  L: '經濟艙',
-  Q: '經濟艙',
-  T: '經濟艙',
-  V: '經濟艙',
-  X: '經濟艙',
-}
-
-// 狀態代碼對照表
-const STATUS_NAMES: Record<string, string> = {
-  HK: 'OK',
-  TK: '已開票',
-  UC: '未確認',
-  XX: '取消',
-  HX: '已刪除',
-  HL: '候補',
-  HN: '需確認',
-  LL: '候補中',
-  WL: '候補',
 }
 
 // 機場和航空公司名稱從 useReferenceData hook 取得（統一從資料庫 ref_airports, ref_airlines 表讀取）
