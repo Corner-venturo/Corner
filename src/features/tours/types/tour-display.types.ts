@@ -146,7 +146,8 @@ export interface TourPageData {
  * @see TourPageData 完整欄位定義（供參考）
  */
 export interface TourPageProps {
-  data: any // eslint-disable-line @typescript-eslint/no-explicit-any -- 技術債：待統一 section 類型
+  /** 技術債：待統一 section 類型後改用 TourPageData */
+  data: any
   isPreview?: boolean
   viewMode?: 'desktop' | 'mobile'
 }
@@ -156,6 +157,7 @@ export interface TourPageProps {
  * @see TourPageProps
  */
 export interface TourPreviewProps {
-  data: any // eslint-disable-line @typescript-eslint/no-explicit-any -- 技術債：待統一 section 類型
+  /** 技術債：待統一 section 類型後改用 TourPageData */
+  data: any
   viewMode?: 'desktop' | 'mobile'
 }
