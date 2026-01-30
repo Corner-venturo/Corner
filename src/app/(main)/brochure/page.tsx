@@ -999,6 +999,24 @@ export default function DesignerPage() {
       fabricDataToCopy = (pageToDuplicate as { fabricData?: Record<string, unknown> }).fabricData
     }
 
+    // 計算原始頁面的 dayIndex（如果是 daily 頁面且沒有 dayIndex）
+    let sourceDayIndex: number | undefined
+    const pageWithDayIndex = pageToDuplicate as CanvasPage & { dayIndex?: number }
+    if (pageToDuplicate.templateKey === 'daily') {
+      if (typeof pageWithDayIndex.dayIndex === 'number') {
+        sourceDayIndex = pageWithDayIndex.dayIndex
+      } else {
+        // 計算原始頁面應該是第幾天
+        let dailyCount = 0
+        for (let i = 0; i < index; i++) {
+          if (generatedPages[i]?.templateKey === 'daily') {
+            dailyCount++
+          }
+        }
+        sourceDayIndex = dailyCount
+      }
+    }
+
     // 建立複製的頁面（使用新 ID，確保唯一性）
     const duplicatedPage: CanvasPage = {
       ...pageToDuplicate,
@@ -1007,22 +1025,9 @@ export default function DesignerPage() {
       elements: [...pageToDuplicate.elements], // 淺複製元素陣列
     }
 
-    // 明確複製 dayIndex（如果是 daily 頁面）
-    const pageWithDayIndex = pageToDuplicate as CanvasPage & { dayIndex?: number }
-    if (pageToDuplicate.templateKey === 'daily') {
-      if (typeof pageWithDayIndex.dayIndex === 'number') {
-        // 原始頁面有 dayIndex，直接複製
-        (duplicatedPage as CanvasPage & { dayIndex?: number }).dayIndex = pageWithDayIndex.dayIndex
-      } else {
-        // 原始頁面沒有 dayIndex（舊文檔），計算正確的 dayIndex
-        let dailyCount = 0
-        for (let i = 0; i < index; i++) {
-          if (generatedPages[i]?.templateKey === 'daily') {
-            dailyCount++
-          }
-        }
-        (duplicatedPage as CanvasPage & { dayIndex?: number }).dayIndex = dailyCount
-      }
+    // 設定複製頁面的 dayIndex（與原始頁面相同）
+    if (pageToDuplicate.templateKey === 'daily' && typeof sourceDayIndex === 'number') {
+      (duplicatedPage as CanvasPage & { dayIndex?: number }).dayIndex = sourceDayIndex
     }
 
     // 如果有 fabricData，也要複製
@@ -1030,9 +1035,24 @@ export default function DesignerPage() {
       (duplicatedPage as { fabricData?: Record<string, unknown> }).fabricData = JSON.parse(JSON.stringify(fabricDataToCopy))
     }
 
-    // 插入到原頁面後面
+    // 插入複製的頁面，並為舊文檔的 daily 頁面補上 dayIndex
     setGeneratedPages(prev => {
-      const newPages = [...prev]
+      // 先為所有沒有 dayIndex 的 daily 頁面補上正確的 dayIndex（在插入前）
+      let dailyCount = 0
+      const pagesWithFixedDayIndex = prev.map((page) => {
+        if (page.templateKey === 'daily') {
+          const p = page as CanvasPage & { dayIndex?: number }
+          if (typeof p.dayIndex !== 'number') {
+            // 舊文檔沒有 dayIndex，補上
+            return { ...page, dayIndex: dailyCount++ }
+          }
+          dailyCount++
+        }
+        return page
+      })
+      
+      // 插入複製的頁面（dayIndex 與原始頁面相同）
+      const newPages = [...pagesWithFixedDayIndex]
       newPages.splice(index + 1, 0, duplicatedPage)
       return newPages
     })
