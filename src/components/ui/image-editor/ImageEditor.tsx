@@ -4,7 +4,6 @@ import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Slider } from '@/components/ui/slider'
 import {
   RotateCcw,
   RotateCw,
@@ -13,103 +12,28 @@ import {
   Crop,
   Loader2,
   Wand2,
-  Sparkles,
-  Sun,
-  Cloud,
-  Leaf,
-  Snowflake,
-  Camera,
-  Utensils,
-  Building,
-  Trees,
   Move,
+  Sun,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 
-// ============ Types ============
+// 拆分模組
+import { AdjustmentSlider } from './AdjustmentSlider'
+import { applyAdjustmentsToImage, cropImage, uploadBase64ToStorage } from './image-utils'
+import {
+  type ImageAdjustments,
+  type ImageEditorSettings,
+  type AiEditAction,
+  DEFAULT_ADJUSTMENTS,
+  DEFAULT_SETTINGS,
+  AI_ACTIONS,
+} from './types'
 
-export interface ImageAdjustments {
-  exposure: number
-  contrast: number
-  highlights: number
-  shadows: number
-  saturation: number
-  temperature: number
-  tint: number
-  clarity: number
-  vignette: number
-}
-
-export interface ImageEditorSettings {
-  /** 縮放倍率 */
-  scale: number
-  /** 位置 X (0-100) */
-  x: number
-  /** 位置 Y (0-100) */
-  y: number
-  /** 旋轉角度 (0, 90, 180, 270) */
-  rotation: number
-  /** 水平翻轉 */
-  flipH: boolean
-  /** 色彩調整 */
-  adjustments: ImageAdjustments
-}
-
-export const DEFAULT_ADJUSTMENTS: ImageAdjustments = {
-  exposure: 0,
-  contrast: 0,
-  highlights: 0,
-  shadows: 0,
-  saturation: 0,
-  temperature: 0,
-  tint: 0,
-  clarity: 0,
-  vignette: 0,
-}
-
-export const DEFAULT_SETTINGS: ImageEditorSettings = {
-  scale: 1,
-  x: 50,
-  y: 50,
-  rotation: 0,
-  flipH: false,
-  adjustments: { ...DEFAULT_ADJUSTMENTS },
-}
-
-// AI 編輯動作
-type AiEditAction =
-  | 'clean_scene'
-  | 'landscape_pro'
-  | 'travel_magazine'
-  | 'food_delicious'
-  | 'architecture_dramatic'
-  | 'golden_hour'
-  | 'blue_hour'
-  | 'season_spring'
-  | 'season_summer'
-  | 'season_autumn'
-  | 'season_winter'
-
-interface AiAction {
-  action: AiEditAction
-  label: string
-  icon: React.ElementType
-}
-
-const AI_ACTIONS: AiAction[] = [
-  { action: 'clean_scene', label: '淨空場景', icon: Sparkles },
-  { action: 'landscape_pro', label: '風景大師', icon: Trees },
-  { action: 'travel_magazine', label: '旅遊雜誌', icon: Camera },
-  { action: 'food_delicious', label: '美食攝影', icon: Utensils },
-  { action: 'architecture_dramatic', label: '建築攝影', icon: Building },
-  { action: 'golden_hour', label: '黃金時刻', icon: Sun },
-  { action: 'blue_hour', label: '藍調時刻', icon: Cloud },
-  { action: 'season_spring', label: '春季櫻花', icon: Leaf },
-  { action: 'season_autumn', label: '秋楓紅葉', icon: Leaf },
-  { action: 'season_winter', label: '冬季雪景', icon: Snowflake },
-]
+// Re-export types
+export type { ImageAdjustments, ImageEditorSettings } from './types'
+export { DEFAULT_ADJUSTMENTS, DEFAULT_SETTINGS } from './types'
 
 // ============ Props ============
 
@@ -631,249 +555,3 @@ export function ImageEditor({
   )
 }
 
-// ============ Sub Components ============
-
-interface AdjustmentSliderProps {
-  label: string
-  value: number
-  min?: number
-  max?: number
-  onChange: (value: number) => void
-}
-
-function AdjustmentSlider({ label, value, min = -100, max = 100, onChange }: AdjustmentSliderProps) {
-  return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-morandi-secondary">{label}</span>
-        <span className="text-xs text-morandi-muted w-10 text-right">
-          {value > 0 ? `+${value}` : value}
-        </span>
-      </div>
-      <Slider
-        value={[value]}
-        min={min}
-        max={max}
-        step={1}
-        onValueChange={(values) => onChange(values[0])}
-        className="w-full"
-      />
-    </div>
-  )
-}
-
-// ============ Helpers ============
-
-async function applyAdjustmentsToImage(
-  src: string,
-  adjustments: ImageAdjustments
-): Promise<string> {
-  // 如果沒有調整，直接返回原圖
-  const hasChanges = Object.values(adjustments).some((v) => v !== 0)
-  if (!hasChanges) return src
-
-  return new Promise((resolve) => {
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.onload = () => {
-      const canvas = document.createElement('canvas')
-      const ctx = canvas.getContext('2d')
-      if (!ctx) {
-        resolve(src)
-        return
-      }
-
-      canvas.width = img.width
-      canvas.height = img.height
-
-      // 基本繪製
-      ctx.drawImage(img, 0, 0)
-
-      // 獲取像素數據
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-      const data = imageData.data
-
-      // 應用調整
-      for (let i = 0; i < data.length; i += 4) {
-        let r = data[i]
-        let g = data[i + 1]
-        let b = data[i + 2]
-
-        // 曝光度
-        if (adjustments.exposure !== 0) {
-          const factor = 1 + adjustments.exposure / 100
-          r = Math.min(255, r * factor)
-          g = Math.min(255, g * factor)
-          b = Math.min(255, b * factor)
-        }
-
-        // 對比度
-        if (adjustments.contrast !== 0) {
-          const factor = (259 * (adjustments.contrast + 255)) / (255 * (259 - adjustments.contrast))
-          r = factor * (r - 128) + 128
-          g = factor * (g - 128) + 128
-          b = factor * (b - 128) + 128
-        }
-
-        // 飽和度
-        if (adjustments.saturation !== 0) {
-          const gray = 0.2989 * r + 0.587 * g + 0.114 * b
-          const factor = 1 + adjustments.saturation / 100
-          r = gray + factor * (r - gray)
-          g = gray + factor * (g - gray)
-          b = gray + factor * (b - gray)
-        }
-
-        // 色溫
-        if (adjustments.temperature !== 0) {
-          const temp = adjustments.temperature / 100
-          r = r + temp * 30
-          b = b - temp * 30
-        }
-
-        // 限制範圍
-        data[i] = Math.max(0, Math.min(255, r))
-        data[i + 1] = Math.max(0, Math.min(255, g))
-        data[i + 2] = Math.max(0, Math.min(255, b))
-      }
-
-      ctx.putImageData(imageData, 0, 0)
-      resolve(canvas.toDataURL('image/jpeg', 0.9))
-    }
-    img.onerror = () => resolve(src)
-    img.src = src
-  })
-}
-
-async function cropImage(
-  src: string,
-  settings: ImageEditorSettings,
-  aspectRatio: number
-): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.onload = () => {
-      // 先處理旋轉/翻轉
-      const isRotated90 = settings.rotation === 90 || settings.rotation === 270
-      const srcWidth = isRotated90 ? img.height : img.width
-      const srcHeight = isRotated90 ? img.width : img.height
-
-      // 建立臨時 canvas 來應用旋轉/翻轉
-      const tempCanvas = document.createElement('canvas')
-      const tempCtx = tempCanvas.getContext('2d')
-      if (!tempCtx) {
-        reject(new Error('Canvas context not available'))
-        return
-      }
-
-      tempCanvas.width = srcWidth
-      tempCanvas.height = srcHeight
-
-      // 應用變換
-      tempCtx.translate(srcWidth / 2, srcHeight / 2)
-      tempCtx.rotate((settings.rotation * Math.PI) / 180)
-      if (settings.flipH) {
-        tempCtx.scale(-1, 1)
-      }
-      tempCtx.drawImage(img, -img.width / 2, -img.height / 2)
-
-      // 現在從變換後的圖片裁切
-      const canvas = document.createElement('canvas')
-      const ctx = canvas.getContext('2d')
-      if (!ctx) {
-        reject(new Error('Canvas context not available'))
-        return
-      }
-
-      // 計算裁切區域
-      const imgRatio = srcWidth / srcHeight
-      let cropWidth: number, cropHeight: number, cropX: number, cropY: number
-
-      if (imgRatio > aspectRatio) {
-        // 圖片較寬，以高度為基準
-        cropHeight = srcHeight / settings.scale
-        cropWidth = cropHeight * aspectRatio
-      } else {
-        // 圖片較高，以寬度為基準
-        cropWidth = srcWidth / settings.scale
-        cropHeight = cropWidth / aspectRatio
-      }
-
-      // 根據位置計算偏移
-      const maxOffsetX = srcWidth - cropWidth
-      const maxOffsetY = srcHeight - cropHeight
-      cropX = (settings.x / 100) * maxOffsetX
-      cropY = (settings.y / 100) * maxOffsetY
-
-      // 設定輸出尺寸
-      canvas.width = cropWidth
-      canvas.height = cropHeight
-
-      ctx.drawImage(
-        tempCanvas,
-        cropX,
-        cropY,
-        cropWidth,
-        cropHeight,
-        0,
-        0,
-        cropWidth,
-        cropHeight
-      )
-
-      canvas.toBlob(
-        (blob) => {
-          if (blob) {
-            resolve(blob)
-          } else {
-            reject(new Error('Canvas to Blob failed'))
-          }
-        },
-        'image/jpeg',
-        0.9
-      )
-    }
-    img.onerror = () => reject(new Error('Image load failed'))
-    img.src = src
-  })
-}
-
-async function uploadBase64ToStorage(
-  base64Data: string
-): Promise<{ success: boolean; url?: string }> {
-  try {
-    const { supabase } = await import('@/lib/supabase/client')
-
-    const matches = base64Data.match(/^data:([^;]+);base64,(.+)$/)
-    if (!matches) return { success: false }
-
-    const mimeType = matches[1]
-    const base64 = matches[2]
-    const ext = mimeType.split('/')[1] || 'png'
-
-    const byteCharacters = atob(base64)
-    const byteNumbers = new Array(byteCharacters.length)
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i)
-    }
-    const byteArray = new Uint8Array(byteNumbers)
-    const blob = new Blob([byteArray], { type: mimeType })
-
-    const fileName = `ai-edited/${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${ext}`
-    const { error: uploadError } = await supabase.storage
-      .from('workspace-files')
-      .upload(fileName, blob)
-
-    if (uploadError) {
-      logger.error('上傳失敗:', uploadError)
-      return { success: false }
-    }
-
-    const { data } = supabase.storage.from('workspace-files').getPublicUrl(fileName)
-    return { success: true, url: data.publicUrl }
-  } catch (error) {
-    logger.error('uploadBase64ToStorage 錯誤:', error)
-    return { success: false }
-  }
-}
