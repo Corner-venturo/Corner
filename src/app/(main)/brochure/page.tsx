@@ -2186,19 +2186,77 @@ export default function DesignerPage() {
       // 保留：新增時間軸項目的邏輯（上方的 newLen > oldLen 處理）
     }
 
-    // 2025-01-22 修改：停止自動同步 templateData 到畫布元素
-    // 原因：用戶明確要求「載入行程就只有這麼一次，不要再不斷地幫我把版本回朔」
-    // 畫布上的編輯應該被保留，不被 templateData 覆蓋
-    //
-    // 原本的邏輯會在 templateData 變化時自動更新畫布元素文字：
-    // - 每日標題、餐食、封面資訊、集合/領隊資訊等
-    // 現在這些都不再自動更新，用戶的畫布編輯會被保留
-    //
-    // 如果用戶想重新從行程載入資料，應該：
-    // 1. 刪除該頁面
-    // 2. 重新添加相同類型的頁面
-    // 或
-    // 1. 手動在畫布上編輯文字
+    // ============================================
+    // 雙向綁定：templateData → 畫布元素
+    // 只更新有變化的欄位，避免整頁重繪
+    // ============================================
+    
+    // 行程總覽頁面：更新每日行程標題、餐食、住宿
+    if (currentPage?.templateKey === 'itinerary') {
+      const oldItineraries = (oldData.dailyItineraries as Array<Record<string, unknown>>) || []
+      const newItineraries = (newData.dailyItineraries as Array<Record<string, unknown>>) || []
+      
+      const days = Math.max(oldItineraries.length, newItineraries.length)
+      for (let i = 0; i < days; i++) {
+        const oldDay = oldItineraries[i] || {}
+        const newDay = newItineraries[i] || {}
+        
+        // 標題
+        if (oldDay.title !== newDay.title && newDay.title !== undefined) {
+          updateElementByName(`第${i + 1}天內容`, { text: String(newDay.title).replace(/>/g, ' ／ ').replace(/＞/g, ' ／ ') })
+        }
+        
+        // 餐食
+        const oldMeals = (oldDay.meals as Record<string, string>) || {}
+        const newMeals = (newDay.meals as Record<string, string>) || {}
+        if (oldMeals.breakfast !== newMeals.breakfast && newMeals.breakfast !== undefined) {
+          updateElementByName(`第${i + 1}天早餐`, { text: newMeals.breakfast })
+        }
+        if (oldMeals.lunch !== newMeals.lunch && newMeals.lunch !== undefined) {
+          updateElementByName(`第${i + 1}天午餐`, { text: newMeals.lunch })
+        }
+        if (oldMeals.dinner !== newMeals.dinner && newMeals.dinner !== undefined) {
+          updateElementByName(`第${i + 1}天晚餐`, { text: newMeals.dinner })
+        }
+        
+        // 住宿
+        if (oldDay.accommodation !== newDay.accommodation && newDay.accommodation !== undefined) {
+          updateElementByName(`第${i + 1}天住宿`, { text: String(newDay.accommodation) })
+        }
+      }
+    }
+    
+    // 封面頁面：更新標題、副標題、目的地等
+    if (currentPage?.templateKey === 'cover' || currentPage?.templateKey === 'japanese-style-v1') {
+      if (oldData.mainTitle !== newData.mainTitle && newData.mainTitle !== undefined) {
+        updateElementByName('主標題', { text: String(newData.mainTitle) })
+      }
+      if (oldData.subtitle !== newData.subtitle && newData.subtitle !== undefined) {
+        updateElementByName('副標題', { text: String(newData.subtitle) })
+      }
+      if (oldData.destination !== newData.destination && newData.destination !== undefined) {
+        updateElementByName('目的地', { text: String(newData.destination) })
+      }
+      if (oldData.travelDates !== newData.travelDates && newData.travelDates !== undefined) {
+        updateElementByName('旅遊日期', { text: String(newData.travelDates) })
+      }
+    }
+    
+    // 行程總覽頁面：集合/領隊資訊
+    if (currentPage?.templateKey === 'itinerary' || currentPage?.templateKey === 'japanese-style-v1-itinerary') {
+      if (oldData.meetingTime !== newData.meetingTime || oldData.meetingPlace !== newData.meetingPlace) {
+        const meeting = [newData.meetingTime, newData.meetingPlace].filter(Boolean).join(' ')
+        if (meeting) {
+          updateElementByName('集合文字', { text: `集合 ${meeting}` })
+        }
+      }
+      if (oldData.leaderName !== newData.leaderName || oldData.leaderPhone !== newData.leaderPhone) {
+        const leader = [newData.leaderName, newData.leaderPhone].filter(Boolean).join(' ')
+        if (leader) {
+          updateElementByName('領隊文字', { text: `領隊 ${leader}` })
+        }
+      }
+    }
   }, [templateData, isCanvasReady, updateElementByName, generatedPages, currentPageIndex, currentDayIndex, selectedStyle, loadCanvasPage])
 
   // ============================================
