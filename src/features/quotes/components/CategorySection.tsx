@@ -24,6 +24,7 @@ import {
 import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { RatesDetailDialog } from '@/features/transportation-rates/components/RatesDetailDialog'
 import { TransportationRate } from '@/types/transportation-rates.types'
+import type { Country as FullCountry } from '@/stores/region-store'
 
 const categoryIcons: Record<string, React.ElementType> = {
   transport: Car,
@@ -49,11 +50,8 @@ interface CategoryTransportationRate {
   category?: string
 }
 
-interface Country {
-  id: string
-  name: string
-  emoji: string | null
-}
+// 此元件只需要 Country 的部分欄位
+type Country = Pick<FullCountry, 'id' | 'name' | 'emoji'>
 
 interface CategorySectionProps {
   category: CostCategory

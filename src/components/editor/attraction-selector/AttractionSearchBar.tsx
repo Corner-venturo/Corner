@@ -5,16 +5,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Search, PenLine, Plus } from 'lucide-react'
+import type { Country as FullCountry, City as FullCity } from '@/stores/region-store'
 
-interface City {
-  id: string
-  name: string
-}
-
-interface Country {
-  id: string
-  name: string
-}
+// 此元件只需要 id 和 name
+type City = Pick<FullCity, 'id' | 'name'>
+type Country = Pick<FullCountry, 'id' | 'name'>
 
 interface AttractionSearchBarProps {
   countries: Country[]

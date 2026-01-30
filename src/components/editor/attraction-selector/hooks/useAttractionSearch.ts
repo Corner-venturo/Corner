@@ -3,6 +3,11 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { Attraction } from '@/features/attractions/types'
+import type { Country as FullCountry, City as FullCity } from '@/stores/region-store'
+
+// 此 hook 只需要 id 和 name
+type City = Pick<FullCity, 'id' | 'name'>
+type Country = Pick<FullCountry, 'id' | 'name'>
 
 interface AttractionWithCity extends Attraction {
   city_name?: string
@@ -53,16 +58,6 @@ interface UseAttractionSearchProps {
   isOpen: boolean
   tourCountryName?: string
   dayTitle?: string
-}
-
-interface City {
-  id: string
-  name: string
-}
-
-interface Country {
-  id: string
-  name: string
 }
 
 export function useAttractionSearch({

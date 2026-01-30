@@ -9,6 +9,7 @@ import useSWR, { mutate } from 'swr'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { useAuthStore } from '@/stores/auth-store'
+import type { Country as FullCountry } from '@/stores/region-store'
 
 export interface TourDestination {
   id: string
@@ -18,10 +19,8 @@ export interface TourDestination {
   created_at: string | null
 }
 
-interface Country {
-  id: string
-  name: string
-  name_en: string
+// 此 hook 只需要 Country 的部分欄位（usage_count 可能是 null）
+type Country = Pick<FullCountry, 'id' | 'name' | 'name_en'> & {
   usage_count?: number | null
 }
 
