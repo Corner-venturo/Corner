@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { DatePicker } from '@/components/ui/date-picker'
 import { useAuthStore } from '@/stores'
-import { useFlightSearch } from '../hooks'
+import { useFlightSearch } from '@/hooks'
 import { useItineraries, createItinerary } from '@/data'
 import { supabase } from '@/lib/supabase/client'
 import { dynamicFrom } from '@/lib/supabase/typed-client'
@@ -82,31 +82,50 @@ export function PackageItineraryDialog({
     outboundFlight: null,
     returnFlight: null,
   })
-  // 航班查詢（使用 hook）
+  // 航班搜尋輸入 state
+  const [outboundFlightNumber, setOutboundFlightNumber] = useState('')
+  const [outboundFlightDate, setOutboundFlightDate] = useState('')
+  const [returnFlightNumber, setReturnFlightNumber] = useState('')
+  const [returnFlightDate, setReturnFlightDate] = useState('')
+
+  // 搜尋用的臨時航班 state（只存 flightNumber）
+  const [searchOutboundFlight, setSearchOutboundFlight] = useState<FlightInfo | null>(null)
+  const [searchReturnFlight, setSearchReturnFlight] = useState<FlightInfo | null>(null)
+
+  // 當輸入改變時，更新搜尋用 state
+  useEffect(() => {
+    setSearchOutboundFlight(outboundFlightNumber ? { flightNumber: outboundFlightNumber } : null)
+  }, [outboundFlightNumber])
+
+  useEffect(() => {
+    setSearchReturnFlight(returnFlightNumber ? { flightNumber: returnFlightNumber } : null)
+  }, [returnFlightNumber])
+
+  // 航班查詢（使用共用 hook）
   const {
-    outboundFlightNumber,
-    outboundFlightDate,
-    searchingOutbound,
+    loadingOutboundFlight: searchingOutbound,
+    loadingReturnFlight: searchingReturn,
     outboundSegments,
-    returnFlightNumber,
-    returnFlightDate,
-    searchingReturn,
     returnSegments,
-    errors: flightSearchError,
-    setOutboundFlightNumber,
-    setOutboundFlightDate,
-    setReturnFlightNumber,
-    setReturnFlightDate,
-    searchOutbound: handleSearchOutboundFlight,
-    searchReturn: handleSearchReturnFlight,
-    selectOutboundSegment: handleSelectOutboundSegment,
-    selectReturnSegment: handleSelectReturnSegment,
+    handleSearchOutboundFlight,
+    handleSearchReturnFlight,
+    handleSelectOutboundSegment,
+    handleSelectReturnSegment,
     clearOutboundSegments,
     clearReturnSegments,
-    reset: resetFlightSearch,
   } = useFlightSearch({
-    onOutboundFound: (flight) => setFormData(prev => ({ ...prev, outboundFlight: flight })),
-    onReturnFound: (flight) => setFormData(prev => ({ ...prev, returnFlight: flight })),
+    outboundFlight: searchOutboundFlight,
+    setOutboundFlight: (flight) => {
+      setFormData(prev => ({ ...prev, outboundFlight: flight }))
+      setOutboundFlightNumber('') // 清空搜尋輸入
+    },
+    returnFlight: searchReturnFlight,
+    setReturnFlight: (flight) => {
+      setFormData(prev => ({ ...prev, returnFlight: flight }))
+      setReturnFlightNumber('') // 清空搜尋輸入
+    },
+    departureDate: outboundFlightDate || pkg?.start_date || '',
+    days: String(pkg?.days || ''),
   })
 
   // 版本控制狀態
@@ -163,7 +182,10 @@ export function PackageItineraryDialog({
         returnFlight: null,
       })
       // 重置航班搜索狀態
-      resetFlightSearch(pkg.start_date || '', pkg.end_date || '')
+      setOutboundFlightNumber('')
+      setOutboundFlightDate(pkg.start_date || '')
+      setReturnFlightNumber('')
+      setReturnFlightDate(pkg.end_date || '')
 
       // 如果有 itinerary_id，直接從資料庫載入
       const loadData = async () => {
@@ -1390,9 +1412,6 @@ export function PackageItineraryDialog({
                             {searchingOutbound ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />}
                           </Button>
                         </div>
-                        {flightSearchError.outbound && (
-                          <p className="text-xs text-morandi-red">{flightSearchError.outbound}</p>
-                        )}
                       </>
                     )}
                   </div>
@@ -1485,9 +1504,6 @@ export function PackageItineraryDialog({
                             {searchingReturn ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />}
                           </Button>
                         </div>
-                        {flightSearchError.return && (
-                          <p className="text-xs text-morandi-red">{flightSearchError.return}</p>
-                        )}
                       </>
                     )}
                   </div>

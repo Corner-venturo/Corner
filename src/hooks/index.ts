@@ -56,3 +56,6 @@ export {
   type BreadcrumbItem,
   type UseBreadcrumbOptions,
 } from './useBreadcrumb'
+
+// 航班搜尋 Hook
+export { useFlightSearch } from './useFlightSearch'
