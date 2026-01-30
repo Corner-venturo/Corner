@@ -173,6 +173,102 @@ export default function DesignerPage() {
   const canvasWidth = selectedDesignType?.width ?? 559
   const canvasHeight = selectedDesignType?.height ?? 794
 
+  // ============================================
+  // 文字編輯雙向綁定：Canvas → templateData
+  // ============================================
+  const handleTextEdit = useCallback((event: { elementId: string; elementName: string; newContent: string }) => {
+    const { elementId, elementName, newContent } = event
+
+    // 根據元素 ID 或 name 判斷對應的資料欄位
+    // 格式：el-day-{N}-content → dailyItineraries[N-1].title
+    // 格式：el-day-{N}-meal-{type}-text → dailyItineraries[N-1].meals.{type}
+
+    // 解析每日行程內容
+    const dayContentMatch = (elementId || elementName).match(/el-day-(\d+)-content/)
+    if (dayContentMatch) {
+      const dayIndex = parseInt(dayContentMatch[1], 10) - 1
+      setTemplateData(prev => {
+        if (!prev) return prev
+        const dailyItineraries = [...((prev.dailyItineraries as Array<Record<string, unknown>>) || [])]
+        const dailyDetails = [...((prev.dailyDetails as Array<Record<string, unknown>>) || [])]
+
+        // 更新 dailyItineraries
+        if (dailyItineraries[dayIndex]) {
+          dailyItineraries[dayIndex] = { ...dailyItineraries[dayIndex], title: newContent }
+        }
+        // 同步更新 dailyDetails
+        if (dailyDetails[dayIndex]) {
+          dailyDetails[dayIndex] = { ...dailyDetails[dayIndex], title: newContent }
+        }
+
+        return { ...prev, dailyItineraries, dailyDetails }
+      })
+      return
+    }
+
+    // 解析餐食文字
+    const mealMatch = (elementId || elementName).match(/el-day-(\d+)-meal-(breakfast|lunch|dinner)-text/)
+    if (mealMatch) {
+      const dayIndex = parseInt(mealMatch[1], 10) - 1
+      const mealType = mealMatch[2] as 'breakfast' | 'lunch' | 'dinner'
+      setTemplateData(prev => {
+        if (!prev) return prev
+        const dailyItineraries = [...((prev.dailyItineraries as Array<Record<string, unknown>>) || [])]
+        const dailyDetails = [...((prev.dailyDetails as Array<Record<string, unknown>>) || [])]
+
+        // 更新 dailyItineraries
+        if (dailyItineraries[dayIndex]) {
+          const meals = { ...((dailyItineraries[dayIndex].meals as Record<string, string>) || {}) }
+          meals[mealType] = newContent
+          dailyItineraries[dayIndex] = { ...dailyItineraries[dayIndex], meals }
+        }
+        // 同步更新 dailyDetails
+        if (dailyDetails[dayIndex]) {
+          const meals = { ...((dailyDetails[dayIndex].meals as Record<string, string>) || {}) }
+          meals[mealType] = newContent
+          dailyDetails[dayIndex] = { ...dailyDetails[dayIndex], meals }
+        }
+
+        return { ...prev, dailyItineraries, dailyDetails }
+      })
+      return
+    }
+
+    // 解析住宿文字
+    const accommodationMatch = (elementId || elementName).match(/el-day-(\d+)-accommodation/)
+    if (accommodationMatch) {
+      const dayIndex = parseInt(accommodationMatch[1], 10) - 1
+      setTemplateData(prev => {
+        if (!prev) return prev
+        const dailyItineraries = [...((prev.dailyItineraries as Array<Record<string, unknown>>) || [])]
+
+        if (dailyItineraries[dayIndex]) {
+          dailyItineraries[dayIndex] = { ...dailyItineraries[dayIndex], accommodation: newContent }
+        }
+
+        return { ...prev, dailyItineraries }
+      })
+      return
+    }
+
+    // 其他欄位可以繼續擴展...
+    // 例如：el-main-title → mainTitle, el-subtitle → subtitle
+    const simpleFieldMap: Record<string, string> = {
+      'el-main-title': 'mainTitle',
+      'el-subtitle': 'subtitle',
+      'el-destination': 'destination',
+      'el-meeting-text': 'meetingTime', // 可能需要更複雜的解析
+      'el-leader-text': 'leaderName',
+    }
+
+    for (const [pattern, field] of Object.entries(simpleFieldMap)) {
+      if ((elementId || elementName).includes(pattern)) {
+        setTemplateData(prev => prev ? { ...prev, [field]: newContent } : prev)
+        return
+      }
+    }
+  }, [setTemplateData])
+
   const {
     canvasRef,
     canvas,
@@ -237,6 +333,7 @@ export default function DesignerPage() {
   } = useBrochureEditorV2({
     width: canvasWidth,
     height: canvasHeight,
+    onTextEdit: handleTextEdit,
   })
 
   // 遮罩編輯模式（雙擊遮罩圖片進入，可拖曳調整圖片位置）

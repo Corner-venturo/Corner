@@ -21,11 +21,20 @@ import { logger } from '@/lib/utils/logger'
 // Types
 // ============================================
 
+/** 文字編輯完成時的 callback 參數 */
+interface TextEditEvent {
+  elementId: string
+  elementName: string
+  newContent: string
+}
+
 interface UseBrochureEditorV2Options {
   width?: number
   height?: number
   initialZoom?: number
   onReady?: () => void
+  /** 文字編輯完成時的 callback（用於雙向綁定） */
+  onTextEdit?: (event: TextEditEvent) => void
 }
 
 interface UseBrochureEditorV2Return {
@@ -164,7 +173,11 @@ interface PageHistory {
 export function useBrochureEditorV2(
   options: UseBrochureEditorV2Options = {}
 ): UseBrochureEditorV2Return {
-  const { width = 559, height = 794, initialZoom = 1, onReady } = options
+  const { width = 559, height = 794, initialZoom = 1, onReady, onTextEdit } = options
+
+  // 使用 ref 存儲 callback 避免 stale closure
+  const onTextEditRef = useRef(onTextEdit)
+  onTextEditRef.current = onTextEdit
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const fabricCanvasRef = useRef<fabric.Canvas | null>(null)
@@ -335,6 +348,33 @@ export function useBrochureEditorV2(
 
     canvas.on('selection:cleared', () => {
       setSelectedObjectIds([])
+    })
+
+    // ============================================
+    // 文字編輯完成事件（雙向綁定用）
+    // ============================================
+    canvas.on('text:editing:exited', (e) => {
+      const target = e.target as fabric.FabricObject & {
+        text?: string
+        id?: string
+        name?: string
+        data?: { elementId?: string; elementName?: string }
+      }
+      if (!target) return
+
+      // 取得元素 ID 和 name
+      const elementId = target.id || target.data?.elementId || ''
+      const elementName = target.name || target.data?.elementName || ''
+      const newContent = target.text || ''
+
+      // 呼叫 callback（如果有設定）
+      if (onTextEditRef.current && (elementId || elementName)) {
+        onTextEditRef.current({
+          elementId,
+          elementName,
+          newContent,
+        })
+      }
     })
 
     // ============================================
