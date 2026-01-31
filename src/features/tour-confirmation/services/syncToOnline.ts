@@ -2,6 +2,8 @@
  * 同步行程到 Online App
  * 
  * 當確認單交接時呼叫，將行程資料同步到 online_trips 表
+ * 
+ * TODO: 等 online_trips 表加入 Database 類型後移除 eslint-disable
  */
 
 import { supabase } from '@/lib/supabase/client'
@@ -13,6 +15,9 @@ interface SyncResult {
   message: string
   onlineTripId?: string
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const supabaseAny = supabase as any
 
 /**
  * 同步行程到 Online
@@ -37,12 +42,12 @@ export async function syncTripToOnline(tourId: string): Promise<SyncResult> {
       .eq('tour_id', tourId)
       .maybeSingle()
 
-    // 3. 檢查是否已經同步過
-    const { data: existingTrip } = await supabase
+    // 3. 檢查是否已經同步過 (online_trips 不在 Database 類型中)
+    const { data: existingTrip } = await supabaseAny
       .from('online_trips')
       .select('id')
       .eq('erp_tour_id', tourId)
-      .maybeSingle()
+      .maybeSingle() as { data: { id: string } | null; error: unknown }
 
     // 4. 準備同步資料
     const syncData = {
@@ -68,7 +73,7 @@ export async function syncTripToOnline(tourId: string): Promise<SyncResult> {
 
     if (existingTrip) {
       // 更新現有記錄
-      const { error: updateError } = await supabase
+      const { error: updateError } = await supabaseAny
         .from('online_trips')
         .update(syncData)
         .eq('id', existingTrip.id)
@@ -82,7 +87,7 @@ export async function syncTripToOnline(tourId: string): Promise<SyncResult> {
       logger.info(`行程已更新到 Online: ${onlineTripId}`)
     } else {
       // 建立新記錄
-      const { data: newTrip, error: insertError } = await supabase
+      const { data: newTrip, error: insertError } = await supabaseAny
         .from('online_trips')
         .insert(syncData)
         .select('id')
