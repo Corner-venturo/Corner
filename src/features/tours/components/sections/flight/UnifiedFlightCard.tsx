@@ -337,79 +337,146 @@ function ArtFlightCard({
   isMobile: boolean
   dateInfo: FormattedDate | null
 }) {
+  // 取得機場代碼（用於浮水印）
+  const airportCode = flight.departureAirport?.match(/\(([A-Z]{3})\)/)?.[1] 
+    || flight.departureAirport?.slice(0, 3).toUpperCase() 
+    || 'TPE'
+
   return (
     <motion.div
-      initial={{ opacity: 0, x: type === 'outbound' ? -20 : 20 }}
-      whileInView={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className={`border-3 ${isMobile ? 'p-4' : 'p-6'}`}
+      className={`relative border-2 group cursor-pointer transition-all duration-300 ${
+        isMobile ? 'p-6' : 'p-8'
+      }`}
       style={{
-        backgroundColor: theme.colors.surface,
         borderColor: theme.colors.primary,
-        borderWidth: theme.effects.borderWidth,
+        backgroundColor: theme.colors.background,
         boxShadow: theme.effects.shadow,
       }}
+      whileHover={{
+        backgroundColor: theme.colors.primary,
+      }}
     >
-      {/* 標籤 */}
-      <div className="flex justify-between items-start mb-4">
-        <span
-          className="text-xs font-bold tracking-widest uppercase px-2 py-1"
-          style={{
-            backgroundColor: theme.colors.primary,
-            color: theme.colors.surface,
-          }}
-        >
-          {type === 'outbound' ? 'OUT' : 'RTN'}
-        </span>
-        {dateInfo && (
-          <span
-            className="text-sm font-mono"
-            style={{ color: theme.colors.muted }}
-          >
-            {dateInfo.full}
-          </span>
-        )}
-      </div>
-
-      {/* 大標題航線 */}
-      <div className="flex items-baseline gap-2 mb-2">
-        <span
-          className="text-4xl font-black tracking-tight"
-          style={{ color: theme.colors.primary }}
-        >
-          {extractCityName(flight.departureAirport)}
-        </span>
-        <span
-          className="text-2xl"
-          style={{ color: theme.colors.secondary }}
-        >
-          →
-        </span>
-        <span
-          className="text-4xl font-black tracking-tight"
-          style={{ color: theme.colors.primary }}
-        >
-          {extractCityName(flight.arrivalAirport)}
-        </span>
-      </div>
-
-      {/* 時間 */}
-      <div className="flex gap-8 text-lg font-mono" style={{ color: theme.colors.text }}>
-        <span>{flight.departureTime || '--:--'}</span>
-        <span style={{ color: theme.colors.muted }}>→</span>
-        <span>{flight.arrivalTime || '--:--'}</span>
-      </div>
-
-      {/* 航班資訊 */}
-      <div
-        className="mt-4 pt-4 font-mono text-sm"
+      {/* 類型標籤 - 角落 */}
+      <span
+        className="absolute top-4 left-4 text-[10px] tracking-[0.3em] uppercase transition-colors duration-300 group-hover:text-white"
         style={{
-          borderTop: `2px solid ${theme.colors.primary}`,
-          color: theme.colors.muted,
+          fontFamily: "'Cinzel', serif",
+          color: theme.colors.primary,
         }}
       >
-        {flight.airline} {flight.flightNumber}
-        {flight.duration && ` · ${flight.duration}`}
+        {type === 'outbound' ? 'OUTBOUND' : 'INBOUND'}
+      </span>
+
+      {/* 大型機場代碼浮水印 */}
+      <div
+        className="absolute top-0 right-0 text-[120px] leading-none font-black opacity-5 pointer-events-none select-none transition-opacity duration-300 group-hover:opacity-10"
+        style={{
+          fontFamily: "'Cinzel', serif",
+        }}
+      >
+        {airportCode}
+      </div>
+
+      {/* 主要內容 */}
+      <div className={`relative z-10 ${isMobile ? 'mt-8' : 'mt-12'}`}>
+        {/* 航線 */}
+        <div className="flex items-center justify-between">
+          {/* 出發 */}
+          <div>
+            <div
+              className={`font-black tracking-tighter transition-colors duration-300 group-hover:text-white ${
+                isMobile ? 'text-4xl' : 'text-6xl'
+              }`}
+              style={{
+                fontFamily: "'Cinzel', serif",
+                color: theme.colors.primary,
+              }}
+            >
+              {airportCode}
+            </div>
+            <div
+              className="text-sm mt-2 transition-colors duration-300 group-hover:text-gray-300"
+              style={{
+                fontFamily: 'monospace',
+                color: theme.colors.muted,
+              }}
+            >
+              {flight.departureTime || '--:--'}
+            </div>
+          </div>
+
+          {/* 中間箭頭 */}
+          <div className="flex-1 flex items-center justify-center px-4">
+            <div
+              className="w-full h-[2px] relative transition-colors duration-300 group-hover:bg-white"
+              style={{ backgroundColor: theme.colors.primary }}
+            >
+              <Plane
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-colors duration-300 group-hover:text-white"
+                size={isMobile ? 16 : 20}
+                style={{ color: theme.colors.primary }}
+              />
+            </div>
+          </div>
+
+          {/* 抵達 */}
+          <div className="text-right">
+            <div
+              className={`font-black tracking-tighter transition-colors duration-300 group-hover:text-white ${
+                isMobile ? 'text-4xl' : 'text-6xl'
+              }`}
+              style={{
+                fontFamily: "'Cinzel', serif",
+                color: theme.colors.primary,
+              }}
+            >
+              {flight.arrivalAirport?.match(/\(([A-Z]{3})\)/)?.[1] 
+                || flight.arrivalAirport?.slice(0, 3).toUpperCase() 
+                || 'NRT'}
+            </div>
+            <div
+              className="text-sm mt-2 transition-colors duration-300 group-hover:text-gray-300"
+              style={{
+                fontFamily: 'monospace',
+                color: theme.colors.muted,
+              }}
+            >
+              {flight.arrivalTime || '--:--'}
+            </div>
+          </div>
+        </div>
+
+        {/* 底部資訊 */}
+        <div
+          className={`flex justify-between items-center transition-colors duration-300 ${
+            isMobile ? 'mt-6 pt-4' : 'mt-8 pt-6'
+          }`}
+          style={{ borderTop: `2px solid ${theme.colors.primary}` }}
+        >
+          <span
+            className="text-xs tracking-wider transition-colors duration-300 group-hover:text-white"
+            style={{
+              fontFamily: 'monospace',
+              color: theme.colors.muted,
+            }}
+          >
+            {flight.airline} {flight.flightNumber}
+          </span>
+          {dateInfo && (
+            <span
+              className="text-xs transition-colors duration-300 group-hover:text-white"
+              style={{
+                fontFamily: "'Cinzel', serif",
+                color: theme.colors.secondary,
+              }}
+            >
+              {dateInfo.full}
+            </span>
+          )}
+        </div>
       </div>
     </motion.div>
   )
