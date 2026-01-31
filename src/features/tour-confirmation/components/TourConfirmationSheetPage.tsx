@@ -17,6 +17,7 @@ import {
   Check,
   X,
   Download,
+  Printer,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -708,10 +709,40 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     )
   }
 
+  // 列印功能
+  const handlePrint = () => {
+    window.print()
+  }
+
   return (
     <div className="space-y-4">
+      {/* 工具列 - 列印時隱藏 */}
+      <div className="flex items-center justify-between print:hidden">
+        <div className="text-sm text-morandi-secondary">
+          {tour.code} {tour.name} | {tour.departure_date} ~ {tour.return_date}
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handlePrint}
+          className="gap-2"
+        >
+          <Printer size={16} />
+          列印
+        </Button>
+      </div>
+
+      {/* 列印時顯示的標題 */}
+      <div className="hidden print:block print:mb-4">
+        <h1 className="text-xl font-bold text-center mb-2">團體確認單</h1>
+        <div className="text-center text-sm">
+          <p className="font-medium">{tour.code} {tour.name}</p>
+          <p>出發日期：{tour.departure_date} ~ {tour.return_date}</p>
+        </div>
+      </div>
+
       {/* 統一表格 */}
-      <div className="border border-border rounded-lg overflow-hidden">
+      <div className="border border-border rounded-lg overflow-hidden print:border-black print:rounded-none">
         <table className="w-full text-sm">
           {/* 表頭 */}
           <thead>
@@ -725,7 +756,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
               <th className="px-3 py-2 text-right font-medium text-morandi-primary w-[90px]">預計支出</th>
               <th className="px-3 py-2 text-right font-medium text-morandi-primary w-[90px]">實際支出</th>
               <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[120px]">備註</th>
-              <th className="px-2 py-2 w-[70px]"></th>
+              <th className="px-2 py-2 w-[70px] print:hidden"></th>
             </tr>
           </thead>
           <tbody>
@@ -758,7 +789,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                         </span>
                       </div>
                     </td>
-                    <td className="px-2 py-1.5 text-right">
+                    <td className="px-2 py-1.5 text-right print:hidden">
                       <div className="flex items-center gap-1 justify-end">
                         {/* 從需求單帶入按鈕（優先顯示，包含資源關聯） */}
                         {hasRequestsForCategory(cat.key) && items.length === 0 && (
@@ -826,7 +857,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                         <td className="px-3 py-2 text-xs text-morandi-secondary truncate max-w-[120px]">
                           {item.notes || '-'}
                         </td>
-                        <td className="px-2 py-2">
+                        <td className="px-2 py-2 print:hidden">
                           <div className="flex items-center gap-1 justify-end">
                             <button
                               onClick={() => handleEdit(item)}
