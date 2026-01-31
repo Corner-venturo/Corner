@@ -26,6 +26,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { useAuthStore } from '@/stores/auth-store'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import { syncTripToOnline } from '../services/syncToOnline'
 import { useTourConfirmationSheet } from '../hooks/useTourConfirmationSheet'
 import { ItemEditDialog } from './ItemEditDialog'
 import type { Tour, Itinerary, DailyItineraryDay } from '@/stores/types'
@@ -744,11 +745,14 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
         if (sheetError) throw sheetError
       }
 
-      // 2. TODO: 同步行程到 Online（之後實作）
-      // await syncToOnline(tour.id)
+      // 2. 同步行程到 Online
+      const syncResult = await syncTripToOnline(tour.id)
+      if (!syncResult.success) {
+        logger.warn('同步到 Online 失敗:', syncResult.message)
+      }
 
       // 3. 顯示成功訊息
-      alert('交接完成！\n\n確認單狀態已更新。\n（行程同步到 Online 功能開發中）')
+      alert('交接完成！\n\n確認單狀態已更新。\n行程已同步到 Online App。')
       reload()
     } catch (error) {
       logger.error('交接失敗:', error)

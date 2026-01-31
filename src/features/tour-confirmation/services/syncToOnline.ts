@@ -1,0 +1,109 @@
+/**
+ * 同步行程到 Online App
+ * 
+ * 當確認單交接時呼叫，將行程資料同步到 online_trips 表
+ */
+
+import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
+import type { Tour, Itinerary } from '@/stores/types'
+
+interface SyncResult {
+  success: boolean
+  message: string
+  onlineTripId?: string
+}
+
+/**
+ * 同步行程到 Online
+ */
+export async function syncTripToOnline(tourId: string): Promise<SyncResult> {
+  try {
+    // 1. 取得旅遊團資料
+    const { data: tour, error: tourError } = await supabase
+      .from('tours')
+      .select('*')
+      .eq('id', tourId)
+      .single()
+
+    if (tourError || !tour) {
+      return { success: false, message: '找不到旅遊團資料' }
+    }
+
+    // 2. 取得行程表資料
+    const { data: itinerary, error: itineraryError } = await supabase
+      .from('itineraries')
+      .select('*')
+      .eq('tour_id', tourId)
+      .maybeSingle()
+
+    // 3. 檢查是否已經同步過
+    const { data: existingTrip } = await supabase
+      .from('online_trips')
+      .select('id')
+      .eq('erp_tour_id', tourId)
+      .maybeSingle()
+
+    // 4. 準備同步資料
+    const syncData = {
+      erp_tour_id: tourId,
+      erp_itinerary_id: itinerary?.id || null,
+      code: tour.code,
+      name: tour.name,
+      departure_date: tour.departure_date,
+      return_date: tour.return_date,
+      destination: tour.location,
+      daily_itinerary: itinerary?.daily_itinerary || [],
+      leader_info: itinerary?.leader || null,
+      meeting_info: itinerary?.meeting_info || null,
+      outbound_flight: (tour as { outbound_flight?: unknown }).outbound_flight || null,
+      return_flight: (tour as { return_flight?: unknown }).return_flight || null,
+      status: 'active',
+      handoff_at: new Date().toISOString(),
+      workspace_id: tour.workspace_id,
+      updated_at: new Date().toISOString(),
+    }
+
+    let onlineTripId: string
+
+    if (existingTrip) {
+      // 更新現有記錄
+      const { error: updateError } = await supabase
+        .from('online_trips')
+        .update(syncData)
+        .eq('id', existingTrip.id)
+
+      if (updateError) {
+        logger.error('更新 Online 行程失敗:', updateError)
+        return { success: false, message: updateError.message }
+      }
+
+      onlineTripId = existingTrip.id
+      logger.info(`行程已更新到 Online: ${onlineTripId}`)
+    } else {
+      // 建立新記錄
+      const { data: newTrip, error: insertError } = await supabase
+        .from('online_trips')
+        .insert(syncData)
+        .select('id')
+        .single()
+
+      if (insertError || !newTrip) {
+        logger.error('建立 Online 行程失敗:', insertError)
+        return { success: false, message: insertError?.message || '建立失敗' }
+      }
+
+      onlineTripId = newTrip.id
+      logger.info(`行程已同步到 Online: ${onlineTripId}`)
+    }
+
+    return {
+      success: true,
+      message: '同步成功',
+      onlineTripId,
+    }
+  } catch (error) {
+    logger.error('同步到 Online 時發生錯誤:', error)
+    return { success: false, message: '同步失敗' }
+  }
+}
