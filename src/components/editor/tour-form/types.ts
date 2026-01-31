@@ -5,6 +5,8 @@ import type {
   HotelInfo as HotelInfoType,
   PricingItem as PricingItemType,
   PricingDetails as PricingDetailsType,
+  PriceTier as PriceTierType,
+  FAQ as FAQType,
 } from '@/stores/types/tour.types'
 
 // 本地類型別名（供此檔案內使用）
@@ -13,6 +15,8 @@ export type DailyImage = DailyImageType
 export type HotelInfo = HotelInfoType
 export type PricingItem = PricingItemType
 export type PricingDetails = PricingDetailsType
+export type PriceTier = PriceTierType
+export type FAQ = FAQType
 
 export interface FlightInfo {
   airline: string
@@ -107,22 +111,7 @@ export interface MeetingPoint {
   airline?: string | null
 }
 
-// HotelInfo, PricingItem, PricingDetails 已從 stores/types/tour.types.ts 統一匯出
-
-// 價格方案（如 4人包團、6人包團、8人包團）
-export interface PriceTier {
-  label: string // 如「4人包團」、「6人包團」
-  sublabel?: string // 如「每人」
-  price: string // 如「34,500」
-  priceNote?: string // 如「起」
-  addon?: string // 如「加購1日包車 / 每人+NT$900」
-}
-
-// 常見問題
-export interface FAQ {
-  question: string // 問題
-  answer: string // 答案
-}
+// HotelInfo, PricingItem, PricingDetails, PriceTier, FAQ 已從 stores/types/tour.types.ts 統一匯出
 
 // Luxury 封面統計卡片（如：特色餐食、景點數量）
 export interface HeroStatCard {
