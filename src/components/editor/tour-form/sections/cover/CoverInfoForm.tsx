@@ -53,7 +53,8 @@ export function CoverInfoForm({
     <div className="space-y-4">
       {/* 封面風格選擇器 */}
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-2">封面風格</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">主題風格</label>
+        <p className="text-xs text-morandi-secondary mb-2">選擇後將套用至全站所有區塊</p>
         {templatesLoading ? (
           <div className="flex items-center justify-center py-4">
             <Loader2 className="w-5 h-5 animate-spin text-morandi-gold" />
