@@ -18,11 +18,14 @@ import {
   X,
   Download,
   Printer,
+  Send,
+  AlertCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { useAuthStore } from '@/stores/auth-store'
 import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 import { useTourConfirmationSheet } from '../hooks/useTourConfirmationSheet'
 import { ItemEditDialog } from './ItemEditDialog'
 import type { Tour, Itinerary, DailyItineraryDay } from '@/stores/types'
@@ -120,6 +123,9 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
   // 需求單資料（用於帶入資源關聯）
   const [tourRequests, setTourRequests] = useState<TourRequestRow[]>([])
   const [requestsLoading, setRequestsLoading] = useState(false)
+
+  // 交接狀態
+  const [handingOver, setHandingOver] = useState(false)
 
   // 載入行程表
   useEffect(() => {
@@ -714,6 +720,44 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     window.print()
   }
 
+  // 計算未完成的需求數量
+  const incompleteRequests = tourRequests.filter(
+    req => req.status !== 'confirmed' && req.status !== 'replied'
+  )
+
+  // 交接功能
+  const handleHandoff = async () => {
+    if (incompleteRequests.length > 0) return
+
+    setHandingOver(true)
+    try {
+      // 1. 更新確認表狀態為已交接
+      if (sheet) {
+        const { error: sheetError } = await supabase
+          .from('tour_confirmation_sheets')
+          .update({
+            status: 'completed',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', sheet.id)
+
+        if (sheetError) throw sheetError
+      }
+
+      // 2. TODO: 同步行程到 Online（之後實作）
+      // await syncToOnline(tour.id)
+
+      // 3. 顯示成功訊息
+      alert('交接完成！\n\n確認單狀態已更新。\n（行程同步到 Online 功能開發中）')
+      reload()
+    } catch (error) {
+      logger.error('交接失敗:', error)
+      alert('交接失敗，請稍後再試')
+    } finally {
+      setHandingOver(false)
+    }
+  }
+
   return (
     <div className="space-y-4">
       {/* 工具列 - 列印時隱藏 */}
@@ -721,15 +765,46 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
         <div className="text-sm text-morandi-secondary">
           {tour.code} {tour.name} | {tour.departure_date} ~ {tour.return_date}
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handlePrint}
-          className="gap-2"
-        >
-          <Printer size={16} />
-          列印
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handlePrint}
+            className="gap-2"
+          >
+            <Printer size={16} />
+            列印
+          </Button>
+
+          {/* 確認交接按鈕 */}
+          {incompleteRequests.length > 0 ? (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled
+              className="gap-2 text-morandi-secondary"
+              title={`尚有 ${incompleteRequests.length} 項需求未完成`}
+            >
+              <AlertCircle size={16} />
+              尚有 {incompleteRequests.length} 項待處理
+            </Button>
+          ) : (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={handleHandoff}
+              disabled={handingOver}
+              className="gap-2 bg-morandi-green hover:bg-morandi-green/90"
+            >
+              {handingOver ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Send size={16} />
+              )}
+              確認交接
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* 列印時顯示的標題 */}
