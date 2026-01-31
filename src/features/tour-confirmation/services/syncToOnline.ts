@@ -9,6 +9,12 @@
 import { createClient } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import type { 
+  DailyItineraryDay, 
+  LeaderInfo, 
+  MeetingInfo,
+  FlightInfo,
+} from '@/stores/types/tour.types'
 
 interface SyncResult {
   success: boolean
@@ -16,28 +22,29 @@ interface SyncResult {
   onlineTripId?: string
 }
 
-/** online_trips 表的資料結構（尚未加入 Database 類型） */
+/** online_trips 表的資料結構（與 Online useTrips.ts 一致） */
 interface OnlineTrip {
   id: string
   erp_tour_id: string
   erp_itinerary_id: string | null
+  workspace_id: string
   code: string
   name: string
   departure_date: string
   return_date: string
   destination: string | null
-  daily_itinerary: unknown[]
-  leader_info: unknown | null
-  meeting_info: unknown | null
-  outbound_flight: unknown | null
-  return_flight: unknown | null
-  status: string
+  daily_itinerary: DailyItineraryDay[]
+  leader_info: LeaderInfo | null
+  meeting_info: MeetingInfo | null
+  outbound_flight: FlightInfo | null
+  return_flight: FlightInfo | null
+  status: 'active' | 'departed' | 'completed' | 'cancelled'
   handoff_at: string
-  workspace_id: string
+  created_at?: string
   updated_at: string
 }
 
-type OnlineTripInsert = Omit<OnlineTrip, 'id'>
+type OnlineTripInsert = Omit<OnlineTrip, 'id' | 'created_at'>
 
 /** 無類型的 Supabase client（用於尚未加入 Database 類型的表） */
 const untypedSupabase = createClient(
@@ -76,23 +83,23 @@ export async function syncTripToOnline(tourId: string): Promise<SyncResult> {
       .maybeSingle<Pick<OnlineTrip, 'id'>>()
 
     // 4. 準備同步資料
-    const dailyItinerary = itinerary?.daily_itinerary
+    const dailyItinerary = itinerary?.daily_itinerary as DailyItineraryDay[] | undefined
     const syncData: OnlineTripInsert = {
       erp_tour_id: tourId,
       erp_itinerary_id: itinerary?.id ?? null,
+      workspace_id: tour.workspace_id ?? '',
       code: tour.code,
       name: tour.name,
       departure_date: tour.departure_date,
       return_date: tour.return_date,
       destination: tour.location ?? null,
       daily_itinerary: Array.isArray(dailyItinerary) ? dailyItinerary : [],
-      leader_info: itinerary?.leader ?? null,
-      meeting_info: itinerary?.meeting_info ?? null,
-      outbound_flight: (tour as Record<string, unknown>).outbound_flight ?? null,
-      return_flight: (tour as Record<string, unknown>).return_flight ?? null,
+      leader_info: (itinerary?.leader as unknown as LeaderInfo) ?? null,
+      meeting_info: (itinerary?.meeting_info as unknown as MeetingInfo) ?? null,
+      outbound_flight: (tour.outbound_flight as unknown as FlightInfo) ?? null,
+      return_flight: (tour.return_flight as unknown as FlightInfo) ?? null,
       status: 'active',
       handoff_at: new Date().toISOString(),
-      workspace_id: tour.workspace_id ?? '',
       updated_at: new Date().toISOString(),
     }
 
