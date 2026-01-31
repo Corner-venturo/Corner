@@ -38,6 +38,8 @@ function NewItineraryPageContent() {
     handleVersionChange: baseHandleVersionChange,
     quoteTierPricings,
     setQuoteTierPricings,
+    isHandedOff,
+    setIsHandedOff,
   } = useItineraryEditor()
 
   const { items: itineraries } = useItineraries()
@@ -49,6 +51,7 @@ function NewItineraryPageContent() {
     setLoading,
     setCurrentVersionIndex,
     setQuoteTierPricings,
+    setIsHandedOff,
   })
 
   // 版本切換處理
@@ -248,19 +251,33 @@ function NewItineraryPageContent() {
         <EditingWarningBanner resourceType="itinerary" resourceId={currentItineraryId} resourceName="此行程" />
       )}
 
+      {/* 交接唯讀提示 */}
+      {isHandedOff && (
+        <div className="bg-amber-50 border-b border-amber-200 px-4 py-3 flex items-center gap-3">
+          <span className="material-symbols-outlined text-amber-600">lock</span>
+          <div>
+            <p className="text-sm font-medium text-amber-800">此行程已交接給領隊</p>
+            <p className="text-xs text-amber-600">行程內容已同步到 Online App，編輯功能已停用</p>
+          </div>
+        </div>
+      )}
+
       <div className="flex-1 overflow-hidden">
         <div className="h-full flex">
-          <ItineraryEditor
-            tourData={tourData}
-            autoSaveStatus={autoSaveStatus}
-            isDirty={isDirty}
-            quoteTierPricings={quoteTierPricings}
-            onChange={(newData) => {
-              logger.log('[Page] ItineraryEditor onChange 收到:', { coverImage: newData.coverImage })
-              setTourData(newData)
-              setIsDirty(true)
-            }}
-          />
+          <div className={isHandedOff ? 'pointer-events-none opacity-60' : ''}>
+            <ItineraryEditor
+              tourData={tourData}
+              autoSaveStatus={autoSaveStatus}
+              isDirty={isDirty}
+              quoteTierPricings={quoteTierPricings}
+              onChange={(newData) => {
+                if (isHandedOff) return // 已交接，禁止編輯
+                logger.log('[Page] ItineraryEditor onChange 收到:', { coverImage: newData.coverImage })
+                setTourData(newData)
+                setIsDirty(true)
+              }}
+            />
+          </div>
 
           <ItineraryPreview tourData={tourData} />
         </div>

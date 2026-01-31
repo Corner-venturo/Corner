@@ -16,6 +16,7 @@ interface UseItineraryDataLoaderProps {
   setLoading: (loading: boolean) => void
   setCurrentVersionIndex: (index: number) => void
   setQuoteTierPricings?: (tierPricings: TierPricing[]) => void
+  setIsHandedOff?: (isHandedOff: boolean) => void
 }
 
 export function useItineraryDataLoader({
@@ -23,6 +24,7 @@ export function useItineraryDataLoader({
   setLoading,
   setCurrentVersionIndex,
   setQuoteTierPricings,
+  setIsHandedOff,
 }: UseItineraryDataLoaderProps) {
   const searchParams = useSearchParams()
   const tourId = searchParams.get('tour_id')
@@ -215,6 +217,22 @@ export function useItineraryDataLoader({
               logger.log('[ItineraryDataLoader] country:', data.country, 'city:', data.city)
               const itinerary = data as unknown as Itinerary
               loadItineraryData(itinerary)
+
+              // 檢查交接狀態（如果有關聯的 tour）
+              if (setIsHandedOff && itinerary.tour_id) {
+                const { data: confirmSheet } = await supabase
+                  .from('tour_confirmation_sheets')
+                  .select('status')
+                  .eq('tour_id', itinerary.tour_id)
+                  .eq('status', 'completed')
+                  .maybeSingle()
+                
+                if (confirmSheet) {
+                  logger.log('[ItineraryDataLoader] 行程已交接，設為唯讀')
+                  setIsHandedOff(true)
+                }
+              }
+
               // 重新整理 SWR 快取
               void invalidateItineraries()
             } else {

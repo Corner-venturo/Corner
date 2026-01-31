@@ -74,6 +74,7 @@ export function useItineraryEditor() {
   const [currentItineraryId, setCurrentItineraryId] = useState<string | null>(itineraryId)
   const [currentVersionIndex, setCurrentVersionIndex] = useState(-1)
   const [quoteTierPricings, setQuoteTierPricings] = useState<TierPricing[]>([])
+  const [isHandedOff, setIsHandedOff] = useState(false) // 是否已交接（唯讀）
 
   const { user } = useAuthStore()
   const tourDataRef = useRef(tourData)
@@ -253,6 +254,8 @@ export function useItineraryEditor() {
     performAutoSave,
     quoteTierPricings,
     setQuoteTierPricings,
+    isHandedOff,
+    setIsHandedOff,
   }
 }
 
