@@ -6,6 +6,7 @@ import { logger } from '@/lib/utils/logger'
 import { CostCategory, ParticipantCounts, SellingPrices, TierPricing } from '../types'
 import type { Quote, QuoteVersion } from '@/stores/types'
 import type { QuickQuoteItem } from '@/types/quote.types'
+import { syncHotelsFromQuoteToItinerary } from '../services/quoteItinerarySync'
 
 interface QuickQuoteCustomerInfo {
   customer_name: string
@@ -157,6 +158,19 @@ export const useQuoteSave = ({
 
         setSaveSuccess(true)
         setTimeout(() => setSaveSuccess(false), UI_DELAYS.SUCCESS_MESSAGE)
+
+        // 同步飯店到行程表
+        const accommodationItems = updatedCategories
+          .find(cat => cat.id === 'accommodation')?.items || []
+        if (accommodationItems.length > 0) {
+          syncHotelsFromQuoteToItinerary(quote.id, accommodationItems)
+            .then(result => {
+              if (!result.success && result.message !== '無關聯行程表，跳過同步') {
+                logger.warn('飯店同步到行程表:', result.message)
+              }
+            })
+            .catch(err => logger.error('飯店同步錯誤:', err))
+        }
       } catch (error) {
         logger.error('儲存失敗:', error)
       }
