@@ -5,9 +5,9 @@
 CREATE TABLE IF NOT EXISTS online_trips (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   
-  -- 關聯 ERP 資料
-  erp_tour_id UUID REFERENCES tours(id) ON DELETE SET NULL,
-  erp_itinerary_id UUID REFERENCES itineraries(id) ON DELETE SET NULL,
+  -- 關聯 ERP 資料（TEXT 類型，配合 ERP 表結構）
+  erp_tour_id TEXT REFERENCES tours(id) ON DELETE SET NULL,
+  erp_itinerary_id TEXT REFERENCES itineraries(id) ON DELETE SET NULL,
   
   -- 基本資訊
   code TEXT NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS online_trips (
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   
   -- 工作區
-  workspace_id UUID
+  workspace_id TEXT
 );
 
 -- 索引
