@@ -69,13 +69,7 @@ export function CoverInfoForm({
             <SelectContent>
               {coverStyleOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: option.color }}
-                    />
-                    {option.label}
-                  </div>
+                  {option.label}
                 </SelectItem>
               ))}
             </SelectContent>
