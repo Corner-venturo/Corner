@@ -11268,10 +11268,12 @@ export type Database = {
           english_name: string | null
           iata_code: string
           icao_code: string | null
+          is_favorite: boolean | null
           latitude: number | null
           longitude: number | null
           name_zh: string | null
           timezone: string | null
+          usage_count: number | null
           workspace_id: string | null
         }
         Insert: {
@@ -11283,10 +11285,12 @@ export type Database = {
           english_name?: string | null
           iata_code: string
           icao_code?: string | null
+          is_favorite?: boolean | null
           latitude?: number | null
           longitude?: number | null
           name_zh?: string | null
           timezone?: string | null
+          usage_count?: number | null
           workspace_id?: string | null
         }
         Update: {
@@ -11298,10 +11302,12 @@ export type Database = {
           english_name?: string | null
           iata_code?: string
           icao_code?: string | null
+          is_favorite?: boolean | null
           latitude?: number | null
           longitude?: number | null
           name_zh?: string | null
           timezone?: string | null
+          usage_count?: number | null
           workspace_id?: string | null
         }
         Relationships: [

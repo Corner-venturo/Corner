@@ -5,27 +5,11 @@ import { cn } from '@/lib/utils'
 import { SectionTitle } from './SectionTitle'
 import { TourPricingSectionArt } from './TourPricingSectionArt'
 import { TourPricingSectionCollage } from './TourPricingSectionCollage'
-
-interface PricingItem {
-  text: string
-  included: boolean
-}
-
-interface PricingDetails {
-  show_pricing_details?: boolean
-  insurance_amount?: string
-  included_items: PricingItem[]
-  excluded_items: PricingItem[]
-  notes: string[]
-}
-
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
+import type { TourPageData, CoverStyleType } from '@/features/tours/types/tour-display.types'
+import type { PricingDetails } from '@/stores/types/tour.types'
 
 interface TourPricingSectionProps {
-  data: {
-    showPricingDetails?: boolean
-    pricingDetails?: PricingDetails
-  }
+  data: TourPageData
   viewMode?: 'desktop' | 'mobile'
   coverStyle?: CoverStyleType
 }

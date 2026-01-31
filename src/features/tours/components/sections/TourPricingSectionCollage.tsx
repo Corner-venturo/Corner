@@ -1,32 +1,22 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import type { PricingDetails } from '@/stores/types/tour.types'
 
-interface PricingItem {
-  text: string
-  included: boolean
-}
-
-interface PriceTier {
+// Collage 風格專用的 PriceTier（與標準版不同結構）
+interface CollagePriceTier {
   name: string
   pricePerPerson: number
   description?: string
   features?: string[]
 }
 
-interface PricingDetails {
-  show_pricing_details?: boolean
-  insurance_amount?: string
-  included_items: PricingItem[]
-  excluded_items: PricingItem[]
-  notes: string[]
-}
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface TourPricingSectionCollageProps {
   data: {
     showPricingDetails?: boolean
-    pricingDetails?: PricingDetails
-    priceTiers?: PriceTier[]
+    pricingDetails?: PricingDetails | null
+    priceTiers?: CollagePriceTier[] | any[] | null
   }
   viewMode?: 'desktop' | 'mobile'
 }
@@ -144,7 +134,7 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
 
                   {priceTiers[0].features && (
                     <ul className="text-sm space-y-2 mb-6" style={{ fontFamily: "'Space Mono', monospace" }}>
-                      {priceTiers[0].features.map((feature, idx) => (
+                      {priceTiers[0].features.map((feature: string, idx: number) => (
                         <li key={idx} className="flex items-center gap-2">
                           <span className="w-1.5 h-1.5 bg-black rounded-full" />
                           {feature}
@@ -225,7 +215,7 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
 
                   {priceTiers[1].features && (
                     <ul className="text-sm space-y-2 mb-6 text-morandi-secondary" style={{ fontFamily: "'Space Mono', monospace" }}>
-                      {priceTiers[1].features.map((feature, idx) => (
+                      {priceTiers[1].features.map((feature: string, idx: number) => (
                         <li key={idx} className="flex items-center gap-2">
                           <span className="w-1.5 h-1.5 bg-[#C6FF00] rounded-full" />
                           {feature}

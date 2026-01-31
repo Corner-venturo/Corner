@@ -1,32 +1,22 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import type { PricingDetails } from '@/stores/types/tour.types'
 
-interface PricingItem {
-  text: string
-  included: boolean
-}
-
-interface PriceTier {
+// Art 風格專用的 PriceTier（與標準版不同結構）
+interface ArtPriceTier {
   name: string
   pricePerPerson: number
   description?: string
   features?: string[]
 }
 
-interface PricingDetails {
-  show_pricing_details?: boolean
-  insurance_amount?: string
-  included_items: PricingItem[]
-  excluded_items: PricingItem[]
-  notes: string[]
-}
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface TourPricingSectionArtProps {
   data: {
     showPricingDetails?: boolean
-    pricingDetails?: PricingDetails
-    priceTiers?: PriceTier[]
+    pricingDetails?: PricingDetails | null
+    priceTiers?: ArtPriceTier[] | any[] | null
   }
   viewMode?: 'desktop' | 'mobile'
 }
@@ -178,7 +168,7 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                     {/* 特色列表 */}
                     {tier.features && tier.features.length > 0 && (
                       <ul className="space-y-3 mb-8">
-                        {tier.features.map((feature, idx) => (
+                        {tier.features.map((feature: string, idx: number) => (
                           <li key={idx} className="flex items-start gap-3 text-sm" style={{ color: colors.ink }}>
                             <span
                               className="w-1 h-1 rounded-full mt-2 flex-shrink-0"

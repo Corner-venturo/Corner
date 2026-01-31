@@ -2,9 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react'
 import { Combobox } from '@/components/ui/combobox'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { useTourDestinations } from '@/features/tours/hooks/useTourDestinations'
+import { useAirports, type Airport } from '@/features/tours/hooks/useAirports'
 
 // 判斷是否為台灣（支援多種寫法）
 const isTaiwanCountry = (country: string | undefined | null): boolean => {
@@ -40,17 +38,14 @@ export function CountryAirportSelector({
   countries: externalCountries,
 }: CountryAirportSelectorProps) {
   const {
-    destinations,
     countries: hookCountries,
-    loading: destinationsLoading,
-    addDestination,
-  } = useTourDestinations({ enabled: true }) // 組件渲染時就需要資料
+    getAirportsByCountry,
+    getAirport,
+    loading,
+  } = useAirports({ enabled: true })
 
-  // 新增機場代碼狀態
-  const [showAddNew, setShowAddNew] = useState(false)
-  const [newCity, setNewCity] = useState('')
-  const [newAirportCode, setNewAirportCode] = useState('')
-  const [saving, setSaving] = useState(false)
+  // 搜尋狀態
+  const [searchQuery, setSearchQuery] = useState('')
 
   // 國家選項（優先使用外部傳入的）
   const countryOptions = useMemo(() => {
@@ -62,50 +57,45 @@ export function CountryAirportSelector({
     return hookCountries.map(c => ({ value: c, label: c }))
   }, [externalCountries, hookCountries])
 
-  // 根據國家取得機場代碼列表
+  // 根據國家取得機場列表
   const availableAirports = useMemo(() => {
     if (!country) return []
-    return destinations
-      .filter(d => d.country === country)
-      .map(d => ({
-        value: d.airport_code,
-        label: `${d.city} (${d.airport_code})`,
-      }))
-  }, [country, destinations])
+    
+    const airports = getAirportsByCountry(country)
+    
+    // favorite 已經排在前面了（由 useAirports 處理）
+    return airports.map(a => ({
+      value: a.iata_code,
+      label: formatAirportLabel(a),
+    }))
+  }, [country, getAirportsByCountry])
+
+  // 格式化機場顯示
+  function formatAirportLabel(airport: Airport): string {
+    const city = airport.city_name_zh || airport.city_name_en || ''
+    const name = airport.name_zh || airport.english_name || ''
+    
+    if (city && name && !name.includes(city)) {
+      return `${city} - ${name} (${airport.iata_code})`
+    }
+    if (city) {
+      return `${city} (${airport.iata_code})`
+    }
+    return `${name || airport.iata_code} (${airport.iata_code})`
+  }
 
   // 處理國家變更
   const handleCountryChange = useCallback((newCountry: string) => {
     const isTaiwan = isTaiwanCountry(newCountry)
     onCountryChange(newCountry, isTaiwan ? 'TW' : '')
-    setShowAddNew(false)
-    setNewCity('')
-    setNewAirportCode('')
   }, [onCountryChange])
 
   // 處理機場代碼變更
   const handleAirportChange = useCallback((code: string) => {
-    const dest = destinations.find(d => d.airport_code === code)
-    onAirportChange(code, dest?.city || code)
-  }, [destinations, onAirportChange])
-
-  // 新增機場代碼
-  const handleAddAirport = useCallback(async () => {
-    if (!country || !newCity.trim() || !newAirportCode.trim()) return
-
-    setSaving(true)
-    try {
-      const result = await addDestination(country, newCity, newAirportCode)
-      if (result.success) {
-        const code = newAirportCode.trim().toUpperCase()
-        onAirportChange(code, newCity.trim())
-        setShowAddNew(false)
-        setNewCity('')
-        setNewAirportCode('')
-      }
-    } finally {
-      setSaving(false)
-    }
-  }, [country, newCity, newAirportCode, addDestination, onAirportChange])
+    const airport = getAirport(code)
+    const cityName = airport?.city_name_zh || airport?.city_name_en || code
+    onAirportChange(code, cityName)
+  }, [getAirport, onAirportChange])
 
   const isTaiwan = isTaiwanCountry(country)
 
@@ -124,7 +114,7 @@ export function CountryAirportSelector({
             onChange={handleCountryChange}
             options={countryOptions}
             placeholder="選擇國家..."
-            emptyMessage={destinationsLoading ? '載入中...' : (countryOptions.length === 0 ? '無可用國家' : '找不到符合的國家')}
+            emptyMessage={loading ? '載入中...' : '找不到符合的國家'}
             showSearchIcon
             showClearButton
             disablePortal={disablePortal}
@@ -139,31 +129,17 @@ export function CountryAirportSelector({
                 城市 (機場代碼)
               </label>
             )}
-            <div className="flex gap-2">
-              <Combobox
-                value={airportCode}
-                onChange={handleAirportChange}
-                options={availableAirports}
-                placeholder={!country ? '請先選擇國家' : '選擇城市...'}
-                emptyMessage={destinationsLoading ? '載入中...' : '找不到城市，點 + 新增'}
-                showSearchIcon
-                showClearButton
-                disabled={!country}
-                className="flex-1 min-w-0"
-                disablePortal={disablePortal}
-              />
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={() => setShowAddNew(true)}
-                disabled={!country}
-                className="h-9 px-2 shrink-0"
-                title="新增城市"
-              >
-                +
-              </Button>
-            </div>
+            <Combobox
+              value={airportCode}
+              onChange={handleAirportChange}
+              options={availableAirports}
+              placeholder={!country ? '請先選擇國家' : '搜尋城市或機場...'}
+              emptyMessage={loading ? '載入中...' : '找不到符合的機場'}
+              showSearchIcon
+              showClearButton
+              disabled={!country}
+              disablePortal={disablePortal}
+            />
           </div>
         ) : (
           <div className="flex items-center">
@@ -172,56 +148,6 @@ export function CountryAirportSelector({
           </div>
         )}
       </div>
-
-      {/* 新增機場代碼區塊 */}
-      {country && !isTaiwan && showAddNew && (
-        <div className="border border-border rounded-lg p-3 space-y-3 bg-morandi-container/20">
-          <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-morandi-primary">
-              新增 {country} 的機場代碼
-            </span>
-            <button
-              type="button"
-              onClick={() => {
-                setShowAddNew(false)
-                setNewCity('')
-                setNewAirportCode('')
-              }}
-              className="text-morandi-secondary hover:text-morandi-primary text-sm"
-            >
-              取消
-            </button>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <Input
-              value={newCity}
-              onChange={e => setNewCity(e.target.value)}
-              placeholder="城市（如：東京）"
-            />
-            <Input
-              value={newAirportCode}
-              onChange={e => {
-                const halfWidth = e.target.value
-                  .replace(/[Ａ-Ｚａ-ｚ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
-                  .replace(/[^A-Za-z]/g, '')
-                  .toUpperCase()
-                setNewAirportCode(halfWidth)
-              }}
-              placeholder="代碼（如：NRT）"
-              maxLength={4}
-            />
-          </div>
-          <Button
-            type="button"
-            onClick={handleAddAirport}
-            disabled={!newCity.trim() || !newAirportCode.trim() || saving}
-            className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-            size="sm"
-          >
-            {saving ? '新增中...' : '新增並選擇'}
-          </Button>
-        </div>
-      )}
 
       {/* 顯示當前選擇的城市代碼（非台灣團）*/}
       {airportCode && !isTaiwan && (

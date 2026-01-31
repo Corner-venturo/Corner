@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Check, X, Info, ChevronDown } from 'lucide-react'
+import type { TourPageData } from '@/features/tours/types/tour-display.types'
+import type { PricingDetails } from '@/stores/types/tour.types'
 
 // Luxury 配色
 const LUXURY = {
@@ -15,26 +17,8 @@ const LUXURY = {
   muted: '#636E72',
 }
 
-interface PricingItem {
-  text: string
-  included: boolean
-}
-
-interface PricingDetails {
-  show_pricing_details?: boolean
-  insurance_amount?: string
-  included_items: PricingItem[]
-  excluded_items: PricingItem[]
-  notes: string[]
-}
-
 interface TourPricingSectionLuxuryProps {
-  data: {
-    showPricingDetails?: boolean
-    pricingDetails?: PricingDetails | null
-    cancellationPolicy?: string[] | null
-    showCancellationPolicy?: boolean
-  }
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
 }
 
