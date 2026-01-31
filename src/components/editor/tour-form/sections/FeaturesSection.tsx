@@ -86,24 +86,7 @@ export function FeaturesSection({
       <div className="flex justify-between items-center border-b-2 border-morandi-gold pb-2">
         <div className="flex items-center gap-4">
           <h2 className="text-lg font-bold text-morandi-primary">行程特色</h2>
-          <div className="flex items-center gap-2">
-            <Palette size={14} className="text-morandi-secondary" />
-            {templatesLoading ? (
-              <Loader2 size={14} className="animate-spin text-morandi-secondary" />
-            ) : (
-              <select
-                value={data.featuresStyle || 'original'}
-                onChange={e => updateField('featuresStyle', e.target.value as FeaturesStyleType)}
-                className="text-xs bg-transparent border-none focus:ring-0 text-morandi-primary cursor-pointer pr-6"
-              >
-                {featuresStyleOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
+          {/* 特色風格已統一 - 跟隨主題設定 (coverStyle) */}
         </div>
         <button
           onClick={addFeature}

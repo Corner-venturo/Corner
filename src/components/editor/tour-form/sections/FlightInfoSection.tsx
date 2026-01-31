@@ -243,15 +243,10 @@ export function FlightInfoSection({
               </DialogHeader>
 
               <div className="space-y-4 pt-2">
-                {/* 航班卡片風格選擇 */}
-                {updateField && (
-                  <FlightStyleSelector
-                    options={flightStyleOptions}
-                    selectedValue={data.flightStyle || 'original'}
-                    onSelect={(value) => updateField('flightStyle', value)}
-                    isLoading={templatesLoading}
-                  />
-                )}
+                {/* 
+                 * 航班風格已統一 - 跟隨主題設定 (coverStyle)
+                 * 不再提供獨立的 flightStyle 選項
+                 */}
 
                 {/* 去程航班 */}
                 <FlightSegmentCard

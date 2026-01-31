@@ -1,5 +1,13 @@
 'use client'
 
+/**
+ * TourPage - 行程展示頁面
+ * 
+ * 🎨 風格統一原則：
+ * 所有區塊跟隨 coverStyle，不再有獨立的 flightStyle、itineraryStyle 等
+ * 選一個主題 → 全站統一風格
+ */
+
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
@@ -14,14 +22,14 @@ import { TourHeroDreamscape } from '@/features/tours/components/sections/TourHer
 import { TourHeroCollage } from '@/features/tours/components/sections/TourHeroCollage'
 import { TourFlightSection } from '@/features/tours/components/sections/TourFlightSection'
 import { TourFeaturesSection } from '@/features/tours/components/sections/TourFeaturesSection'
+import { TourFeaturesSectionLuxury } from '@/features/tours/components/sections/TourFeaturesSectionLuxury'
 import { TourItinerarySection } from '@/features/tours/components/sections/TourItinerarySection'
 import { TourItinerarySectionLuxury } from '@/features/tours/components/sections/TourItinerarySectionLuxury'
 import { TourItinerarySectionArt } from '@/features/tours/components/sections/TourItinerarySectionArt'
 import { TourLeaderSection } from '@/features/tours/components/sections/TourLeaderSection'
+import { TourLeaderSectionLuxury } from '@/features/tours/components/sections/TourLeaderSectionLuxury'
 import { TourHotelsSection } from '@/features/tours/components/sections/TourHotelsSection'
 import { TourHotelsSectionLuxury } from '@/features/tours/components/sections/TourHotelsSectionLuxury'
-import { TourFeaturesSectionLuxury } from '@/features/tours/components/sections/TourFeaturesSectionLuxury'
-import { TourLeaderSectionLuxury } from '@/features/tours/components/sections/TourLeaderSectionLuxury'
 import { TourPricingSection } from '@/features/tours/components/sections/TourPricingSection'
 import { TourPricingSectionLuxury } from '@/features/tours/components/sections/TourPricingSectionLuxury'
 import { TourPriceTiersSection } from '@/features/tours/components/sections/TourPriceTiersSection'
@@ -36,6 +44,9 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
   const dailyItinerary = Array.isArray(data.dailyItinerary) ? data.dailyItinerary : []
   const [companyLogoUrl, setCompanyLogoUrl] = useState<string | null>(null)
 
+  // 統一風格 - 所有區塊跟隨 coverStyle
+  const style = data.coverStyle || 'original'
+
   // Custom hooks
   const { scrollOpacity } = useTourScrollEffects({ viewMode, isPreview })
   const { activeDayIndex, dayRefs, handleDayNavigate } = useTourItineraryNav(dailyItinerary)
@@ -44,7 +55,6 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
   useEffect(() => {
     const fetchCompanyLogo = async () => {
       try {
-        // 查詢 file_path 包含 logos/ 的資產（公司 LOGO 存放在 logos/ 資料夾）
         const { data: assets, error } = await supabase
           .from('company_assets')
           .select('file_path')
@@ -72,6 +82,12 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
     fetchCompanyLogo()
   }, [])
 
+  // 判斷是否為特定風格
+  const isLuxury = style === 'luxury'
+  const isArt = style === 'art'
+  const isDreamscape = style === 'dreamscape'
+  const isCollage = style === 'collage'
+
   return (
     <div className={viewMode === 'mobile' ? 'min-h-screen bg-muted' : 'min-h-screen bg-card'}>
       {/* Navigation */}
@@ -82,19 +98,19 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
         viewMode={viewMode}
       />
 
-      {/* Hero Section - 根據 coverStyle 切換八種風格 */}
+      {/* Hero Section */}
       <div id="top">
-        {data.coverStyle === 'luxury' ? (
+        {isLuxury ? (
           <TourHeroLuxury data={data} viewMode={viewMode} />
-        ) : data.coverStyle === 'art' ? (
+        ) : isArt ? (
           <TourHeroArt data={data} viewMode={viewMode} />
-        ) : data.coverStyle === 'gemini' ? (
+        ) : style === 'gemini' ? (
           <TourHeroGemini data={data} viewMode={viewMode} />
-        ) : data.coverStyle === 'nature' ? (
+        ) : style === 'nature' ? (
           <TourHeroNature data={data} viewMode={viewMode} />
-        ) : data.coverStyle === 'dreamscape' ? (
+        ) : isDreamscape ? (
           <TourHeroDreamscape data={data} viewMode={viewMode} />
-        ) : data.coverStyle === 'collage' ? (
+        ) : isCollage ? (
           <TourHeroCollage data={data} viewMode={viewMode} />
         ) : (
           <TourHeroSection data={data} viewMode={viewMode} />
@@ -106,35 +122,26 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
         <div className="border-t border-border"></div>
       </div>
 
-      {/* Flight Section - TourFlightSection 內部會根據 flightStyle/coverStyle 決定顯示風格 */}
+      {/* Flight Section - 風格跟隨 coverStyle */}
       <div id="flight">
-        <TourFlightSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
+        <TourFlightSection data={{ ...data, flightStyle: style }} viewMode={viewMode} coverStyle={style} />
       </div>
 
-      {/* Features Section - 只有當 features 有資料時才顯示 */}
+      {/* Features Section */}
       {data.showFeatures !== false && data.features?.length > 0 && (
         <>
-          {/* Divider */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="border-t border-border"></div>
           </div>
 
           <div id="features">
-            {(() => {
-              // 優先使用 featuresStyle，否則 fallback 到 coverStyle
-              const effectiveFeaturesStyle = data.featuresStyle ||
-                (data.coverStyle === 'luxury' ? 'luxury' :
-                 data.coverStyle === 'collage' ? 'collage' : 'original')
-
-              if (effectiveFeaturesStyle === 'luxury') {
-                return <TourFeaturesSectionLuxury data={data} viewMode={viewMode} />
-              } else {
-                return <TourFeaturesSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} featuresStyle={effectiveFeaturesStyle} />
-              }
-            })()}
+            {isLuxury ? (
+              <TourFeaturesSectionLuxury data={data} viewMode={viewMode} />
+            ) : (
+              <TourFeaturesSection data={data} viewMode={viewMode} coverStyle={style} featuresStyle={isCollage ? 'collage' : 'original'} />
+            )}
           </div>
 
-          {/* Divider */}
           {viewMode !== 'mobile' && (
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="border-t border-border"></div>
@@ -145,160 +152,128 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
 
       {/* Itinerary Section */}
       <div id="itinerary">
-        {(() => {
-          // 優先使用 itineraryStyle，否則 fallback 到 coverStyle
-          const effectiveStyle = data.itineraryStyle ||
-            (data.coverStyle === 'luxury' ? 'luxury' :
-             data.coverStyle === 'art' ? 'art' :
-             data.coverStyle === 'dreamscape' ? 'dreamscape' : 'original')
-
-          if (effectiveStyle === 'luxury') {
-            return (
-              <TourItinerarySectionLuxury
-                data={data}
-                viewMode={viewMode}
-                activeDayIndex={activeDayIndex}
-                dayRefs={dayRefs}
-                handleDayNavigate={handleDayNavigate}
-              />
-            )
-          } else if (effectiveStyle === 'art') {
-            return (
-              <TourItinerarySectionArt
-                data={data}
-                viewMode={viewMode}
-                activeDayIndex={activeDayIndex}
-                dayRefs={dayRefs}
-                handleDayNavigate={handleDayNavigate}
-              />
-            )
-          } else {
-            // 傳遞 effectiveStyle 作為 coverStyle，讓 TourItinerarySection 內部處理 dreamscape
-            return (
-              <TourItinerarySection
-                data={data}
-                viewMode={viewMode}
-                activeDayIndex={activeDayIndex}
-                dayRefs={dayRefs}
-                handleDayNavigate={handleDayNavigate}
-                coverStyle={effectiveStyle === 'dreamscape' ? 'dreamscape' : data.coverStyle}
-              />
-            )
-          }
-        })()}
+        {isLuxury ? (
+          <TourItinerarySectionLuxury
+            data={data}
+            viewMode={viewMode}
+            activeDayIndex={activeDayIndex}
+            dayRefs={dayRefs}
+            handleDayNavigate={handleDayNavigate}
+          />
+        ) : isArt ? (
+          <TourItinerarySectionArt
+            data={data}
+            viewMode={viewMode}
+            activeDayIndex={activeDayIndex}
+            dayRefs={dayRefs}
+            handleDayNavigate={handleDayNavigate}
+          />
+        ) : (
+          <TourItinerarySection
+            data={data}
+            viewMode={viewMode}
+            activeDayIndex={activeDayIndex}
+            dayRefs={dayRefs}
+            handleDayNavigate={handleDayNavigate}
+            coverStyle={style}
+          />
+        )}
       </div>
 
-      {/* Divider */}
+      {/* Leader Section */}
       {(data.leader?.name || data.leader?.phone || data.meetingInfo?.time || data.meetingInfo?.location || (data.meetingPoints && data.meetingPoints.length > 0)) && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="border-t border-border"></div>
-        </div>
-      )}
-
-      {/* Leader and Meeting Section - 有資料才顯示 */}
-      {(data.leader?.name || data.leader?.phone || data.meetingInfo?.time || data.meetingInfo?.location || (data.meetingPoints && data.meetingPoints.length > 0)) && (
-        <div id="leader">
-          {data.coverStyle === 'luxury' ? (
-            <TourLeaderSectionLuxury data={data} viewMode={viewMode} />
-          ) : (
-            <TourLeaderSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
-          )}
-        </div>
-      )}
-
-      {/* Divider */}
-      {data.showHotels !== false && data.hotels && data.hotels.length > 0 && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="border-t border-border"></div>
-        </div>
+        <>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="border-t border-border"></div>
+          </div>
+          <div id="leader">
+            {isLuxury ? (
+              <TourLeaderSectionLuxury data={data} viewMode={viewMode} />
+            ) : (
+              <TourLeaderSection data={data} viewMode={viewMode} coverStyle={style} />
+            )}
+          </div>
+        </>
       )}
 
       {/* Hotels Section */}
       {data.showHotels !== false && data.hotels && data.hotels.length > 0 && (
-        <div id="hotels">
-          {data.coverStyle === 'luxury' ? (
-            <TourHotelsSectionLuxury data={data} viewMode={viewMode} />
-          ) : (
-            <TourHotelsSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
-          )}
-        </div>
+        <>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="border-t border-border"></div>
+          </div>
+          <div id="hotels">
+            {isLuxury ? (
+              <TourHotelsSectionLuxury data={data} viewMode={viewMode} />
+            ) : (
+              <TourHotelsSection data={data} viewMode={viewMode} coverStyle={style} />
+            )}
+          </div>
+        </>
       )}
 
-      {/* Divider - Price Tiers */}
+      {/* Price Tiers Section */}
       {data.showPriceTiers && data.priceTiers && data.priceTiers.length > 0 && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="border-t border-border"></div>
         </div>
       )}
-
-      {/* Price Tiers Section (4人、6人、8人包團) */}
       <div id="price-tiers">
-        {data.coverStyle === 'luxury' ? (
+        {isLuxury ? (
           <TourPriceTiersSectionLuxury data={data} viewMode={viewMode} />
         ) : (
-          <TourPriceTiersSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
+          <TourPriceTiersSection data={data} viewMode={viewMode} coverStyle={style} />
         )}
       </div>
 
-      {/* Divider - Pricing Details */}
+      {/* Pricing Details Section */}
       {data.showPricingDetails && data.pricingDetails && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="border-t border-border"></div>
         </div>
       )}
-
-      {/* Pricing Details Section (費用包含/不含) */}
       <div id="pricing">
-        {data.coverStyle === 'luxury' ? (
+        {isLuxury ? (
           <TourPricingSectionLuxury data={data} viewMode={viewMode} />
         ) : (
-          <TourPricingSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
+          <TourPricingSection data={data} viewMode={viewMode} coverStyle={style} />
         )}
       </div>
 
-      {/* Divider - FAQ */}
+      {/* FAQ Section */}
       {data.showFaqs && data.faqs && data.faqs.length > 0 && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="border-t border-border"></div>
         </div>
       )}
-
-      {/* FAQ Section */}
       <div id="faq">
-        <TourFAQSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
+        <TourFAQSection data={data} viewMode={viewMode} coverStyle={style} />
       </div>
 
-      {/* Divider - Notices */}
+      {/* Notices Section */}
       {((data.showNotices && data.notices && data.notices.length > 0) ||
         (data.showCancellationPolicy && data.cancellationPolicy && data.cancellationPolicy.length > 0)) && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="border-t border-border"></div>
         </div>
       )}
-
-      {/* Notices & Cancellation Section */}
       <div id="notices">
-        <TourNoticesSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
+        <TourNoticesSection data={data} viewMode={viewMode} coverStyle={style} />
       </div>
 
       {/* Footer */}
       <footer className="bg-morandi-primary py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            {/* Company Logo */}
             <div className="flex justify-center mb-3">
               {companyLogoUrl ? (
                 <img
                   src={companyLogoUrl}
                   alt="Company Logo"
-                  className={`w-auto object-contain ${
-                    viewMode === 'mobile' ? 'h-6' : 'h-8'
-                  }`}
+                  className={`w-auto object-contain ${viewMode === 'mobile' ? 'h-6' : 'h-8'}`}
                 />
               ) : (
-                <h3 className={`font-bold text-morandi-gold ${
-                  viewMode === 'mobile' ? 'text-lg' : 'text-2xl'
-                }`}>
+                <h3 className={`font-bold text-morandi-gold ${viewMode === 'mobile' ? 'text-lg' : 'text-2xl'}`}>
                   {COMPANY.name}
                 </h3>
               )}
