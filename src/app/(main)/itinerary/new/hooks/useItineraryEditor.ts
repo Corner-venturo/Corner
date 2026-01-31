@@ -6,6 +6,7 @@ import { useAuthStore } from '@/stores'
 import { createItinerary, updateItinerary } from '@/data'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
+import { syncHotelsFromItineraryToQuote } from '@/features/quotes/services/quoteItinerarySync'
 import type {
   FlightInfo,
   Feature,
@@ -144,6 +145,17 @@ export function useItineraryEditor() {
         logger.log('[ItineraryEditor] 更新行程:', currentItineraryId)
         await updateItinerary(currentItineraryId, convertedData)
         logger.log('[ItineraryEditor] 更新完成')
+
+        // 同步飯店到報價單
+        if (convertedData.daily_itinerary && convertedData.daily_itinerary.length > 0) {
+          syncHotelsFromItineraryToQuote(currentItineraryId, convertedData.daily_itinerary as { accommodation?: string }[])
+            .then(result => {
+              if (!result.success && result.message !== '無關聯報價單，跳過同步') {
+                logger.warn('飯店同步到報價單:', result.message)
+              }
+            })
+            .catch(err => logger.error('飯店同步錯誤:', err))
+        }
       } else {
         if (!convertedData.title) {
           setAutoSaveStatus('idle')

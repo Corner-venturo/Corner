@@ -9,7 +9,11 @@
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import type { CostCategory, CostItem } from '../types'
-import type { DailyItineraryDay } from '@/stores/types'
+// 支援兩種 daily itinerary 類型
+interface DailyItineraryItem {
+  accommodation?: string
+  [key: string]: unknown
+}
 import type { Json } from '@/lib/supabase/types'
 
 interface SyncResult {
@@ -66,7 +70,7 @@ export async function syncHotelsFromQuoteToItinerary(
       return { success: false, message: '找不到行程表' }
     }
 
-    const dailyItinerary = (itinerary.daily_itinerary || []) as unknown as DailyItineraryDay[]
+    const dailyItinerary = (itinerary.daily_itinerary || []) as unknown as DailyItineraryItem[]
 
     // 3. 根據報價單住宿項目更新行程表
     let updated = false
@@ -117,7 +121,7 @@ export async function syncHotelsFromQuoteToItinerary(
  */
 export async function syncHotelsFromItineraryToQuote(
   itineraryId: string,
-  dailyItinerary: DailyItineraryDay[]
+  dailyItinerary: DailyItineraryItem[]
 ): Promise<SyncResult> {
   try {
     // 1. 取得關聯的報價單
