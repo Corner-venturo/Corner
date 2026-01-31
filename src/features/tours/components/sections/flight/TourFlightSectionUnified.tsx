@@ -1,20 +1,26 @@
 'use client'
 
+/**
+ * 統一航班區塊 - 根據風格路由到對應元件
+ *
+ * 風格對應：
+ * - original, nature, gemini → UnifiedFlightCard (卡片式)
+ * - luxury → LuxuryFlightSection (表格式)
+ * - art → UnifiedFlightCard with Art theme
+ * - dreamscape → DreamscapeFlightSection (時間軸式)
+ * - collage → CollageFlightSection (登機證式)
+ */
+
 import { UnifiedFlightCard } from './UnifiedFlightCard'
+import { LuxuryFlightSection } from './LuxuryFlightSection'
+import { DreamscapeFlightSection } from './DreamscapeFlightSection'
+import { CollageFlightSection } from './CollageFlightSection'
 import { getTheme, type TourStyle } from '@/features/tours/themes'
 import type { TourPageData } from '@/features/tours/types/tour-display.types'
-
-/**
- * 統一航班區塊 - 用主題系統取代多個獨立元件
- *
- * 整合前：5 個獨立元件 (1,464 行)
- * 整合後：1 個統一元件 + 主題系統
- */
 
 interface TourFlightSectionUnifiedProps {
   data: TourPageData
   viewMode: 'desktop' | 'mobile'
-  /** 強制指定風格，覆蓋 data.flightStyle */
   forceStyle?: TourStyle
 }
 
@@ -25,10 +31,8 @@ function resolveStyle(
 ): TourStyle {
   // 優先使用 flightStyle
   if (flightStyle && flightStyle !== 'none') {
-    // 特殊映射
     if (flightStyle === 'chinese') return 'nature'
     if (flightStyle === 'japanese') return 'nature'
-    // 直接對應
     if (['original', 'luxury', 'art', 'dreamscape', 'collage', 'nature', 'gemini'].includes(flightStyle)) {
       return flightStyle as TourStyle
     }
@@ -44,11 +48,7 @@ function resolveStyle(
   return 'original'
 }
 
-export function TourFlightSectionUnified({
-  data,
-  viewMode,
-  forceStyle,
-}: TourFlightSectionUnifiedProps) {
+export function TourFlightSectionUnified({ data, viewMode, forceStyle }: TourFlightSectionUnifiedProps) {
   const isMobile = viewMode === 'mobile'
 
   // 國內無航班
@@ -63,6 +63,50 @@ export function TourFlightSectionUnified({
 
   // 決定風格
   const style = forceStyle || resolveStyle(data.flightStyle, data.coverStyle)
+
+  // ============================================
+  // 特殊布局風格 - 使用專屬 Section 元件
+  // ============================================
+
+  // Luxury - 表格式
+  if (style === 'luxury') {
+    return (
+      <LuxuryFlightSection
+        outboundFlight={data.outboundFlight}
+        returnFlight={data.returnFlight}
+        viewMode={viewMode}
+      />
+    )
+  }
+
+  // Dreamscape - 時間軸式
+  if (style === 'dreamscape') {
+    return (
+      <DreamscapeFlightSection
+        outboundFlight={data.outboundFlight}
+        returnFlight={data.returnFlight}
+        departureDate={data.departureDate}
+        viewMode={viewMode}
+      />
+    )
+  }
+
+  // Collage - 登機證式
+  if (style === 'collage') {
+    return (
+      <CollageFlightSection
+        outboundFlight={data.outboundFlight}
+        returnFlight={data.returnFlight}
+        departureDate={data.departureDate}
+        viewMode={viewMode}
+      />
+    )
+  }
+
+  // ============================================
+  // 卡片式風格 - 使用 UnifiedFlightCard
+  // ============================================
+
   const theme = getTheme(style)
 
   // 區塊背景樣式
@@ -89,14 +133,11 @@ export function TourFlightSectionUnified({
     >
       <div className={isMobile ? 'px-4' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'}>
         {/* 標題（部分風格顯示） */}
-        {['nature', 'luxury'].includes(style) && (
+        {style === 'nature' && (
           <div className="flex flex-col items-center justify-center gap-2 mb-8 text-center">
             <h2
               className="text-2xl md:text-3xl font-medium tracking-wide"
-              style={{
-                color: theme.colors.text,
-                fontFamily: theme.fonts.heading,
-              }}
+              style={{ color: theme.colors.text, fontFamily: theme.fonts.heading }}
             >
               航班資訊
             </h2>
@@ -125,16 +166,12 @@ export function TourFlightSectionUnified({
           )}
         </div>
 
-        {/* 底部說明（部分風格顯示） */}
-        {['nature', 'luxury'].includes(style) && (
+        {/* 底部說明（nature 風格顯示） */}
+        {style === 'nature' && (
           <div className="text-center mt-8">
             <p
               className="text-xs leading-relaxed"
-              style={{
-                color: theme.colors.muted,
-                opacity: 0.5,
-                fontFamily: theme.fonts.body,
-              }}
+              style={{ color: theme.colors.muted, opacity: 0.5, fontFamily: theme.fonts.body }}
             >
               * 航班時間可能會有所變動，請以最新通知為準。
             </p>
