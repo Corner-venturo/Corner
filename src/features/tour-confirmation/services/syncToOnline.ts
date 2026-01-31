@@ -3,12 +3,12 @@
  * 
  * 當確認單交接時呼叫，將行程資料同步到 online_trips 表
  * 
- * TODO: 等 online_trips 表加入 Database 類型後移除 eslint-disable
+ * TODO: online_trips 表建立後，重新執行 supabase gen types 更新類型
  */
 
+import { createClient } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
-import type { Tour, Itinerary } from '@/stores/types'
 
 interface SyncResult {
   success: boolean
@@ -16,8 +16,34 @@ interface SyncResult {
   onlineTripId?: string
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const supabaseAny = supabase as any
+/** online_trips 表的資料結構（尚未加入 Database 類型） */
+interface OnlineTrip {
+  id: string
+  erp_tour_id: string
+  erp_itinerary_id: string | null
+  code: string
+  name: string
+  departure_date: string
+  return_date: string
+  destination: string | null
+  daily_itinerary: unknown[]
+  leader_info: unknown | null
+  meeting_info: unknown | null
+  outbound_flight: unknown | null
+  return_flight: unknown | null
+  status: string
+  handoff_at: string
+  workspace_id: string
+  updated_at: string
+}
+
+type OnlineTripInsert = Omit<OnlineTrip, 'id'>
+
+/** 無類型的 Supabase client（用於尚未加入 Database 類型的表） */
+const untypedSupabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 /**
  * 同步行程到 Online
@@ -36,36 +62,37 @@ export async function syncTripToOnline(tourId: string): Promise<SyncResult> {
     }
 
     // 2. 取得行程表資料
-    const { data: itinerary, error: itineraryError } = await supabase
+    const { data: itinerary } = await supabase
       .from('itineraries')
       .select('*')
       .eq('tour_id', tourId)
       .maybeSingle()
 
-    // 3. 檢查是否已經同步過 (online_trips 不在 Database 類型中)
-    const { data: existingTrip } = await supabaseAny
+    // 3. 檢查是否已經同步過
+    const { data: existingTrip } = await untypedSupabase
       .from('online_trips')
       .select('id')
       .eq('erp_tour_id', tourId)
-      .maybeSingle() as { data: { id: string } | null; error: unknown }
+      .maybeSingle<Pick<OnlineTrip, 'id'>>()
 
     // 4. 準備同步資料
-    const syncData = {
+    const dailyItinerary = itinerary?.daily_itinerary
+    const syncData: OnlineTripInsert = {
       erp_tour_id: tourId,
-      erp_itinerary_id: itinerary?.id || null,
+      erp_itinerary_id: itinerary?.id ?? null,
       code: tour.code,
       name: tour.name,
       departure_date: tour.departure_date,
       return_date: tour.return_date,
-      destination: tour.location,
-      daily_itinerary: itinerary?.daily_itinerary || [],
-      leader_info: itinerary?.leader || null,
-      meeting_info: itinerary?.meeting_info || null,
-      outbound_flight: (tour as { outbound_flight?: unknown }).outbound_flight || null,
-      return_flight: (tour as { return_flight?: unknown }).return_flight || null,
+      destination: tour.location ?? null,
+      daily_itinerary: Array.isArray(dailyItinerary) ? dailyItinerary : [],
+      leader_info: itinerary?.leader ?? null,
+      meeting_info: itinerary?.meeting_info ?? null,
+      outbound_flight: (tour as Record<string, unknown>).outbound_flight ?? null,
+      return_flight: (tour as Record<string, unknown>).return_flight ?? null,
       status: 'active',
       handoff_at: new Date().toISOString(),
-      workspace_id: tour.workspace_id,
+      workspace_id: tour.workspace_id ?? '',
       updated_at: new Date().toISOString(),
     }
 
@@ -73,7 +100,7 @@ export async function syncTripToOnline(tourId: string): Promise<SyncResult> {
 
     if (existingTrip) {
       // 更新現有記錄
-      const { error: updateError } = await supabaseAny
+      const { error: updateError } = await untypedSupabase
         .from('online_trips')
         .update(syncData)
         .eq('id', existingTrip.id)
@@ -87,15 +114,15 @@ export async function syncTripToOnline(tourId: string): Promise<SyncResult> {
       logger.info(`行程已更新到 Online: ${onlineTripId}`)
     } else {
       // 建立新記錄
-      const { data: newTrip, error: insertError } = await supabaseAny
+      const { data: newTrip, error: insertError } = await untypedSupabase
         .from('online_trips')
         .insert(syncData)
         .select('id')
-        .single()
+        .single<Pick<OnlineTrip, 'id'>>()
 
       if (insertError || !newTrip) {
         logger.error('建立 Online 行程失敗:', insertError)
-        return { success: false, message: insertError?.message || '建立失敗' }
+        return { success: false, message: insertError?.message ?? '建立失敗' }
       }
 
       onlineTripId = newTrip.id
