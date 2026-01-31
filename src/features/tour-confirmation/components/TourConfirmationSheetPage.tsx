@@ -141,7 +141,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     loadItinerary()
   }, [tour.id])
 
-  // 載入需求單（包含已確認的需求單）
+  // 載入需求單（顯示所有狀態，除了取消的）
   useEffect(() => {
     const loadTourRequests = async () => {
       if (!tour.id) return
@@ -151,7 +151,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
           .from('tour_requests')
           .select('*')
           .eq('tour_id', tour.id)
-          .in('status', ['confirmed', 'replied'])
+          .neq('status', 'cancelled')
           .order('service_date')
         if (data) {
           setTourRequests(data)
