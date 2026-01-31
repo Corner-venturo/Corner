@@ -50,15 +50,18 @@ CREATE INDEX IF NOT EXISTS idx_online_trips_departure ON online_trips(departure_
 ALTER TABLE online_trips ENABLE ROW LEVEL SECURITY;
 
 -- 允許所有已認證用戶讀取
+DROP POLICY IF EXISTS "online_trips_select" ON online_trips;
 CREATE POLICY "online_trips_select" ON online_trips
   FOR SELECT TO authenticated
   USING (true);
 
 -- 只有 ERP 可以寫入（透過 service_role）
+DROP POLICY IF EXISTS "online_trips_insert" ON online_trips;
 CREATE POLICY "online_trips_insert" ON online_trips
   FOR INSERT TO authenticated
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "online_trips_update" ON online_trips;
 CREATE POLICY "online_trips_update" ON online_trips
   FOR UPDATE TO authenticated
   USING (true);

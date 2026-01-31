@@ -3,12 +3,16 @@ import type {
   LeaderInfo as LeaderInfoType,
   DailyImage as DailyImageType,
   HotelInfo as HotelInfoType,
+  PricingItem as PricingItemType,
+  PricingDetails as PricingDetailsType,
 } from '@/stores/types/tour.types'
 
 // 本地類型別名（供此檔案內使用）
 export type LeaderInfo = LeaderInfoType
 export type DailyImage = DailyImageType
 export type HotelInfo = HotelInfoType
+export type PricingItem = PricingItemType
+export type PricingDetails = PricingDetailsType
 
 export interface FlightInfo {
   airline: string
@@ -103,22 +107,7 @@ export interface MeetingPoint {
   airline?: string | null
 }
 
-// HotelInfo 已從 stores/types/tour.types.ts 統一匯出
-
-// 費用包含/不含項目
-export interface PricingItem {
-  text: string // 項目文字
-  included: boolean // 是否包含
-}
-
-// 詳細團費資訊
-export interface PricingDetails {
-  show_pricing_details?: boolean // 是否顯示詳細團費
-  insurance_amount?: '250' | '300' | '500' | string // 旅遊責任險金額（萬元），可選擇或自訂
-  included_items: PricingItem[] // 費用包含項目
-  excluded_items: PricingItem[] // 費用不含項目
-  notes: string[] // 注意事項
-}
+// HotelInfo, PricingItem, PricingDetails 已從 stores/types/tour.types.ts 統一匯出
 
 // 價格方案（如 4人包團、6人包團、8人包團）
 export interface PriceTier {

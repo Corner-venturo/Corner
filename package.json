@@ -162,6 +162,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^6.1.0",
     "jsdom": "^27.2.0",
+    "pg": "^8.18.0",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
     "tsx": "^4.20.6",
