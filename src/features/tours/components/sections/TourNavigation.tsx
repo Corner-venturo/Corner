@@ -1,6 +1,7 @@
 import { Home, Plane, MapPin, Phone, Users, HelpCircle, DollarSign, Hotel, Sparkles, AlertCircle, type LucideIcon } from 'lucide-react'
 import { FloatingDock } from '@/components/ui/floating-dock'
 import { useMemo } from 'react'
+import type { TourPageData } from '@/features/tours/types/tour-display.types'
 
 interface NavLink {
   title: string
@@ -8,31 +9,8 @@ interface NavLink {
   href: string
 }
 
-interface TourNavigationData {
-  navLinks?: NavLink[]
-  // 判斷各區塊是否有內容
-  features?: unknown[]
-  showFeatures?: boolean
-  dailyItinerary?: unknown[]
-  leader?: { name?: string }
-  meetingInfo?: { time?: string; location?: string }
-  meetingPoints?: unknown[]
-  hotels?: unknown[]
-  showHotels?: boolean
-  priceTiers?: unknown[]
-  showPriceTiers?: boolean
-  pricingDetails?: unknown
-  showPricingDetails?: boolean
-  faqs?: unknown[]
-  showFaqs?: boolean
-  notices?: unknown[]
-  showNotices?: boolean
-  cancellationPolicy?: unknown[]
-  showCancellationPolicy?: boolean
-}
-
 interface TourNavigationProps {
-  data: TourNavigationData
+  data: TourPageData
   scrollOpacity: number
   isPreview: boolean
   viewMode: 'desktop' | 'mobile'

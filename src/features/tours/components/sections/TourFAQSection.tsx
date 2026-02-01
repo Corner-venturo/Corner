@@ -4,19 +4,10 @@ import { cn } from '@/lib/utils'
 import { MessageCircleQuestion, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import { SectionTitle } from './SectionTitle'
-
-interface FAQ {
-  question: string
-  answer: string
-}
-
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
+import type { TourPageData, CoverStyleType } from '@/features/tours/types/tour-display.types'
 
 interface TourFAQSectionProps {
-  data: {
-    showFaqs?: boolean
-    faqs?: FAQ[]
-  }
+  data: TourPageData
   viewMode?: 'desktop' | 'mobile'
   coverStyle?: CoverStyleType
 }

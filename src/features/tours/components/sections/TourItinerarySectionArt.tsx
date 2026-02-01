@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion'
 import { MutableRefObject } from 'react'
-import { TourFormData } from '@/components/editor/tour-form/types'
 import { ART } from './utils/art-theme'
 import { useImageGallery } from './hooks/useImageGallery'
 import {
@@ -14,9 +13,10 @@ import {
 import { ImageGalleryModal } from './components/ImageGalleryModal'
 import { MobileDaySection } from './components/MobileDaySection'
 import { DaySection } from './components/DaySection'
+import type { TourPageData } from '@/features/tours/types/tour-display.types'
 
 interface TourItinerarySectionArtProps {
-  data: TourFormData
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
   activeDayIndex: number
   dayRefs: MutableRefObject<(HTMLDivElement | null)[]>

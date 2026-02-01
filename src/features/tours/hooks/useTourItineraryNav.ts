@@ -2,11 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react'
 
-interface DailyItineraryItem {
-  [key: string]: unknown
-}
-
-export function useTourItineraryNav(dailyItinerary: DailyItineraryItem[]) {
+// 使用泛型讓 hook 接受任何陣列類型（只需要 length）
+export function useTourItineraryNav<T>(dailyItinerary: T[]) {
   const [activeDayIndex, setActiveDayIndex] = useState(0)
   const dayRefs = useRef<(HTMLDivElement | null)[]>([])
 

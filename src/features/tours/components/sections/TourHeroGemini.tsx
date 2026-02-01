@@ -2,6 +2,7 @@
 
 import { MapPin, Calendar } from 'lucide-react'
 import { isHtmlString, cleanTiptapHtml } from '@/lib/utils/rich-text'
+import type { TourPageData } from '@/features/tours/types/tour-display.types'
 
 // 渲染可能包含 HTML 的文字（保留內聯樣式）
 function RichText({ html, className }: { html: string | null | undefined; className?: string }) {
@@ -14,19 +15,7 @@ function RichText({ html, className }: { html: string | null | undefined; classN
 }
 
 interface TourHeroGeminiProps {
-  data: {
-    coverImage?: string | null
-    tagline?: string | null
-    title: string
-    subtitle?: string | null
-    description?: string | null
-    departureDate: string
-    tourCode: string
-    country?: string
-    city?: string
-    price?: string
-    priceNote?: string
-  }
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
 }
 

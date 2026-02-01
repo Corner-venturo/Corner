@@ -1,23 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import type { PricingDetails } from '@/stores/types/tour.types'
+import type { TourPageData } from '@/features/tours/types/tour-display.types'
 
-// Art 風格專用的 PriceTier（與標準版不同結構）
-interface ArtPriceTier {
-  name: string
-  pricePerPerson: number
-  description?: string
-  features?: string[]
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface TourPricingSectionArtProps {
-  data: {
-    showPricingDetails?: boolean
-    pricingDetails?: PricingDetails | null
-    priceTiers?: ArtPriceTier[] | any[] | null
-  }
+  data: TourPageData
   viewMode?: 'desktop' | 'mobile'
 }
 
@@ -146,7 +133,7 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                       className="text-2xl font-light mb-2"
                       style={{ fontFamily: "'Zen Old Mincho', serif", color: colors.ink }}
                     >
-                      {tier.name}
+                      {tier.name || tier.label || '方案'}
                     </h3>
                     <p className="text-sm text-morandi-secondary mb-8" style={{ fontFamily: "'Italiana', serif" }}>
                       {tier.description || '專屬行程體驗'}
@@ -159,7 +146,7 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                           className="text-4xl lg:text-5xl font-light"
                           style={{ fontFamily: "'Cinzel', serif", color: colors.clay }}
                         >
-                          {formatPrice(tier.pricePerPerson)}
+                          {formatPrice(typeof tier.pricePerPerson === 'number' ? tier.pricePerPerson : Number(tier.pricePerPerson || tier.price) || 0)}
                         </span>
                         <span className="text-sm text-morandi-secondary">TWD / 人</span>
                       </div>

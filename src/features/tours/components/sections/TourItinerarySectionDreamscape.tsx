@@ -3,8 +3,11 @@
 import { MutableRefObject, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
-import { TourFormData, DreamscapeDayLayout } from '@/components/editor/tour-form/types'
 import { formatDateMonthDayEN } from '@/lib/utils/format-date'
+import type { DailyItinerary as DailyItineraryType, TourPageData } from '@/features/tours/types/tour-display.types'
+
+// Dreamscape 每日行程佈局風格
+type DreamscapeDayLayout = 'blobLeft' | 'blobRight' | 'fullHero' | 'glassCard'
 
 // Dreamscape 配色
 const DREAM = {
@@ -18,7 +21,7 @@ const DREAM = {
 }
 
 interface TourItinerarySectionDreamscapeProps {
-  data: TourFormData
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
   activeDayIndex: number
   dayRefs: MutableRefObject<(HTMLDivElement | null)[]>
@@ -26,7 +29,7 @@ interface TourItinerarySectionDreamscapeProps {
 }
 
 // 計算 dayLabel
-function calculateDayLabels(itinerary: TourFormData['dailyItinerary']): string[] {
+function calculateDayLabels(itinerary: DailyItineraryType[]): string[] {
   const labels: string[] = []
   let currentDayNumber = 0
   let alternativeCount = 0
@@ -62,7 +65,7 @@ function BlobLeftLayout({
   isMobile,
   dayRef,
 }: {
-  day: TourFormData['dailyItinerary'][0]
+  day: DailyItineraryType
   dayLabel: string
   index: number
   isMobile: boolean
@@ -177,7 +180,7 @@ function BlobRightLayout({
   isMobile,
   dayRef,
 }: {
-  day: TourFormData['dailyItinerary'][0]
+  day: DailyItineraryType
   dayLabel: string
   index: number
   isMobile: boolean
@@ -296,7 +299,7 @@ function FullHeroLayout({
   isMobile,
   dayRef,
 }: {
-  day: TourFormData['dailyItinerary'][0]
+  day: DailyItineraryType
   dayLabel: string
   index: number
   isMobile: boolean
@@ -396,7 +399,7 @@ function GlassCardLayout({
   isMobile,
   dayRefs,
 }: {
-  days: TourFormData['dailyItinerary']
+  days: DailyItineraryType[]
   dayLabels: string[]
   startIndex: number
   isMobile: boolean

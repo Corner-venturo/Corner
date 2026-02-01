@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, ArrowRight, ChevronDown } from 'lucide-react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
+import type { TourPageData, Feature } from '@/features/tours/types/tour-display.types'
 
 // Luxury 配色
 const LUXURY = {
@@ -16,20 +17,8 @@ const LUXURY = {
   muted: '#636E72',
 }
 
-interface TourFeature {
-  icon: string
-  title: string
-  description: string
-  images?: string[]
-  tag?: string // 自訂標籤文字
-  tagColor?: string // 自訂標籤顏色
-}
-
 interface TourFeaturesSectionLuxuryProps {
-  data: {
-    features?: TourFeature[]
-    showFeatures?: boolean
-  }
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
 }
 
@@ -87,7 +76,7 @@ export function TourFeaturesSectionLuxury({ data, viewMode }: TourFeaturesSectio
   }
 
   // 取得標籤文字：優先使用自訂 tag，其次用 icon 對應，最後用預設
-  const getFeatureTag = (feature: TourFeature, index: number) => {
+  const getFeatureTag = (feature: Feature, index: number) => {
     // 優先使用自訂標籤
     if (feature.tag && feature.tag.trim()) return feature.tag.trim()
     // 其次用 icon 對應
@@ -99,7 +88,7 @@ export function TourFeaturesSectionLuxury({ data, viewMode }: TourFeaturesSectio
   }
 
   // 取得標籤顏色：優先使用自訂 tagColor，其次根據索引交替
-  const getTagColor = (feature: TourFeature, index: number) => {
+  const getTagColor = (feature: Feature, index: number) => {
     // 優先使用自訂顏色
     if (feature.tagColor) return feature.tagColor
     // 預設交替使用主色和次色
@@ -235,7 +224,7 @@ function FeatureCard({
   onToggleExpand,
   onImageClick
 }: {
-  feature: TourFeature
+  feature: Feature
   index: number
   isMobile: boolean
   tag: string

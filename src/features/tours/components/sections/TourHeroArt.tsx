@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { isHtmlString, cleanTiptapHtml } from '@/lib/utils/rich-text'
 import { ART } from './utils/art-theme'
+import type { TourPageData } from '@/features/tours/types/tour-display.types'
 
 // 渲染可能包含 HTML 的文字（保留內聯樣式）
 function RichText({ html, className }: { html: string | null | undefined; className?: string }) {
@@ -21,26 +22,12 @@ const brutalistShadow = '6px 6px 0px 0px rgba(28,28,28,1)'
 const DEFAULT_COVER = ''
 
 interface TourHeroArtProps {
-  data: {
-    coverImage?: string | null
-    tagline?: string | null
-    title: string
-    subtitle?: string | null
-    description?: string | null
-    departureDate: string
-    tourCode: string
-    country?: string
-    city?: string
-    price?: string
-    priceNote?: string
-    days?: number
-    dailyItinerary?: Array<{ dayLabel?: string }>
-  }
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
 }
 
 // 從標題或行程陣列中提取天數
-function extractDayNumber(title: string, dailyItinerary?: Array<{ dayLabel?: string }>): number {
+function extractDayNumber(title: string | undefined, dailyItinerary?: Array<{ dayLabel?: string }>): number {
   // 優先從 dailyItinerary 計算天數
   if (dailyItinerary && dailyItinerary.length > 0) {
     // 檢查最後一個 dayLabel，可能是 "Day 5" 或 "Day 3-4" 這種格式
@@ -62,9 +49,11 @@ function extractDayNumber(title: string, dailyItinerary?: Array<{ dayLabel?: str
   }
 
   // fallback: 從標題中提取天數
-  const match = title.match(/(\d+)\s*[天日]/)
-  if (match) {
-    return parseInt(match[1], 10)
+  if (title) {
+    const match = title.match(/(\d+)\s*[天日]/)
+    if (match) {
+      return parseInt(match[1], 10)
+    }
   }
 
   // 最後 fallback: 返回 0（不顯示或顯示 --）
@@ -72,7 +61,7 @@ function extractDayNumber(title: string, dailyItinerary?: Array<{ dayLabel?: str
 }
 
 // 格式化日期為 DEC 24 格式
-function formatDateShort(dateStr: string): string {
+function formatDateShort(dateStr: string | undefined): string {
   if (!dateStr) return ''
   try {
     const date = new Date(dateStr)

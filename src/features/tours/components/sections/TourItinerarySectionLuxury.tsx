@@ -3,7 +3,6 @@
 import { motion } from 'framer-motion'
 import { MutableRefObject, useState } from 'react'
 import { MapPin, Star, ArrowRight } from 'lucide-react'
-import { TourFormData } from '@/components/editor/tour-form/types'
 import {
   LUXURY,
   DAY_COLORS,
@@ -16,9 +15,10 @@ import {
 } from './utils/itineraryLuxuryUtils'
 import { ImageGalleryModal } from './modals/ImageGalleryModal'
 import { ActivityDetailModal } from './modals/ActivityDetailModal'
+import type { TourPageData } from '@/features/tours/types/tour-display.types'
 
 interface TourItinerarySectionLuxuryProps {
-  data: TourFormData
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
   activeDayIndex: number
   dayRefs: MutableRefObject<(HTMLDivElement | null)[]>

@@ -595,7 +595,7 @@ export const useEmailStore = create<EmailStoreState>()(
           }
           const { data, error } = await supabase
             .from('emails')
-             
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- emails Insert 型別與實際結構不符
             .insert(insertData as any)
             .select()
             .single()

@@ -4,7 +4,7 @@ import React from 'react'
 import { TransportationRate } from '@/types/transportation-rates.types'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { DndContext, closestCenter, DragEndEvent, SensorDescriptor } from '@dnd-kit/core'
+import { DndContext, closestCenter, DragEndEvent, SensorDescriptor, SensorOptions } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { ItemRow } from './item-row'
 
@@ -34,8 +34,7 @@ interface CategoryGroupRowProps {
   setIsAdding: (isAdding: boolean) => void
   setNewRow: (row: Partial<TransportationRate>) => void
   handleItemDragEnd: (categoryKey: string, event: DragEndEvent) => Promise<void>
-   
-  sensors: SensorDescriptor<any>[]
+  sensors: SensorDescriptor<SensorOptions>[]
 }
 
 export function CategoryGroupRow({

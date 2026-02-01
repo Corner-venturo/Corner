@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { HotelInfo } from '@/components/editor/tour-form/types'
+import type { TourPageData, HotelInfo } from '@/features/tours/types/tour-display.types'
 
 // Luxury 配色
 const LUXURY = {
@@ -17,10 +17,7 @@ const LUXURY = {
 }
 
 interface TourHotelsSectionLuxuryProps {
-  data: {
-    hotels?: HotelInfo[] | null
-    showHotels?: boolean
-  }
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
 }
 

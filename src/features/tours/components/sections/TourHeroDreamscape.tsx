@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { isHtmlString, cleanTiptapHtml } from '@/lib/utils/rich-text'
 import { formatMonthShort } from '@/lib/utils/format-date'
+import type { TourPageData } from '@/features/tours/types/tour-display.types'
 
 // 渲染可能包含 HTML 的文字
 function RichText({ html, className }: { html: string | null | undefined; className?: string }) {
@@ -30,26 +31,12 @@ const DREAM = {
 const DEFAULT_COVER = ''
 
 interface TourHeroDreamscapeProps {
-  data: {
-    coverImage?: string | null
-    tagline?: string | null
-    title: string
-    subtitle?: string | null
-    description?: string | null
-    departureDate: string
-    tourCode: string
-    country?: string
-    city?: string
-    price?: string
-    priceNote?: string
-    days?: number
-    dailyItinerary?: Array<{ dayLabel?: string }>
-  }
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
 }
 
 // 從標題或行程陣列中提取天數
-function extractDayNumber(title: string, dailyItinerary?: Array<{ dayLabel?: string }>): number {
+function extractDayNumber(title: string | undefined, dailyItinerary?: Array<{ dayLabel?: string }>): number {
   if (dailyItinerary && dailyItinerary.length > 0) {
     const lastDay = dailyItinerary[dailyItinerary.length - 1]
     if (lastDay?.dayLabel) {
@@ -60,13 +47,15 @@ function extractDayNumber(title: string, dailyItinerary?: Array<{ dayLabel?: str
     }
     return dailyItinerary.length
   }
-  const match = title.match(/(\d+)\s*[天日]/)
-  if (match) return parseInt(match[1], 10)
+  if (title) {
+    const match = title.match(/(\d+)\s*[天日]/)
+    if (match) return parseInt(match[1], 10)
+  }
   return 0
 }
 
 // 格式化日期為 DEC 24 格式
-function formatDateShort(dateStr: string): string {
+function formatDateShort(dateStr: string | undefined): string {
   if (!dateStr) return ''
   try {
     const date = new Date(dateStr)
@@ -79,7 +68,8 @@ function formatDateShort(dateStr: string): string {
 }
 
 // 分割標題（取得主標題和副標題）
-function splitTitle(title: string): { main: string; sub: string } {
+function splitTitle(title: string | undefined): { main: string; sub: string } {
+  if (!title) return { main: '', sub: '' }
   // 嘗試用常見分隔符分割
   const separators = ['｜', '|', '·', '—', '-']
   for (const sep of separators) {

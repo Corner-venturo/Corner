@@ -286,7 +286,7 @@ export class PluginManager {
 
   private async getPluginStorage<T>(pluginId: string, key: string): Promise<T | null> {
     // plugin_storage 表尚未加入 Supabase 型別定義（需先執行 migration）
-     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- plugin_storage 表尚未加入型別定義
     const { data, error } = await (supabase as any)
       .from('plugin_storage')
       .select('value')
@@ -301,7 +301,7 @@ export class PluginManager {
 
   private async setPluginStorage<T>(pluginId: string, key: string, value: T): Promise<void> {
     // plugin_storage 表尚未加入 Supabase 型別定義（需先執行 migration）
-     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- plugin_storage 表尚未加入型別定義
     await (supabase as any)
       .from('plugin_storage')
       .upsert({
@@ -315,7 +315,7 @@ export class PluginManager {
 
   private async deletePluginStorage(pluginId: string, key: string): Promise<void> {
     // plugin_storage 表尚未加入 Supabase 型別定義（需先執行 migration）
-     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- plugin_storage 表尚未加入型別定義
     await (supabase as any)
       .from('plugin_storage')
       .delete()
@@ -326,7 +326,7 @@ export class PluginManager {
 
   private async savePluginConfig(pluginId: string, config: PluginConfig): Promise<void> {
     // plugin_configs 表尚未加入 Supabase 型別定義（需先執行 migration）
-     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- plugin_configs 表尚未加入型別定義
     await (supabase as any)
       .from('plugin_configs')
       .upsert({

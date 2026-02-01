@@ -356,11 +356,17 @@ export interface Itinerary {
 
 // 價格方案（如 4人包團、6人包團、8人包團）
 export interface PriceTier {
+  // 基本欄位（報價單用）
   label: string // 如「4人包團」、「6人包團」
   sublabel?: string // 如「每人」
   price: string // 如「34,500」
   priceNote?: string // 如「起」
   addon?: string // 如「加購1日包車 / 每人+NT$900」
+  // 展示層欄位（Tour Section 用）
+  name?: string // 方案名稱（展示用，同 label）
+  description?: string // 方案說明
+  pricePerPerson?: number | string // 每人價格（數值或格式化字串）
+  features?: string[] // 方案包含項目
 }
 
 // 常見問題

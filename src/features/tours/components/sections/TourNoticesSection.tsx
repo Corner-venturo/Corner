@@ -3,16 +3,10 @@
 import { cn } from '@/lib/utils'
 import { AlertCircle, FileX } from 'lucide-react'
 import { SectionTitle } from './SectionTitle'
-
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
+import type { TourPageData, CoverStyleType } from '@/features/tours/types/tour-display.types'
 
 interface TourNoticesSectionProps {
-  data: {
-    showNotices?: boolean
-    notices?: string[]
-    showCancellationPolicy?: boolean
-    cancellationPolicy?: string[]
-  }
+  data: TourPageData
   viewMode?: 'desktop' | 'mobile'
   coverStyle?: CoverStyleType
 }

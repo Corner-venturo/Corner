@@ -76,6 +76,7 @@ export interface TourPageData {
   countries?: TourCountry[]
   departureDate?: string
   tourCode?: string
+  days?: number // 行程天數（可從 dailyItinerary 計算）
 
   // === 封面 ===
   coverImage?: string | null
@@ -146,7 +147,11 @@ export interface TourPageData {
  * @see TourPageData 完整欄位定義（供參考）
  */
 export interface TourPageProps {
-  /** 技術債：待統一 section 類型後改用 TourPageData */
+  /**
+   * 技術債：待統一 39 個 section 類型後改用 TourPageData
+   * 目前各 section 有不同的必填欄位要求，強制類型會導致大量錯誤
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any
   isPreview?: boolean
   viewMode?: 'desktop' | 'mobile'
@@ -157,7 +162,10 @@ export interface TourPageProps {
  * @see TourPageProps
  */
 export interface TourPreviewProps {
-  /** 技術債：待統一 section 類型後改用 TourPageData */
+  /**
+   * 技術債：待統一 39 個 section 類型後改用 TourPageData
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any
   viewMode?: 'desktop' | 'mobile'
 }

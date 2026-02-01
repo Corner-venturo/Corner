@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { Phone, MapPin, Calendar, Clock, User } from 'lucide-react'
+import type { TourPageData } from '@/features/tours/types/tour-display.types'
 
 // Luxury 配色
 const LUXURY = {
@@ -14,26 +15,8 @@ const LUXURY = {
   muted: '#636E72',
 }
 
-interface MeetingPoint {
-  time: string
-  location: string
-}
-
 interface TourLeaderSectionLuxuryProps {
-  data: {
-    leader?: {
-      name?: string | null
-      domesticPhone?: string | null
-      overseasPhone?: string | null
-    } | null
-    meetingInfo?: {
-      time?: string | null
-      location?: string | null
-    } | null
-    meetingPoints?: MeetingPoint[] | null
-    departureDate?: string | null
-    showLeaderMeeting?: boolean
-  }
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
 }
 

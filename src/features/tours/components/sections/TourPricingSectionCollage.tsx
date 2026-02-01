@@ -1,23 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import type { PricingDetails } from '@/stores/types/tour.types'
+import type { TourPageData } from '@/features/tours/types/tour-display.types'
 
-// Collage 風格專用的 PriceTier（與標準版不同結構）
-interface CollagePriceTier {
-  name: string
-  pricePerPerson: number
-  description?: string
-  features?: string[]
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface TourPricingSectionCollageProps {
-  data: {
-    showPricingDetails?: boolean
-    pricingDetails?: PricingDetails | null
-    priceTiers?: CollagePriceTier[] | any[] | null
-  }
+  data: TourPageData
   viewMode?: 'desktop' | 'mobile'
 }
 
@@ -117,7 +104,7 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
                   </div>
 
                   <h3 className="text-2xl font-bold mb-1" style={{ fontFamily: "'Noto Serif TC', serif" }}>
-                    {priceTiers[0].name}
+                    {priceTiers[0].name || priceTiers[0].label || '方案 A'}
                   </h3>
                   <p className="text-xs text-morandi-secondary mb-6" style={{ fontFamily: "'Space Mono', monospace" }}>
                     {priceTiers[0].description || '專屬司導，行程彈性最大化'}
@@ -125,7 +112,7 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
 
                   <div className="mb-6 border-y-2 border-dashed border-border py-4">
                     <div className="text-4xl font-bold text-[#FF0080]" style={{ fontFamily: "'Cinzel', serif" }}>
-                      {formatPrice(priceTiers[0].pricePerPerson)}
+                      {formatPrice(typeof priceTiers[0].pricePerPerson === 'number' ? priceTiers[0].pricePerPerson : Number(priceTiers[0].pricePerPerson || priceTiers[0].price) || 0)}
                     </div>
                     <div className="text-xs text-morandi-secondary text-right" style={{ fontFamily: "'Space Mono', monospace" }}>
                       TWD / 每人
@@ -198,7 +185,7 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
                   </div>
 
                   <h3 className="text-2xl font-bold mb-1" style={{ fontFamily: "'Noto Serif TC', serif" }}>
-                    {priceTiers[1].name}
+                    {priceTiers[1].name || priceTiers[1].label || '方案 B'}
                   </h3>
                   <p className="text-xs text-morandi-secondary mb-6" style={{ fontFamily: "'Space Mono', monospace" }}>
                     {priceTiers[1].description || '豪華九人座，空間更寬敞'}
@@ -206,7 +193,7 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
 
                   <div className="mb-6 border-y-2 border-dashed border-border py-4">
                     <div className="text-4xl font-bold text-[#C6FF00]" style={{ fontFamily: "'Cinzel', serif" }}>
-                      {formatPrice(priceTiers[1].pricePerPerson)}
+                      {formatPrice(typeof priceTiers[1].pricePerPerson === 'number' ? priceTiers[1].pricePerPerson : Number(priceTiers[1].pricePerPerson || priceTiers[1].price) || 0)}
                     </div>
                     <div className="text-xs text-morandi-secondary text-right" style={{ fontFamily: "'Space Mono', monospace" }}>
                       TWD / 每人

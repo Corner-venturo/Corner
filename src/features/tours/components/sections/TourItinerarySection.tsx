@@ -16,17 +16,17 @@ import {
 } from '@/components/tour-preview'
 import { ArrowRight, Sparkles } from 'lucide-react'
 import Image from 'next/image'
-import { TourFormData } from '@/components/editor/tour-form/types'
 import { SectionTitle } from './SectionTitle'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
+import type { TourPageData, CoverStyleType, DailyItinerary } from '@/features/tours/types/tour-display.types'
 
 interface TourItinerarySectionProps {
-  data: TourFormData
+  data: TourPageData
   viewMode: 'desktop' | 'mobile'
   activeDayIndex: number
   dayRefs: MutableRefObject<(HTMLDivElement | null)[]>
   handleDayNavigate: (index: number) => void
-  coverStyle?: 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
+  coverStyle?: CoverStyleType
 }
 
 // 將標題中的文字符號轉換成 SVG 圖標
@@ -73,7 +73,7 @@ function renderTitleWithIcons(title: string, viewMode: 'desktop' | 'mobile') {
 }
 
 // 計算 dayLabel 的函數 - 處理建議方案編號
-function calculateDayLabels(itinerary: TourFormData['dailyItinerary']): string[] {
+function calculateDayLabels(itinerary: DailyItinerary[]): string[] {
   const labels: string[] = []
   let currentDayNumber = 0
   let alternativeCount = 0 // 當前建議方案的計數 (B=1, C=2, ...)
