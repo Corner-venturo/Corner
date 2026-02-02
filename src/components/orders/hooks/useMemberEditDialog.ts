@@ -29,6 +29,7 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
     setEditFormData({
       chinese_name: member.chinese_name || '',
       passport_name: member.passport_name || '',
+      passport_name_print: member.passport_name_print || '',
       birth_date: member.birth_date || '',
       gender: member.gender || '',
       id_number: member.id_number || '',
@@ -52,6 +53,7 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
       const memberUpdateData: Record<string, unknown> = {
         chinese_name: editFormData.chinese_name || null,
         passport_name: editFormData.passport_name || null,
+        passport_name_print: editFormData.passport_name_print || null,
         birth_date: editFormData.birth_date || null,
         gender: editFormData.gender || null,
         id_number: editFormData.id_number || null,

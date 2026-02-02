@@ -332,6 +332,27 @@ export function OrderMembersExpandable({
 
   // Handlers
   const handleUpdateField = useCallback(async (memberId: string, field: keyof OrderMember, value: string | number | null) => {
+    // 對於開票期限，同步更新同 PNR 的所有成員
+    if (field === 'ticketing_deadline') {
+      const currentMember = membersData.members.find(m => m.id === memberId)
+      if (currentMember?.pnr) {
+        const samePnrMembers = membersData.members.filter(m => m.pnr === currentMember.pnr)
+        const deadlineValue = typeof value === 'string' || value === null ? value : null
+        // 更新本地狀態
+        membersData.setMembers(membersData.members.map(m =>
+          m.pnr === currentMember.pnr ? { ...m, ticketing_deadline: deadlineValue } : m
+        ))
+        // 更新資料庫中所有同 PNR 的成員
+        try {
+          const memberIds = samePnrMembers.map(m => m.id)
+          await supabase.from('order_members').update({ ticketing_deadline: deadlineValue }).in('id', memberIds)
+        } catch (error) {
+          logger.error('更新欄位失敗:', error)
+        }
+        return
+      }
+    }
+    // 一般欄位更新
     membersData.setMembers(membersData.members.map(m => m.id === memberId ? { ...m, [field]: value } : m))
     try {
       await supabase.from('order_members').update({ [field]: value }).eq('id', memberId)

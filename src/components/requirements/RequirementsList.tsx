@@ -1074,68 +1074,65 @@ export function RequirementsList({
                           </span>
                         </td>
                         <td className="px-3 py-2.5 text-center">
-                          {/* 只在該供應商的第一行顯示操作按鈕 */}
-                          {isFirstRowForSupplier && (
-                            <div className="flex items-center justify-center gap-1">
-                              {/* 隱藏/恢復按鈕 */}
-                              {!isCancelled && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleToggleHidden(
-                                    existingRequest?.id || null,
-                                    !isHidden,
-                                    !existingRequest ? {
-                                      category: cat.key,
-                                      supplierName: supplierName || '',
-                                      title,
-                                      serviceDate,
-                                      quantity,
-                                      notes: notes || undefined,
-                                      resourceId,
-                                      resourceType: cat.key === 'hotel' ? 'hotel' : cat.key === 'restaurant' ? 'restaurant' : cat.key === 'activity' ? 'attraction' : undefined,
-                                    } : undefined
-                                  )}
-                                  className={cn(
-                                    'h-7 w-7 p-0',
-                                    isHidden
-                                      ? 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50'
-                                      : 'text-morandi-muted hover:text-morandi-secondary hover:bg-morandi-container/30'
-                                  )}
-                                  title={isHidden ? '恢復顯示' : '隱藏'}
-                                >
-                                  {isHidden ? <Eye size={14} /> : <EyeOff size={14} />}
-                                </Button>
-                              )}
-                              {/* 列印取消單按鈕 */}
-                              {isCancelled && supplierName && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => {
-                                    const items = cancelledBySupplier.get(supplierName)
-                                    if (items) handlePrintCancellation(supplierName, items)
-                                  }}
-                                  className="h-7 w-7 p-0 text-morandi-red hover:text-morandi-red/80 hover:bg-morandi-red/10"
-                                  title="列印取消單"
-                                >
-                                  <Printer size={14} />
-                                </Button>
-                              )}
-                              {/* 產生需求單按鈕 */}
-                              {!isCancelled && supplierName && onOpenRequestDialog && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => openRequestDialog(cat.key, supplierName)}
-                                  className="h-7 w-7 p-0 text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10"
-                                  title="產生需求單"
-                                >
-                                  <FileText size={14} />
-                                </Button>
-                              )}
-                            </div>
-                          )}
+                          <div className="flex items-center justify-center gap-1">
+                            {/* 隱藏/恢復按鈕 - 隱藏項目一定要顯示恢復按鈕，不受 isFirstRowForSupplier 限制 */}
+                            {!isCancelled && (isHidden || isFirstRowForSupplier) && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleToggleHidden(
+                                  existingRequest?.id || null,
+                                  !isHidden,
+                                  !existingRequest ? {
+                                    category: cat.key,
+                                    supplierName: supplierName || '',
+                                    title,
+                                    serviceDate,
+                                    quantity,
+                                    notes: notes || undefined,
+                                    resourceId,
+                                    resourceType: cat.key === 'hotel' ? 'hotel' : cat.key === 'restaurant' ? 'restaurant' : cat.key === 'activity' ? 'attraction' : undefined,
+                                  } : undefined
+                                )}
+                                className={cn(
+                                  'h-7 w-7 p-0',
+                                  isHidden
+                                    ? 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50'
+                                    : 'text-morandi-muted hover:text-morandi-secondary hover:bg-morandi-container/30'
+                                )}
+                                title={isHidden ? '恢復顯示' : '隱藏'}
+                              >
+                                {isHidden ? <Eye size={14} /> : <EyeOff size={14} />}
+                              </Button>
+                            )}
+                            {/* 列印取消單按鈕 */}
+                            {isFirstRowForSupplier && isCancelled && supplierName && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  const items = cancelledBySupplier.get(supplierName)
+                                  if (items) handlePrintCancellation(supplierName, items)
+                                }}
+                                className="h-7 w-7 p-0 text-morandi-red hover:text-morandi-red/80 hover:bg-morandi-red/10"
+                                title="列印取消單"
+                              >
+                                <Printer size={14} />
+                              </Button>
+                            )}
+                            {/* 產生需求單按鈕 */}
+                            {isFirstRowForSupplier && !isCancelled && supplierName && onOpenRequestDialog && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => openRequestDialog(cat.key, supplierName)}
+                                className="h-7 w-7 p-0 text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10"
+                                title="產生需求單"
+                              >
+                                <FileText size={14} />
+                              </Button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     )

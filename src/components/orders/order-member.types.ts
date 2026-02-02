@@ -14,6 +14,7 @@ export interface OrderMember {
   identity?: string | null
   chinese_name?: string | null
   passport_name?: string | null
+  passport_name_print?: string | null
   birth_date?: string | null
   age?: number | null
   id_number?: string | null

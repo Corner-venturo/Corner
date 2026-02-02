@@ -48,7 +48,8 @@ export function CalendarGrid({
         timeZone="Asia/Taipei"
         dayCellContent={(arg) => arg.dayNumberText.replace('日', '')}
         height="100%"
-        dayMaxEvents={3}
+        dayMaxEvents={7}
+        eventMinHeight={20}
         moreLinkClick={onMoreLinkClick}
         moreLinkText="更多"
         weekends={true}

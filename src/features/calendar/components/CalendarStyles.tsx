@@ -66,7 +66,7 @@ export function CalendarStyles() {
 
       .fc .fc-daygrid-day-frame {
         min-height: 140px;
-        padding: 8px;
+        padding: 2px 4px;
         background-color: transparent;
       }
 
@@ -90,7 +90,7 @@ export function CalendarStyles() {
 
       .fc .fc-daygrid-day-number {
         color: #333333;
-        padding: 4px;
+        padding: 2px 4px;
         font-size: 14px;
         font-weight: 500;
         border-radius: 4px;
@@ -140,7 +140,7 @@ export function CalendarStyles() {
 
       /* 事件樣式 */
       .fc .fc-daygrid-day-events {
-        margin-top: 4px;
+        margin-top: 0 !important;
       }
 
       .fc-event {
@@ -148,14 +148,30 @@ export function CalendarStyles() {
         border: none;
         border-left: 2px solid currentColor;
         font-size: 11px;
-        padding: 4px 6px;
+        line-height: 1.2 !important;
+        padding: 0 4px !important;
         border-radius: 0 4px 4px 0;
         font-weight: 500;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         transition: all 0.2s ease;
-        margin: 2px 4px;
+        margin: 0 2px !important;
         background-color: rgba(184, 169, 154, 0.1);
         color: #333333;
+      }
+
+      .fc-event .fc-event-main {
+        padding: 0 !important;
+      }
+
+      /* 事件容器間距 - 控制每行高度 */
+      .fc .fc-daygrid-event-harness {
+        margin-bottom: 2px !important;
+      }
+
+      .fc .fc-daygrid-block-event {
+        height: 17px !important;
+        min-height: 17px !important;
+        border-top: 2px solid white !important;
       }
 
       .fc-event:hover {
@@ -252,7 +268,7 @@ export function CalendarStyles() {
 
       /* 單日事件樣式 */
       .fc .fc-daygrid-event.fc-event-start.fc-event-end {
-        margin: 2px 4px;
+        margin: 0 2px !important;
       }
 
       /* 跨日事件樣式 */

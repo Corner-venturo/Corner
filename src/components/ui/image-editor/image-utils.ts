@@ -37,7 +37,36 @@ export async function applyAdjustmentsToImage(
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
       const data = imageData.data
 
-      // 應用調整
+      // 先處理銳利度（需要鄰近像素，所以要先處理）
+      if (adjustments.clarity && adjustments.clarity !== 0) {
+        const originalData = new Uint8ClampedArray(data)
+        const width = canvas.width
+        const height = canvas.height
+        const amount = adjustments.clarity / 100 // -1 到 1
+
+        for (let y = 1; y < height - 1; y++) {
+          for (let x = 1; x < width - 1; x++) {
+            const idx = (y * width + x) * 4
+
+            for (let c = 0; c < 3; c++) {
+              // 取鄰近像素
+              const top = originalData[((y - 1) * width + x) * 4 + c]
+              const bottom = originalData[((y + 1) * width + x) * 4 + c]
+              const left = originalData[(y * width + (x - 1)) * 4 + c]
+              const right = originalData[(y * width + (x + 1)) * 4 + c]
+              const center = originalData[idx + c]
+
+              // Unsharp mask: center + amount * (center - blur)
+              const blur = (top + bottom + left + right) / 4
+              const sharpened = center + amount * (center - blur) * 2
+
+              data[idx + c] = Math.max(0, Math.min(255, sharpened))
+            }
+          }
+        }
+      }
+
+      // 應用其他調整
       for (let i = 0; i < data.length; i += 4) {
         let r = data[i]
         let g = data[i + 1]

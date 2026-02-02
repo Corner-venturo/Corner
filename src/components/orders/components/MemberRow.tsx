@@ -261,7 +261,7 @@ export function MemberRow({
           ) : (
             <input
               type="date"
-              value={member.ticketing_deadline || ''}
+              value={member.ticketing_deadline ? member.ticketing_deadline.slice(0, 10) : ''}
               onChange={e => onUpdateField(member.id, 'ticketing_deadline', e.target.value || null)}
               className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
             />

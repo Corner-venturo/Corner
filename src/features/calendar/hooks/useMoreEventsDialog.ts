@@ -55,7 +55,9 @@ export function useMoreEventsDialog() {
         events: sortedEvents,
       })
 
-      return 'popover' as const
+      // 返回 'none' 防止 FullCalendar 顯示內建 popover（會導致 getBoundingClientRect 錯誤）
+      // 改用我們自己的 Dialog 顯示
+      return 'none' as const
     },
     [compareEvents]
   )

@@ -5,9 +5,8 @@ import { useParams, useRouter } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
-import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Loader2, MapPin, MessageSquare, Printer, Plane, ClipboardList } from 'lucide-react'
+import { Loader2, MapPin, MessageSquare } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { useTourDetails } from '@/features/tours/hooks/useTours-advanced'
 import { useWorkspaceChannels } from '@/stores/workspace-store'
@@ -197,7 +196,7 @@ export default function TourDetailPage() {
             { label: code, href: `/tours/${code}` },
           ]}
         />
-        <div className="flex-1 flex items-center justify-center pt-[72px]">
+        <div className="flex-1 flex items-center justify-center">
           <Loader2 className="animate-spin text-morandi-secondary" size={32} />
         </div>
       </div>
@@ -219,7 +218,7 @@ export default function TourDetailPage() {
             { label: code, href: `/tours/${code}` },
           ]}
         />
-        <div className="flex-1 flex items-center justify-center pt-[72px]">
+        <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <p className="text-morandi-secondary mb-4">找不到團號 {code} 的旅遊團</p>
             <Button onClick={handleBack}>返回列表</Button>
@@ -260,11 +259,9 @@ export default function TourDetailPage() {
         }
       />
 
-      {/* 內容區域 - 加上 pt-[72px] 避免被 header 擋住 */}
-      <div className="flex-1 overflow-auto pt-[72px] p-6">
-        <Card className="p-6">
-          {renderTabContent()}
-        </Card>
+      {/* 內容區域 */}
+      <div className="flex-1 overflow-auto">
+        {renderTabContent()}
       </div>
     </div>
   )

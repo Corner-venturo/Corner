@@ -478,13 +478,29 @@ export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
       continue;
     }
 
-    // 3. 解析出票期限 (從 OPW 或 OPC 行)
-    // 格式: "OPW-20NOV:2038/1C7/BR REQUIRES TICKET ON OR BEFORE 23NOV:2038"
-    const opwMatch = line.match(/(?:ON OR BEFORE|BEFORE)\s+(\d{2})([A-Z]{3}):?\d*/i);
+    // 3. 解析出票期限
+    // 3a. OPW/OPC 格式（優先）: "OPW-04FEB:2129/1C7/JX REQUIRES TICKET ON OR BEFORE 05FEB:2129"
+    // 注意：實際期限在 "ON OR BEFORE" 後面，優先於 TK TL
+    // 時間格式：DDMON:HHMM（如 05FEB:2129 表示 2/5 21:29）
+    const opwMatch = line.match(/(?:ON OR BEFORE|BEFORE)\s+(\d{2})([A-Z]{3}):?(\d{4})?/i);
     if (opwMatch) {
-      logger.log('    ✅ 找到出票期限!', opwMatch);
+      logger.log('    ✅ 找到 OPW 出票期限!', opwMatch);
       const day = opwMatch[1];
       const monthStr = opwMatch[2].toUpperCase();
+      const time = opwMatch[3];  // 可能是 undefined
+      const deadline = parseAmadeusDate(day, monthStr, time);
+      logger.log('    📅 解析日期:', deadline, time ? `時間: ${time}` : '');
+      result.ticketingDeadline = deadline;  // OPW 優先，直接覆蓋
+      continue;
+    }
+
+    // 3b. TK TL 格式（備用）: "TK TL02FEB/TPEW123ML"
+    // 只在沒有 OPW 時使用
+    const tkTlMatch = line.match(/TK\s+TL\s*(\d{2})([A-Z]{3})/i);
+    if (tkTlMatch && !result.ticketingDeadline) {
+      logger.log('    ✅ 找到 TK TL 出票期限 (備用)!', tkTlMatch);
+      const day = tkTlMatch[1];
+      const monthStr = tkTlMatch[2].toUpperCase();
       const deadline = parseAmadeusDate(day, monthStr);
       logger.log('    📅 解析日期:', deadline);
       result.ticketingDeadline = deadline;
@@ -831,7 +847,7 @@ export function parseFareFromTelegram(rawPNR: string): ParsedFareData | null {
  * 解析 Amadeus 日期格式 (DDMMM) 轉換為 Date
  * 例如：03JUN → 2024-06-03 或 2025-06-03 (根據當前日期判斷年份)
  */
-function parseAmadeusDate(day: string, monthStr: string): Date | null {
+function parseAmadeusDate(day: string, monthStr: string, time?: string): Date | null {
   const monthMap: Record<string, number> = {
     JAN: 0, FEB: 1, MAR: 2, APR: 3, MAY: 4, JUN: 5,
     JUL: 6, AUG: 7, SEP: 8, OCT: 9, NOV: 10, DEC: 11,
@@ -853,7 +869,15 @@ function parseAmadeusDate(day: string, monthStr: string): Date | null {
     year++;
   }
 
-  return new Date(year, month, dayNum);
+  // 解析時間（格式：HHMM，如 2129 = 21:29）
+  let hour = 0;
+  let minute = 0;
+  if (time && time.length === 4) {
+    hour = parseInt(time.slice(0, 2), 10);
+    minute = parseInt(time.slice(2, 4), 10);
+  }
+
+  return new Date(year, month, dayNum, hour, minute);
 }
 
 /**

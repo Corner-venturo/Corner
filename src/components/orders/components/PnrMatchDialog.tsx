@@ -401,13 +401,17 @@ export function PnrMatchDialog({
         })
 
         for (const update of updates) {
-          const updateData: { pnr: string; ticket_number?: string | null; flight_cost?: number | null } = { pnr: update.pnr }
+          const updateData: { pnr: string; ticket_number?: string | null; flight_cost?: number | null; ticketing_deadline?: string | null } = { pnr: update.pnr }
           if (update.ticket_number) {
             updateData.ticket_number = update.ticket_number
           }
           // 如果有票價資訊，同時更新機票票價
           if (perPersonFare !== null) {
             updateData.flight_cost = perPersonFare
+          }
+          // 如果有開票期限，同時更新
+          if (parsedPnr.ticketingDeadline) {
+            updateData.ticketing_deadline = parsedPnr.ticketingDeadline.toISOString().split('T')[0]
           }
           await supabase
             .from('order_members')
@@ -451,6 +455,7 @@ export function PnrMatchDialog({
             pnr: recordLocator,
             ticket_number: ticketInfo?.number || null,
             flight_cost: perPersonFare,
+            ticketing_deadline: parsedPnr.ticketingDeadline?.toISOString() || null,
             member_type: 'adult',
             identity: '大人',
           }

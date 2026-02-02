@@ -524,6 +524,36 @@ export function TourRequestFormDialog({
     }
   }
 
+  // 更新需求單狀態為「已發送」
+  const updateRequestsStatus = async () => {
+    // 收集有 ID 的項目（已存在的需求單）
+    const requestIds = items
+      .map((item: RequestItem) => item.id)
+      .filter((id: string): id is string => !!id && !id.startsWith('new-'))
+
+    if (requestIds.length === 0) return
+
+    try {
+      const now = new Date().toISOString()
+      const { error } = await supabase
+        .from('tour_requests')
+        .update({
+          status: 'sent',
+          sent_at: now,
+          updated_at: now,
+        })
+        .in('id', requestIds)
+
+      if (error) {
+        logger.warn('更新需求單狀態失敗:', error)
+      } else {
+        logger.info(`已更新 ${requestIds.length} 筆需求單狀態為「已發送」`)
+      }
+    } catch (err) {
+      logger.error('更新需求單狀態錯誤:', err)
+    }
+  }
+
   // 開啟新視窗列印（避免 Dialog z-index 問題）
   const handlePrintInNewWindow = async () => {
     setSaving(true)
@@ -538,6 +568,9 @@ export function TourRequestFormDialog({
       // 儲存供應商資訊（背景執行）
       saveSupplierInfo()
 
+      // 更新需求單狀態為「已發送」
+      updateRequestsStatus()
+
       // 開啟新視窗列印
       const printWindow = window.open('', '_blank', 'width=900,height=700')
       if (!printWindow) {
@@ -547,6 +580,8 @@ export function TourRequestFormDialog({
 
       printWindow.document.write(printContent)
       printWindow.document.close()
+
+      toast({ title: '需求單已發送', description: '狀態已更新為「已發送」' })
     } finally {
       setSaving(false)
     }

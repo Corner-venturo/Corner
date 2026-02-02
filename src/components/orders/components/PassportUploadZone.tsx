@@ -134,6 +134,25 @@ export function PassportUploadZone({
             </Button>
           </div>
 
+          {/* 辨識按鈕移到照片上方 */}
+          <Button
+            onClick={onBatchUpload}
+            disabled={isUploading || processedFiles.length === 0}
+            className="w-full"
+          >
+            {isUploading ? (
+              <>
+                <span className="animate-spin mr-2">⏳</span>
+                辨識中...
+              </>
+            ) : (
+              <>
+                <Upload size={16} className="mr-2" />
+                開始辨識並建立成員 ({processedFiles.length})
+              </>
+            )}
+          </Button>
+
           <div className="grid grid-cols-4 gap-2 max-h-40 overflow-y-auto">
             {processedFiles.map((pf, index) => (
               <div key={index} className="relative group">
@@ -169,24 +188,6 @@ export function PassportUploadZone({
               </div>
             ))}
           </div>
-
-          <Button
-            onClick={onBatchUpload}
-            disabled={isUploading || processedFiles.length === 0}
-            className="w-full"
-          >
-            {isUploading ? (
-              <>
-                <span className="animate-spin mr-2">⏳</span>
-                辨識中...
-              </>
-            ) : (
-              <>
-                <Upload size={16} className="mr-2" />
-                開始辨識並建立成員 ({processedFiles.length})
-              </>
-            )}
-          </Button>
         </div>
       )}
     </div>

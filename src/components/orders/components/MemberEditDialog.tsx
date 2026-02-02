@@ -28,6 +28,7 @@ type EditMode = 'edit' | 'verify'
 export interface EditFormData {
   chinese_name?: string
   passport_name?: string
+  passport_name_print?: string
   birth_date?: string
   gender?: string
   id_number?: string
@@ -245,7 +246,7 @@ export function MemberEditDialog({
         </div>
 
         {/* 按鈕區域 - 固定在底部 */}
-        <div className="flex-shrink-0 flex justify-between pt-4 pb-2 border-t bg-card">
+        <div className="flex-shrink-0 flex justify-between pt-4 pb-2 border-t">
           {/* 左邊：從顧客同步按鈕 */}
           <div>
             {editingMember?.customer_id && (

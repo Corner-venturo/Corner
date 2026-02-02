@@ -64,10 +64,9 @@ export function MoreEventsDialog({
                         <span className="capitalize">{event.extendedProps.type}</span>
                       </div>
                       {event.extendedProps.location && <span>{event.extendedProps.location}</span>}
-                      {event.extendedProps.participants && (
+                      {(event.extendedProps.max_participants ?? 0) > 0 && (
                         <span>
-                          {event.extendedProps.participants}/{event.extendedProps.max_participants}
-                          人
+                          {event.extendedProps.participants ?? 0}/{event.extendedProps.max_participants}人
                         </span>
                       )}
                       {duration > 0 && (

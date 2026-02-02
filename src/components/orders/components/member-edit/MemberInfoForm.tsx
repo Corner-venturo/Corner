@@ -14,112 +14,130 @@ interface MemberInfoFormProps {
 }
 
 export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
+  const inputClass = "w-full px-3 py-1.5 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+  const labelClass = "block text-xs font-medium text-morandi-primary mb-1"
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <h3 className="text-sm font-medium text-morandi-primary">成員資料</h3>
 
-      {/* 中文姓名 */}
-      <div>
-        <label className="block text-xs font-medium text-morandi-primary mb-1">中文姓名</label>
-        <input
-          type="text"
-          value={formData.chinese_name || ''}
-          onChange={e => onChange({ ...formData, chinese_name: e.target.value })}
-          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
-        />
+      {/* 中文姓名 + 性別 */}
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className={labelClass}>中文姓名</label>
+          <input
+            type="text"
+            value={formData.chinese_name || ''}
+            onChange={e => onChange({ ...formData, chinese_name: e.target.value })}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label className={labelClass}>性別</label>
+          <select
+            value={formData.gender || ''}
+            onChange={e => onChange({ ...formData, gender: e.target.value })}
+            className={inputClass}
+          >
+            <option value="">-</option>
+            <option value="M">男</option>
+            <option value="F">女</option>
+          </select>
+        </div>
       </div>
 
-      {/* 護照拼音 */}
-      <div>
-        <label className="block text-xs font-medium text-morandi-primary mb-1">護照拼音</label>
-        <input
-          type="text"
-          value={formData.passport_name || ''}
-          onChange={e => onChange({ ...formData, passport_name: e.target.value })}
-          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
-        />
+      {/* 護照拼音 + 吊牌拼音 */}
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className={labelClass}>護照拼音</label>
+          <input
+            type="text"
+            value={formData.passport_name || ''}
+            onChange={e => onChange({ ...formData, passport_name: e.target.value })}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label className={labelClass}>
+            吊牌拼音
+            <span className="text-morandi-muted font-normal ml-1 text-[10px]">(列印)</span>
+          </label>
+          <input
+            type="text"
+            value={formData.passport_name_print || ''}
+            onChange={e => onChange({ ...formData, passport_name_print: e.target.value })}
+            placeholder="HSU ZHENG-YI"
+            className={inputClass}
+          />
+        </div>
       </div>
 
-      {/* 出生年月日 */}
-      <div>
-        <label className="block text-xs font-medium text-morandi-primary mb-1">出生年月日</label>
-        <input
-          type="text"
-          value={formData.birth_date || ''}
-          onChange={e => onChange({ ...formData, birth_date: e.target.value })}
-          placeholder="YYYY-MM-DD"
-          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
-        />
+      {/* 出生年月日 + 身分證號 */}
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className={labelClass}>出生年月日</label>
+          <input
+            type="text"
+            value={formData.birth_date || ''}
+            onChange={e => onChange({ ...formData, birth_date: e.target.value })}
+            placeholder="YYYY-MM-DD"
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label className={labelClass}>身分證號</label>
+          <input
+            type="text"
+            value={formData.id_number || ''}
+            onChange={e => onChange({ ...formData, id_number: e.target.value.toUpperCase() })}
+            className={inputClass}
+          />
+        </div>
       </div>
 
-      {/* 性別 */}
-      <div>
-        <label className="block text-xs font-medium text-morandi-primary mb-1">性別</label>
-        <select
-          value={formData.gender || ''}
-          onChange={e => onChange({ ...formData, gender: e.target.value })}
-          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
-        >
-          <option value="">請選擇</option>
-          <option value="M">男</option>
-          <option value="F">女</option>
-        </select>
+      {/* 護照號碼 + 護照效期 */}
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className={labelClass}>護照號碼</label>
+          <input
+            type="text"
+            value={formData.passport_number || ''}
+            onChange={e => onChange({ ...formData, passport_number: e.target.value })}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label className={labelClass}>護照效期</label>
+          <input
+            type="text"
+            value={formData.passport_expiry || ''}
+            onChange={e => onChange({ ...formData, passport_expiry: e.target.value })}
+            placeholder="YYYY-MM-DD"
+            className={inputClass}
+          />
+        </div>
       </div>
 
-      {/* 身分證號 */}
-      <div>
-        <label className="block text-xs font-medium text-morandi-primary mb-1">身分證號</label>
-        <input
-          type="text"
-          value={formData.id_number || ''}
-          onChange={e => onChange({ ...formData, id_number: e.target.value.toUpperCase() })}
-          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
-        />
-      </div>
-
-      {/* 護照號碼 */}
-      <div>
-        <label className="block text-xs font-medium text-morandi-primary mb-1">護照號碼</label>
-        <input
-          type="text"
-          value={formData.passport_number || ''}
-          onChange={e => onChange({ ...formData, passport_number: e.target.value })}
-          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
-        />
-      </div>
-
-      {/* 護照效期 */}
-      <div>
-        <label className="block text-xs font-medium text-morandi-primary mb-1">護照效期</label>
-        <input
-          type="text"
-          value={formData.passport_expiry || ''}
-          onChange={e => onChange({ ...formData, passport_expiry: e.target.value })}
-          placeholder="YYYY-MM-DD"
-          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
-        />
-      </div>
-
-      {/* 特殊餐食 */}
-      <div>
-        <label className="block text-xs font-medium text-morandi-primary mb-1">特殊餐食</label>
-        <input
-          type="text"
-          value={formData.special_meal || ''}
-          onChange={e => onChange({ ...formData, special_meal: e.target.value })}
-          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
-        />
-      </div>
-
-      {/* 備註 */}
-      <div>
-        <label className="block text-xs font-medium text-morandi-primary mb-1">備註</label>
-        <textarea
-          value={formData.remarks || ''}
-          onChange={e => onChange({ ...formData, remarks: e.target.value })}
-          rows={2}
-          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold resize-none"
-        />
+      {/* 特殊餐食 + 備註 */}
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className={labelClass}>特殊餐食</label>
+          <input
+            type="text"
+            value={formData.special_meal || ''}
+            onChange={e => onChange({ ...formData, special_meal: e.target.value })}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label className={labelClass}>備註</label>
+          <input
+            type="text"
+            value={formData.remarks || ''}
+            onChange={e => onChange({ ...formData, remarks: e.target.value })}
+            className={inputClass}
+          />
+        </div>
       </div>
     </div>
   )

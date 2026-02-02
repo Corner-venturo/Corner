@@ -5,6 +5,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import Link from 'next/link'
 import { TableColumn } from '@/components/ui/enhanced-table'
 import { Tour } from '@/stores/types'
 import { cn } from '@/lib/utils'
@@ -23,7 +24,23 @@ export function useTourTableColumns({ getStatusColor }: UseTourTableColumnsParam
         label: '團號',
         sortable: true,
         width: '110px',
-        render: (value) => <span className="text-sm text-morandi-primary">{String(value || "")}</span>,
+        render: (value, row) => {
+          const tour = row as Tour & { __isProposal?: boolean }
+          const code = String(value || "")
+          // 提案不顯示連結
+          if (tour.__isProposal) {
+            return <span className="text-sm text-morandi-primary">{code}</span>
+          }
+          return (
+            <Link
+              href={`/tours/${code}`}
+              onClick={(e) => e.stopPropagation()}
+              className="text-sm text-morandi-gold hover:text-morandi-gold-hover hover:underline font-medium"
+            >
+              {code}
+            </Link>
+          )
+        },
       },
       {
         key: 'name',
