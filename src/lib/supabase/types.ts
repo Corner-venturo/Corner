@@ -7823,6 +7823,83 @@ export type Database = {
           },
         ]
       }
+      online_trip_members: {
+        Row: {
+          checked_in: boolean | null
+          checked_in_at: string | null
+          created_at: string | null
+          erp_driver_task_id: string | null
+          erp_employee_id: string | null
+          erp_order_member_id: string | null
+          id: string
+          member_type: string | null
+          name: string | null
+          phone: string | null
+          remarks: string | null
+          role: string
+          room_number: string | null
+          room_type: string | null
+          roommates: string[] | null
+          special_meal: string | null
+          trip_id: string
+          updated_at: string | null
+          vehicle_number: string | null
+          vehicle_seat: string | null
+        }
+        Insert: {
+          checked_in?: boolean | null
+          checked_in_at?: string | null
+          created_at?: string | null
+          erp_driver_task_id?: string | null
+          erp_employee_id?: string | null
+          erp_order_member_id?: string | null
+          id?: string
+          member_type?: string | null
+          name?: string | null
+          phone?: string | null
+          remarks?: string | null
+          role: string
+          room_number?: string | null
+          room_type?: string | null
+          roommates?: string[] | null
+          special_meal?: string | null
+          trip_id: string
+          updated_at?: string | null
+          vehicle_number?: string | null
+          vehicle_seat?: string | null
+        }
+        Update: {
+          checked_in?: boolean | null
+          checked_in_at?: string | null
+          created_at?: string | null
+          erp_driver_task_id?: string | null
+          erp_employee_id?: string | null
+          erp_order_member_id?: string | null
+          id?: string
+          member_type?: string | null
+          name?: string | null
+          phone?: string | null
+          remarks?: string | null
+          role?: string
+          room_number?: string | null
+          room_type?: string | null
+          roommates?: string[] | null
+          special_meal?: string | null
+          trip_id?: string
+          updated_at?: string | null
+          vehicle_number?: string | null
+          vehicle_seat?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "online_trip_members_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "online_trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       online_trips: {
         Row: {
           code: string
@@ -18653,6 +18730,9 @@ export type Database = {
         | "photo"
         | "email_attachment"
         | "other"
+        | "request"
+        | "cancellation"
+        | "confirmation"
       folder_type:
         | "root"
         | "tour"
@@ -18822,6 +18902,9 @@ export const Constants = {
         "photo",
         "email_attachment",
         "other",
+        "request",
+        "cancellation",
+        "confirmation",
       ],
       folder_type: [
         "root",

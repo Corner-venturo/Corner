@@ -53,14 +53,14 @@ export async function createTourFolders(
     const folders = DEFAULT_TOUR_FOLDERS.map((folder, index) => ({
       workspace_id: workspaceId,
       name: folder.name,
-      folder_type: 'tour',
+      folder_type: 'tour' as const,
       icon: folder.icon,
       color: folder.color,
       parent_id: null,
       path: `/${tourCode}/${folder.name}`,
       depth: 1,
       tour_id: tourId,
-      default_category: folder.category,
+      default_category: folder.category as 'quote' | 'contract' | 'passport' | 'itinerary' | 'ticket' | 'voucher' | 'insurance' | 'photo' | 'other' | 'visa' | 'invoice' | 'email_attachment' | 'request' | 'cancellation' | 'confirmation',
       is_system: true,
       sort_order: index,
       created_by: createdBy || null,
@@ -83,6 +83,8 @@ export async function createTourFolders(
   }
 }
 
+type DBFileCategory = 'quote' | 'contract' | 'passport' | 'itinerary' | 'ticket' | 'voucher' | 'insurance' | 'photo' | 'other' | 'visa' | 'invoice' | 'email_attachment' | 'request' | 'cancellation' | 'confirmation'
+
 /**
  * 取得團的資料夾（依類型）
  */
@@ -96,7 +98,7 @@ export async function getTourFolder(
     .from('folders')
     .select('id')
     .eq('tour_id', tourId)
-    .eq('default_category', category)
+    .eq('default_category', category as DBFileCategory)
     .single()
 
   if (error || !data) {
