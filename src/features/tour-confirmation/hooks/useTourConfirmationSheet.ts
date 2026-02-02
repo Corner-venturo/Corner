@@ -114,9 +114,19 @@ export function useTourConfirmationSheet({ tourId }: UseTourConfirmationSheetPro
     }
   }, [tourId])
 
+  // 檢查是否已交接（鎖定狀態）
+  const isLocked = useCallback(() => {
+    return sheet?.status === 'confirmed'
+  }, [sheet])
+
   // 更新確認表
   const updateSheet = useCallback(async (updates: Partial<TourConfirmationSheet>) => {
     if (!sheet) return
+
+    // 🔒 後端鎖定：已交接的確認單禁止修改（除非是更新狀態本身）
+    if (isLocked() && !('status' in updates)) {
+      throw new Error('此確認單已交接，無法修改')
+    }
 
     setSaving(true)
     try {
@@ -141,11 +151,16 @@ export function useTourConfirmationSheet({ tourId }: UseTourConfirmationSheetPro
     } finally {
       setSaving(false)
     }
-  }, [sheet])
+  }, [sheet, isLocked])
 
   // 新增明細項目
   const addItem = useCallback(async (item: CreateConfirmationItem) => {
     if (!sheet) return
+
+    // 🔒 後端鎖定：已交接的確認單禁止新增
+    if (isLocked()) {
+      throw new Error('此確認單已交接，無法新增項目')
+    }
 
     setSaving(true)
     try {
@@ -208,10 +223,20 @@ export function useTourConfirmationSheet({ tourId }: UseTourConfirmationSheetPro
     } finally {
       setSaving(false)
     }
-  }, [sheet])
+  }, [sheet, isLocked])
 
   // 更新明細項目
   const updateItem = useCallback(async (itemId: string, updates: UpdateConfirmationItem) => {
+    // 🔒 後端鎖定：已交接的確認單只允許更新領隊記帳欄位
+    if (isLocked()) {
+      const allowedFields = ['leader_expense', 'leader_expense_note', 'leader_expense_at', 'receipt_images', 'actual_cost']
+      const updateKeys = Object.keys(updates)
+      const hasDisallowedField = updateKeys.some(key => !allowedFields.includes(key))
+      if (hasDisallowedField) {
+        throw new Error('此確認單已交接，只能更新記帳相關欄位')
+      }
+    }
+
     setSaving(true)
     try {
       // 準備更新資料
@@ -243,10 +268,15 @@ export function useTourConfirmationSheet({ tourId }: UseTourConfirmationSheetPro
     } finally {
       setSaving(false)
     }
-  }, [])
+  }, [isLocked])
 
   // 刪除明細項目
   const deleteItem = useCallback(async (itemId: string) => {
+    // 🔒 後端鎖定：已交接的確認單禁止刪除
+    if (isLocked()) {
+      throw new Error('此確認單已交接，無法刪除項目')
+    }
+
     setSaving(true)
     try {
       const { error } = await supabase
@@ -265,7 +295,7 @@ export function useTourConfirmationSheet({ tourId }: UseTourConfirmationSheetPro
     } finally {
       setSaving(false)
     }
-  }, [])
+  }, [isLocked])
 
   // 按類別分組的明細
   const groupedItems = useMemo((): GroupedConfirmationItems => {
@@ -315,6 +345,7 @@ export function useTourConfirmationSheet({ tourId }: UseTourConfirmationSheetPro
     loading,
     saving,
     error,
+    isLocked,
     createSheet,
     updateSheet,
     addItem,
