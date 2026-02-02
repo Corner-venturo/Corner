@@ -270,6 +270,22 @@ export interface TemplateData {
   }
   // 通用
   currentPageNumber?: number // 當前頁碼
+  
+  // Corner Travel 專用
+  currentDayData?: DailyDetailData // 當前天數資料（每日行程頁用）
+  hotelName?: string // 當天住宿名稱
+  cityDescription?: string // 城市介紹文字
+  attractionName?: string // 景點名稱
+  attractionDescription?: string // 景點介紹
+  attractionImage?: string // 景點圖片
+  secondaryAttractionName?: string // 次要景點名稱
+  secondaryAttractionDescription?: string // 次要景點介紹
+  continuedContent?: string // 延續上頁的內容
+  memoImage1?: string // 注意事項頁圖片1
+  memoImage2?: string // 注意事項頁圖片2
+  luggageRules?: Array<{ category: string; rule: string; value: string }> // 行李規定
+  prohibitedItems?: Array<{ category: string; items: string }> // 禁帶物品
+  liquidRules?: string[] // 液體規定
 }
 
 /**

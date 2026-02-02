@@ -13,6 +13,21 @@ import { japaneseStyleV1Attraction } from '../definitions/japanese-style-v1-attr
 import { japaneseStyleV1HotelMulti } from '../definitions/japanese-style-v1-hotel-multi'
 import { japaneseStyleV1Vehicle } from '../definitions/japanese-style-v1-vehicle'
 import { japaneseStyleV1Table } from '../definitions/japanese-style-v1-table'
+// Corner Travel 官方風格
+import {
+  cornerTravelV1BackCover,
+  cornerTravelV1FrontCover,
+  cornerTravelV1TocLeft,
+  cornerTravelV1TocRight,
+} from '../definitions/corner-travel-v1'
+import {
+  cornerTravelV1DailyLeft,
+  cornerTravelV1DailyRight,
+} from '../definitions/corner-travel-v1-daily'
+import {
+  cornerTravelV1MemoLeft,
+  cornerTravelV1MemoRight,
+} from '../definitions/corner-travel-v1-memo'
 import type { PageTemplate, TemplateData, TemplateOption, DailyItinerary, DailyDetailData, MemoSettings, CountryCode, HotelData, VehicleData } from '../definitions/types'
 import type { CanvasPage, CanvasElement } from '@/features/designer/components/types'
 import type { TimelineItineraryData, TimelineDay } from '@/types/timeline-itinerary.types'
@@ -41,6 +56,7 @@ const SCALE_FACTOR = A5_OUTPUT_WIDTH / A5_DESIGN_WIDTH // ≈ 3.254
 
 // 範本註冊表
 const templateRegistry: Record<string, PageTemplate> = {
+  // 日系風格
   [japaneseStyleV1.id]: japaneseStyleV1,
   [japaneseStyleV1Toc.id]: japaneseStyleV1Toc,
   [japaneseStyleV1Itinerary.id]: japaneseStyleV1Itinerary,
@@ -48,6 +64,15 @@ const templateRegistry: Record<string, PageTemplate> = {
   [japaneseStyleV1Memo.id]: japaneseStyleV1Memo,
   [japaneseStyleV1Hotel.id]: japaneseStyleV1Hotel,
   [japaneseStyleV1HotelMulti.id]: japaneseStyleV1HotelMulti,
+  // Corner Travel 官方風格
+  [cornerTravelV1BackCover.id]: cornerTravelV1BackCover,
+  [cornerTravelV1FrontCover.id]: cornerTravelV1FrontCover,
+  [cornerTravelV1TocLeft.id]: cornerTravelV1TocLeft,
+  [cornerTravelV1TocRight.id]: cornerTravelV1TocRight,
+  [cornerTravelV1DailyLeft.id]: cornerTravelV1DailyLeft,
+  [cornerTravelV1DailyRight.id]: cornerTravelV1DailyRight,
+  [cornerTravelV1MemoLeft.id]: cornerTravelV1MemoLeft,
+  [cornerTravelV1MemoRight.id]: cornerTravelV1MemoRight,
   [japaneseStyleV1Attraction.id]: japaneseStyleV1Attraction,
   [japaneseStyleV1Vehicle.id]: japaneseStyleV1Vehicle,
   [japaneseStyleV1Table.id]: japaneseStyleV1Table,
@@ -62,10 +87,13 @@ export interface StyleSeries {
   name: string
   templates: {
     cover: string // 封面範本 ID
+    backCover?: string // 封底範本 ID（跨頁用）
     toc: string // 目錄範本 ID
     itinerary: string // 行程總覽範本 ID
     daily: string // 當日行程範本 ID
+    dailyRight?: string // 當日行程右頁範本 ID（跨頁用）
     memo: string // 備忘錄範本 ID
+    memoRight?: string // 備忘錄右頁範本 ID（跨頁用）
     hotel: string // 飯店介紹範本 ID（單一飯店）
     hotelMulti: string // 飯店介紹範本 ID（多飯店）
     attraction: string // 景點介紹範本 ID
@@ -84,6 +112,25 @@ export const styleSeries: StyleSeries[] = [
       itinerary: 'japanese-style-v1-itinerary',
       daily: 'japanese-style-v1-daily',
       memo: 'japanese-style-v1-memo',
+      hotel: 'japanese-style-v1-hotel',
+      hotelMulti: 'japanese-style-v1-hotel-multi',
+      attraction: 'japanese-style-v1-attraction',
+      vehicle: 'japanese-style-v1-vehicle',
+      table: 'japanese-style-v1-table',
+    },
+  },
+  {
+    id: 'corner-travel-v1',
+    name: 'Corner Travel 官方',
+    templates: {
+      cover: 'corner-travel-v1-front-cover', // 封面（右頁）
+      backCover: 'corner-travel-v1-back-cover', // 封底（左頁）
+      toc: 'corner-travel-v1-toc-left', // 目錄（左頁）
+      itinerary: 'corner-travel-v1-toc-right', // 目錄（右頁）
+      daily: 'corner-travel-v1-daily-left', // 每日行程（左頁）
+      dailyRight: 'corner-travel-v1-daily-right', // 每日行程（右頁）
+      memo: 'corner-travel-v1-memo-left', // 注意事項（左頁）
+      memoRight: 'corner-travel-v1-memo-right', // 注意事項（右頁）
       hotel: 'japanese-style-v1-hotel',
       hotelMulti: 'japanese-style-v1-hotel-multi',
       attraction: 'japanese-style-v1-attraction',
