@@ -393,9 +393,9 @@ export function TourRequestFormDialog({
       // 將 HTML 轉成 Blob
       const blob = new Blob([htmlContent], { type: 'text/html' })
 
-      // 上傳到 Storage (files bucket)
+      // 上傳到 Storage (workspace-files bucket)
       const { error: uploadError } = await supabase.storage
-        .from('files')
+        .from('workspace-files')
         .upload(storagePath, blob, {
           contentType: 'text/html',
           upsert: true,
@@ -417,7 +417,7 @@ export function TourRequestFormDialog({
           size_bytes: blob.size,
           extension: 'html',
           storage_path: storagePath,
-          storage_bucket: 'files',
+          storage_bucket: 'workspace-files',
           category: 'other',
           tags: ['需求單', categoryName],
           tour_id: tourId,
@@ -560,6 +560,7 @@ export function TourRequestFormDialog({
   // 開啟新視窗列印（避免 Dialog z-index 問題）
   const handlePrintInNewWindow = async () => {
     setSaving(true)
+    toast({ title: '處理中...', description: 'v4: workspace-files bucket' })
 
     try {
       // 生成 HTML 內容
