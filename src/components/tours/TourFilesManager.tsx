@@ -22,8 +22,10 @@ import type { Folder, VenturoFile } from '@/types/file-system.types'
 interface TourFilesManagerProps {
   tourId: string
   tourCode: string
-  /** 團關聯的報價單 ID（用於查詢報價單） */
+  /** 團關聯的報價單 ID（1:1） */
   quoteId?: string | null
+  /** 團關聯的行程表 ID（1:1） */
+  itineraryId?: string | null
 }
 
 // 預設的團資料夾結構
@@ -41,7 +43,7 @@ const DEFAULT_TOUR_FOLDERS = [
   { name: '其他', category: 'other', icon: '📁' },
 ]
 
-export function TourFilesManager({ tourId, tourCode, quoteId }: TourFilesManagerProps) {
+export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: TourFilesManagerProps) {
   const router = useRouter()
   const { user } = useAuthStore()
   const workspaceId = user?.workspace_id
@@ -69,32 +71,15 @@ export function TourFilesManager({ tourId, tourCode, quoteId }: TourFilesManager
 
           // 計算數量
           if (folder.dbType) {
-            // DB 驅動的資料夾 - 根據類型用不同查詢
-            if (folder.dbType === 'itinerary') {
-              // 行程表：從 itineraries.tour_id 查
-              const { count: c } = await supabase
-                .from('itineraries')
-                .select('id', { count: 'exact', head: true })
-                .eq('tour_id', tourId)
-                .eq('_deleted', false)
-              count = c || 0
-            } else if (folder.dbType === 'quote') {
-              // 報價單：用 tour_id 或 quoteId
-              let query = supabase
-                .from('quotes')
-                .select('id', { count: 'exact', head: true })
-              
-              if (quoteId) {
-                // 優先用 tour.quote_id 關聯
-                query = query.eq('id', quoteId)
-              } else {
-                query = query.eq('tour_id', tourId)
-              }
-              
-              const { count: c } = await query
-              count = c || 0
+            // DB 驅動的資料夾
+            if (folder.dbType === 'quote') {
+              // 報價單：1:1 關聯，直接看 quoteId 有沒有
+              count = quoteId ? 1 : 0
+            } else if (folder.dbType === 'itinerary') {
+              // 行程表：1:1 關聯，直接看 itineraryId 有沒有
+              count = itineraryId ? 1 : 0
             } else {
-              // 其他：直接用 tour_id
+              // 其他（1:N）：用 tour_id 查
               const table = folder.dbType === 'confirmation' ? 'tour_confirmation_sheets'
                 : folder.dbType === 'contract' ? 'contracts'
                 : 'tour_requests'
@@ -233,7 +218,7 @@ export function TourFilesManager({ tourId, tourCode, quoteId }: TourFilesManager
     } finally {
       setLoading(false)
     }
-  }, [tourId, quoteId])
+  }, [tourId, quoteId, itineraryId])
 
   // 載入 DB 驅動的資料夾內容
   const loadDbFolderContent = async (
@@ -244,58 +229,51 @@ export function TourFilesManager({ tourId, tourCode, quoteId }: TourFilesManager
 
     switch (dbType) {
       case 'quote': {
-        // 報價單：用 quoteId 或 tour_id
-        let query = supabase
+        // 報價單：1:1 關聯，用 tour.quote_id
+        if (!quoteId) break
+        
+        const { data } = await supabase
           .from('quotes')
           .select('id, quote_number, title, status, created_at')
-        
-        if (quoteId) {
-          query = query.eq('id', quoteId)
-        } else {
-          query = query.eq('tour_id', tourId)
-        }
-        
-        const { data } = await query.order('created_at', { ascending: false })
+          .eq('id', quoteId)
+          .single()
         
         if (data) {
-          for (const q of data) {
-            items.push({
-              id: q.id,
-              name: q.title || q.quote_number || '未命名報價單',
-              type: 'file',
-              icon: '📋',
-              parentId: folderId,
-              createdAt: q.created_at,
-              status: q.status,
-              dbType: 'quote',
-              dbId: q.id,
-            })
-          }
+          items.push({
+            id: data.id,
+            name: data.title || data.quote_number || '未命名報價單',
+            type: 'file',
+            icon: '📋',
+            parentId: folderId,
+            createdAt: data.created_at,
+            status: data.status,
+            dbType: 'quote',
+            dbId: data.id,
+          })
         }
         break
       }
       case 'itinerary': {
-        // 統一從 itineraries 表查詢
+        // 行程表：1:1 關聯，用 tour.itinerary_id
+        if (!itineraryId) break
+        
         const { data } = await supabase
           .from('itineraries')
           .select('id, title, code, created_at')
-          .eq('tour_id', tourId)
-          .eq('_deleted', false)
-          .order('created_at', { ascending: false })
+          .eq('id', itineraryId)
+          .single()
         
         if (data) {
-          for (const itinerary of data) {
-            items.push({
-              id: itinerary.id,
-              name: itinerary.title || itinerary.code || '未命名行程表',
-              type: 'file',
-              icon: '🗺️',
-              parentId: folderId,
-              createdAt: itinerary.created_at,
-              dbType: 'itinerary',
-              dbId: itinerary.id,
-            })
-          }
+          items.push({
+            id: data.id,
+            name: data.title || data.code || '未命名行程表',
+            type: 'file',
+            icon: '🗺️',
+            parentId: folderId,
+            createdAt: data.created_at,
+            dbType: 'itinerary',
+            dbId: data.id,
+          })
         }
         break
       }

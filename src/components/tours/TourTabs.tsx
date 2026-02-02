@@ -155,7 +155,7 @@ export function TourTabContent({
         />
       )
     case 'files':
-      return <TourFilesManager tourId={tour.id} tourCode={tour.code || ''} quoteId={tour.quote_id} />
+      return <TourFilesManager tourId={tour.id} tourCode={tour.code || ''} quoteId={tour.quote_id} itineraryId={tour.itinerary_id} />
     case 'designs':
       return <TourDesignsTab tourId={tour.id} proposalId={undefined} />
     case 'overview':
