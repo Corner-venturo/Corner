@@ -77,7 +77,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
   return createPortal(
     /* eslint-disable venturo/no-custom-modal -- 列印預覽需要使用 createPortal */
     <div
-      className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-8 print:p-0 print:bg-transparent print:block"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-8 print:p-0 print:bg-transparent print:block"
       onClick={onClose}
       id="printable-confirmation-overlay"
     >

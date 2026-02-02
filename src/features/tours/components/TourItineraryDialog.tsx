@@ -151,7 +151,7 @@ export function TourItineraryDialog({
   // 載入中顯示
   if (isOpen && isLoading) {
     return (
-      <div className="fixed inset-0 z-[9100] flex items-center justify-center bg-black/50">
+      <div className="fixed inset-0 z-[9100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
         <div className="bg-white rounded-lg p-6 flex items-center gap-3">
           <Loader2 className="w-5 h-5 animate-spin text-morandi-gold" />
           <span className="text-sm text-morandi-secondary">載入行程表...</span>

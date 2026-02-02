@@ -83,7 +83,7 @@ export function CreateChannelDialog({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-[9100]">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9100]">
       <div className="card-morandi-elevated w-96 max-h-[80vh] flex flex-col">
         <h3 className="font-semibold mb-4 text-morandi-primary">建立頻道</h3>
 

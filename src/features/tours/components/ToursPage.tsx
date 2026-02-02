@@ -43,7 +43,7 @@ const TourDetailDialog = dynamic(
   {
     /* eslint-disable venturo/no-custom-modal -- 動態載入時的 loading 狀態 */
     loading: () => (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9000]">
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9000]">
         <Loader2 className="animate-spin text-white" size={32} />
       </div>
     ),
