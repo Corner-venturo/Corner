@@ -82,16 +82,90 @@ export function useSupplierResponses(options?: UseSupplierResponsesOptions) {
     if (!workspaceId) return []
 
     try {
-      // [Pending] request_responses 資料表尚未建立
-      // 待建立後啟用此查詢
-      logger.log('⚠️ request_responses 表尚未建立，返回空資料')
-      return []
+      // 查詢供應商回覆
+      let query = supabase
+        .from('request_responses')
+        .select(`
+          id,
+          request_id,
+          responder_workspace_id,
+          status,
+          total_amount,
+          notes,
+          created_at,
+          workspaces:responder_workspace_id (name),
+          tour_requests:request_id (
+            id,
+            code,
+            category,
+            tour_name,
+            service_date,
+            service_date_end
+          ),
+          request_response_items (
+            id,
+            resource_type,
+            resource_name,
+            license_plate,
+            driver_name,
+            driver_phone,
+            available_start_date,
+            available_end_date,
+            unit_price,
+            notes,
+            created_at
+          )
+        `)
 
-      // 未來實作：
-      // const { data, error } = await supabase
-      //   .from('request_responses')
-      //   .select('...')
-      // ...
+      // 只查詢發給當前 workspace 的需求的回覆
+      // 或者當前 workspace 發出的回覆（供應商視角）
+      // TODO: 可能需要更精確的權限過濾
+
+      if (requestId) {
+        query = query.eq('request_id', requestId)
+      }
+
+      if (submittedOnly) {
+        query = query.neq('status', 'draft')
+      }
+
+      const { data, error } = await query
+
+      if (error) throw error
+
+      // 轉換資料格式
+      return (data || []).map((row: Record<string, unknown>) => ({
+        id: row.id as string,
+        request_id: row.request_id as string,
+        supplier_workspace_id: row.responder_workspace_id as string,
+        supplier_workspace_name: (row.workspaces as { name: string } | null)?.name || null,
+        status: row.status as 'draft' | 'submitted' | 'accepted' | 'rejected',
+        total_price: row.total_amount as number | null,
+        notes: row.notes as string | null,
+        responded_at: row.created_at as string | null,
+        created_at: row.created_at as string,
+        items: ((row.request_response_items as Record<string, unknown>[]) || []).map((item) => ({
+          id: item.id as string,
+          response_id: row.id as string,
+          item_type: item.resource_type as 'vehicle' | 'leader' | 'other',
+          item_name: item.resource_name as string,
+          item_description: item.notes as string | null,
+          unit_price: item.unit_price as number | null,
+          quantity: 1,
+          available_date_start: item.available_start_date as string | null,
+          available_date_end: item.available_end_date as string | null,
+          notes: item.notes as string | null,
+          created_at: item.created_at as string,
+        })),
+        request: row.tour_requests ? {
+          id: (row.tour_requests as Record<string, unknown>).id as string,
+          code: (row.tour_requests as Record<string, unknown>).code as string,
+          category: (row.tour_requests as Record<string, unknown>).category as string,
+          tour_name: (row.tour_requests as Record<string, unknown>).tour_name as string | null,
+          service_date: (row.tour_requests as Record<string, unknown>).service_date as string | null,
+          service_date_end: (row.tour_requests as Record<string, unknown>).service_date_end as string | null,
+        } : undefined,
+      }))
     } catch (error) {
       logger.error('取得供應商回覆失敗:', error)
       return []

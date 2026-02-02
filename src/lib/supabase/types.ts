@@ -3727,6 +3727,162 @@ export type Database = {
         }
         Relationships: []
       }
+      driver_tasks: {
+        Row: {
+          accepted_at: string | null
+          agency_contact_name: string | null
+          agency_contact_phone: string | null
+          assigned_at: string | null
+          cancelled_at: string | null
+          completed_at: string | null
+          created_at: string | null
+          created_by: string | null
+          currency: string | null
+          driver_id: string | null
+          driver_name: string | null
+          driver_note: string | null
+          driver_phone: string | null
+          dropoff_address: string | null
+          dropoff_lat: number | null
+          dropoff_lng: number | null
+          dropoff_location: string
+          dropoff_note: string | null
+          estimated_cost: number | null
+          final_cost: number | null
+          id: string
+          internal_note: string | null
+          passenger_count: number | null
+          passenger_name: string | null
+          passenger_note: string | null
+          passenger_phone: string | null
+          picked_up_at: string | null
+          pickup_address: string | null
+          pickup_lat: number | null
+          pickup_lng: number | null
+          pickup_location: string
+          pickup_note: string | null
+          pickup_time: string
+          service_date: string
+          source_workspace_id: string | null
+          started_at: string | null
+          status: string | null
+          stops: Json | null
+          supplier_id: string
+          supplier_name: string | null
+          task_code: string
+          tour_code: string | null
+          tour_id: string | null
+          tour_name: string | null
+          tour_request_id: string | null
+          updated_at: string | null
+          updated_by: string | null
+          vehicle_info: string | null
+          workspace_id: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          agency_contact_name?: string | null
+          agency_contact_phone?: string | null
+          assigned_at?: string | null
+          cancelled_at?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_note?: string | null
+          driver_phone?: string | null
+          dropoff_address?: string | null
+          dropoff_lat?: number | null
+          dropoff_lng?: number | null
+          dropoff_location: string
+          dropoff_note?: string | null
+          estimated_cost?: number | null
+          final_cost?: number | null
+          id?: string
+          internal_note?: string | null
+          passenger_count?: number | null
+          passenger_name?: string | null
+          passenger_note?: string | null
+          passenger_phone?: string | null
+          picked_up_at?: string | null
+          pickup_address?: string | null
+          pickup_lat?: number | null
+          pickup_lng?: number | null
+          pickup_location: string
+          pickup_note?: string | null
+          pickup_time: string
+          service_date: string
+          source_workspace_id?: string | null
+          started_at?: string | null
+          status?: string | null
+          stops?: Json | null
+          supplier_id: string
+          supplier_name?: string | null
+          task_code: string
+          tour_code?: string | null
+          tour_id?: string | null
+          tour_name?: string | null
+          tour_request_id?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          vehicle_info?: string | null
+          workspace_id: string
+        }
+        Update: {
+          accepted_at?: string | null
+          agency_contact_name?: string | null
+          agency_contact_phone?: string | null
+          assigned_at?: string | null
+          cancelled_at?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_note?: string | null
+          driver_phone?: string | null
+          dropoff_address?: string | null
+          dropoff_lat?: number | null
+          dropoff_lng?: number | null
+          dropoff_location?: string
+          dropoff_note?: string | null
+          estimated_cost?: number | null
+          final_cost?: number | null
+          id?: string
+          internal_note?: string | null
+          passenger_count?: number | null
+          passenger_name?: string | null
+          passenger_note?: string | null
+          passenger_phone?: string | null
+          picked_up_at?: string | null
+          pickup_address?: string | null
+          pickup_lat?: number | null
+          pickup_lng?: number | null
+          pickup_location?: string
+          pickup_note?: string | null
+          pickup_time?: string
+          service_date?: string
+          source_workspace_id?: string | null
+          started_at?: string | null
+          status?: string | null
+          stops?: Json | null
+          supplier_id?: string
+          supplier_name?: string | null
+          task_code?: string
+          tour_code?: string | null
+          tour_id?: string | null
+          tour_name?: string | null
+          tour_request_id?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          vehicle_info?: string | null
+          workspace_id?: string
+        }
+        Relationships: []
+      }
       email_accounts: {
         Row: {
           account_type: string
@@ -7666,6 +7822,69 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      online_trips: {
+        Row: {
+          code: string
+          created_at: string | null
+          daily_itinerary: Json | null
+          departure_date: string
+          destination: string | null
+          erp_itinerary_id: string | null
+          erp_tour_id: string | null
+          handoff_at: string | null
+          id: string
+          leader_info: Json | null
+          meeting_info: Json | null
+          name: string
+          outbound_flight: Json | null
+          return_date: string | null
+          return_flight: Json | null
+          status: string | null
+          updated_at: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          daily_itinerary?: Json | null
+          departure_date: string
+          destination?: string | null
+          erp_itinerary_id?: string | null
+          erp_tour_id?: string | null
+          handoff_at?: string | null
+          id?: string
+          leader_info?: Json | null
+          meeting_info?: Json | null
+          name: string
+          outbound_flight?: Json | null
+          return_date?: string | null
+          return_flight?: Json | null
+          status?: string | null
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          daily_itinerary?: Json | null
+          departure_date?: string
+          destination?: string | null
+          erp_itinerary_id?: string | null
+          erp_tour_id?: string | null
+          handoff_at?: string | null
+          id?: string
+          leader_info?: Json | null
+          meeting_info?: Json | null
+          name?: string
+          outbound_flight?: Json | null
+          return_date?: string | null
+          return_flight?: Json | null
+          status?: string | null
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: []
       }
       order_members: {
         Row: {
@@ -12268,6 +12487,63 @@ export type Database = {
         }
         Relationships: []
       }
+      supplier_employees: {
+        Row: {
+          app_user_id: string | null
+          code: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          is_active: boolean | null
+          line_id: string | null
+          name: string
+          phone: string | null
+          role: string | null
+          supplier_id: string
+          updated_at: string | null
+          vehicle_capacity: number | null
+          vehicle_plate: string | null
+          vehicle_type: string | null
+          workspace_id: string
+        }
+        Insert: {
+          app_user_id?: string | null
+          code?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          line_id?: string | null
+          name: string
+          phone?: string | null
+          role?: string | null
+          supplier_id: string
+          updated_at?: string | null
+          vehicle_capacity?: number | null
+          vehicle_plate?: string | null
+          vehicle_type?: string | null
+          workspace_id: string
+        }
+        Update: {
+          app_user_id?: string | null
+          code?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          line_id?: string | null
+          name?: string
+          phone?: string | null
+          role?: string | null
+          supplier_id?: string
+          updated_at?: string | null
+          vehicle_capacity?: number | null
+          vehicle_plate?: string | null
+          vehicle_type?: string | null
+          workspace_id?: string
+        }
+        Relationships: []
+      }
       supplier_payment_accounts: {
         Row: {
           account_holder: string
@@ -12398,6 +12674,67 @@ export type Database = {
           },
         ]
       }
+      supplier_request_responses: {
+        Row: {
+          attachments: Json | null
+          created_at: string | null
+          currency: string | null
+          id: string
+          notes: string | null
+          quoted_price: number | null
+          request_id: string
+          responded_by: string | null
+          response_type: string
+          supplier_id: string
+        }
+        Insert: {
+          attachments?: Json | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          notes?: string | null
+          quoted_price?: number | null
+          request_id: string
+          responded_by?: string | null
+          response_type: string
+          supplier_id: string
+        }
+        Update: {
+          attachments?: Json | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          notes?: string | null
+          quoted_price?: number | null
+          request_id?: string
+          responded_by?: string | null
+          response_type?: string
+          supplier_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_request_responses_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "tour_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_request_responses_responded_by_fkey"
+            columns: ["responded_by"]
+            isOneToOne: false
+            referencedRelation: "supplier_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_request_responses_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       supplier_service_areas: {
         Row: {
           city_id: string
@@ -12430,6 +12767,56 @@ export type Database = {
           },
           {
             foreignKeyName: "supplier_cities_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_users: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          is_active: boolean | null
+          last_login_at: string | null
+          name: string
+          phone: string | null
+          role: string | null
+          supplier_id: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          is_active?: boolean | null
+          last_login_at?: string | null
+          name: string
+          phone?: string | null
+          role?: string | null
+          supplier_id: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          is_active?: boolean | null
+          last_login_at?: string | null
+          name?: string
+          phone?: string | null
+          role?: string | null
+          supplier_id?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_users_supplier_id_fkey"
             columns: ["supplier_id"]
             isOneToOne: false
             referencedRelation: "suppliers"

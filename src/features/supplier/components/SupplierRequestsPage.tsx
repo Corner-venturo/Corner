@@ -35,6 +35,11 @@ const RESPONSE_STATUS_CONFIG: Record<string, { label: string; variant: 'default'
     variant: 'secondary',
     icon: <Send className="h-3 w-3" />,
   },
+  quoted: {
+    label: '已報價',
+    variant: 'secondary',
+    icon: <Send className="h-3 w-3" />,
+  },
   accepted: {
     label: '已確認',
     variant: 'default',
@@ -44,6 +49,11 @@ const RESPONSE_STATUS_CONFIG: Record<string, { label: string; variant: 'default'
     label: '已拒絕',
     variant: 'destructive',
     icon: <XCircle className="h-3 w-3" />,
+  },
+  need_info: {
+    label: '待補資料',
+    variant: 'outline',
+    icon: <Clock className="h-3 w-3" />,
   },
 }
 
@@ -66,6 +76,7 @@ export function SupplierRequestsPage() {
   // 過濾需求
   const filteredRequests = requests.filter(r => {
     if (filterStatus === 'all') return true
+    if (filterStatus === 'pending') return r.response_status === 'pending' || !r.response_status
     return r.response_status === filterStatus
   })
 
@@ -185,9 +196,10 @@ export function SupplierRequestsPage() {
       <div className="px-4 py-2 border-b border-border bg-card flex gap-2">
         {[
           { value: 'all', label: '全部', count: requests.length },
-          { value: 'pending', label: '待回覆', count: requests.filter(r => r.response_status === 'pending').length },
-          { value: 'responded', label: '已回覆', count: requests.filter(r => r.response_status === 'responded').length },
+          { value: 'pending', label: '待回覆', count: requests.filter(r => r.response_status === 'pending' || !r.response_status).length },
+          { value: 'quoted', label: '已報價', count: requests.filter(r => r.response_status === 'quoted').length },
           { value: 'accepted', label: '已確認', count: requests.filter(r => r.response_status === 'accepted').length },
+          { value: 'rejected', label: '已拒絕', count: requests.filter(r => r.response_status === 'rejected').length },
         ].map(tab => (
           <Button
             key={tab.value}

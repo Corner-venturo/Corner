@@ -136,6 +136,44 @@ export async function syncTripToOnline(tourId: string): Promise<SyncResult> {
       logger.info(`行程已同步到 Online: ${onlineTripId}`)
     }
 
+    // 5. 建立行程群組聊天室（如果尚未建立）
+    const { data: existingConv } = await untypedSupabase
+      .from('conversations')
+      .select('id')
+      .eq('trip_id', onlineTripId)
+      .eq('type', 'trip')
+      .maybeSingle()
+
+    if (!existingConv) {
+      const chatName = `${tour.code} ${tour.name}`
+      const { data: newConv, error: convError } = await untypedSupabase
+        .from('conversations')
+        .insert({
+          type: 'trip',
+          trip_id: onlineTripId,
+          name: chatName,
+          status: 'active',
+        })
+        .select('id')
+        .single()
+
+      if (convError) {
+        logger.warn('建立行程群組失敗（不影響同步）:', convError)
+      } else if (newConv) {
+        // 發送系統訊息
+        await untypedSupabase.from('messages').insert({
+          conversation_id: newConv.id,
+          sender_id: null,
+          type: 'system',
+          content: '行程群組已建立，團員可以在這裡交流',
+        })
+        logger.info(`行程群組已建立: ${newConv.id}`)
+      }
+    }
+
+    // 6. 同步團員到 online_trip_members
+    await syncTripMembers(tourId, onlineTripId, itinerary?.leader as LeaderInfo | null)
+
     return {
       success: true,
       message: '同步成功',
@@ -144,5 +182,167 @@ export async function syncTripToOnline(tourId: string): Promise<SyncResult> {
   } catch (error) {
     logger.error('同步到 Online 時發生錯誤:', error)
     return { success: false, message: '同步失敗' }
+  }
+}
+
+/**
+ * 同步團員到 Online（含分車分房資料）
+ */
+async function syncTripMembers(
+  tourId: string, 
+  onlineTripId: string,
+  leaderInfo: LeaderInfo | null
+): Promise<void> {
+  try {
+    // 1. 先清除舊的成員資料（避免重複）
+    await untypedSupabase
+      .from('online_trip_members')
+      .delete()
+      .eq('trip_id', onlineTripId)
+
+    // 2. 取得該團的所有訂單
+    const { data: orders } = await supabase
+      .from('orders')
+      .select('id')
+      .eq('tour_id', tourId)
+
+    if (!orders || orders.length === 0) {
+      // 只同步領隊
+      if (leaderInfo?.name) {
+        await untypedSupabase.from('online_trip_members').insert({
+          trip_id: onlineTripId,
+          role: 'leader',
+          name: leaderInfo.name,
+          phone: leaderInfo.domesticPhone || leaderInfo.overseasPhone || null,
+        })
+        logger.info(`同步領隊: ${leaderInfo.name}`)
+      }
+      return
+    }
+
+    const orderIds = orders.map(o => o.id)
+
+    // 3. 取得所有訂單成員
+    const { data: orderMembers } = await supabase
+      .from('order_members')
+      .select('id, chinese_name, passport_name, member_type, special_meal, remarks, checked_in, checked_in_at')
+      .in('order_id', orderIds)
+
+    if (!orderMembers || orderMembers.length === 0) {
+      logger.info('沒有訂單成員')
+      return
+    }
+
+    // 4. 取得分車資料
+    const memberIds = orderMembers.map(m => m.id)
+    const { data: vehicleAssignments } = await supabase
+      .from('tour_vehicle_assignments')
+      .select('order_member_id, tour_vehicles(vehicle_number, seat_number)')
+      .in('order_member_id', memberIds)
+
+    // 5. 取得分房資料
+    const { data: roomAssignments } = await supabase
+      .from('tour_room_assignments')
+      .select('order_member_id, tour_rooms(room_number, room_type)')
+      .in('order_member_id', memberIds)
+
+    // 建立查找表
+    const vehicleMap = new Map<string, { vehicle_number: string; seat_number?: string }>()
+    if (vehicleAssignments) {
+      for (const va of vehicleAssignments) {
+        const vehicle = va.tour_vehicles as { vehicle_number?: string; seat_number?: string } | null
+        if (vehicle?.vehicle_number) {
+          vehicleMap.set(va.order_member_id, {
+            vehicle_number: vehicle.vehicle_number,
+            seat_number: vehicle.seat_number,
+          })
+        }
+      }
+    }
+
+    const roomMap = new Map<string, { room_number: string; room_type?: string; roommates: string[] }>()
+    if (roomAssignments) {
+      // 先按房間分組，找出同房人
+      const roomGroups = new Map<string, string[]>()
+      for (const ra of roomAssignments) {
+        const room = ra.tour_rooms as { room_number?: string; room_type?: string } | null
+        if (room?.room_number) {
+          const group = roomGroups.get(room.room_number) || []
+          group.push(ra.order_member_id)
+          roomGroups.set(room.room_number, group)
+        }
+      }
+
+      // 建立 roomMap
+      for (const ra of roomAssignments) {
+        const room = ra.tour_rooms as { room_number?: string; room_type?: string } | null
+        if (room?.room_number) {
+          const allInRoom = roomGroups.get(room.room_number) || []
+          const roommates = allInRoom.filter(id => id !== ra.order_member_id)
+          const roommateNames = roommates
+            .map(id => orderMembers.find(m => m.id === id))
+            .filter(m => m)
+            .map(m => m!.chinese_name || m!.passport_name || '未知')
+
+          roomMap.set(ra.order_member_id, {
+            room_number: room.room_number,
+            room_type: room.room_type,
+            roommates: roommateNames,
+          })
+        }
+      }
+    }
+
+    // 6. 準備插入資料
+    const membersToInsert: Array<Record<string, unknown>> = []
+
+    // 領隊
+    if (leaderInfo?.name) {
+      membersToInsert.push({
+        trip_id: onlineTripId,
+        role: 'leader',
+        name: leaderInfo.name,
+        phone: leaderInfo.domesticPhone || leaderInfo.overseasPhone || null,
+      })
+    }
+
+    // 團員
+    for (const member of orderMembers) {
+      const vehicle = vehicleMap.get(member.id)
+      const room = roomMap.get(member.id)
+
+      membersToInsert.push({
+        trip_id: onlineTripId,
+        role: 'traveler',
+        name: member.chinese_name || member.passport_name || null,
+        phone: null,
+        erp_order_member_id: member.id,
+        member_type: member.member_type,
+        special_meal: member.special_meal,
+        remarks: member.remarks,
+        checked_in: member.checked_in ?? false,
+        checked_in_at: member.checked_in_at,
+        vehicle_number: vehicle?.vehicle_number ?? null,
+        vehicle_seat: vehicle?.seat_number ?? null,
+        room_number: room?.room_number ?? null,
+        room_type: room?.room_type ?? null,
+        roommates: room?.roommates ?? null,
+      })
+    }
+
+    // 7. 批量插入
+    if (membersToInsert.length > 0) {
+      const { error: insertError } = await untypedSupabase
+        .from('online_trip_members')
+        .insert(membersToInsert)
+
+      if (insertError) {
+        logger.error('同步團員失敗:', insertError)
+      } else {
+        logger.info(`成功同步 ${membersToInsert.length} 位成員到 Online（含分車分房）`)
+      }
+    }
+  } catch (error) {
+    logger.error('同步團員時發生錯誤:', error)
   }
 }

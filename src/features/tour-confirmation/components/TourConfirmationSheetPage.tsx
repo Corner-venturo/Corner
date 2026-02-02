@@ -726,9 +726,23 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     req => req.status !== 'confirmed' && req.status !== 'replied'
   )
 
+  // 檢查是否已設定領隊
+  const hasLeader = sheet?.tour_leader_name && sheet.tour_leader_name.trim() !== ''
+
   // 交接功能
   const handleHandoff = async () => {
     if (incompleteRequests.length > 0) return
+
+    // 檢查領隊
+    if (!hasLeader) {
+      const proceed = window.confirm(
+        '⚠️ 尚未設定領隊\n\n' +
+        '如果此團需要領隊，請先在上方填寫領隊姓名。\n' +
+        '如果此團不需要領隊（如包車），可以繼續交接。\n\n' +
+        '確定要繼續交接嗎？'
+      )
+      if (!proceed) return
+    }
 
     setHandingOver(true)
     try {
