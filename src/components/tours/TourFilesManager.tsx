@@ -67,18 +67,27 @@ export function TourFilesManager({ tourId, tourCode }: TourFilesManagerProps) {
 
           // 計算數量
           if (folder.dbType) {
-            // DB 驅動的資料夾
-            const table = folder.dbType === 'quote' ? 'quotes'
-              : folder.dbType === 'itinerary' ? 'proposals'
-              : folder.dbType === 'confirmation' ? 'tour_confirmation_sheets'
-              : folder.dbType === 'contract' ? 'contracts'
-              : 'tour_requests'
-            
-            const { count: c } = await supabase
-              .from(table)
-              .select('id', { count: 'exact', head: true })
-              .eq('tour_id', tourId)
-            count = c || 0
+            // DB 驅動的資料夾 - 根據類型用不同查詢
+            if (folder.dbType === 'itinerary') {
+              // 行程表：從 proposals.converted_tour_id 查
+              const { count: c } = await supabase
+                .from('proposals')
+                .select('id', { count: 'exact', head: true })
+                .eq('converted_tour_id', tourId)
+              count = c || 0
+            } else {
+              // 其他：直接用 tour_id
+              const table = folder.dbType === 'quote' ? 'quotes'
+                : folder.dbType === 'confirmation' ? 'tour_confirmation_sheets'
+                : folder.dbType === 'contract' ? 'contracts'
+                : 'tour_requests'
+              
+              const { count: c } = await supabase
+                .from(table)
+                .select('id', { count: 'exact', head: true })
+                .eq('tour_id', tourId)
+              count = c || 0
+            }
           } else {
             // 檔案資料夾
             const { count: c } = await supabase
