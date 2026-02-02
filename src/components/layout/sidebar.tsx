@@ -76,7 +76,16 @@ const menuItems: MenuItem[] = [
     ],
   },
   { href: '/visas', label: '簽證管理', icon: FileCheck, requiredPermission: 'visas' },
-  { href: '/design', label: '設計範本', icon: Palette, requiredPermission: 'design' },
+  {
+    href: '/design',
+    label: '設計',
+    icon: Palette,
+    requiredPermission: 'design',
+    children: [
+      { href: '/design', label: '設計列表', icon: Palette, requiredPermission: 'design' },
+      { href: '/design/new', label: '新增設計', icon: Palette, requiredPermission: 'design' },
+    ],
+  },
   { href: '/office', label: '文件', icon: FileSpreadsheet, requiredPermission: 'office' },
   // 合約管理和確認單管理已整合到團的操作中，不需要獨立入口
   // { href: '/contracts', label: '合約管理', icon: FileSignature, requiredPermission: 'contracts' },

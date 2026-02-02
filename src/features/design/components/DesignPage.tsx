@@ -21,7 +21,7 @@ export function DesignPage() {
 
   // 新增設計 - 直接跳轉到設計工具
   const handleCreate = useCallback(() => {
-    router.push('/brochure')
+    router.push('/design/new')
   }, [router])
 
   // 編輯設計 - 跳轉到設計工具並帶入參數
@@ -35,7 +35,7 @@ export function DesignPage() {
     if (design.itinerary_id) {
       params.set('itinerary_id', design.itinerary_id)
     }
-    router.push(`/brochure?${params.toString()}`)
+    router.push(`/design/new?${params.toString()}`)
   }, [router])
 
   // 處理刪除
