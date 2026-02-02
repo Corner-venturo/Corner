@@ -370,72 +370,7 @@ export function TourRequestFormDialog({
     `
   }
 
-  // 儲存文件到 files 表（與檔案管理整合）
-  const saveToTourDocuments = async (htmlContent: string) => {
-    const tourId = tour?.id || proposal?.converted_tour_id
-    
-    if (!tourId) {
-      toast({ title: '存檔跳過', description: '尚未轉團，無法存檔', variant: 'default' })
-      return // 不拋錯，允許列印但不存檔
-    }
-    if (!user?.workspace_id) {
-      return // 靜默跳過
-    }
-
-    try {
-      // 生成檔案名稱（Storage 不支援中文）
-      const timestamp = Date.now()
-      const randomStr = Math.random().toString(36).substring(2, 8)
-      const fileName = `${timestamp}-${randomStr}.html`
-      const storagePath = `${user.workspace_id}/${fileName}`
-      const displayName = `${categoryName}需求單_${supplierInfo.name}.html`
-
-      // 將 HTML 轉成 Blob
-      const blob = new Blob([htmlContent], { type: 'text/html' })
-
-      // 上傳到 Storage (workspace-files bucket)
-      const { error: uploadError } = await supabase.storage
-        .from('workspace-files')
-        .upload(storagePath, blob, {
-          contentType: 'text/html',
-          upsert: true,
-        })
-
-      if (uploadError) {
-        logger.error('上傳失敗:', uploadError)
-        throw new Error(`上傳失敗: ${uploadError.message}`)
-      }
-
-      // 記錄到 files 表
-      const { error: insertError } = await dynamicFrom('files')
-        .insert({
-          workspace_id: user.workspace_id,
-          folder_id: null,
-          filename: displayName,
-          original_filename: displayName,
-          content_type: 'text/html',
-          size_bytes: blob.size,
-          extension: 'html',
-          storage_path: storagePath,
-          storage_bucket: 'workspace-files',
-          category: 'other',
-          tags: ['需求單', categoryName],
-          tour_id: tourId,
-          source: 'request_form',
-          description: `團號: ${tourCode || tour?.code || '-'}, 出發日期: ${formatDate(departureDate || tour?.departure_date || pkg?.start_date)}`,
-        })
-
-      if (insertError) {
-        logger.error('寫入 DB 失敗:', insertError)
-        throw new Error(`寫入 DB 失敗: ${insertError.message}`)
-      }
-      
-      toast({ title: '需求單已存檔' })
-    } catch (err) {
-      logger.error('存檔失敗:', err)
-      toast({ title: '存檔失敗', description: err instanceof Error ? err.message : '未知錯誤', variant: 'destructive' })
-    }
-  }
+  // 不再存 HTML 檔案，改為只記錄發送狀態（在 updateRequestsStatus 處理）
 
   // 儲存/更新供應商資訊
   const saveSupplierInfo = async () => {
@@ -565,13 +500,10 @@ export function TourRequestFormDialog({
       // 生成 HTML 內容
       const printContent = generatePrintHtml()
 
-      // 1. 儲存到文件管理
-      await saveToTourDocuments(printContent)
-
-      // 2. 儲存供應商資訊
+      // 1. 儲存供應商資訊
       await saveSupplierInfo()
 
-      // 3. 更新需求單狀態為「已發送」
+      // 2. 更新需求單狀態為「已發送」（含發送時間記錄）
       await updateRequestsStatus()
 
       // 全部存檔成功後，開啟新視窗列印
