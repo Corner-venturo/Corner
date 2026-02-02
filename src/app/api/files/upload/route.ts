@@ -104,10 +104,10 @@ export async function POST(request: NextRequest) {
     const safeFilename = `${timestamp}-${randomStr}.${extension}`
     const storagePath = `${workspaceId}/${safeFilename}`
 
-    // 上傳到 Supabase Storage
+    // 上傳到 Supabase Storage (workspace-files bucket)
     const fileBuffer = await file.arrayBuffer()
     const { error: uploadError } = await supabase.storage
-      .from('files')
+      .from('workspace-files')
       .upload(storagePath, fileBuffer, {
         contentType: file.type,
         upsert: false,
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
         size_bytes: file.size,
         extension,
         storage_path: storagePath,
-        storage_bucket: 'files',
+        storage_bucket: 'workspace-files',
         category,
         tags,
         tour_id: tourId,
@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
     if (dbError) {
       logger.error('[File Upload] Database error:', dbError)
       // 嘗試刪除已上傳的檔案
-      await supabase.storage.from('files').remove([storagePath])
+      await supabase.storage.from('workspace-files').remove([storagePath])
       return NextResponse.json(
         { error: 'Failed to save file record' },
         { status: 500 }

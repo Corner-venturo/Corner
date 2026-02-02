@@ -560,7 +560,6 @@ export function TourRequestFormDialog({
   // 開啟新視窗列印（避免 Dialog z-index 問題）
   const handlePrintInNewWindow = async () => {
     setSaving(true)
-    toast({ title: '處理中...', description: 'v4: workspace-files bucket' })
 
     try {
       // 生成 HTML 內容
