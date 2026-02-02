@@ -10,6 +10,7 @@ import { SWRProvider } from '@/lib/swr'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { IntlProvider } from '@/components/providers/IntlProvider'
+import { Toaster } from 'sonner'
 
 export const dynamic = 'force-dynamic'
 export const dynamicParams = true
@@ -32,6 +33,7 @@ export default async function RootLayout({
       <body className="antialiased">
         <ErrorLogger />
         <GlobalDialogs />
+        <Toaster position="top-right" richColors closeButton />
         <IntlProvider locale={locale} messages={messages}>
           <AppInitializer>
             <ErrorBoundary>
