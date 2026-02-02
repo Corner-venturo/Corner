@@ -135,7 +135,9 @@ export function OrderMembersExpandable({
   const customerMatch = useCustomerMatch(customers, membersData.members, membersData.setMembers)
   const memberExport = useMemberExport(membersData.members)
   const memberEdit = useMemberEditDialog({ members: membersData.members, setMembers: membersData.setMembers })
-  const passportUpload = usePassportUpload({ orderId, workspaceId, onSuccess: membersData.loadMembers })
+  // 🔧 修復：團體模式下使用選擇的訂單 ID 或第一個訂單的 ID
+  const effectiveOrderId = orderId || membersData.selectedOrderIdForAdd || (membersData.tourOrders.length === 1 ? membersData.tourOrders[0]?.id : undefined)
+  const passportUpload = usePassportUpload({ orderId: effectiveOrderId, workspaceId, onSuccess: membersData.loadMembers })
   const { isRecognizing, recognizePassport } = useOcrRecognition()
 
   // 從 localStorage 讀取欄位顯示設定（v2: 2026-01-05 重置預設值）

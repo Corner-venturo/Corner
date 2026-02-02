@@ -98,6 +98,8 @@ interface QuoteItem {
   latitude?: number | null
   longitude?: number | null
   googleMapsUrl?: string | null
+  // 報價（業務報給客戶的價格）
+  quotedPrice?: number | null
 }
 
 // 變更追蹤項目
@@ -378,6 +380,7 @@ export function RequirementsList({
           latitude: item.resource_latitude,
           longitude: item.resource_longitude,
           googleMapsUrl: item.resource_google_maps_url,
+          quotedPrice: item.unit_price,
         })
       }
     }
@@ -918,9 +921,10 @@ export function RequirementsList({
                 <tr className="bg-morandi-container/50 border-b border-border">
                   <th className="px-3 py-2.5 text-left font-medium text-morandi-primary w-[70px]">日期</th>
                   <th className="px-3 py-2.5 text-left font-medium text-morandi-primary w-[140px]">供應商</th>
-                  <th className="px-3 py-2.5 text-left font-medium text-morandi-primary">項目說明</th>
-                  <th className="px-3 py-2.5 text-right font-medium text-morandi-primary w-[90px]">成本</th>
-                  <th className="px-3 py-2.5 text-center font-medium text-morandi-primary w-[90px]">狀態</th>
+                  <th className="px-3 py-2.5 text-left font-medium text-morandi-primary w-[200px]">項目說明</th>
+                  <th className="px-3 py-2.5 text-right font-medium text-morandi-primary w-[80px]">報價</th>
+                  <th className="px-3 py-2.5 text-right font-medium text-morandi-primary w-[80px]">成本</th>
+                  <th className="px-3 py-2.5 text-center font-medium text-morandi-primary w-[80px]">狀態</th>
                   <th className="px-3 py-2.5 text-center font-medium text-morandi-primary w-[70px]">操作</th>
                 </tr>
               </thead>
@@ -929,10 +933,11 @@ export function RequirementsList({
                   const trackItems = changeTrackByCategory[cat.key]
                   if (trackItems.length === 0) return null
 
-                  // 輔助函數：找匹配的需求單（優先用 resource_id，其次用 supplier_name）
+                  // 輔助函數：找匹配的需求單（優先用 resource_id，其次用 supplier_name + service_date）
                   const findMatchingRequest = (itemData: ChangeTrackItem['item']) => {
                     const itemResourceId = 'resourceId' in itemData ? itemData.resourceId : undefined
                     const itemSupplierName = 'supplierName' in itemData ? itemData.supplierName : itemData.supplier_name
+                    const itemServiceDate = 'serviceDate' in itemData ? itemData.serviceDate : itemData.service_date
 
                     // 優先用 resource_id 匹配（更可靠）
                     if (itemResourceId) {
@@ -942,9 +947,11 @@ export function RequirementsList({
                       if (byResourceId) return byResourceId
                     }
 
-                    // 其次用 supplier_name 匹配
+                    // 其次用 supplier_name + service_date 匹配（避免同名供應商在不同日期混淆）
                     return existingRequests.find(r =>
-                      r.category === cat.key && r.supplier_name === itemSupplierName
+                      r.category === cat.key &&
+                      r.supplier_name === itemSupplierName &&
+                      r.service_date === itemServiceDate
                     )
                   }
 
@@ -952,7 +959,25 @@ export function RequirementsList({
                   const getSupplierKey = (itemData: ChangeTrackItem['item']) => {
                     const itemResourceId = 'resourceId' in itemData ? itemData.resourceId : undefined
                     const itemSupplierName = 'supplierName' in itemData ? itemData.supplierName : itemData.supplier_name
-                    return itemResourceId || itemSupplierName || ''
+                    const serviceDate = 'serviceDate' in itemData ? itemData.serviceDate : itemData.service_date
+
+                    // 優先用 resourceId
+                    if (itemResourceId) {
+                      return itemResourceId
+                    }
+
+                    // 「飯店早餐」是固定文字，但每天可能是不同飯店，需要用日期區分
+                    if (itemSupplierName === '飯店早餐') {
+                      return `飯店早餐-${serviceDate || ''}`
+                    }
+
+                    // 一般供應商用名稱分組
+                    if (itemSupplierName) {
+                      return itemSupplierName
+                    }
+
+                    // 沒有供應商時，用 title + date 作為唯一 key
+                    return `${itemData.title}-${serviceDate || ''}`
                   }
 
                   // 計算隱藏與可見項目
@@ -1021,6 +1046,8 @@ export function RequirementsList({
                     }
 
                     const quotedCost = existingRequest?.quoted_cost
+                    // 報價（從報價單帶入）
+                    const quotedPrice = 'quotedPrice' in itemData ? itemData.quotedPrice : null
 
                     return (
                       <tr
@@ -1046,6 +1073,9 @@ export function RequirementsList({
                               </div>
                             )}
                           </div>
+                        </td>
+                        <td className="px-3 py-2.5 text-right font-medium text-morandi-secondary">
+                          {quotedPrice ? `$${quotedPrice.toLocaleString()}` : '-'}
                         </td>
                         <td className="px-3 py-2.5 text-right font-medium text-morandi-primary">
                           {quotedCost ? `$${quotedCost.toLocaleString()}` : '-'}
@@ -1146,10 +1176,11 @@ export function RequirementsList({
                             )}
                           </div>
                         </td>
+                        <td></td>{/* 報價欄 */}
                         <td className="px-3 py-2 text-right font-medium text-morandi-primary">
                           {categoryTotal > 0 ? `$${categoryTotal.toLocaleString()}` : ''}
                         </td>
-                        <td></td>
+                        <td></td>{/* 狀態欄 */}
                         <td className="px-3 py-2 text-center">
                           {/* 新增按鈕 */}
                           <Button
@@ -1171,7 +1202,7 @@ export function RequirementsList({
                       {isHiddenExpanded && hiddenItems.length > 0 && (
                         <>
                           <tr className="bg-morandi-muted/10 border-t border-dashed border-morandi-muted/30">
-                            <td colSpan={6} className="px-3 py-1.5 text-xs text-morandi-muted">
+                            <td colSpan={7} className="px-3 py-1.5 text-xs text-morandi-muted">
                               <div className="flex items-center gap-1">
                                 <EyeOff size={12} />
                                 <span>已隱藏的項目</span>
