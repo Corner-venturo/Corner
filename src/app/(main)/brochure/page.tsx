@@ -30,6 +30,7 @@ import {
   Upload,
   LayoutList,
   Layers,
+  LayoutGrid,
   Columns2,
   FileDown,
   Printer,
@@ -56,6 +57,7 @@ import { useBrochureEditorV2 } from '@/features/designer/hooks/useBrochureEditor
 import { useMaskEditMode } from '@/features/designer/hooks/useMaskEditMode'
 import { LoadingOverlay, SavingIndicator, UnsavedIndicator } from '@/features/designer/components/LoadingOverlay'
 import { ElementLibrary } from '@/features/designer/components/ElementLibrary'
+import { BlockLibrary } from '@/features/designer/components/BlockLibrary'
 import { EditorToolbar } from '@/features/designer/components/EditorToolbar'
 import { PropertiesPanel } from '@/features/designer/components/PropertiesPanel'
 import { ImageMaskFillDialog } from '@/features/designer/components/ImageMaskFill'
@@ -133,6 +135,7 @@ export default function DesignerPage() {
   const [showLeftPanel, setShowLeftPanel] = useState(false)  // 預設關閉元素庫
   const [showRightPanel, setShowRightPanel] = useState(true)
   const [showLayerPanel, setShowLayerPanel] = useState(false)  // 預設關閉圖層
+  const [showBlockLibrary, setShowBlockLibrary] = useState(false)  // 區塊元件庫
   const [isDualPageMode, setIsDualPageMode] = useState(false)
   const [selectedObject, setSelectedObject] = useState<fabric.FabricObject | null>(null)
   const [showImageMaskFill, setShowImageMaskFill] = useState(false)
@@ -2640,6 +2643,14 @@ export default function DesignerPage() {
         <Button
           variant="ghost"
           size="sm"
+          onClick={() => setShowBlockLibrary(true)}
+          title="插入區塊"
+        >
+          <LayoutGrid size={16} />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => setShowRightPanel(!showRightPanel)}
           className={cn(!showRightPanel && 'text-morandi-muted')}
           title="屬性面板"
@@ -3050,6 +3061,46 @@ export default function DesignerPage() {
         targetShape={maskTargetShape}
         onComplete={() => {
           setMaskTargetShape(null)
+        }}
+      />
+
+      {/* 區塊元件庫 */}
+      <BlockLibrary
+        isOpen={showBlockLibrary}
+        onClose={() => setShowBlockLibrary(false)}
+        onInsertBlock={(elements) => {
+          // 把區塊元素加入 Canvas
+          if (canvas) {
+            elements.forEach(el => {
+              if (el.type === 'text') {
+                const textEl = el as import('@/features/designer/components/types').TextElement
+                const text = new fabric.Textbox(textEl.content || '', {
+                  left: textEl.x,
+                  top: textEl.y,
+                  width: textEl.width,
+                  fontSize: textEl.style?.fontSize || 12,
+                  fontFamily: textEl.style?.fontFamily || 'Noto Sans TC',
+                  fontWeight: textEl.style?.fontWeight || 'normal',
+                  fill: textEl.style?.color || '#000',
+                  textAlign: textEl.style?.textAlign || 'left',
+                })
+                canvas.add(text)
+              } else if (el.type === 'shape') {
+                const shapeEl = el as import('@/features/designer/components/types').ShapeElement
+                const rect = new fabric.Rect({
+                  left: shapeEl.x,
+                  top: shapeEl.y,
+                  width: shapeEl.width,
+                  height: shapeEl.height,
+                  fill: shapeEl.fill || '#ccc',
+                  stroke: shapeEl.stroke,
+                  strokeWidth: shapeEl.strokeWidth || 0,
+                })
+                canvas.add(rect)
+              }
+            })
+            canvas.renderAll()
+          }
         }}
       />
 
