@@ -62,18 +62,7 @@ export interface Tour extends BaseEntity {
   outbound_flight?: FlightInfo | null // 去程航班
   return_flight?: FlightInfo | null // 回程航班
 
-  // 版本鎖定欄位 (V2.0)
-  locked_quote_id?: string | null // 鎖定的報價單 ID
-  locked_quote_version?: number | null // 鎖定的報價單版本號
-  locked_itinerary_id?: string | null // 鎖定的行程 ID
-  locked_itinerary_version?: number | null // 鎖定的行程版本號
-  locked_at?: string | null // 版本鎖定時間
-  locked_by?: string | null // 執行鎖定的用戶 ID
-
-  // 解鎖記錄欄位 (V2.0)
-  last_unlocked_at?: string | null // 上次解鎖時間
-  last_unlocked_by?: string | null // 上次解鎖的用戶 ID
-  modification_reason?: string | null // 解鎖修改原因
+  // 版本鎖定欄位已移除 - 公司規範：一團一份，不需版本鎖定
 
   // 同步欄位
   _deleted?: boolean | null // 軟刪除標記

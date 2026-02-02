@@ -396,37 +396,7 @@ export function LinkDocumentsToTourDialog({
     setTimelineDialogOpen(false)
   }
 
-  // 自動鎖定行程表到旅遊團
-  const autoLockItineraryToTour = useCallback(async (itineraryId?: string) => {
-    // 如果旅遊團已有 locked_at，表示已經鎖定過，不再處理
-    if (tour.locked_at) return
-
-    try {
-      const updateData: Record<string, unknown> = {
-        locked_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      }
-
-      // 如果有 itineraries 表的記錄 ID，也設定 locked_itinerary_id
-      if (itineraryId) {
-        updateData.locked_itinerary_id = itineraryId
-      }
-
-      const { error } = await supabase
-        .from('tours')
-        .update(updateData)
-        .eq('id', tour.id)
-
-      if (error) {
-        logger.error('自動鎖定行程表失敗:', error)
-      } else {
-        logger.log('已自動鎖定行程表到旅遊團:', { tourId: tour.id, itineraryId })
-        toast.success('已自動鎖定行程表')
-      }
-    } catch (err) {
-      logger.error('自動鎖定行程表錯誤:', err)
-    }
-  }, [tour.id, tour.locked_at])
+  // 自動鎖定已移除 - 公司規範：一團一份，不需版本鎖定
 
   // 儲存時間軸資料
   const handleSaveTimeline = useCallback(async (timelineData: TimelineItineraryData) => {
@@ -451,15 +421,12 @@ export function LinkDocumentsToTourDialog({
         await syncTimelineToQuote(tourProposalPackage.quote_id, timelineData)
       }
 
-      // 自動鎖定（如果是第一個行程表）
-      await autoLockItineraryToTour()
-
       refreshPackage()
     } catch (error) {
       logger.error('儲存時間軸資料失敗:', error)
       throw error
     }
-  }, [tourProposalPackage, refreshPackage, autoLockItineraryToTour])
+  }, [tourProposalPackage, refreshPackage])
 
   // 主對話框開啟時，子對話框應關閉
   const mainDialogOpen = isOpen && !timelineDialogOpen && !packageItineraryDialogOpen
@@ -713,10 +680,8 @@ export function LinkDocumentsToTourDialog({
           onClose={() => setPackageItineraryDialogOpen(false)}
           pkg={tourProposalPackage}
           proposal={fakeProposal}
-          onItineraryCreated={(itineraryId?: string) => {
+          onItineraryCreated={() => {
             refreshPackage()
-            // 自動鎖定（如果是第一個行程表）
-            autoLockItineraryToTour(itineraryId)
           }}
         />
       )}

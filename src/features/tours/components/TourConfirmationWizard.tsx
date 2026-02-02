@@ -172,24 +172,18 @@ export function TourConfirmationWizard({
       const selectedQuote = quotes.find(q => q.id === selectedQuoteId)
       const selectedItinerary = itineraries.find(it => it.id === selectedItineraryId)
 
-      // 更新 tour 狀態為進行中，並記錄鎖定的版本
+      // 更新 tour 狀態為進行中
       const { error } = await supabase
         .from('tours')
         .update({
           status: '進行中',
-          locked_quote_id: selectedQuoteId,
-          locked_quote_version: selectedQuote?.version || null,
-          locked_itinerary_id: selectedItineraryId,
-          locked_itinerary_version: selectedItinerary?.version || null,
-          locked_at: new Date().toISOString(),
-          // locked_by 需要從 auth 取得當前用戶
           updated_at: new Date().toISOString(),
         })
         .eq('id', tour.id)
 
       if (error) throw error
 
-      toast.success('版本已鎖定！')
+      toast.success('已確認！')
       onOpenChange(false)
       onConfirmed?.()
     } catch (error) {
