@@ -568,6 +568,32 @@ export function TourFilesManager({ tourId, tourCode }: TourFilesManagerProps) {
     loadFolderContent(null)
   }, [loadFolderContent])
 
+  // 根據當前資料夾類型，決定空狀態的新增操作
+  const getEmptyStateAction = useCallback(() => {
+    if (!currentFolderId?.startsWith('folder-')) return undefined
+    
+    const category = currentFolderId.replace('folder-', '')
+    const folderConfig = DEFAULT_TOUR_FOLDERS.find(f => f.category === category)
+    
+    if (!folderConfig?.dbType) return undefined // 檔案資料夾用上傳
+    
+    const actions: Record<string, { label: string; path: string }> = {
+      quote: { label: '新增報價單', path: `/quotes/new?tour_id=${tourId}` },
+      itinerary: { label: '新增行程表', path: `/proposals/new?tour_id=${tourId}` },
+      confirmation: { label: '建立確認單', path: `/tours/${tourId}/confirmation` },
+      contract: { label: '新增合約', path: `/contracts/new?tour_id=${tourId}` },
+      request: { label: '新增需求單', path: `/tours/${tourId}?tab=requirements` },
+    }
+    
+    const action = actions[folderConfig.dbType]
+    if (!action) return undefined
+    
+    return {
+      label: action.label,
+      onClick: () => router.push(action.path),
+    }
+  }, [currentFolderId, tourId, router])
+
   return (
     <div className="h-[600px] border rounded-lg overflow-hidden bg-background">
       <FinderView
@@ -584,6 +610,7 @@ export function TourFilesManager({ tourId, tourCode }: TourFilesManagerProps) {
         onCreateFolder={handleCreateFolder}
         onUpload={handleUpload}
         onDownload={handleDownload}
+        emptyStateAction={getEmptyStateAction()}
       />
     </div>
   )

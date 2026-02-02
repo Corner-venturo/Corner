@@ -81,6 +81,11 @@ export interface FinderViewProps {
   onCreateFolder?: (name: string, parentId: string | null) => void
   onUpload?: (files: FileList, folderId: string | null) => void
   onDownload?: (item: FinderItem) => void
+  /** 空狀態的新增操作（DB 驅動的資料夾） */
+  emptyStateAction?: {
+    label: string
+    onClick: () => void
+  }
 }
 
 // ============================================================================
@@ -321,6 +326,7 @@ export function FinderView({
   onCreateFolder,
   onUpload,
   onDownload,
+  emptyStateAction,
 }: FinderViewProps) {
   const [internalViewMode, setInternalViewMode] = useState(viewMode)
   const [draggedIds, setDraggedIds] = useState<string[]>([])
@@ -522,18 +528,29 @@ export function FinderView({
         ) : sortedItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
             <Folder size={48} className="mb-3 opacity-50" />
-            <p>資料夾是空的</p>
-            {onUpload && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-4"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <Upload size={14} className="mr-2" />
-                上傳檔案
-              </Button>
-            )}
+            <p>尚無資料</p>
+            <div className="flex gap-2 mt-4">
+              {emptyStateAction && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={emptyStateAction.onClick}
+                >
+                  <Plus size={14} className="mr-2" />
+                  {emptyStateAction.label}
+                </Button>
+              )}
+              {onUpload && !emptyStateAction && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload size={14} className="mr-2" />
+                  上傳檔案
+                </Button>
+              )}
+            </div>
           </div>
         ) : (
           <div className={cn(
