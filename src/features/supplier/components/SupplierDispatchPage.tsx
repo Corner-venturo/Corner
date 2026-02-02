@@ -95,25 +95,24 @@ export function SupplierDispatchPage() {
             id,
             code,
             tour_id,
+            tour_code,
+            tour_name,
             category,
             service_date,
             title,
             quantity,
             notes,
             response_status,
-            response_data,
-            tours (
-              code,
-              name
-            )
+            reply_content,
+            assigned_vehicle_id,
+            assignee_name
           `)
           .eq('recipient_workspace_id', user.workspace_id)
           .eq('response_status', 'accepted')
 
         // 整理需求資料
         const confirmedRequests: ConfirmedRequest[] = (requestsData || []).map(r => {
-          const tours = r.tours as { code: string; name: string } | null
-          const responseData = r.response_data as { 
+          const replyContent = r.reply_content as { 
             driver_id?: string
             driver_name?: string
             dispatch_status?: string
@@ -122,16 +121,16 @@ export function SupplierDispatchPage() {
           return {
             id: r.id,
             request_code: r.code || '',
-            tour_code: tours?.code || null,
-            tour_name: tours?.name || null,
+            tour_code: r.tour_code || null,
+            tour_name: r.tour_name || null,
             category: r.category || 'other',
             service_date: r.service_date || '',
             title: r.title || '',
             quantity: r.quantity || 1,
             notes: r.notes || null,
-            dispatch_status: (responseData?.dispatch_status as 'pending' | 'assigned' | 'completed') || 'pending',
-            assigned_driver_id: responseData?.driver_id || null,
-            assigned_driver_name: responseData?.driver_name || null,
+            dispatch_status: (replyContent?.dispatch_status as 'pending' | 'assigned' | 'completed') || 'pending',
+            assigned_driver_id: replyContent?.driver_id || r.assigned_vehicle_id || null,
+            assigned_driver_name: replyContent?.driver_name || r.assignee_name || null,
           }
         })
 
@@ -164,21 +163,23 @@ export function SupplierDispatchPage() {
     try {
       const driver = drivers.find(d => d.id === selectedDriverId)
       
-      // 取得現有 response_data 並更新
+      // 取得現有 reply_content 並更新
       const { data: currentData } = await supabase
         .from('tour_requests')
-        .select('response_data')
+        .select('reply_content')
         .eq('id', selectedRequest.id)
         .single()
 
-      const existingData = (currentData?.response_data || {}) as Record<string, unknown>
+      const existingContent = (currentData?.reply_content || {}) as Record<string, unknown>
       
-      // 更新 response_data（保留現有資料）
+      // 更新 reply_content 和 assignee_name（保留現有資料）
       const { error } = await supabase
         .from('tour_requests')
         .update({
-          response_data: {
-            ...existingData,
+          assigned_vehicle_id: selectedDriverId,
+          assignee_name: driver?.name || '',
+          reply_content: {
+            ...existingContent,
             driver_id: selectedDriverId,
             driver_name: driver?.name || '',
             dispatch_status: 'assigned',
