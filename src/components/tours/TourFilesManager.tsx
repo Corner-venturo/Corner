@@ -610,11 +610,11 @@ export function TourFilesManager({ tourId, tourCode, quoteId }: TourFilesManager
     if (!folderConfig?.dbType) return undefined // 檔案資料夾用上傳
     
     const actions: Record<string, { label: string; path: string }> = {
-      quote: { label: '新增報價單', path: `/quotes/new?tour_id=${tourId}` },
+      quote: { label: '前往報價單', path: `/quotes` }, // 報價單用 Dialog 建立，需在報價單頁面操作
       itinerary: { label: '新增行程表', path: `/itinerary/block-editor?tour_id=${tourId}` },
-      confirmation: { label: '建立確認單', path: `/tours/${tourId}/confirmation` },
-      contract: { label: '新增合約', path: `/contracts/new?tour_id=${tourId}` },
-      request: { label: '新增需求單', path: `/tours/${tourId}?tab=requirements` },
+      confirmation: { label: '建立確認單', path: `/tours/${tourCode}/confirmation` },
+      contract: { label: '新增合約', path: `/contracts?tour_id=${tourId}` },
+      request: { label: '新增需求單', path: `/tours/${tourCode}?tab=requirements` },
     }
     
     const action = actions[folderConfig.dbType]
