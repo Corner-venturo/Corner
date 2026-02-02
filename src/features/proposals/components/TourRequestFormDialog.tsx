@@ -370,76 +370,70 @@ export function TourRequestFormDialog({
     `
   }
 
-  // 儲存文件到 tour_documents
+  // 儲存文件到 files 表（與檔案管理整合）
   const saveToTourDocuments = async (htmlContent: string) => {
-    // 需要有團號才能存（支援 proposal 模式和 tour 模式）
     const tourId = tour?.id || proposal?.converted_tour_id
-    logger.info('saveToTourDocuments 開始', { tourId, tourCode: tour?.code, proposalId: proposal?.id })
+    
     if (!tourId) {
-      logger.warn('無法存檔：缺少 tourId', { tourId: tour?.id, proposalConvertedId: proposal?.converted_tour_id })
-      toast({ title: '存檔跳過', description: '尚未轉團，無法存檔到旅遊團文件', variant: 'default' })
-      throw new Error('缺少 tourId，無法存檔')
+      toast({ title: '存檔跳過', description: '尚未轉團，無法存檔', variant: 'default' })
+      return // 不拋錯，允許列印但不存檔
     }
     if (!user?.workspace_id) {
-      logger.warn('無法存檔：缺少 workspace_id')
-      return
+      return // 靜默跳過
     }
 
     try {
-      // 生成檔案名稱
-      const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '')
-      const fileName = `需求單_${categoryName}_${supplierInfo.name}_${timestamp}.html`
-      const filePath = `${tourId}/${fileName}`
+      // 生成檔案名稱（Storage 不支援中文）
+      const timestamp = Date.now()
+      const randomStr = Math.random().toString(36).substring(2, 8)
+      const fileName = `${timestamp}-${randomStr}.html`
+      const storagePath = `${user.workspace_id}/${fileName}`
+      const displayName = `${categoryName}需求單_${supplierInfo.name}.html`
 
       // 將 HTML 轉成 Blob
       const blob = new Blob([htmlContent], { type: 'text/html' })
 
-      // 上傳到 Storage
-      logger.info('開始上傳需求單:', { tourId, fileName, filePath })
-      const { error: uploadError, data: uploadData } = await supabase.storage
-        .from('tour-documents')
-        .upload(filePath, blob, {
+      // 上傳到 Storage (files bucket)
+      const { error: uploadError } = await supabase.storage
+        .from('files')
+        .upload(storagePath, blob, {
           contentType: 'text/html',
-          upsert: true,  // 改為 upsert 允許覆蓋
+          upsert: true,
         })
 
       if (uploadError) {
-        logger.error('上傳文件失敗:', uploadError)
-        toast({ title: '存檔失敗', description: uploadError.message, variant: 'destructive' })
-        return
+        logger.error('上傳失敗:', uploadError)
+        throw new Error(`上傳失敗: ${uploadError.message}`)
       }
-      
-      logger.info('上傳成功:', uploadData)
 
-      // 取得公開 URL
-      const { data: urlData } = supabase.storage
-        .from('tour-documents')
-        .getPublicUrl(filePath)
-
-      // 記錄到 tour_documents 表
-       
-      const { error: insertError } = await dynamicFrom('tour_documents')
+      // 記錄到 files 表
+      const { error: insertError } = await dynamicFrom('files')
         .insert({
-          tour_id: tourId,
           workspace_id: user.workspace_id,
-          name: `${categoryName}需求單 - ${supplierInfo.name}`,
+          folder_id: null,
+          filename: displayName,
+          original_filename: displayName,
+          content_type: 'text/html',
+          size_bytes: blob.size,
+          extension: 'html',
+          storage_path: storagePath,
+          storage_bucket: 'files',
+          category: 'other',
+          tags: ['需求單', categoryName],
+          tour_id: tourId,
+          source: 'request_form',
           description: `團號: ${tourCode || tour?.code || '-'}, 出發日期: ${formatDate(departureDate || tour?.departure_date || pkg?.start_date)}`,
-          file_path: filePath,
-          public_url: urlData?.publicUrl || '',
-          file_name: fileName,
-          file_size: blob.size,
-          mime_type: 'text/html',
-          // uploaded_by 需要 auth.users UUID，暫時留空
-          uploaded_by: null,
         })
 
       if (insertError) {
-        logger.warn('記錄文件失敗:', insertError)
-      } else {
-        toast({ title: '需求單已存檔' })
+        logger.error('寫入 DB 失敗:', insertError)
+        throw new Error(`寫入 DB 失敗: ${insertError.message}`)
       }
+      
+      toast({ title: '需求單已存檔' })
     } catch (err) {
       logger.error('存檔失敗:', err)
+      toast({ title: '存檔失敗', description: err instanceof Error ? err.message : '未知錯誤', variant: 'destructive' })
     }
   }
 
@@ -571,7 +565,7 @@ export function TourRequestFormDialog({
       // 生成 HTML 內容
       const printContent = generatePrintHtml()
 
-      // 1. 先儲存到文件管理（必須成功）
+      // 1. 儲存到文件管理
       await saveToTourDocuments(printContent)
 
       // 2. 儲存供應商資訊
