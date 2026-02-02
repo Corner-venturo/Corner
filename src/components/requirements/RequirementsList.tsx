@@ -183,19 +183,7 @@ export function RequirementsList({
         workspaceId = (tourData as Tour).workspace_id || null
 
         // 取得報價單 ID
-        const tourQuoteId = (tourData as { quote_id?: string | null }).quote_id
-        const tourLockedQuoteId = (tourData as { locked_quote_id?: string | null }).locked_quote_id
-        quoteId = quoteId || tourQuoteId || tourLockedQuoteId || null
-
-        if (!quoteId) {
-          const { data: linkedQuote } = await supabase
-            .from('quotes')
-            .select('id')
-            .eq('tour_id', tourId)
-            .limit(1)
-            .maybeSingle()
-          quoteId = linkedQuote?.id || null
-        }
+        quoteId = quoteId || (tourData as { quote_id?: string | null }).quote_id || null
 
         // 載入航班資訊
         if (tourData.outbound_flight) {

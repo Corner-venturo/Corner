@@ -101,10 +101,9 @@ export async function POST(request: NextRequest) {
       proposal_id: proposal_id,
       proposal_package_id: package_id,
       converted_from_proposal: true,
-      // 自動鎖定報價單和行程表
-      locked_quote_id: pkgData.quote_id || null,
-      locked_itinerary_id: pkgData.itinerary_id || null,
-      locked_at: pkgData.quote_id || pkgData.itinerary_id ? new Date().toISOString() : null,
+      // 報價單和行程表 ID
+      quote_id: pkgData.quote_id || null,
+      itinerary_id: pkgData.itinerary_id || null,
       profit: 0,
       total_cost: 0,
       total_revenue: 0,

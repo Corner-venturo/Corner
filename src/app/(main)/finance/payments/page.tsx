@@ -30,7 +30,7 @@ const BatchConfirmReceiptDialog = dynamic(
 const ReceiptConfirmDialog = dynamic(
   () => import('@/features/finance/payments').then(m => m.ReceiptConfirmDialog),
   /* eslint-disable venturo/no-custom-modal -- 動態載入時的 loading 狀態 */
-  { loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"><Loader2 className="animate-spin text-white" size={32} /></div> }
+  { loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9000]"><Loader2 className="animate-spin text-white" size={32} /></div> }
 )
 const AddReceiptDialog = dynamic(
   () => import('@/features/finance/payments').then(m => m.AddReceiptDialog),

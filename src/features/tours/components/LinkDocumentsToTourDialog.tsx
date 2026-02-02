@@ -485,19 +485,21 @@ export function LinkDocumentsToTourDialog({
                     <FileText className="w-4 h-4 text-morandi-gold" />
                     <span className="font-medium text-sm text-morandi-primary">行程</span>
                   </div>
-                  {/* 新增行程表按鈕（統一入口，直接開 PackageItineraryDialog） */}
-                  <button
-                    onClick={handleSelectSimpleItinerary}
-                    disabled={isCreatingPackage}
-                    className="p-1 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors disabled:opacity-50"
-                    title="新增行程表"
-                  >
-                    {isCreatingPackage ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Plus className="w-4 h-4" />
-                    )}
-                  </button>
+                  {/* 新增行程表按鈕（只在沒有行程表時顯示） */}
+                  {!hasTimelineData && itineraryType !== 'simple' && !tourProposalPackage?.itinerary_id && (
+                    <button
+                      onClick={handleSelectSimpleItinerary}
+                      disabled={isCreatingPackage}
+                      className="p-1 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors disabled:opacity-50"
+                      title="新增行程表"
+                    >
+                      {isCreatingPackage ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Plus className="w-4 h-4" />
+                      )}
+                    </button>
+                  )}
                 </div>
                 <div className="flex-1 overflow-auto mt-2">
                   {hasTimelineData ? (
@@ -566,18 +568,21 @@ export function LinkDocumentsToTourDialog({
                     <Calculator className="w-4 h-4 text-morandi-gold" />
                     <span className="font-medium text-sm text-morandi-primary">報價</span>
                   </div>
-                  <button
-                    onClick={handleCreateStandardQuote}
-                    disabled={isCreatingStandardQuote}
-                    className="p-1 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors disabled:opacity-50"
-                    title="新增報價單"
-                  >
-                    {isCreatingStandardQuote ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Plus className="w-4 h-4" />
-                    )}
-                  </button>
+                  {/* 新增報價單按鈕（只在沒有團體報價單時顯示） */}
+                  {linkedStandardQuotes.length === 0 && (
+                    <button
+                      onClick={handleCreateStandardQuote}
+                      disabled={isCreatingStandardQuote}
+                      className="p-1 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors disabled:opacity-50"
+                      title="新增報價單"
+                    >
+                      {isCreatingStandardQuote ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Plus className="w-4 h-4" />
+                      )}
+                    </button>
+                  )}
                 </div>
                 <div className="flex-1 overflow-auto mt-2 space-y-1">
                   {linkedStandardQuotes.length > 0 ? (

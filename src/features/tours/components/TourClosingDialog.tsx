@@ -201,7 +201,7 @@ export function TourClosingDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent level={1} className="max-w-lg">
+      <DialogContent level={2} className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calculator size={20} className="text-morandi-gold" />
