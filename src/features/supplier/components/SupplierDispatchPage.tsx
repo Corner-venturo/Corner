@@ -139,12 +139,21 @@ export function SupplierDispatchPage() {
         // 載入司機列表
         const { data: driversData } = await supabase
           .from('supplier_employees')
-          .select('id, name, phone, vehicle_plate, vehicle_type, status')
+          .select('id, name, phone, vehicle_plate, vehicle_type, is_active')
           .eq('supplier_id', user.workspace_id)
           .eq('role', 'driver')
-          .eq('status', 'active')
+          .eq('is_active', true)
 
-        setDrivers(driversData || [])
+        // 轉換為 Driver 格式
+        const formattedDrivers: Driver[] = (driversData || []).map(d => ({
+          id: d.id,
+          name: d.name,
+          phone: d.phone || '',
+          vehicle_plate: d.vehicle_plate,
+          vehicle_type: d.vehicle_type,
+          status: d.is_active ? 'active' : 'inactive',
+        }))
+        setDrivers(formattedDrivers)
       } catch (error) {
         console.error('載入資料失敗:', error)
       } finally {
