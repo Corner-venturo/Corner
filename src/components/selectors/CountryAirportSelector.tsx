@@ -70,18 +70,10 @@ export function CountryAirportSelector({
     }))
   }, [country, getAirportsByCountry])
 
-  // 格式化機場顯示
+  // 格式化機場顯示（只顯示城市名）
   function formatAirportLabel(airport: Airport): string {
-    const city = airport.city_name_zh || airport.city_name_en || ''
-    const name = airport.name_zh || airport.english_name || ''
-    
-    if (city && name && !name.includes(city)) {
-      return `${city} - ${name} (${airport.iata_code})`
-    }
-    if (city) {
-      return `${city} (${airport.iata_code})`
-    }
-    return `${name || airport.iata_code} (${airport.iata_code})`
+    const city = airport.city_name_zh || airport.city_name_en || airport.iata_code
+    return `${city} (${airport.iata_code})`
   }
 
   // 處理國家變更
