@@ -570,16 +570,16 @@ export function TourRequestFormDialog({
       // 生成 HTML 內容
       const printContent = generatePrintHtml()
 
-      // 儲存到文件管理（背景執行，不阻塞列印）
-      saveToTourDocuments(printContent)
+      // 1. 先儲存到文件管理（必須成功）
+      await saveToTourDocuments(printContent)
 
-      // 儲存供應商資訊（背景執行）
-      saveSupplierInfo()
+      // 2. 儲存供應商資訊
+      await saveSupplierInfo()
 
-      // 更新需求單狀態為「已發送」
-      updateRequestsStatus()
+      // 3. 更新需求單狀態為「已發送」
+      await updateRequestsStatus()
 
-      // 開啟新視窗列印
+      // 全部存檔成功後，開啟新視窗列印
       const printWindow = window.open('', '_blank', 'width=900,height=700')
       if (!printWindow) {
         toast({ title: '請允許彈出視窗以進行列印', variant: 'destructive' })
@@ -589,7 +589,14 @@ export function TourRequestFormDialog({
       printWindow.document.write(printContent)
       printWindow.document.close()
 
-      toast({ title: '需求單已發送', description: '狀態已更新為「已發送」' })
+      toast({ title: '需求單已發送並存檔', description: '狀態已更新為「已發送」' })
+    } catch (err) {
+      logger.error('需求單處理失敗:', err)
+      toast({ 
+        title: '存檔失敗', 
+        description: '請重試或聯繫系統管理員',
+        variant: 'destructive' 
+      })
     } finally {
       setSaving(false)
     }
