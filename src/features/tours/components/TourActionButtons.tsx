@@ -132,7 +132,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                   e.stopPropagation()
                   onProposalArchive?.(proposal)
                 }}
-                className="px-1.5 py-0.5 text-morandi-secondary/60 hover:text-morandi-secondary hover:bg-morandi-container rounded transition-colors flex items-center gap-0.5 text-xs"
+                className="px-1.5 py-0.5 text-morandi-secondary/60 hover:text-morandi-secondary hover:bg-morandi-secondary/10 rounded transition-colors flex items-center gap-0.5 text-xs"
                 title="封存"
               >
                 <Archive size={14} />
@@ -184,7 +184,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               e.stopPropagation()
               handleCreateChannel(tour)
             }}
-            className="px-1.5 py-0.5 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors flex items-center gap-0.5 text-xs"
+            className="px-1.5 py-0.5 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-secondary/10 rounded transition-colors flex items-center gap-0.5 text-xs"
             title="建立工作空間頻道"
           >
             <MessageSquare size={14} />
@@ -209,7 +209,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                 router.push(`/quotes?tour_id=${tour.id}`)
               }
             }}
-            className="px-1.5 py-0.5 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
+            className="px-1.5 py-0.5 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
             title="報價與行程管理"
           >
             <Calculator size={14} />
@@ -223,7 +223,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               // 直接跳轉到設計頁面，不需要中間的 Dialog
               router.push(`/brochure?tour_id=${tour.id}`)
             }}
-            className="px-1.5 py-0.5 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
+            className="px-1.5 py-0.5 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
             title="設計手冊或網頁行程"
           >
             <Palette size={14} />
@@ -240,7 +240,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                 router.push(`/contracts?tour_id=${tour.id}`)
               }
             }}
-            className="px-1.5 py-0.5 text-morandi-gold/80 hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
+            className="px-1.5 py-0.5 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
             title="合約管理"
           >
             <FileSignature size={14} />
@@ -255,7 +255,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                 onOpenRequirementsDialog(tour)
               }
             }}
-            className="px-1.5 py-0.5 text-morandi-gold/80 hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
+            className="px-1.5 py-0.5 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
             title="需求總覽"
           >
             <ListChecks size={14} />
@@ -270,7 +270,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                 onOpenTourControlDialog(tour)
               }
             }}
-            className="px-1.5 py-0.5 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-primary/10 rounded transition-colors flex items-center gap-0.5 text-xs"
+            className="px-1.5 py-0.5 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-secondary/10 rounded transition-colors flex items-center gap-0.5 text-xs"
             title="團控表"
           >
             <ClipboardEdit size={14} />
@@ -296,7 +296,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               'px-1.5 py-0.5 rounded transition-colors flex items-center gap-0.5 text-xs',
               tour.archived
                 ? 'text-morandi-gold/60 hover:text-morandi-gold hover:bg-morandi-gold/10'
-                : 'text-morandi-secondary/60 hover:text-morandi-secondary hover:bg-morandi-container'
+                : 'text-morandi-secondary/60 hover:text-morandi-secondary hover:bg-morandi-secondary/10'
             )}
             title={tour.archived ? '解除封存' : '封存'}
           >
@@ -311,7 +311,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                 e.stopPropagation()
                 onCloseTour(tour)
               }}
-              className="px-1.5 py-0.5 text-morandi-green hover:text-morandi-green hover:bg-status-success-bg rounded transition-colors flex items-center gap-0.5 text-xs"
+              className="px-1.5 py-0.5 text-morandi-green hover:bg-morandi-green/10 rounded transition-colors flex items-center gap-0.5 text-xs"
               title="結案"
             >
               <FileCheck size={14} />
