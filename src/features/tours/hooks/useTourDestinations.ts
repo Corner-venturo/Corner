@@ -24,9 +24,9 @@ type Country = Pick<FullCountry, 'id' | 'name' | 'name_en'> & {
   usage_count?: number | null
 }
 
-// SWR 快取 key
-const COUNTRIES_CACHE_KEY = 'entity:countries:list'
-const DESTINATIONS_CACHE_KEY = 'entity:tour_destinations:list'
+// SWR 快取 key（避免與 entity 系統衝突，使用不同的 key）
+const COUNTRIES_CACHE_KEY = 'tour:countries:slim'
+const DESTINATIONS_CACHE_KEY = 'tour:destinations:list'
 
 // SWR 配置：靜態資料，較長的快取時間
 const SWR_CONFIG = {

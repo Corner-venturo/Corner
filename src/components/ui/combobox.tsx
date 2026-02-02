@@ -126,7 +126,10 @@ export function Combobox<T = unknown>({
 
   // 篩選選項
   const filteredOptions = React.useMemo(() => {
-    return options.filter(option => option.label?.toLowerCase().includes(searchValue.toLowerCase()))
+    return options.filter(option => {
+      const label = typeof option.label === 'string' ? option.label : String(option.label ?? '')
+      return label.toLowerCase().includes(searchValue.toLowerCase())
+    })
   }, [options, searchValue])
 
   // 處理輸入變化

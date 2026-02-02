@@ -66,7 +66,7 @@ const COUNTRY_NAME_TO_CODE: Record<string, string> = Object.fromEntries(
 
 // SWR 快取 key
 const AIRPORTS_CACHE_KEY = 'entity:ref_airports:list'
-const COUNTRIES_CACHE_KEY = 'entity:countries:list'
+const COUNTRIES_NAMES_CACHE_KEY = 'entity:countries:names'
 
 // SWR 配置
 const SWR_CONFIG = {
@@ -131,7 +131,7 @@ export function useAirports(options: UseAirportsOptions = {}) {
     data: countries = [],
     isLoading: countriesLoading,
   } = useSWR<string[]>(
-    enabled ? COUNTRIES_CACHE_KEY : null,
+    enabled ? COUNTRIES_NAMES_CACHE_KEY : null,
     fetchCountries,
     SWR_CONFIG
   )
