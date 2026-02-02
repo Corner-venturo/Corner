@@ -1,29 +1,35 @@
 /**
- * 手冊模板元件
+ * 手冊模板系統
+ * 
+ * 結構：
+ * - primitives: 基礎元素（Text, Image, Divider...）
+ * - blocks: 區塊元件（Header, DaySchedule, HotelCard...）
+ * - pages: 頁面元件（Cover, Toc, Daily...）
+ * - themes: 主題設定（cornerTravel, japanese...）
  * 
  * 使用方式：
  * ```tsx
- * import { CornerTravel, JapaneseStyle } from '@/features/designer/components/brochure-templates'
+ * import { pages, themes, PAGE_SIZES } from '@/features/designer/components/brochure-templates'
  * 
- * // Corner Travel 風格
- * <CornerTravel.Cover data={data} />
- * <CornerTravel.Daily data={data} day={day} dayIndex={0} />
+ * const theme = themes.cornerTravelTheme
  * 
- * // 日系風格
- * <JapaneseStyle.Cover data={data} />
- * <JapaneseStyle.Daily data={data} day={day} dayIndex={0} />
- * 
- * // 混搭
- * <CornerTravel.Cover data={data} />
- * <JapaneseStyle.Daily data={data} day={day} dayIndex={0} />
+ * <pages.Cover data={data} theme={theme} size={PAGE_SIZES.A5} />
+ * <pages.Toc data={data} theme={theme} />
+ * <pages.Daily data={data} theme={theme} day={day} image={img} />
  * ```
  */
 
-import * as CornerTravel from './corner-travel'
-import * as JapaneseStyle from './japanese-style'
+// 基礎元素
+export * as primitives from './primitives'
 
-export { CornerTravel, JapaneseStyle }
+// 區塊元件
+export * as blocks from './blocks'
 
-// 共用類型
-export type { PageSize } from './japanese-style/types'
-export { PAGE_SIZES } from './japanese-style/types'
+// 頁面元件
+export * as pages from './pages'
+
+// 主題
+export * as themes from './themes'
+
+// 類型
+export * from './types'

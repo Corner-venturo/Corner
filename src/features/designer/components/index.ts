@@ -12,6 +12,6 @@ export type { ImageAdjustments } from './ImageFilters'
 export { ImageAdjustmentsPanel } from './ImageAdjustmentsPanel'
 export { ElementLibrary, QuickInsertBar } from './ElementLibrary'
 export { PropertiesPanel } from './PropertiesPanel'
-export { TemplateSelector } from './TemplateSelector'
+// TemplateSelector 已整合到新的 brochure-templates 系統
 export { GradientPicker, cssGradientToFabric } from './GradientPicker'
 export { ImageMaskFillDialog, MASK_SHAPES } from './ImageMaskFill'
