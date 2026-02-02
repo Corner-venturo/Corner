@@ -300,7 +300,7 @@ export function ImageEditor({
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0 gap-0">
+      <DialogContent level={3} className="max-w-4xl max-h-[90vh] flex flex-col p-0 gap-0">
         <DialogHeader className="px-6 py-4 border-b border-border">
           <DialogTitle>{t('title')}</DialogTitle>
         </DialogHeader>
