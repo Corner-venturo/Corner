@@ -100,8 +100,18 @@ interface TourTabContentProps {
   /** 額外 props 傳給 OrderMembersExpandable */
   workspaceId?: string
   forceShowPnr?: boolean
+  /** PNR 配對 Dialog 控制（Dialog 專用） */
+  showPnrMatchDialog?: boolean
+  onPnrMatchDialogChange?: (show: boolean) => void
+  onPnrMatchSuccess?: () => void
   /** 需求單回調 */
   onAddRequest?: () => void
+  onOpenRequestDialog?: (data: {
+    category: string
+    supplierName: string
+    items: { serviceDate: string | null; title: string; quantity: number; note?: string }[]
+    startDate: string | null
+  }) => void
 }
 
 export function TourTabContent({
@@ -109,7 +119,11 @@ export function TourTabContent({
   activeTab,
   workspaceId,
   forceShowPnr,
+  showPnrMatchDialog,
+  onPnrMatchDialogChange,
+  onPnrMatchSuccess,
   onAddRequest,
+  onOpenRequestDialog,
 }: TourTabContentProps) {
   switch (activeTab) {
     case 'members':
@@ -120,6 +134,9 @@ export function TourTabContent({
           mode="tour"
           forceShowPnr={forceShowPnr}
           tour={tour}
+          showPnrMatchDialog={showPnrMatchDialog}
+          onPnrMatchDialogChange={onPnrMatchDialogChange}
+          onPnrMatchSuccess={onPnrMatchSuccess}
         />
       )
     case 'orders':
@@ -134,6 +151,7 @@ export function TourTabContent({
           tourId={tour.id}
           quoteId={tour.quote_id}
           onAddRequest={onAddRequest}
+          onOpenRequestDialog={onOpenRequestDialog}
         />
       )
     case 'files':

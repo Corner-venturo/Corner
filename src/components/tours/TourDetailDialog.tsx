@@ -11,8 +11,7 @@ import { useWorkspaceChannels } from '@/stores/workspace-store'
 import { useChannelMemberStore } from '@/stores/workspace/channel-member-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { TourOverview } from '@/components/tours/tour-overview'
-import { TourOrders } from '@/components/tours/tour-orders'
-import { OrderMembersExpandable } from '@/components/orders/OrderMembersExpandable'
+// TourOrders, OrderMembersExpandable 等已移至 TourTabContent
 import { PnrMatchDialog } from '@/components/orders/components/PnrMatchDialog'
 import { TourCloseDialog } from '@/components/tours/tour-close-dialog'
 import { TourConfirmationDialog } from '@/features/tours/components/TourConfirmationDialog'
@@ -42,49 +41,14 @@ const TourCosts = dynamic(
   { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
 )
 
-const TourConfirmationSheet = dynamic(
-  () => import('@/components/tours/tour-confirmation-sheet').then(m => m.TourConfirmationSheet),
-  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
-)
-
-
-const TourCheckin = dynamic(
-  () => import('@/components/tours/tour-checkin').then(m => m.TourCheckin),
-  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
-)
-
-const TourRequirementsTab = dynamic(
-  () => import('@/components/tours/tour-requirements-tab').then(m => m.TourRequirementsTab),
-  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
-)
-
-const TourFilesManager = dynamic(
-  () => import('@/components/tours/TourFilesManager').then(m => m.TourFilesManager),
-  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
-)
-
-const TourDesignsTab = dynamic(
-  () => import('@/components/tours/tour-designs-tab').then(m => m.TourDesignsTab),
-  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
-)
+// 以下頁籤元件已移至 TourTabContent 共用元件
 
 const TourRequestFormDialog = dynamic(
   () => import('@/features/proposals/components/TourRequestFormDialog').then(m => m.TourRequestFormDialog),
   { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
 )
 
-// 🔧 優化：調整頁籤順序，團員名單優先（最常用），總覽置末（減少初始載入）
-// 分車/分房已移至團員名單工具列（概念上是針對團員的操作）
-const tabs = [
-  { value: 'members', label: '團員名單' },
-  { value: 'orders', label: '訂單管理' },
-  { value: 'requirements', label: '需求總覽' },
-  { value: 'confirmation', label: '團確單' },
-  { value: 'checkin', label: '報到' },
-  { value: 'designs', label: '設計' },
-  { value: 'files', label: '檔案' },
-  { value: 'overview', label: '總覽' },
-]
+import { TOUR_TABS, TourTabContent } from '@/components/tours/TourTabs'
 
 interface TourDetailDialogProps {
   isOpen: boolean
@@ -412,75 +376,50 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange, defaul
   const renderTabContent = () => {
     if (!tour) return null
 
-    switch (activeTab) {
-      case 'overview':
-        return (
-          <div className="space-y-6">
-            {/* 基本資訊 */}
-            <TourOverview
-              tour={tour}
-              onEdit={() => setShowEditDialog(true)}
-              onManageQuote={() => setShowQuotePicker(true)}
-            />
-
-            {/* 收款紀錄 */}
-            <TourPayments
-              tour={tour}
-              triggerAdd={triggerPaymentAdd}
-              onTriggerAddComplete={() => setTriggerPaymentAdd(false)}
-              showSummary={false}
-            />
-
-            {/* 成本支出 */}
-            <TourCosts tour={tour} showSummary={false} />
-          </div>
-        )
-      case 'orders':
-        return <TourOrders tour={tour} />
-      case 'members':
-        return (
-          <OrderMembersExpandable
-            tourId={tour.id}
-            workspaceId={currentWorkspace?.id || ''}
-            mode="tour"
-            forceShowPnr={forceShowPnr}
+    // overview 有 Dialog 專用的額外功能（編輯、報價單管理、triggerAdd）
+    if (activeTab === 'overview') {
+      return (
+        <div className="space-y-6">
+          <TourOverview
             tour={tour}
-            showPnrMatchDialog={showMembersPnrMatchDialog}
-            onPnrMatchDialogChange={setShowMembersPnrMatchDialog}
-            onPnrMatchSuccess={() => {
-              setForceShowPnr(true)
-              handleSuccess()
-            }}
+            onEdit={() => setShowEditDialog(true)}
+            onManageQuote={() => setShowQuotePicker(true)}
           />
-        )
-      case 'confirmation':
-        return <TourConfirmationSheet tourId={tour.id} />
-      case 'checkin':
-        return <TourCheckin tour={tour} />
-      case 'requirements':
-        return (
-          <TourRequirementsTab
-            tourId={tour.id}
-            quoteId={tour.quote_id}
-            onOpenRequestDialog={(data) => {
-              setRequirementsRequestData({
-                category: data.category,
-                supplierName: data.supplierName,
-                items: data.items,
-                startDate: data.startDate,
-              })
-              setShowRequirementsRequestDialog(true)
-            }}
+          <TourPayments
+            tour={tour}
+            triggerAdd={triggerPaymentAdd}
+            onTriggerAddComplete={() => setTriggerPaymentAdd(false)}
+            showSummary={false}
           />
-        )
-      case 'files':
-        return <TourFilesManager tourId={tour.id} tourCode={tour.code || ''} />
-      case 'designs':
-        // Tour 沒有 proposal_id，TourDesignsTab 會透過 proposal_package_id 查詢
-        return <TourDesignsTab tourId={tour.id} proposalId={undefined} />
-      default:
-        return <TourOverview tour={tour} />
+          <TourCosts tour={tour} showSummary={false} />
+        </div>
+      )
     }
+
+    // 其他頁籤使用共用元件
+    return (
+      <TourTabContent
+        tour={tour}
+        activeTab={activeTab}
+        workspaceId={currentWorkspace?.id}
+        forceShowPnr={forceShowPnr}
+        showPnrMatchDialog={showMembersPnrMatchDialog}
+        onPnrMatchDialogChange={setShowMembersPnrMatchDialog}
+        onPnrMatchSuccess={() => {
+          setForceShowPnr(true)
+          handleSuccess()
+        }}
+        onOpenRequestDialog={(data) => {
+          setRequirementsRequestData({
+            category: data.category,
+            supplierName: data.supplierName,
+            items: data.items,
+            startDate: data.startDate,
+          })
+          setShowRequirementsRequestDialog(true)
+        }}
+      />
+    )
   }
 
   return (
@@ -505,7 +444,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange, defaul
               {/* Tabs */}
               {tour && (
                 <div className="flex items-center flex-1 min-w-0">
-                  {tabs.map((tab) => (
+                  {TOUR_TABS.map((tab) => (
                     <button
                       key={tab.value}
                       onClick={() => setActiveTab(tab.value)}
