@@ -22,6 +22,8 @@ import type { Folder, VenturoFile } from '@/types/file-system.types'
 interface TourFilesManagerProps {
   tourId: string
   tourCode: string
+  /** 團關聯的報價單 ID（用於查詢報價單） */
+  quoteId?: string | null
 }
 
 // 預設的團資料夾結構
@@ -39,7 +41,7 @@ const DEFAULT_TOUR_FOLDERS = [
   { name: '其他', category: 'other', icon: '📁' },
 ]
 
-export function TourFilesManager({ tourId, tourCode }: TourFilesManagerProps) {
+export function TourFilesManager({ tourId, tourCode, quoteId }: TourFilesManagerProps) {
   const router = useRouter()
   const { user } = useAuthStore()
   const workspaceId = user?.workspace_id
@@ -75,10 +77,24 @@ export function TourFilesManager({ tourId, tourCode }: TourFilesManagerProps) {
                 .select('id', { count: 'exact', head: true })
                 .eq('converted_tour_id', tourId)
               count = c || 0
+            } else if (folder.dbType === 'quote') {
+              // 報價單：用 tour_id 或 quoteId
+              let query = supabase
+                .from('quotes')
+                .select('id', { count: 'exact', head: true })
+              
+              if (quoteId) {
+                // 優先用 tour.quote_id 關聯
+                query = query.eq('id', quoteId)
+              } else {
+                query = query.eq('tour_id', tourId)
+              }
+              
+              const { count: c } = await query
+              count = c || 0
             } else {
               // 其他：直接用 tour_id
-              const table = folder.dbType === 'quote' ? 'quotes'
-                : folder.dbType === 'confirmation' ? 'tour_confirmation_sheets'
+              const table = folder.dbType === 'confirmation' ? 'tour_confirmation_sheets'
                 : folder.dbType === 'contract' ? 'contracts'
                 : 'tour_requests'
               
@@ -216,7 +232,7 @@ export function TourFilesManager({ tourId, tourCode }: TourFilesManagerProps) {
     } finally {
       setLoading(false)
     }
-  }, [tourId])
+  }, [tourId, quoteId])
 
   // 載入 DB 驅動的資料夾內容
   const loadDbFolderContent = async (
@@ -227,11 +243,18 @@ export function TourFilesManager({ tourId, tourCode }: TourFilesManagerProps) {
 
     switch (dbType) {
       case 'quote': {
-        const { data } = await supabase
+        // 報價單：用 quoteId 或 tour_id
+        let query = supabase
           .from('quotes')
           .select('id, quote_number, title, status, created_at')
-          .eq('tour_id', tourId)
-          .order('created_at', { ascending: false })
+        
+        if (quoteId) {
+          query = query.eq('id', quoteId)
+        } else {
+          query = query.eq('tour_id', tourId)
+        }
+        
+        const { data } = await query.order('created_at', { ascending: false })
         
         if (data) {
           for (const q of data) {
