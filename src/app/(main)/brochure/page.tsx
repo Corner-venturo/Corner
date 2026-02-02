@@ -3097,6 +3097,23 @@ export default function DesignerPage() {
                   strokeWidth: shapeEl.strokeWidth || 0,
                 })
                 canvas.add(rect)
+              } else if (el.type === 'image') {
+                // 圖片 placeholder（灰色矩形 + 圖標）
+                const imgEl = el as import('@/features/designer/components/types').ImageElement
+                const placeholder = new fabric.Rect({
+                  left: imgEl.x,
+                  top: imgEl.y,
+                  width: imgEl.width,
+                  height: imgEl.height,
+                  fill: '#e8e4df',
+                  stroke: '#c9aa7c',
+                  strokeWidth: 1,
+                  rx: 4,
+                  ry: 4,
+                })
+                // 標記為圖片 placeholder，雙擊可替換
+                ;(placeholder as fabric.Rect & { isImagePlaceholder: boolean }).isImagePlaceholder = true
+                canvas.add(placeholder)
               }
             })
             canvas.renderAll()

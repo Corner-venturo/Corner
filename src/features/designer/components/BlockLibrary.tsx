@@ -19,6 +19,7 @@ import {
   Users,
   AlertCircle,
   ChevronRight,
+  Image as ImageIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -36,7 +37,7 @@ interface BlockDefinition {
   name: string
   description: string
   icon: React.ComponentType<{ className?: string }>
-  category: 'schedule' | 'info' | 'layout'
+  category: 'schedule' | 'info' | 'image' | 'layout'
   // 生成 Canvas 元素的函數
   generateElements: (options: BlockOptions) => CanvasElement[]
 }
@@ -477,6 +478,182 @@ function generateHeaderBlock(options: BlockOptions): CanvasElement[] {
   return elements
 }
 
+/**
+ * 單圖滿版區塊
+ */
+function generateSingleImageBlock(options: BlockOptions): CanvasElement[] {
+  const { width, x, y } = options
+  const height = width * 0.6  // 3:5 比例
+  const baseId = `block-img1-${Date.now()}`
+
+  return [{
+    id: `${baseId}-image`,
+    type: 'image',
+    name: '滿版圖片',
+    x,
+    y,
+    width,
+    height,
+    zIndex: 1,
+    rotation: 0,
+    opacity: 1,
+    locked: false,
+    visible: true,
+    src: '',  // 使用者需要自己上傳
+    objectFit: 'cover',
+    placeholder: true,
+  } as ImageElement]
+}
+
+/**
+ * 雙圖並排區塊
+ */
+function generateDualImageBlock(options: BlockOptions): CanvasElement[] {
+  const { width, x, y } = options
+  const gap = 8
+  const imgWidth = (width - gap) / 2
+  const imgHeight = imgWidth * 0.75  // 4:3 比例
+  const baseId = `block-img2-${Date.now()}`
+
+  return [
+    {
+      id: `${baseId}-left`,
+      type: 'image',
+      name: '左圖',
+      x,
+      y,
+      width: imgWidth,
+      height: imgHeight,
+      zIndex: 1,
+      rotation: 0,
+      opacity: 1,
+      locked: false,
+      visible: true,
+      src: '',
+      objectFit: 'cover',
+      placeholder: true,
+    } as ImageElement,
+    {
+      id: `${baseId}-right`,
+      type: 'image',
+      name: '右圖',
+      x: x + imgWidth + gap,
+      y,
+      width: imgWidth,
+      height: imgHeight,
+      zIndex: 1,
+      rotation: 0,
+      opacity: 1,
+      locked: false,
+      visible: true,
+      src: '',
+      objectFit: 'cover',
+      placeholder: true,
+    } as ImageElement,
+  ]
+}
+
+/**
+ * 三圖排列區塊（上1下2）
+ */
+function generateTripleImageBlock(options: BlockOptions): CanvasElement[] {
+  const { width, x, y } = options
+  const gap = 8
+  const topHeight = width * 0.5
+  const bottomWidth = (width - gap) / 2
+  const bottomHeight = bottomWidth * 0.75
+  const baseId = `block-img3-${Date.now()}`
+
+  return [
+    {
+      id: `${baseId}-top`,
+      type: 'image',
+      name: '上圖',
+      x,
+      y,
+      width,
+      height: topHeight,
+      zIndex: 1,
+      rotation: 0,
+      opacity: 1,
+      locked: false,
+      visible: true,
+      src: '',
+      objectFit: 'cover',
+      placeholder: true,
+    } as ImageElement,
+    {
+      id: `${baseId}-bottom-left`,
+      type: 'image',
+      name: '左下圖',
+      x,
+      y: y + topHeight + gap,
+      width: bottomWidth,
+      height: bottomHeight,
+      zIndex: 1,
+      rotation: 0,
+      opacity: 1,
+      locked: false,
+      visible: true,
+      src: '',
+      objectFit: 'cover',
+      placeholder: true,
+    } as ImageElement,
+    {
+      id: `${baseId}-bottom-right`,
+      type: 'image',
+      name: '右下圖',
+      x: x + bottomWidth + gap,
+      y: y + topHeight + gap,
+      width: bottomWidth,
+      height: bottomHeight,
+      zIndex: 1,
+      rotation: 0,
+      opacity: 1,
+      locked: false,
+      visible: true,
+      src: '',
+      objectFit: 'cover',
+      placeholder: true,
+    } as ImageElement,
+  ]
+}
+
+/**
+ * 四宮格區塊
+ */
+function generateGridImageBlock(options: BlockOptions): CanvasElement[] {
+  const { width, x, y } = options
+  const gap = 8
+  const imgSize = (width - gap) / 2
+  const baseId = `block-img4-${Date.now()}`
+
+  const positions = [
+    { x: 0, y: 0, name: '左上' },
+    { x: imgSize + gap, y: 0, name: '右上' },
+    { x: 0, y: imgSize + gap, name: '左下' },
+    { x: imgSize + gap, y: imgSize + gap, name: '右下' },
+  ]
+
+  return positions.map((pos, i) => ({
+    id: `${baseId}-${i}`,
+    type: 'image',
+    name: pos.name,
+    x: x + pos.x,
+    y: y + pos.y,
+    width: imgSize,
+    height: imgSize,
+    zIndex: 1,
+    rotation: 0,
+    opacity: 1,
+    locked: false,
+    visible: true,
+    src: '',
+    objectFit: 'cover',
+    placeholder: true,
+  } as ImageElement))
+}
+
 // 區塊定義列表
 const BLOCKS: BlockDefinition[] = [
   {
@@ -519,12 +696,46 @@ const BLOCKS: BlockDefinition[] = [
     category: 'layout',
     generateElements: generateHeaderBlock,
   },
+  // 圖片版面
+  {
+    id: 'single-image',
+    name: '單圖滿版',
+    description: '一張大圖佔滿寬度',
+    icon: ImageIcon,
+    category: 'image',
+    generateElements: generateSingleImageBlock,
+  },
+  {
+    id: 'dual-image',
+    name: '雙圖並排',
+    description: '左右兩張圖片',
+    icon: ImageIcon,
+    category: 'image',
+    generateElements: generateDualImageBlock,
+  },
+  {
+    id: 'triple-image',
+    name: '三圖排列',
+    description: '上1下2 排列',
+    icon: ImageIcon,
+    category: 'image',
+    generateElements: generateTripleImageBlock,
+  },
+  {
+    id: 'grid-image',
+    name: '四宮格',
+    description: '2x2 圖片網格',
+    icon: ImageIcon,
+    category: 'image',
+    generateElements: generateGridImageBlock,
+  },
 ]
 
 // 分類
 const CATEGORIES = [
   { id: 'schedule', name: '行程', icon: Calendar },
   { id: 'info', name: '資訊', icon: FileText },
+  { id: 'image', name: '圖片', icon: ImageIcon },
   { id: 'layout', name: '版面', icon: MapPin },
 ]
 
