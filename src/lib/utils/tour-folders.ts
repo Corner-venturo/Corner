@@ -8,19 +8,20 @@ import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 
 // 預設資料夾結構
+// dataSource: 資料來源 (db = 從特定表讀取, files = 從 files 表讀取上傳檔案)
 export const DEFAULT_TOUR_FOLDERS = [
-  { name: '需求單', category: 'request', icon: '📋', color: '#c9aa7c' },
-  { name: '取消單', category: 'cancellation', icon: '❌', color: '#c08374' },
-  { name: '報價單', category: 'quote', icon: '💰', color: '#8b9a7c' },
-  { name: '確認單', category: 'confirmation', icon: '✅', color: '#7c8b9a' },
-  { name: '合約', category: 'contract', icon: '📄', color: '#9a7c8b' },
-  { name: '護照', category: 'passport', icon: '🛂', color: '#7c9a8b' },
-  { name: '行程表', category: 'itinerary', icon: '🗓️', color: '#8b7c9a' },
-  { name: '機票', category: 'ticket', icon: '✈️', color: '#9a8b7c' },
-  { name: '憑證', category: 'voucher', icon: '🎫', color: '#7c8b8b' },
-  { name: '保險', category: 'insurance', icon: '🛡️', color: '#8b8b7c' },
-  { name: '照片', category: 'photo', icon: '📷', color: '#8b7c8b' },
-  { name: '其他', category: 'other', icon: '📁', color: '#8b8b8b' },
+  { name: '報價單', category: 'quote', icon: '💰', color: '#8b9a7c', dataSource: 'db', table: 'quotes', createLabel: '建立報價單' },
+  { name: '行程表', category: 'itinerary', icon: '🗓️', color: '#8b7c9a', dataSource: 'db', table: 'proposal_packages', createLabel: '建立行程表' },
+  { name: '確認單', category: 'confirmation', icon: '✅', color: '#7c8b9a', dataSource: 'db', table: 'tour_confirmation_sheets', createLabel: '建立確認單' },
+  { name: '合約', category: 'contract', icon: '📄', color: '#9a7c8b', dataSource: 'db', table: 'contracts', createLabel: '建立合約' },
+  { name: '需求單', category: 'request', icon: '📋', color: '#c9aa7c', dataSource: 'db', table: 'tour_requests', createLabel: '建立需求單' },
+  { name: '取消單', category: 'cancellation', icon: '❌', color: '#c08374', dataSource: 'files', table: 'files', createLabel: '上傳取消單' },
+  { name: '護照', category: 'passport', icon: '🛂', color: '#7c9a8b', dataSource: 'files', table: 'files', createLabel: '上傳護照' },
+  { name: '機票', category: 'ticket', icon: '✈️', color: '#9a8b7c', dataSource: 'files', table: 'files', createLabel: '上傳機票' },
+  { name: '憑證', category: 'voucher', icon: '🎫', color: '#7c8b8b', dataSource: 'files', table: 'files', createLabel: '上傳憑證' },
+  { name: '保險', category: 'insurance', icon: '🛡️', color: '#8b8b7c', dataSource: 'files', table: 'files', createLabel: '上傳保單' },
+  { name: '簽證', category: 'visa', icon: '📑', color: '#7c8b7c', dataSource: 'files', table: 'files', createLabel: '上傳簽證' },
+  { name: '其他', category: 'other', icon: '📁', color: '#8b8b8b', dataSource: 'files', table: 'files', createLabel: '上傳檔案' },
 ] as const
 
 export type FileCategory = typeof DEFAULT_TOUR_FOLDERS[number]['category']
