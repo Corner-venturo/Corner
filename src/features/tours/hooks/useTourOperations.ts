@@ -212,11 +212,13 @@ export function useTourOperations(params: UseTourOperationsParams) {
             logger.warn('更新報價單失敗:', quoteError.message)
           }
           onQuoteLinked?.(fromQuoteId, createdTour.id)
-          router.replace('/tours')
         }
 
         resetForm()
         closeDialog()
+
+        // 開團成功後跳轉到詳情頁
+        router.push(`/tours/${code}`)
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : '建立旅遊團失敗'
         setFormError(errorMessage)

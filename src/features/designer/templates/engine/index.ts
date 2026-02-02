@@ -13,21 +13,8 @@ import { japaneseStyleV1Attraction } from '../definitions/japanese-style-v1-attr
 import { japaneseStyleV1HotelMulti } from '../definitions/japanese-style-v1-hotel-multi'
 import { japaneseStyleV1Vehicle } from '../definitions/japanese-style-v1-vehicle'
 import { japaneseStyleV1Table } from '../definitions/japanese-style-v1-table'
-// Corner Travel 官方風格
-import {
-  cornerTravelV1BackCover,
-  cornerTravelV1FrontCover,
-  cornerTravelV1TocLeft,
-  cornerTravelV1TocRight,
-} from '../definitions/corner-travel-v1'
-import {
-  cornerTravelV1DailyLeft,
-  cornerTravelV1DailyRight,
-} from '../definitions/corner-travel-v1-daily'
-import {
-  cornerTravelV1MemoLeft,
-  cornerTravelV1MemoRight,
-} from '../definitions/corner-travel-v1-memo'
+// Corner Travel 官方風格現在用 React 元件：
+// import { Brochure } from '@/features/designer/components/brochure-templates/corner-travel'
 import type { PageTemplate, TemplateData, TemplateOption, DailyItinerary, DailyDetailData, MemoSettings, CountryCode, HotelData, VehicleData } from '../definitions/types'
 import type { CanvasPage, CanvasElement } from '@/features/designer/components/types'
 import type { TimelineItineraryData, TimelineDay } from '@/types/timeline-itinerary.types'
@@ -64,15 +51,7 @@ const templateRegistry: Record<string, PageTemplate> = {
   [japaneseStyleV1Memo.id]: japaneseStyleV1Memo,
   [japaneseStyleV1Hotel.id]: japaneseStyleV1Hotel,
   [japaneseStyleV1HotelMulti.id]: japaneseStyleV1HotelMulti,
-  // Corner Travel 官方風格
-  [cornerTravelV1BackCover.id]: cornerTravelV1BackCover,
-  [cornerTravelV1FrontCover.id]: cornerTravelV1FrontCover,
-  [cornerTravelV1TocLeft.id]: cornerTravelV1TocLeft,
-  [cornerTravelV1TocRight.id]: cornerTravelV1TocRight,
-  [cornerTravelV1DailyLeft.id]: cornerTravelV1DailyLeft,
-  [cornerTravelV1DailyRight.id]: cornerTravelV1DailyRight,
-  [cornerTravelV1MemoLeft.id]: cornerTravelV1MemoLeft,
-  [cornerTravelV1MemoRight.id]: cornerTravelV1MemoRight,
+  // Corner Travel 官方風格 → 改用 React 元件，不再用 generateElements
   [japaneseStyleV1Attraction.id]: japaneseStyleV1Attraction,
   [japaneseStyleV1Vehicle.id]: japaneseStyleV1Vehicle,
   [japaneseStyleV1Table.id]: japaneseStyleV1Table,
@@ -119,25 +98,8 @@ export const styleSeries: StyleSeries[] = [
       table: 'japanese-style-v1-table',
     },
   },
-  {
-    id: 'corner-travel-v1',
-    name: 'Corner Travel 官方',
-    templates: {
-      cover: 'corner-travel-v1-front-cover', // 封面（右頁）
-      backCover: 'corner-travel-v1-back-cover', // 封底（左頁）
-      toc: 'corner-travel-v1-toc-left', // 目錄（左頁）
-      itinerary: 'corner-travel-v1-toc-right', // 目錄（右頁）
-      daily: 'corner-travel-v1-daily-left', // 每日行程（左頁）
-      dailyRight: 'corner-travel-v1-daily-right', // 每日行程（右頁）
-      memo: 'corner-travel-v1-memo-left', // 注意事項（左頁）
-      memoRight: 'corner-travel-v1-memo-right', // 注意事項（右頁）
-      hotel: 'japanese-style-v1-hotel',
-      hotelMulti: 'japanese-style-v1-hotel-multi',
-      attraction: 'japanese-style-v1-attraction',
-      vehicle: 'japanese-style-v1-vehicle',
-      table: 'japanese-style-v1-table',
-    },
-  },
+  // Corner Travel 官方風格 → 改用 React 元件
+  // import { Brochure } from '@/features/designer/components/brochure-templates/corner-travel'
 ]
 
 /**
