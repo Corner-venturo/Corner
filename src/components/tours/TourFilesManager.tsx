@@ -30,7 +30,8 @@ interface TourFilesManagerProps {
 
 // 預設的團資料夾結構
 const DEFAULT_TOUR_FOLDERS = [
-  { name: '報價單', category: 'quote', icon: '📋', dbType: 'quote' as const },
+  { name: '團體報價單', category: 'quote', icon: '📋', dbType: 'quote' as const },
+  { name: '快速報價', category: 'quick_quote', icon: '💰', dbType: 'quick_quote' as const },
   { name: '行程表', category: 'itinerary', icon: '🗺️', dbType: 'itinerary' as const },
   { name: '確認單', category: 'confirmation', icon: '✅', dbType: 'confirmation' as const },
   { name: '合約', category: 'contract', icon: '📝', dbType: 'contract' as const },
@@ -73,8 +74,16 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
           if (folder.dbType) {
             // DB 驅動的資料夾
             if (folder.dbType === 'quote') {
-              // 報價單：1:1 關聯，直接看 quoteId 有沒有
+              // 團體報價單：1:1 關聯，直接看 quoteId 有沒有
               count = quoteId ? 1 : 0
+            } else if (folder.dbType === 'quick_quote') {
+              // 快速報價：1:N，用 quotes.tour_id + quote_type 查
+              const { count: c } = await supabase
+                .from('quotes')
+                .select('id', { count: 'exact', head: true })
+                .eq('tour_id', tourId)
+                .eq('quote_type', 'quick')
+              count = c || 0
             } else if (folder.dbType === 'itinerary') {
               // 行程表：1:1 關聯，直接看 itineraryId 有沒有
               count = itineraryId ? 1 : 0
@@ -222,26 +231,26 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
 
   // 載入 DB 驅動的資料夾內容
   const loadDbFolderContent = async (
-    dbType: 'quote' | 'itinerary' | 'confirmation' | 'contract' | 'request',
+    dbType: 'quote' | 'quick_quote' | 'itinerary' | 'confirmation' | 'contract' | 'request',
     items: FinderItem[]
   ) => {
     const folderId = `folder-${dbType}`
 
     switch (dbType) {
       case 'quote': {
-        // 報價單：1:1 關聯，用 tour.quote_id
+        // 團體報價單：1:1 關聯，用 tour.quote_id
         if (!quoteId) break
         
         const { data } = await supabase
           .from('quotes')
-          .select('id, quote_number, title, status, created_at')
+          .select('id, code, name, status, created_at')
           .eq('id', quoteId)
           .single()
         
         if (data) {
           items.push({
             id: data.id,
-            name: data.title || data.quote_number || '未命名報價單',
+            name: data.name || data.code || '未命名報價單',
             type: 'file',
             icon: '📋',
             parentId: folderId,
@@ -250,6 +259,32 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
             dbType: 'quote',
             dbId: data.id,
           })
+        }
+        break
+      }
+      case 'quick_quote': {
+        // 快速報價：1:N 關聯，用 quotes.tour_id
+        const { data } = await supabase
+          .from('quotes')
+          .select('id, code, name, status, created_at')
+          .eq('tour_id', tourId)
+          .eq('quote_type', 'quick')
+          .order('created_at', { ascending: false })
+        
+        if (data) {
+          for (const q of data) {
+            items.push({
+              id: q.id,
+              name: q.name || q.code || '未命名快速報價',
+              type: 'file',
+              icon: '💰',
+              parentId: folderId,
+              createdAt: q.created_at,
+              status: q.status,
+              dbType: 'quick_quote',
+              dbId: q.id,
+            })
+          }
         }
         break
       }
@@ -384,6 +419,9 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
       switch (item.dbType) {
         case 'quote':
           router.push(`/quotes/${item.dbId}`)
+          break
+        case 'quick_quote':
+          router.push(`/quotes/quick/${item.dbId}`)
           break
         case 'itinerary':
           router.push(`/itinerary/block-editor?itinerary_id=${item.dbId}`)
@@ -588,7 +626,8 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
     if (!folderConfig?.dbType) return undefined // 檔案資料夾用上傳
     
     const actions: Record<string, { label: string; path: string }> = {
-      quote: { label: '前往報價單', path: `/quotes` }, // 報價單用 Dialog 建立，需在報價單頁面操作
+      quote: { label: '前往報價單', path: `/quotes` },
+      quick_quote: { label: '新增快速報價', path: `/quotes/quick?tour_id=${tourId}` },
       itinerary: { label: '新增行程表', path: `/itinerary/block-editor?tour_id=${tourId}` },
       confirmation: { label: '建立確認單', path: `/tours/${tourCode}/confirmation` },
       contract: { label: '新增合約', path: `/contracts?tour_id=${tourId}` },
