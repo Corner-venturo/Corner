@@ -37,13 +37,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuTrigger,
-} from '@/components/ui/context-menu'
 import { formatDistanceToNow } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 
@@ -151,7 +144,10 @@ interface FinderItemCardProps {
   onSelect: (e: React.MouseEvent) => void
   onDoubleClick: () => void
   onDragStart: (e: React.DragEvent) => void
-  onContextMenu?: (item: FinderItem) => void
+  onOpen?: () => void
+  onDownload?: () => void
+  onRename?: () => void
+  onDelete?: () => void
 }
 
 function FinderItemCard({
@@ -161,6 +157,10 @@ function FinderItemCard({
   onSelect,
   onDoubleClick,
   onDragStart,
+  onOpen,
+  onDownload,
+  onRename,
+  onDelete,
 }: FinderItemCardProps) {
   const [isDragOver, setIsDragOver] = useState(false)
 
@@ -227,7 +227,7 @@ function FinderItemCard({
       onClick={onSelect}
       onDoubleClick={onDoubleClick}
       className={cn(
-        'flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer select-none',
+        'flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer select-none group',
         'transition-all duration-100',
         selected 
           ? 'bg-blue-100 dark:bg-blue-900/30' 
@@ -260,6 +260,44 @@ function FinderItemCard({
       <span className="text-sm text-muted-foreground">
         {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true, locale: zhTW })}
       </span>
+      
+      {/* 操作選單 */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+          <button className="p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-muted">
+            <MoreHorizontal size={16} />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {onOpen && (
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onOpen() }}>
+              {item.type === 'folder' ? '開啟' : '檢視'}
+            </DropdownMenuItem>
+          )}
+          {onDownload && (
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDownload() }}>
+              <Download size={14} className="mr-2" />
+              下載
+            </DropdownMenuItem>
+          )}
+          {(onRename || onDelete) && <DropdownMenuSeparator />}
+          {onRename && (
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onRename() }}>
+              <Edit2 size={14} className="mr-2" />
+              重新命名
+            </DropdownMenuItem>
+          )}
+          {onDelete && (
+            <DropdownMenuItem 
+              className="text-destructive"
+              onClick={(e) => { e.stopPropagation(); onDelete() }}
+            >
+              <Trash2 size={14} className="mr-2" />
+              刪除
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }
@@ -498,85 +536,32 @@ export function FinderView({
             )}
           </div>
         ) : (
-          <ContextMenu>
-            <ContextMenuTrigger asChild>
-              <div className={cn(
-                internalViewMode === 'grid' 
-                  ? 'grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2'
-                  : 'flex flex-col gap-1'
-              )}>
-                {sortedItems.map(item => (
-                  <ContextMenu key={item.id}>
-                    <ContextMenuTrigger>
-                      <FinderItemCard
-                        item={item}
-                        selected={selectedIds.has(item.id)}
-                        viewMode={internalViewMode}
-                        onSelect={(e) => { e.stopPropagation(); handleSelect(item, e) }}
-                        onDoubleClick={() => handleOpen(item)}
-                        onDragStart={(e) => handleDragStart(item, e)}
-                      />
-                    </ContextMenuTrigger>
-                    <ContextMenuContent>
-                      <ContextMenuItem onClick={() => handleOpen(item)}>
-                        {item.type === 'folder' ? '開啟' : '檢視'}
-                      </ContextMenuItem>
-                      {item.type === 'file' && onDownload && (
-                        <ContextMenuItem onClick={() => onDownload(item)}>
-                          <Download size={14} className="mr-2" />
-                          下載
-                        </ContextMenuItem>
-                      )}
-                      <ContextMenuSeparator />
-                      {onRename && (
-                        <ContextMenuItem onClick={() => {
-                          const newName = prompt('重新命名', item.name)
-                          if (newName && newName !== item.name) {
-                            onRename(item.id, newName)
-                          }
-                        }}>
-                          <Edit2 size={14} className="mr-2" />
-                          重新命名
-                        </ContextMenuItem>
-                      )}
-                      {onDelete && (
-                        <ContextMenuItem 
-                          className="text-destructive"
-                          onClick={() => onDelete([item.id])}
-                        >
-                          <Trash2 size={14} className="mr-2" />
-                          刪除
-                        </ContextMenuItem>
-                      )}
-                    </ContextMenuContent>
-                  </ContextMenu>
-                ))}
-              </div>
-            </ContextMenuTrigger>
-            <ContextMenuContent>
-              {onCreateFolder && (
-                <ContextMenuItem onClick={() => onCreateFolder('新資料夾', currentFolderId)}>
-                  <FolderPlus size={14} className="mr-2" />
-                  新增資料夾
-                </ContextMenuItem>
-              )}
-              {onUpload && (
-                <ContextMenuItem onClick={() => fileInputRef.current?.click()}>
-                  <Upload size={14} className="mr-2" />
-                  上傳檔案
-                </ContextMenuItem>
-              )}
-              {currentPath.length > 0 && (
-                <>
-                  <ContextMenuSeparator />
-                  <ContextMenuItem onClick={() => onNavigate(currentPath.length > 1 ? currentPath[currentPath.length - 2].id : null)}>
-                    <ArrowUpFromLine size={14} className="mr-2" />
-                    上一層
-                  </ContextMenuItem>
-                </>
-              )}
-            </ContextMenuContent>
-          </ContextMenu>
+          <div className={cn(
+            internalViewMode === 'grid' 
+              ? 'grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2'
+              : 'flex flex-col gap-1'
+          )}>
+            {sortedItems.map(item => (
+              <FinderItemCard
+                key={item.id}
+                item={item}
+                selected={selectedIds.has(item.id)}
+                viewMode={internalViewMode}
+                onSelect={(e) => { e.stopPropagation(); handleSelect(item, e) }}
+                onDoubleClick={() => handleOpen(item)}
+                onDragStart={(e) => handleDragStart(item, e)}
+                onOpen={() => handleOpen(item)}
+                onDownload={item.type === 'file' ? () => onDownload?.(item) : undefined}
+                onRename={onRename ? () => {
+                  const newName = prompt('重新命名', item.name)
+                  if (newName && newName !== item.name) {
+                    onRename(item.id, newName)
+                  }
+                } : undefined}
+                onDelete={onDelete ? () => onDelete([item.id]) : undefined}
+              />
+            ))}
+          </div>
         )}
       </div>
 
