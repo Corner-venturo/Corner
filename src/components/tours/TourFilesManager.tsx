@@ -71,11 +71,12 @@ export function TourFilesManager({ tourId, tourCode, quoteId }: TourFilesManager
           if (folder.dbType) {
             // DB 驅動的資料夾 - 根據類型用不同查詢
             if (folder.dbType === 'itinerary') {
-              // 行程表：從 proposals.converted_tour_id 查
+              // 行程表：從 itineraries.tour_id 查
               const { count: c } = await supabase
-                .from('proposals')
+                .from('itineraries')
                 .select('id', { count: 'exact', head: true })
-                .eq('converted_tour_id', tourId)
+                .eq('tour_id', tourId)
+                .eq('_deleted', false)
               count = c || 0
             } else if (folder.dbType === 'quote') {
               // 報價單：用 tour_id 或 quoteId
@@ -274,27 +275,26 @@ export function TourFilesManager({ tourId, tourCode, quoteId }: TourFilesManager
         break
       }
       case 'itinerary': {
+        // 統一從 itineraries 表查詢
         const { data } = await supabase
-          .from('proposals')
-          .select('id, title, created_at, packages:proposal_packages(id, version_name)')
-          .eq('converted_tour_id', tourId)
+          .from('itineraries')
+          .select('id, title, code, created_at')
+          .eq('tour_id', tourId)
+          .eq('_deleted', false)
           .order('created_at', { ascending: false })
         
         if (data) {
-          for (const p of data) {
-            const packages = p.packages as { id: string; version_name: string }[] || []
-            for (const pkg of packages) {
-              items.push({
-                id: pkg.id,
-                name: pkg.version_name || p.title || '未命名行程表',
-                type: 'file',
-                icon: '🗺️',
-                parentId: folderId,
-                createdAt: p.created_at,
-                dbType: 'itinerary',
-                dbId: pkg.id,
-              })
-            }
+          for (const itinerary of data) {
+            items.push({
+              id: itinerary.id,
+              name: itinerary.title || itinerary.code || '未命名行程表',
+              type: 'file',
+              icon: '🗺️',
+              parentId: folderId,
+              createdAt: itinerary.created_at,
+              dbType: 'itinerary',
+              dbId: itinerary.id,
+            })
           }
         }
         break
@@ -408,7 +408,7 @@ export function TourFilesManager({ tourId, tourCode, quoteId }: TourFilesManager
           router.push(`/quotes/${item.dbId}`)
           break
         case 'itinerary':
-          router.push(`/proposals?package=${item.dbId}`)
+          router.push(`/itinerary/block-editor?itinerary_id=${item.dbId}`)
           break
         case 'confirmation':
           router.push(`/tours/${tourId}/confirmation`)
@@ -611,7 +611,7 @@ export function TourFilesManager({ tourId, tourCode, quoteId }: TourFilesManager
     
     const actions: Record<string, { label: string; path: string }> = {
       quote: { label: '新增報價單', path: `/quotes/new?tour_id=${tourId}` },
-      itinerary: { label: '新增行程表', path: `/proposals/new?tour_id=${tourId}` },
+      itinerary: { label: '新增行程表', path: `/itinerary/block-editor?tour_id=${tourId}` },
       confirmation: { label: '建立確認單', path: `/tours/${tourId}/confirmation` },
       contract: { label: '新增合約', path: `/contracts/new?tour_id=${tourId}` },
       request: { label: '新增需求單', path: `/tours/${tourId}?tab=requirements` },
