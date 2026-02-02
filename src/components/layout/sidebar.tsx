@@ -86,7 +86,16 @@ const menuItems: MenuItem[] = [
       { href: '/design/new', label: '新增設計', icon: Palette, requiredPermission: 'design' },
     ],
   },
-  { href: '/office', label: '文件', icon: FileSpreadsheet, requiredPermission: 'office' },
+  {
+    href: '/office',
+    label: '文件',
+    icon: FileSpreadsheet,
+    requiredPermission: 'office',
+    children: [
+      { href: '/office', label: '文件列表', icon: FileSpreadsheet, requiredPermission: 'office' },
+      { href: '/office/editor', label: '新增文件', icon: FileSpreadsheet, requiredPermission: 'office' },
+    ],
+  },
   // 合約管理和確認單管理已整合到團的操作中，不需要獨立入口
   // { href: '/contracts', label: '合約管理', icon: FileSignature, requiredPermission: 'contracts' },
   // { href: '/confirmations', label: '確認單管理', icon: CircleDot, requiredPermission: 'confirmations' },
