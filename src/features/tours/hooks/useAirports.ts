@@ -27,46 +27,14 @@ export interface Airport {
   usage_count: number
 }
 
-// 國家代碼對應中文名稱
-const COUNTRY_CODE_TO_NAME: Record<string, string> = {
-  TW: '台灣',
-  JP: '日本',
-  KR: '韓國',
-  CN: '中國',
-  HK: '香港',
-  MO: '澳門',
-  TH: '泰國',
-  SG: '新加坡',
-  MY: '馬來西亞',
-  VN: '越南',
-  PH: '菲律賓',
-  ID: '印尼',
-  KH: '柬埔寨',
-  MM: '緬甸',
-  US: '美國',
-  CA: '加拿大',
-  GB: '英國',
-  FR: '法國',
-  DE: '德國',
-  IT: '義大利',
-  ES: '西班牙',
-  NL: '荷蘭',
-  CH: '瑞士',
-  AT: '奧地利',
-  CZ: '捷克',
-  TR: '土耳其',
-  AE: '阿聯酋',
-  AU: '澳洲',
-  NZ: '紐西蘭',
+interface CountryInfo {
+  name: string
+  code: string
 }
-
-const COUNTRY_NAME_TO_CODE: Record<string, string> = Object.fromEntries(
-  Object.entries(COUNTRY_CODE_TO_NAME).map(([code, name]) => [name, code])
-)
 
 // SWR 快取 key
 const AIRPORTS_CACHE_KEY = 'entity:ref_airports:list'
-const COUNTRIES_NAMES_CACHE_KEY = 'entity:countries:names'
+const COUNTRIES_CACHE_KEY = 'entity:countries:slim'
 
 // SWR 配置
 const SWR_CONFIG = {
@@ -91,11 +59,11 @@ async function fetchAirports(): Promise<Airport[]> {
   return (data || []) as Airport[]
 }
 
-// 從 countries 表讀取國家
-async function fetchCountries(): Promise<string[]> {
+// 從 countries 表讀取國家（含 code 用於對照）
+async function fetchCountries(): Promise<CountryInfo[]> {
   const { data, error } = await supabase
     .from('countries')
-    .select('name')
+    .select('name, code')
     .eq('is_active', true)
     .order('usage_count', { ascending: false, nullsFirst: false })
     .order('display_order', { ascending: true })
@@ -105,7 +73,7 @@ async function fetchCountries(): Promise<string[]> {
     throw error
   }
   
-  return (data || []).map(c => c.name)
+  return (data || []) as CountryInfo[]
 }
 
 interface UseAirportsOptions {
@@ -126,12 +94,12 @@ export function useAirports(options: UseAirportsOptions = {}) {
     SWR_CONFIG
   )
 
-  // 載入國家列表
+  // 載入國家列表（含 code 用於對照）
   const {
-    data: countries = [],
+    data: countriesData = [],
     isLoading: countriesLoading,
-  } = useSWR<string[]>(
-    enabled ? COUNTRIES_NAMES_CACHE_KEY : null,
+  } = useSWR<CountryInfo[]>(
+    enabled ? COUNTRIES_CACHE_KEY : null,
     fetchCountries,
     SWR_CONFIG
   )
@@ -139,17 +107,38 @@ export function useAirports(options: UseAirportsOptions = {}) {
   const loading = airportsLoading || countriesLoading
   const error = airportsError
 
+  // 建立 name → code 對照表（從 DB 讀取，非硬編碼）
+  const countryNameToCode = useMemo(() => {
+    const map: Record<string, string> = {}
+    for (const c of countriesData) {
+      map[c.name] = c.code
+    }
+    return map
+  }, [countriesData])
+
+  // 建立 code → name 對照表
+  const countryCodeToName = useMemo(() => {
+    const map: Record<string, string> = {}
+    for (const c of countriesData) {
+      map[c.code] = c.name
+    }
+    return map
+  }, [countriesData])
+
+  // 返回國家名稱陣列（保持向後相容）
+  const countries = useMemo(() => countriesData.map(c => c.name), [countriesData])
+
   // 根據國家名稱取得機場列表（按使用次數排序）
   const getAirportsByCountry = useCallback(
     (countryName: string): Airport[] => {
-      const countryCode = COUNTRY_NAME_TO_CODE[countryName]
+      const countryCode = countryNameToCode[countryName]
       if (!countryCode) return []
       
       return airports
         .filter(a => a.country_code === countryCode)
         .sort((a, b) => (b.usage_count || 0) - (a.usage_count || 0))
     },
-    [airports]
+    [airports, countryNameToCode]
   )
 
   // 取得機場詳細資訊
@@ -199,12 +188,12 @@ export function useAirports(options: UseAirportsOptions = {}) {
       .filter(a => (a.usage_count || 0) > 0)
       .map(a => ({
         id: a.iata_code,
-        country: COUNTRY_CODE_TO_NAME[a.country_code || ''] || a.country_code || '',
+        country: countryCodeToName[a.country_code || ''] || a.country_code || '',
         city: a.city_name_zh || a.city_name_en || '',
         airport_code: a.iata_code,
         created_at: null,
       }))
-  }, [airports])
+  }, [airports, countryCodeToName])
 
   return {
     airports,

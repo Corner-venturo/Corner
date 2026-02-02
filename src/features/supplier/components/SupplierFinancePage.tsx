@@ -90,10 +90,9 @@ export function SupplierFinancePage() {
           .from('supplier_request_responses')
           .select(`
             id,
-            status,
-            quoted_amount,
-            payment_status,
-            paid_at,
+            response_type,
+            quoted_price,
+            created_at,
             tour_requests (
               id,
               code,
@@ -106,18 +105,18 @@ export function SupplierFinancePage() {
             )
           `)
           .eq('supplier_id', user.workspace_id)
-          .eq('status', 'accepted')
+          .eq('response_type', 'accepted')
           .gte('created_at', dateRange.start.toISOString())
           .lte('created_at', dateRange.end.toISOString())
 
         // 計算統計
         let totalRevenue = 0
-        let pendingPayment = 0
-        let completedPayment = 0
+        const pendingPayment = 0 // TODO: 需要新增 payment_status 欄位
+        const completedPayment = 0
         const paymentRecords: PaymentRecord[] = []
 
         ;(responsesData || []).forEach(r => {
-          const amount = r.quoted_amount || 0
+          const amount = r.quoted_price || 0
           const req = r.tour_requests as unknown as {
             id: string
             code: string
@@ -127,20 +126,14 @@ export function SupplierFinancePage() {
 
           totalRevenue += amount
 
-          if (r.payment_status === 'paid') {
-            completedPayment += amount
-          } else {
-            pendingPayment += amount
-          }
-
           paymentRecords.push({
             id: r.id,
             tour_code: req?.tours?.code || '-',
             tour_name: req?.tours?.name || '-',
             service_date: req?.service_date || '',
             amount,
-            status: r.payment_status === 'paid' ? 'paid' : 'pending',
-            paid_at: r.paid_at,
+            status: 'pending', // TODO: 需要新增 payment_status 欄位
+            paid_at: null,
           })
         })
 
@@ -175,9 +168,7 @@ export function SupplierFinancePage() {
     <div className="space-y-6">
       <ResponsiveHeader
         title="財務報表"
-        description="查看營收統計和請款記錄"
         icon={LineChart}
-        iconClassName="bg-morandi-green/10 text-morandi-green"
       />
 
       {/* 期間選擇 */}

@@ -234,7 +234,7 @@ export function SupplierDispatchPage() {
     {
       key: 'service_date',
       label: '服務日期',
-      width: 120,
+      width: '120px',
       render: (_, row) => (
         <div className="flex items-center gap-2">
           <Calendar className="h-4 w-4 text-morandi-secondary" />
@@ -245,7 +245,7 @@ export function SupplierDispatchPage() {
     {
       key: 'tour_code',
       label: '團號',
-      width: 120,
+      width: '120px',
       render: (_, row) => (
         <span className="font-mono text-sm">{row.tour_code || '-'}</span>
       ),
@@ -267,13 +267,13 @@ export function SupplierDispatchPage() {
     {
       key: 'quantity',
       label: '數量',
-      width: 80,
+      width: '80px',
       render: (_, row) => <span>{row.quantity} 台</span>,
     },
     {
       key: 'dispatch_status',
       label: '派單狀態',
-      width: 100,
+      width: '100px',
       render: (_, row) => {
         const config = DISPATCH_STATUS_CONFIG[row.dispatch_status]
         const Icon = config.icon
@@ -288,7 +288,7 @@ export function SupplierDispatchPage() {
     {
       key: 'assigned_driver_name',
       label: '指派司機',
-      width: 120,
+      width: '120px',
       render: (_, row) => (
         <div className="flex items-center gap-2">
           {row.assigned_driver_name ? (
@@ -305,7 +305,7 @@ export function SupplierDispatchPage() {
     {
       key: 'actions',
       label: '操作',
-      width: 100,
+      width: '100px',
       render: (_, row) => (
         <Button
           variant="outline"
@@ -323,9 +323,7 @@ export function SupplierDispatchPage() {
     <div className="space-y-6">
       <ResponsiveHeader
         title="派單管理"
-        description="將已確認的需求派給司機"
         icon={Truck}
-        iconClassName="bg-morandi-blue/10 text-morandi-blue"
       />
 
       {/* 篩選器 */}
@@ -358,7 +356,6 @@ export function SupplierDispatchPage() {
         columns={columns}
         isLoading={isLoading}
         emptyMessage="目前沒有需要派單的需求"
-        keyField="id"
       />
 
       {/* 派單對話框 */}
