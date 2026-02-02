@@ -102,10 +102,7 @@ function formatFileSize(bytes?: number): string {
 function getItemIcon(item: FinderItem): React.ReactNode {
   if (item.type === 'folder') {
     return (
-      <div 
-        className="w-12 h-12 flex items-center justify-center"
-        style={{ color: item.color || '#F59E0B' }}
-      >
+      <div className="w-12 h-12 flex items-center justify-center text-morandi-gold">
         <Folder size={40} fill="currentColor" strokeWidth={1} />
       </div>
     )
@@ -116,23 +113,21 @@ function getItemIcon(item: FinderItem): React.ReactNode {
   
   if (item.thumbnailUrl) {
     return (
-      <div className="w-12 h-12 rounded overflow-hidden bg-gray-100">
+      <div className="w-12 h-12 rounded overflow-hidden bg-morandi-container">
         <img src={item.thumbnailUrl} alt="" className="w-full h-full object-cover" />
       </div>
     )
   }
 
-  let iconColor = '#6B7280'
-  if (ext === 'pdf') iconColor = '#EF4444'
-  else if (['doc', 'docx'].includes(ext || '')) iconColor = '#3B82F6'
-  else if (['xls', 'xlsx'].includes(ext || '')) iconColor = '#10B981'
-  else if (['jpg', 'jpeg', 'png', 'gif'].includes(ext || '')) iconColor = '#EC4899'
+  // 檔案類型顏色（保留語義化顏色）
+  let colorClass = 'text-morandi-secondary'
+  if (ext === 'pdf') colorClass = 'text-red-500'
+  else if (['doc', 'docx'].includes(ext || '')) colorClass = 'text-blue-500'
+  else if (['xls', 'xlsx'].includes(ext || '')) colorClass = 'text-green-500'
+  else if (['jpg', 'jpeg', 'png', 'gif'].includes(ext || '')) colorClass = 'text-pink-500'
 
   return (
-    <div 
-      className="w-12 h-12 flex items-center justify-center"
-      style={{ color: iconColor }}
-    >
+    <div className={cn('w-12 h-12 flex items-center justify-center', colorClass)}>
       <File size={36} strokeWidth={1.5} />
     </div>
   )
@@ -200,9 +195,9 @@ function FinderItemCard({
           'flex flex-col items-center p-3 rounded-lg cursor-pointer select-none',
           'transition-all duration-100',
           selected 
-            ? 'bg-blue-100 dark:bg-blue-900/30' 
-            : 'hover:bg-gray-100 dark:hover:bg-gray-800',
-          isDragOver && item.type === 'folder' && 'ring-2 ring-blue-400 bg-blue-50'
+            ? 'bg-morandi-gold/10' 
+            : 'hover:bg-morandi-container/50',
+          isDragOver && item.type === 'folder' && 'ring-2 ring-morandi-gold bg-morandi-gold/5'
         )}
       >
         {getItemIcon(item)}
@@ -235,16 +230,16 @@ function FinderItemCard({
         'flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer select-none group',
         'transition-all duration-100',
         selected 
-          ? 'bg-blue-100 dark:bg-blue-900/30' 
-          : 'hover:bg-gray-100 dark:hover:bg-gray-800',
-        isDragOver && item.type === 'folder' && 'ring-2 ring-blue-400 bg-blue-50'
+          ? 'bg-morandi-gold/10' 
+          : 'hover:bg-morandi-container/50',
+        isDragOver && item.type === 'folder' && 'ring-2 ring-morandi-gold bg-morandi-gold/5'
       )}
     >
       <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
         {item.type === 'folder' ? (
-          <Folder size={24} className="text-amber-500" fill="currentColor" strokeWidth={1} />
+          <Folder size={24} className="text-morandi-gold" fill="currentColor" strokeWidth={1} />
         ) : (
-          <File size={24} className="text-gray-500" strokeWidth={1.5} />
+          <File size={24} className="text-morandi-secondary" strokeWidth={1.5} />
         )}
       </div>
       <div className="flex-1 min-w-0">
@@ -315,7 +310,7 @@ export function FinderView({
   items,
   currentPath,
   loading,
-  viewMode = 'grid',
+  viewMode = 'list',
   selectedIds = new Set(),
   onNavigate,
   onSelect,
@@ -514,7 +509,7 @@ export function FinderView({
       <div
         className={cn(
           'flex-1 overflow-auto p-4',
-          isDraggingOver && 'bg-blue-50 dark:bg-blue-900/10'
+          isDraggingOver && 'bg-morandi-gold/5'
         )}
         onDragOver={(e) => { e.preventDefault(); setIsDraggingOver(true) }}
         onDragLeave={() => setIsDraggingOver(false)}
