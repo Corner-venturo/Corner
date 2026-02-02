@@ -44,8 +44,8 @@ const TourRequirementsTab = dynamic(
   { loading: () => <TabLoading /> }
 )
 
-const TourFilesFinder = dynamic(
-  () => import('@/components/tours/TourFilesFinder').then(m => m.TourFilesFinder),
+const TourFilesManager = dynamic(
+  () => import('@/components/tours/TourFilesManager').then(m => m.TourFilesManager),
   { loading: () => <TabLoading /> }
 )
 
@@ -173,7 +173,7 @@ export default function TourDetailPage() {
       case 'requirements':
         return <TourRequirementsTab tourId={tour.id} quoteId={tour.quote_id} />
       case 'files':
-        return <TourFilesFinder tourId={tour.id} tourCode={tour.code || ''} />
+        return <TourFilesManager tourId={tour.id} tourCode={tour.code || ''} />
       case 'designs':
         return <TourDesignsTab tourId={tour.id} proposalId={undefined} />
       default:

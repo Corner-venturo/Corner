@@ -58,8 +58,8 @@ const TourRequirementsTab = dynamic(
   { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
 )
 
-const TourFilesFinder = dynamic(
-  () => import('@/components/tours/TourFilesFinder').then(m => m.TourFilesFinder),
+const TourFilesManager = dynamic(
+  () => import('@/components/tours/TourFilesManager').then(m => m.TourFilesManager),
   { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
 )
 
@@ -474,7 +474,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange, defaul
           />
         )
       case 'files':
-        return <TourFilesFinder tourId={tour.id} tourCode={tour.code || ''} />
+        return <TourFilesManager tourId={tour.id} tourCode={tour.code || ''} />
       case 'designs':
         // Tour 沒有 proposal_id，TourDesignsTab 會透過 proposal_package_id 查詢
         return <TourDesignsTab tourId={tour.id} proposalId={undefined} />
