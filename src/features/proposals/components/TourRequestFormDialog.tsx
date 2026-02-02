@@ -374,8 +374,13 @@ export function TourRequestFormDialog({
   const saveToTourDocuments = async (htmlContent: string) => {
     // 需要有團號才能存（支援 proposal 模式和 tour 模式）
     const tourId = tour?.id || proposal?.converted_tour_id
-    if (!tourId || !user?.workspace_id) {
-      logger.log('無法存檔：尚未轉團或缺少 workspace_id')
+    if (!tourId) {
+      logger.warn('無法存檔：缺少 tourId', { tourId: tour?.id, proposalConvertedId: proposal?.converted_tour_id })
+      toast({ title: '存檔跳過', description: '尚未轉團，無法存檔到旅遊團文件', variant: 'default' })
+      return
+    }
+    if (!user?.workspace_id) {
+      logger.warn('無法存檔：缺少 workspace_id')
       return
     }
 
@@ -389,18 +394,21 @@ export function TourRequestFormDialog({
       const blob = new Blob([htmlContent], { type: 'text/html' })
 
       // 上傳到 Storage
-      const { error: uploadError } = await supabase.storage
+      logger.info('開始上傳需求單:', { tourId, fileName, filePath })
+      const { error: uploadError, data: uploadData } = await supabase.storage
         .from('tour-documents')
         .upload(filePath, blob, {
           contentType: 'text/html',
-          upsert: false,
+          upsert: true,  // 改為 upsert 允許覆蓋
         })
 
       if (uploadError) {
-        // 如果 bucket 不存在，跳過（不中斷列印流程）
-        logger.warn('上傳文件失敗:', uploadError)
+        logger.error('上傳文件失敗:', uploadError)
+        toast({ title: '存檔失敗', description: uploadError.message, variant: 'destructive' })
         return
       }
+      
+      logger.info('上傳成功:', uploadData)
 
       // 取得公開 URL
       const { data: urlData } = supabase.storage
