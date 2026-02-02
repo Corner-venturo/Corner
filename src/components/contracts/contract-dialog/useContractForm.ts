@@ -432,10 +432,17 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
 
       let template = await response.text()
 
-      // 替換所有變數
+      // 替換所有變數（加入 XSS 防護）
       Object.entries(contractData).forEach(([key, value]) => {
         const regex = new RegExp(`{{${key}}}`, 'g')
-        template = template.replace(regex, value || '')
+        // HTML 轉義防止 XSS 攻擊
+        const safeValue = String(value || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;')
+        template = template.replace(regex, safeValue)
       })
 
       // 開啟新視窗並列印
