@@ -334,8 +334,8 @@ export function TourRequestFormDialog({
 
         <div class="tour-info">
           <div class="tour-grid">
-            <div>團號：${tourCode || '-'}</div>
-            <div>團名：${tourName || proposal?.title || '-'}</div>
+            <div>團號：${tourCode || tour?.code || '-'}</div>
+            <div>團名：${tourName || tour?.name || proposal?.title || '-'}</div>
             <div>出發日期：${formatDate(departureDate || pkg?.start_date)}</div>
             <div>人數：${pax || proposal?.group_size || '-'} 人</div>
           </div>
@@ -374,10 +374,11 @@ export function TourRequestFormDialog({
   const saveToTourDocuments = async (htmlContent: string) => {
     // 需要有團號才能存（支援 proposal 模式和 tour 模式）
     const tourId = tour?.id || proposal?.converted_tour_id
+    logger.info('saveToTourDocuments 開始', { tourId, tourCode: tour?.code, proposalId: proposal?.id })
     if (!tourId) {
       logger.warn('無法存檔：缺少 tourId', { tourId: tour?.id, proposalConvertedId: proposal?.converted_tour_id })
       toast({ title: '存檔跳過', description: '尚未轉團，無法存檔到旅遊團文件', variant: 'default' })
-      return
+      throw new Error('缺少 tourId，無法存檔')
     }
     if (!user?.workspace_id) {
       logger.warn('無法存檔：缺少 workspace_id')
@@ -422,7 +423,7 @@ export function TourRequestFormDialog({
           tour_id: tourId,
           workspace_id: user.workspace_id,
           name: `${categoryName}需求單 - ${supplierInfo.name}`,
-          description: `團號: ${tourCode || '-'}, 出發日期: ${formatDate(departureDate || pkg?.start_date)}`,
+          description: `團號: ${tourCode || tour?.code || '-'}, 出發日期: ${formatDate(departureDate || tour?.departure_date || pkg?.start_date)}`,
           file_path: filePath,
           public_url: urlData?.publicUrl || '',
           file_name: fileName,
@@ -737,19 +738,19 @@ export function TourRequestFormDialog({
               <div className="grid grid-cols-4 gap-4 text-sm">
                 <div>
                   <span className="text-morandi-secondary">團號：</span>
-                  <span className="font-medium ml-1">{tourCode || '-'}</span>
+                  <span className="font-medium ml-1">{tourCode || tour?.code || '-'}</span>
                 </div>
                 <div>
                   <span className="text-morandi-secondary">團名：</span>
-                  <span className="font-medium ml-1">{tourName || proposal?.title || '-'}</span>
+                  <span className="font-medium ml-1">{tourName || tour?.name || proposal?.title || '-'}</span>
                 </div>
                 <div>
                   <span className="text-morandi-secondary">出發日期：</span>
-                  <span className="font-medium ml-1">{formatDate(departureDate || pkg?.start_date)}</span>
+                  <span className="font-medium ml-1">{formatDate(departureDate || tour?.departure_date || pkg?.start_date)}</span>
                 </div>
                 <div>
                   <span className="text-morandi-secondary">人數：</span>
-                  <span className="font-medium ml-1">{pax || proposal?.group_size || '-'} 人</span>
+                  <span className="font-medium ml-1">{pax || tour?.current_participants || tour?.max_participants || proposal?.group_size || '-'} 人</span>
                 </div>
               </div>
             </div>
