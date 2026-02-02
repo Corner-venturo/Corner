@@ -34,6 +34,8 @@ import {
   Building,
   Palette,
   Mail,
+  Truck,
+  LineChart,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
@@ -105,7 +107,9 @@ const menuItems: MenuItem[] = [
 const supplierMenuItems: MenuItem[] = [
   { href: '/', label: '首頁', icon: Home },
   { href: '/supplier/requests', label: '需求收件匣', icon: ClipboardList },
+  { href: '/supplier/dispatch', label: '派單管理', icon: Truck }, // 車行專用
   { href: '/database/fleet', label: '車隊管理', icon: Bus }, // 車行專用
+  { href: '/supplier/finance', label: '財務報表', icon: LineChart },
 ]
 
 const personalToolItems: MenuItem[] = [
