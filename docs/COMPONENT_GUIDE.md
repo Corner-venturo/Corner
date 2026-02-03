@@ -101,6 +101,76 @@ export default function MyListPage() {
   <div className="p-4">標題</div>
   <table>...</table>
 </div>
+```
+
+---
+
+## 📂 非表格頁面標準佈局
+
+當頁面不使用 `ListPageLayout`（例如樹狀結構、卡片網格）時，必須遵循以下規範：
+
+### 標準結構
+
+```tsx
+export default function MyPage() {
+  return (
+    <div className="h-full flex flex-col">
+      {/* 1. 頁面標題 - 必須使用 ResponsiveHeader */}
+      <ResponsiveHeader
+        title="頁面標題"
+        icon={SomeIcon}
+        breadcrumb={[
+          { label: '首頁', href: '/' },
+          { label: '上層頁面', href: '/parent' },
+          { label: '目前頁面', href: '/parent/current' },
+        ]}
+        onAdd={handleAdd}      // 主要動作按鈕
+        addLabel="新增 XXX"
+      />
+
+      {/* 2. 內容區 - 只用 overflow-auto，不加額外 padding/border */}
+      <div className="flex-1 overflow-auto">
+        <MyContent />
+      </div>
+    </div>
+  )
+}
+```
+
+### 工具列規範（如需要）
+
+```tsx
+{/* 工具列樣式 */}
+<div className="flex items-center gap-2 px-4 py-3 bg-morandi-bg border-b border-morandi-border">
+  <Button variant="outline" size="sm">
+    <Icon className="w-4 h-4 mr-1" />
+    按鈕文字
+  </Button>
+</div>
+```
+
+### ❌ 禁止的做法
+
+```tsx
+// ❌ 不要在內容區外層加額外的 padding 和 border
+<div className="flex-1 overflow-hidden p-4">
+  <div className="h-full border rounded-lg bg-background">
+    <Content />
+  </div>
+</div>
+
+// ✅ 正確做法
+<div className="flex-1 overflow-auto">
+  <Content />
+</div>
+
+// ❌ 不要用 emoji 當圖示
+icon: '📁'
+
+// ✅ 使用 lucide-react 圖示或不設定（用預設）
+icon: <Folder size={18} />
+// 或
+icon: undefined  // 讓組件使用預設圖示
 
 // ✅ 使用 ListPageLayout
 <ListPageLayout title="..." data={...} columns={...} />
