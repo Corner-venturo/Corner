@@ -23,20 +23,23 @@ interface TourFilesTreeProps {
   itineraryId?: string | null
 }
 
+// 檔案分類類型（對應 DB enum）
+type FileCategory = 'quote' | 'itinerary' | 'confirmation' | 'request' | 'passport' | 'visa' | 'ticket' | 'voucher' | 'insurance' | 'other' | 'contract' | 'invoice' | 'photo' | 'email_attachment' | 'cancellation'
+
 // 預設的團資料夾結構
 const DEFAULT_FOLDERS = [
   { id: 'quote', name: '團體報價單', icon: '📋', dbType: 'quote' as const },
   { id: 'quick_quote', name: '快速報價', icon: '💰', dbType: 'quick_quote' as const },
   { id: 'itinerary', name: '行程表', icon: '🗺️', dbType: 'itinerary' as const },
   { id: 'confirmation', name: '確認單', icon: '✅', dbType: 'confirmation' as const },
-  { id: 'contract', name: '合約', icon: '📝', dbType: 'contract' as const },
+  // TODO: contract 暫時移除，等 contracts 表建立後再啟用
   { id: 'request', name: '需求單', icon: '📨', dbType: 'request' as const },
-  { id: 'passport', name: '護照', icon: '🛂', category: 'passport' },
-  { id: 'visa', name: '簽證', icon: '📄', category: 'visa' },
-  { id: 'ticket', name: '機票', icon: '✈️', category: 'ticket' },
-  { id: 'voucher', name: '住宿憑證', icon: '🏨', category: 'voucher' },
-  { id: 'insurance', name: '保險', icon: '🛡️', category: 'insurance' },
-  { id: 'other', name: '其他', icon: '📁', category: 'other' },
+  { id: 'passport', name: '護照', icon: '🛂', category: 'passport' as FileCategory },
+  { id: 'visa', name: '簽證', icon: '📄', category: 'visa' as FileCategory },
+  { id: 'ticket', name: '機票', icon: '✈️', category: 'ticket' as FileCategory },
+  { id: 'voucher', name: '住宿憑證', icon: '🏨', category: 'voucher' as FileCategory },
+  { id: 'insurance', name: '保險', icon: '🛡️', category: 'insurance' as FileCategory },
+  { id: 'other', name: '其他', icon: '📁', category: 'other' as FileCategory },
 ]
 
 export function TourFilesTree({ tourId, tourCode, quoteId, itineraryId }: TourFilesTreeProps) {
@@ -71,12 +74,7 @@ export function TourFilesTree({ tourId, tourCode, quoteId, itineraryId }: TourFi
             .select('id', { count: 'exact', head: true })
             .eq('tour_id', tourId)
           childCount = count || 0
-        } else if (folder.dbType === 'contract') {
-          const { count } = await supabase
-            .from('contracts')
-            .select('id', { count: 'exact', head: true })
-            .eq('tour_id', tourId)
-          childCount = count || 0
+        // TODO: contract 分支暫時移除，等 contracts 表建立後再啟用
         } else if (folder.dbType === 'request') {
           const { count } = await supabase
             .from('tour_requests')
@@ -183,34 +181,18 @@ export function TourFilesTree({ tourId, tourCode, quoteId, itineraryId }: TourFi
             })
           }
         }
-      } else if (dbType === 'contract') {
-        const { data } = await supabase
-          .from('contracts')
-          .select('id, contract_number, customer_name')
-          .eq('tour_id', tourId)
-          .order('created_at', { ascending: false })
-        if (data) {
-          for (const c of data) {
-            children.push({
-              id: c.id,
-              name: c.customer_name || c.contract_number || '未命名合約',
-              type: 'file',
-              icon: '📝',
-              data: { dbType: 'contract', dbId: c.id },
-            })
-          }
-        }
+      // TODO: contract 分支暫時移除
       } else if (dbType === 'request') {
         const { data } = await supabase
           .from('tour_requests')
-          .select('id, request_number, supplier_name, request_type')
+          .select('id, code, supplier_name, request_type')
           .eq('tour_id', tourId)
           .order('created_at', { ascending: false })
         if (data) {
           for (const r of data) {
             children.push({
               id: r.id,
-              name: `${r.request_type || '需求'} - ${r.supplier_name || r.request_number}`,
+              name: `${r.request_type || '需求'} - ${r.supplier_name || r.code}`,
               type: 'file',
               icon: '📨',
               data: { dbType: 'request', dbId: r.id },
@@ -220,17 +202,17 @@ export function TourFilesTree({ tourId, tourCode, quoteId, itineraryId }: TourFi
       } else if (category) {
         const { data } = await supabase
           .from('files')
-          .select('id, name, mime_type')
+          .select('id, filename, content_type')
           .eq('tour_id', tourId)
-          .eq('category', category)
+          .eq('category', category as FileCategory)
           .order('created_at', { ascending: false })
         if (data) {
           for (const f of data) {
             children.push({
               id: f.id,
-              name: f.name,
+              name: f.filename,
               type: 'file',
-              data: { fileId: f.id, mimeType: f.mime_type },
+              data: { fileId: f.id, mimeType: f.content_type },
             })
           }
         }
@@ -260,9 +242,6 @@ export function TourFilesTree({ tourId, tourCode, quoteId, itineraryId }: TourFi
           break
         case 'confirmation':
           router.push(`/tours/${tourCode}/confirmation`)
-          break
-        case 'contract':
-          router.push(`/contracts?id=${dbId}`)
           break
         case 'request':
           toast.info('需求單功能開發中')

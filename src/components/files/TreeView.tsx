@@ -306,4 +306,4 @@ function findItem(items: TreeItem[], id: string): TreeItem | null {
   return null
 }
 
-export type { TreeItem, TreeViewProps }
+export type { TreeViewProps }

@@ -51,7 +51,7 @@ export interface FinderItem {
   icon?: string
   color?: string
   parentId: string | null
-  createdAt: string
+  createdAt?: string | null  // 允許 null，DB 回傳可能為 null
   updatedAt?: string
   // File specific
   size?: number
@@ -61,9 +61,9 @@ export interface FinderItem {
   // Folder specific
   childCount?: number
   // DB link (for virtual folders like 報價單)
-  dbType?: 'quote' | 'itinerary' | 'confirmation' | 'contract' | 'request'
+  dbType?: 'quote' | 'quick_quote' | 'itinerary' | 'confirmation' | 'request'
   dbId?: string
-  status?: string
+  status?: string | null
 }
 
 export interface FinderViewProps {
@@ -257,9 +257,11 @@ function FinderItemCard({
           {formatFileSize(item.size)}
         </span>
       )}
-      <span className="text-sm text-muted-foreground">
-        {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true, locale: zhTW })}
-      </span>
+      {item.createdAt && (
+        <span className="text-sm text-muted-foreground">
+          {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true, locale: zhTW })}
+        </span>
+      )}
       
       {/* 操作選單 */}
       <DropdownMenu>

@@ -28,14 +28,26 @@ interface TourFilesManagerProps {
   itineraryId?: string | null
 }
 
+// 檔案分類類型（對應 DB enum）
+type FileCategory = 'quote' | 'itinerary' | 'confirmation' | 'request' | 'passport' | 'visa' | 'ticket' | 'voucher' | 'insurance' | 'other' | 'contract' | 'invoice' | 'photo' | 'email_attachment' | 'cancellation'
+type DbType = 'quote' | 'quick_quote' | 'itinerary' | 'confirmation' | 'request'
+
+interface TourFolder {
+  name: string
+  category: FileCategory | 'quick_quote'  // quick_quote 是虛擬分類，不存在於 DB
+  icon: string
+  dbType?: DbType
+}
+
 // 預設的團資料夾結構
-const DEFAULT_TOUR_FOLDERS = [
-  { name: '團體報價單', category: 'quote', icon: '📋', dbType: 'quote' as const },
-  { name: '快速報價', category: 'quick_quote', icon: '💰', dbType: 'quick_quote' as const },
-  { name: '行程表', category: 'itinerary', icon: '🗺️', dbType: 'itinerary' as const },
-  { name: '確認單', category: 'confirmation', icon: '✅', dbType: 'confirmation' as const },
-  { name: '合約', category: 'contract', icon: '📝', dbType: 'contract' as const },
-  { name: '需求單', category: 'request', icon: '📨', dbType: 'request' as const },
+const DEFAULT_TOUR_FOLDERS: TourFolder[] = [
+  { name: '團體報價單', category: 'quote', icon: '📋', dbType: 'quote' },
+  { name: '快速報價', category: 'quick_quote', icon: '💰', dbType: 'quick_quote' },
+  { name: '行程表', category: 'itinerary', icon: '🗺️', dbType: 'itinerary' },
+  { name: '確認單', category: 'confirmation', icon: '✅', dbType: 'confirmation' },
+  // TODO: 合約功能暫未實作，contracts 表尚未建立
+  // { name: '合約', category: 'contract', icon: '📝', dbType: 'contract' },
+  { name: '需求單', category: 'request', icon: '📨', dbType: 'request' },
   { name: '護照', category: 'passport', icon: '🛂' },
   { name: '簽證', category: 'visa', icon: '📄' },
   { name: '機票', category: 'ticket', icon: '✈️' },
@@ -89,9 +101,7 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
               count = itineraryId ? 1 : 0
             } else {
               // 其他（1:N）：用 tour_id 查
-              const table = folder.dbType === 'confirmation' ? 'tour_confirmation_sheets'
-                : folder.dbType === 'contract' ? 'contracts'
-                : 'tour_requests'
+              const table = folder.dbType === 'confirmation' ? 'tour_confirmation_sheets' : 'tour_requests'
               
               const { count: c } = await supabase
                 .from(table)
@@ -100,12 +110,12 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
               count = c || 0
             }
           } else {
-            // 檔案資料夾
+            // 檔案資料夾（這裡的 folder.category 一定是有效的 FileCategory）
             const { count: c } = await supabase
               .from('files')
               .select('id', { count: 'exact', head: true })
               .eq('tour_id', tourId)
-              .eq('category', folder.category)
+              .eq('category', folder.category as FileCategory)
             count = c || 0
           }
 
@@ -156,7 +166,7 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
             .from('files')
             .select('*')
             .eq('tour_id', tourId)
-            .eq('category', category)
+            .eq('category', category as FileCategory)
             .order('created_at', { ascending: false })
 
           if (files) {
@@ -231,7 +241,7 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
 
   // 載入 DB 驅動的資料夾內容
   const loadDbFolderContent = async (
-    dbType: 'quote' | 'quick_quote' | 'itinerary' | 'confirmation' | 'contract' | 'request',
+    dbType: 'quote' | 'quick_quote' | 'itinerary' | 'confirmation' | 'request',
     items: FinderItem[]
   ) => {
     const folderId = `folder-${dbType}`
@@ -336,30 +346,7 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
         }
         break
       }
-      case 'contract': {
-        const { data } = await supabase
-          .from('contracts')
-          .select('id, name, contract_number, status, created_at')
-          .eq('tour_id', tourId)
-          .order('created_at', { ascending: false })
-        
-        if (data) {
-          for (const c of data) {
-            items.push({
-              id: c.id,
-              name: c.name || c.contract_number || '未命名合約',
-              type: 'file',
-              icon: '📝',
-              parentId: folderId,
-              createdAt: c.created_at,
-              status: c.status,
-              dbType: 'contract',
-              dbId: c.id,
-            })
-          }
-        }
-        break
-      }
+      // TODO: contract case 暫時移除，等 contracts 表建立後再啟用
       case 'request': {
         const { data } = await supabase
           .from('tour_requests')
@@ -428,9 +415,6 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
           break
         case 'confirmation':
           router.push(`/tours/${tourId}/confirmation`)
-          break
-        case 'contract':
-          router.push(`/contracts?id=${item.dbId}`)
           break
         case 'request':
           toast.info('需求單功能開發中')
@@ -545,9 +529,9 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
   const handleUpload = useCallback(async (files: FileList, folderId: string | null) => {
     if (!workspaceId) return
 
-    const category = folderId?.startsWith('folder-') 
+    const category = (folderId?.startsWith('folder-') 
       ? folderId.replace('folder-', '') 
-      : 'other'
+      : 'other') as FileCategory
     const actualFolderId = folderId?.startsWith('folder-') ? null : folderId
 
     try {
@@ -630,7 +614,7 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
       quick_quote: { label: '新增快速報價', path: `/quotes/quick?tour_id=${tourId}` },
       itinerary: { label: '新增行程表', path: `/itinerary/block-editor?tour_id=${tourId}` },
       confirmation: { label: '建立確認單', path: `/tours/${tourCode}/confirmation` },
-      contract: { label: '新增合約', path: `/contracts?tour_id=${tourId}` },
+      // TODO: contract action 暫時移除
       request: { label: '新增需求單', path: `/tours/${tourCode}?tab=requirements` },
     }
     

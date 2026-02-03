@@ -127,7 +127,7 @@ export function TourTabContent({
 }: TourTabContentProps) {
   switch (activeTab) {
     case 'members':
-      return (
+      return workspaceId ? (
         <OrderMembersExpandable
           tourId={tour.id}
           workspaceId={workspaceId}
@@ -138,7 +138,7 @@ export function TourTabContent({
           onPnrMatchDialogChange={onPnrMatchDialogChange}
           onPnrMatchSuccess={onPnrMatchSuccess}
         />
-      )
+      ) : null
     case 'orders':
       return <TourOrders tour={tour} />
     case 'confirmation':
@@ -150,7 +150,6 @@ export function TourTabContent({
         <TourRequirementsTab
           tourId={tour.id}
           quoteId={tour.quote_id}
-          onAddRequest={onAddRequest}
           onOpenRequestDialog={onOpenRequestDialog}
         />
       )

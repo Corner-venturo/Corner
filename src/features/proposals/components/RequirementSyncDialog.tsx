@@ -64,7 +64,7 @@ export function RequirementSyncDialog({
 
   // 取得 quoteId
   const quoteId = tour
-    ? (tour.quote_id || tour.locked_quote_id)
+    ? (tour.quote_id || (tour as { locked_quote_id?: string | null }).locked_quote_id)
     : pkg?.quote_id
 
   // Realtime 訂閱報價單變更
