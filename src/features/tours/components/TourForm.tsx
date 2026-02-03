@@ -62,7 +62,7 @@ export function TourForm({
         }
       }}
     >
-      <DialogContent level={1}
+      <DialogContent
         level={1}
         className={`${mode === 'edit' ? 'max-w-3xl' : 'max-w-6xl'} w-[90vw] h-[80vh] overflow-hidden`}
         aria-describedby={undefined}

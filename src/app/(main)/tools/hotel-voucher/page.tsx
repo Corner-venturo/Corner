@@ -234,7 +234,7 @@ export default function HotelVoucherPage() {
     <>
       <style>{PRINT_STYLES}</style>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent level={1}
+        <DialogContent
           level={1}
           className="max-w-[900px] w-full max-h-[90vh] overflow-y-auto p-0 print:max-w-full print:rounded-none print:max-h-none print:overflow-visible print:shadow-none"
           id="hotel-voucher-printable"

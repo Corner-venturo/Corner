@@ -57,7 +57,7 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent level={1}
+      <DialogContent
         level={1}
         className="max-w-md"
         onInteractOutside={e => {
