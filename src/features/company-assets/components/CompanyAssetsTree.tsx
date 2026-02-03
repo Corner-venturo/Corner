@@ -330,7 +330,7 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
         </Button>
 
         {/* 選取資料夾時顯示的操作 */}
-        {selectedItem?.data?.isFolder && (
+        {selectedItem?.data?.isFolder === true && (
           <>
             <Button
               variant="ghost"
