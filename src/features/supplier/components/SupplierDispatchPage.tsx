@@ -360,7 +360,7 @@ export function SupplierDispatchPage() {
 
       {/* 派單對話框 */}
       <Dialog open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>
-        <DialogContent>
+        <DialogContent level={2}>
           <DialogHeader>
             <DialogTitle>指派司機</DialogTitle>
             <DialogDescription>

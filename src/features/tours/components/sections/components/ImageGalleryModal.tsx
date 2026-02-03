@@ -23,7 +23,7 @@ export function ImageGalleryModal({
 }: ImageGalleryModalProps) {
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent
+      <DialogContent level={2}
         level={1}
         className="max-w-5xl w-full border-none p-0 gap-0"
         style={{ backgroundColor: ART.ink }}

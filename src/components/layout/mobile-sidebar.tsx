@@ -228,7 +228,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent
+      <DialogContent level={1}
         level={1} className="lg:hidden fixed top-0 left-0 bottom-0 right-auto w-72 max-w-[80vw] translate-x-0 translate-y-0 bg-background shadow-lg rounded-none rounded-r-xl p-0 gap-0 data-[state=open]:slide-in-from-left data-[state=closed]:slide-out-to-left"
       >
         {/* 頂部標題 */}

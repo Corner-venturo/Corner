@@ -764,7 +764,7 @@ export function BlockLibrary({ isOpen, onClose, onInsertBlock, insertY = 100 }: 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent level={2} className="max-w-md">
         <DialogHeader>
           <DialogTitle>插入區塊</DialogTitle>
         </DialogHeader>

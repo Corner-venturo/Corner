@@ -59,7 +59,7 @@ export function OrderSelectDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent
+      <DialogContent level={2}
         nested level={2}
         className="max-w-md"
         onInteractOutside={(e) => {
