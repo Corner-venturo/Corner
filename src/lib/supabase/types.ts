@@ -2504,6 +2504,57 @@ export type Database = {
           },
         ]
       }
+      company_asset_folders: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          icon: string | null
+          id: string
+          name: string
+          parent_id: string | null
+          sort_order: number | null
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          parent_id?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          parent_id?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_asset_folders_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "company_asset_folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_asset_folders_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_assets: {
         Row: {
           asset_type: string | null
@@ -2511,6 +2562,7 @@ export type Database = {
           description: string | null
           file_path: string
           file_size: number | null
+          folder_id: string | null
           id: string
           mime_type: string | null
           name: string
@@ -2525,6 +2577,7 @@ export type Database = {
           description?: string | null
           file_path: string
           file_size?: number | null
+          folder_id?: string | null
           id?: string
           mime_type?: string | null
           name: string
@@ -2539,6 +2592,7 @@ export type Database = {
           description?: string | null
           file_path?: string
           file_size?: number | null
+          folder_id?: string | null
           id?: string
           mime_type?: string | null
           name?: string
@@ -2547,7 +2601,15 @@ export type Database = {
           uploaded_by?: string | null
           uploaded_by_name?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "company_assets_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "company_asset_folders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       company_contacts: {
         Row: {
@@ -15113,6 +15175,7 @@ export type Database = {
           features: Json | null
           id: string
           is_active: boolean | null
+          itinerary_id: string | null
           last_unlocked_at: string | null
           last_unlocked_by: string | null
           location: string | null
@@ -15174,6 +15237,7 @@ export type Database = {
           features?: Json | null
           id: string
           is_active?: boolean | null
+          itinerary_id?: string | null
           last_unlocked_at?: string | null
           last_unlocked_by?: string | null
           location?: string | null
@@ -15235,6 +15299,7 @@ export type Database = {
           features?: Json | null
           id?: string
           is_active?: boolean | null
+          itinerary_id?: string | null
           last_unlocked_at?: string | null
           last_unlocked_by?: string | null
           location?: string | null
