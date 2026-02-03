@@ -220,7 +220,14 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
 
   // 新增資料夾
   const handleCreateFolder = useCallback(async () => {
-    if (!newFolderName.trim() || !workspaceId) return
+    if (!newFolderName.trim()) {
+      toast.error('請輸入資料夾名稱')
+      return
+    }
+    if (!workspaceId) {
+      toast.error('無法取得 workspace，請重新整理頁面')
+      return
+    }
 
     try {
       if (editingFolder) {
