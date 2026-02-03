@@ -66,26 +66,27 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
 
   // 載入資料
   const loadData = useCallback(async () => {
-    if (!workspaceId) return
-    
     setLoading(true)
     try {
       // 載入資料夾
-      const { data: folderData, error: folderError } = await supabase
+      let folderQuery = supabase
         .from('company_asset_folders')
         .select('*')
-        .eq('workspace_id', workspaceId)
         .order('sort_order', { ascending: true })
         .order('name', { ascending: true })
+      
+      if (workspaceId) {
+        folderQuery = folderQuery.eq('workspace_id', workspaceId)
+      }
 
+      const { data: folderData, error: folderError } = await folderQuery
       if (folderError) throw folderError
       setFolders(folderData || [])
 
-      // 載入檔案
+      // 載入檔案（包含舊資料，不限 workspace）
       const { data: assetData, error: assetError } = await supabase
         .from('company_assets')
         .select('id, name, file_path, mime_type, folder_id, asset_type')
-        .or(`workspace_id.eq.${workspaceId},workspace_id.is.null`)
         .order('created_at', { ascending: false })
 
       if (assetError) throw assetError
