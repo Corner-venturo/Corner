@@ -63,6 +63,7 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
   const [newFolderName, setNewFolderName] = useState('')
   const [parentFolderId, setParentFolderId] = useState<string | null>(null)
   const [editingFolder, setEditingFolder] = useState<CompanyAssetFolder | null>(null)
+  const [creatingFolder, setCreatingFolder] = useState(false)
 
   // 載入資料
   const loadData = useCallback(async () => {
@@ -224,7 +225,9 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
       toast.error('無法取得 workspace，請重新整理頁面')
       return
     }
+    if (creatingFolder) return // 防止重複點擊
 
+    setCreatingFolder(true)
     try {
       if (editingFolder) {
         // 編輯模式
@@ -257,8 +260,10 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
     } catch (err) {
       logger.error('建立資料夾失敗', err)
       toast.error('建立失敗')
+    } finally {
+      setCreatingFolder(false)
     }
-  }, [newFolderName, workspaceId, parentFolderId, editingFolder, loadData])
+  }, [newFolderName, workspaceId, parentFolderId, editingFolder, loadData, creatingFolder])
 
   // 刪除資料夾
   const handleDeleteFolder = useCallback(async (folderId: string) => {
@@ -309,7 +314,7 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
   return (
     <div className="flex flex-col h-full">
       {/* 工具列 */}
-      <div className="flex items-center gap-2 p-2 border-b">
+      <div className="flex items-center gap-2 px-4 py-3 bg-morandi-bg border-b border-morandi-border">
         <Button
           variant="outline"
           size="sm"
@@ -322,14 +327,6 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
         >
           <FolderPlus className="w-4 h-4 mr-1" />
           新增資料夾
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onAddFile?.(selectedItem?.data?.folderId as string || null)}
-        >
-          <Plus className="w-4 h-4 mr-1" />
-          上傳檔案
         </Button>
 
         {/* 選取資料夾時顯示的操作 */}
@@ -362,7 +359,7 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
       </div>
 
       {/* 樹狀檢視 */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto px-4 py-2">
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">
             <p>尚無資源</p>
@@ -400,8 +397,8 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
             <Button variant="outline" onClick={() => setShowFolderDialog(false)}>
               取消
             </Button>
-            <Button onClick={handleCreateFolder} disabled={!newFolderName.trim()}>
-              {editingFolder ? '儲存' : '建立'}
+            <Button onClick={handleCreateFolder} disabled={!newFolderName.trim() || creatingFolder}>
+              {creatingFolder ? '處理中...' : (editingFolder ? '儲存' : '建立')}
             </Button>
           </DialogFooter>
         </DialogContent>

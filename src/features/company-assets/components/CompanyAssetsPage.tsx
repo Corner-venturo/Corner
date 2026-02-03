@@ -188,19 +188,20 @@ export const CompanyAssetsPage: React.FC = () => {
         title="公司資源管理"
         icon={FolderArchive}
         breadcrumb={[
-          { label: '資料庫', href: '/database' },
+          { label: '首頁', href: '/' },
+          { label: '資料庫管理', href: '/database' },
           { label: '公司資源管理', href: '/database/company-assets' },
         ]}
+        onAdd={() => handleAddFile(null)}
+        addLabel="上傳檔案"
       />
 
-      <div className="flex-1 overflow-hidden p-4">
-        <div className="h-full border rounded-lg bg-background">
-          <CompanyAssetsTree
-            key={refreshKey}
-            onSelectFile={handleSelectFile}
-            onAddFile={handleAddFile}
-          />
-        </div>
+      <div className="flex-1 overflow-auto">
+        <CompanyAssetsTree
+          key={refreshKey}
+          onSelectFile={handleSelectFile}
+          onAddFile={handleAddFile}
+        />
       </div>
 
       <CompanyAssetsDialog
