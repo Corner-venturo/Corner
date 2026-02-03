@@ -138,7 +138,7 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
             id: `folder-${folder.id}`,
             name: folder.name,
             type: 'folder',
-            icon: folder.icon || '📁',
+            // 不設 icon，讓 TreeView 用預設的 Folder icon
             childCount: childFolders.length + childAssets.length,
             children: buildNode(folder.id),
             data: { folderId: folder.id, isFolder: true },
@@ -173,14 +173,10 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
     loadData()
   }, [loadData])
 
-  // 取得檔案圖示
-  const getFileIcon = (assetType: string | null, mimeType: string | null): string => {
-    if (assetType === 'image' || mimeType?.startsWith('image/')) return '🖼️'
-    if (assetType === 'video' || mimeType?.startsWith('video/')) return '🎬'
-    if (mimeType?.includes('pdf')) return '📄'
-    if (mimeType?.includes('word') || mimeType?.includes('document')) return '📝'
-    if (mimeType?.includes('excel') || mimeType?.includes('spreadsheet')) return '📊'
-    return '📎'
+  // 取得檔案圖示（不用 emoji，用 undefined 讓 TreeView 用預設 icon）
+  const getFileIcon = (_assetType: string | null, _mimeType: string | null): undefined => {
+    // TreeView 會根據 type='file' 自動用 File icon
+    return undefined
   }
 
   // 處理項目選取
