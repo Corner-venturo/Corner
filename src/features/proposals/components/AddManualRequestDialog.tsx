@@ -40,12 +40,12 @@ import { RestaurantSelector, type CombinedRestaurant } from '@/components/editor
 import { HotelSelector } from '@/components/editor/hotel-selector'
 import { AttractionSelector } from '@/components/editor/attraction-selector'
 
-// 需求類別
+// 需求類別（統一使用 accommodation/meal）
 const CATEGORIES = [
   { key: 'transport', label: '交通（派車）' },
   { key: 'guide', label: '領隊' },
-  { key: 'hotel', label: '住宿' },
-  { key: 'restaurant', label: '餐食' },
+  { key: 'accommodation', label: '住宿' },
+  { key: 'meal', label: '餐食' },
   { key: 'activity', label: '門票/活動' },
   { key: 'other', label: '其他' },
 ]
@@ -358,7 +358,7 @@ export function AddManualRequestDialog({
             )}
 
             {/* 資源選擇（餐廳/飯店/景點）*/}
-            {(formData.category === 'restaurant' || formData.category === 'hotel' || formData.category === 'activity') && (
+            {(formData.category === 'meal' || formData.category === 'accommodation' || formData.category === 'activity') && (
               <div className="space-y-2">
                 <Label>從資料庫選擇</Label>
                 <div className="flex items-center gap-2">
@@ -386,15 +386,15 @@ export function AddManualRequestDialog({
                       type="button"
                       variant="outline"
                       onClick={() => {
-                        if (formData.category === 'restaurant') setShowRestaurantSelector(true)
-                        else if (formData.category === 'hotel') setShowHotelSelector(true)
+                        if (formData.category === 'meal') setShowRestaurantSelector(true)
+                        else if (formData.category === 'accommodation') setShowHotelSelector(true)
                         else if (formData.category === 'activity') setShowAttractionSelector(true)
                       }}
                       className="gap-2"
                     >
                       <Search size={16} />
-                      {formData.category === 'restaurant' && '選擇餐廳'}
-                      {formData.category === 'hotel' && '選擇飯店'}
+                      {formData.category === 'meal' && '選擇餐廳'}
+                      {formData.category === 'accommodation' && '選擇飯店'}
                       {formData.category === 'activity' && '選擇景點'}
                     </Button>
                   )}
@@ -438,8 +438,8 @@ export function AddManualRequestDialog({
               <p className="text-xs text-morandi-secondary">
                 {formData.category === 'transport' && '台數'}
                 {formData.category === 'guide' && '人數'}
-                {formData.category === 'hotel' && '間數'}
-                {formData.category === 'restaurant' && '人數'}
+                {formData.category === 'accommodation' && '間數'}
+                {formData.category === 'meal' && '人數'}
                 {formData.category === 'activity' && '人數'}
                 {formData.category === 'other' && '數量'}
               </p>

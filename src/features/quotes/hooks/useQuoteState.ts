@@ -262,7 +262,7 @@ export const useQuoteState = () => {
         hasLoadedTierPricings.current = true
       }
     }
-  }, [quote?.id, relatedTour?.code]) // 只在 quote.id 改變時執行
+  }, [quote?.id, quote?.updated_at, relatedTour?.code]) // 當 quote.id 或 quote 資料更新時執行
 
   // 當行程表載入後，自動添加航班資訊到交通類別
   useEffect(() => {

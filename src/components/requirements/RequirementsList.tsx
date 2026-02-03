@@ -110,14 +110,14 @@ interface ChangeTrackItem {
 
 // FlightInfo 已移至 @/types/flight.types.ts
 
-// 分類配置
-type CategoryKey = 'transport' | 'hotel' | 'restaurant' | 'activity' | 'other'
+// 分類配置（統一使用 accommodation/meal）
+type CategoryKey = 'transport' | 'accommodation' | 'meal' | 'activity' | 'other'
 const CATEGORIES: { key: CategoryKey; label: string; quoteCategoryId: string }[] = [
   { key: 'transport', label: '交通', quoteCategoryId: 'transport' },
-  { key: 'hotel', label: '住宿', quoteCategoryId: 'accommodation' },
-  { key: 'restaurant', label: '餐食', quoteCategoryId: 'meals' },
-  { key: 'activity', label: '門票/活動', quoteCategoryId: 'activities' },
-  { key: 'other', label: '其他', quoteCategoryId: 'others' },
+  { key: 'accommodation', label: '住宿', quoteCategoryId: 'accommodation' },
+  { key: 'meal', label: '餐食', quoteCategoryId: 'meal' },
+  { key: 'activity', label: '活動', quoteCategoryId: 'activity' },
+  { key: 'other', label: '其他', quoteCategoryId: 'other' },
 ]
 
 // ============================================
@@ -336,11 +336,11 @@ export function RequirementsList({
         let title = item.name
         let serviceDate: string | null = null
 
-        if (cat.key === 'hotel') {
+        if (cat.key === 'accommodation') {
           supplierName = item.name
           title = item.name
           if (item.day) serviceDate = calculateDate(item.day)
-        } else if (cat.key === 'restaurant') {
+        } else if (cat.key === 'meal') {
           const match = item.name.match(/Day\s*(\d+)\s*(早餐|午餐|晚餐)\s*(?:[：:]|\s*-\s*)\s*(.+)/)
           if (match) {
             const dayNum = parseInt(match[1])
@@ -384,7 +384,7 @@ export function RequirementsList({
   // 計算變更追蹤
   const changeTrackByCategory = useMemo(() => {
     const result: Record<CategoryKey, ChangeTrackItem[]> = {
-      transport: [], hotel: [], restaurant: [], activity: [], other: [],
+      transport: [], accommodation: [], meal: [], activity: [], other: [],
     }
 
     if (confirmedSnapshot.length === 0) {
@@ -587,10 +587,16 @@ export function RequirementsList({
 
       // 建立需求單
       if (newItems.length > 0) {
-        const { data: existingCodes } = await supabase
+        // 查詢現有需求單（用於檢查重複 + 生成編號）
+        const { data: existingRequests } = await supabase
           .from('tour_requests')
-          .select('code')
+          .select('code, supplier_name, category, service_date')
           .or(tourId ? `tour_id.eq.${tourId}` : `proposal_package_id.eq.${proposalPackageId}`)
+
+        // 建立已存在的需求單 key set（供應商+分類+日期）
+        const existingKeys = new Set(
+          (existingRequests || []).map(r => `${r.supplier_name}-${r.category}-${r.service_date || 'no-date'}`)
+        )
 
         const itemsBySupplier = new Map<string, QuoteItem[]>()
         for (const item of newItems) {
@@ -602,12 +608,20 @@ export function RequirementsList({
         const requestsToInsert = []
         for (const [, items] of itemsBySupplier) {
           const firstItem = items[0]
+          const serviceDates = items.map(i => i.serviceDate).filter((d): d is string => !!d).sort()
+          const serviceDate = serviceDates[0] || null
+
+          // 檢查是否已存在相同供應商+分類+日期的需求單
+          const checkKey = `${firstItem.supplierName}-${firstItem.category}-${serviceDate || 'no-date'}`
+          if (existingKeys.has(checkKey)) {
+            // 已存在，跳過不重複建立
+            continue
+          }
+
           const code = generateTourRequestCode(
             source.code || 'PKG',
-            [...(existingCodes || []), ...requestsToInsert.map(r => ({ code: r.code }))]
+            [...(existingRequests || []), ...requestsToInsert.map(r => ({ code: r.code }))]
           )
-
-          const serviceDates = items.map(i => i.serviceDate).filter((d): d is string => !!d).sort()
 
           requestsToInsert.push({
             code,
@@ -618,7 +632,7 @@ export function RequirementsList({
             handler_type: 'external',
             supplier_name: firstItem.supplierName,
             category: firstItem.category,
-            service_date: serviceDates[0] || null,
+            service_date: serviceDate,
             title: `${firstItem.supplierName} - ${CATEGORIES.find(c => c.key === firstItem.category)?.label || firstItem.category}`,
             quantity: items.reduce((sum, i) => sum + i.quantity, 0),
             status: 'pending',
@@ -626,6 +640,9 @@ export function RequirementsList({
             created_by: user.id,
             created_by_name: user.name || user.email || '',
           })
+
+          // 加入已存在集合，避免本次迴圈內重複
+          existingKeys.add(checkKey)
         }
 
         if (requestsToInsert.length > 0) {
@@ -1091,7 +1108,7 @@ export function RequirementsList({
                                     quantity,
                                     notes: notes || undefined,
                                     resourceId,
-                                    resourceType: cat.key === 'hotel' ? 'hotel' : cat.key === 'restaurant' ? 'restaurant' : cat.key === 'activity' ? 'attraction' : undefined,
+                                    resourceType: cat.key === 'accommodation' ? 'hotel' : cat.key === 'meal' ? 'restaurant' : cat.key === 'activity' ? 'attraction' : undefined,
                                   } : undefined
                                 )}
                                 className={cn(

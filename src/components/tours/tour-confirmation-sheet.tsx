@@ -3,11 +3,11 @@
 /**
  * TourConfirmationSheet - 團確單總覽
  *
- * 從行程表的 daily_itinerary 讀取住宿/餐食資料，
+ * 以需求總覽為主，從報價單的 categories 讀取住宿/餐食資料，
  * 按供應商分組顯示，並提供「產生需求單」按鈕
  *
  * 流程：
- * 行程表 → 團確單（內部確認） → 產生需求單 → 發給供應商
+ * 報價單 → 團確單（內部確認） → 產生需求單 → 發給供應商
  */
 
 import { useMemo, useState, useCallback } from 'react'
@@ -25,49 +25,38 @@ import {
   Ticket,
   UtensilsCrossed,
   Package,
+  AlertCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useItineraries } from '@/data'
 import { useTourRequests } from '@/stores/tour-request-store'
-import { useToursSlim } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { useToast } from '@/components/ui/use-toast'
 import { QuickRequestFromItemDialog } from '@/features/finance/requests/components/QuickRequestFromItemDialog'
-import type { DailyItineraryDay } from '@/stores/types/tour.types'
+import { useRequirementsData, type QuoteItem, type CategoryKey, CATEGORIES } from '@/components/requirements/hooks/useRequirementsData'
 
 interface TourConfirmationSheetProps {
   tourId: string
 }
 
-// 住宿項目（從行程表解析）
-interface AccommodationItem {
-  dayIndex: number
-  dayLabel: string
-  date: string
-  hotelName: string
-}
-
-// 餐食項目（從行程表解析）
-interface MealItem {
-  dayIndex: number
-  dayLabel: string
-  date: string
-  mealType: '早餐' | '午餐' | '晚餐'
-  restaurantName: string
-}
-
 // 按供應商分組的結果
-interface SupplierGroup<T> {
+interface SupplierGroup {
   supplierName: string
-  items: T[]
+  items: QuoteItem[]
 }
 
 export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
-  const { items: tours } = useToursSlim()
-  const { items: itineraries, loading: itineraryLoading } = useItineraries()
-  const { items: existingRequests, fetchAll: refreshRequests } = useTourRequests()
-  const { user: currentUser } = useAuthStore()
   const { toast } = useToast()
+  const { user: currentUser } = useAuthStore()
+  const { items: existingRequests, fetchAll: refreshRequests } = useTourRequests()
+
+  // 使用需求總覽的資料來源
+  const {
+    loading,
+    tour,
+    linkedQuoteId,
+    quoteItems,
+    changeTrackByCategory,
+  } = useRequirementsData({ tourId })
 
   const [generatingFor, setGeneratingFor] = useState<string | null>(null)
 
@@ -84,44 +73,15 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
     tourName: string
   } | null>(null)
 
-  // 找到當前團
-  const tour = useMemo(() => {
-    return tours.find(t => t.id === tourId)
-  }, [tours, tourId])
+  // 住宿項目按飯店分組
+  const hotelGroups = useMemo((): SupplierGroup[] => {
+    const accommodationItems = changeTrackByCategory.accommodation
+      .filter(item => item.type !== 'cancelled')
+      .map(item => item.item as QuoteItem)
 
-  // 找到關聯的行程表
-  const itinerary = useMemo(() => {
-    if (!tour) return null
-    // 優先使用鎖定的行程 ID，否則嘗試用 tour_id 匹配
-    if (tour.locked_itinerary_id) {
-      return itineraries.find(i => i.id === tour.locked_itinerary_id)
-    }
-    // 備用：用 tour_id 找
-    return itineraries.find(i => i.tour_id === tourId)
-  }, [tour, itineraries, tourId])
-
-  // 解析住宿資料並按飯店分組
-  const hotelGroups = useMemo((): SupplierGroup<AccommodationItem>[] => {
-    if (!itinerary?.daily_itinerary) return []
-
-    const items: AccommodationItem[] = []
-    const dailyItinerary = itinerary.daily_itinerary as DailyItineraryDay[]
-
-    dailyItinerary.forEach((day, index) => {
-      if (day.accommodation && day.accommodation.trim() && day.accommodation !== '溫暖的家') {
-        items.push({
-          dayIndex: index,
-          dayLabel: day.dayLabel || `Day ${index + 1}`,
-          date: day.date || '',
-          hotelName: day.accommodation.trim(),
-        })
-      }
-    })
-
-    // 按飯店名稱分組
-    const grouped: Record<string, AccommodationItem[]> = {}
-    items.forEach(item => {
-      const name = item.hotelName
+    const grouped: Record<string, QuoteItem[]> = {}
+    accommodationItems.forEach(item => {
+      const name = item.supplierName
       if (!grouped[name]) {
         grouped[name] = []
       }
@@ -130,59 +90,19 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
 
     return Object.entries(grouped).map(([supplierName, items]) => ({
       supplierName,
-      items: items.sort((a, b) => a.dayIndex - b.dayIndex),
+      items: items.sort((a, b) => (a.serviceDate || '').localeCompare(b.serviceDate || '')),
     }))
-  }, [itinerary])
+  }, [changeTrackByCategory])
 
-  // 解析餐食資料並按餐廳分組
-  const restaurantGroups = useMemo((): SupplierGroup<MealItem>[] => {
-    if (!itinerary?.daily_itinerary) return []
+  // 餐食項目按餐廳分組
+  const restaurantGroups = useMemo((): SupplierGroup[] => {
+    const mealItems = changeTrackByCategory.meal
+      .filter(item => item.type !== 'cancelled')
+      .map(item => item.item as QuoteItem)
 
-    const items: MealItem[] = []
-    const dailyItinerary = itinerary.daily_itinerary as DailyItineraryDay[]
-
-    dailyItinerary.forEach((day, index) => {
-      const meals = day.meals
-      if (!meals) return
-
-      // 早餐
-      if (meals.breakfast && !isDefaultMeal(meals.breakfast)) {
-        items.push({
-          dayIndex: index,
-          dayLabel: day.dayLabel || `Day ${index + 1}`,
-          date: day.date || '',
-          mealType: '早餐',
-          restaurantName: meals.breakfast.trim(),
-        })
-      }
-
-      // 午餐
-      if (meals.lunch && !isDefaultMeal(meals.lunch)) {
-        items.push({
-          dayIndex: index,
-          dayLabel: day.dayLabel || `Day ${index + 1}`,
-          date: day.date || '',
-          mealType: '午餐',
-          restaurantName: meals.lunch.trim(),
-        })
-      }
-
-      // 晚餐
-      if (meals.dinner && !isDefaultMeal(meals.dinner)) {
-        items.push({
-          dayIndex: index,
-          dayLabel: day.dayLabel || `Day ${index + 1}`,
-          date: day.date || '',
-          mealType: '晚餐',
-          restaurantName: meals.dinner.trim(),
-        })
-      }
-    })
-
-    // 按餐廳名稱分組
-    const grouped: Record<string, MealItem[]> = {}
-    items.forEach(item => {
-      const name = item.restaurantName
+    const grouped: Record<string, QuoteItem[]> = {}
+    mealItems.forEach(item => {
+      const name = item.supplierName
       if (!grouped[name]) {
         grouped[name] = []
       }
@@ -191,15 +111,15 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
 
     return Object.entries(grouped).map(([supplierName, items]) => ({
       supplierName,
-      items: items.sort((a, b) => a.dayIndex - b.dayIndex),
+      items: items.sort((a, b) => (a.serviceDate || '').localeCompare(b.serviceDate || '')),
     }))
-  }, [itinerary])
+  }, [changeTrackByCategory])
 
   // 過濾出有供應商的需求單（可請款）
   const requestsWithSupplier = useMemo(() => {
     return existingRequests.filter(req =>
       req.tour_id === tourId &&
-      req.supplier_id // 有供應商 ID 才能請款
+      req.supplier_id
     )
   }, [existingRequests, tourId])
 
@@ -217,9 +137,11 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
     switch (category) {
       case 'hotel':
       case '住宿':
+      case 'accommodation':
         return <Hotel size={14} className="text-blue-600" />
       case 'transportation':
       case '交通':
+      case 'transport':
         return <Bus size={14} className="text-green-600" />
       case 'activity':
       case 'ticket':
@@ -254,8 +176,8 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
   // 產生需求單
   const handleGenerateRequest = useCallback(async (
     supplierName: string,
-    category: 'hotel' | 'restaurant',
-    items: AccommodationItem[] | MealItem[]
+    category: 'accommodation' | 'meal',
+    items: QuoteItem[]
   ) => {
     if (!tour) return
 
@@ -263,21 +185,19 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
 
     try {
       // 計算服務日期範圍
-      const dates = items.map(item => item.date).filter(Boolean)
+      const dates = items.map(item => item.serviceDate).filter(Boolean) as string[]
       const serviceDate = dates[0] || ''
       const serviceDateEnd = dates.length > 1 ? dates[dates.length - 1] : serviceDate
 
       // 產生描述
       let description = ''
-      if (category === 'hotel') {
-        const hotelItems = items as AccommodationItem[]
-        description = hotelItems.map(item => `${item.dayLabel} (${item.date})`).join('\n')
+      if (category === 'accommodation') {
+        description = items.map(item => `${item.serviceDate || ''}`).join('\n')
       } else {
-        const mealItems = items as MealItem[]
-        description = mealItems.map(item => `${item.dayLabel} ${item.mealType} (${item.date})`).join('\n')
+        description = items.map(item => `${item.serviceDate || ''} ${item.title}`).join('\n')
       }
 
-      // 透過 API 建立需求單（API 會自動產生編號）
+      // 透過 API 建立需求單
       const response = await fetch('/api/tour-requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -286,8 +206,8 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
           tour_id: tourId,
           tour_code: tour.code,
           tour_name: tour.name,
-          title: `${supplierName} - ${category === 'hotel' ? '住宿預訂' : '餐食預訂'}`,
-          category,
+          title: `${supplierName} - ${category === 'accommodation' ? '住宿預訂' : '餐食預訂'}`,
+          category: category,  // 直接使用 accommodation/meal
           supplier_name: supplierName,
           service_date: serviceDate,
           service_date_end: serviceDateEnd,
@@ -304,7 +224,6 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
         throw new Error('API request failed')
       }
 
-      // 重新載入需求單列表
       await refreshRequests()
 
       toast({
@@ -323,7 +242,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
   }, [tour, tourId, currentUser, refreshRequests, toast])
 
   // Loading 狀態
-  if (itineraryLoading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-32 text-morandi-secondary">
         <Loader2 className="animate-spin mr-2" size={20} />
@@ -332,13 +251,13 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
     )
   }
 
-  // 沒有行程表
-  if (!itinerary) {
+  // 沒有報價單
+  if (!linkedQuoteId) {
     return (
       <div className="flex flex-col items-center justify-center h-32 text-morandi-secondary">
-        <FileText size={32} className="mb-2 opacity-50" />
-        <p>此團尚未關聯行程表</p>
-        <p className="text-xs mt-1">請先建立或關聯行程表</p>
+        <AlertCircle size={32} className="mb-2 opacity-50" />
+        <p>此團尚未關聯報價單</p>
+        <p className="text-xs mt-1">請先建立或關聯報價單</p>
       </div>
     )
   }
@@ -348,8 +267,8 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
     return (
       <div className="flex flex-col items-center justify-center h-32 text-morandi-secondary">
         <Calendar size={32} className="mb-2 opacity-50" />
-        <p>行程表尚無住宿/餐食資料</p>
-        <p className="text-xs mt-1">請先在行程表填寫每日住宿和餐食</p>
+        <p>報價單尚無住宿/餐食資料</p>
+        <p className="text-xs mt-1">請先在報價單填寫住宿和餐食項目</p>
       </div>
     )
   }
@@ -367,7 +286,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
           <div className="bg-card p-4 space-y-4">
             {hotelGroups.map(group => {
               const hasRequest = hasExistingRequest(group.supplierName, 'hotel')
-              const isGenerating = generatingFor === `hotel-${group.supplierName}`
+              const isGenerating = generatingFor === `accommodation-${group.supplierName}`
 
               return (
                 <div key={group.supplierName} className="border border-border rounded-lg overflow-hidden">
@@ -386,7 +305,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                     ) : (
                       <Button
                         size="sm"
-                        onClick={() => handleGenerateRequest(group.supplierName, 'hotel', group.items)}
+                        onClick={() => handleGenerateRequest(group.supplierName, 'accommodation', group.items)}
                         disabled={isGenerating}
                         className="h-7 text-xs bg-morandi-gold hover:bg-morandi-gold-hover text-white"
                       >
@@ -405,14 +324,14 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                     <thead>
                       <tr className="bg-morandi-container/30 text-morandi-secondary">
                         <th className="text-left px-3 py-2 font-medium w-24">日期</th>
-                        <th className="text-left px-3 py-2 font-medium">天數</th>
+                        <th className="text-left px-3 py-2 font-medium">說明</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
                       {group.items.map((item, idx) => (
                         <tr key={idx} className="hover:bg-morandi-container/10">
-                          <td className="px-3 py-2 text-morandi-primary">{item.date}</td>
-                          <td className="px-3 py-2 text-morandi-secondary">{item.dayLabel}</td>
+                          <td className="px-3 py-2 text-morandi-primary">{item.serviceDate || '-'}</td>
+                          <td className="px-3 py-2 text-morandi-secondary">{item.title}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -435,7 +354,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
           <div className="bg-card p-4 space-y-4">
             {restaurantGroups.map(group => {
               const hasRequest = hasExistingRequest(group.supplierName, 'restaurant')
-              const isGenerating = generatingFor === `restaurant-${group.supplierName}`
+              const isGenerating = generatingFor === `meal-${group.supplierName}`
 
               return (
                 <div key={group.supplierName} className="border border-border rounded-lg overflow-hidden">
@@ -454,7 +373,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                     ) : (
                       <Button
                         size="sm"
-                        onClick={() => handleGenerateRequest(group.supplierName, 'restaurant', group.items)}
+                        onClick={() => handleGenerateRequest(group.supplierName, 'meal', group.items)}
                         disabled={isGenerating}
                         className="h-7 text-xs bg-morandi-gold hover:bg-morandi-gold-hover text-white"
                       >
@@ -473,16 +392,14 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                     <thead>
                       <tr className="bg-morandi-container/30 text-morandi-secondary">
                         <th className="text-left px-3 py-2 font-medium w-24">日期</th>
-                        <th className="text-left px-3 py-2 font-medium w-20">天數</th>
-                        <th className="text-left px-3 py-2 font-medium">餐別</th>
+                        <th className="text-left px-3 py-2 font-medium">說明</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
                       {group.items.map((item, idx) => (
                         <tr key={idx} className="hover:bg-morandi-container/10">
-                          <td className="px-3 py-2 text-morandi-primary">{item.date}</td>
-                          <td className="px-3 py-2 text-morandi-secondary">{item.dayLabel}</td>
-                          <td className="px-3 py-2 text-morandi-primary">{item.mealType}</td>
+                          <td className="px-3 py-2 text-morandi-primary">{item.serviceDate || '-'}</td>
+                          <td className="px-3 py-2 text-morandi-secondary">{item.title}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -585,20 +502,4 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
       )}
     </div>
   )
-}
-
-// 判斷是否為預設餐食（不需要建立需求單）
-function isDefaultMeal(meal: string): boolean {
-  const defaultMeals = [
-    '敬請自理',
-    '自理',
-    '飯店內早餐',
-    '飯店早餐',
-    '機上餐食',
-    '溫暖的家',
-    '機上用餐',
-    '-',
-    '',
-  ]
-  return defaultMeals.some(d => meal.includes(d))
 }

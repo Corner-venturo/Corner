@@ -178,18 +178,267 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     }
   }, [addingCategory])
 
-  // 自動建立確認表（如果不存在）
+  // 自動建立確認表並帶入需求單（如果不存在）
   useEffect(() => {
-    if (!loading && !sheet && tour && workspaceId) {
-      createSheet({
-        tour_code: tour.code,
-        tour_name: tour.name,
-        departure_date: tour.departure_date || undefined,
-        return_date: tour.return_date || undefined,
-        workspace_id: workspaceId,
-      })
+    const createAndImport = async () => {
+      if (!loading && !sheet && tour && workspaceId && !requestsLoading) {
+        try {
+          // 1. 建立確認表
+          const newSheet = await createSheet({
+            tour_code: tour.code,
+            tour_name: tour.name,
+            departure_date: tour.departure_date || undefined,
+            return_date: tour.return_date || undefined,
+            workspace_id: workspaceId,
+          })
+
+          if (!newSheet?.id) return
+
+          // 2. 自動帶入所有需求單資料
+          const categoryMap: Record<string, ConfirmationItemCategory> = {
+            transport: 'transport',
+            vehicle: 'transport',
+            meal: 'meal',
+            restaurant: 'meal',
+            accommodation: 'accommodation',
+            hotel: 'accommodation',
+            activity: 'activity',
+            attraction: 'activity',
+            other: 'other',
+          }
+
+          for (const req of tourRequests) {
+            const category = categoryMap[req.category] || 'other'
+            await addItem({
+              sheet_id: newSheet.id,
+              category,
+              service_date: req.service_date || '',
+              service_date_end: req.service_date_end || null,
+              day_label: null,
+              supplier_name: req.supplier_name || '',
+              supplier_id: req.supplier_id || null,
+              title: req.title,
+              description: req.description || null,
+              unit_price: null,
+              currency: req.currency || 'TWD',
+              quantity: req.quantity || null,
+              subtotal: null,
+              expected_cost: req.quoted_cost || req.estimated_cost || null,
+              actual_cost: req.final_cost || null,
+              contact_info: null,
+              booking_reference: null,
+              booking_status: req.status === 'confirmed' ? 'confirmed' : 'pending',
+              type_data: null,
+              sort_order: 0,
+              notes: req.notes || null,
+              workspace_id: workspaceId,
+              request_id: req.id,
+              resource_type: req.resource_type as ResourceType | null,
+              resource_id: req.resource_id || null,
+              latitude: req.latitude || null,
+              longitude: req.longitude || null,
+              google_maps_url: req.google_maps_url || null,
+            })
+          }
+
+          // 3. 自動帶入航班資訊
+          if (tour.outbound_flight) {
+            const outbound = tour.outbound_flight
+            await addItem({
+              sheet_id: newSheet.id,
+              category: 'transport',
+              service_date: tour.departure_date || '',
+              service_date_end: null,
+              day_label: null,
+              supplier_name: outbound.airline || '',
+              supplier_id: null,
+              title: `去程 ${outbound.flightNumber} ${outbound.departureAirport}→${outbound.arrivalAirport}`,
+              description: `${outbound.departureTime} - ${outbound.arrivalTime}`,
+              unit_price: null,
+              currency: 'TWD',
+              quantity: null,
+              subtotal: null,
+              expected_cost: null,
+              actual_cost: null,
+              contact_info: null,
+              booking_reference: null,
+              booking_status: 'confirmed',
+              type_data: null,
+              sort_order: 0,
+              notes: outbound.duration || null,
+              workspace_id: workspaceId,
+            })
+          }
+
+          if (tour.return_flight) {
+            const returnFlight = tour.return_flight
+            await addItem({
+              sheet_id: newSheet.id,
+              category: 'transport',
+              service_date: tour.return_date || '',
+              service_date_end: null,
+              day_label: null,
+              supplier_name: returnFlight.airline || '',
+              supplier_id: null,
+              title: `回程 ${returnFlight.flightNumber} ${returnFlight.departureAirport}→${returnFlight.arrivalAirport}`,
+              description: `${returnFlight.departureTime} - ${returnFlight.arrivalTime}`,
+              unit_price: null,
+              currency: 'TWD',
+              quantity: null,
+              subtotal: null,
+              expected_cost: null,
+              actual_cost: null,
+              contact_info: null,
+              booking_reference: null,
+              booking_status: 'confirmed',
+              type_data: null,
+              sort_order: 1,
+              notes: returnFlight.duration || null,
+              workspace_id: workspaceId,
+            })
+          }
+
+          // 重新載入以顯示新資料
+          reload()
+        } catch (err) {
+          logger.error('建立確認表失敗:', err)
+        }
+      }
     }
-  }, [loading, sheet, tour, workspaceId, createSheet])
+    createAndImport()
+  }, [loading, sheet, tour, workspaceId, tourRequests, requestsLoading, createSheet, addItem, reload])
+
+  // 如果確認表存在但沒有項目，自動帶入需求單
+  const [hasAutoImported, setHasAutoImported] = useState(false)
+  useEffect(() => {
+    const autoImportToExistingSheet = async () => {
+      // 條件：確認表存在、沒有項目、有需求單、尚未自動帶入過
+      if (
+        sheet?.id &&
+        groupedItems.transport.length === 0 &&
+        groupedItems.meal.length === 0 &&
+        groupedItems.accommodation.length === 0 &&
+        groupedItems.activity.length === 0 &&
+        groupedItems.other.length === 0 &&
+        (tourRequests.length > 0 || tour.outbound_flight || tour.return_flight) &&
+        !requestsLoading &&
+        !hasAutoImported
+      ) {
+        setHasAutoImported(true)
+
+        try {
+          const categoryMap: Record<string, ConfirmationItemCategory> = {
+            transport: 'transport',
+            vehicle: 'transport',
+            meal: 'meal',
+            restaurant: 'meal',
+            accommodation: 'accommodation',
+            hotel: 'accommodation',
+            activity: 'activity',
+            attraction: 'activity',
+            other: 'other',
+          }
+
+          // 帶入需求單
+          for (const req of tourRequests) {
+            const category = categoryMap[req.category] || 'other'
+            await addItem({
+              sheet_id: sheet.id,
+              category,
+              service_date: req.service_date || '',
+              service_date_end: req.service_date_end || null,
+              day_label: null,
+              supplier_name: req.supplier_name || '',
+              supplier_id: req.supplier_id || null,
+              title: req.title,
+              description: req.description || null,
+              unit_price: null,
+              currency: req.currency || 'TWD',
+              quantity: req.quantity || null,
+              subtotal: null,
+              expected_cost: req.quoted_cost || req.estimated_cost || null,
+              actual_cost: req.final_cost || null,
+              contact_info: null,
+              booking_reference: null,
+              booking_status: req.status === 'confirmed' ? 'confirmed' : 'pending',
+              type_data: null,
+              sort_order: 0,
+              notes: req.notes || null,
+              workspace_id: workspaceId,
+              request_id: req.id,
+              resource_type: req.resource_type as ResourceType | null,
+              resource_id: req.resource_id || null,
+              latitude: req.latitude || null,
+              longitude: req.longitude || null,
+              google_maps_url: req.google_maps_url || null,
+            })
+          }
+
+          // 帶入航班
+          if (tour.outbound_flight) {
+            const outbound = tour.outbound_flight
+            await addItem({
+              sheet_id: sheet.id,
+              category: 'transport',
+              service_date: tour.departure_date || '',
+              service_date_end: null,
+              day_label: null,
+              supplier_name: outbound.airline || '',
+              supplier_id: null,
+              title: `去程 ${outbound.flightNumber} ${outbound.departureAirport}→${outbound.arrivalAirport}`,
+              description: `${outbound.departureTime} - ${outbound.arrivalTime}`,
+              unit_price: null,
+              currency: 'TWD',
+              quantity: null,
+              subtotal: null,
+              expected_cost: null,
+              actual_cost: null,
+              contact_info: null,
+              booking_reference: null,
+              booking_status: 'confirmed',
+              type_data: null,
+              sort_order: 0,
+              notes: outbound.duration || null,
+              workspace_id: workspaceId,
+            })
+          }
+
+          if (tour.return_flight) {
+            const returnFlight = tour.return_flight
+            await addItem({
+              sheet_id: sheet.id,
+              category: 'transport',
+              service_date: tour.return_date || '',
+              service_date_end: null,
+              day_label: null,
+              supplier_name: returnFlight.airline || '',
+              supplier_id: null,
+              title: `回程 ${returnFlight.flightNumber} ${returnFlight.departureAirport}→${returnFlight.arrivalAirport}`,
+              description: `${returnFlight.departureTime} - ${returnFlight.arrivalTime}`,
+              unit_price: null,
+              currency: 'TWD',
+              quantity: null,
+              subtotal: null,
+              expected_cost: null,
+              actual_cost: null,
+              contact_info: null,
+              booking_reference: null,
+              booking_status: 'confirmed',
+              type_data: null,
+              sort_order: 1,
+              notes: returnFlight.duration || null,
+              workspace_id: workspaceId,
+            })
+          }
+
+          reload()
+        } catch (err) {
+          logger.error('自動帶入失敗:', err)
+        }
+      }
+    }
+    autoImportToExistingSheet()
+  }, [sheet, groupedItems, tourRequests, tour, workspaceId, requestsLoading, hasAutoImported, addItem, reload])
 
   // 開啟 inline 新增模式
   const handleAdd = (category: ConfirmationItemCategory) => {
@@ -833,6 +1082,57 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
           <p>出發日期：{tour.departure_date} ~ {tour.return_date}</p>
         </div>
       </div>
+
+      {/* 每日行程表 */}
+      {itinerary?.daily_itinerary && itinerary.daily_itinerary.length > 0 && (
+        <div className="border border-border rounded-lg overflow-hidden">
+          <div className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white">
+            <span className="font-medium">每日行程</span>
+            <span className="text-blue-100 text-sm">({itinerary.daily_itinerary.length} 天)</span>
+          </div>
+          <div className="divide-y divide-border">
+            {itinerary.daily_itinerary.map((day, idx) => (
+              <div key={idx} className="px-4 py-3 bg-card hover:bg-morandi-container/10">
+                <div className="flex items-start gap-4">
+                  {/* 日期 */}
+                  <div className="flex-shrink-0 w-20">
+                    <div className="text-sm font-medium text-morandi-primary">{day.dayLabel}</div>
+                    <div className="text-xs text-morandi-secondary">{day.date}</div>
+                  </div>
+                  {/* 行程內容 */}
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-morandi-primary">{day.title}</div>
+                    {day.activities && day.activities.length > 0 && (
+                      <div className="text-sm text-morandi-secondary mt-1">
+                        {day.activities.map(a => a.title).filter(Boolean).join(' → ')}
+                      </div>
+                    )}
+                  </div>
+                  {/* 住宿 */}
+                  <div className="flex-shrink-0 text-right">
+                    {day.accommodation && day.accommodation !== '溫暖的家' && (
+                      <div className="text-sm">
+                        <span className="text-morandi-secondary">住宿：</span>
+                        <span className="text-morandi-primary">{day.accommodation}</span>
+                      </div>
+                    )}
+                    {/* 餐食 */}
+                    {day.meals && (
+                      <div className="text-xs text-morandi-secondary mt-1">
+                        {[
+                          day.meals.breakfast && day.meals.breakfast !== '敬請自理' ? `早：${day.meals.breakfast}` : null,
+                          day.meals.lunch && day.meals.lunch !== '敬請自理' ? `午：${day.meals.lunch}` : null,
+                          day.meals.dinner && day.meals.dinner !== '敬請自理' ? `晚：${day.meals.dinner}` : null,
+                        ].filter(Boolean).join(' | ')}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 統一表格 */}
       <div className="border border-border rounded-lg overflow-hidden print:border-black print:rounded-none">

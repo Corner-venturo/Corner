@@ -38,8 +38,8 @@ const OrderMembersExpandable = dynamic(
   { loading: () => <TabLoading /> }
 )
 
-const TourConfirmationSheet = dynamic(
-  () => import('@/components/tours/tour-confirmation-sheet').then(m => m.TourConfirmationSheet),
+const TourConfirmationSheetPage = dynamic(
+  () => import('@/features/tour-confirmation/components/TourConfirmationSheetPage').then(m => m.TourConfirmationSheetPage),
   { loading: () => <TabLoading /> }
 )
 
@@ -53,8 +53,8 @@ const TourRequirementsTab = dynamic(
   { loading: () => <TabLoading /> }
 )
 
-const TourFilesManager = dynamic(
-  () => import('@/components/tours/TourFilesManager').then(m => m.TourFilesManager),
+const TourFilesTree = dynamic(
+  () => import('@/components/tours/TourFilesTree').then(m => m.TourFilesTree),
   { loading: () => <TabLoading /> }
 )
 
@@ -142,7 +142,7 @@ export function TourTabContent({
     case 'orders':
       return <TourOrders tour={tour} />
     case 'confirmation':
-      return <TourConfirmationSheet tourId={tour.id} />
+      return <TourConfirmationSheetPage tour={tour} />
     case 'checkin':
       return <TourCheckin tour={tour} />
     case 'requirements':
@@ -155,7 +155,7 @@ export function TourTabContent({
         />
       )
     case 'files':
-      return <TourFilesManager tourId={tour.id} tourCode={tour.code || ''} quoteId={tour.quote_id} itineraryId={tour.itinerary_id} />
+      return <TourFilesTree tourId={tour.id} tourCode={tour.code || ''} quoteId={tour.quote_id} itineraryId={tour.itinerary_id} />
     case 'designs':
       return <TourDesignsTab tourId={tour.id} proposalId={undefined} />
     case 'overview':
