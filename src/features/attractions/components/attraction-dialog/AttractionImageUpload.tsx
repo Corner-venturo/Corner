@@ -7,6 +7,7 @@ import { ImagePosition } from '../../hooks/useAttractionForm'
 import { useAuthStore } from '@/stores/auth-store'
 import { isFeatureAvailable } from '@/lib/feature-restrictions'
 import { ImageEditor, type ImageEditorSettings } from '@/components/ui/image-editor'
+import { logger } from '@/lib/utils/logger'
 
 interface ImagePositionAdjusterProps {
   url: string
@@ -69,7 +70,7 @@ function ImagePositionAdjuster({
       // 同時更新位置
       handleSave(settings)
     } catch (error) {
-      console.error('上傳裁切圖片失敗:', error)
+      logger.error('上傳裁切圖片失敗:', error)
     }
   }
 

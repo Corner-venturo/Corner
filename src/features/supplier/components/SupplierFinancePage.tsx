@@ -7,6 +7,7 @@
 'use client'
 
 import React, { useState, useEffect, useMemo } from 'react'
+import { logger } from '@/lib/utils/logger'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -146,7 +147,7 @@ export function SupplierFinancePage() {
 
         setPayments(paymentRecords)
       } catch (error) {
-        console.error('載入財務資料失敗:', error)
+        logger.error('載入財務資料失敗:', error)
       } finally {
         setIsLoading(false)
       }

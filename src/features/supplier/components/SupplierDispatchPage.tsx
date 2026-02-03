@@ -7,6 +7,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { logger } from '@/lib/utils/logger'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
@@ -155,7 +156,7 @@ export function SupplierDispatchPage() {
         }))
         setDrivers(formattedDrivers)
       } catch (error) {
-        console.error('載入資料失敗:', error)
+        logger.error('載入資料失敗:', error)
       } finally {
         setIsLoading(false)
       }
@@ -216,7 +217,7 @@ export function SupplierDispatchPage() {
       setSelectedRequest(null)
       setSelectedDriverId('')
     } catch (error) {
-      console.error('派單失敗:', error)
+      logger.error('派單失敗:', error)
       alert('派單失敗，請稍後再試')
     } finally {
       setIsAssigning(false)
