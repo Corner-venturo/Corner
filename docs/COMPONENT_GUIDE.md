@@ -152,15 +152,16 @@ export default function MyPage() {
 ### ❌ 禁止的做法
 
 ```tsx
-// ❌ 不要在內容區外層加額外的 padding 和 border
+// ⚠️ 重要：MainLayout 已經有 p-4 lg:p-6
+// 頁面裡「絕對不要」再加 padding！
+
+// ❌ 錯誤：會造成雙重 padding，內容比其他頁面更內縮
 <div className="flex-1 overflow-hidden p-4">
-  <div className="h-full border rounded-lg bg-background">
-    <Content />
-  </div>
+  <Content />
 </div>
 
-// ✅ 正確做法
-<div className="flex-1 overflow-auto">
+// ✅ 正確：不加 padding，讓 MainLayout 統一處理
+<div className="flex-1 overflow-hidden">
   <Content />
 </div>
 
