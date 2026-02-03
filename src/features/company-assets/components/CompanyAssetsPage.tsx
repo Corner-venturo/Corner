@@ -196,12 +196,14 @@ export const CompanyAssetsPage: React.FC = () => {
         addLabel="上傳檔案"
       />
 
-      <div className="flex-1 overflow-auto">
-        <CompanyAssetsTree
-          key={refreshKey}
-          onSelectFile={handleSelectFile}
-          onAddFile={handleAddFile}
-        />
+      <div className="flex-1 overflow-auto p-4">
+        <div className="h-full border border-border rounded-xl overflow-hidden bg-card shadow-sm flex flex-col">
+          <CompanyAssetsTree
+            key={refreshKey}
+            onSelectFile={handleSelectFile}
+            onAddFile={handleAddFile}
+          />
+        </div>
       </div>
 
       <CompanyAssetsDialog

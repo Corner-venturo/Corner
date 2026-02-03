@@ -314,7 +314,7 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
   return (
     <div className="flex flex-col h-full">
       {/* 工具列 */}
-      <div className="flex items-center gap-2 px-4 py-3 bg-morandi-bg border-b border-morandi-border">
+      <div className="flex items-center gap-2 px-4 py-3 bg-morandi-container/40 border-b border-border/60">
         <Button
           variant="outline"
           size="sm"
