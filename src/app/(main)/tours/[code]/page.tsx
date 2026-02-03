@@ -124,7 +124,7 @@ export default function TourDetailPage() {
           { label: '旅遊團管理', href: '/tours' },
           { label: `${tour.code} ${tour.name}`, href: `/tours/${code}` },
         ]}
-        tabs={TOUR_TABS}
+        tabs={[...TOUR_TABS]}
         activeTab={activeTab}
         onTabChange={setActiveTab}
         actions={
