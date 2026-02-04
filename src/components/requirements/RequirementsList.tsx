@@ -139,6 +139,7 @@ export function RequirementsList({
   const [linkedQuoteId, setLinkedQuoteId] = useState<string | null>(propQuoteId || null)
   const [existingRequests, setExistingRequests] = useState<TourRequest[]>([])
   const [quoteCategories, setQuoteCategories] = useState<CostCategory[]>([])
+  const [quoteGroupSize, setQuoteGroupSize] = useState<number | null>(null)
   const [startDate, setStartDate] = useState<string | null>(null)
   const [outboundFlight, setOutboundFlight] = useState<FlightInfo | null>(null)
   const [returnFlight, setReturnFlight] = useState<FlightInfo | null>(null)
@@ -226,13 +227,14 @@ export function RequirementsList({
       if (quoteId) {
         const { data: quote } = await supabase
           .from('quotes')
-          .select('categories, start_date')
+          .select('categories, start_date, group_size')
           .eq('id', quoteId)
           .single()
 
         if (quote) {
           setQuoteCategories((quote.categories as unknown as CostCategory[]) || [])
           setStartDate(quote.start_date || (tour?.departure_date) || null)
+          setQuoteGroupSize(quote.group_size || null)
         }
       } else {
         setQuoteCategories([])
@@ -517,6 +519,19 @@ export function RequirementsList({
     if (!user || !tour) return
 
     const workspaceId = tour.workspace_id || user.workspace_id || ''
+
+    // 先查詢已存在的項目（保留的已付清項目），避免重複插入
+    const { data: existingItems } = await supabase
+      .from('tour_confirmation_items')
+      .select('category, supplier_name, title, service_date')
+      .eq('sheet_id', sheetId)
+
+    const existingKeys = new Set(
+      (existingItems || []).map(item =>
+        `${item.category}-${item.supplier_name}-${item.title}-${item.service_date || ''}`
+      )
+    )
+
     const allItems: Array<{
       sheet_id: string
       category: string
@@ -524,8 +539,9 @@ export function RequirementsList({
       supplier_name: string
       title: string
       description?: string | null
-      expected_cost?: number | null
+      unit_price?: number | null
       quantity?: number | null
+      subtotal?: number | null
       booking_status: string
       sort_order: number
       workspace_id: string
@@ -537,54 +553,85 @@ export function RequirementsList({
       notes?: string | null
     }> = []
 
-    // 1. 航班資訊（放在最前面）
+    // 1. 航班資訊（放在最前面，跳過已存在的）
     if (outboundFlight) {
-      allItems.push({
-        sheet_id: sheetId,
-        category: 'transport',
-        service_date: tour.departure_date || '',
-        supplier_name: outboundFlight.airline || '',
-        title: `去程 ${outboundFlight.flightNumber || ''} ${outboundFlight.departureAirport || ''}→${outboundFlight.arrivalAirport || ''}`,
-        description: outboundFlight.departureTime && outboundFlight.arrivalTime
-          ? `${outboundFlight.departureAirport} ${outboundFlight.departureTime} → ${outboundFlight.arrivalAirport} ${outboundFlight.arrivalTime}`
-          : null,
-        booking_status: 'confirmed',
-        sort_order: 0,
-        workspace_id: workspaceId,
-        notes: outboundFlight.duration || null,
-      })
+      const outboundTitle = `去程 ${outboundFlight.flightNumber || ''} ${outboundFlight.departureAirport || ''}→${outboundFlight.arrivalAirport || ''}`
+      const outboundKey = `transport-${outboundFlight.airline || ''}-${outboundTitle}-${tour.departure_date || ''}`
+      if (!existingKeys.has(outboundKey)) {
+        allItems.push({
+          sheet_id: sheetId,
+          category: 'transport',
+          service_date: tour.departure_date || '',
+          supplier_name: outboundFlight.airline || '',
+          title: outboundTitle,
+          description: outboundFlight.departureTime && outboundFlight.arrivalTime
+            ? `${outboundFlight.departureAirport} ${outboundFlight.departureTime} → ${outboundFlight.arrivalAirport} ${outboundFlight.arrivalTime}`
+            : null,
+          booking_status: 'confirmed',
+          sort_order: 0,
+          workspace_id: workspaceId,
+          notes: outboundFlight.duration || null,
+        })
+      }
     }
 
     if (returnFlight) {
-      allItems.push({
-        sheet_id: sheetId,
-        category: 'transport',
-        service_date: tour.return_date || '',
-        supplier_name: returnFlight.airline || '',
-        title: `回程 ${returnFlight.flightNumber || ''} ${returnFlight.departureAirport || ''}→${returnFlight.arrivalAirport || ''}`,
-        description: returnFlight.departureTime && returnFlight.arrivalTime
-          ? `${returnFlight.departureAirport} ${returnFlight.departureTime} → ${returnFlight.arrivalAirport} ${returnFlight.arrivalTime}`
-          : null,
-        booking_status: 'confirmed',
-        sort_order: 1,
-        workspace_id: workspaceId,
-        notes: returnFlight.duration || null,
-      })
+      const returnTitle = `回程 ${returnFlight.flightNumber || ''} ${returnFlight.departureAirport || ''}→${returnFlight.arrivalAirport || ''}`
+      const returnKey = `transport-${returnFlight.airline || ''}-${returnTitle}-${tour.return_date || ''}`
+      if (!existingKeys.has(returnKey)) {
+        allItems.push({
+          sheet_id: sheetId,
+          category: 'transport',
+          service_date: tour.return_date || '',
+          supplier_name: returnFlight.airline || '',
+          title: returnTitle,
+          description: returnFlight.departureTime && returnFlight.arrivalTime
+            ? `${returnFlight.departureAirport} ${returnFlight.departureTime} → ${returnFlight.arrivalAirport} ${returnFlight.arrivalTime}`
+            : null,
+          booking_status: 'confirmed',
+          sort_order: 1,
+          workspace_id: workspaceId,
+          notes: returnFlight.duration || null,
+        })
+      }
     }
 
-    // 2. 從報價單項目產生（排除自理）
+    // 2. 從報價單項目產生（排除自理和已隱藏項目）
     const quoteItemsFiltered = quoteItems
-      .filter(item => !item.title.includes('自理') && !item.supplierName.includes('自理'))
+      .filter(item => {
+        // 排除自理
+        if (item.title.includes('自理') || item.supplierName.includes('自理')) return false
+        // 排除已隱藏的項目（檢查 existingRequests）
+        const existingRequest = existingRequests.find(r =>
+          r.category === item.category &&
+          r.supplier_name === item.supplierName &&
+          r.title === item.title
+        )
+        if (existingRequest?.hidden) return false
+        return true
+      })
 
     quoteItemsFiltered.forEach((item, index) => {
+      // 檢查是否已存在（跳過已付清保留的項目）
+      const serviceDate = item.serviceDate || tour.departure_date || ''
+      const itemKey = `${item.category}-${item.supplierName || ''}-${item.title}-${serviceDate}`
+      if (existingKeys.has(itemKey)) return // 跳過已存在的項目
+
+      // 餐食和活動預設用團體人數，其他用原始數量
+      const useGroupSize = (item.category === 'meal' || item.category === 'activity') && quoteGroupSize
+      const qty = useGroupSize ? quoteGroupSize : (item.quantity || 1)
+      const unitPrice = item.quotedPrice || null
+      const subtotal = unitPrice && qty ? unitPrice * qty : null
+
       allItems.push({
         sheet_id: sheetId,
         category: item.category,
-        service_date: item.serviceDate || tour.departure_date || '',
+        service_date: serviceDate,
         supplier_name: item.supplierName || '',
         title: item.title,
-        expected_cost: item.quotedPrice || null,
-        quantity: item.quantity || 1,
+        unit_price: unitPrice,
+        quantity: qty,
+        subtotal: subtotal,
         booking_status: 'pending',
         sort_order: index + 10, // 航班後面
         workspace_id: workspaceId,
@@ -604,7 +651,7 @@ export function RequirementsList({
 
       if (error) throw error
     }
-  }, [user, tour, quoteItems, outboundFlight, returnFlight])
+  }, [user, tour, quoteItems, quoteGroupSize, existingRequests, outboundFlight, returnFlight])
 
   // 產生團確單
   const handleGenerateConfirmationSheet = useCallback(async () => {
@@ -629,15 +676,16 @@ export function RequirementsList({
         .maybeSingle()
 
       if (existingSheet) {
-        // 已有團確單，刪除舊的項目重新產生
+        // 已有團確單，只刪除尚未填實際支出的項目（保留已付清的）
         await supabase
           .from('tour_confirmation_items')
           .delete()
           .eq('sheet_id', existingSheet.id)
+          .is('actual_cost', null)
 
-        // 插入新項目
+        // 插入新項目（insertConfirmationItems 會跳過已存在的項目）
         await insertConfirmationItems(existingSheet.id)
-        toast({ title: '團確單已更新' })
+        toast({ title: '團確單已更新（已保留已付清項目）' })
       } else {
         // 建立新的團確單
         const { data: newSheet, error: sheetError } = await supabase

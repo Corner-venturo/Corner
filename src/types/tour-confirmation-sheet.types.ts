@@ -44,6 +44,10 @@ export interface TourConfirmationSheet extends BaseEntity {
   // 備註
   notes: string | null
 
+  // 外幣設定（用於預計支出換算）
+  foreign_currency: string | null // JP, TH, US...
+  exchange_rate: number | null // 例如：0.22（1日圓 = 0.22台幣）
+
   workspace_id: string
 }
 

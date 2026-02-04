@@ -36,10 +36,13 @@ export const CalcInput: React.FC<CalcInputProps> = ({
   const [isFocused, setIsFocused] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // 當外部 value 改變且不在編輯中時，更新顯示
+  // 格式化數字（加千分位）
+  const formatNumber = (num: number) => num.toLocaleString('en-US')
+
+  // 當外部 value 改變且不在編輯中時，更新顯示（帶千分位格式）
   useEffect(() => {
     if (!isFocused) {
-      setDisplayValue(value != null ? String(value) : '')
+      setDisplayValue(value != null ? formatNumber(value) : '')
       setIsExpression(false)
     }
   }, [value, isFocused])
@@ -66,16 +69,18 @@ export const CalcInput: React.FC<CalcInputProps> = ({
         onChange(finalValue)
         // 儲存公式（Excel 式行為）
         onFormulaChange?.(trimmed)
-        setDisplayValue(String(finalValue))
+        setDisplayValue(formatNumber(finalValue))
       }
     } else {
-      const num = parseFloat(trimmed)
+      // 移除千分位後解析
+      const cleanedValue = trimmed.replace(/,/g, '')
+      const num = parseFloat(cleanedValue)
       if (!isNaN(num)) {
         const finalValue = Math.round(num)
         onChange(finalValue)
         // 純數字不需要儲存公式
         onFormulaChange?.(undefined)
-        setDisplayValue(String(finalValue))
+        setDisplayValue(formatNumber(finalValue))
       }
     }
 
@@ -90,9 +95,10 @@ export const CalcInput: React.FC<CalcInputProps> = ({
     const hasOperator = /[+\-*/]/.test(newValue.slice(1))
     setIsExpression(hasOperator)
 
-    // 純數字即時更新
+    // 純數字即時更新（移除千分位後解析）
     if (!hasOperator) {
-      const num = parseFloat(newValue)
+      const cleanedValue = newValue.replace(/,/g, '')
+      const num = parseFloat(cleanedValue)
       if (!isNaN(num)) {
         onChange(Math.round(num))
       }
@@ -110,13 +116,16 @@ export const CalcInput: React.FC<CalcInputProps> = ({
     onKeyDown?.(e)
   }
 
-  // 處理聚焦 - Excel 式行為：顯示公式
+  // 處理聚焦 - Excel 式行為：顯示公式或原始數字
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     setIsFocused(true)
     // 如果有儲存的公式，顯示公式而非計算結果
     if (formula) {
       setDisplayValue(formula)
       setIsExpression(true)
+    } else if (value != null) {
+      // 沒有公式時，顯示原始數字（不帶千分位，方便編輯）
+      setDisplayValue(String(value))
     }
     onFocus?.(e)
   }

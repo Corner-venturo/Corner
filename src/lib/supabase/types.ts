@@ -14770,6 +14770,8 @@ export type Database = {
           created_by_name: string | null
           currency: string | null
           description: string | null
+          driver_name: string | null
+          driver_phone: string | null
           estimated_cost: number | null
           final_cost: number | null
           google_maps_url: string | null
@@ -14782,6 +14784,7 @@ export type Database = {
           member_ids: string[] | null
           notes: string | null
           order_id: string | null
+          plate_number: string | null
           priority: string | null
           proposal_package_id: string | null
           quantity: number | null
@@ -14835,6 +14838,8 @@ export type Database = {
           created_by_name?: string | null
           currency?: string | null
           description?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
           estimated_cost?: number | null
           final_cost?: number | null
           google_maps_url?: string | null
@@ -14847,6 +14852,7 @@ export type Database = {
           member_ids?: string[] | null
           notes?: string | null
           order_id?: string | null
+          plate_number?: string | null
           priority?: string | null
           proposal_package_id?: string | null
           quantity?: number | null
@@ -14900,6 +14906,8 @@ export type Database = {
           created_by_name?: string | null
           currency?: string | null
           description?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
           estimated_cost?: number | null
           final_cost?: number | null
           google_maps_url?: string | null
@@ -14912,6 +14920,7 @@ export type Database = {
           member_ids?: string[] | null
           notes?: string | null
           order_id?: string | null
+          plate_number?: string | null
           priority?: string | null
           proposal_package_id?: string | null
           quantity?: number | null

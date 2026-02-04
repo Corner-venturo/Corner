@@ -41,12 +41,6 @@ export const useQuoteState = () => {
   const isSpecialTour = relatedTour?.status === '特殊團' // 使用中文狀態值
   const isReadOnly = isSpecialTour // 特殊團報價單設為唯讀
 
-  // 計算旅遊團的實際預計人數（從訂單的 member_count 加總）
-  const tourPlannedParticipants = useMemo(() => {
-    if (!relatedTour) return 0
-    const tourOrders = orders.filter(order => order.tour_id === relatedTour.id)
-    return tourOrders.reduce((sum, order) => sum + (order.member_count || 0), 0)
-  }, [relatedTour, orders])
 
   // SWR 自動載入行程表
 
@@ -326,24 +320,20 @@ export const useQuoteState = () => {
     hasAddedFlightInfo.current = true
   }, [linkedItinerary, categories, formatFlightInfo])
 
-  // 總人數：優先使用旅遊團訂單的預計人數，其次用 max_participants，最後從參與人數加總
+  // 總人數：直接用報價單設定的人數
   const groupSize =
-    tourPlannedParticipants ||
-    relatedTour?.max_participants ||
     participantCounts.adult +
-      participantCounts.child_with_bed +
-      participantCounts.child_no_bed +
-      participantCounts.single_room +
-      participantCounts.infant
+    participantCounts.child_with_bed +
+    participantCounts.child_no_bed +
+    participantCounts.single_room +
+    participantCounts.infant || 1
 
-  // 導遊費用分攤人數（不含嬰兒）：優先使用旅遊團訂單的預計人數，其次用 max_participants，最後從參與人數加總
+  // 團體分攤人數（不含嬰兒）：直接用報價單設定的人數
   const groupSizeForGuide =
-    tourPlannedParticipants ||
-    relatedTour?.max_participants ||
     participantCounts.adult +
-      participantCounts.child_with_bed +
-      participantCounts.child_no_bed +
-      participantCounts.single_room
+    participantCounts.child_with_bed +
+    participantCounts.child_no_bed +
+    participantCounts.single_room || 1
 
   const [quoteName, setQuoteName] = useState<string>(quote?.name || '')
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false)

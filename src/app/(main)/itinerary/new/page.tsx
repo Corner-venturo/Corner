@@ -264,20 +264,19 @@ function NewItineraryPageContent() {
 
       <div className="flex-1 overflow-hidden">
         <div className="h-full flex">
-          <div className={isHandedOff ? 'pointer-events-none opacity-60' : ''}>
-            <ItineraryEditor
-              tourData={tourData}
-              autoSaveStatus={autoSaveStatus}
-              isDirty={isDirty}
-              quoteTierPricings={quoteTierPricings}
-              onChange={(newData) => {
-                if (isHandedOff) return // 已交接，禁止編輯
-                logger.log('[Page] ItineraryEditor onChange 收到:', { coverImage: newData.coverImage })
-                setTourData(newData)
-                setIsDirty(true)
-              }}
-            />
-          </div>
+          <ItineraryEditor
+            tourData={tourData}
+            autoSaveStatus={autoSaveStatus}
+            isDirty={isDirty}
+            quoteTierPricings={quoteTierPricings}
+            className={isHandedOff ? 'pointer-events-none opacity-60' : ''}
+            onChange={(newData) => {
+              if (isHandedOff) return // 已交接，禁止編輯
+              logger.log('[Page] ItineraryEditor onChange 收到:', { coverImage: newData.coverImage })
+              setTourData(newData)
+              setIsDirty(true)
+            }}
+          />
 
           <ItineraryPreview tourData={tourData} />
         </div>

@@ -95,6 +95,10 @@ export function AddManualRequestDialog({
     latitude: null as number | null,
     longitude: null as number | null,
     googleMapsUrl: '',
+    // 交通專用欄位
+    driverName: '',
+    plateNumber: '',
+    driverPhone: '',
   })
 
   // 資源選擇器狀態
@@ -132,6 +136,9 @@ export function AddManualRequestDialog({
       latitude: null,
       longitude: null,
       googleMapsUrl: '',
+      driverName: '',
+      plateNumber: '',
+      driverPhone: '',
     })
     setShowRestaurantSelector(false)
     setShowHotelSelector(false)
@@ -248,6 +255,10 @@ export function AddManualRequestDialog({
         latitude: formData.latitude,
         longitude: formData.longitude,
         google_maps_url: formData.googleMapsUrl || null,
+        // 交通專用欄位
+        driver_name: formData.category === 'transport' ? (formData.driverName || null) : null,
+        plate_number: formData.category === 'transport' ? (formData.plateNumber || null) : null,
+        driver_phone: formData.category === 'transport' ? (formData.driverPhone || null) : null,
         // 狀態
         status: 'draft',
         handler_type: formData.recipientWorkspaceId ? 'external' : 'internal',
@@ -354,6 +365,42 @@ export function AddManualRequestDialog({
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+            )}
+
+            {/* 交通專用欄位：司機、車號、手機 */}
+            {formData.category === 'transport' && (
+              <div className="space-y-3 p-3 bg-morandi-container/20 rounded-lg">
+                <p className="text-xs text-morandi-secondary font-medium">車輛資訊（供應商回覆後填寫）</p>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-xs">司機</Label>
+                    <Input
+                      value={formData.driverName}
+                      onChange={(e) => setFormData(prev => ({ ...prev, driverName: e.target.value }))}
+                      placeholder="司機姓名"
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">車號</Label>
+                    <Input
+                      value={formData.plateNumber}
+                      onChange={(e) => setFormData(prev => ({ ...prev, plateNumber: e.target.value }))}
+                      placeholder="車牌號碼"
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">手機</Label>
+                    <Input
+                      value={formData.driverPhone}
+                      onChange={(e) => setFormData(prev => ({ ...prev, driverPhone: e.target.value }))}
+                      placeholder="司機電話"
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                </div>
               </div>
             )}
 

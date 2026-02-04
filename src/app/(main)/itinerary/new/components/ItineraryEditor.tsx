@@ -11,12 +11,13 @@ interface ItineraryEditorProps {
   autoSaveStatus: AutoSaveStatus
   isDirty: boolean
   quoteTierPricings?: TierPricing[]
+  className?: string
   onChange: (newData: LocalTourData) => void
 }
 
-export function ItineraryEditor({ tourData, autoSaveStatus, isDirty, quoteTierPricings, onChange }: ItineraryEditorProps) {
+export function ItineraryEditor({ tourData, autoSaveStatus, isDirty, quoteTierPricings, className, onChange }: ItineraryEditorProps) {
   return (
-    <div className="w-1/2 bg-card border-r border-border flex flex-col">
+    <div className={`w-1/2 bg-card border-r border-border flex flex-col ${className || ''}`}>
       <div className="h-14 bg-morandi-gold/90 text-white px-6 flex items-center justify-between border-b border-border">
         <h2 className="text-lg font-semibold">編輯表單</h2>
         {/* 自動存檔狀態指示 */}
