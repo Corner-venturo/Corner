@@ -14,7 +14,7 @@ export const visaEntity = createEntityHook<Visa>('visas', {
     orderBy: { column: 'created_at', ascending: false },
   },
   slim: {
-    select: 'id,member_id,visa_type,status,submission_date,issue_date',
+    select: 'id,order_id,visa_type,status,submission_date,expected_issue_date',
   },
   detail: { select: '*' },
   cache: CACHE_PRESETS.medium,

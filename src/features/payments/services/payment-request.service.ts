@@ -160,6 +160,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       subtotal: itemData.unit_price * itemData.quantity,
       notes: itemData.notes,
       sort_order: itemData.sort_order,
+      tour_request_id: itemData.tour_request_id || null, // 關聯需求單
       workspace_id: workspaceId, // RLS 需要
       created_at: now,
       updated_at: now,

@@ -14,7 +14,7 @@ export const disbursementOrderEntity = createEntityHook<DisbursementOrder>('disb
     orderBy: { column: 'created_at', ascending: false },
   },
   slim: {
-    select: 'id,code,tour_id,status,total_amount,disbursement_date,created_at',
+    select: 'id,code,status,amount,disbursement_date,created_at',
   },
   detail: { select: '*' },
   cache: CACHE_PRESETS.high,

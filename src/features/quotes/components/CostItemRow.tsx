@@ -51,6 +51,8 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
         <CalcInput
           value={item.quantity}
           onChange={val => handleUpdateItem(categoryId, item.id, 'quantity', val)}
+          formula={item.quantity_formula}
+          onFormulaChange={f => handleUpdateItem(categoryId, item.id, 'quantity_formula', f)}
           className={`${inputClass} text-center`}
         />
       </td>
@@ -59,6 +61,8 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
           <CalcInput
             value={item.adult_price}
             onChange={val => handleUpdateItem(categoryId, item.id, 'adult_price', val)}
+            formula={item.adult_price_formula}
+            onFormulaChange={f => handleUpdateItem(categoryId, item.id, 'adult_price_formula', f)}
             className={`${inputClass} text-center`}
             placeholder="成人票價"
           />
@@ -66,6 +70,8 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
           <CalcInput
             value={item.child_price}
             onChange={val => handleUpdateItem(categoryId, item.id, 'child_price', val)}
+            formula={item.child_price_formula}
+            onFormulaChange={f => handleUpdateItem(categoryId, item.id, 'child_price_formula', f)}
             className={`${inputClass} text-center`}
             placeholder="兒童票價"
           />
@@ -73,6 +79,8 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
           <CalcInput
             value={item.infant_price}
             onChange={val => handleUpdateItem(categoryId, item.id, 'infant_price', val)}
+            formula={item.infant_price_formula}
+            onFormulaChange={f => handleUpdateItem(categoryId, item.id, 'infant_price_formula', f)}
             className={`${inputClass} text-center`}
             placeholder="嬰兒票價"
           />
@@ -80,6 +88,8 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
           <CalcInput
             value={item.unit_price}
             onChange={val => handleUpdateItem(categoryId, item.id, 'unit_price', val)}
+            formula={item.unit_price_formula}
+            onFormulaChange={f => handleUpdateItem(categoryId, item.id, 'unit_price_formula', f)}
             className={`${inputClass} text-center`}
           />
         )}

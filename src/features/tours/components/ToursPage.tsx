@@ -28,7 +28,7 @@ import { LinkDocumentsToTourDialog } from './LinkDocumentsToTourDialog'
 import { TourItineraryDialog } from './TourItineraryDialog'
 import { ContractDialog } from '@/components/contracts/ContractDialog'
 import { TourClosingDialog } from './TourClosingDialog'
-import { TourControlDialogWrapper } from './TourControlDialogWrapper'
+// TourControlDialogWrapper 已移除，功能整合到團確單
 import { TourRequirementsDialog } from './TourRequirementsDialog'
 import { TourEditDialog } from '@/components/tours/tour-edit-dialog'
 import { ProposalsTableContent } from '@/features/proposals/components/ProposalsTableContent'
@@ -56,7 +56,6 @@ export const ToursPage: React.FC = () => {
   const router = useRouter()
   const { user } = useAuthStore()
 
-  const [tourControlDialogTour, setTourControlDialogTour] = useState<Tour | null>(null)
   const [requirementsDialogTour, setRequirementsDialogTour] = useState<Tour | null>(null)
 
   // Edit dialog state (using TourEditDialog instead of TourForm for edit mode)
@@ -262,9 +261,6 @@ export const ToursPage: React.FC = () => {
     onOpenContractDialog: openContractDialog,
     onCloseTour: openClosingDialog,
     onOpenArchiveDialog: openArchiveDialog,
-    onOpenTourControlDialog: (tour: Tour) => {
-      setTourControlDialogTour(tour)
-    },
     onOpenRequirementsDialog: (tour: Tour) => {
       setRequirementsDialogTour(tour)
     },
@@ -467,14 +463,6 @@ export const ToursPage: React.FC = () => {
           open={!!closingDialogTour}
           onOpenChange={(open) => !open && closeClosingDialog()}
           onSuccess={closeClosingDialog}
-        />
-      )}
-
-      {/* 團控表對話框 */}
-      {tourControlDialogTour && (
-        <TourControlDialogWrapper
-          tour={tourControlDialogTour}
-          onClose={() => setTourControlDialogTour(null)}
         />
       )}
 

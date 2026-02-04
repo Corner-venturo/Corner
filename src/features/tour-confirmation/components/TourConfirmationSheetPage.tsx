@@ -125,8 +125,99 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
   const [tourRequests, setTourRequests] = useState<TourRequestRow[]>([])
   const [requestsLoading, setRequestsLoading] = useState(false)
 
+  // 訂單和團員資料（用於聯絡人和人數配置）
+  interface OrderMember {
+    id: string
+    chinese_name: string | null
+    birth_date: string | null
+  }
+  interface TourOrder {
+    id: string
+    code: string
+    contact_person: string | null
+    contact_phone: string | null
+    contact_email: string | null
+    members: OrderMember[]
+  }
+  const [tourOrders, setTourOrders] = useState<TourOrder[]>([])
+  const [ordersLoading, setOrdersLoading] = useState(false)
+
+  // 房型配置資料（從 tour_rooms 表或報價單取得）
+  interface TourRoom {
+    id: string
+    night_number: number
+    hotel_name: string | null
+    room_type: string
+    room_number: string | null
+    amount: number | null
+    notes: string | null
+  }
+  const [tourRooms, setTourRooms] = useState<TourRoom[]>([])
+
+  // 報價單房型資料（從報價單住宿項目取得）
+  interface QuoteRoomItem {
+    day: number
+    room_type: string
+    quantity: number
+  }
+  const [quoteRoomItems, setQuoteRoomItems] = useState<QuoteRoomItem[]>([])
+
+  // 從需求單取得遊覽車資訊
+  const vehicleRequests = tourRequests.filter(
+    req => req.category === 'vehicle' || req.category === 'transport'
+  )
+
+  // 計算人數分組（6歲以下、65歲以上、其他）
+  const calculateAgeGroups = () => {
+    const allMembers = tourOrders.flatMap(o => o.members)
+    const today = new Date()
+    const departureDate = tour.departure_date ? new Date(tour.departure_date) : today
+
+    let under6 = 0
+    let over65 = 0
+    let others = 0
+
+    allMembers.forEach(member => {
+      if (!member.birth_date) {
+        others++
+        return
+      }
+      const birthDate = new Date(member.birth_date)
+      const age = Math.floor((departureDate.getTime() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000))
+      if (age < 6) {
+        under6++
+      } else if (age >= 65) {
+        over65++
+      } else {
+        others++
+      }
+    })
+
+    return { under6, over65, others, total: allMembers.length }
+  }
+
+  const ageGroups = calculateAgeGroups()
+
+  // 取得主要聯絡人（第一筆訂單）
+  const primaryContact = tourOrders.length > 0 ? tourOrders[0] : null
+
   // 交接狀態
   const [handingOver, setHandingOver] = useState(false)
+
+  // 每日說明展開狀態
+  const [expandedDays, setExpandedDays] = useState<Record<number, boolean>>({})
+  // 每日說明文字
+  const [dayNotes, setDayNotes] = useState<Record<number, string>>({})
+
+  // 切換說明展開
+  const toggleDayNote = (dayIdx: number) => {
+    setExpandedDays(prev => ({ ...prev, [dayIdx]: !prev[dayIdx] }))
+  }
+
+  // 更新說明文字
+  const updateDayNote = (dayIdx: number, note: string) => {
+    setDayNotes(prev => ({ ...prev, [dayIdx]: note }))
+  }
 
   // 載入行程表
   useEffect(() => {
@@ -170,6 +261,116 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     }
     loadTourRequests()
   }, [tour.id])
+
+  // 載入訂單和團員資料
+  useEffect(() => {
+    const loadOrdersAndMembers = async () => {
+      if (!tour.id) return
+      setOrdersLoading(true)
+      try {
+        // 載入訂單
+        const { data: orders } = await supabase
+          .from('orders')
+          .select('id, code, contact_person, contact_phone, contact_email')
+          .eq('tour_id', tour.id)
+          .order('created_at')
+
+        if (orders && orders.length > 0) {
+          // 載入每個訂單的成員
+          const ordersWithMembers: TourOrder[] = []
+          for (const order of orders) {
+            const { data: members } = await supabase
+              .from('order_members')
+              .select('id, chinese_name, birth_date')
+              .eq('order_id', order.id)
+
+            ordersWithMembers.push({
+              ...order,
+              members: members || [],
+            })
+          }
+          setTourOrders(ordersWithMembers)
+        }
+      } finally {
+        setOrdersLoading(false)
+      }
+    }
+    loadOrdersAndMembers()
+  }, [tour.id])
+
+  // 載入房型配置資料
+  useEffect(() => {
+    const loadTourRooms = async () => {
+      if (!tour.id) return
+      try {
+        const { data } = await supabase
+          .from('tour_rooms')
+          .select('id, night_number, hotel_name, room_type, room_number, amount, notes')
+          .eq('tour_id', tour.id)
+          .order('night_number')
+          .order('room_type')
+        if (data) {
+          setTourRooms(data)
+        }
+      } catch (err) {
+        logger.error('載入房型配置失敗:', err)
+      }
+    }
+    loadTourRooms()
+  }, [tour.id])
+
+  // 載入報價單房型資料
+  useEffect(() => {
+    const loadQuoteRoomItems = async () => {
+      if (!tour.quote_id) return
+      try {
+        const { data: quote } = await supabase
+          .from('quotes')
+          .select('versions')
+          .eq('id', tour.quote_id)
+          .maybeSingle()
+
+        if (!quote?.versions) return
+
+        // 取得最新版本的 categories
+        const versions = quote.versions as Array<{
+          categories?: Array<{
+            id: string
+            name: string
+            items?: Array<{
+              name?: string // 房型名稱存在 name 欄位（如：雙人房、三人房）
+              day?: number
+              quantity?: number | null
+            }>
+          }>
+        }>
+        if (!versions || versions.length === 0) return
+
+        const latestVersion = versions[versions.length - 1]
+        if (!latestVersion?.categories) return
+
+        // 找住宿類別（id 為 'accommodation' 或名稱包含住宿）
+        const accommodationCategory = latestVersion.categories.find(
+          cat => cat.id === 'accommodation' || cat.name === '住宿'
+        )
+        if (!accommodationCategory?.items) return
+
+        // 房型名稱存在 item.name 欄位，day 欄位表示第幾天
+        const roomItems: QuoteRoomItem[] = accommodationCategory.items
+          .filter(item => item.day && item.name)
+          .map(item => ({
+            day: item.day!,
+            room_type: item.name!, // 房型名稱在 name 欄位
+            quantity: item.quantity || 1,
+          }))
+
+        setQuoteRoomItems(roomItems)
+      } catch (err) {
+        logger.error('載入報價單房型資料失敗:', err)
+      }
+    }
+    loadQuoteRoomItems()
+  }, [tour.quote_id])
 
   // 當開始新增時，聚焦到第一個輸入框
   useEffect(() => {
@@ -253,7 +454,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
               supplier_name: outbound.airline || '',
               supplier_id: null,
               title: `去程 ${outbound.flightNumber} ${outbound.departureAirport}→${outbound.arrivalAirport}`,
-              description: `${outbound.departureTime} - ${outbound.arrivalTime}`,
+              description: `${outbound.departureAirport} ${outbound.departureTime} → ${outbound.arrivalAirport} ${outbound.arrivalTime}`,
               unit_price: null,
               currency: 'TWD',
               quantity: null,
@@ -281,7 +482,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
               supplier_name: returnFlight.airline || '',
               supplier_id: null,
               title: `回程 ${returnFlight.flightNumber} ${returnFlight.departureAirport}→${returnFlight.arrivalAirport}`,
-              description: `${returnFlight.departureTime} - ${returnFlight.arrivalTime}`,
+              description: `${returnFlight.departureAirport} ${returnFlight.departureTime} → ${returnFlight.arrivalAirport} ${returnFlight.arrivalTime}`,
               unit_price: null,
               currency: 'TWD',
               quantity: null,
@@ -386,7 +587,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
               supplier_name: outbound.airline || '',
               supplier_id: null,
               title: `去程 ${outbound.flightNumber} ${outbound.departureAirport}→${outbound.arrivalAirport}`,
-              description: `${outbound.departureTime} - ${outbound.arrivalTime}`,
+              description: `${outbound.departureAirport} ${outbound.departureTime} → ${outbound.arrivalAirport} ${outbound.arrivalTime}`,
               unit_price: null,
               currency: 'TWD',
               quantity: null,
@@ -414,7 +615,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
               supplier_name: returnFlight.airline || '',
               supplier_id: null,
               title: `回程 ${returnFlight.flightNumber} ${returnFlight.departureAirport}→${returnFlight.arrivalAirport}`,
-              description: `${returnFlight.departureTime} - ${returnFlight.arrivalTime}`,
+              description: `${returnFlight.departureAirport} ${returnFlight.departureTime} → ${returnFlight.arrivalAirport} ${returnFlight.arrivalTime}`,
               unit_price: null,
               currency: 'TWD',
               quantity: null,
@@ -484,7 +685,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
           supplier_name: outbound.airline || '',
           supplier_id: null,
           title: `去程 ${outbound.flightNumber} ${outbound.departureAirport}→${outbound.arrivalAirport}`,
-          description: `${outbound.departureTime} - ${outbound.arrivalTime}`,
+          description: `${outbound.departureAirport} ${outbound.departureTime} → ${outbound.arrivalAirport} ${outbound.arrivalTime}`,
           unit_price: null,
           currency: 'TWD',
           quantity: null,
@@ -513,7 +714,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
           supplier_name: returnFlight.airline || '',
           supplier_id: null,
           title: `回程 ${returnFlight.flightNumber} ${returnFlight.departureAirport}→${returnFlight.arrivalAirport}`,
-          description: `${returnFlight.departureTime} - ${returnFlight.arrivalTime}`,
+          description: `${returnFlight.departureAirport} ${returnFlight.departureTime} → ${returnFlight.arrivalAirport} ${returnFlight.arrivalTime}`,
           unit_price: null,
           currency: 'TWD',
           quantity: null,
@@ -1083,6 +1284,121 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
         </div>
       </div>
 
+      {/* 團基本資訊 */}
+      <div className="border border-border rounded-lg overflow-hidden">
+        <table className="w-full text-sm">
+          <tbody>
+            {/* 團名 / 團號 */}
+            <tr className="border-b border-border">
+              <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium w-[100px]">團名</td>
+              <td className="px-4 py-2 w-[40%]">{tour.name || '-'}</td>
+              <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium w-[100px]">團號</td>
+              <td className="px-4 py-2">{tour.code || '-'}</td>
+            </tr>
+            {/* 出團日期 / 隨團領隊 */}
+            <tr className="border-b border-border">
+              <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">出團日期</td>
+              <td className="px-4 py-2 w-[40%]">
+                {tour.departure_date && tour.return_date
+                  ? `${tour.departure_date} ~ ${tour.return_date}`
+                  : tour.departure_date || '-'}
+              </td>
+              <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium w-[100px]">隨團領隊</td>
+              <td className="px-4 py-2">{sheet?.tour_leader_name || '-'}</td>
+            </tr>
+            {/* 聯絡人+航班（去程） */}
+            {(() => {
+              const outbound = itinerary?.outbound_flight || tour.outbound_flight
+              const returnFlight = itinerary?.return_flight || tour.return_flight
+              const formatFlightDate = (dateStr: string | null | undefined) => {
+                if (!dateStr) return ''
+                const date = new Date(dateStr)
+                return `${date.getMonth() + 1}/${String(date.getDate()).padStart(2, '0')}`
+              }
+              const outboundFlight = outbound && typeof outbound === 'object' ? outbound as { airline?: string; flightNumber?: string; departureAirport?: string; arrivalAirport?: string; departureTime?: string; arrivalTime?: string } : null
+              const returnFlightData = returnFlight && typeof returnFlight === 'object' ? returnFlight as { airline?: string; flightNumber?: string; departureAirport?: string; arrivalAirport?: string; departureTime?: string; arrivalTime?: string } : null
+
+              return (
+                <>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">聯絡人</td>
+                    <td className="px-4 py-2">{primaryContact?.contact_person || '-'}</td>
+                    <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium w-[60px]">
+                      <span className="text-green-600">去程</span>
+                    </td>
+                    <td className="px-4 py-2">
+                      {outboundFlight?.flightNumber
+                        ? `${formatFlightDate(tour.departure_date)} ${outboundFlight.airline} ${outboundFlight.flightNumber} ${outboundFlight.departureAirport} ${outboundFlight.departureTime} → ${outboundFlight.arrivalAirport} ${outboundFlight.arrivalTime}`
+                        : '-'}
+                    </td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">聯絡電話</td>
+                    <td className="px-4 py-2">{primaryContact?.contact_phone || '-'}</td>
+                    <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">
+                      <span className="text-blue-600">回程</span>
+                    </td>
+                    <td className="px-4 py-2">
+                      {returnFlightData?.flightNumber
+                        ? `${formatFlightDate(tour.return_date)} ${returnFlightData.airline} ${returnFlightData.flightNumber} ${returnFlightData.departureAirport} ${returnFlightData.departureTime} → ${returnFlightData.arrivalAirport} ${returnFlightData.arrivalTime}`
+                        : '-'}
+                    </td>
+                  </tr>
+                </>
+              )
+            })()}
+            {/* 人數配置 */}
+            <tr className="border-b border-border">
+              <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">團體人數</td>
+              <td className="px-4 py-2" colSpan={3}>
+                <div className="flex items-center gap-6">
+                  <span className="font-medium">{ageGroups.total} 人</span>
+                  <span className="text-morandi-secondary">
+                    <span className="text-blue-600">6歲以下：{ageGroups.under6}</span>
+                    <span className="mx-2">|</span>
+                    <span className="text-orange-600">65歲以上：{ageGroups.over65}</span>
+                    <span className="mx-2">|</span>
+                    <span>一般：{ageGroups.others}</span>
+                  </span>
+                </div>
+              </td>
+            </tr>
+            {/* 遊覽車 */}
+            <tr>
+              <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium align-top">遊覽車</td>
+              <td className="px-4 py-2 p-0" colSpan={3}>
+                {vehicleRequests.length > 0 ? (
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-morandi-container/20">
+                        <th className="px-3 py-1.5 text-left font-medium text-morandi-secondary w-[150px]">車行名稱</th>
+                        <th className="px-3 py-1.5 text-left font-medium text-morandi-secondary w-[100px]">聯絡人</th>
+                        <th className="px-3 py-1.5 text-left font-medium text-morandi-secondary w-[120px]">電話</th>
+                        <th className="px-3 py-1.5 text-left font-medium text-morandi-secondary w-[100px]">確認時間</th>
+                        <th className="px-3 py-1.5 text-left font-medium text-morandi-secondary">備註</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {vehicleRequests.map((req, idx) => (
+                        <tr key={req.id} className={idx % 2 === 1 ? 'bg-morandi-container/5' : ''}>
+                          <td className="px-3 py-1.5">{req.supplier_name || '-'}</td>
+                          <td className="px-3 py-1.5">{req.assignee_name || '-'}</td>
+                          <td className="px-3 py-1.5">-</td>
+                          <td className="px-3 py-1.5">{req.confirmed_at ? new Date(req.confirmed_at).toLocaleDateString('zh-TW') : '-'}</td>
+                          <td className="px-3 py-1.5 text-morandi-secondary">{req.notes || req.title || '-'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div className="px-3 py-2 text-morandi-secondary text-sm">尚無遊覽車資訊</div>
+                )}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       {/* 每日行程表 */}
       {itinerary?.daily_itinerary && itinerary.daily_itinerary.length > 0 && (
         <div className="border border-border rounded-lg overflow-hidden">
@@ -1090,49 +1406,221 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
             <span className="font-medium">每日行程</span>
             <span className="text-blue-100 text-sm">({itinerary.daily_itinerary.length} 天)</span>
           </div>
-          <div className="divide-y divide-border">
-            {itinerary.daily_itinerary.map((day, idx) => (
-              <div key={idx} className="px-4 py-3 bg-card hover:bg-morandi-container/10">
-                <div className="flex items-start gap-4">
-                  {/* 日期 */}
-                  <div className="flex-shrink-0 w-20">
-                    <div className="text-sm font-medium text-morandi-primary">{day.dayLabel}</div>
-                    <div className="text-xs text-morandi-secondary">{day.date}</div>
-                  </div>
-                  {/* 行程內容 */}
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-morandi-primary">{day.title}</div>
-                    {day.activities && day.activities.length > 0 && (
-                      <div className="text-sm text-morandi-secondary mt-1">
-                        {day.activities.map(a => a.title).filter(Boolean).join(' → ')}
-                      </div>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-morandi-container/50 border-b border-border">
+                <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[80px]">日期</th>
+                <th className="px-3 py-2 text-left font-medium text-morandi-primary">行程</th>
+              </tr>
+            </thead>
+            <tbody>
+              {itinerary.daily_itinerary.map((day, idx) => {
+                const isExpanded = expandedDays[idx]
+                const noteText = dayNotes[idx] || ''
+
+                // 組合行程字串
+                const itineraryStr = day.activities && day.activities.length > 0
+                  ? `${day.dayLabel}｜${day.activities.map(a => a.title).filter(Boolean).join(' > ')}`
+                  : `${day.dayLabel}｜${day.title || ''}`
+
+                return (
+                  <React.Fragment key={idx}>
+                    {/* 第一行：日期 + 行程 */}
+                    <tr className="border-t border-border/50 bg-card hover:bg-morandi-container/10">
+                      <td className="px-3 py-2 align-top">
+                        <div className="text-sm font-medium text-morandi-primary">{day.date}</div>
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="text-morandi-primary">{itineraryStr}</div>
+                      </td>
+                    </tr>
+                    {/* 第二行：[+] 按鈕 + 餐食住宿（固定欄位間距） */}
+                    <tr className="border-t border-border/30 bg-morandi-container/5">
+                      <td className="px-3 py-2 align-top">
+                        <button
+                          onClick={() => toggleDayNote(idx)}
+                          className="flex items-center gap-1 text-xs text-morandi-gold hover:text-morandi-gold-hover"
+                          title={isExpanded ? '收起說明' : '新增說明'}
+                        >
+                          <Plus size={14} className={`transition-transform ${isExpanded ? 'rotate-45' : ''}`} />
+                          說明
+                        </button>
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="flex text-sm text-morandi-secondary">
+                          <span className="w-[150px] flex items-center">
+                            早：{day.meals?.breakfast || 'X'}
+                            {day.meals?.breakfast === '飯店早餐' && (
+                              <Check size={14} className="ml-1 text-morandi-green/40" />
+                            )}
+                          </span>
+                          <span className="w-[150px] flex items-center">
+                            午：{day.meals?.lunch || 'X'}
+                          </span>
+                          <span className="w-[150px] flex items-center">
+                            晚：{day.meals?.dinner || 'X'}
+                          </span>
+                          {day.accommodation && day.accommodation !== '溫暖的家' && (
+                            <span className="flex-1 flex items-center">
+                              住：{day.accommodation}
+                              {(day.isSameAccommodation || day.accommodation.includes('同上')) && (
+                                <Check size={14} className="ml-1 text-morandi-green/40" />
+                              )}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                    {/* 第三行：說明（展開時顯示） */}
+                    {isExpanded && (
+                      <tr className="border-t border-border/30 bg-morandi-gold/5">
+                        <td className="px-3 py-2 align-top">
+                          <span className="text-xs text-morandi-secondary">備註</span>
+                        </td>
+                        <td className="px-3 py-2">
+                          <textarea
+                            value={noteText}
+                            onChange={(e) => updateDayNote(idx, e.target.value)}
+                            placeholder="輸入說明文字，例如：提醒客戶帶護照..."
+                            className="w-full px-2 py-1.5 text-sm border border-border rounded bg-card focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 resize-none"
+                            rows={2}
+                          />
+                        </td>
+                      </tr>
                     )}
-                  </div>
-                  {/* 住宿 */}
-                  <div className="flex-shrink-0 text-right">
-                    {day.accommodation && day.accommodation !== '溫暖的家' && (
-                      <div className="text-sm">
-                        <span className="text-morandi-secondary">住宿：</span>
-                        <span className="text-morandi-primary">{day.accommodation}</span>
-                      </div>
-                    )}
-                    {/* 餐食 */}
-                    {day.meals && (
-                      <div className="text-xs text-morandi-secondary mt-1">
-                        {[
-                          day.meals.breakfast && day.meals.breakfast !== '敬請自理' ? `早：${day.meals.breakfast}` : null,
-                          day.meals.lunch && day.meals.lunch !== '敬請自理' ? `午：${day.meals.lunch}` : null,
-                          day.meals.dinner && day.meals.dinner !== '敬請自理' ? `晚：${day.meals.dinner}` : null,
-                        ].filter(Boolean).join(' | ')}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                  </React.Fragment>
+                )
+              })}
+            </tbody>
+          </table>
         </div>
       )}
+
+      {/* 飯店確認 */}
+      {(() => {
+        // 從行程表取得每天的住宿資訊
+        if (!itinerary?.daily_itinerary || itinerary.daily_itinerary.length === 0) {
+          return null
+        }
+
+        // 建立每晚住宿清單（排除最後一天和「溫暖的家」）
+        const nightlyAccommodations: Array<{
+          nightNumber: number
+          date: string
+          dayLabel: string
+          hotelName: string
+          isSameAsPrevious: boolean
+        }> = []
+
+        itinerary.daily_itinerary.forEach((day, idx) => {
+          // 最後一天通常不住宿
+          if (idx === itinerary.daily_itinerary.length - 1) return
+          if (!day.accommodation || day.accommodation === '溫暖的家') return
+
+          const isSame = day.isSameAccommodation || day.accommodation.includes('同上')
+          // 提取實際飯店名稱（去掉「同上」前綴）
+          let hotelName = day.accommodation
+          if (isSame && day.accommodation.includes('(')) {
+            hotelName = day.accommodation.replace(/同上\s*\(([^)]+)\)/, '$1').trim()
+          }
+
+          nightlyAccommodations.push({
+            nightNumber: idx + 1,
+            date: day.date || '',
+            dayLabel: day.dayLabel || `Day ${idx + 1}`,
+            hotelName: hotelName,
+            isSameAsPrevious: isSame,
+          })
+        })
+
+        if (nightlyAccommodations.length === 0) {
+          return null
+        }
+
+        // 從需求單取得住宿確認狀態
+        const accommodationRequests = tourRequests.filter(
+          req => req.category === 'accommodation' || req.category === 'hotel'
+        )
+
+        // 取得每晚的房型配置（優先使用報價單，其次使用 tour_rooms）
+        const getRoomTypesForNight = (nightNumber: number) => {
+          // 優先從報價單取得房型
+          const quoteRooms = quoteRoomItems.filter(r => r.day === nightNumber)
+          if (quoteRooms.length > 0) {
+            return quoteRooms
+              .map(r => `${r.room_type} x${r.quantity}`)
+              .join('、')
+          }
+
+          // 其次從 tour_rooms 表取得
+          const rooms = tourRooms.filter(r => r.night_number === nightNumber)
+          if (rooms.length === 0) return '-'
+          // 統計各房型數量
+          const roomCounts: Record<string, number> = {}
+          rooms.forEach(r => {
+            const type = r.room_type || '未指定'
+            roomCounts[type] = (roomCounts[type] || 0) + 1
+          })
+          return Object.entries(roomCounts)
+            .map(([type, count]) => `${type} x${count}`)
+            .join('、')
+        }
+
+        // 取得飯店的確認狀態
+        const getHotelStatus = (hotelName: string) => {
+          const req = accommodationRequests.find(r =>
+            r.supplier_name?.includes(hotelName) || r.title?.includes(hotelName)
+          )
+          if (!req) return { status: 'pending', label: '待確認', color: 'bg-yellow-100 text-yellow-700' }
+          if (req.status === 'confirmed') return { status: 'confirmed', label: '已確認', color: 'bg-green-100 text-green-700' }
+          if (req.status === 'replied') return { status: 'replied', label: '已回覆', color: 'bg-blue-100 text-blue-700' }
+          return { status: 'pending', label: '待確認', color: 'bg-yellow-100 text-yellow-700' }
+        }
+
+        return (
+          <div className="border border-border rounded-lg overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-2 bg-purple-600 text-white">
+              <div className="flex items-center gap-2">
+                <span className="font-medium">飯店確認</span>
+                <span className="text-purple-100 text-sm">({nightlyAccommodations.length} 晚)</span>
+              </div>
+            </div>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-morandi-container/50 border-b border-border">
+                  <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[80px]">日期</th>
+                  <th className="px-3 py-2 text-left font-medium text-morandi-primary">飯店名稱</th>
+                  <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[200px]">房型配置</th>
+                  <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[80px]">狀態</th>
+                </tr>
+              </thead>
+              <tbody>
+                {nightlyAccommodations.map((night, idx) => {
+                  const status = getHotelStatus(night.hotelName)
+                  const roomTypes = getRoomTypesForNight(night.nightNumber)
+                  return (
+                    <tr key={idx} className={`border-t border-border/50 hover:bg-morandi-container/10 ${idx % 2 === 1 ? 'bg-morandi-container/5' : ''}`}>
+                      <td className="px-3 py-2 text-morandi-secondary">{night.date}</td>
+                      <td className="px-3 py-2">
+                        <span className="font-medium">{night.hotelName}</span>
+                        {night.isSameAsPrevious && (
+                          <span className="ml-2 text-xs text-morandi-secondary">(續住)</span>
+                        )}
+                      </td>
+                      <td className="px-3 py-2 text-morandi-secondary">{roomTypes}</td>
+                      <td className="px-3 py-2">
+                        <span className={`px-1.5 py-0.5 rounded text-xs ${status.color}`}>
+                          {status.label}
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        )
+      })()}
 
       {/* 統一表格 */}
       <div className="border border-border rounded-lg overflow-hidden print:border-black print:rounded-none">

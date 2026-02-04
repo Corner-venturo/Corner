@@ -28,7 +28,7 @@ export const tourEntity = createEntityHook<Tour>('tours', {
     },
   },
   slim: {
-    select: 'id,code,name,departure_date,return_date,status,location,current_participants,max_participants,archived,workspace_id,country_id,main_city_id,created_at,updated_at,service,locked_at,locked_itinerary_id,itinerary_id,quote_id,proposal_package_id,contract_template,contract_completed,contract_archived_date',
+    select: 'id,code,name,departure_date,return_date,status,location,current_participants,max_participants,archived,workspace_id,country_id,main_city_id,created_at,updated_at,locked_at,locked_itinerary_id,itinerary_id,quote_id,proposal_package_id,contract_template,contract_completed,contract_archived_date',
   },
   detail: {
     select: '*',

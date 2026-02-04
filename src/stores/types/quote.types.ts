@@ -130,6 +130,10 @@ export interface QuickQuoteItem {
   unit_price: number // 單價
   amount: number // 金額（quantity * unit_price）
   notes: string // 備註
+  // === Excel 式公式儲存（顯示計算結果，點擊顯示公式）===
+  quantity_formula?: string // 數量公式（如 "10+5"）
+  cost_formula?: string // 成本公式
+  unit_price_formula?: string // 單價公式
 }
 
 export interface QuoteVersion {

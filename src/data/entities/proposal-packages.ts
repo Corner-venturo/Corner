@@ -14,7 +14,7 @@ export const proposalPackageEntity = createEntityHook<ProposalPackage>('proposal
     orderBy: { column: 'version_number', ascending: true },
   },
   slim: {
-    select: 'id,proposal_id,version_number,name,status',
+    select: 'id,proposal_id,version_number,version_name,is_active',
   },
   detail: { select: '*' },
   cache: CACHE_PRESETS.medium,

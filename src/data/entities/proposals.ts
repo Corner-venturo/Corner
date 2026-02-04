@@ -14,7 +14,7 @@ export const proposalEntity = createEntityHook<Proposal>('proposals', {
     orderBy: { column: 'created_at', ascending: false },
   },
   slim: {
-    select: 'id,code,name,destination,status,created_at',
+    select: 'id,code,title,destination,status,created_at',
   },
   detail: { select: '*' },
   cache: CACHE_PRESETS.medium,

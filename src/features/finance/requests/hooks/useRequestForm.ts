@@ -27,7 +27,7 @@ export function useRequestForm() {
   const [requestItems, setRequestItems] = useState<RequestItem[]>(() => [
     {
       id: Math.random().toString(36).substr(2, 9),
-      category: '匯款', // Default category
+      category: '其他', // Default category
       supplier_id: '',
       supplierName: '',
       description: '',
@@ -113,7 +113,7 @@ export function useRequestForm() {
   const addNewEmptyItem = useCallback(() => {
     const newItem: RequestItem = {
       id: Math.random().toString(36).substr(2, 9),
-      category: '匯款',
+      category: '其他',
       supplier_id: '',
       supplierName: '',
       description: '',
@@ -150,7 +150,7 @@ export function useRequestForm() {
     setRequestItems([
       {
         id: Math.random().toString(36).substr(2, 9),
-        category: '匯款', // Default category
+        category: '其他', // Default category
         supplier_id: '',
         supplierName: '',
         description: '',

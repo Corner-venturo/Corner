@@ -14,7 +14,7 @@ export const todoEntity = createEntityHook<Todo>('todos', {
     orderBy: { column: 'created_at', ascending: false },
   },
   slim: {
-    select: 'id,title,status,priority,due_date,assignee_id',
+    select: 'id,title,status,priority,deadline,assignee',
   },
   detail: { select: '*' },
   cache: {

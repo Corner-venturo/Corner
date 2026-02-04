@@ -580,6 +580,7 @@ export default function QuoteDetailPage() {
                         handleAddRow={categoryOps.handleAddRow}
                         handleInsertItem={categoryOps.handleInsertItem}
                         handleAddGuideRow={categoryOps.handleAddGuideRow}
+                        handleAddTransportRow={categoryOps.handleAddTransportRow}
                         handleAddAdultTicket={categoryOps.handleAddAdultTicket}
                         handleAddChildTicket={categoryOps.handleAddChildTicket}
                         handleAddInfantTicket={categoryOps.handleAddInfantTicket}

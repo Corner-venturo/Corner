@@ -465,15 +465,6 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange, defaul
               <div className="flex items-center gap-1">
                 {tour && (
                   <>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-white/90 hover:text-white hover:bg-card/20 h-8"
-                      onClick={() => setShowConfirmationDialog(true)}
-                    >
-                      <ClipboardList size={15} className="mr-1" />
-                      團確單
-                    </Button>
                     {!tour.archived && (
                       <Button
                         variant="ghost"

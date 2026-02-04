@@ -121,6 +121,33 @@ export const useTransportOperations = ({
     [categories, calculateGuideWithCategories, groupSizeForGuide, setCategories]
   )
 
+  // 新增交通項目（遊覽車等）
+  const handleAddTransportRow = useCallback(
+    (category_id: string) => {
+      const newItem: CostItem = {
+        id: Date.now().toString(),
+        name: '遊覽車',
+        quantity: 1,
+        unit_price: null,
+        total: 0,
+        note: '',
+      }
+
+      setCategories(prev =>
+        prev.map(cat => {
+          if (cat.id === category_id) {
+            return {
+              ...cat,
+              items: [...cat.items, newItem],
+            }
+          }
+          return cat
+        })
+      )
+    },
+    [setCategories]
+  )
+
   // 新增成人
   const handleAddAdultTicket = useCallback(
     (category_id: string) => {
@@ -212,6 +239,7 @@ export const useTransportOperations = ({
     calculateGuideWithCategories,
     updateGuideItems,
     handleAddGuideRow,
+    handleAddTransportRow,
     handleAddAdultTicket,
     handleAddChildTicket,
     handleAddInfantTicket,

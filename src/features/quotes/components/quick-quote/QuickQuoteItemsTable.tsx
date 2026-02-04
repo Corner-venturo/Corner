@@ -88,6 +88,18 @@ const SortableRow: React.FC<SortableRowProps> = ({
     transition,
   }
 
+  // 處理聚焦 - Excel 式行為：顯示公式
+  const handleFocus = (
+    field: 'cost' | 'unit_price' | 'quantity',
+    setExpr: (val: string) => void
+  ) => {
+    const formulaField = `${field}_formula` as 'cost_formula' | 'unit_price_formula' | 'quantity_formula'
+    const formula = item[formulaField]
+    if (formula) {
+      setExpr(formula)
+    }
+  }
+
   // 處理計算式欄位的 Enter 或 blur - 計算並更新
   const handleExpressionCommit = (
     field: 'cost' | 'unit_price' | 'quantity',
@@ -95,8 +107,11 @@ const SortableRow: React.FC<SortableRowProps> = ({
     setExpr: (val: string) => void
   ) => {
     const cleaned = cleanExpressionInput(expr)
+    const formulaField = `${field}_formula` as 'cost_formula' | 'unit_price_formula' | 'quantity_formula'
+
     if (!cleaned || cleaned === '-') {
       onUpdateItem(item.id, field, 0)
+      onUpdateItem(item.id, formulaField, undefined)
       setExpr('')
       return
     }
@@ -105,17 +120,19 @@ const SortableRow: React.FC<SortableRowProps> = ({
     const hasOperator = /[+\-*/()]/.test(cleaned.replace(/^-/, '')) // 忽略開頭的負號
 
     if (hasOperator) {
-      // 有運算符號，計算結果
+      // 有運算符號，計算結果並儲存公式
       const result = evaluateExpression(cleaned, NaN)
       if (!isNaN(result)) {
         onUpdateItem(item.id, field, result)
+        onUpdateItem(item.id, formulaField, cleaned) // 儲存公式
         setExpr(String(result))
       }
     } else {
-      // 純數字
+      // 純數字，清除公式
       const num = parseFloat(cleaned)
       if (!isNaN(num)) {
         onUpdateItem(item.id, field, num)
+        onUpdateItem(item.id, formulaField, undefined)
         setExpr(String(num))
       }
     }
@@ -169,10 +186,16 @@ const SortableRow: React.FC<SortableRowProps> = ({
               e.currentTarget.blur()
             }
           }}
+          onFocus={() => handleFocus('quantity', setQuantityExpr)}
           onBlur={() => handleExpressionCommit('quantity', quantityExpr, setQuantityExpr)}
           disabled={!isEditing}
           placeholder="可輸入算式"
-          className={`${inputClass} text-center`}
+          className={cn(
+            inputClass,
+            'text-center',
+            item.quantity_formula && '!text-blue-600'
+          )}
+          title={item.quantity_formula ? `公式: ${item.quantity_formula}` : undefined}
         />
       </td>
       {isEditing && (
@@ -191,9 +214,15 @@ const SortableRow: React.FC<SortableRowProps> = ({
                 e.currentTarget.blur()
               }
             }}
+            onFocus={() => handleFocus('cost', setCostExpr)}
             onBlur={() => handleExpressionCommit('cost', costExpr, setCostExpr)}
             placeholder="可輸入算式"
-            className={`${inputClass} text-right`}
+            className={cn(
+              inputClass,
+              'text-right',
+              item.cost_formula && '!text-blue-600'
+            )}
+            title={item.cost_formula ? `公式: ${item.cost_formula}` : undefined}
           />
         </td>
       )}
@@ -212,10 +241,16 @@ const SortableRow: React.FC<SortableRowProps> = ({
               e.currentTarget.blur()
             }
           }}
+          onFocus={() => handleFocus('unit_price', setUnitPriceExpr)}
           onBlur={() => handleExpressionCommit('unit_price', unitPriceExpr, setUnitPriceExpr)}
           disabled={!isEditing}
           placeholder="可輸入算式"
-          className={`${inputClass} text-right`}
+          className={cn(
+            inputClass,
+            'text-right',
+            item.unit_price_formula && '!text-blue-600'
+          )}
+          title={item.unit_price_formula ? `公式: ${item.unit_price_formula}` : undefined}
         />
       </td>
       <td className={`${cellClass} text-right font-medium`}>

@@ -16,7 +16,6 @@ import {
   Calculator,
   FileCheck,
   ClipboardList,
-  ClipboardEdit,
   Palette,
   ListChecks,
 } from 'lucide-react'
@@ -49,8 +48,6 @@ interface UseTourActionButtonsParams {
   onCloseTour?: (tour: Tour) => void
   // 封存對話框
   onOpenArchiveDialog?: (tour: Tour) => void
-  // 團控表對話框
-  onOpenTourControlDialog?: (tour: Tour) => void
   // 需求總覽對話框
   onOpenRequirementsDialog?: (tour: Tour) => void
   // 提案點擊處理（查看版本）
@@ -77,7 +74,6 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
     onOpenContractDialog,
     onCloseTour,
     onOpenArchiveDialog,
-    onOpenTourControlDialog,
     onOpenRequirementsDialog,
     onProposalClick,
     onProposalEdit,
@@ -262,21 +258,6 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
             <span>需求</span>
           </button>
 
-          {/* 團控表 */}
-          <button
-            onClick={e => {
-              e.stopPropagation()
-              if (onOpenTourControlDialog) {
-                onOpenTourControlDialog(tour)
-              }
-            }}
-            className="px-1.5 py-0.5 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-secondary/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-            title="團控表"
-          >
-            <ClipboardEdit size={14} />
-            <span>團控</span>
-          </button>
-
           {/* 封存/解除封存 */}
           <button
             onClick={e => {
@@ -347,7 +328,6 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
       onOpenQuoteDialog,
       onCloseTour,
       onOpenArchiveDialog,
-      onOpenTourControlDialog,
       onOpenRequirementsDialog,
       onProposalClick,
       onProposalEdit,

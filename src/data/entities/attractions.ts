@@ -14,7 +14,7 @@ export const attractionEntity = createEntityHook<Attraction>('attractions', {
     orderBy: { column: 'name', ascending: true },
   },
   slim: {
-    select: 'id,name,city_id,category,admission_fee',
+    select: 'id,name,city_id,category,ticket_price',
   },
   detail: { select: '*' },
   cache: CACHE_PRESETS.low, // 基礎資料，變動少

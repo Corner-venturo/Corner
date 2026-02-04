@@ -14,7 +14,7 @@ export const itineraryEntity = createEntityHook<Itinerary>('itineraries', {
     orderBy: { column: 'created_at', ascending: false },
   },
   slim: {
-    select: 'id,tour_id,name,total_days',
+    select: 'id,tour_id,title,duration_days',
   },
   detail: { select: '*' },
   cache: CACHE_PRESETS.medium,

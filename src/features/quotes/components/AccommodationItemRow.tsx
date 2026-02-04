@@ -50,6 +50,8 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
         <CalcInput
           value={item.quantity}
           onChange={val => handleUpdateItem(categoryId, item.id, 'quantity', val)}
+          formula={item.quantity_formula}
+          onFormulaChange={f => handleUpdateItem(categoryId, item.id, 'quantity_formula', f)}
           className={`${inputClass} text-center`}
           placeholder="人"
         />
@@ -60,6 +62,8 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
         <CalcInput
           value={item.unit_price}
           onChange={val => handleUpdateItem(categoryId, item.id, 'unit_price', val)}
+          formula={item.unit_price_formula}
+          onFormulaChange={f => handleUpdateItem(categoryId, item.id, 'unit_price_formula', f)}
           className={`${inputClass} text-center`}
           placeholder="單價"
         />

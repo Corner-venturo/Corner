@@ -129,7 +129,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
   // 取得關聯的團
   const tour = currentRequest.tour_id ? tours.find(t => t.id === currentRequest.tour_id) : null
 
-  // 供應商選項（給 Combobox 使用）
+  // 付款對象選項（給 Combobox 使用）
   const supplierOptions = suppliers.map(s => ({
     value: s.id,
     label: s.name || '未命名',
@@ -366,7 +366,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
               <div className="bg-morandi-background/50 border-b border-morandi-container/20">
                 <div className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_96px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_96px]'} px-3 py-2.5`}>
                   <span className="text-xs font-medium text-morandi-muted">類別</span>
-                  <span className="text-xs font-medium text-morandi-muted">供應商</span>
+                  <span className="text-xs font-medium text-morandi-muted">付款對象</span>
                   <span className="text-xs font-medium text-morandi-muted">說明</span>
                   <span className="text-xs font-medium text-morandi-muted text-right">單價</span>
                   <span className="text-xs font-medium text-morandi-muted text-center">數量</span>
@@ -400,7 +400,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                         options={supplierOptions}
                         value={newItem.supplier_id}
                         onChange={(value) => setNewItem({ ...newItem, supplier_id: value })}
-                        placeholder="選擇供應商..."
+                        placeholder="選擇付款對象..."
                         className="[&_input]:h-8 [&_input]:text-xs [&_input]:bg-transparent"
                       />
                     </div>
@@ -482,7 +482,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                               options={supplierOptions}
                               value={editItem.supplier_id || ''}
                               onChange={(value) => setEditItem({ ...editItem, supplier_id: value })}
-                              placeholder="選擇供應商..."
+                              placeholder="選擇付款對象..."
                               className="[&_input]:h-8 [&_input]:text-xs [&_input]:bg-transparent"
                             />
                           </div>

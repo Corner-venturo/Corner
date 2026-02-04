@@ -26,6 +26,13 @@ export interface CostItem {
   child_price?: number | null // 小朋友價
   infant_price?: number | null // 嬰兒價
 
+  // === Excel 式公式儲存（顯示計算結果，點擊顯示公式）===
+  quantity_formula?: string // 數量公式（如 "10+5"）
+  unit_price_formula?: string // 單價公式
+  adult_price_formula?: string // 成人價公式
+  child_price_formula?: string // 兒童價公式
+  infant_price_formula?: string // 嬰兒價公式
+
   // === 資源關聯（餐廳/飯店/景點）===
   resource_type?: CostItemResourceType // 資源類型
   resource_id?: string // 關聯的資源 ID（指向對應表格）

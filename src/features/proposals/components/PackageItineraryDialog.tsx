@@ -261,6 +261,8 @@ export function PackageItineraryDialog({
     accommodation: string
     sameAsPrevious: boolean
     hotelBreakfast: boolean
+    lunchSelf: boolean      // 午餐自理
+    dinnerSelf: boolean     // 晚餐自理
     activities?: SimpleActivity[]  // 時間軸活動
   }>>([])
 
@@ -298,9 +300,14 @@ export function PackageItineraryDialog({
     if (dailyData && dailyData.length > 0) {
       const loadedSchedule = dailyData.map((day, idx) => {
         const isHotelBreakfast = day.meals?.breakfast === '飯店早餐'
+        const isLunchSelf = day.meals?.lunch === '敬請自理' || day.meals?.lunch === '自理'
+        const isDinnerSelf = day.meals?.dinner === '敬請自理' || day.meals?.dinner === '自理'
         let sameAsPrevious = false
-        if (idx > 0 && dailyData![idx - 1]?.accommodation) {
-          sameAsPrevious = day.accommodation === dailyData![idx - 1].accommodation
+        // 檢查是否續住：住宿包含「同上」或與前一天相同
+        if (idx > 0) {
+          const prevAccommodation = dailyData![idx - 1]?.accommodation
+          sameAsPrevious = Boolean(day.accommodation?.includes('同上')) ||
+            Boolean(prevAccommodation && day.accommodation === prevAccommodation)
         }
         // 載入活動（如果有的話）
         const activities = (day.activities || []).map((act, actIdx) => ({
@@ -314,12 +321,14 @@ export function PackageItineraryDialog({
           route: day.title || '',
           meals: {
             breakfast: isHotelBreakfast ? '' : (day.meals?.breakfast || ''),
-            lunch: day.meals?.lunch || '',
-            dinner: day.meals?.dinner || '',
+            lunch: isLunchSelf ? '' : (day.meals?.lunch || ''),
+            dinner: isDinnerSelf ? '' : (day.meals?.dinner || ''),
           },
           accommodation: sameAsPrevious ? '' : (day.accommodation || ''),
           sameAsPrevious,
           hotelBreakfast: isHotelBreakfast,
+          lunchSelf: isLunchSelf,
+          dinnerSelf: isDinnerSelf,
           activities: activities.length > 0 ? activities : undefined,
         }
       })
@@ -337,6 +346,8 @@ export function PackageItineraryDialog({
         accommodation: '',
         sameAsPrevious: false,
         hotelBreakfast: false,
+        lunchSelf: false,
+        dinnerSelf: false,
         activities: undefined,
       })))
     }
@@ -372,6 +383,8 @@ export function PackageItineraryDialog({
           accommodation: '',
           sameAsPrevious: false,
           hotelBreakfast: false,
+          lunchSelf: false,
+          dinnerSelf: false,
           activities: undefined,
         })))
       }
@@ -396,7 +409,7 @@ export function PackageItineraryDialog({
       const newSchedule = [...prev]
       if (field === 'route' || field === 'accommodation') {
         newSchedule[index] = { ...newSchedule[index], [field]: value }
-      } else if (field === 'sameAsPrevious' || field === 'hotelBreakfast') {
+      } else if (field === 'sameAsPrevious' || field === 'hotelBreakfast' || field === 'lunchSelf' || field === 'dinnerSelf') {
         newSchedule[index] = { ...newSchedule[index], [field]: value as boolean }
       } else if (field.startsWith('meals.')) {
         const mealType = field.split('.')[1] as 'breakfast' | 'lunch' | 'dinner'
@@ -623,6 +636,8 @@ export function PackageItineraryDialog({
       const defaultTitle = isFirst ? '抵達目的地' : isLast ? '返回台灣' : `第 ${day.day} 天行程`
       const title = day.route?.trim() || defaultTitle
       const breakfast = day.hotelBreakfast ? '飯店早餐' : day.meals.breakfast
+      const lunch = day.lunchSelf ? '敬請自理' : day.meals.lunch
+      const dinner = day.dinnerSelf ? '敬請自理' : day.meals.dinner
       let accommodation = day.accommodation || ''
       if (day.sameAsPrevious && idx > 0) {
         // 往前找到實際填寫的住宿
@@ -638,7 +653,7 @@ export function PackageItineraryDialog({
         dayLabel: `Day ${day.day}`,
         date: dateLabel,
         title,
-        meals: { breakfast, lunch: day.meals.lunch, dinner: day.meals.dinner },
+        meals: { breakfast, lunch, dinner },
         accommodation: isLast ? '' : accommodation,
       }
     })
@@ -1022,6 +1037,8 @@ export function PackageItineraryDialog({
         const defaultTitle = isFirst ? '抵達目的地' : isLast ? '返回台灣' : `第 ${day.day} 天行程`
         const title = day.route?.trim() || defaultTitle
         const breakfast = day.hotelBreakfast ? '飯店早餐' : day.meals.breakfast
+        const lunch = day.lunchSelf ? '敬請自理' : day.meals.lunch
+        const dinner = day.dinnerSelf ? '敬請自理' : day.meals.dinner
         let accommodation = day.accommodation || ''
         if (day.sameAsPrevious) {
           accommodation = getPreviousAccommodation(idx) || '續住'
@@ -1044,8 +1061,9 @@ export function PackageItineraryDialog({
           description: '',
           activities: formattedActivities,
           recommendations: [],
-          meals: { breakfast, lunch: day.meals.lunch, dinner: day.meals.dinner },
-          accommodation,
+          meals: { breakfast, lunch, dinner },
+          accommodation: day.sameAsPrevious ? `同上 (${getPreviousAccommodation(idx) || ''})` : accommodation,
+          isSameAccommodation: day.sameAsPrevious || false,
           images: [],
         }
       })
@@ -1096,7 +1114,7 @@ export function PackageItineraryDialog({
     <>
     {/* 主對話框：使用 level={2}（作為子 Dialog 使用） */}
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent level={2} className="max-w-4xl max-h-[90vh] overflow-hidden">
+      <DialogContent level={2} className="max-w-5xl max-h-[90vh] overflow-hidden">
         {/* 載入中 */}
         {isDataLoading ? (
           <div className="h-64 flex items-center justify-center">
@@ -1673,59 +1691,80 @@ export function PackageItineraryDialog({
                           placeholder={isFirst ? '抵達目的地' : isLast ? '返回台灣' : '今日行程標題'}
                           className="h-8 text-sm mb-2"
                         />
-                        <div className="grid grid-cols-3 gap-2">
+                        {/* 表格式餐食（三欄） */}
+                        <div className="grid grid-cols-3 gap-2 text-xs">
+                          {/* 早餐 */}
                           <div className="relative">
                             <Input
                               value={day.hotelBreakfast ? '飯店早餐' : (day.meals.breakfast || '')}
                               onChange={e => updateDaySchedule(idx, 'meals.breakfast', e.target.value)}
                               placeholder="早餐"
-                              className="h-8 text-xs"
+                              className="h-8 text-xs pl-7"
                               disabled={day.hotelBreakfast}
                             />
                             {!isFirst && (
-                              <label className="flex items-center gap-1 mt-1 cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={day.hotelBreakfast}
-                                  onChange={e => updateDaySchedule(idx, 'hotelBreakfast', e.target.checked)}
-                                  className="w-3 h-3 rounded border-border text-morandi-gold focus:ring-morandi-gold"
-                                />
-                                <span className="text-[10px] text-morandi-secondary">飯店早餐</span>
-                              </label>
+                              <input
+                                type="checkbox"
+                                checked={day.hotelBreakfast}
+                                onChange={e => updateDaySchedule(idx, 'hotelBreakfast', e.target.checked)}
+                                className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded border-border text-morandi-gold focus:ring-morandi-gold cursor-pointer"
+                                title="飯店早餐"
+                              />
                             )}
                           </div>
-                          <Input
-                            value={day.meals.lunch || ''}
-                            onChange={e => updateDaySchedule(idx, 'meals.lunch', e.target.value)}
-                            placeholder="午餐"
-                            className="h-8 text-xs"
-                          />
-                          <Input
-                            value={day.meals.dinner || ''}
-                            onChange={e => updateDaySchedule(idx, 'meals.dinner', e.target.value)}
-                            placeholder="晚餐"
-                            className="h-8 text-xs"
-                          />
-                        </div>
-                        {!isLast && (
-                          <div className="mt-2">
+                          {/* 午餐 */}
+                          <div className="relative">
                             <Input
-                              value={day.sameAsPrevious ? `同上 (${getPreviousAccommodation(idx) || '續住'})` : (day.accommodation || '')}
+                              value={day.lunchSelf ? '敬請自理' : (day.meals.lunch || '')}
+                              onChange={e => updateDaySchedule(idx, 'meals.lunch', e.target.value)}
+                              placeholder="午餐"
+                              className="h-8 text-xs pl-7"
+                              disabled={day.lunchSelf}
+                            />
+                            <input
+                              type="checkbox"
+                              checked={day.lunchSelf || false}
+                              onChange={e => updateDaySchedule(idx, 'lunchSelf', e.target.checked)}
+                              className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded border-border text-morandi-gold focus:ring-morandi-gold cursor-pointer"
+                              title="敬請自理"
+                            />
+                          </div>
+                          {/* 晚餐 */}
+                          <div className="relative">
+                            <Input
+                              value={day.dinnerSelf ? '敬請自理' : (day.meals.dinner || '')}
+                              onChange={e => updateDaySchedule(idx, 'meals.dinner', e.target.value)}
+                              placeholder="晚餐"
+                              className="h-8 text-xs pl-7"
+                              disabled={day.dinnerSelf}
+                            />
+                            <input
+                              type="checkbox"
+                              checked={day.dinnerSelf || false}
+                              onChange={e => updateDaySchedule(idx, 'dinnerSelf', e.target.checked)}
+                              className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded border-border text-morandi-gold focus:ring-morandi-gold cursor-pointer"
+                              title="敬請自理"
+                            />
+                          </div>
+                        </div>
+                        {/* 住宿（獨立一行） */}
+                        {!isLast && (
+                          <div className="relative mt-1.5">
+                            <Input
+                              value={day.sameAsPrevious ? `同上 (${getPreviousAccommodation(idx) || ''})` : (day.accommodation || '')}
                               onChange={e => updateDaySchedule(idx, 'accommodation', e.target.value)}
                               placeholder="住宿飯店"
-                              className="h-8 text-xs"
+                              className="h-8 text-xs pl-7"
                               disabled={day.sameAsPrevious}
                             />
                             {idx > 0 && (
-                              <label className="flex items-center gap-1 mt-1 cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={day.sameAsPrevious}
-                                  onChange={e => updateDaySchedule(idx, 'sameAsPrevious', e.target.checked)}
-                                  className="w-3 h-3 rounded border-border text-morandi-gold focus:ring-morandi-gold"
-                                />
-                                <span className="text-[10px] text-morandi-secondary">續住</span>
-                              </label>
+                              <input
+                                type="checkbox"
+                                checked={day.sameAsPrevious}
+                                onChange={e => updateDaySchedule(idx, 'sameAsPrevious', e.target.checked)}
+                                className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded border-border text-morandi-gold focus:ring-morandi-gold cursor-pointer"
+                                title="續住"
+                              />
                             )}
                           </div>
                         )}
@@ -1804,73 +1843,85 @@ export function PackageItineraryDialog({
                             className="h-8 text-xs"
                           />
 
-                          {/* 餐食 */}
+                          {/* 餐食（三欄，勾選框在左側） */}
                           <div className="grid grid-cols-3 gap-2">
                             {/* 早餐 */}
-                            <div className="group relative">
+                            <div className="relative">
                               <input
                                 type="text"
                                 value={day.hotelBreakfast ? '飯店早餐' : (day.meals.breakfast || '')}
                                 onChange={e => updateDaySchedule(idx, 'meals.breakfast', e.target.value)}
                                 placeholder="早餐"
                                 disabled={day.hotelBreakfast}
-                                className="w-full h-8 px-3 text-xs border border-border rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold disabled:text-morandi-secondary"
+                                className="w-full h-8 pl-7 pr-3 text-xs border border-border rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold disabled:text-morandi-secondary"
                               />
                               {idx > 0 && (
-                                <button
-                                  type="button"
-                                  onClick={() => updateDaySchedule(idx, 'hotelBreakfast', !day.hotelBreakfast)}
-                                  className={`absolute right-2 top-1/2 -translate-y-1/2 text-[10px] px-1.5 py-0.5 rounded transition-all ${
-                                    day.hotelBreakfast
-                                      ? 'bg-morandi-gold text-white'
-                                      : 'text-morandi-secondary opacity-0 group-hover:opacity-100 hover:text-morandi-gold'
-                                  }`}
-                                >
-                                  飯店
-                                </button>
+                                <input
+                                  type="checkbox"
+                                  checked={day.hotelBreakfast}
+                                  onChange={e => updateDaySchedule(idx, 'hotelBreakfast', e.target.checked)}
+                                  className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded border-border text-morandi-gold focus:ring-morandi-gold cursor-pointer"
+                                  title="飯店早餐"
+                                />
                               )}
                             </div>
                             {/* 午餐 */}
-                            <input
-                              type="text"
-                              value={day.meals.lunch || ''}
-                              onChange={e => updateDaySchedule(idx, 'meals.lunch', e.target.value)}
-                              placeholder="午餐"
-                              className="h-8 px-3 text-xs border border-border rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold"
-                            />
-                            {/* 晚餐 */}
-                            <input
-                              type="text"
-                              value={day.meals.dinner || ''}
-                              onChange={e => updateDaySchedule(idx, 'meals.dinner', e.target.value)}
-                              placeholder="晚餐"
-                              className="h-8 px-3 text-xs border border-border rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold"
-                            />
-                          </div>
-
-                          {/* 住宿 */}
-                          {idx < dailySchedule.length - 1 && (
-                            <div className="group relative">
+                            <div className="relative">
                               <input
                                 type="text"
-                                value={day.sameAsPrevious ? `同上 (${getPreviousAccommodation(idx) || '續住'})` : (day.accommodation || '')}
+                                value={day.lunchSelf ? '敬請自理' : (day.meals.lunch || '')}
+                                onChange={e => updateDaySchedule(idx, 'meals.lunch', e.target.value)}
+                                placeholder="午餐"
+                                disabled={day.lunchSelf}
+                                className="w-full h-8 pl-7 pr-3 text-xs border border-border rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold disabled:text-morandi-secondary"
+                              />
+                              <input
+                                type="checkbox"
+                                checked={day.lunchSelf || false}
+                                onChange={e => updateDaySchedule(idx, 'lunchSelf', e.target.checked)}
+                                className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded border-border text-morandi-gold focus:ring-morandi-gold cursor-pointer"
+                                title="敬請自理"
+                              />
+                            </div>
+                            {/* 晚餐 */}
+                            <div className="relative">
+                              <input
+                                type="text"
+                                value={day.dinnerSelf ? '敬請自理' : (day.meals.dinner || '')}
+                                onChange={e => updateDaySchedule(idx, 'meals.dinner', e.target.value)}
+                                placeholder="晚餐"
+                                disabled={day.dinnerSelf}
+                                className="w-full h-8 pl-7 pr-3 text-xs border border-border rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold disabled:text-morandi-secondary"
+                              />
+                              <input
+                                type="checkbox"
+                                checked={day.dinnerSelf || false}
+                                onChange={e => updateDaySchedule(idx, 'dinnerSelf', e.target.checked)}
+                                className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded border-border text-morandi-gold focus:ring-morandi-gold cursor-pointer"
+                                title="敬請自理"
+                              />
+                            </div>
+                          </div>
+
+                          {/* 住宿（獨立一行，勾選框在左側） */}
+                          {idx < dailySchedule.length - 1 && (
+                            <div className="relative">
+                              <input
+                                type="text"
+                                value={day.sameAsPrevious ? `同上 (${getPreviousAccommodation(idx) || ''})` : (day.accommodation || '')}
                                 onChange={e => updateDaySchedule(idx, 'accommodation', e.target.value)}
                                 placeholder="住宿飯店"
                                 disabled={day.sameAsPrevious}
-                                className="w-full h-8 px-3 text-xs border border-border rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold disabled:text-morandi-secondary"
+                                className="w-full h-8 pl-7 pr-3 text-xs border border-border rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold disabled:text-morandi-secondary"
                               />
                               {idx > 0 && (
-                                <button
-                                  type="button"
-                                  onClick={() => updateDaySchedule(idx, 'sameAsPrevious', !day.sameAsPrevious)}
-                                  className={`absolute right-2 top-1/2 -translate-y-1/2 text-[10px] px-1.5 py-0.5 rounded transition-all ${
-                                    day.sameAsPrevious
-                                      ? 'bg-morandi-gold text-white'
-                                      : 'text-morandi-secondary opacity-0 group-hover:opacity-100 hover:text-morandi-gold'
-                                  }`}
-                                >
-                                  續住
-                                </button>
+                                <input
+                                  type="checkbox"
+                                  checked={day.sameAsPrevious}
+                                  onChange={e => updateDaySchedule(idx, 'sameAsPrevious', e.target.checked)}
+                                  className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded border-border text-morandi-gold focus:ring-morandi-gold cursor-pointer"
+                                  title="續住"
+                                />
                               )}
                             </div>
                           )}

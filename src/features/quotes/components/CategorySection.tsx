@@ -62,6 +62,7 @@ interface CategorySectionProps {
   handleAddRow: (categoryId: string) => void
   handleInsertItem: (categoryId: string, item: CostItem) => void
   handleAddGuideRow: (categoryId: string) => void
+  handleAddTransportRow: (categoryId: string) => void
   handleAddAdultTicket: (categoryId: string) => void
   handleAddChildTicket: (categoryId: string) => void
   handleAddInfantTicket: (categoryId: string) => void
@@ -90,6 +91,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   handleAddRow,
   handleInsertItem,
   handleAddGuideRow,
+  handleAddTransportRow,
   handleAddAdultTicket,
   handleAddChildTicket,
   handleAddInfantTicket,
@@ -292,6 +294,19 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
               >
                 <Plus size={12} className="mr-1" />
                 新增
+              </Button>
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={() => handleAddTransportRow(category.id)}
+                disabled={isReadOnly}
+                className={cn(
+                  'text-morandi-secondary hover:bg-morandi-gold/10',
+                  isReadOnly && 'cursor-not-allowed opacity-60'
+                )}
+              >
+                <Car size={12} className="mr-1" />
+                交通
               </Button>
               <Button
                 variant="ghost"

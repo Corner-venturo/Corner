@@ -133,7 +133,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
 
   // === 批量請款狀態 ===
   const [batchDate, setBatchDate] = useState(getNextThursdayDate())
-  const [batchCategory, setBatchCategory] = useState<PaymentItemCategory>('匯款')
+  const [batchCategory, setBatchCategory] = useState<PaymentItemCategory>('其他')
   const [batchSupplierId, setBatchSupplierId] = useState('')
   const [batchDescription, setBatchDescription] = useState('')
   const [batchTotalAmount, setBatchTotalAmount] = useState(0)
@@ -262,7 +262,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
 
     // 重置批量請款（預設兩個空白行）
     setBatchDate(getNextThursdayDate())
-    setBatchCategory('匯款')
+    setBatchCategory('其他')
     setBatchSupplierId('')
     setBatchDescription('')
     setBatchTotalAmount(0)
@@ -331,7 +331,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
     setImportFromRequests(false)
     setSelectedRequestItems({})
     setBatchDate(getNextThursdayDate())
-    setBatchCategory('匯款')
+    setBatchCategory('其他')
     setBatchSupplierId('')
     setBatchDescription('')
     setBatchTotalAmount(0)
@@ -448,6 +448,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
               description: item.title,
               unit_price: selectedRequestItems[item.id]?.amount || 0,
               quantity: 1,
+              tour_request_id: item.id, // 關聯到需求單
             }))
         }
 

@@ -89,6 +89,7 @@ export function useRequestOperations() {
             quantity: item.quantity,
             notes: '',
             sort_order: i + 1,
+            tour_request_id: item.tour_request_id || null, // 關聯需求單
           })
         }
 
@@ -132,6 +133,7 @@ export function useRequestOperations() {
             quantity: item.quantity,
             notes: '',
             sort_order: i + 1,
+            tour_request_id: item.tour_request_id || null, // 關聯需求單
           })
         }
 
@@ -187,6 +189,7 @@ export function useRequestOperations() {
             quantity: item.quantity,
             notes: '',
             sort_order: i + 1,
+            tour_request_id: item.tour_request_id || null, // 關聯需求單
           })
         }
 

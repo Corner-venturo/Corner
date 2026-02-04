@@ -9,9 +9,8 @@
  *
  * 功能：
  * - 從報價單解析需求項目
- * - 變更追蹤（新增/已確認/取消）
- * - 確認變更並建立需求單
  * - 手動新增需求
+ * - 產生團確單
  */
 
 import { useEffect, useState, useMemo, useCallback } from 'react'
@@ -21,14 +20,13 @@ import {
   Loader2,
   AlertCircle,
   RefreshCw,
-  Check,
   FileText,
   Plus,
-  Printer,
   EyeOff,
   Eye,
   ChevronDown,
   ChevronRight,
+  ClipboardList,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
@@ -36,11 +34,9 @@ import { useAuthStore } from '@/stores'
 import { AddManualRequestDialog } from '@/features/proposals/components/AddManualRequestDialog'
 import type { Tour } from '@/stores/types'
 import type { CostCategory } from '@/features/quotes/types'
-import type { ConfirmedRequirementItem, ConfirmedRequirementsSnapshot, ProposalPackage } from '@/types/proposal.types'
-import type { Json } from '@/lib/supabase/types'
+import type { ProposalPackage } from '@/types/proposal.types'
 import { useToast } from '@/components/ui/use-toast'
 import { logger } from '@/lib/utils/logger'
-import { generateTourRequestCode } from '@/stores/utils/code-generator'
 import { getStatusConfig } from '@/lib/status-config'
 import type { FlightInfo } from '@/types/flight.types'
 
@@ -102,23 +98,24 @@ interface QuoteItem {
   quotedPrice?: number | null
 }
 
-// 變更追蹤項目
-interface ChangeTrackItem {
-  type: 'confirmed' | 'new' | 'cancelled'
-  item: ConfirmedRequirementItem | QuoteItem
-}
-
 // FlightInfo 已移至 @/types/flight.types.ts
 
 // 分類配置（統一使用 accommodation/meal）
+// quoteCategoryId 對應報價單的 category.id（複數形式）
 type CategoryKey = 'transport' | 'accommodation' | 'meal' | 'activity' | 'other'
 const CATEGORIES: { key: CategoryKey; label: string; quoteCategoryId: string }[] = [
   { key: 'transport', label: '交通', quoteCategoryId: 'transport' },
   { key: 'accommodation', label: '住宿', quoteCategoryId: 'accommodation' },
-  { key: 'meal', label: '餐食', quoteCategoryId: 'meal' },
-  { key: 'activity', label: '活動', quoteCategoryId: 'activity' },
-  { key: 'other', label: '其他', quoteCategoryId: 'other' },
+  { key: 'meal', label: '餐食', quoteCategoryId: 'meals' },
+  { key: 'activity', label: '活動', quoteCategoryId: 'activities' },
+  { key: 'other', label: '其他', quoteCategoryId: 'others' },
 ]
+
+// 安全地取得 CategoryKey（防止未知類別導致錯誤）
+function safeGetCategoryKey(category: string): CategoryKey {
+  const validKeys: CategoryKey[] = ['transport', 'accommodation', 'meal', 'activity', 'other']
+  return validKeys.includes(category as CategoryKey) ? (category as CategoryKey) : 'other'
+}
 
 // ============================================
 // Component
@@ -145,8 +142,7 @@ export function RequirementsList({
   const [startDate, setStartDate] = useState<string | null>(null)
   const [outboundFlight, setOutboundFlight] = useState<FlightInfo | null>(null)
   const [returnFlight, setReturnFlight] = useState<FlightInfo | null>(null)
-  const [confirmedSnapshot, setConfirmedSnapshot] = useState<ConfirmedRequirementItem[]>([])
-  const [confirmingChanges, setConfirmingChanges] = useState(false)
+  const [generatingSheet, setGeneratingSheet] = useState(false)
 
   // Dialog 狀態
   const [addManualDialogOpen, setAddManualDialogOpen] = useState(false)
@@ -191,14 +187,6 @@ export function RequirementsList({
           setReturnFlight(tourData.return_flight as FlightInfo | null)
         }
 
-        // 載入已確認快照
-        if (tourData.confirmed_requirements && typeof tourData.confirmed_requirements === 'object') {
-          const snapshot = (tourData.confirmed_requirements as unknown as ConfirmedRequirementsSnapshot)?.snapshot
-          setConfirmedSnapshot(snapshot || [])
-        } else {
-          setConfirmedSnapshot([])
-        }
-
         // 載入現有需求單
         const { data: requests } = await supabase
           .from('tour_requests')
@@ -222,14 +210,6 @@ export function RequirementsList({
 
         // 取得報價單 ID
         quoteId = quoteId || (pkgData as { quote_id?: string | null }).quote_id || null
-
-        // 載入已確認快照
-        if (pkgData.confirmed_requirements && typeof pkgData.confirmed_requirements === 'object') {
-          const snapshot = (pkgData.confirmed_requirements as unknown as ConfirmedRequirementsSnapshot)?.snapshot
-          setConfirmedSnapshot(snapshot || [])
-        } else {
-          setConfirmedSnapshot([])
-        }
 
         // 載入現有需求單
         const { data: requests } = await supabase
@@ -301,25 +281,54 @@ export function RequirementsList({
     const items: QuoteItem[] = []
 
     for (const cat of CATEGORIES) {
-      // 交通：從航班資訊
+      // 交通：從報價單的 transport 和 group-transport 讀取
       if (cat.key === 'transport') {
-        if (outboundFlight || returnFlight) {
-          const flightInfos: string[] = []
-          const outboundInfo = formatFlightInfo(outboundFlight, '去程')
-          const returnInfo = formatFlightInfo(returnFlight, '回程')
-          if (outboundInfo) flightInfos.push(outboundInfo)
-          if (returnInfo) flightInfos.push(returnInfo)
+        // 讀取 transport category（機票等）
+        const transportCategory = quoteCategories.find(c => c.id === 'transport')
+        if (transportCategory?.items) {
+          for (const item of transportCategory.items) {
+            if (!item.name) continue
+            // 排除身份票種（成人/兒童/嬰兒），這些不需要建立需求單
+            if (['成人', '兒童', '嬰兒'].includes(item.name)) continue
 
-          if (flightInfos.length > 0) {
-            const airline = outboundFlight?.airline || returnFlight?.airline || '航空公司'
+            const supplierName = item.name
+            const title = item.name
+            const key = `transport-${supplierName}-${title}-`
             items.push({
               category: 'transport',
-              supplierName: airline,
-              title: '機票',
-              serviceDate: startDate,
-              quantity: 1,
-              key: 'transport-機票',
-              notes: flightInfos.join('\n'),
+              supplierName,
+              title,
+              serviceDate: null,
+              quantity: item.quantity || 1,
+              key,
+              resourceType: item.resource_type,
+              resourceId: item.resource_id,
+              quotedPrice: item.unit_price,
+            })
+          }
+        }
+
+        // 讀取 group-transport category（遊覽車等）
+        const groupTransportCategory = quoteCategories.find(c => c.id === 'group-transport')
+        if (groupTransportCategory?.items) {
+          for (const item of groupTransportCategory.items) {
+            if (!item.name) continue
+            // 排除「領隊分攤」，這不是需求項目
+            if (item.name === '領隊分攤') continue
+
+            const supplierName = item.name
+            const title = item.name
+            const key = `transport-${supplierName}-${title}-`
+            items.push({
+              category: 'transport',
+              supplierName,
+              title,
+              serviceDate: null,
+              quantity: item.quantity || 1,
+              key,
+              resourceType: item.resource_type,
+              resourceId: item.resource_id,
+              quotedPrice: item.unit_price,
             })
           }
         }
@@ -331,6 +340,9 @@ export function RequirementsList({
 
       for (const item of quoteCategory.items) {
         if (!item.name) continue
+        // 跳過自理項目（不需要產生需求單）
+        // 檢查 is_self_arranged 標記，或名稱包含「自理」
+        if (item.is_self_arranged || item.name.includes('自理')) continue
 
         let supplierName = ''
         let title = item.name
@@ -349,9 +361,13 @@ export function RequirementsList({
             serviceDate = calculateDate(dayNum)
           }
         } else if (cat.key === 'activity') {
+          // 活動：活動名稱 = 供應商名稱
+          supplierName = item.name
           title = item.name
           if (item.day) serviceDate = calculateDate(item.day)
-        } else {
+        } else if (cat.key === 'other') {
+          // 其他：項目名稱 = 供應商名稱
+          supplierName = item.name
           title = item.name
         }
 
@@ -374,78 +390,30 @@ export function RequirementsList({
     }
 
     return items
-  }, [quoteCategories, calculateDate, startDate, outboundFlight, returnFlight, formatFlightInfo])
+  }, [quoteCategories, calculateDate])
 
-  // 生成項目 key
-  const generateItemKey = useCallback((category: string, supplierName: string, title: string, date: string | null) => {
-    return `${category}-${supplierName}-${title}-${date || ''}`
-  }, [])
-
-  // 計算變更追蹤
-  const changeTrackByCategory = useMemo(() => {
-    const result: Record<CategoryKey, ChangeTrackItem[]> = {
+  // 按分類整理項目
+  const itemsByCategory = useMemo(() => {
+    const result: Record<CategoryKey, QuoteItem[]> = {
       transport: [], accommodation: [], meal: [], activity: [], other: [],
     }
 
-    if (confirmedSnapshot.length === 0) {
-      for (const item of quoteItems) {
-        const cat = item.category as CategoryKey
-        result[cat].push({ type: 'new', item })
-      }
-      return result
-    }
-
-    const snapshotKeys = new Map<string, ConfirmedRequirementItem>()
-    for (const snap of confirmedSnapshot) {
-      const key = generateItemKey(snap.category, snap.supplier_name, snap.title, snap.service_date)
-      snapshotKeys.set(key, snap)
-    }
-
-    const quoteKeys = new Set<string>()
     for (const item of quoteItems) {
-      const key = generateItemKey(item.category, item.supplierName, item.title, item.serviceDate)
-      quoteKeys.add(key)
-    }
-
-    for (const item of quoteItems) {
-      const cat = item.category as CategoryKey
-      const key = generateItemKey(item.category, item.supplierName, item.title, item.serviceDate)
-      if (snapshotKeys.has(key)) {
-        result[cat].push({ type: 'confirmed', item })
-      } else {
-        result[cat].push({ type: 'new', item })
-      }
-    }
-
-    for (const snap of confirmedSnapshot) {
-      const cat = snap.category as CategoryKey
-      const key = generateItemKey(snap.category, snap.supplier_name, snap.title, snap.service_date)
-      if (!quoteKeys.has(key)) {
-        result[cat].push({ type: 'cancelled', item: snap })
-      }
+      const cat = safeGetCategoryKey(item.category)
+      result[cat].push(item)
     }
 
     // 按日期排序
     for (const cat of Object.keys(result) as CategoryKey[]) {
       result[cat].sort((a, b) => {
-        const dateA = ('serviceDate' in a.item ? a.item.serviceDate : a.item.service_date) || ''
-        const dateB = ('serviceDate' in b.item ? b.item.serviceDate : b.item.service_date) || ''
+        const dateA = a.serviceDate || ''
+        const dateB = b.serviceDate || ''
         return dateA.localeCompare(dateB)
       })
     }
 
     return result
-  }, [quoteItems, confirmedSnapshot, generateItemKey])
-
-  // 是否有變更
-  const hasUnconfirmedChanges = useMemo(() => {
-    for (const cat of CATEGORIES) {
-      if (changeTrackByCategory[cat.key].some(item => item.type === 'new' || item.type === 'cancelled')) {
-        return true
-      }
-    }
-    return false
-  }, [changeTrackByCategory])
+  }, [quoteItems])
 
   // ============================================
   // 動作
@@ -544,136 +512,161 @@ export function RequirementsList({
     setAddManualDialogOpen(true)
   }, [])
 
-  // 確認需求
-  const handleConfirmChanges = useCallback(async () => {
-    if (!user) return
+  // 插入團確單項目
+  const insertConfirmationItems = useCallback(async (sheetId: string) => {
+    if (!user || !tour) return
 
-    // 來源資訊
-    const source = mode === 'tour' && tour
-      ? { id: tour.id, code: tour.code || '', title: tour.name, workspaceId: tour.workspace_id || user.workspace_id || '', startDate }
-      : pkg
-        ? { id: pkg.id, code: '', title: pkg.version_name || '', workspaceId: user.workspace_id || '', startDate }
-        : null
+    const workspaceId = tour.workspace_id || user.workspace_id || ''
+    const allItems: Array<{
+      sheet_id: string
+      category: string
+      service_date: string
+      supplier_name: string
+      title: string
+      description?: string | null
+      expected_cost?: number | null
+      quantity?: number | null
+      booking_status: string
+      sort_order: number
+      workspace_id: string
+      resource_type?: string | null
+      resource_id?: string | null
+      latitude?: number | null
+      longitude?: number | null
+      google_maps_url?: string | null
+      notes?: string | null
+    }> = []
 
-    if (!source) return
-
-    setConfirmingChanges(true)
-    try {
-      const newSnapshot: ConfirmedRequirementItem[] = quoteItems.map(item => ({
-        id: crypto.randomUUID(),
-        category: item.category,
-        supplier_name: item.supplierName,
-        service_date: item.serviceDate,
-        title: item.title,
-        quantity: item.quantity,
-        notes: item.notes,
-      }))
-
-      const snapshotData: ConfirmedRequirementsSnapshot = {
-        snapshot: newSnapshot,
-        confirmed_at: new Date().toISOString(),
-        confirmed_by: user.id,
-      }
-
-      // 收集新增項目
-      const newItems: QuoteItem[] = []
-      for (const cat of CATEGORIES) {
-        for (const trackItem of changeTrackByCategory[cat.key]) {
-          if (trackItem.type === 'new') {
-            newItems.push(trackItem.item as QuoteItem)
-          }
-        }
-      }
-
-      // 建立需求單
-      if (newItems.length > 0) {
-        // 查詢現有需求單（用於檢查重複 + 生成編號）
-        const { data: existingRequests } = await supabase
-          .from('tour_requests')
-          .select('code, supplier_name, category, service_date')
-          .or(tourId ? `tour_id.eq.${tourId}` : `proposal_package_id.eq.${proposalPackageId}`)
-
-        // 建立已存在的需求單 key set（供應商+分類+日期）
-        const existingKeys = new Set(
-          (existingRequests || []).map(r => `${r.supplier_name}-${r.category}-${r.service_date || 'no-date'}`)
-        )
-
-        const itemsBySupplier = new Map<string, QuoteItem[]>()
-        for (const item of newItems) {
-          const key = `${item.category}-${item.supplierName}`
-          if (!itemsBySupplier.has(key)) itemsBySupplier.set(key, [])
-          itemsBySupplier.get(key)!.push(item)
-        }
-
-        const requestsToInsert = []
-        for (const [, items] of itemsBySupplier) {
-          const firstItem = items[0]
-          const serviceDates = items.map(i => i.serviceDate).filter((d): d is string => !!d).sort()
-          const serviceDate = serviceDates[0] || null
-
-          // 檢查是否已存在相同供應商+分類+日期的需求單
-          const checkKey = `${firstItem.supplierName}-${firstItem.category}-${serviceDate || 'no-date'}`
-          if (existingKeys.has(checkKey)) {
-            // 已存在，跳過不重複建立
-            continue
-          }
-
-          const code = generateTourRequestCode(
-            source.code || 'PKG',
-            [...(existingRequests || []), ...requestsToInsert.map(r => ({ code: r.code }))]
-          )
-
-          requestsToInsert.push({
-            code,
-            tour_id: tourId || null,
-            proposal_package_id: proposalPackageId || null,
-            tour_code: source.code,
-            tour_name: source.title,
-            handler_type: 'external',
-            supplier_name: firstItem.supplierName,
-            category: firstItem.category,
-            service_date: serviceDate,
-            title: `${firstItem.supplierName} - ${CATEGORIES.find(c => c.key === firstItem.category)?.label || firstItem.category}`,
-            quantity: items.reduce((sum, i) => sum + i.quantity, 0),
-            status: 'pending',
-            workspace_id: source.workspaceId,
-            created_by: user.id,
-            created_by_name: user.name || user.email || '',
-          })
-
-          // 加入已存在集合，避免本次迴圈內重複
-          existingKeys.add(checkKey)
-        }
-
-        if (requestsToInsert.length > 0) {
-          await supabase.from('tour_requests').insert(requestsToInsert)
-        }
-      }
-
-      // 更新快照
-      if (mode === 'tour' && tourId) {
-        await supabase
-          .from('tours')
-          .update({ confirmed_requirements: snapshotData as unknown as Json })
-          .eq('id', tourId)
-      } else if (proposalPackageId) {
-        await supabase
-          .from('proposal_packages')
-          .update({ confirmed_requirements: snapshotData as unknown as Json })
-          .eq('id', proposalPackageId)
-      }
-
-      setConfirmedSnapshot(newSnapshot)
-      await loadData(false)
-
-      toast({ title: '需求確認完成' })
-    } catch (error) {
-      logger.error('確認需求失敗:', error)
-      toast({ title: '確認失敗', variant: 'destructive' })
-    } finally {
-      setConfirmingChanges(false)
+    // 1. 航班資訊（放在最前面）
+    if (outboundFlight) {
+      allItems.push({
+        sheet_id: sheetId,
+        category: 'transport',
+        service_date: tour.departure_date || '',
+        supplier_name: outboundFlight.airline || '',
+        title: `去程 ${outboundFlight.flightNumber || ''} ${outboundFlight.departureAirport || ''}→${outboundFlight.arrivalAirport || ''}`,
+        description: outboundFlight.departureTime && outboundFlight.arrivalTime
+          ? `${outboundFlight.departureAirport} ${outboundFlight.departureTime} → ${outboundFlight.arrivalAirport} ${outboundFlight.arrivalTime}`
+          : null,
+        booking_status: 'confirmed',
+        sort_order: 0,
+        workspace_id: workspaceId,
+        notes: outboundFlight.duration || null,
+      })
     }
-  }, [tour, pkg, user, quoteItems, changeTrackByCategory, tourId, proposalPackageId, mode, startDate, loadData, toast])
+
+    if (returnFlight) {
+      allItems.push({
+        sheet_id: sheetId,
+        category: 'transport',
+        service_date: tour.return_date || '',
+        supplier_name: returnFlight.airline || '',
+        title: `回程 ${returnFlight.flightNumber || ''} ${returnFlight.departureAirport || ''}→${returnFlight.arrivalAirport || ''}`,
+        description: returnFlight.departureTime && returnFlight.arrivalTime
+          ? `${returnFlight.departureAirport} ${returnFlight.departureTime} → ${returnFlight.arrivalAirport} ${returnFlight.arrivalTime}`
+          : null,
+        booking_status: 'confirmed',
+        sort_order: 1,
+        workspace_id: workspaceId,
+        notes: returnFlight.duration || null,
+      })
+    }
+
+    // 2. 從報價單項目產生（排除自理）
+    const quoteItemsFiltered = quoteItems
+      .filter(item => !item.title.includes('自理') && !item.supplierName.includes('自理'))
+
+    quoteItemsFiltered.forEach((item, index) => {
+      allItems.push({
+        sheet_id: sheetId,
+        category: item.category,
+        service_date: item.serviceDate || tour.departure_date || '',
+        supplier_name: item.supplierName || '',
+        title: item.title,
+        expected_cost: item.quotedPrice || null,
+        quantity: item.quantity || 1,
+        booking_status: 'pending',
+        sort_order: index + 10, // 航班後面
+        workspace_id: workspaceId,
+        resource_type: item.resourceType || null,
+        resource_id: item.resourceId || null,
+        latitude: item.latitude || null,
+        longitude: item.longitude || null,
+        google_maps_url: item.googleMapsUrl || null,
+        notes: item.notes || null,
+      })
+    })
+
+    if (allItems.length > 0) {
+      const { error } = await supabase
+        .from('tour_confirmation_items')
+        .insert(allItems)
+
+      if (error) throw error
+    }
+  }, [user, tour, quoteItems, outboundFlight, returnFlight])
+
+  // 產生團確單
+  const handleGenerateConfirmationSheet = useCallback(async () => {
+    if (!user || mode !== 'tour' || !tourId || !tour) {
+      toast({ title: '只有旅遊團模式可以產生團確單', variant: 'destructive' })
+      return
+    }
+
+    const workspaceId = tour.workspace_id || user.workspace_id
+    if (!workspaceId) {
+      toast({ title: '缺少 workspace 資訊', variant: 'destructive' })
+      return
+    }
+
+    setGeneratingSheet(true)
+    try {
+      // 1. 檢查是否已有團確單
+      const { data: existingSheet } = await supabase
+        .from('tour_confirmation_sheets')
+        .select('id')
+        .eq('tour_id', tourId)
+        .maybeSingle()
+
+      if (existingSheet) {
+        // 已有團確單，刪除舊的項目重新產生
+        await supabase
+          .from('tour_confirmation_items')
+          .delete()
+          .eq('sheet_id', existingSheet.id)
+
+        // 插入新項目
+        await insertConfirmationItems(existingSheet.id)
+        toast({ title: '團確單已更新' })
+      } else {
+        // 建立新的團確單
+        const { data: newSheet, error: sheetError } = await supabase
+          .from('tour_confirmation_sheets')
+          .insert({
+            tour_id: tourId,
+            tour_code: tour.code,
+            tour_name: tour.name,
+            departure_date: tour.departure_date,
+            return_date: tour.return_date,
+            workspace_id: workspaceId,
+            status: 'draft',
+          })
+          .select()
+          .single()
+
+        if (sheetError) throw sheetError
+
+        // 插入項目
+        await insertConfirmationItems(newSheet.id)
+        toast({ title: '團確單已產生' })
+      }
+    } catch (error) {
+      logger.error('產生團確單失敗:', error)
+      toast({ title: '產生團確單失敗', variant: 'destructive' })
+    } finally {
+      setGeneratingSheet(false)
+    }
+  }, [user, mode, tourId, tour, toast, insertConfirmationItems])
 
   // 格式化日期
   const formatDate = (dateStr: string | null | undefined) => {
@@ -685,23 +678,15 @@ export function RequirementsList({
   const openRequestDialog = useCallback((category: string, supplierName: string) => {
     if (!onOpenRequestDialog) return
 
-    const categoryItems = changeTrackByCategory[category as CategoryKey] || []
+    const categoryItems = itemsByCategory[category as CategoryKey] || []
     const items = categoryItems
-      .filter(trackItem => {
-        if (trackItem.type === 'cancelled') return false
-        const itemData = trackItem.item
-        const itemSupplier = 'supplierName' in itemData ? itemData.supplierName : itemData.supplier_name
-        return itemSupplier === supplierName
-      })
-      .map(trackItem => {
-        const itemData = trackItem.item
-        return {
-          serviceDate: 'serviceDate' in itemData ? itemData.serviceDate : itemData.service_date,
-          title: itemData.title,
-          quantity: 'quantity' in itemData ? itemData.quantity : 1,
-          notes: itemData.notes,
-        }
-      })
+      .filter(item => item.supplierName === supplierName)
+      .map(item => ({
+        serviceDate: item.serviceDate,
+        title: item.title,
+        quantity: item.quantity,
+        notes: item.notes,
+      }))
 
     onOpenRequestDialog({
       category,
@@ -711,150 +696,12 @@ export function RequirementsList({
       pkg: pkg || undefined,
       startDate,
     })
-  }, [changeTrackByCategory, tour, pkg, startDate, onOpenRequestDialog])
-
-  // 取得按供應商分組的取消項目
-  const cancelledBySupplier = useMemo(() => {
-    const result = new Map<string, ConfirmedRequirementItem[]>()
-    for (const cat of CATEGORIES) {
-      const trackItems = changeTrackByCategory[cat.key]
-      for (const ti of trackItems) {
-        if (ti.type === 'cancelled') {
-          const snap = ti.item as ConfirmedRequirementItem
-          const existing = result.get(snap.supplier_name) || []
-          existing.push(snap)
-          result.set(snap.supplier_name, existing)
-        }
-      }
-    }
-    return result
-  }, [changeTrackByCategory])
-
-  // 列印取消單
-  const handlePrintCancellation = useCallback((supplierName: string, items: ConfirmedRequirementItem[]) => {
-    const formatDateStr = (dateStr: string | null) => {
-      if (!dateStr) return '-'
-      return new Date(dateStr).toLocaleDateString('zh-TW', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      })
-    }
-
-    const tourCode = tour?.code || pkg?.version_name || ''
-    const tourName = tour?.name || pkg?.version_name || ''
-
-    const printContent = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>取消通知單 - ${supplierName}</title>
-  <style>
-    @page { size: A4; margin: 15mm; }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: "Microsoft JhengHei", "PingFang TC", sans-serif; font-size: 12pt; line-height: 1.6; color: #333; padding: 20px; }
-    .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #c9aa7c; padding-bottom: 15px; }
-    .header h1 { font-size: 20pt; color: #3a3633; margin-bottom: 5px; }
-    .header .subtitle { font-size: 11pt; color: #8b8680; }
-    .info-section { margin-bottom: 20px; }
-    .info-row { display: flex; margin-bottom: 8px; }
-    .info-label { width: 100px; font-weight: bold; color: #3a3633; }
-    .info-value { flex: 1; }
-    .notice-box { background: #fff5f5; border: 1px solid #c08374; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
-    .notice-box p { color: #c08374; font-weight: bold; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    th, td { border: 1px solid #d4c4b0; padding: 10px; text-align: left; }
-    th { background: #f6f4f1; color: #3a3633; font-weight: bold; }
-    .cancelled { color: #c08374; text-decoration: line-through; }
-    .footer { margin-top: 40px; text-align: center; font-size: 10pt; color: #8b8680; }
-    .print-controls { padding: 16px; border-bottom: 1px solid #eee; text-align: right; }
-    .print-controls button { padding: 8px 16px; margin-left: 8px; cursor: pointer; border-radius: 6px; }
-    .btn-outline { background: white; border: 1px solid #ddd; }
-    .btn-primary { background: #c9aa7c; color: white; border: none; }
-    @media print { .print-controls { display: none; } body { padding: 0; } }
-  </style>
-</head>
-<body>
-  <div class="print-controls">
-    <button class="btn-outline" onclick="window.close()">關閉</button>
-    <button class="btn-primary" onclick="window.print()">列印</button>
-  </div>
-
-  <div class="header">
-    <h1>取消通知單</h1>
-    <div class="subtitle">CANCELLATION NOTICE</div>
-  </div>
-
-  <div class="info-section">
-    <div class="info-row">
-      <span class="info-label">供應商：</span>
-      <span class="info-value">${supplierName}</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label">團號：</span>
-      <span class="info-value">${tourCode || '-'}</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label">團名：</span>
-      <span class="info-value">${tourName || '-'}</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label">發單日期：</span>
-      <span class="info-value">${new Date().toLocaleDateString('zh-TW')}</span>
-    </div>
-  </div>
-
-  <div class="notice-box">
-    <p>因行程變化，煩請取消以下預訂項目：</p>
-  </div>
-
-  <table>
-    <thead>
-      <tr>
-        <th style="width: 80px;">日期</th>
-        <th style="width: 100px;">分類</th>
-        <th>項目說明</th>
-        <th style="width: 80px;">數量</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${items.map(item => `
-        <tr>
-          <td class="cancelled">${formatDateStr(item.service_date)}</td>
-          <td class="cancelled">${CATEGORIES.find(c => c.key === item.category)?.label || item.category}</td>
-          <td class="cancelled">${item.title}${item.notes ? `<br><small>${item.notes}</small>` : ''}</td>
-          <td class="cancelled">${item.quantity}</td>
-        </tr>
-      `).join('')}
-    </tbody>
-  </table>
-
-  <div class="footer">
-    <p>如有任何疑問，請與我們聯繫。謝謝您的配合！</p>
-  </div>
-</body>
-</html>
-`
-
-    const printWindow = window.open('', '_blank', 'width=900,height=700')
-    if (!printWindow) {
-      toast({ title: '請允許彈出視窗以進行列印', variant: 'destructive' })
-      return
-    }
-
-    printWindow.document.write(printContent)
-    printWindow.document.close()
-  }, [tour, pkg, toast])
+  }, [itemsByCategory, tour, pkg, startDate, onOpenRequestDialog])
 
   // 總項目數
   const totalItems = useMemo(() => {
-    let count = 0
-    for (const cat of CATEGORIES) {
-      count += changeTrackByCategory[cat.key].filter(t => t.type !== 'cancelled').length
-    }
-    return count
-  }, [changeTrackByCategory])
+    return quoteItems.length
+  }, [quoteItems])
 
   // ============================================
   // Render
@@ -875,9 +722,6 @@ export function RequirementsList({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-sm text-morandi-secondary">共 {totalItems} 項</span>
-            {hasUnconfirmedChanges && (
-              <span className="text-xs text-morandi-gold">(有變更待確認)</span>
-            )}
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -890,15 +734,15 @@ export function RequirementsList({
               <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
               刷新
             </Button>
-            {(confirmedSnapshot.length === 0 || hasUnconfirmedChanges) && quoteItems.length > 0 && (
+            {mode === 'tour' && quoteItems.length > 0 && (
               <Button
                 size="sm"
-                onClick={handleConfirmChanges}
-                disabled={confirmingChanges}
+                onClick={handleGenerateConfirmationSheet}
+                disabled={generatingSheet}
                 className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
-                {confirmingChanges ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-                {confirmedSnapshot.length === 0 ? '確認需求' : '確認變更'}
+                {generatingSheet ? <Loader2 size={14} className="animate-spin" /> : <ClipboardList size={14} />}
+                產生團確單
               </Button>
             )}
           </div>
@@ -935,112 +779,66 @@ export function RequirementsList({
               </thead>
               <tbody>
                 {CATEGORIES.map((cat) => {
-                  const trackItems = changeTrackByCategory[cat.key]
-                  if (trackItems.length === 0) return null
+                  const categoryItems = itemsByCategory[cat.key]
+                  if (categoryItems.length === 0) return null
 
-                  // 輔助函數：找匹配的需求單（優先用 resource_id，其次用 supplier_name + service_date）
-                  const findMatchingRequest = (itemData: ChangeTrackItem['item']) => {
-                    const itemResourceId = 'resourceId' in itemData ? itemData.resourceId : undefined
-                    const itemSupplierName = 'supplierName' in itemData ? itemData.supplierName : itemData.supplier_name
-                    const itemServiceDate = 'serviceDate' in itemData ? itemData.serviceDate : itemData.service_date
-
-                    // 優先用 resource_id 匹配（更可靠）
-                    if (itemResourceId) {
+                  // 輔助函數：找匹配的需求單
+                  const findMatchingRequest = (item: QuoteItem) => {
+                    if (item.resourceId) {
                       const byResourceId = existingRequests.find(r =>
-                        r.category === cat.key && r.resource_id === itemResourceId
+                        r.category === cat.key && r.resource_id === item.resourceId
                       )
                       if (byResourceId) return byResourceId
                     }
-
-                    // 其次用 supplier_name + service_date 匹配（避免同名供應商在不同日期混淆）
                     return existingRequests.find(r =>
                       r.category === cat.key &&
-                      r.supplier_name === itemSupplierName &&
-                      r.service_date === itemServiceDate
+                      r.supplier_name === item.supplierName &&
+                      r.service_date === item.serviceDate
                     )
                   }
 
-                  // 輔助函數：取得供應商識別 key（優先 resource_id）
-                  const getSupplierKey = (itemData: ChangeTrackItem['item']) => {
-                    const itemResourceId = 'resourceId' in itemData ? itemData.resourceId : undefined
-                    const itemSupplierName = 'supplierName' in itemData ? itemData.supplierName : itemData.supplier_name
-                    const serviceDate = 'serviceDate' in itemData ? itemData.serviceDate : itemData.service_date
-
-                    // 優先用 resourceId
-                    if (itemResourceId) {
-                      return itemResourceId
-                    }
-
-                    // 「飯店早餐」是固定文字，但每天可能是不同飯店，需要用日期區分
-                    if (itemSupplierName === '飯店早餐') {
-                      return `飯店早餐-${serviceDate || ''}`
-                    }
-
-                    // 一般供應商用名稱分組
-                    if (itemSupplierName) {
-                      return itemSupplierName
-                    }
-
-                    // 沒有供應商時，用 title + date 作為唯一 key
-                    return `${itemData.title}-${serviceDate || ''}`
+                  // 輔助函數：取得供應商識別 key
+                  const getSupplierKey = (item: QuoteItem) => {
+                    if (item.resourceId) return item.resourceId
+                    if (item.supplierName === '飯店早餐') return `飯店早餐-${item.serviceDate || ''}`
+                    if (item.supplierName) return item.supplierName
+                    return `${item.title}-${item.serviceDate || ''}`
                   }
 
                   // 計算隱藏與可見項目
-                  const visibleItems: typeof trackItems = []
-                  const hiddenItems: typeof trackItems = []
+                  const visibleItems: QuoteItem[] = []
+                  const hiddenItems: QuoteItem[] = []
 
-                  for (const trackItem of trackItems) {
-                    const existingRequest = findMatchingRequest(trackItem.item)
-                    // 如果有對應的需求單且被隱藏，則放入隱藏區
+                  for (const item of categoryItems) {
+                    const existingRequest = findMatchingRequest(item)
                     if (existingRequest?.hidden) {
-                      hiddenItems.push(trackItem)
+                      hiddenItems.push(item)
                     } else {
-                      visibleItems.push(trackItem)
+                      visibleItems.push(item)
                     }
                   }
 
                   const isHiddenExpanded = expandedHiddenCategories.has(cat.key)
 
-                  const categoryTotal = visibleItems.reduce((sum, ti) => {
-                    if (ti.type === 'cancelled') return sum
-                    const existing = findMatchingRequest(ti.item)
+                  const categoryTotal = visibleItems.reduce((sum, item) => {
+                    const existing = findMatchingRequest(item)
                     return sum + (existing?.quoted_cost || 0)
                   }, 0)
 
-                  // 追蹤已顯示操作按鈕的供應商（同一供應商只在第一行顯示按鈕）
+                  // 追蹤已顯示操作按鈕的供應商
                   const renderedSuppliers = new Set<string>()
 
-                  // 渲染單一項目的函數
-                  const renderItem = (trackItem: ChangeTrackItem, idx: number, isHidden: boolean) => {
-                    const isCancelled = trackItem.type === 'cancelled'
-                    const isNew = trackItem.type === 'new'
-                    const itemData = trackItem.item
-                    const supplierName = 'supplierName' in itemData ? itemData.supplierName : itemData.supplier_name
-                    const serviceDate = 'serviceDate' in itemData ? itemData.serviceDate : itemData.service_date
-                    const title = itemData.title
-                    const notes = itemData.notes
-                    const quantity = 'quantity' in itemData ? itemData.quantity : 1
-                    const resourceId = 'resourceId' in itemData ? itemData.resourceId : undefined
-
-                    // 找匹配的需求單
-                    const existingRequest = findMatchingRequest(itemData)
-
-                    // 判斷是否為該供應商的第一行（只有第一行顯示操作按鈕）
-                    const supplierKey = getSupplierKey(itemData)
+                  // 渲染單一項目
+                  const renderItem = (item: QuoteItem, idx: number, isHidden: boolean) => {
+                    const existingRequest = findMatchingRequest(item)
+                    const supplierKey = getSupplierKey(item)
                     const isFirstRowForSupplier = !renderedSuppliers.has(supplierKey)
-                    if (isFirstRowForSupplier) {
-                      renderedSuppliers.add(supplierKey)
-                    }
+                    if (isFirstRowForSupplier) renderedSuppliers.add(supplierKey)
 
-                    // 使用統一狀態配置
-                    let statusLabel = ''
+                    // 狀態配置
+                    let statusLabel = '待作業'
                     let statusClass = ''
-                    if (isCancelled) {
-                      statusLabel = '待取消'
-                      const config = getStatusConfig('tour_request', 'cancelled')
-                      statusClass = `${config.bgColor} ${config.color}`
-                    } else if (isNew || !existingRequest) {
-                      statusLabel = '待作業'
+                    if (!existingRequest) {
                       const config = getStatusConfig('tour_request', 'pending')
                       statusClass = `${config.bgColor} ${config.color}`
                     } else {
@@ -1050,40 +848,31 @@ export function RequirementsList({
                       statusClass = `${config.bgColor} ${config.color}`
                     }
 
-                    const quotedCost = existingRequest?.quoted_cost
-                    // 報價（從報價單帶入）
-                    const quotedPrice = 'quotedPrice' in itemData ? itemData.quotedPrice : null
-
                     return (
                       <tr
                         key={`${cat.key}-${isHidden ? 'hidden' : 'visible'}-${idx}`}
                         className={cn(
                           'border-t border-border/50 hover:bg-morandi-container/20',
-                          isCancelled && 'bg-morandi-red/5',
                           isHidden && 'bg-morandi-muted/5'
                         )}
                       >
-                        <td className={cn('px-3 py-2.5', isCancelled && 'line-through text-morandi-muted')}>
-                          {formatDate(serviceDate)}
-                        </td>
-                        <td className={cn('px-3 py-2.5', isCancelled && 'line-through text-morandi-muted')}>
-                          {supplierName || '-'}
-                        </td>
+                        <td className="px-3 py-2.5">{formatDate(item.serviceDate)}</td>
+                        <td className="px-3 py-2.5">{item.supplierName || '-'}</td>
                         <td className="px-3 py-2.5">
-                          <div className={cn(isCancelled && 'line-through text-morandi-muted')}>
-                            <span>{title}</span>
-                            {notes && (
+                          <div>
+                            <span>{item.title}</span>
+                            {item.notes && (
                               <div className="text-xs mt-0.5 text-morandi-secondary whitespace-pre-line">
-                                {notes}
+                                {item.notes}
                               </div>
                             )}
                           </div>
                         </td>
                         <td className="px-3 py-2.5 text-right font-medium text-morandi-secondary">
-                          {quotedPrice ? `$${quotedPrice.toLocaleString()}` : '-'}
+                          {item.quotedPrice ? `$${item.quotedPrice.toLocaleString()}` : '-'}
                         </td>
                         <td className="px-3 py-2.5 text-right font-medium text-morandi-primary">
-                          {quotedCost ? `$${quotedCost.toLocaleString()}` : '-'}
+                          {existingRequest?.quoted_cost ? `$${existingRequest.quoted_cost.toLocaleString()}` : '-'}
                         </td>
                         <td className="px-3 py-2.5 text-center">
                           <span className={cn('inline-flex items-center px-2 py-0.5 rounded text-xs font-medium', statusClass)}>
@@ -1092,8 +881,8 @@ export function RequirementsList({
                         </td>
                         <td className="px-3 py-2.5 text-center">
                           <div className="flex items-center justify-center gap-1">
-                            {/* 隱藏/恢復按鈕 - 隱藏項目一定要顯示恢復按鈕，不受 isFirstRowForSupplier 限制 */}
-                            {!isCancelled && (isHidden || isFirstRowForSupplier) && (
+                            {/* 隱藏/恢復按鈕 */}
+                            {(isHidden || isFirstRowForSupplier) && (
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -1102,12 +891,12 @@ export function RequirementsList({
                                   !isHidden,
                                   !existingRequest ? {
                                     category: cat.key,
-                                    supplierName: supplierName || '',
-                                    title,
-                                    serviceDate,
-                                    quantity,
-                                    notes: notes || undefined,
-                                    resourceId,
+                                    supplierName: item.supplierName || '',
+                                    title: item.title,
+                                    serviceDate: item.serviceDate,
+                                    quantity: item.quantity,
+                                    notes: item.notes,
+                                    resourceId: item.resourceId,
                                     resourceType: cat.key === 'accommodation' ? 'hotel' : cat.key === 'meal' ? 'restaurant' : cat.key === 'activity' ? 'attraction' : undefined,
                                   } : undefined
                                 )}
@@ -1122,27 +911,12 @@ export function RequirementsList({
                                 {isHidden ? <Eye size={14} /> : <EyeOff size={14} />}
                               </Button>
                             )}
-                            {/* 列印取消單按鈕 */}
-                            {isFirstRowForSupplier && isCancelled && supplierName && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  const items = cancelledBySupplier.get(supplierName)
-                                  if (items) handlePrintCancellation(supplierName, items)
-                                }}
-                                className="h-7 w-7 p-0 text-morandi-red hover:text-morandi-red/80 hover:bg-morandi-red/10"
-                                title="列印取消單"
-                              >
-                                <Printer size={14} />
-                              </Button>
-                            )}
                             {/* 產生需求單按鈕 */}
-                            {isFirstRowForSupplier && !isCancelled && supplierName && onOpenRequestDialog && (
+                            {isFirstRowForSupplier && item.supplierName && onOpenRequestDialog && (
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => openRequestDialog(cat.key, supplierName)}
+                                onClick={() => openRequestDialog(cat.key, item.supplierName)}
                                 className="h-7 w-7 p-0 text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10"
                                 title="產生需求單"
                               >
@@ -1163,7 +937,7 @@ export function RequirementsList({
                           <div className="flex items-center gap-3">
                             <span className="font-medium text-morandi-primary">{cat.label}</span>
                             <span className="text-xs text-morandi-secondary">
-                              ({visibleItems.filter(t => t.type !== 'cancelled').length} 項)
+                              ({visibleItems.length} 項)
                             </span>
                             {/* 已隱藏指示器 */}
                             {hiddenItems.length > 0 && (
@@ -1222,19 +996,6 @@ export function RequirementsList({
           </div>
         )}
 
-        {/* 底部說明 */}
-        {hasUnconfirmedChanges && (
-          <div className="flex items-center gap-4 text-xs text-morandi-secondary px-2">
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-morandi-red/20 rounded border border-morandi-red/50" />
-              <span className="text-morandi-red">取消</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-amber-100 rounded border border-amber-300" />
-              <span className="text-amber-700">待作業</span>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* 手動新增需求 Dialog */}
