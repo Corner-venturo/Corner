@@ -2570,6 +2570,7 @@ export type Database = {
           updated_at: string | null
           uploaded_by: string | null
           uploaded_by_name: string | null
+          workspace_id: string | null
         }
         Insert: {
           asset_type?: string | null
@@ -2585,6 +2586,7 @@ export type Database = {
           updated_at?: string | null
           uploaded_by?: string | null
           uploaded_by_name?: string | null
+          workspace_id?: string | null
         }
         Update: {
           asset_type?: string | null
@@ -2600,6 +2602,7 @@ export type Database = {
           updated_at?: string | null
           uploaded_by?: string | null
           uploaded_by_name?: string | null
+          workspace_id?: string | null
         }
         Relationships: [
           {
@@ -2607,6 +2610,13 @@ export type Database = {
             columns: ["folder_id"]
             isOneToOne: false
             referencedRelation: "company_asset_folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_assets_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -8334,6 +8344,7 @@ export type Database = {
           supplier_id: string | null
           supplier_name: string | null
           tour_id: string | null
+          tour_request_id: string | null
           unitprice: number | null
           updated_at: string | null
           updated_by: string | null
@@ -8356,6 +8367,7 @@ export type Database = {
           supplier_id?: string | null
           supplier_name?: string | null
           tour_id?: string | null
+          tour_request_id?: string | null
           unitprice?: number | null
           updated_at?: string | null
           updated_by?: string | null
@@ -8378,6 +8390,7 @@ export type Database = {
           supplier_id?: string | null
           supplier_name?: string | null
           tour_id?: string | null
+          tour_request_id?: string | null
           unitprice?: number | null
           updated_at?: string | null
           updated_by?: string | null
@@ -8396,6 +8409,20 @@ export type Database = {
             columns: ["tour_id"]
             isOneToOne: false
             referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_request_items_tour_request_id_fkey"
+            columns: ["tour_request_id"]
+            isOneToOne: false
+            referencedRelation: "tour_request_payment_summary"
+            referencedColumns: ["tour_request_id"]
+          },
+          {
+            foreignKeyName: "payment_request_items_tour_request_id_fkey"
+            columns: ["tour_request_id"]
+            isOneToOne: false
+            referencedRelation: "tour_requests"
             referencedColumns: ["id"]
           },
         ]
@@ -11944,6 +11971,13 @@ export type Database = {
             foreignKeyName: "request_responses_request_id_fkey"
             columns: ["request_id"]
             isOneToOne: false
+            referencedRelation: "tour_request_payment_summary"
+            referencedColumns: ["tour_request_id"]
+          },
+          {
+            foreignKeyName: "request_responses_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
             referencedRelation: "tour_requests"
             referencedColumns: ["id"]
           },
@@ -12851,6 +12885,13 @@ export type Database = {
           supplier_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "supplier_request_responses_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "tour_request_payment_summary"
+            referencedColumns: ["tour_request_id"]
+          },
           {
             foreignKeyName: "supplier_request_responses_request_id_fkey"
             columns: ["request_id"]
@@ -13779,6 +13820,13 @@ export type Database = {
             foreignKeyName: "tour_confirmation_items_request_id_fkey"
             columns: ["request_id"]
             isOneToOne: false
+            referencedRelation: "tour_request_payment_summary"
+            referencedColumns: ["tour_request_id"]
+          },
+          {
+            foreignKeyName: "tour_confirmation_items_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
             referencedRelation: "tour_requests"
             referencedColumns: ["id"]
           },
@@ -14554,6 +14602,13 @@ export type Database = {
             foreignKeyName: "tour_request_items_request_id_fkey"
             columns: ["request_id"]
             isOneToOne: false
+            referencedRelation: "tour_request_payment_summary"
+            referencedColumns: ["tour_request_id"]
+          },
+          {
+            foreignKeyName: "tour_request_items_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
             referencedRelation: "tour_requests"
             referencedColumns: ["id"]
           },
@@ -14603,6 +14658,13 @@ export type Database = {
           voucher_type?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "tour_request_member_vouchers_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "tour_request_payment_summary"
+            referencedColumns: ["tour_request_id"]
+          },
           {
             foreignKeyName: "tour_request_member_vouchers_request_id_fkey"
             columns: ["request_id"]
@@ -14671,6 +14733,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "tour_request_messages_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "tour_request_payment_summary"
+            referencedColumns: ["tour_request_id"]
+          },
           {
             foreignKeyName: "tour_request_messages_request_id_fkey"
             columns: ["request_id"]
@@ -18414,6 +18483,21 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tour_request_payment_summary: {
+        Row: {
+          category: string | null
+          estimated_cost: number | null
+          final_cost: number | null
+          supplier_id: string | null
+          supplier_name: string | null
+          title: string | null
+          total_paid: number | null
+          total_requested: number | null
+          tour_id: string | null
+          tour_request_id: string | null
+        }
+        Relationships: []
       }
       tour_requests_progress: {
         Row: {
