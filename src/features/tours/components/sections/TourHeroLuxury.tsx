@@ -112,9 +112,9 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
 
             {/* 描述 - 靠左對齊 */}
             {data.description && (
-              <div className="flex gap-6 items-start pt-2">
+              <div className="flex gap-4 items-start">
                 <div
-                  className="w-12 h-px mt-3 opacity-50"
+                  className="w-10 h-px mt-3 opacity-40 ml-1"
                   style={{ backgroundColor: LUXURY.text }}
                 />
                 <p
@@ -164,9 +164,6 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
                   }}
                 >
                   {data.departureDate || 'Coming Soon'}
-                </p>
-                <p className="text-xs mt-1" style={{ color: LUXURY.muted }}>
-                  Limited Availability
                 </p>
               </div>
             </div>
