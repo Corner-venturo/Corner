@@ -377,11 +377,7 @@ export function TourItinerarySectionLuxury({
                               <div
                                 className="mt-4 p-4 rounded-lg cursor-pointer hover:bg-opacity-80 transition-colors"
                                 style={{ backgroundColor: LUXURY.background }}
-                                onClick={() => day.activities?.[0] && setSelectedActivity({
-                                  title: day.activities[0].title || '',
-                                  description: day.activities[0].description,
-                                  image: day.activities[0].image
-                                })}
+                                onClick={() => openImageGallery(allImages, 0)}
                               >
                                 {/* 景點名稱列表 */}
                                 <div className="flex flex-wrap gap-2 mb-2">
