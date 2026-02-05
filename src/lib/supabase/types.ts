@@ -13852,7 +13852,9 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           departure_date: string | null
+          exchange_rate: number | null
           flight_info: string | null
+          foreign_currency: string | null
           id: string
           itinerary_id: string | null
           itinerary_version: number | null
@@ -13877,7 +13879,9 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           departure_date?: string | null
+          exchange_rate?: number | null
           flight_info?: string | null
+          foreign_currency?: string | null
           id?: string
           itinerary_id?: string | null
           itinerary_version?: number | null
@@ -13902,7 +13906,9 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           departure_date?: string | null
+          exchange_rate?: number | null
           flight_info?: string | null
+          foreign_currency?: string | null
           id?: string
           itinerary_id?: string | null
           itinerary_version?: number | null
@@ -14324,6 +14330,7 @@ export type Database = {
           code: string | null
           created_at: string | null
           display_order: number | null
+          domestic_phone: string | null
           email: string | null
           english_name: string | null
           id: string
@@ -14332,9 +14339,11 @@ export type Database = {
           name: string
           national_id: string | null
           notes: string | null
+          overseas_phone: string | null
           passport_expiry: string | null
           passport_number: string | null
           phone: string | null
+          photo: string | null
           specialties: string[] | null
           status: string | null
           updated_at: string | null
@@ -14344,6 +14353,7 @@ export type Database = {
           code?: string | null
           created_at?: string | null
           display_order?: number | null
+          domestic_phone?: string | null
           email?: string | null
           english_name?: string | null
           id?: string
@@ -14352,9 +14362,11 @@ export type Database = {
           name: string
           national_id?: string | null
           notes?: string | null
+          overseas_phone?: string | null
           passport_expiry?: string | null
           passport_number?: string | null
           phone?: string | null
+          photo?: string | null
           specialties?: string[] | null
           status?: string | null
           updated_at?: string | null
@@ -14364,6 +14376,7 @@ export type Database = {
           code?: string | null
           created_at?: string | null
           display_order?: number | null
+          domestic_phone?: string | null
           email?: string | null
           english_name?: string | null
           id?: string
@@ -14372,9 +14385,11 @@ export type Database = {
           name?: string
           national_id?: string | null
           notes?: string | null
+          overseas_phone?: string | null
           passport_expiry?: string | null
           passport_number?: string | null
           phone?: string | null
+          photo?: string | null
           specialties?: string[] | null
           status?: string | null
           updated_at?: string | null

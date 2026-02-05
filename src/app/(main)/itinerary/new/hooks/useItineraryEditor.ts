@@ -7,6 +7,8 @@ import { createItinerary, updateItinerary } from '@/data'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import { syncHotelsFromItineraryToQuote } from '@/features/quotes/services/quoteItinerarySync'
+import { supabase } from '@/lib/supabase/client'
+import { confirm } from '@/lib/ui/alert-dialog'
 import type {
   FlightInfo,
   Feature,
@@ -157,6 +159,37 @@ export function useItineraryEditor() {
               }
             })
             .catch(err => logger.error('飯店同步錯誤:', err))
+        }
+
+        // 同步領隊到 tour_leaders 表
+        const leader = convertedData.leader
+        if (leader?.name && leader.name.trim()) {
+          // 檢查是否已存在
+          const { data: existingLeader } = await supabase
+            .from('tour_leaders')
+            .select('id, name')
+            .eq('name', leader.name.trim())
+            .maybeSingle()
+
+          if (!existingLeader) {
+            // 詢問是否要新增到領隊資料庫
+            const shouldSave = await confirm(
+              `要將「${leader.name}」新增到領隊資料庫嗎？\n下次可以直接搜尋選用。`,
+              { title: '儲存領隊資料', type: 'info' }
+            )
+
+            if (shouldSave) {
+              await supabase.from('tour_leaders').insert({
+                name: leader.name.trim(),
+                english_name: leader.englishName || null,
+                photo: leader.photo || null,
+                domestic_phone: leader.domesticPhone || null,
+                overseas_phone: leader.overseasPhone || null,
+                status: 'active',
+              })
+              logger.log('[ItineraryEditor] 領隊已新增到資料庫:', leader.name)
+            }
+          }
         }
       } else {
         if (!convertedData.title) {

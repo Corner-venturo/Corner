@@ -238,25 +238,50 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
   }>({ open: false, itemId: null })
   const [exchangeRateInput, setExchangeRateInput] = useState('')
 
-  // 處理幣值轉換
+  // 本地匯率狀態（當資料庫欄位不存在時使用）
+  const [localExchangeRate, setLocalExchangeRate] = useState<number | null>(null)
+  const effectiveExchangeRate = sheet?.exchange_rate ?? localExchangeRate
+
+  // 處理幣值轉換 - 點擊外幣按鈕時，自動用小計除以匯率更新預計支出
   const handleCurrencyConvert = async (itemId: string) => {
     if (!sheet) return
 
     // 如果還沒設定匯率，打開對話框設定
-    if (!sheet.exchange_rate) {
+    if (!effectiveExchangeRate) {
       setExchangeRateDialog({ open: true, itemId })
       return
     }
 
-    // 已有匯率，直接轉換該項目的預計支出
+    // 找到該項目
     const item = Object.values(groupedItems).flat().find(i => i.id === itemId)
-    if (!item?.expected_cost) return
+    if (!item) return
 
-    const convertedAmount = Math.round(item.expected_cost / sheet.exchange_rate)
-    toast({
-      title: `換算結果`,
-      description: `${item.expected_cost.toLocaleString()} TWD = ${convertedAmount.toLocaleString()} ${destinationCurrency || '外幣'}`,
-    })
+    // 計算小計（優先用資料庫的 subtotal，否則用 unit_price * quantity）
+    const subtotal = item.subtotal ?? ((item.unit_price || 0) * (item.quantity || 1))
+    if (subtotal <= 0) {
+      toast({ title: '小計為 0，無法換算', variant: 'destructive' })
+      return
+    }
+
+    // 換算：小計(TWD) / 匯率 = 外幣金額
+    const convertedAmount = Math.round(subtotal / effectiveExchangeRate)
+
+    try {
+      // 更新預計支出
+      await updateItem(itemId, { expected_cost: convertedAmount })
+
+      // 同步更新 localExpectedCostsRef 以確保 UI 立即反映新值
+      localExpectedCostsRef.current[itemId] = { value: convertedAmount, dirty: false }
+      forceUpdate(n => n + 1)
+
+      toast({
+        title: `已更新預計支出`,
+        description: `${subtotal.toLocaleString()} TWD ÷ ${effectiveExchangeRate} = ${convertedAmount.toLocaleString()} ${destinationCurrency}`,
+      })
+    } catch (err) {
+      logger.error('更新預計支出失敗:', err)
+      toast({ title: '更新失敗', variant: 'destructive' })
+    }
   }
 
   // 儲存匯率設定
@@ -273,23 +298,26 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
         foreign_currency: destinationCurrency,
       })
       toast({ title: '匯率設定成功', description: `1 ${destinationCurrency} = ${rate} TWD` })
-      setExchangeRateDialog({ open: false, itemId: null })
-      setExchangeRateInput('')
-
-      // 如果有指定項目，執行轉換
-      if (exchangeRateDialog.itemId) {
-        const item = Object.values(groupedItems).flat().find(i => i.id === exchangeRateDialog.itemId)
-        if (item?.expected_cost) {
-          const convertedAmount = Math.round(item.expected_cost / rate)
-          toast({
-            title: `換算結果`,
-            description: `${item.expected_cost.toLocaleString()} TWD = ${convertedAmount.toLocaleString()} ${destinationCurrency || '外幣'}`,
-          })
-        }
-      }
     } catch (err) {
-      logger.error('儲存匯率失敗:', err)
-      toast({ title: '儲存失敗', variant: 'destructive' })
+      // 如果資料庫欄位不存在，改用本地狀態
+      logger.warn('無法儲存匯率到資料庫，使用本地狀態:', err)
+      setLocalExchangeRate(rate)
+      toast({ title: '匯率已設定（本次有效）', description: `1 ${destinationCurrency} = ${rate} TWD` })
+    }
+
+    setExchangeRateDialog({ open: false, itemId: null })
+    setExchangeRateInput('')
+
+    // 如果有指定項目，執行轉換
+    if (exchangeRateDialog.itemId) {
+      const item = Object.values(groupedItems).flat().find(i => i.id === exchangeRateDialog.itemId)
+      if (item?.expected_cost) {
+        const convertedAmount = Math.round(item.expected_cost / rate)
+        toast({
+          title: `換算結果`,
+          description: `${item.expected_cost.toLocaleString()} TWD = ${convertedAmount.toLocaleString()} ${destinationCurrency || '外幣'}`,
+        })
+      }
     }
   }
 
@@ -1794,15 +1822,14 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                                 className="flex-1 h-7 px-2 py-1 text-xs bg-transparent border border-transparent hover:border-border focus:border-morandi-gold focus:ring-1 focus:ring-morandi-gold/30 rounded outline-none"
                                 placeholder="備註..."
                               />
-                              {destinationCurrency && item.expected_cost ? (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-6 px-1.5 text-xs text-morandi-gold hover:text-morandi-gold-hover shrink-0"
+                              {destinationCurrency && (item.subtotal || (item.unit_price && item.quantity)) ? (
+                                <button
+                                  type="button"
+                                  className="h-6 px-1.5 text-xs text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10 rounded shrink-0"
                                   onClick={() => handleCurrencyConvert(item.id)}
                                 >
                                   {destinationCurrency}
-                                </Button>
+                                </button>
                               ) : null}
                             </div>
                           </td>
@@ -2212,17 +2239,17 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
           <h3 className="font-medium text-morandi-primary">結算</h3>
           {destinationCurrency && (
             <div className="flex items-center gap-2 text-sm">
-              {sheet?.exchange_rate ? (
+              {effectiveExchangeRate ? (
                 <>
                   <span className="text-morandi-secondary">
-                    匯率：1 {destinationCurrency} = {sheet.exchange_rate} TWD
+                    匯率：1 {destinationCurrency} = {effectiveExchangeRate} TWD
                   </span>
                   <Button
                     variant="ghost"
                     size="sm"
                     className="h-6 px-2 text-xs text-morandi-gold hover:text-morandi-gold-hover"
                     onClick={() => {
-                      setExchangeRateInput(sheet.exchange_rate?.toString() || '')
+                      setExchangeRateInput(effectiveExchangeRate?.toString() || '')
                       setExchangeRateDialog({ open: true, itemId: null })
                     }}
                   >
@@ -2256,18 +2283,18 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
               {formatCurrency(costSummary.total.actual)}
             </p>
           </div>
-          {destinationCurrency && sheet?.exchange_rate && (
+          {destinationCurrency && effectiveExchangeRate && (
             <>
               <div className="space-y-1">
                 <p className="text-xs text-morandi-secondary">預計支出 ({destinationCurrency})</p>
                 <p className="text-lg font-mono font-medium text-morandi-gold">
-                  {Math.round(costSummary.total.expected / sheet.exchange_rate).toLocaleString()}
+                  {Math.round(costSummary.total.expected / effectiveExchangeRate).toLocaleString()}
                 </p>
               </div>
               <div className="space-y-1">
                 <p className="text-xs text-morandi-secondary">實際支出 ({destinationCurrency})</p>
                 <p className="text-lg font-mono font-medium text-morandi-gold">
-                  {Math.round(costSummary.total.actual / sheet.exchange_rate).toLocaleString()}
+                  {Math.round(costSummary.total.actual / effectiveExchangeRate).toLocaleString()}
                 </p>
               </div>
             </>
