@@ -112,9 +112,9 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
 
             {/* 描述 - 靠左對齊 */}
             {data.description && (
-              <div className="flex gap-4 items-start">
+              <div className="flex gap-3 items-start -mt-2">
                 <div
-                  className="w-10 h-px mt-3 opacity-40 ml-1"
+                  className="w-8 h-px mt-2.5 opacity-30 ml-2"
                   style={{ backgroundColor: LUXURY.text }}
                 />
                 <p
