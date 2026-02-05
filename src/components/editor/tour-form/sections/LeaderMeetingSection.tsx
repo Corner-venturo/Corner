@@ -1,7 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { TourFormData, MeetingPoint } from '../types'
-import { Plus, X, Upload, User, Loader2 } from 'lucide-react'
+import { Plus, X, Upload, User, Loader2, Search } from 'lucide-react'
 import { uploadFileToStorage } from '@/services/storage'
+import { supabase } from '@/lib/supabase/client'
+import type { TourLeader } from '@/types/tour-leader.types'
 
 interface LeaderMeetingSectionProps {
   data: TourFormData
@@ -55,6 +57,80 @@ export function LeaderMeetingSection({
   // 頭像上傳狀態
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
   const photoInputRef = useRef<HTMLInputElement>(null)
+
+  // 領隊搜尋狀態
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<TourLeader[]>([])
+  const [showDropdown, setShowDropdown] = useState(false)
+  const [isSearching, setIsSearching] = useState(false)
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // 搜尋領隊
+  const searchLeaders = useCallback(async (query: string) => {
+    if (!query || query.length < 1) {
+      setSearchResults([])
+      return
+    }
+
+    setIsSearching(true)
+    try {
+      const { data, error } = await supabase
+        .from('tour_leaders')
+        .select('*')
+        .or(`name.ilike.%${query}%,english_name.ilike.%${query}%`)
+        .eq('status', 'active')
+        .limit(5)
+
+      if (!error && data) {
+        setSearchResults(data as unknown as TourLeader[])
+        setShowDropdown(data.length > 0)
+      }
+    } catch (err) {
+      console.error('Search leaders error:', err)
+    } finally {
+      setIsSearching(false)
+    }
+  }, [])
+
+  // 處理名稱輸入
+  const handleNameChange = (value: string) => {
+    updateNestedField('leader', 'name', value)
+    setSearchQuery(value)
+
+    // 防抖搜尋
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current)
+    }
+    searchTimeoutRef.current = setTimeout(() => {
+      searchLeaders(value)
+    }, 300)
+  }
+
+  // 選擇領隊
+  const handleSelectLeader = (leader: TourLeader) => {
+    // 填入所有資料
+    updateNestedField('leader', 'name', leader.name)
+    updateNestedField('leader', 'englishName', leader.english_name || '')
+    updateNestedField('leader', 'domesticPhone', leader.domestic_phone || leader.phone || '')
+    updateNestedField('leader', 'overseasPhone', leader.overseas_phone || '')
+    if (leader.photo) {
+      updateNestedField('leader', 'photo', leader.photo)
+    }
+    setShowDropdown(false)
+    setSearchResults([])
+  }
+
+  // 點擊外部關閉下拉
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // 頭像上傳處理
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -188,15 +264,66 @@ export function LeaderMeetingSection({
               </button>
             )}
           </div>
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-morandi-primary mb-1">領隊姓名</label>
-            <input
-              type="text"
-              value={data.leader?.name || ''}
-              onChange={e => updateNestedField('leader', 'name', e.target.value)}
-              className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
-              placeholder="鍾惠如 小姐"
-            />
+          <div className="flex-1 space-y-3">
+            {/* 中文名稱 - 帶搜尋 */}
+            <div className="relative" ref={dropdownRef}>
+              <label className="block text-sm font-medium text-morandi-primary mb-1">中文名稱</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={data.leader?.name || ''}
+                  onChange={e => handleNameChange(e.target.value)}
+                  onFocus={() => searchQuery && searchResults.length > 0 && setShowDropdown(true)}
+                  className="w-full px-3 py-2 pr-10 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
+                  placeholder="輸入名稱搜尋領隊..."
+                />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  {isSearching ? (
+                    <Loader2 size={16} className="text-morandi-secondary animate-spin" />
+                  ) : (
+                    <Search size={16} className="text-morandi-secondary" />
+                  )}
+                </div>
+              </div>
+              {/* 搜尋結果下拉 */}
+              {showDropdown && searchResults.length > 0 && (
+                <div className="absolute z-50 w-full mt-1 bg-card border border-morandi-container rounded-lg shadow-lg max-h-60 overflow-auto">
+                  {searchResults.map((leader) => (
+                    <button
+                      key={leader.id}
+                      type="button"
+                      onClick={() => handleSelectLeader(leader)}
+                      className="w-full px-3 py-2 text-left hover:bg-morandi-container/30 transition-colors flex items-center gap-3"
+                    >
+                      {leader.photo ? (
+                        <img src={leader.photo} alt="" className="w-8 h-8 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-morandi-container/50 flex items-center justify-center">
+                          <User size={14} className="text-morandi-secondary" />
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-sm font-medium text-morandi-primary">{leader.name}</p>
+                        {leader.english_name && (
+                          <p className="text-xs text-morandi-secondary">{leader.english_name}</p>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            {/* 英文暱稱 */}
+            <div>
+              <label className="block text-sm font-medium text-morandi-primary mb-1">英文暱稱</label>
+              <input
+                type="text"
+                value={data.leader?.englishName || ''}
+                onChange={e => updateNestedField('leader', 'englishName', e.target.value)}
+                className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
+                placeholder="Iris"
+              />
+            </div>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">

@@ -89,6 +89,7 @@ export function TourLeaderSection({ data, viewMode, coverStyle = 'original' }: T
                   <p className="text-xs text-morandi-secondary mb-1">領隊姓名</p>
                   <p className={viewMode === 'mobile' ? 'text-base font-semibold text-morandi-primary' : 'text-lg font-semibold text-morandi-primary'}>
                     {data.leader?.name || '待定'}
+                    {data.leader?.englishName && ` ${data.leader.englishName}`}
                   </p>
                 </div>
                 <div>

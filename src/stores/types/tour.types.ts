@@ -136,7 +136,8 @@ export interface FocusCard {
 }
 
 export interface LeaderInfo {
-  name: string
+  name: string // 中文名稱
+  englishName?: string | null // 英文暱稱
   domesticPhone: string
   overseasPhone: string
   // 進階欄位（Art/Collage 風格使用）

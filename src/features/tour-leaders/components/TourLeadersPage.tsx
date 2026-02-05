@@ -18,7 +18,10 @@ import { confirm, alert } from '@/lib/ui/alert-dialog'
 const emptyFormData: TourLeaderFormData = {
   name: '',
   english_name: '',
+  photo: '',
   phone: '',
+  domestic_phone: '',
+  overseas_phone: '',
   email: '',
   address: '',
   national_id: '',
@@ -68,7 +71,10 @@ export const TourLeadersPage: React.FC = () => {
     setFormData({
       name: item.name || '',
       english_name: item.english_name || '',
+      photo: item.photo || '',
       phone: item.phone || '',
+      domestic_phone: item.domestic_phone || '',
+      overseas_phone: item.overseas_phone || '',
       email: item.email || '',
       address: item.address || '',
       national_id: item.national_id || '',
@@ -131,7 +137,10 @@ export const TourLeadersPage: React.FC = () => {
       const data = {
         name: formData.name,
         english_name: formData.english_name || null,
+        photo: formData.photo || null,
         phone: formData.phone || null,
+        domestic_phone: formData.domestic_phone || null,
+        overseas_phone: formData.overseas_phone || null,
         email: formData.email || null,
         address: formData.address || null,
         national_id: formData.national_id || null,

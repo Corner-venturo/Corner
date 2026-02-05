@@ -4,12 +4,14 @@
 
 'use client'
 
-import React from 'react'
+import React, { useRef, useState } from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Upload, User, X, Loader2 } from 'lucide-react'
+import { uploadFileToStorage } from '@/services/storage'
 import type { TourLeaderFormData } from '@/types/tour-leader.types'
 
 interface TourLeadersDialogProps {
@@ -32,6 +34,29 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
   onFormFieldChange,
   onSubmit,
 }) => {
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
+  const photoInputRef = useRef<HTMLInputElement>(null)
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) return
+
+    setIsUploadingPhoto(true)
+    try {
+      const result = await uploadFileToStorage(file, {
+        bucket: 'workspace-files',
+        folder: 'leader-photos',
+      })
+      onFormFieldChange('photo', result.publicUrl)
+    } catch (error) {
+      console.error('Failed to upload photo:', error)
+    } finally {
+      setIsUploadingPhoto(false)
+      if (photoInputRef.current) photoInputRef.current.value = ''
+    }
+  }
+
   return (
     <FormDialog
       open={isOpen}
@@ -47,33 +72,96 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
         {/* 基本資料 */}
         <div>
           <h4 className="text-sm font-semibold text-morandi-primary mb-3">基本資料</h4>
+          <div className="flex gap-4 mb-4">
+            {/* 頭像上傳 */}
+            <div className="flex-shrink-0">
+              <div className="relative">
+                {formData.photo ? (
+                  <div className="relative">
+                    <img
+                      src={formData.photo}
+                      alt="領隊頭像"
+                      className="w-20 h-20 rounded-full object-cover border-2 border-morandi-container"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => onFormFieldChange('photo', '')}
+                      className="absolute -top-1 -right-1 p-1 bg-morandi-red text-white rounded-full hover:bg-morandi-red/80 transition-colors"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    className="w-20 h-20 rounded-full bg-morandi-container/50 flex items-center justify-center cursor-pointer hover:bg-morandi-container transition-colors border-2 border-dashed border-morandi-container"
+                    onClick={() => photoInputRef.current?.click()}
+                  >
+                    {isUploadingPhoto ? (
+                      <Loader2 size={24} className="text-morandi-secondary animate-spin" />
+                    ) : (
+                      <User size={24} className="text-morandi-secondary" />
+                    )}
+                  </div>
+                )}
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoUpload}
+                  className="hidden"
+                />
+              </div>
+              {!formData.photo && (
+                <button
+                  type="button"
+                  onClick={() => photoInputRef.current?.click()}
+                  disabled={isUploadingPhoto}
+                  className="mt-2 flex items-center gap-1 text-xs text-morandi-secondary hover:text-morandi-primary transition-colors"
+                >
+                  <Upload size={12} />
+                  上傳頭像
+                </button>
+              )}
+            </div>
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-morandi-primary">
+                  中文姓名 <span className="text-morandi-red">*</span>
+                </label>
+                <Input
+                  value={formData.name}
+                  onChange={e => onFormFieldChange('name', e.target.value)}
+                  placeholder="輸入中文姓名"
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-morandi-primary">英文暱稱</label>
+                <Input
+                  value={formData.english_name}
+                  onChange={e => onFormFieldChange('english_name', e.target.value)}
+                  placeholder="輸入英文暱稱"
+                  className="mt-1"
+                />
+              </div>
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">
-                中文姓名 <span className="text-morandi-red">*</span>
-              </label>
+              <label className="text-sm font-medium text-morandi-primary">國內電話</label>
               <Input
-                value={formData.name}
-                onChange={e => onFormFieldChange('name', e.target.value)}
-                placeholder="輸入中文姓名"
+                value={formData.domestic_phone}
+                onChange={e => onFormFieldChange('domestic_phone', e.target.value)}
+                placeholder="+886 0912345678"
                 className="mt-1"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">英文姓名（護照拼音）</label>
+              <label className="text-sm font-medium text-morandi-primary">國外電話</label>
               <Input
-                value={formData.english_name}
-                onChange={e => onFormFieldChange('english_name', e.target.value)}
-                placeholder="輸入護照拼音"
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-morandi-primary">電話</label>
-              <Input
-                value={formData.phone}
-                onChange={e => onFormFieldChange('phone', e.target.value)}
-                placeholder="輸入電話號碼"
+                value={formData.overseas_phone}
+                onChange={e => onFormFieldChange('overseas_phone', e.target.value)}
+                placeholder="+81 08012345678"
                 className="mt-1"
               />
             </div>
@@ -84,6 +172,15 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
                 value={formData.email}
                 onChange={e => onFormFieldChange('email', e.target.value)}
                 placeholder="輸入 Email"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-morandi-primary">電話（舊）</label>
+              <Input
+                value={formData.phone}
+                onChange={e => onFormFieldChange('phone', e.target.value)}
+                placeholder="輸入電話號碼"
                 className="mt-1"
               />
             </div>

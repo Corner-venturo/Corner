@@ -141,6 +141,11 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
                   }}
                 >
                   {leader?.name || '待定'}
+                  {leader?.englishName && (
+                    <span className="ml-2" style={{ color: LUXURY.text }}>
+                      {leader.englishName}
+                    </span>
+                  )}
                 </h3>
                 <p className="text-sm mb-2" style={{ color: LUXURY.muted }}>
                   Professional Guide

@@ -277,12 +277,12 @@ export function TourItinerarySectionLuxury({
                       {/* 圖片區 - 有圖片時顯示圖片，無圖片時顯示景點列表 */}
                       {hasImages ? (
                         <div className="mb-6">
-                          {/* 單張圖片：左圖右文 */}
+                          {/* 單張圖片：手機上下排列，桌面左圖右文 */}
                           {allImages.length === 1 && (
-                            <div className="grid grid-cols-2 gap-6">
-                              {/* 左側圖片 */}
+                            <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-6`}>
+                              {/* 圖片 */}
                               <div
-                                className="relative h-56 overflow-hidden rounded-md cursor-pointer group/img"
+                                className={`relative ${isMobile ? 'h-48' : 'h-56'} overflow-hidden rounded-md cursor-pointer group/img`}
                                 onClick={() => openImageGallery(allImages, 0)}
                               >
                                 <img
@@ -292,9 +292,9 @@ export function TourItinerarySectionLuxury({
                                 />
                                 <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/20 transition-colors" />
                               </div>
-                              {/* 右側說明 */}
+                              {/* 說明 */}
                               <div
-                                className="flex flex-col justify-center p-5"
+                                className={`flex flex-col justify-center ${isMobile ? 'p-4' : 'p-5'}`}
                                 style={{ backgroundColor: LUXURY.background }}
                               >
                                 {/* 1. 標題 */}
