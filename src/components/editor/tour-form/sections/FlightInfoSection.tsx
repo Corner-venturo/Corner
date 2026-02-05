@@ -231,10 +231,9 @@ export function FlightInfoSection({
 
       {/* 航班設定 Modal */}
       <Dialog open={showFlightSettings} onOpenChange={setShowFlightSettings}>
-        <DialogContent level={1} className="max-w-[95vw] max-h-[95vh] overflow-hidden p-0">
-          <div className="flex h-full">
-            {/* 左側：設定表單 */}
-            <div className="w-1/2 p-6 overflow-y-auto max-h-[90vh] border-r border-morandi-container">
+        <DialogContent level={1} className="!flex !flex-row max-w-[95vw] h-[90vh] overflow-hidden p-0">
+          {/* 左側：設定表單 */}
+          <div className="w-1/2 min-w-0 p-6 overflow-y-auto overflow-x-hidden border-r border-morandi-container">
               <DialogHeader className="mb-4">
                 <DialogTitle className="flex items-center gap-2">
                   <Plane className="w-5 h-5" style={{ color: '#B8A99A' }} />
@@ -274,27 +273,26 @@ export function FlightInfoSection({
                   onClearSegments={clearReturnSegments}
                 />
               </div>
-            </div>
-
-            {/* 右側：即時預覽 */}
-            <PreviewPanel
-              styleLabel={currentStyle?.label}
-              styleColor={currentStyle?.color}
-            >
-              {(viewMode) => (
-                <div className="w-full h-full overflow-auto p-6">
-                  <TourFlightSection
-                    data={{
-                      outboundFlight: data.outboundFlight,
-                      returnFlight: data.returnFlight,
-                      flightStyle: data.flightStyle || 'original',
-                    }}
-                    viewMode={viewMode}
-                  />
-                </div>
-              )}
-            </PreviewPanel>
           </div>
+
+          {/* 右側：即時預覽 */}
+          <PreviewPanel
+            styleLabel={currentStyle?.label}
+            styleColor={currentStyle?.color}
+          >
+            {(viewMode) => (
+              <div className="w-full h-full overflow-auto p-6">
+                <TourFlightSection
+                  data={{
+                    outboundFlight: data.outboundFlight,
+                    returnFlight: data.returnFlight,
+                    flightStyle: data.flightStyle || 'original',
+                  }}
+                  viewMode={viewMode}
+                />
+              </div>
+            )}
+          </PreviewPanel>
         </DialogContent>
       </Dialog>
 

@@ -105,16 +105,25 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
                 style={{ backgroundColor: `${LUXURY.secondary}10` }}
               />
 
-              {/* 頭像佔位符 */}
-              <div
-                className="w-20 h-20 rounded-full flex items-center justify-center flex-shrink-0 border-2 shadow-sm relative z-10"
-                style={{
-                  backgroundColor: '#f5f5f5',
-                  borderColor: LUXURY.surface
-                }}
-              >
-                <User className="w-8 h-8" style={{ color: LUXURY.muted }} />
-              </div>
+              {/* 頭像 */}
+              {leader?.photo ? (
+                <img
+                  src={leader.photo}
+                  alt={leader?.name || 'Tour Leader'}
+                  className="w-20 h-20 rounded-full object-cover flex-shrink-0 border-2 shadow-sm relative z-10"
+                  style={{ borderColor: LUXURY.surface }}
+                />
+              ) : (
+                <div
+                  className="w-20 h-20 rounded-full flex items-center justify-center flex-shrink-0 border-2 shadow-sm relative z-10"
+                  style={{
+                    backgroundColor: '#f5f5f5',
+                    borderColor: LUXURY.surface
+                  }}
+                >
+                  <User className="w-8 h-8" style={{ color: LUXURY.muted }} />
+                </div>
+              )}
 
               {/* 領隊資訊 */}
               <div className="relative z-10">

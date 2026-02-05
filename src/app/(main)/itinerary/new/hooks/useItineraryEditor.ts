@@ -41,7 +41,8 @@ export interface LocalTourData {
   features: Feature[]
   focusCards: FocusCard[]
   leader: LeaderInfo
-  meetingInfo: MeetingPoint
+  meetingInfo?: MeetingPoint
+  meetingPoints?: MeetingPoint[]
   hotels?: HotelInfo[]
   itinerarySubtitle: string
   dailyItinerary: DailyItinerary[]
@@ -302,6 +303,7 @@ function getEmptyTourData(): LocalTourData {
       time: '',
       location: '',
     },
+    meetingPoints: [],
     itinerarySubtitle: '',
     dailyItinerary: [],
     showPricingDetails: false,

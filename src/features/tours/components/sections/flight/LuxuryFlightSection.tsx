@@ -47,14 +47,50 @@ export function LuxuryFlightSection({ outboundFlight, returnFlight, viewMode }: 
 
   if (!hasFlightInfo) return null
 
+  // 手機版：卡片式佈局
+  if (isMobile) {
+    return (
+      <section id="flight" className="py-6" style={{ backgroundColor: theme.colors.background }}>
+        <div className="px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-card rounded-xl shadow-md border overflow-hidden relative"
+            style={{ borderColor: '#f0f0f0' }}
+          >
+            {/* 左側強調線 */}
+            <div
+              className="absolute top-0 left-0 w-1.5 h-full rounded-l-xl"
+              style={{ backgroundColor: theme.colors.primary }}
+            />
+
+            {/* 標題 */}
+            <div className="pl-5 pr-4 py-3 border-b" style={{ borderColor: '#f0f0f0' }}>
+              <h2 className="text-base font-bold" style={{ color: theme.colors.text }}>
+                航班資訊
+              </h2>
+            </div>
+
+            {/* 航班卡片 */}
+            <div className="divide-y" style={{ borderColor: '#f0f0f0' }}>
+              {outboundFlight && (
+                <MobileFlightCard flight={outboundFlight} type="outbound" theme={theme} />
+              )}
+              {returnFlight && (
+                <MobileFlightCard flight={returnFlight} type="return" theme={theme} />
+              )}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    )
+  }
+
+  // 電腦版：表格式佈局
   return (
-    <section
-      id="flight"
-      className={isMobile ? 'py-8' : 'py-16'}
-      style={{ backgroundColor: theme.colors.background }}
-    >
-      <div className={isMobile ? 'px-4' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'}>
-        {/* 卡片容器 */}
+    <section id="flight" className="py-16" style={{ backgroundColor: theme.colors.background }}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -69,20 +105,20 @@ export function LuxuryFlightSection({ outboundFlight, returnFlight, viewMode }: 
           />
 
           {/* 標題區 */}
-          <div className={`flex flex-col md:flex-row justify-between items-start md:items-end ${isMobile ? 'p-6 pb-4' : 'p-8 lg:p-12 pb-6'} gap-4`}>
+          <div className="flex flex-row justify-between items-end p-8 lg:p-12 pb-6 gap-4">
             <div>
               <span
                 className="italic block mb-1"
                 style={{
                   color: theme.colors.secondary,
                   fontFamily: theme.fonts.heading,
-                  fontSize: isMobile ? '1rem' : '1.125rem'
+                  fontSize: '1.125rem'
                 }}
               >
                 Your Journey Begins
               </span>
               <h2
-                className={`font-bold ${isMobile ? 'text-xl' : 'text-3xl'}`}
+                className="font-bold text-3xl"
                 style={{
                   color: theme.colors.text,
                   fontFamily: theme.fonts.heading
@@ -91,10 +127,7 @@ export function LuxuryFlightSection({ outboundFlight, returnFlight, viewMode }: 
                 航班資訊詳情
               </h2>
             </div>
-            <div
-              className="flex items-center gap-2 text-sm"
-              style={{ color: theme.colors.muted }}
-            >
+            <div className="flex items-center gap-2 text-sm" style={{ color: theme.colors.muted }}>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: theme.colors.primary }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -103,7 +136,7 @@ export function LuxuryFlightSection({ outboundFlight, returnFlight, viewMode }: 
           </div>
 
           {/* 航班表格 */}
-          <div className={`overflow-x-auto ${isMobile ? 'px-4 pb-6' : 'px-8 lg:px-12 pb-8'}`}>
+          <div className="px-8 lg:px-12 pb-8">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr style={{ borderBottom: '1px solid #E5E7EB' }}>
@@ -112,17 +145,15 @@ export function LuxuryFlightSection({ outboundFlight, returnFlight, viewMode }: 
                   <th className="py-4 px-4 text-[10px] font-bold uppercase tracking-widest" style={{ color: theme.colors.muted }}>Airline</th>
                   <th className="py-4 px-4 text-[10px] font-bold uppercase tracking-widest" style={{ color: theme.colors.muted }}>Flight No.</th>
                   <th className="py-4 px-4 text-[10px] font-bold uppercase tracking-widest" style={{ color: theme.colors.muted }}>Schedule</th>
-                  {!isMobile && (
-                    <th className="py-4 px-4 text-[10px] font-bold uppercase tracking-widest text-right" style={{ color: theme.colors.muted }}>Class</th>
-                  )}
+                  <th className="py-4 px-4 text-[10px] font-bold uppercase tracking-widest text-right" style={{ color: theme.colors.muted }}>Class</th>
                 </tr>
               </thead>
               <tbody className="text-sm">
                 {outboundFlight && (
-                  <FlightRow flight={outboundFlight} type="outbound" isMobile={isMobile} theme={theme} />
+                  <FlightRow flight={outboundFlight} type="outbound" isMobile={false} theme={theme} />
                 )}
                 {returnFlight && (
-                  <FlightRow flight={returnFlight} type="return" isMobile={isMobile} theme={theme} />
+                  <FlightRow flight={returnFlight} type="return" isMobile={false} theme={theme} />
                 )}
               </tbody>
             </table>
@@ -130,6 +161,84 @@ export function LuxuryFlightSection({ outboundFlight, returnFlight, viewMode }: 
         </motion.div>
       </div>
     </section>
+  )
+}
+
+// 手機版航班卡片
+function MobileFlightCard({
+  flight,
+  type,
+  theme,
+}: {
+  flight: FlightInfo
+  type: 'outbound' | 'return'
+  theme: ReturnType<typeof getTheme>
+}) {
+  const isOutbound = type === 'outbound'
+  const { date, day } = formatFlightDate(flight.departureDate)
+  const labelColor = isOutbound ? theme.colors.primary : theme.colors.secondary
+
+  return (
+    <div className="pl-5 pr-4 py-4">
+      {/* 標籤 + 日期 */}
+      <div className="flex items-center justify-between mb-3">
+        <span
+          className="text-xs font-bold px-2 py-1 rounded"
+          style={{ backgroundColor: `${labelColor}15`, color: labelColor }}
+        >
+          {isOutbound ? '去程' : '回程'}
+        </span>
+        <span className="text-sm" style={{ color: theme.colors.muted }}>
+          {date} {day}
+        </span>
+      </div>
+
+      {/* 航班資訊 */}
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm font-medium" style={{ color: theme.colors.text }}>
+          {flight.airline || '--'}
+        </span>
+        <span className="text-sm font-mono" style={{ color: theme.colors.muted }}>
+          {flight.flightNumber || '--'}
+        </span>
+      </div>
+
+      {/* 起降時間 */}
+      <div className="flex items-center gap-3">
+        <div className="flex-1">
+          <div className="text-xl font-bold" style={{ color: theme.colors.text }}>
+            {flight.departureTime || '--:--'}
+          </div>
+          <div className="text-xs font-medium" style={{ color: theme.colors.muted }}>
+            {flight.departureAirport || '--'}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1 px-2">
+          <div className="w-8 h-px" style={{ backgroundColor: theme.colors.muted }} />
+          <svg
+            className="w-4 h-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            style={{ color: labelColor }}
+          >
+            <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>
+          </svg>
+          <div className="w-8 h-px" style={{ backgroundColor: theme.colors.muted }} />
+        </div>
+
+        <div className="flex-1 text-right">
+          <div className="text-xl font-bold" style={{ color: theme.colors.text }}>
+            {flight.arrivalTime || '--:--'}
+          </div>
+          <div className="text-xs font-medium" style={{ color: theme.colors.muted }}>
+            {flight.arrivalAirport || '--'}
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -158,15 +267,21 @@ function FlightRow({
       {/* Type */}
       <td className="py-6 px-4">
         <div
-          className="flex flex-col items-center justify-center w-12 h-12 rounded-lg transition-colors"
+          className="flex items-center justify-center w-10 h-10 rounded-lg transition-colors"
           style={{ backgroundColor: iconBgColor, color: iconColor }}
         >
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            className="w-5 h-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ transform: 'rotate(0deg)' }}
+          >
             <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>
           </svg>
-          <span className="text-[9px] font-bold uppercase mt-0.5">
-            {isOutbound ? 'Out' : 'In'}
-          </span>
         </div>
       </td>
 

@@ -191,12 +191,31 @@ export function DayCard({
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-1">
               特別安排 (highlight)
+              <span className="text-xs text-morandi-secondary ml-2">Shift+Enter 換行</span>
             </label>
-            <input
-              type="text"
+            <textarea
               value={day.highlight || ''}
-              onChange={e => updateDailyItinerary(dayIndex, 'highlight', e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg"
+              onChange={e => {
+                updateDailyItinerary(dayIndex, 'highlight', e.target.value)
+                // 自動調整高度
+                e.target.style.height = 'auto'
+                e.target.style.height = `${e.target.scrollHeight}px`
+              }}
+              onKeyDown={e => {
+                // 只有 Shift+Enter 才換行，單獨 Enter 不換行（保持原有行為）
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault()
+                }
+              }}
+              ref={el => {
+                // 初始化時調整高度
+                if (el && day.highlight) {
+                  el.style.height = 'auto'
+                  el.style.height = `${el.scrollHeight}px`
+                }
+              }}
+              className="w-full px-3 py-2 border rounded-lg resize-none overflow-hidden min-h-[42px]"
+              rows={1}
               placeholder="✨ 特別安排：由布院 · 金麟湖 ～ 日本 OL 人氣 NO.1 散策地"
             />
           </div>
@@ -222,18 +241,6 @@ export function DayCard({
             </div>
           )}
 
-          {/* 描述 */}
-          <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">描述</label>
-            <textarea
-              value={day.description || ''}
-              onChange={e => updateDailyItinerary(dayIndex, 'description', e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg"
-              rows={3}
-              placeholder="集合於台灣桃園國際機場..."
-            />
-          </div>
-
           {/* 活動 */}
           <ActivitiesSection
         day={day}
@@ -250,6 +257,18 @@ export function DayCard({
         setActivityDragOver={setActivityDragOver}
         onOpenPositionEditor={onOpenPositionEditor}
       />
+
+          {/* 描述 */}
+          <div>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">描述</label>
+            <textarea
+              value={day.description || ''}
+              onChange={e => updateDailyItinerary(dayIndex, 'description', e.target.value)}
+              className="w-full px-3 py-2 border rounded-lg"
+              rows={3}
+              placeholder="集合於台灣桃園國際機場..."
+            />
+          </div>
 
       {/* 推薦行程 */}
       <RecommendationsSection

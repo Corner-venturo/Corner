@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion'
+import { User } from 'lucide-react'
 import { SectionTitle } from './SectionTitle'
 import { TourLeaderSectionArt } from './TourLeaderSectionArt'
 import { TourLeaderSectionCollage } from './TourLeaderSectionCollage'
+import { TourLeaderSectionLuxury } from './TourLeaderSectionLuxury'
 import type { TourPageData, CoverStyleType } from '@/features/tours/types/tour-display.types'
 
 /**
@@ -24,6 +26,11 @@ export function TourLeaderSection({ data, viewMode, coverStyle = 'original' }: T
   // Collage 風格使用專用組件
   if (coverStyle === 'collage') {
     return <TourLeaderSectionCollage data={data} viewMode={viewMode} />
+  }
+
+  // Luxury 風格使用專用組件
+  if (coverStyle === 'luxury') {
+    return <TourLeaderSectionLuxury data={data} viewMode={viewMode} />
   }
 
   return (
@@ -62,24 +69,40 @@ export function TourLeaderSection({ data, viewMode, coverStyle = 'original' }: T
             >
               領隊資訊
             </h3>
-            <div className={viewMode === 'mobile' ? 'space-y-3' : 'space-y-4'}>
-              <div>
-                <p className="text-xs text-morandi-secondary mb-1">領隊姓名</p>
-                <p className={viewMode === 'mobile' ? 'text-base font-semibold text-morandi-primary' : 'text-lg font-semibold text-morandi-primary'}>
-                  {data.leader?.name || '待定'}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-morandi-secondary mb-1">國內電話</p>
-                <p className={viewMode === 'mobile' ? 'text-base font-semibold text-morandi-primary' : 'text-lg font-semibold text-morandi-primary'}>
-                  {data.leader?.domesticPhone || '待定'}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-morandi-secondary mb-1">國外電話</p>
-                <p className={viewMode === 'mobile' ? 'text-base font-semibold text-morandi-primary' : 'text-lg font-semibold text-morandi-primary'}>
-                  {data.leader?.overseasPhone || '待定'}
-                </p>
+            <div className={viewMode === 'mobile' ? 'flex items-start gap-4' : 'flex items-start gap-6'}>
+              {/* 領隊頭像 */}
+              {data.leader?.photo ? (
+                <img
+                  src={data.leader.photo}
+                  alt={data.leader?.name || 'Tour Leader'}
+                  className={viewMode === 'mobile' ? 'w-16 h-16 rounded-full object-cover flex-shrink-0 border-2 border-morandi-container' : 'w-20 h-20 rounded-full object-cover flex-shrink-0 border-2 border-morandi-container'}
+                />
+              ) : (
+                <div
+                  className={viewMode === 'mobile' ? 'w-16 h-16 rounded-full bg-morandi-container/30 flex items-center justify-center flex-shrink-0' : 'w-20 h-20 rounded-full bg-morandi-container/30 flex items-center justify-center flex-shrink-0'}
+                >
+                  <User className={viewMode === 'mobile' ? 'w-8 h-8 text-morandi-secondary' : 'w-10 h-10 text-morandi-secondary'} />
+                </div>
+              )}
+              <div className={viewMode === 'mobile' ? 'space-y-3 flex-1' : 'space-y-4 flex-1'}>
+                <div>
+                  <p className="text-xs text-morandi-secondary mb-1">領隊姓名</p>
+                  <p className={viewMode === 'mobile' ? 'text-base font-semibold text-morandi-primary' : 'text-lg font-semibold text-morandi-primary'}>
+                    {data.leader?.name || '待定'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-morandi-secondary mb-1">國內電話</p>
+                  <p className={viewMode === 'mobile' ? 'text-base font-semibold text-morandi-primary' : 'text-lg font-semibold text-morandi-primary'}>
+                    {data.leader?.domesticPhone || '待定'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-morandi-secondary mb-1">國外電話</p>
+                  <p className={viewMode === 'mobile' ? 'text-base font-semibold text-morandi-primary' : 'text-lg font-semibold text-morandi-primary'}>
+                    {data.leader?.overseasPhone || '待定'}
+                  </p>
+                </div>
               </div>
             </div>
           </motion.div>

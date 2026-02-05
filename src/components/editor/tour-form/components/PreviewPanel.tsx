@@ -11,6 +11,8 @@ interface PreviewPanelProps {
   styleColor?: string
   /** 預設顯示模式 */
   defaultMode?: 'desktop' | 'mobile'
+  /** 額外 className */
+  className?: string
 }
 
 export function PreviewPanel({
@@ -18,6 +20,7 @@ export function PreviewPanel({
   styleLabel,
   styleColor,
   defaultMode = 'desktop',
+  className,
 }: PreviewPanelProps) {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>(defaultMode)
 
@@ -25,7 +28,7 @@ export function PreviewPanel({
   const scale = viewMode === 'mobile' ? 0.7 : 0.5
 
   return (
-    <div className="w-1/2 bg-card flex flex-col">
+    <div className={cn('bg-card flex flex-col w-1/2 min-w-0', className)}>
       {/* 標題列（和主編輯器一致） */}
       <div className="h-14 bg-card border-b px-6 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">

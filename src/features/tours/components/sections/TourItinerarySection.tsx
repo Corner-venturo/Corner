@@ -249,7 +249,7 @@ export function TourItinerarySection({
                     )}>
                       <Sparkles size={viewMode === 'mobile' ? 14 : 16} className="text-status-warning flex-shrink-0 mt-0.5" />
                       <p className={cn(
-                        "font-medium leading-relaxed text-morandi-primary",
+                        "font-medium leading-relaxed text-morandi-primary whitespace-pre-line",
                         viewMode === 'mobile' ? 'text-xs' : 'text-sm md:text-base'
                       )}>
                         {day.highlight}
@@ -259,7 +259,7 @@ export function TourItinerarySection({
 
                   {day.description && (
                     <p className={cn(
-                      "text-sm md:text-base leading-relaxed md:leading-7 text-morandi-secondary",
+                      "text-sm md:text-base leading-relaxed md:leading-7 text-morandi-secondary whitespace-pre-line",
                       viewMode === 'mobile' ? 'mt-0 mb-4 px-4' : 'mt-4 mb-4'
                     )}>
                       {day.description}

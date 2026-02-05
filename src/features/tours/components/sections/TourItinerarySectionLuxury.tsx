@@ -152,52 +152,52 @@ export function TourItinerarySectionLuxury({
 
                     {/* 左側：日期區塊 */}
                     <div
-                      className={`${isMobile ? 'p-6' : 'lg:col-span-2 p-8'} text-white flex flex-col justify-between items-start relative overflow-hidden`}
+                      className={`${isMobile ? 'p-4' : 'lg:col-span-2 p-8'} text-white ${isMobile ? 'flex flex-row items-center justify-between' : 'flex flex-col justify-between items-start'} relative overflow-hidden`}
                       style={{ backgroundColor: dayColor }}
                     >
-                      {/* 大數字背景 */}
-                      <div
-                        className="absolute -right-4 top-1/2 -translate-y-1/2 text-9xl font-bold select-none"
-                        style={{
-                          fontFamily: "'Noto Serif TC', serif",
-                          color: 'rgba(255,255,255,0.05)'
-                        }}
-                      >
-                        {dayNumber.padStart(2, '0')}
-                      </div>
+                      {/* 大數字背景 - 手機版隱藏 */}
+                      {!isMobile && (
+                        <div
+                          className="absolute -right-4 top-1/2 -translate-y-1/2 text-9xl font-bold select-none"
+                          style={{
+                            fontFamily: "'Noto Serif TC', serif",
+                            color: 'rgba(255,255,255,0.05)'
+                          }}
+                        >
+                          {dayNumber.padStart(2, '0')}
+                        </div>
+                      )}
 
-                      <div>
+                      <div className={isMobile ? 'flex items-center gap-3' : ''}>
                         {/* 日期標籤 - DEC 25 格式 */}
-                        {/* 使用 dayNumber（從 dayLabel 提取）而非 index，這樣建議行程會使用正確的天數 */}
                         {(() => {
-                          // 從 dayNumber 提取數字部分（如 "5" 或 "5-B" → 5）
                           const numericDay = parseInt(dayNumber.split('-')[0], 10)
                           const dateDisplay = formatDateShort(day.date) || calculateDayDate(data.departureDate, numericDay)
                           return dateDisplay ? (
                             <span
-                              className="inline-block px-3 py-1.5 mb-3 bg-card/10 backdrop-blur-sm rounded text-xs font-medium tracking-widest"
+                              className={`inline-block px-3 py-1.5 bg-card/10 backdrop-blur-sm rounded text-xs font-medium tracking-widest ${isMobile ? '' : 'mb-3'}`}
                             >
                               {dateDisplay}
                             </span>
                           ) : null
                         })()}
                         <h3
-                          className="text-5xl font-medium"
+                          className={`${isMobile ? 'text-2xl' : 'text-4xl'} font-medium whitespace-nowrap`}
                           style={{ fontFamily: "'Noto Serif TC', serif" }}
                         >
                           Day {dayNumber}
                         </h3>
                       </div>
 
-                      <div className="space-y-1 z-10">
-                        <div className="text-xs uppercase tracking-widest opacity-70">
+                      <div className={`${isMobile ? 'text-right' : 'space-y-1'} z-10`}>
+                        <div className={`text-xs uppercase tracking-widest opacity-70 ${isMobile ? 'hidden' : ''}`}>
                           {day.isAlternative ? 'Alternative' : 'Location'}
                         </div>
                         <div
-                          className="font-medium text-lg"
+                          className={`font-medium ${isMobile ? 'text-base' : 'text-lg'}`}
                           style={{ color: day.isAlternative ? '#fff' : LUXURY.secondary }}
                         >
-                          {day.locationLabel || day.title?.split(' ')[0] || '探索'}
+                          {day.locationLabel || data.city || '探索'}
                         </div>
                       </div>
                     </div>
@@ -231,10 +231,40 @@ export function TourItinerarySectionLuxury({
                         )}
                       </div>
 
+                      {/* 特別安排 */}
+                      {day.highlight && (
+                        <div
+                          className="flex items-start gap-3 mb-6 p-4 rounded-lg border-l-4"
+                          style={{
+                            backgroundColor: `${LUXURY.secondary}08`,
+                            borderColor: LUXURY.secondary
+                          }}
+                        >
+                          <Star
+                            className="w-5 h-5 flex-shrink-0 mt-0.5"
+                            style={{ color: LUXURY.secondary }}
+                          />
+                          <div>
+                            <span
+                              className="text-xs font-bold uppercase tracking-wider block mb-1"
+                              style={{ color: LUXURY.secondary }}
+                            >
+                              Special Arrangement
+                            </span>
+                            <p
+                              className="text-sm font-medium whitespace-pre-line"
+                              style={{ color: LUXURY.text }}
+                            >
+                              {day.highlight}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
                       {/* 描述 */}
                       {day.description && (
                         <p
-                          className={`leading-loose mb-8 font-light ${isMobile ? 'text-sm' : ''}`}
+                          className={`leading-loose mb-8 font-light whitespace-pre-line ${isMobile ? 'text-sm' : ''}`}
                           style={{
                             color: LUXURY.muted,
                             fontFamily: "'Noto Sans TC', sans-serif"
@@ -316,31 +346,72 @@ export function TourItinerarySectionLuxury({
 
                           {/* 多張圖片：橫向排列，最多顯示3張 */}
                           {allImages.length >= 2 && (
-                            <div className={`grid gap-4 ${allImages.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
-                              {allImages.slice(0, 3).map((img, imgIdx) => (
-                                <div
-                                  key={imgIdx}
-                                  className="relative h-44 overflow-hidden rounded-md cursor-pointer group/img"
-                                  onClick={() => openImageGallery(allImages, imgIdx)}
-                                >
-                                  <img
-                                    src={img.url}
-                                    alt={img.title || ''}
-                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105"
-                                  />
-                                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                                  {/* 左下角標籤 */}
-                                  <div className="absolute bottom-3 left-3">
-                                    <span
-                                      className="text-white text-xs font-bold uppercase tracking-wider"
-                                      style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
-                                    >
-                                      {img.title}
-                                    </span>
+                            <>
+                              <div className={`grid gap-4 ${allImages.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+                                {allImages.slice(0, 3).map((img, imgIdx) => (
+                                  <div
+                                    key={imgIdx}
+                                    className="relative h-44 overflow-hidden rounded-md cursor-pointer group/img"
+                                    onClick={() => openImageGallery(allImages, imgIdx)}
+                                  >
+                                    <img
+                                      src={img.url}
+                                      alt={img.title || ''}
+                                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                                    {/* 左下角標籤 */}
+                                    <div className="absolute bottom-3 left-3">
+                                      <span
+                                        className="text-white text-xs font-bold uppercase tracking-wider"
+                                        style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
+                                      >
+                                        {img.title}
+                                      </span>
+                                    </div>
                                   </div>
+                                ))}
+                              </div>
+
+                              {/* 簡短說明 + 點擊提示 */}
+                              <div
+                                className="mt-4 p-4 rounded-lg cursor-pointer hover:bg-opacity-80 transition-colors"
+                                style={{ backgroundColor: LUXURY.background }}
+                                onClick={() => day.activities?.[0] && setSelectedActivity({
+                                  title: day.activities[0].title || '',
+                                  description: day.activities[0].description,
+                                  image: day.activities[0].image
+                                })}
+                              >
+                                {/* 景點名稱列表 */}
+                                <div className="flex flex-wrap gap-2 mb-2">
+                                  {day.activities?.slice(0, 3).map((activity, idx) => (
+                                    <span
+                                      key={idx}
+                                      className="text-xs font-medium px-2 py-1 rounded-full"
+                                      style={{ backgroundColor: `${LUXURY.secondary}20`, color: LUXURY.secondary }}
+                                    >
+                                      {activity.title}
+                                    </span>
+                                  ))}
                                 </div>
-                              ))}
-                            </div>
+                                {/* 第一個景點的簡短描述 */}
+                                {day.activities?.[0]?.description && (
+                                  <p
+                                    className="text-sm line-clamp-2 mb-2"
+                                    style={{ color: LUXURY.muted }}
+                                  >
+                                    {day.activities[0].description}
+                                  </p>
+                                )}
+                                <span
+                                  className="text-xs flex items-center gap-1"
+                                  style={{ color: LUXURY.secondary }}
+                                >
+                                  點擊查看詳情 <ArrowRight className="w-3 h-3" />
+                                </span>
+                              </div>
+                            </>
                           )}
 
                           {/* 如果超過3張，顯示查看更多按鈕 */}
@@ -371,23 +442,32 @@ export function TourItinerarySectionLuxury({
                             >
                               Highlight
                             </h4>
-                            <ul className="space-y-2">
+                            <ul className="space-y-3">
                               {day.activities.map((activity, actIdx) => (
                                 <li
                                   key={actIdx}
-                                  className="flex items-center gap-2 text-sm cursor-pointer hover:opacity-80"
-                                  style={{ color: LUXURY.muted }}
+                                  className="cursor-pointer hover:opacity-80"
                                   onClick={() => setSelectedActivity({
                                     title: activity.title || '',
                                     description: activity.description,
                                     image: activity.image
                                   })}
                                 >
-                                  <span
-                                    className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                                    style={{ backgroundColor: LUXURY.secondary }}
-                                  />
-                                  {activity.title}
+                                  <div className="flex items-center gap-2 text-sm" style={{ color: LUXURY.text }}>
+                                    <span
+                                      className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                                      style={{ backgroundColor: LUXURY.secondary }}
+                                    />
+                                    <span className="font-medium">{activity.title}</span>
+                                  </div>
+                                  {activity.description && (
+                                    <p
+                                      className="text-xs mt-1 ml-4 line-clamp-2"
+                                      style={{ color: LUXURY.muted }}
+                                    >
+                                      {activity.description}
+                                    </p>
+                                  )}
                                 </li>
                               ))}
                             </ul>

@@ -22,36 +22,42 @@ let savedCityId = ''
 function parseDayTitleForAttractions(title: string): string[] {
   if (!title) return []
 
-  // 分割符號：→、⇀、·、|、、、-、/
-  const separators = /[→⇀·|、\-/]/g
+  // 分割符號：→、⇀、·、|、>、、、-、/
+  const separators = /[→⇀·|>、\-/]/g
   const parts = title.split(separators)
 
-  // 過濾掉常見的非景點關鍵字
-  const excludePatterns = [
-    /機場/,
-    /飯店/,
-    /酒店/,
-    /入住/,
-    /check.?in/i,
-    /check.?out/i,
-    /自由活動/,
-    /午餐/,
-    /晚餐/,
-    /早餐/,
-    /用餐/,
-    /休息/,
+  // 過濾掉「完全符合」的非景點關鍵字（不是包含）
+  const exactExcludePatterns = [
+    /^機場$/,
+    /^飯店$/,
+    /^酒店$/,
+    /^入住$/,
+    /^check.?in$/i,
+    /^check.?out$/i,
+    /^自由活動$/,
+    /^午餐$/,
+    /^晚餐$/,
+    /^早餐$/,
+    /^用餐$/,
     /^台北$/,
     /^桃園$/,
     /^國際$/,
     /^\s*$/,
-    /✈/,
-    /⭐/,
+    /^✈.*$/,
+    /^⭐.*$/,
+  ]
+
+  // 「包含」就排除的關鍵字（通常是連接詞）
+  const partialExcludePatterns = [
+    /飯店入住/,
+    /酒店入住/,
   ]
 
   return parts
     .map(p => p.trim())
     .filter(p => p.length >= 2) // 至少 2 個字
-    .filter(p => !excludePatterns.some(pattern => pattern.test(p)))
+    .filter(p => !exactExcludePatterns.some(pattern => pattern.test(p)))
+    .filter(p => !partialExcludePatterns.some(pattern => pattern.test(p)))
 }
 
 interface UseAttractionSearchProps {
@@ -100,6 +106,13 @@ export function useAttractionSearch({
       }
     }
   }, [isOpen, tourCountryName, countries])
+
+  // 打開對話框時清空搜尋框，讓建議景點排在最前面
+  useEffect(() => {
+    if (isOpen) {
+      setSearchQuery('')
+    }
+  }, [isOpen])
 
   // 更新國家時同步保存
   const handleCountryChange = (countryId: string) => {

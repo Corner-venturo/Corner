@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { TourFormData, MeetingPoint } from '../types'
-import { Plus, X } from 'lucide-react'
+import { Plus, X, Upload, User, Loader2 } from 'lucide-react'
+import { uploadFileToStorage } from '@/services/storage'
 
 interface LeaderMeetingSectionProps {
   data: TourFormData
@@ -51,6 +52,43 @@ export function LeaderMeetingSection({
   // 追蹤是否已自動填入過
   const hasAutoFilledRef = useRef(false)
 
+  // 頭像上傳狀態
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
+  const photoInputRef = useRef<HTMLInputElement>(null)
+
+  // 頭像上傳處理
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // 檢查檔案類型
+    if (!file.type.startsWith('image/')) {
+      return
+    }
+
+    setIsUploadingPhoto(true)
+    try {
+      const result = await uploadFileToStorage(file, {
+        bucket: 'workspace-files',
+        folder: 'leader-photos',
+      })
+      updateNestedField('leader', 'photo', result.publicUrl)
+    } catch (error) {
+      console.error('Failed to upload leader photo:', error)
+    } finally {
+      setIsUploadingPhoto(false)
+      // 清空 input 以允許重複上傳相同檔案
+      if (photoInputRef.current) {
+        photoInputRef.current.value = ''
+      }
+    }
+  }
+
+  // 移除頭像
+  const handleRemovePhoto = () => {
+    updateNestedField('leader', 'photo', null)
+  }
+
   // 當有領隊資料且沒有集合地點時，自動新增一個並帶入時間
   useEffect(() => {
     const hasLeaderName = data.leader?.name && data.leader.name.trim() !== ''
@@ -97,15 +135,69 @@ export function LeaderMeetingSection({
 
       <div className="bg-morandi-container/20 p-4 rounded-lg space-y-3">
         <h3 className="font-bold text-morandi-secondary">領隊資訊</h3>
-        <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">領隊姓名</label>
-          <input
-            type="text"
-            value={data.leader?.name || ''}
-            onChange={e => updateNestedField('leader', 'name', e.target.value)}
-            className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
-            placeholder="鍾惠如 小姐"
-          />
+
+        {/* 頭像上傳 */}
+        <div className="flex items-start gap-4">
+          <div className="flex-shrink-0">
+            <div className="relative group">
+              {data.leader?.photo ? (
+                <div className="relative">
+                  <img
+                    src={data.leader.photo}
+                    alt="領隊頭像"
+                    className="w-20 h-20 rounded-full object-cover border-2 border-morandi-container"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemovePhoto}
+                    className="absolute -top-1 -right-1 p-1 bg-morandi-red text-white rounded-full hover:bg-morandi-red/80 transition-colors"
+                    title="移除頭像"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              ) : (
+                <div
+                  className="w-20 h-20 rounded-full bg-morandi-container/50 flex items-center justify-center cursor-pointer hover:bg-morandi-container transition-colors border-2 border-dashed border-morandi-container"
+                  onClick={() => photoInputRef.current?.click()}
+                >
+                  {isUploadingPhoto ? (
+                    <Loader2 size={24} className="text-morandi-secondary animate-spin" />
+                  ) : (
+                    <User size={24} className="text-morandi-secondary" />
+                  )}
+                </div>
+              )}
+              <input
+                ref={photoInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoUpload}
+                className="hidden"
+              />
+            </div>
+            {!data.leader?.photo && (
+              <button
+                type="button"
+                onClick={() => photoInputRef.current?.click()}
+                disabled={isUploadingPhoto}
+                className="mt-2 flex items-center gap-1 text-xs text-morandi-secondary hover:text-morandi-primary transition-colors"
+              >
+                <Upload size={12} />
+                上傳頭像
+              </button>
+            )}
+          </div>
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-morandi-primary mb-1">領隊姓名</label>
+            <input
+              type="text"
+              value={data.leader?.name || ''}
+              onChange={e => updateNestedField('leader', 'name', e.target.value)}
+              className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
+              placeholder="鍾惠如 小姐"
+            />
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>

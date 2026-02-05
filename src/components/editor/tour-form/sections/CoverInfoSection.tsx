@@ -153,10 +153,9 @@ export function CoverInfoSection({
 
       {/* 封面設定 Modal */}
       <Dialog open={showCoverSettings} onOpenChange={setShowCoverSettings}>
-        <DialogContent level={1} className="max-w-[95vw] max-h-[95vh] overflow-hidden p-0">
-          <div className="flex h-full">
-            {/* 左側：設定表單 */}
-            <div className="w-1/2 p-6 overflow-y-auto max-h-[90vh] border-r border-morandi-container">
+        <DialogContent level={1} className="!flex !flex-row max-w-[95vw] h-[90vh] overflow-hidden p-0">
+          {/* 左側：設定表單 */}
+          <div className="w-1/2 min-w-0 p-6 overflow-y-auto overflow-x-hidden border-r border-morandi-container">
               <DialogHeader className="mb-4">
                 <DialogTitle className="flex items-center gap-2">
                   <div
@@ -206,16 +205,15 @@ export function CoverInfoSection({
                   完成設定
                 </Button>
               </div>
-            </div>
-
-            {/* 右側：實時預覽 */}
-            <PreviewPanel
-              styleLabel={currentStyleOption?.label || '經典全屏'}
-              styleColor={currentStyleColor}
-            >
-              {renderHeroPreview}
-            </PreviewPanel>
           </div>
+
+          {/* 右側：實時預覽 */}
+          <PreviewPanel
+            styleLabel={currentStyleOption?.label || '經典全屏'}
+            styleColor={currentStyleColor}
+          >
+            {renderHeroPreview}
+          </PreviewPanel>
         </DialogContent>
       </Dialog>
     </div>

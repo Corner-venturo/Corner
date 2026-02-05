@@ -177,33 +177,59 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
   })
 
   // 幣值轉換相關
-  const COUNTRY_CURRENCY_MAP: Record<string, string> = {
-    '日本': 'JP',
-    'Japan': 'JP',
-    '泰國': 'TH',
-    'Thailand': 'TH',
-    '韓國': 'KR',
-    'Korea': 'KR',
-    '越南': 'VN',
-    'Vietnam': 'VN',
-    '美國': 'US',
-    'USA': 'US',
-    '新加坡': 'SG',
-    'Singapore': 'SG',
-    '馬來西亞': 'MY',
-    'Malaysia': 'MY',
-    '中國': 'CN',
-    'China': 'CN',
-    '香港': 'HK',
-    'Hong Kong': 'HK',
-    '澳門': 'MO',
-    'Macau': 'MO',
-    '歐洲': 'EU',
-    'Europe': 'EU',
+  // 機場代碼 / 城市 / 國家 對應幣別
+  const DESTINATION_CURRENCY_MAP: Record<string, string> = {
+    // 日本
+    '日本': 'JPY', 'Japan': 'JPY',
+    'NRT': 'JPY', 'HND': 'JPY', 'KIX': 'JPY', 'NGO': 'JPY', 'CTS': 'JPY', 'FUK': 'JPY', 'OKA': 'JPY',
+    '東京': 'JPY', '大阪': 'JPY', '京都': 'JPY', '北海道': 'JPY', '沖繩': 'JPY', '名古屋': 'JPY', '福岡': 'JPY',
+    // 泰國
+    '泰國': 'THB', 'Thailand': 'THB',
+    'BKK': 'THB', 'CNX': 'THB', 'HKT': 'THB',
+    '曼谷': 'THB', '清邁': 'THB', '普吉': 'THB',
+    // 韓國
+    '韓國': 'KRW', 'Korea': 'KRW',
+    'ICN': 'KRW', 'GMP': 'KRW', 'PUS': 'KRW',
+    '首爾': 'KRW', '釜山': 'KRW',
+    // 越南
+    '越南': 'VND', 'Vietnam': 'VND',
+    'SGN': 'VND', 'HAN': 'VND', 'DAD': 'VND',
+    '胡志明': 'VND', '河內': 'VND', '峴港': 'VND',
+    // 美國
+    '美國': 'USD', 'USA': 'USD',
+    'LAX': 'USD', 'JFK': 'USD', 'SFO': 'USD',
+    // 新加坡
+    '新加坡': 'SGD', 'Singapore': 'SGD', 'SIN': 'SGD',
+    // 馬來西亞
+    '馬來西亞': 'MYR', 'Malaysia': 'MYR', 'KUL': 'MYR',
+    // 中國
+    '中國': 'CNY', 'China': 'CNY',
+    'PVG': 'CNY', 'PEK': 'CNY', 'CAN': 'CNY',
+    '上海': 'CNY', '北京': 'CNY', '廣州': 'CNY',
+    // 香港
+    '香港': 'HKD', 'Hong Kong': 'HKD', 'HKG': 'HKD',
+    // 澳門
+    '澳門': 'MOP', 'Macau': 'MOP', 'MFM': 'MOP',
+    // 歐洲
+    '歐洲': 'EUR', 'Europe': 'EUR',
   }
 
   // 從團的目的地取得幣別
-  const destinationCurrency = COUNTRY_CURRENCY_MAP[tour.location || ''] || null
+  const getDestinationCurrency = () => {
+    // 1. 先從 tour.location 查找
+    if (tour.location && DESTINATION_CURRENCY_MAP[tour.location]) {
+      return DESTINATION_CURRENCY_MAP[tour.location]
+    }
+    // 2. 從團號前三碼（機場代碼）查找
+    if (tour.code) {
+      const airportCode = tour.code.substring(0, 3).toUpperCase()
+      if (DESTINATION_CURRENCY_MAP[airportCode]) {
+        return DESTINATION_CURRENCY_MAP[airportCode]
+      }
+    }
+    return null
+  }
+  const destinationCurrency = getDestinationCurrency()
 
   // 匯率設定對話框
   const [exchangeRateDialog, setExchangeRateDialog] = useState<{
@@ -1361,7 +1387,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                     <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">聯絡人</td>
                     <td className="px-4 py-2">{primaryContact?.contact_person || '-'}</td>
                     <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium w-[60px]">
-                      <span className="text-green-600">去程</span>
+                      <span className="text-morandi-green">去程</span>
                     </td>
                     <td className="px-4 py-2">
                       {outboundFlight?.flightNumber
@@ -1373,7 +1399,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                     <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">聯絡電話</td>
                     <td className="px-4 py-2">{primaryContact?.contact_phone || '-'}</td>
                     <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">
-                      <span className="text-blue-600">回程</span>
+                      <span className="text-morandi-gold">回程</span>
                     </td>
                     <td className="px-4 py-2">
                       {returnFlightData?.flightNumber
@@ -1391,9 +1417,9 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                 <div className="flex items-center gap-6">
                   <span className="font-medium">{ageGroups.total} 人</span>
                   <span className="text-morandi-secondary">
-                    <span className="text-blue-600">6歲以下：{ageGroups.under6}</span>
+                    <span className="text-morandi-green">6歲以下：{ageGroups.under6}</span>
                     <span className="mx-2">|</span>
-                    <span className="text-orange-600">65歲以上：{ageGroups.over65}</span>
+                    <span className="text-morandi-gold">65歲以上：{ageGroups.over65}</span>
                     <span className="mx-2">|</span>
                     <span>一般：{ageGroups.others}</span>
                   </span>
@@ -1442,9 +1468,9 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
       {/* 每日行程表 */}
       {itinerary?.daily_itinerary && itinerary.daily_itinerary.length > 0 && (
         <div className="border border-border rounded-lg overflow-hidden">
-          <div className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white">
+          <div className="flex items-center gap-2 px-4 py-2 bg-morandi-gold text-white">
             <span className="font-medium">每日行程</span>
-            <span className="text-blue-100 text-sm">({itinerary.daily_itinerary.length} 天)</span>
+            <span className="text-white/80 text-sm">({itinerary.daily_itinerary.length} 天)</span>
           </div>
           <table className="w-full text-sm">
             <thead>
@@ -1611,18 +1637,18 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
           const req = accommodationRequests.find(r =>
             r.supplier_name?.includes(hotelName) || r.title?.includes(hotelName)
           )
-          if (!req) return { status: 'pending', label: '待確認', color: 'bg-yellow-100 text-yellow-700' }
-          if (req.status === 'confirmed') return { status: 'confirmed', label: '已確認', color: 'bg-green-100 text-green-700' }
-          if (req.status === 'replied') return { status: 'replied', label: '已回覆', color: 'bg-blue-100 text-blue-700' }
-          return { status: 'pending', label: '待確認', color: 'bg-yellow-100 text-yellow-700' }
+          if (!req) return { status: 'pending', label: '待確認', color: 'bg-morandi-gold/20 text-morandi-gold' }
+          if (req.status === 'confirmed') return { status: 'confirmed', label: '已確認', color: 'bg-morandi-green/20 text-morandi-green' }
+          if (req.status === 'replied') return { status: 'replied', label: '已回覆', color: 'bg-morandi-container text-morandi-primary' }
+          return { status: 'pending', label: '待確認', color: 'bg-morandi-gold/20 text-morandi-gold' }
         }
 
         return (
           <div className="border border-border rounded-lg overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-2 bg-purple-600 text-white">
+            <div className="flex items-center justify-between px-4 py-2 bg-morandi-primary text-white">
               <div className="flex items-center gap-2">
                 <span className="font-medium">飯店確認</span>
-                <span className="text-purple-100 text-sm">({nightlyAccommodations.length} 晚)</span>
+                <span className="text-white/80 text-sm">({nightlyAccommodations.length} 晚)</span>
               </div>
             </div>
             <table className="w-full text-sm">
@@ -1664,20 +1690,20 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
 
       {/* 統一表格 */}
       <div className="border border-border rounded-lg overflow-hidden print:border-black print:rounded-none">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm table-fixed">
           {/* 表頭 */}
           <thead>
             <tr className="bg-morandi-container/50 border-b border-border">
-              <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[60px] border-r border-border/30">分類</th>
-              <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[70px] border-r border-border/30">日期</th>
-              <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[120px] border-r border-border/30">供應商</th>
+              <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[4%] border-r border-border/30">分類</th>
+              <th className="px-1 py-2 text-left font-medium text-morandi-primary w-[5%] border-r border-border/30">日期</th>
+              <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[12%] border-r border-border/30">供應商</th>
               <th className="px-2 py-2 text-left font-medium text-morandi-primary border-r border-border/30">項目說明</th>
-              <th className="px-2 py-2 text-right font-medium text-morandi-primary w-[70px] border-r border-border/30">單價</th>
-              <th className="px-2 py-2 text-center font-medium text-morandi-primary w-[50px] border-r border-border/30">數量</th>
-              <th className="px-2 py-2 text-right font-medium text-morandi-primary w-[80px] border-r border-border/30">小計</th>
-              <th className="px-2 py-2 text-right font-medium text-morandi-primary w-[80px] border-r border-border/30">預計支出</th>
-              <th className="px-2 py-2 text-right font-medium text-morandi-primary w-[80px] border-r border-border/30">實際支出</th>
-              <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[100px]">備註</th>
+              <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[6%] border-r border-border/30">單價</th>
+              <th className="px-1 py-2 text-center font-medium text-morandi-primary w-[4%] border-r border-border/30">數量</th>
+              <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[6%] border-r border-border/30">小計</th>
+              <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[7%] border-r border-border/30">預計支出</th>
+              <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[7%] border-r border-border/30">實際支出</th>
+              <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[28%]">備註</th>
             </tr>
           </thead>
           <tbody>
@@ -1739,7 +1765,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                           }`}
                         >
                           <td className="px-2 py-2 text-morandi-secondary text-xs border-r border-border/30">{cat.label}</td>
-                          <td className="px-2 py-2 text-sm border-r border-border/30">{formatDate(item.service_date)}</td>
+                          <td className="px-1 py-2 text-xs border-r border-border/30">{formatDate(item.service_date)}</td>
                           <td className="px-2 py-2 text-sm border-r border-border/30">{item.supplier_name}</td>
                           <td className="px-2 py-2 text-sm border-r border-border/30">{item.title}</td>
                           <td className="px-2 py-2 text-right font-mono text-sm border-r border-border/30">{item.unit_price ? formatCurrency(item.unit_price) : '-'}</td>
@@ -1758,15 +1784,27 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                           </td>
                           <td className="px-2 py-2 text-right font-mono text-sm border-r border-border/30 hidden print:table-cell">{item.expected_cost ? formatCurrency(item.expected_cost) : '-'}</td>
                           <td className="px-2 py-2 text-right font-mono text-sm border-r border-border/30">{item.actual_cost ? formatCurrency(item.actual_cost) : '-'}</td>
-                          <td className="px-1 py-1 border-r border-border/30 print:hidden">
-                            <input
-                              type="text"
-                              value={item.id in localNotesRef.current ? localNotesRef.current[item.id].value : (item.notes || '')}
-                              onChange={(e) => handleNotesChange(item.id, e.target.value)}
-                              onBlur={() => handleNotesBlur(item.id)}
-                              className="w-full h-7 px-2 py-1 text-xs bg-transparent border border-transparent hover:border-border focus:border-morandi-gold focus:ring-1 focus:ring-morandi-gold/30 rounded outline-none"
-                              placeholder="備註..."
-                            />
+                          <td className="px-1 py-1 print:hidden">
+                            <div className="flex items-center gap-1">
+                              <input
+                                type="text"
+                                value={item.id in localNotesRef.current ? localNotesRef.current[item.id].value : (item.notes || '')}
+                                onChange={(e) => handleNotesChange(item.id, e.target.value)}
+                                onBlur={() => handleNotesBlur(item.id)}
+                                className="flex-1 h-7 px-2 py-1 text-xs bg-transparent border border-transparent hover:border-border focus:border-morandi-gold focus:ring-1 focus:ring-morandi-gold/30 rounded outline-none"
+                                placeholder="備註..."
+                              />
+                              {destinationCurrency && item.expected_cost ? (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 px-1.5 text-xs text-morandi-gold hover:text-morandi-gold-hover shrink-0"
+                                  onClick={() => handleCurrencyConvert(item.id)}
+                                >
+                                  {destinationCurrency}
+                                </Button>
+                              ) : null}
+                            </div>
                           </td>
                           <td className="px-2 py-2 text-xs text-morandi-secondary hidden print:table-cell">
                             {item.notes || '-'}
@@ -1821,7 +1859,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                                   )}
                                   {tour.return_flight && (
                                     <span>
-                                      <span className="text-blue-600">回程</span> {tour.return_flight.airline} {tour.return_flight.flightNumber} {tour.return_flight.departureAirport}→{tour.return_flight.arrivalAirport}
+                                      <span className="text-morandi-gold">回程</span> {tour.return_flight.airline} {tour.return_flight.flightNumber} {tour.return_flight.departureAirport}→{tour.return_flight.arrivalAirport}
                                     </span>
                                   )}
                                 </div>
@@ -1871,7 +1909,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                                   />
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
-                                  <span className="text-blue-600 font-medium w-10">回程</span>
+                                  <span className="text-morandi-gold font-medium w-10">回程</span>
                                   <input
                                     placeholder="航空"
                                     value={manualFlight.return.airline}
@@ -2166,6 +2204,75 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
             </tr>
           </tfoot>
         </table>
+      </div>
+
+      {/* 結算區塊 */}
+      <div className="mt-4 border border-border rounded-lg p-4 bg-morandi-container/20">
+        <div className="flex items-center justify-between">
+          <h3 className="font-medium text-morandi-primary">結算</h3>
+          {destinationCurrency && (
+            <div className="flex items-center gap-2 text-sm">
+              {sheet?.exchange_rate ? (
+                <>
+                  <span className="text-morandi-secondary">
+                    匯率：1 {destinationCurrency} = {sheet.exchange_rate} TWD
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2 text-xs text-morandi-gold hover:text-morandi-gold-hover"
+                    onClick={() => {
+                      setExchangeRateInput(sheet.exchange_rate?.toString() || '')
+                      setExchangeRateDialog({ open: true, itemId: null })
+                    }}
+                  >
+                    修改
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={() => setExchangeRateDialog({ open: true, itemId: null })}
+                >
+                  設定 {destinationCurrency} 匯率
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="space-y-1">
+            <p className="text-xs text-morandi-secondary">預計支出 (TWD)</p>
+            <p className="text-lg font-mono font-medium text-morandi-primary">
+              {formatCurrency(costSummary.total.expected)}
+            </p>
+          </div>
+          <div className="space-y-1">
+            <p className="text-xs text-morandi-secondary">實際支出 (TWD)</p>
+            <p className="text-lg font-mono font-medium text-morandi-primary">
+              {formatCurrency(costSummary.total.actual)}
+            </p>
+          </div>
+          {destinationCurrency && sheet?.exchange_rate && (
+            <>
+              <div className="space-y-1">
+                <p className="text-xs text-morandi-secondary">預計支出 ({destinationCurrency})</p>
+                <p className="text-lg font-mono font-medium text-morandi-gold">
+                  {Math.round(costSummary.total.expected / sheet.exchange_rate).toLocaleString()}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs text-morandi-secondary">實際支出 ({destinationCurrency})</p>
+                <p className="text-lg font-mono font-medium text-morandi-gold">
+                  {Math.round(costSummary.total.actual / sheet.exchange_rate).toLocaleString()}
+                </p>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* 編輯對話框 */}

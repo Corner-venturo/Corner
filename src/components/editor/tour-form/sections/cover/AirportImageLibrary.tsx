@@ -3,10 +3,12 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import { useAirportImages, createAirportImage, deleteAirportImage } from '@/data'
 import { ImageUploader } from '@/components/ui/image-uploader'
+import { UnsplashSearch } from '@/components/ui/image-uploader/UnsplashSearch'
+import { PexelsPicker } from '@/features/designer/components/PexelsPicker'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Loader2, Plus, Trash2 } from 'lucide-react'
+import { Loader2, Plus, Trash2, Upload, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores'
 import { logger } from '@/lib/utils/logger'
@@ -36,6 +38,8 @@ export function AirportImageLibrary({
   const deleteImage = deleteAirportImage
 
   const [showAddDialog, setShowAddDialog] = useState(false)
+  const [showUnsplashDialog, setShowUnsplashDialog] = useState(false)
+  const [showPexelsDialog, setShowPexelsDialog] = useState(false)
   const [newImageUrl, setNewImageUrl] = useState('')
   const [newImageLabel, setNewImageLabel] = useState('')
   const [isUploading, setIsUploading] = useState(false)
@@ -187,22 +191,69 @@ export function AirportImageLibrary({
         </div>
       )}
 
-      {/* 直接上傳 */}
-      <ImageUploader
-        value={selectedImage}
-        onChange={onImageUpload}
-        position={position}
-        onPositionChange={onPositionChange}
-        bucket="city-backgrounds"
-        filePrefix="itinerary"
-        previewHeight="80px"
-        aspectRatio={16 / 9}
-        placeholder="或直接上傳（僅用於此行程）"
-      />
+      {/* 上傳或搜尋 - 三個選項 */}
+      <div className="grid grid-cols-3 gap-2">
+        {/* 直接上傳 */}
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-1 text-[11px] text-morandi-secondary">
+            <Upload size={11} />
+            <span>上傳</span>
+          </div>
+          <ImageUploader
+            value={selectedImage}
+            onChange={onImageUpload}
+            position={position}
+            onPositionChange={onPositionChange}
+            bucket="city-backgrounds"
+            filePrefix="itinerary"
+            previewHeight="70px"
+            aspectRatio={16 / 9}
+            placeholder="本地圖片"
+          />
+        </div>
+
+        {/* Unsplash */}
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-1 text-[11px] text-morandi-secondary">
+            <Search size={11} />
+            <span>Unsplash</span>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShowUnsplashDialog(true)}
+            className="w-full h-[70px] border-dashed border-2 hover:border-morandi-gold/50 hover:bg-morandi-gold/5 transition-all"
+          >
+            <div className="flex flex-col items-center gap-0.5 text-morandi-secondary">
+              <Search size={18} />
+              <span className="text-[10px]">搜尋圖片</span>
+            </div>
+          </Button>
+        </div>
+
+        {/* Pexels */}
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-1 text-[11px] text-morandi-secondary">
+            <Search size={11} />
+            <span>Pexels</span>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShowPexelsDialog(true)}
+            className="w-full h-[70px] border-dashed border-2 hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all"
+          >
+            <div className="flex flex-col items-center gap-0.5 text-morandi-secondary">
+              <Search size={18} />
+              <span className="text-[10px]">搜尋圖片</span>
+            </div>
+          </Button>
+        </div>
+      </div>
 
       {/* 新增圖片對話框 */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent level={1} className="max-w-md">
+        <DialogContent level={2} className="max-w-md">
           <DialogHeader>
             <DialogTitle>新增圖片到 {airportCode}</DialogTitle>
           </DialogHeader>
@@ -252,6 +303,46 @@ export function AirportImageLibrary({
                 {isUploading ? <Loader2 size={14} className="animate-spin" /> : '加入圖片庫'}
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Unsplash 搜尋對話框 */}
+      <Dialog open={showUnsplashDialog} onOpenChange={setShowUnsplashDialog}>
+        <DialogContent level={2} className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Search size={18} />
+              Unsplash 免費圖庫
+            </DialogTitle>
+          </DialogHeader>
+
+          <UnsplashSearch
+            onSelect={(url) => {
+              onImageUpload(url)
+              setShowUnsplashDialog(false)
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Pexels 搜尋對話框 */}
+      <Dialog open={showPexelsDialog} onOpenChange={setShowPexelsDialog}>
+        <DialogContent level={2} className="max-w-4xl max-h-[85vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Search size={18} />
+              Pexels 免費圖庫
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="overflow-y-auto max-h-[calc(85vh-80px)]">
+            <PexelsPicker
+              onSelectImage={(url) => {
+                onImageUpload(url)
+                setShowPexelsDialog(false)
+              }}
+            />
           </div>
         </DialogContent>
       </Dialog>

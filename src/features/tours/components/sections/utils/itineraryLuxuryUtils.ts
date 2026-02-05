@@ -14,12 +14,15 @@ export const LUXURY = {
   tableHeader: '#F0F4F3',
 }
 
-// Day 卡片背景色循環
+// Day 卡片背景色循環（7天不重複）
 export const DAY_COLORS = [
-  LUXURY.primary,    // 深綠
-  LUXURY.text,       // 深灰
-  LUXURY.secondary,  // 金銅
-  LUXURY.accent,     // 酒紅
+  '#2C5F4D',  // 深綠
+  '#8F4F4F',  // 酒紅
+  '#4A6FA5',  // 靛藍
+  '#6B5B4F',  // 摩卡棕
+  '#5D6D7E',  // 石板灰
+  '#7D5A50',  // 赤褐
+  '#3D5A45',  // 森林綠
 ]
 
 // 計算 dayLabel

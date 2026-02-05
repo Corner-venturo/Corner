@@ -25,7 +25,7 @@ export function ItineraryPreview({ tourData }: ItineraryPreviewProps) {
 
   const scale = viewMode === 'mobile' ? 0.7 : 0.5
 
-  // Convert icon strings to components for preview
+  // Convert icon strings to components for preview and transform data structure
   const processedData = useMemo(
     () => ({
       ...tourData,
@@ -33,6 +33,8 @@ export function ItineraryPreview({ tourData }: ItineraryPreviewProps) {
         ...f,
         iconComponent: iconMap[f.icon] || Sparkles,
       })),
+      // 將 meetingInfo 轉換為 meetingPoints 陣列給預覽使用
+      meetingPoints: tourData.meetingPoints || (tourData.meetingInfo ? [tourData.meetingInfo] : []),
     }),
     [tourData]
   )
