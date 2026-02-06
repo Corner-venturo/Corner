@@ -73,6 +73,21 @@ const TourCosts = dynamic(
   { loading: () => <TabLoading /> }
 )
 
+const TourQuoteTab = dynamic(
+  () => import('@/components/tours/tour-quote-tab').then(m => m.TourQuoteTab),
+  { loading: () => <TabLoading /> }
+)
+
+const TourItineraryTab = dynamic(
+  () => import('@/components/tours/tour-itinerary-tab').then(m => m.TourItineraryTab),
+  { loading: () => <TabLoading /> }
+)
+
+const TourWebpageTab = dynamic(
+  () => import('@/components/tours/tour-webpage-tab').then(m => m.TourWebpageTab),
+  { loading: () => <TabLoading /> }
+)
+
 // ============================================================================
 // 頁籤定義（共用）
 // ============================================================================
@@ -81,6 +96,9 @@ export const TOUR_TABS = [
   { value: 'members', label: '團員名單' },
   { value: 'orders', label: '訂單管理' },
   { value: 'requirements', label: '需求總覽' },
+  { value: 'quote', label: '報價單' },
+  { value: 'itinerary', label: '行程表' },
+  { value: 'webpage', label: '網頁' },
   { value: 'confirmation', label: '團確單' },
   { value: 'checkin', label: '報到' },
   { value: 'designs', label: '設計' },
@@ -153,6 +171,12 @@ export function TourTabContent({
           onOpenRequestDialog={onOpenRequestDialog}
         />
       )
+    case 'quote':
+      return <TourQuoteTab tour={tour} />
+    case 'itinerary':
+      return <TourItineraryTab tour={tour} />
+    case 'webpage':
+      return <TourWebpageTab tour={tour} />
     case 'files':
       return <TourFilesTree tourId={tour.id} tourCode={tour.code || ''} quoteId={tour.quote_id} itineraryId={tour.itinerary_id} />
     case 'designs':

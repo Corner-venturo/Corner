@@ -63,6 +63,7 @@ export interface SortableActivityItemProps {
   updateActivity: (dayIndex: number, actIndex: number, field: string, value: string) => void
   removeActivity: (dayIndex: number, actIndex: number) => void
   handleActivityImageUpload: (dayIndex: number, actIndex: number, file: File) => void
+  handleExternalImageUpload?: (dayIndex: number, actIndex: number, imageUrl: string) => Promise<void>
   isActivityUploading: boolean
   isActivityDragOver: boolean
   setActivityDragOver: (value: { dayIndex: number; actIndex: number } | null) => void
@@ -103,6 +104,7 @@ export interface DayCardProps {
   onOpenRestaurantSelector: (dayIndex: number, mealType: 'breakfast' | 'lunch' | 'dinner') => void
   // Image upload handlers
   handleActivityImageUpload: (dayIndex: number, actIndex: number, file: File) => Promise<void>
+  handleExternalImageUpload?: (dayIndex: number, actIndex: number, imageUrl: string) => Promise<void>
   onOpenPositionEditor: (dayIndex: number, actIndex: number) => void
 }
 

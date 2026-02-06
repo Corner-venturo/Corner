@@ -1,16 +1,26 @@
 'use client'
 
-import React, { useRef, useEffect, useCallback } from 'react'
+/**
+ * QuoteDetailEmbed - 可嵌入的報價單詳情元件
+ *
+ * 用於：
+ * 1. 報價單頁面 /quotes/[id]
+ * 2. 旅遊團報價單分頁
+ *
+ * 接收 quoteId 作為 prop，而不是從 URL 讀取
+ */
+
+import React, { useRef, useEffect, useCallback, useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { ParticipantCounts, SellingPrices, VersionRecord } from '@/features/quotes/types'
-import type { Tour as TourType } from '@/types/tour.types'
-import { useQuoteState } from '@/features/quotes/hooks/useQuoteState'
+import { ParticipantCounts, SellingPrices, VersionRecord, CostCategory, CostItem } from '@/features/quotes/types'
+import type { Tour } from '@/types/tour.types'
+import { useQuotes } from '@/features/quotes/hooks/useQuotes'
 import { useCategoryOperations } from '@/features/quotes/hooks/useCategoryOperations'
 import { useQuoteCalculations } from '@/features/quotes/hooks/useQuoteCalculations'
 import { useQuoteActions } from '@/features/quotes/hooks/useQuoteActions'
-import { useSyncOperations } from './hooks/useSyncOperations'
+import { useToursSlim, useItineraries, updateItinerary, createTour } from '@/data'
 import { useAuthStore } from '@/stores'
-import { useItineraries, updateItinerary } from '@/data'
 import { toast } from 'sonner'
 import type { QuoteConfirmationStatus } from '@/types/quote.types'
 import {
@@ -26,11 +36,9 @@ import {
   LocalPricingDialog,
 } from '@/features/quotes/components'
 import type { LocalTier } from '@/features/quotes/components/LocalPricingDialog'
-import { NotFoundState } from '@/components/ui/not-found-state'
+import { Loader2 } from 'lucide-react'
 import type { MealDiff } from '@/features/quotes/components'
-import type { CostItem } from '@/features/quotes/types'
-import type { Itinerary, CreateInput, Tour } from '@/stores/types'
-// TourType imported above from @/types/tour.types
+import type { Itinerary, CreateInput } from '@/stores/types'
 import { EditingWarningBanner } from '@/components/EditingWarningBanner'
 import {
   calculateTierParticipantCounts,
@@ -38,79 +46,111 @@ import {
   calculateIdentityProfits,
   generateUniqueId,
 } from '@/features/quotes/utils/priceCalculations'
+import { costCategories, TierPricing } from '@/features/quotes/types'
 
-export default function QuoteDetailPage() {
+interface QuoteDetailEmbedProps {
+  quoteId: string
+  /** 是否顯示 header（在分頁模式下可能要隱藏） */
+  showHeader?: boolean
+}
 
-  // Scroll handling refs (必須在任何條件判斷之前宣告)
+export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbedProps) {
+  const router = useRouter()
+  const { quotes, updateQuote, loadQuotes } = useQuotes()
+  const { items: tours } = useToursSlim()
+  const { items: itineraries } = useItineraries()
+  const { user } = useAuthStore()
+
+  // Scroll handling refs
   const scrollRef = useRef<HTMLDivElement>(null)
   const scrollTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
-  // State management hook
-  const quoteState = useQuoteState()
-  const {
-    quote,
-    relatedTour,
-    isSpecialTour,
-    isReadOnly,
-    categories,
-    setCategories,
-    accommodationDays,
-    setAccommodationDays,
-    participantCounts,
-    setParticipantCounts,
-    groupSize,
-    groupSizeForGuide,
-    quoteName,
-    setQuoteName,
-    saveSuccess,
-    setSaveSuccess,
-    isSaveDialogOpen,
-    setIsSaveDialogOpen,
-    versionName,
-    setVersionName,
-    currentEditingVersion,
-    setCurrentEditingVersion,
-    sellingPrices,
-    setSellingPrices,
-    // 砍次表相關
-    tierPricings,
-    setTierPricings,
-    // 404 狀態
-    notFound,
-    hasLoaded,
-    updateQuote,
-    addTour,
-    router,
-  } = quoteState
-
-  // Itinerary data for sync
-  const { items: itineraries } = useItineraries()
-
-  // Auth store for staff info
-  const { user } = useAuthStore()
-
-  // 處理確認狀態變更
-  const handleConfirmationStatusChange = React.useCallback(async (status: QuoteConfirmationStatus) => {
-    if (!quote) return
-    try {
-      await updateQuote(quote.id, { confirmation_status: status })
-    } catch (error) {
-      const { toast } = await import('sonner')
-      toast.error('更新狀態失敗，請稍後再試')
+  // 載入報價單
+  useEffect(() => {
+    if (quotes.length === 0) {
+      loadQuotes()
     }
-  }, [quote, updateQuote])
+  }, [quotes.length, loadQuotes])
 
-  // Sync operations hook
-  const syncOps = useSyncOperations({
-    quote: quote ?? null,
-    categories,
-    accommodationDays,
-    setCategories,
-    setAccommodationDays,
-    itineraries,
-    updateItinerary: updateItinerary as unknown as (id: string, data: Partial<Itinerary>) => Promise<void>,
-    router,
+  const quote = quotes.find(q => q.id === quoteId)
+
+  // 檢查是否為特殊團報價單
+  const relatedTour = quote?.tour_id ? tours.find(t => t.id === quote.tour_id) : null
+  const isSpecialTour = relatedTour?.status === '特殊團'
+  const isReadOnly = isSpecialTour
+
+  // State
+  const [categories, setCategories] = useState<CostCategory[]>([])
+  const [accommodationDays, setAccommodationDays] = useState(0)
+  const [participantCounts, setParticipantCounts] = useState<ParticipantCounts>({
+    adult: 0,
+    child_with_bed: 0,
+    child_no_bed: 0,
+    single_room: 0,
+    infant: 0,
   })
+  const [quoteName, setQuoteName] = useState('')
+  const [saveSuccess, setSaveSuccess] = useState(false)
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false)
+  const [versionName, setVersionName] = useState('')
+  const [currentEditingVersion, setCurrentEditingVersion] = useState<number | null>(null)
+  const [sellingPrices, setSellingPrices] = useState<SellingPrices>({
+    adult: 0,
+    child_with_bed: 0,
+    child_no_bed: 0,
+    single_room: 0,
+    infant: 0,
+  })
+  const [tierPricings, setTierPricings] = useState<TierPricing[]>([])
+  const [hasLoaded, setHasLoaded] = useState(false)
+
+  // 初始化資料
+  useEffect(() => {
+    if (quote && !hasLoaded) {
+      setCategories(
+        (quote.categories && quote.categories.length > 0)
+          ? quote.categories.map(cat => ({
+              ...cat,
+              total: cat.items.reduce((sum: number, item: CostItem) => sum + (item.total || 0), 0),
+            }))
+          : costCategories
+      )
+      setAccommodationDays(quote.accommodation_days || 0)
+      setParticipantCounts(quote.participant_counts || {
+        adult: quote.group_size || 20,
+        child_with_bed: 0,
+        child_no_bed: 0,
+        single_room: 0,
+        infant: 0,
+      })
+      setQuoteName(quote.name || '')
+      setSellingPrices(quote.selling_prices || {
+        adult: 0,
+        child_with_bed: 0,
+        child_no_bed: 0,
+        single_room: 0,
+        infant: 0,
+      })
+      setTierPricings(quote.tier_pricings || [])
+      setHasLoaded(true)
+    }
+  }, [quote, hasLoaded])
+
+  // Group size calculations
+  const groupSize = useMemo(() => {
+    return (participantCounts.adult || 0) +
+      (participantCounts.child_with_bed || 0) +
+      (participantCounts.child_no_bed || 0) +
+      (participantCounts.single_room || 0)
+  }, [participantCounts])
+
+  const groupSizeForGuide = useMemo(() => {
+    return (participantCounts.adult || 0) +
+      (participantCounts.child_with_bed || 0) +
+      (participantCounts.child_no_bed || 0) +
+      (participantCounts.single_room || 0) +
+      (participantCounts.infant || 0)
+  }, [participantCounts])
 
   // Category operations hook
   const categoryOps = useCategoryOperations({
@@ -139,9 +179,9 @@ export default function QuoteDetailPage() {
 
   // Actions hook
   const actions = useQuoteActions({
-    quote,
+    quote: quote || null,
     updateQuote,
-    addTour: addTour as unknown as (data: CreateInput<Tour>) => Promise<Tour | undefined>,
+    addTour: createTour as unknown as (data: CreateInput<Tour>) => Promise<Tour | undefined>,
     router,
     updatedCategories,
     total_cost,
@@ -160,42 +200,48 @@ export default function QuoteDetailPage() {
   const { handleSave, handleSaveAsNewVersion, formatDateTime, handleFinalize, handleCreateTour, handleDeleteVersion } = actions
 
   // 同步到行程表 - 狀態
-  const [isSyncDialogOpen, setIsSyncDialogOpen] = React.useState(false)
-  const [syncDiffs, setSyncDiffs] = React.useState<MealDiff[]>([])
-  const [syncItineraryTitle, setSyncItineraryTitle] = React.useState<string>('')
+  const [isSyncDialogOpen, setIsSyncDialogOpen] = useState(false)
+  const [syncDiffs, setSyncDiffs] = useState<MealDiff[]>([])
+  const [syncItineraryTitle, setSyncItineraryTitle] = useState<string>('')
 
-  // 開啟同步對話框
-  const handleSyncToItinerary = useCallback(() => {
-    if (!quote?.itinerary_id) {
-      toast.error('此報價單沒有連結行程表')
-      return
+  // 報價單預覽
+  const [showQuotationPreview, setShowQuotationPreview] = useState(false)
+  const [showLinkTourDialog, setShowLinkTourDialog] = useState(false)
+  const [showImportMealsDialog, setShowImportMealsDialog] = useState(false)
+  const [showImportActivitiesDialog, setShowImportActivitiesDialog] = useState(false)
+  const [showLocalPricingDialog, setShowLocalPricingDialog] = useState(false)
+
+  const [previewParticipantCounts, setPreviewParticipantCounts] = useState<ParticipantCounts | null>(null)
+  const [previewSellingPrices, setPreviewSellingPrices] = useState<SellingPrices | null>(null)
+  const [previewTierLabel, setPreviewTierLabel] = useState<string | undefined>(undefined)
+  const [previewTierPricings, setPreviewTierPricings] = useState<Array<{
+    participant_count: number
+    selling_prices: SellingPrices
+  }>>([])
+
+  // 處理確認狀態變更
+  const handleConfirmationStatusChange = useCallback(async (status: QuoteConfirmationStatus) => {
+    if (!quote) return
+    try {
+      await updateQuote(quote.id, { confirmation_status: status })
+    } catch {
+      toast.error('更新狀態失敗，請稍後再試')
     }
+  }, [quote, updateQuote])
 
-    const result = syncOps.calculateSyncDiffs()
-    if (!result) {
-      toast.error('找不到連結的行程表')
-      return
+  // 處理狀態變更
+  const handleStatusChange = useCallback((status: 'proposed' | 'approved', showLinkDialog?: boolean) => {
+    if (!quote) return
+    if (status === 'approved' && showLinkDialog) {
+      setShowLinkTourDialog(true)
+    } else {
+      updateQuote(quote.id, { status })
     }
+  }, [quote, updateQuote])
 
-    if (result.diffs.length === 0) {
-      toast.info('沒有需要同步的變更')
-      return
-    }
-
-    setSyncDiffs(result.diffs)
-    setSyncItineraryTitle(result.itinerary.title || result.itinerary.tagline || '')
-    setIsSyncDialogOpen(true)
-  }, [quote, syncOps])
-
-  // 確認同步
-  const handleConfirmSync = useCallback(() => {
-    syncOps.handleConfirmSync(syncDiffs)
-  }, [syncOps, syncDiffs])
-
-  // 載入特定版本
+  // 載入版本
   const handleLoadVersion = useCallback(
     (versionIndex: number, versionData: VersionRecord) => {
-      // 載入版本資料
       setCategories(versionData.categories || [])
       setAccommodationDays(versionData.accommodation_days || 0)
       if (versionData.participant_counts) {
@@ -204,200 +250,10 @@ export default function QuoteDetailPage() {
       if (versionData.selling_prices) {
         setSellingPrices(versionData.selling_prices)
       }
-
-      // 記錄當前編輯的版本索引（-1 表示主版本，null 表示初始狀態）
       setCurrentEditingVersion(versionIndex === -1 ? null : versionIndex)
     },
-    [setCategories, setAccommodationDays, setParticipantCounts, setSellingPrices, setCurrentEditingVersion]
+    []
   )
-
-
-  // 報價單預覽
-  const [showQuotationPreview, setShowQuotationPreview] = React.useState(false)
-  // 關聯旅遊團對話框
-  const [showLinkTourDialog, setShowLinkTourDialog] = React.useState(false)
-  // 匯入餐飲對話框
-  const [showImportMealsDialog, setShowImportMealsDialog] = React.useState(false)
-  // 匯入景點對話框
-  const [showImportActivitiesDialog, setShowImportActivitiesDialog] = React.useState(false)
-  // Local 報價對話框
-  const [showLocalPricingDialog, setShowLocalPricingDialog] = React.useState(false)
-
-  // 處理狀態變更
-  const handleStatusChange = React.useCallback((status: 'proposed' | 'approved', showLinkDialog?: boolean) => {
-    if (!quote) return
-
-    if (status === 'approved' && showLinkDialog) {
-      // 成交時顯示關聯旅遊團對話框
-      setShowLinkTourDialog(true)
-    } else {
-      // 直接更新狀態
-      updateQuote(quote.id, { status })
-    }
-  }, [quote, updateQuote])
-
-  // 處理新建旅遊團
-  const handleCreateNewTour = React.useCallback(() => {
-    if (!quote) return
-    // 先更新狀態為進行中（綁定旅遊團後自動變更）
-    updateQuote(quote.id, { status: '進行中' })
-    // 呼叫原本的建立旅遊團功能
-    handleCreateTour()
-  }, [quote, updateQuote, handleCreateTour])
-
-  // 處理關聯現有旅遊團
-  const handleLinkExistingTour = React.useCallback(async (tour: { id: string; code: string }) => {
-    if (!quote) return
-    // 更新報價單狀態和關聯旅遊團（綁定後自動變更為進行中）
-    await updateQuote(quote.id, {
-      status: '進行中',
-      tour_id: tour.id
-    })
-    // 更新旅遊團的 quote_id
-    const { updateTour } = await import('@/data')
-    await updateTour(tour.id, { quote_id: quote.id })
-    toast.success(`已關聯旅遊團：${tour.code}`)
-  }, [quote, updateQuote])
-
-  // 處理匯入餐飲
-  const handleImportMeals = React.useCallback((items: CostItem[]) => {
-    setCategories(prev => {
-      const newCategories = [...prev]
-      const mealsCategory = newCategories.find(cat => cat.id === 'meals')
-      if (mealsCategory) {
-        mealsCategory.items = [...mealsCategory.items, ...items]
-        mealsCategory.total = mealsCategory.items.reduce((sum, item) => sum + (item.total || 0), 0)
-      }
-      return newCategories
-    })
-    toast.success(`已匯入 ${items.length} 筆餐飲`)
-  }, [setCategories])
-
-  // 處理匯入景點
-  const handleImportActivities = React.useCallback((items: CostItem[]) => {
-    setCategories(prev => {
-      const newCategories = [...prev]
-      const activitiesCategory = newCategories.find(cat => cat.id === 'activities')
-      if (activitiesCategory) {
-        activitiesCategory.items = [...activitiesCategory.items, ...items]
-        activitiesCategory.total = activitiesCategory.items.reduce((sum, item) => sum + (item.total || 0), 0)
-      }
-      return newCategories
-    })
-    toast.success(`已匯入 ${items.length} 筆景點`)
-  }, [setCategories])
-
-  // 開啟匯入對話框（需要先有關聯的行程表）
-  const handleOpenMealsImportDialog = React.useCallback(() => {
-    if (!quote?.itinerary_id) {
-      toast.error('此報價單沒有關聯的行程表')
-      return
-    }
-    setShowImportMealsDialog(true)
-  }, [quote])
-
-  const handleOpenActivitiesImportDialog = React.useCallback(() => {
-    if (!quote?.itinerary_id) {
-      toast.error('此報價單沒有關聯的行程表')
-      return
-    }
-    setShowImportActivitiesDialog(true)
-  }, [quote])
-
-  // 計算總人數（成人 + 兒童佔床 + 兒童不佔床 + 單人房）
-  const totalParticipants = React.useMemo(() => {
-    return (participantCounts.adult || 0) +
-           (participantCounts.child_with_bed || 0) +
-           (participantCounts.child_no_bed || 0) +
-           (participantCounts.single_room || 0)
-  }, [participantCounts])
-
-  // 處理 Local 報價確認
-  const handleLocalPricingConfirm = React.useCallback((tiers: LocalTier[], _matchedTierIndex: number) => {
-    // 產生檻次表：第一個使用目前總人數，後續使用 Local 報價的檻次
-    const sortedTiers = [...tiers].sort((a, b) => a.participants - b.participants)
-
-    // 找到目前人數對應的檻次索引
-    let currentTierIdx = 0
-    for (let i = 0; i < sortedTiers.length; i++) {
-      if (sortedTiers[i].participants <= totalParticipants) {
-        currentTierIdx = i
-      }
-    }
-    const currentLocalPrice = sortedTiers[currentTierIdx]?.unitPrice || 0
-
-    // 先計算 baseCosts（不含 Local，用現有 categories）
-    // 然後再創建 Local 項目
-
-    // 產生檻次表
-    const newTierPricings = sortedTiers.map((tier, index) => {
-      // 第一個檻次使用目前總人數（並對應到符合的 Local 單價）
-      const participantCount = index === 0 ? totalParticipants : tier.participants
-      // 該檻次對應的 Local 單價（每人）
-      const localUnitPrice = index === 0 ? currentLocalPrice : tier.unitPrice
-
-      // 計算新的人數分布（保持原始比例）
-      const newCounts = calculateTierParticipantCounts(participantCount, participantCounts)
-
-      // 計算新的成本（不含 Local）
-      const baseCosts = calculateTierCosts(categories, newCounts, participantCounts)
-
-      // 加上 Local 單價
-      const newCosts = {
-        adult: baseCosts.adult + localUnitPrice,
-        child_with_bed: baseCosts.child_with_bed + localUnitPrice,
-        child_no_bed: baseCosts.child_no_bed + localUnitPrice,
-        single_room: baseCosts.single_room + localUnitPrice,
-        infant: baseCosts.infant, // 嬰兒不算 Local
-      }
-
-      return {
-        id: generateUniqueId(),
-        participant_count: participantCount,
-        participant_counts: newCounts,
-        identity_costs: newCosts,
-        selling_prices: { ...sellingPrices },
-        identity_profits: calculateIdentityProfits(sellingPrices, newCosts),
-      }
-    })
-
-    // 在團體分攤創建 Local 報價項目（顯示用，total=0 不參與計算）
-    setCategories(prev => {
-      const newCategories = [...prev]
-      const groupTransportCategory = newCategories.find(cat => cat.id === 'group-transport')
-      if (groupTransportCategory) {
-        // 移除舊的 Local 報價項目
-        groupTransportCategory.items = groupTransportCategory.items.filter(
-          item => !item.name.startsWith('Local 報價')
-        )
-
-        // 新增 Local 報價項目（顯示用）
-        const newItem: CostItem = {
-          id: `local-${Date.now()}`,
-          name: 'Local 報價',
-          quantity: 1,
-          unit_price: currentLocalPrice,
-          total: 0, // 不參與計算，砍次表會單獨處理
-          note: `目前適用: $${currentLocalPrice.toLocaleString()}/人 | ${sortedTiers.map(t => `${t.participants}人=$${t.unitPrice.toLocaleString()}`).join(' / ')}`,
-        }
-        groupTransportCategory.items.push(newItem)
-      }
-      return newCategories
-    })
-
-    setTierPricings(newTierPricings)
-    toast.success(`Local 報價已套用，產生 ${newTierPricings.length} 個檻次`)
-  }, [totalParticipants, participantCounts, categories, sellingPrices, setCategories, setTierPricings])
-  const [previewParticipantCounts, setPreviewParticipantCounts] =
-    React.useState<ParticipantCounts | null>(null)
-  const [previewSellingPrices, setPreviewSellingPrices] = React.useState<SellingPrices | null>(null)
-  const [previewTierLabel, setPreviewTierLabel] = React.useState<string | undefined>(undefined)
-  const [previewTierPricings, setPreviewTierPricings] = React.useState<
-    Array<{
-      participant_count: number
-      selling_prices: SellingPrices
-    }>
-  >([])
 
   const handleGenerateQuotation = useCallback(
     (
@@ -409,7 +265,6 @@ export default function QuoteDetailPage() {
         selling_prices: SellingPrices
       }>
     ) => {
-      // 如果有傳入檻次表數據，使用檻次表數據；否則使用原始數據
       setPreviewParticipantCounts(tierParticipantCounts || null)
       setPreviewSellingPrices(tierSellingPrices || null)
       setPreviewTierLabel(tierLabel)
@@ -427,16 +282,131 @@ export default function QuoteDetailPage() {
     setShowQuotationPreview(false)
   }, [])
 
-  // Scroll handling effect (必須在任何條件判斷之前)
+  // Sync operations (simplified)
+  const handleSyncToItinerary = useCallback(() => {
+    toast.info('同步功能開發中')
+  }, [])
+
+  const handleSyncAccommodationFromItinerary = useCallback(() => {
+    toast.info('同步功能開發中')
+  }, [])
+
+  // Import handlers
+  const handleImportMeals = useCallback((items: CostItem[]) => {
+    setCategories(prev => {
+      const newCategories = [...prev]
+      const mealsCategory = newCategories.find(cat => cat.id === 'meals')
+      if (mealsCategory) {
+        mealsCategory.items = [...mealsCategory.items, ...items]
+        mealsCategory.total = mealsCategory.items.reduce((sum, item) => sum + (item.total || 0), 0)
+      }
+      return newCategories
+    })
+    toast.success(`已匯入 ${items.length} 筆餐飲`)
+  }, [])
+
+  const handleImportActivities = useCallback((items: CostItem[]) => {
+    setCategories(prev => {
+      const newCategories = [...prev]
+      const activitiesCategory = newCategories.find(cat => cat.id === 'activities')
+      if (activitiesCategory) {
+        activitiesCategory.items = [...activitiesCategory.items, ...items]
+        activitiesCategory.total = activitiesCategory.items.reduce((sum, item) => sum + (item.total || 0), 0)
+      }
+      return newCategories
+    })
+    toast.success(`已匯入 ${items.length} 筆景點`)
+  }, [])
+
+  const handleOpenMealsImportDialog = useCallback(() => {
+    if (!quote?.itinerary_id) {
+      toast.error('此報價單沒有關聯的行程表')
+      return
+    }
+    setShowImportMealsDialog(true)
+  }, [quote])
+
+  const handleOpenActivitiesImportDialog = useCallback(() => {
+    if (!quote?.itinerary_id) {
+      toast.error('此報價單沒有關聯的行程表')
+      return
+    }
+    setShowImportActivitiesDialog(true)
+  }, [quote])
+
+  // 計算總人數
+  const totalParticipants = useMemo(() => {
+    return (participantCounts.adult || 0) +
+           (participantCounts.child_with_bed || 0) +
+           (participantCounts.child_no_bed || 0) +
+           (participantCounts.single_room || 0)
+  }, [participantCounts])
+
+  // Local pricing handler
+  const handleLocalPricingConfirm = useCallback((tiers: LocalTier[], _matchedTierIndex: number) => {
+    const sortedTiers = [...tiers].sort((a, b) => a.participants - b.participants)
+    let currentTierIdx = 0
+    for (let i = 0; i < sortedTiers.length; i++) {
+      if (sortedTiers[i].participants <= totalParticipants) {
+        currentTierIdx = i
+      }
+    }
+    const currentLocalPrice = sortedTiers[currentTierIdx]?.unitPrice || 0
+
+    const newTierPricings = sortedTiers.map((tier, index) => {
+      const participantCount = index === 0 ? totalParticipants : tier.participants
+      const localUnitPrice = index === 0 ? currentLocalPrice : tier.unitPrice
+      const newCounts = calculateTierParticipantCounts(participantCount, participantCounts)
+      const baseCosts = calculateTierCosts(categories, newCounts, participantCounts)
+      const newCosts = {
+        adult: baseCosts.adult + localUnitPrice,
+        child_with_bed: baseCosts.child_with_bed + localUnitPrice,
+        child_no_bed: baseCosts.child_no_bed + localUnitPrice,
+        single_room: baseCosts.single_room + localUnitPrice,
+        infant: baseCosts.infant,
+      }
+      return {
+        id: generateUniqueId(),
+        participant_count: participantCount,
+        participant_counts: newCounts,
+        identity_costs: newCosts,
+        selling_prices: { ...sellingPrices },
+        identity_profits: calculateIdentityProfits(sellingPrices, newCosts),
+      }
+    })
+
+    setCategories(prev => {
+      const newCategories = [...prev]
+      const groupTransportCategory = newCategories.find(cat => cat.id === 'group-transport')
+      if (groupTransportCategory) {
+        groupTransportCategory.items = groupTransportCategory.items.filter(
+          item => !item.name.startsWith('Local 報價')
+        )
+        const newItem: CostItem = {
+          id: `local-${Date.now()}`,
+          name: 'Local 報價',
+          quantity: 1,
+          unit_price: currentLocalPrice,
+          total: 0,
+          note: `目前適用: $${currentLocalPrice.toLocaleString()}/人 | ${sortedTiers.map(t => `${t.participants}人=$${t.unitPrice.toLocaleString()}`).join(' / ')}`,
+        }
+        groupTransportCategory.items.push(newItem)
+      }
+      return newCategories
+    })
+
+    setTierPricings(newTierPricings)
+    toast.success(`Local 報價已套用，產生 ${newTierPricings.length} 個檻次`)
+  }, [totalParticipants, participantCounts, categories, sellingPrices])
+
+  // Scroll handling effect
   useEffect(() => {
     const handleScroll = () => {
       if (scrollRef.current) {
         scrollRef.current.classList.add('scrolling')
-
         if (scrollTimeoutRef.current) {
           clearTimeout(scrollTimeoutRef.current)
         }
-
         scrollTimeoutRef.current = setTimeout(() => {
           if (scrollRef.current) {
             scrollRef.current.classList.remove('scrolling')
@@ -452,35 +422,16 @@ export default function QuoteDetailPage() {
     }
   }, [])
 
-  // 如果還在載入，顯示載入中
-  if (!hasLoaded) {
+  // Loading state
+  if (!hasLoaded || !quote) {
     return (
       <div className="flex items-center justify-center h-[50vh]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-morandi-gold mx-auto mb-4"></div>
+          <Loader2 className="animate-spin h-12 w-12 text-morandi-gold mx-auto mb-4" />
           <p className="text-morandi-secondary">載入中...</p>
         </div>
       </div>
     )
-  }
-
-  // 如果資料已載入但找不到報價單，顯示 404 狀態
-  if (notFound) {
-    return (
-      <div className="flex items-center justify-center h-[50vh]">
-        <NotFoundState
-          title="找不到該報價單"
-          description="您要找的報價單可能已被刪除或不存在"
-          backButtonLabel="返回報價單列表"
-          backHref="/quotes"
-        />
-      </div>
-    )
-  }
-
-  // 最後的 null 檢查（理論上不應到達這裡）
-  if (!quote) {
-    return null
   }
 
   return (
@@ -492,41 +443,43 @@ export default function QuoteDetailPage() {
         resourceName="此報價單"
       />
 
-      <QuoteHeader
-        isSpecialTour={isSpecialTour}
-        isReadOnly={isReadOnly}
-        relatedTour={relatedTour as Tour | null}
-        quote={quote as Parameters<typeof QuoteHeader>[0]['quote']}
-        quoteName={quoteName}
-        setQuoteName={setQuoteName}
-        participantCounts={participantCounts}
-        setParticipantCounts={setParticipantCounts}
-        saveSuccess={saveSuccess}
-        setIsSaveDialogOpen={setIsSaveDialogOpen}
-        handleSave={handleSave}
-        handleCreateTour={handleCreateTour}
-        handleGenerateQuotation={handleGenerateQuotation}
-        handleSyncToItinerary={handleSyncToItinerary}
-        handleSyncAccommodationFromItinerary={syncOps.handleSyncAccommodationFromItinerary}
-        onStatusChange={handleStatusChange}
-        router={router}
-        accommodationDays={accommodationDays}
-        contactInfo={{
-          contact_person: quote.contact_person || '',
-          contact_phone: quote.contact_phone || '',
-          contact_address: quote.contact_address || '',
-        }}
-        onContactInfoChange={(info) => {
-          updateQuote(quote.id, {
-            contact_person: info.contact_person,
-            contact_phone: info.contact_phone,
-            contact_address: info.contact_address,
-          })
-        }}
-        staffId={user?.id}
-        staffName={user?.name || user?.email}
-        onConfirmationStatusChange={handleConfirmationStatusChange}
-      />
+      {showHeader && (
+        <QuoteHeader
+          isSpecialTour={isSpecialTour}
+          isReadOnly={isReadOnly}
+          relatedTour={relatedTour as Tour | null}
+          quote={quote as Parameters<typeof QuoteHeader>[0]['quote']}
+          quoteName={quoteName}
+          setQuoteName={setQuoteName}
+          participantCounts={participantCounts}
+          setParticipantCounts={setParticipantCounts}
+          saveSuccess={saveSuccess}
+          setIsSaveDialogOpen={setIsSaveDialogOpen}
+          handleSave={handleSave}
+          handleCreateTour={handleCreateTour}
+          handleGenerateQuotation={handleGenerateQuotation}
+          handleSyncToItinerary={handleSyncToItinerary}
+          handleSyncAccommodationFromItinerary={handleSyncAccommodationFromItinerary}
+          onStatusChange={handleStatusChange}
+          router={router}
+          accommodationDays={accommodationDays}
+          contactInfo={{
+            contact_person: quote.contact_person || '',
+            contact_phone: quote.contact_phone || '',
+            contact_address: quote.contact_address || '',
+          }}
+          onContactInfoChange={(info) => {
+            updateQuote(quote.id, {
+              contact_person: info.contact_person,
+              contact_phone: info.contact_phone,
+              contact_address: info.contact_address,
+            })
+          }}
+          staffId={user?.id}
+          staffName={user?.name || user?.email}
+          onConfirmationStatusChange={handleConfirmationStatusChange}
+        />
+      )}
 
       <div className="w-full pb-6">
         <div className="grid grid-cols-1 lg:grid-cols-10 gap-6 w-full">
@@ -611,10 +564,9 @@ export default function QuoteDetailPage() {
             setTierPricings={setTierPricings}
           />
         </div>
-
       </div>
 
-      {/* 另存新版本對話框 */}
+      {/* Dialogs */}
       <SaveVersionDialog
         isOpen={isSaveDialogOpen}
         onClose={() => setIsSaveDialogOpen(false)}
@@ -623,16 +575,14 @@ export default function QuoteDetailPage() {
         onSave={(note) => handleSaveAsNewVersion(note, setCurrentEditingVersion)}
       />
 
-      {/* 同步到行程表對話框 */}
       <SyncToItineraryDialog
         isOpen={isSyncDialogOpen}
         onClose={() => setIsSyncDialogOpen(false)}
-        onConfirm={handleConfirmSync}
+        onConfirm={() => {}}
         diffs={syncDiffs}
         itineraryTitle={syncItineraryTitle}
       />
 
-      {/* 可列印的報價單 */}
       <PrintableQuotation
         quote={quote as unknown as Parameters<typeof PrintableQuotation>[0]['quote']}
         quoteName={quoteName}
@@ -648,31 +598,39 @@ export default function QuoteDetailPage() {
         tierPricings={previewTierPricings}
       />
 
-      {/* 關聯旅遊團對話框 */}
       <LinkTourDialog
         isOpen={showLinkTourDialog}
         onClose={() => setShowLinkTourDialog(false)}
-        onCreateNew={handleCreateNewTour}
-        onLinkExisting={handleLinkExistingTour}
+        onCreateNew={() => {
+          if (quote) {
+            updateQuote(quote.id, { status: '進行中' })
+            handleCreateTour()
+          }
+        }}
+        onLinkExisting={async (tour) => {
+          if (quote) {
+            await updateQuote(quote.id, { status: '進行中', tour_id: tour.id })
+            const { updateTour } = await import('@/data')
+            await updateTour(tour.id, { quote_id: quote.id })
+            toast.success(`已關聯旅遊團：${tour.code}`)
+          }
+        }}
       />
 
-      {/* 匯入餐飲對話框 */}
       <ImportMealsDialog
         isOpen={showImportMealsDialog}
         onClose={() => setShowImportMealsDialog(false)}
-        meals={syncOps.itineraryMealsData}
+        meals={[]}
         onImport={handleImportMeals}
       />
 
-      {/* 匯入景點對話框 */}
       <ImportActivitiesDialog
         isOpen={showImportActivitiesDialog}
         onClose={() => setShowImportActivitiesDialog(false)}
-        activities={syncOps.itineraryActivitiesData}
+        activities={[]}
         onImport={handleImportActivities}
       />
 
-      {/* Local 報價對話框 */}
       <LocalPricingDialog
         isOpen={showLocalPricingDialog}
         onClose={() => setShowLocalPricingDialog(false)}

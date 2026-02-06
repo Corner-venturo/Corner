@@ -2,11 +2,14 @@
 
 import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { TourPreview } from '@/components/editor/TourPreview'
-import { Sparkles, Building2, UtensilsCrossed, Calendar, Plane, MapPin } from 'lucide-react'
-import type { LocalTourData } from '../hooks/useItineraryEditor'
+import { Sparkles, Building2, UtensilsCrossed, Calendar, Plane, MapPin, Cloud, CloudOff, Save } from 'lucide-react'
+import type { LocalTourData, AutoSaveStatus } from '../hooks/useItineraryEditor'
 
 interface ItineraryPreviewProps {
   tourData: LocalTourData
+  isDirty?: boolean
+  autoSaveStatus?: AutoSaveStatus
+  onSave?: () => void
 }
 
 // Icon mapping
@@ -19,7 +22,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string; size?: n
   IconMapPin: MapPin,
 }
 
-export function ItineraryPreview({ tourData }: ItineraryPreviewProps) {
+export function ItineraryPreview({ tourData, isDirty, autoSaveStatus, onSave }: ItineraryPreviewProps) {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop')
   const mobileContentRef = useRef<HTMLDivElement>(null)
 
@@ -80,6 +83,39 @@ export function ItineraryPreview({ tourData }: ItineraryPreviewProps) {
             </button>
           </div>
         </div>
+        {/* 儲存狀態與按鈕 */}
+        {(onSave || autoSaveStatus) && (
+          <div className="flex items-center gap-3 text-sm">
+            {autoSaveStatus === 'saving' && (
+              <span className="flex items-center gap-1.5 text-morandi-secondary">
+                <Cloud size={14} className="animate-pulse" />
+                存檔中...
+              </span>
+            )}
+            {autoSaveStatus === 'saved' && (
+              <span className="flex items-center gap-1.5 text-morandi-green">
+                <Cloud size={14} />
+                已儲存
+              </span>
+            )}
+            {autoSaveStatus === 'error' && (
+              <span className="flex items-center gap-1.5 text-morandi-red">
+                <CloudOff size={14} />
+                存檔失敗
+              </span>
+            )}
+            {onSave && isDirty && autoSaveStatus !== 'saving' && (
+              <button
+                type="button"
+                onClick={onSave}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium bg-morandi-gold text-white hover:bg-morandi-gold-hover transition-colors"
+              >
+                <Save size={14} />
+                儲存
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* 預覽容器 */}

@@ -295,7 +295,7 @@ export function useItineraryEditor() {
 
 function getEmptyTourData(): LocalTourData {
   return {
-    tagline: 'Corner Travel 2025',
+    tagline: `Corner Travel ${new Date().getFullYear()}`,
     title: '',
     subtitle: '',
     description: '',

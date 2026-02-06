@@ -174,7 +174,7 @@ export function useItineraryForm({ createItinerary, userId }: UseItineraryFormPr
       }
 
       const newItinerary = {
-        tagline: 'Corner Travel 2025',
+        tagline: `Corner Travel ${new Date().getFullYear()}`,
         title: newItineraryTitle.trim(),
         subtitle: '',
         description: '',

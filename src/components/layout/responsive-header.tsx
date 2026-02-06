@@ -79,7 +79,7 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
   return (
     <div
       className={cn(
-        'fixed top-0 right-0 h-[72px] bg-background z-[200] flex items-center justify-between px-6',
+        'fixed top-0 right-0 h-[72px] bg-background z-[200] flex items-center justify-between px-6 print:hidden',
         'left-0',
         sidebarCollapsed ? 'md:left-16' : 'md:left-[190px]'
       )}

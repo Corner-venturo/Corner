@@ -1,10 +1,8 @@
 /**
- * LinkDocumentsToTourDialog - 旅遊團文件管理對話框
- * 左邊：行程表（根據 proposal_package.itinerary_type 顯示對應類型）
- *   - timeline: 快速行程表（開啟 ItineraryDialog）
- *   - simple: 網頁行程表（跳轉到行程編輯頁面）
- * 中間：團體報價單
- * 右邊：快速報價單
+ * LinkDocumentsToTourDialog - 快速報價單管理對話框
+ *
+ * 注意：團體報價單和行程表已移至專屬分頁（TourQuoteTab、TourItineraryTab）
+ * 此對話框現在只用於管理快速報價單（可建立多份比價）
  */
 
 'use client'
@@ -167,11 +165,13 @@ export function LinkDocumentsToTourDialog({
 
   // ========== 報價單相關 ==========
 
-  // 已連結的團體報價單
+  // 已連結的團體報價單（包含 quote_type 為 null 的舊資料）
   const linkedStandardQuotes = useMemo(() => {
     return quotes.filter(q => {
       const item = q as Quote & { _deleted?: boolean }
-      return q.tour_id === tour.id && !item._deleted && q.quote_type === 'standard'
+      // quote_type 為 'standard' 或 null/undefined（舊資料）都算團體報價單
+      const isStandardOrLegacy = q.quote_type === 'standard' || q.quote_type === null || q.quote_type === undefined
+      return q.tour_id === tour.id && !item._deleted && isStandardOrLegacy
     })
   }, [quotes, tour.id])
 
@@ -436,164 +436,17 @@ export function LinkDocumentsToTourDialog({
       {/* 主對話框 */}
       {mainDialogOpen && (
         <Dialog open={mainDialogOpen} onOpenChange={open => !open && onClose()} modal={true}>
-          <DialogContent level={1} className="max-w-4xl max-h-[85vh] flex flex-col overflow-hidden">
+          <DialogContent level={1} className="max-w-md max-h-[85vh] flex flex-col overflow-hidden">
             <DialogHeader className="flex-shrink-0">
-              <DialogTitle>管理文件</DialogTitle>
+              <DialogTitle>快速報價單</DialogTitle>
               <DialogDescription>
-                為「{tour.name}」管理行程表與報價單
+                為「{tour.name}」建立多份快速報價單比價
               </DialogDescription>
             </DialogHeader>
 
-            <div className="grid grid-cols-3 gap-4 mt-4 flex-1 min-h-0 overflow-hidden">
-              {/* ========== 行程 ========== */}
-              <div className="flex flex-col p-3 rounded-lg border border-morandi-container bg-card overflow-hidden">
-                <div className="flex items-center justify-between pb-2 border-b border-morandi-container/50 flex-shrink-0">
-                  <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-morandi-gold" />
-                    <span className="font-medium text-sm text-morandi-primary">行程</span>
-                  </div>
-                  {/* 新增行程表按鈕（只在沒有行程表時顯示） */}
-                  {!hasTimelineData && itineraryType !== 'simple' && !tourProposalPackage?.itinerary_id && (
-                    <button
-                      onClick={handleSelectSimpleItinerary}
-                      disabled={isCreatingPackage}
-                      className="p-1 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors disabled:opacity-50"
-                      title="新增行程表"
-                    >
-                      {isCreatingPackage ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Plus className="w-4 h-4" />
-                      )}
-                    </button>
-                  )}
-                </div>
-                <div className="flex-1 overflow-auto mt-2">
-                  {hasTimelineData ? (
-                    // 已有時間軸行程表
-                    <button
-                      onClick={handleOpenItineraryDialog}
-                      className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-morandi-gold/5 transition-colors text-left"
-                    >
-                      <Clock className="w-3.5 h-3.5 text-morandi-gold" />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-xs text-morandi-primary">時間軸行程表</div>
-                        <div className="text-[10px] text-morandi-secondary">
-                          {(tourProposalPackage?.timeline_data as TimelineItineraryData)?.days?.length || 0} 天
-                        </div>
-                      </div>
-                    </button>
-                  ) : itineraryType === 'simple' ? (
-                    // 已有快速行程表
-                    <button
-                      onClick={handleOpenItineraryDialog}
-                      className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-morandi-gold/5 transition-colors text-left"
-                    >
-                      <Zap className="w-3.5 h-3.5 text-morandi-gold" />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-xs text-morandi-primary">快速行程表</div>
-                        <div className="text-[10px] text-morandi-secondary">
-                          點擊編輯
-                        </div>
-                      </div>
-                    </button>
-                  ) : tourProposalPackage?.itinerary_id ? (
-                    // 已有網頁行程表
-                    <button
-                      onClick={() => {
-                        onClose()
-                        const itineraryId = tourProposalPackage?.itinerary_id
-                        if (itineraryId) {
-                          router.push(`/itinerary/new?itinerary_id=${itineraryId}`)
-                        } else {
-                          router.push(`/itinerary/new?tour_id=${tour.id}`)
-                        }
-                      }}
-                      className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-morandi-gold/5 transition-colors text-left"
-                    >
-                      <FileText className="w-3.5 h-3.5 text-morandi-secondary" />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-xs text-morandi-primary">網頁行程表</div>
-                        <div className="text-[10px] text-morandi-secondary">
-                          點擊編輯
-                        </div>
-                      </div>
-                    </button>
-                  ) : (
-                    // 尚未建立行程表
-                    <div className="text-xs text-morandi-secondary text-center py-4">
-                      點擊 + 選擇行程表類型
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* ========== 報價 ========== */}
-              <div className="flex flex-col p-3 rounded-lg border border-morandi-container bg-card overflow-hidden">
-                <div className="flex items-center justify-between pb-2 border-b border-morandi-container/50 flex-shrink-0">
-                  <div className="flex items-center gap-2">
-                    <Calculator className="w-4 h-4 text-morandi-gold" />
-                    <span className="font-medium text-sm text-morandi-primary">報價</span>
-                  </div>
-                  {/* 新增報價單按鈕（只在沒有團體報價單時顯示） */}
-                  {linkedStandardQuotes.length === 0 && (
-                    <button
-                      onClick={handleCreateStandardQuote}
-                      disabled={isCreatingStandardQuote}
-                      className="p-1 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors disabled:opacity-50"
-                      title="新增報價單"
-                    >
-                      {isCreatingStandardQuote ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Plus className="w-4 h-4" />
-                      )}
-                    </button>
-                  )}
-                </div>
-                <div className="flex-1 overflow-auto mt-2 space-y-1">
-                  {linkedStandardQuotes.length > 0 ? (
-                    linkedStandardQuotes.map(quote => (
-                      <div
-                        key={quote.id}
-                        className="flex items-center justify-between p-2 rounded-lg hover:bg-morandi-gold/5 text-xs"
-                      >
-                        <button
-                          onClick={() => handleViewQuote(quote)}
-                          className="flex-1 min-w-0 text-left"
-                        >
-                          <div className="font-mono text-morandi-gold">{quote.code}</div>
-                          <div className="text-morandi-secondary truncate text-[10px]">
-                            {stripHtml(quote.name) || '未命名'}
-                          </div>
-                        </button>
-                        <div className="flex items-center gap-1 shrink-0">
-                          <button
-                            onClick={() => handleViewQuote(quote)}
-                            className="p-1 text-morandi-secondary hover:text-morandi-primary rounded"
-                          >
-                            <ExternalLink className="w-3 h-3" />
-                          </button>
-                          <button
-                            onClick={(e) => handleUnlinkQuote(e, quote)}
-                            disabled={isUnlinkingQuote}
-                            className="p-1 text-morandi-red/60 hover:text-morandi-red rounded disabled:opacity-50"
-                          >
-                            <Unlink className="w-3 h-3" />
-                          </button>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-xs text-morandi-secondary text-center py-4">
-                      尚未建立
-                    </div>
-                  )}
-                </div>
-              </div>
-
+            <div className="mt-4 flex-1 min-h-0 overflow-hidden">
               {/* ========== 快速報價單 ========== */}
-              <div className="flex flex-col p-3 rounded-lg border border-morandi-container bg-card overflow-hidden">
+              <div className="flex flex-col p-4 rounded-lg border border-morandi-container bg-card overflow-hidden h-full">
                 <div className="flex items-center justify-between pb-2 border-b border-morandi-container/50 flex-shrink-0">
                   <div className="flex items-center gap-2">
                     <Calculator className="w-4 h-4 text-morandi-primary" />

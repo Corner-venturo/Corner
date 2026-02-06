@@ -35,6 +35,7 @@ export function DayCard({
   onOpenHotelSelector,
   onOpenRestaurantSelector,
   handleActivityImageUpload,
+  handleExternalImageUpload,
   onOpenPositionEditor,
 }: DayCardProps) {
   // 圖片上傳狀態
@@ -252,6 +253,7 @@ export function DayCard({
         updateDailyItinerary={updateDailyItinerary}
         onOpenAttractionSelector={onOpenAttractionSelector}
         handleActivityImageUpload={handleImageUploadWithLoading}
+        handleExternalImageUpload={handleExternalImageUpload}
         uploadingActivityImage={uploadingActivityImage}
         activityDragOver={activityDragOver}
         setActivityDragOver={setActivityDragOver}

@@ -1511,25 +1511,29 @@ input[type='number'] {
   display: none;
 }
 
-/* ===== 出納單列印樣式 ===== */
+/* ===== 列印樣式 ===== */
 @media print {
   @page {
-    size: A4 landscape;
-    margin: 10mm;
+    size: 210mm 297mm; /* A4 直式 */
+    margin: 5mm;
   }
 
-  /* 隱藏所有非列印內容 */
-  body > *:not(#__next),
+  /* 隱藏不需要列印的元素 */
+  .no-print,
+  .print\:hidden,
+  [class*="print:hidden"],
+  [data-radix-dialog-overlay],
+  [data-radix-dialog-close],
   header,
   nav,
   aside,
-  footer,
-  .no-print,
-  button,
-  [data-radix-dialog-overlay],
-  [data-radix-dialog-close] {
+  /* 隱藏側邊欄和頂部導航 */
+  [data-sidebar],
+  .sidebar,
+  [role="navigation"],
+  /* 隱藏所有按鈕 */
+  button {
     display: none !important;
-    visibility: hidden !important;
   }
 
   /* 重置基本樣式 */
@@ -1540,6 +1544,51 @@ input[type='number'] {
     width: 100% !important;
     height: auto !important;
     overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 主內容區滿版 */
+  main, [role="main"], .main-content {
+    position: static !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    left: 0 !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: auto !important;
+    overflow: visible !important;
+  }
+
+  main > div {
+    padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* 隱藏工具列和不需要的元素 */
+  .space-y-4 > div:first-child:not(#print-content),
+  [class*="breadcrumb"],
+  [class*="Breadcrumb"] {
+    display: none !important;
+  }
+
+  /* 移除所有容器的間距 - 滿版 */
+  html, body, main, div {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .space-y-4,
+  .space-y-6 {
+    gap: 0 !important;
+  }
+
+  .space-y-4 > *:not(#print-content),
+  .space-y-6 > *:not(#print-content) {
+    display: none !important;
   }
 
   /* 出納單列印容器 */
@@ -1609,6 +1658,56 @@ input[type='number'] {
     margin-top: 8mm !important;
     font-size: 8pt !important;
     color: #666 !important;
+  }
+
+  /* === 團確單列印樣式 === */
+  #print-content {
+    display: block !important;
+    visibility: visible !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    padding: 5mm !important;
+    margin: 0 !important;
+    background: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    z-index: 999999 !important;
+    box-sizing: border-box !important;
+  }
+
+  #print-content * {
+    visibility: visible !important;
+  }
+
+  /* 隱藏第一個列印標題 div（因為表格已有標題） */
+  #print-content > div.hidden {
+    display: none !important;
+  }
+
+  #print-content button {
+    display: none !important;
+  }
+
+  #print-content input {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  #print-content table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  /* 防止表格頁尾在每頁重複，但表頭可以重複 */
+  #print-content thead {
+    display: table-header-group;
+  }
+
+  #print-content tfoot {
+    display: table-row-group !important;
   }
 
   /* === 通用列印輔助 class（新增，不影響現有樣式） === */

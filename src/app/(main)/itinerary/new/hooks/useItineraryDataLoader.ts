@@ -57,7 +57,7 @@ export function useItineraryDataLoader({
     logger.log('[ItineraryDataLoader] 行程資料 - features:', itinerary.features, 'daily_itinerary:', (itinerary.daily_itinerary as unknown[])?.length || 0)
 
     setTourData({
-      tagline: itinerary.tagline || 'Corner Travel 2025',
+      tagline: itinerary.tagline || `Corner Travel ${new Date().getFullYear()}`,
       title: itinerary.title || '',
       subtitle: itinerary.subtitle || '',
       description: itinerary.description || '',
@@ -260,7 +260,7 @@ export function useItineraryDataLoader({
           )
 
           setTourData({
-            tagline: 'Corner Travel 2025',
+            tagline: `Corner Travel ${new Date().getFullYear()}`,
             title: quoteName || '',
             subtitle: '',
             description: '',
@@ -339,7 +339,7 @@ export function useItineraryDataLoader({
       const isTaiwan = country?.name === '台灣'
 
       setTourData({
-        tagline: 'Corner Travel 2025',
+        tagline: `Corner Travel ${new Date().getFullYear()}`,
         title: tour.name,
         subtitle: '精緻旅遊',
         description: tour.description || '',

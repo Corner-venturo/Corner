@@ -23,6 +23,7 @@ interface DayListProps {
   onOpenHotelSelector: (dayIndex: number) => void
   onOpenRestaurantSelector: (dayIndex: number, mealType: 'breakfast' | 'lunch' | 'dinner') => void
   handleActivityImageUpload: (dayIndex: number, actIndex: number, file: File) => Promise<void>
+  handleExternalImageUpload?: (dayIndex: number, actIndex: number, imageUrl: string) => Promise<void>
   onOpenPositionEditor: (dayIndex: number, actIndex: number) => void
 }
 
@@ -44,6 +45,7 @@ export function DayList({
   onOpenHotelSelector,
   onOpenRestaurantSelector,
   handleActivityImageUpload,
+  handleExternalImageUpload,
   onOpenPositionEditor,
 }: DayListProps) {
   // 管理每天的摺疊狀態
@@ -137,6 +139,7 @@ export function DayList({
           onOpenHotelSelector={onOpenHotelSelector}
           onOpenRestaurantSelector={onOpenRestaurantSelector}
           handleActivityImageUpload={handleActivityImageUpload}
+          handleExternalImageUpload={handleExternalImageUpload}
           onOpenPositionEditor={onOpenPositionEditor}
         />
       ))}

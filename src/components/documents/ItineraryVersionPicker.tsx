@@ -140,7 +140,7 @@ export function ItineraryVersionPicker({
         departure_date: tour.departure_date || '',
         city: cityName,
         daily_itinerary: formattedDailyItinerary,
-        tagline: 'Corner Travel 2025',
+        tagline: `Corner Travel ${new Date().getFullYear()}`,
         subtitle: '',
         description: '',
         cover_image: '',

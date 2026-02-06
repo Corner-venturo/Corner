@@ -36,6 +36,7 @@ interface ActivitiesSectionProps {
   updateDailyItinerary: (index: number, field: string, value: unknown) => void
   onOpenAttractionSelector: (dayIndex: number) => void
   handleActivityImageUpload: (dayIndex: number, actIndex: number, file: File) => void
+  handleExternalImageUpload?: (dayIndex: number, actIndex: number, imageUrl: string) => Promise<void>
   uploadingActivityImage: { dayIndex: number; actIndex: number } | null
   activityDragOver: { dayIndex: number; actIndex: number } | null
   setActivityDragOver: (value: { dayIndex: number; actIndex: number } | null) => void
@@ -52,6 +53,7 @@ export function ActivitiesSection({
   updateDailyItinerary,
   onOpenAttractionSelector,
   handleActivityImageUpload,
+  handleExternalImageUpload,
   uploadingActivityImage,
   activityDragOver,
   setActivityDragOver,
@@ -217,6 +219,7 @@ export function ActivitiesSection({
                     updateActivity={updateActivity}
                     removeActivity={removeActivity}
                     handleActivityImageUpload={handleActivityImageUpload}
+                    handleExternalImageUpload={handleExternalImageUpload}
                     isActivityUploading={isActivityUploading}
                     isActivityDragOver={isActivityDragOver}
                     setActivityDragOver={setActivityDragOver}

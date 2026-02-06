@@ -103,6 +103,7 @@ export function DailyItinerarySection({
     handleSelectHotels,
     handleSelectRestaurants,
     handleActivityImageUpload,
+    handleExternalImageUpload,
     handleSaveToLibrary,
   } = useDailyItinerary({
     data,
@@ -184,6 +185,7 @@ export function DailyItinerarySection({
         onOpenHotelSelector={handleOpenHotelSelector}
         onOpenRestaurantSelector={handleOpenRestaurantSelector}
         handleActivityImageUpload={handleActivityImageUpload}
+        handleExternalImageUpload={handleExternalImageUpload}
         onOpenPositionEditor={(dIdx, aIdx) => {
           setActivityPositionEditor({ isOpen: true, dayIndex: dIdx, actIndex: aIdx })
         }}

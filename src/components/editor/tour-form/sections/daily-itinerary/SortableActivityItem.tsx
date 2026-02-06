@@ -1,12 +1,15 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, ImageIcon, Loader2, X, Crop, Upload, Database, Clock, ChevronDown, ChevronUp } from 'lucide-react'
+import { GripVertical, ImageIcon, Loader2, X, Crop, Upload, Database, Clock, ChevronDown, ChevronUp, Search } from 'lucide-react'
 import { RelatedImagesPreviewer } from '../../../RelatedImagesPreviewer'
 import { getImagePositionStyle } from '@/components/ui/image-position-editor'
 import { SortableActivityItemProps } from './types'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { UnsplashSearch } from '@/components/ui/image-uploader/UnsplashSearch'
+import { PexelsPicker } from '@/features/designer/components/PexelsPicker'
 
 export function SortableActivityItem({
   activity,
@@ -15,6 +18,7 @@ export function SortableActivityItem({
   updateActivity,
   removeActivity,
   handleActivityImageUpload,
+  handleExternalImageUpload,
   isActivityUploading,
   isActivityDragOver,
   setActivityDragOver,
@@ -27,6 +31,8 @@ export function SortableActivityItem({
     // 如果已有時間資料，預設展開
     !!(activity.startTime || activity.endTime)
   )
+  const [showUnsplashDialog, setShowUnsplashDialog] = useState(false)
+  const [showPexelsDialog, setShowPexelsDialog] = useState(false)
 
   // 判斷是否可以存到資料庫（手動新增或已修改的景點）
   const canSaveToDb = !activity.attraction_id || activity.attraction_id.startsWith('manual_')
@@ -253,18 +259,35 @@ export function SortableActivityItem({
       {/* 底部操作區 */}
       <div className="flex items-center justify-between mt-2 pt-2 border-t border-morandi-container/50">
         <div className="flex items-center gap-2">
-          {!activity.image && (
-            <button
-              type="button"
-              onClick={() => activityFileInputRefs.current[activityInputKey]?.click()}
-              disabled={isActivityUploading}
-              className="flex items-center gap-1 px-2 py-1 text-xs text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50 rounded transition-colors disabled:opacity-50"
-            >
-              <Upload size={12} />
-              上傳圖片
-            </button>
-          )}
-          {/* 相關圖片預覽 - 在同一排 */}
+          {/* 上傳圖片 */}
+          <button
+            type="button"
+            onClick={() => activityFileInputRefs.current[activityInputKey]?.click()}
+            disabled={isActivityUploading}
+            className="flex items-center gap-1 px-2 py-1 text-xs text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50 rounded transition-colors disabled:opacity-50"
+          >
+            <Upload size={12} />
+            上傳
+          </button>
+          {/* Unsplash */}
+          <button
+            type="button"
+            onClick={() => setShowUnsplashDialog(true)}
+            className="flex items-center gap-1 px-2 py-1 text-xs text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50 rounded transition-colors"
+          >
+            <Search size={12} />
+            Unsplash
+          </button>
+          {/* Pexels */}
+          <button
+            type="button"
+            onClick={() => setShowPexelsDialog(true)}
+            className="flex items-center gap-1 px-2 py-1 text-xs text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded transition-colors"
+          >
+            <Search size={12} />
+            Pexels
+          </button>
+          {/* 相關圖片預覽 */}
           {activity.title && (
             <RelatedImagesPreviewer
               activityTitle={activity.title}
@@ -300,6 +323,52 @@ export function SortableActivityItem({
           </button>
         </div>
       </div>
+
+      {/* Unsplash 搜尋對話框 */}
+      <Dialog open={showUnsplashDialog} onOpenChange={setShowUnsplashDialog}>
+        <DialogContent level={2} className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Search size={18} />
+              Unsplash 免費圖庫
+            </DialogTitle>
+          </DialogHeader>
+          <UnsplashSearch
+            onSelect={async (url) => {
+              setShowUnsplashDialog(false)
+              if (handleExternalImageUpload) {
+                await handleExternalImageUpload(dayIndex, actIndex, url)
+              } else {
+                updateActivity(dayIndex, actIndex, 'image', url)
+              }
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Pexels 搜尋對話框 */}
+      <Dialog open={showPexelsDialog} onOpenChange={setShowPexelsDialog}>
+        <DialogContent level={2} className="max-w-4xl max-h-[85vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Search size={18} />
+              Pexels 免費圖庫
+            </DialogTitle>
+          </DialogHeader>
+          <div className="overflow-y-auto max-h-[calc(85vh-80px)]">
+            <PexelsPicker
+              onSelectImage={async (url) => {
+                setShowPexelsDialog(false)
+                if (handleExternalImageUpload) {
+                  await handleExternalImageUpload(dayIndex, actIndex, url)
+                } else {
+                  updateActivity(dayIndex, actIndex, 'image', url)
+                }
+              }}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

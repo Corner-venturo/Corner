@@ -86,8 +86,13 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
           if (folder.dbType) {
             // DB 驅動的資料夾
             if (folder.dbType === 'quote') {
-              // 團體報價單：1:1 關聯，直接看 quoteId 有沒有
-              count = quoteId ? 1 : 0
+              // 團體報價單：用 tour_id 查詢（排除快速報價）
+              const { count: c } = await supabase
+                .from('quotes')
+                .select('id', { count: 'exact', head: true })
+                .eq('tour_id', tourId)
+                .or('quote_type.is.null,quote_type.eq.standard')
+              count = c || 0
             } else if (folder.dbType === 'quick_quote') {
               // 快速報價：1:N，用 quotes.tour_id + quote_type 查
               const { count: c } = await supabase
@@ -97,8 +102,12 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
                 .eq('quote_type', 'quick')
               count = c || 0
             } else if (folder.dbType === 'itinerary') {
-              // 行程表：1:1 關聯，直接看 itineraryId 有沒有
-              count = itineraryId ? 1 : 0
+              // 行程表：用 tour_id 查詢
+              const { count: c } = await supabase
+                .from('itineraries')
+                .select('id', { count: 'exact', head: true })
+                .eq('tour_id', tourId)
+              count = c || 0
             } else {
               // 其他（1:N）：用 tour_id 查
               const table = folder.dbType === 'confirmation' ? 'tour_confirmation_sheets' : 'tour_requests'
@@ -248,27 +257,28 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
 
     switch (dbType) {
       case 'quote': {
-        // 團體報價單：1:1 關聯，用 tour.quote_id
-        if (!quoteId) break
-        
+        // 團體報價單：用 tour_id 查詢（排除快速報價）
         const { data } = await supabase
           .from('quotes')
           .select('id, code, name, status, created_at')
-          .eq('id', quoteId)
-          .single()
-        
+          .eq('tour_id', tourId)
+          .or('quote_type.is.null,quote_type.eq.standard')
+          .order('created_at', { ascending: false })
+
         if (data) {
-          items.push({
-            id: data.id,
-            name: data.name || data.code || '未命名報價單',
-            type: 'file',
-            icon: '📋',
-            parentId: folderId,
-            createdAt: data.created_at,
-            status: data.status,
-            dbType: 'quote',
-            dbId: data.id,
-          })
+          for (const q of data) {
+            items.push({
+              id: q.id,
+              name: q.name || q.code || '未命名報價單',
+              type: 'file',
+              icon: '📋',
+              parentId: folderId,
+              createdAt: q.created_at,
+              status: q.status,
+              dbType: 'quote',
+              dbId: q.id,
+            })
+          }
         }
         break
       }
@@ -299,26 +309,26 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
         break
       }
       case 'itinerary': {
-        // 行程表：1:1 關聯，用 tour.itinerary_id
-        if (!itineraryId) break
-        
+        // 行程表：用 tour_id 查詢
         const { data } = await supabase
           .from('itineraries')
           .select('id, title, code, created_at')
-          .eq('id', itineraryId)
-          .single()
-        
+          .eq('tour_id', tourId)
+          .order('created_at', { ascending: false })
+
         if (data) {
-          items.push({
-            id: data.id,
-            name: data.title || data.code || '未命名行程表',
-            type: 'file',
-            icon: '🗺️',
-            parentId: folderId,
-            createdAt: data.created_at,
-            dbType: 'itinerary',
-            dbId: data.id,
-          })
+          for (const i of data) {
+            items.push({
+              id: i.id,
+              name: i.title || i.code || '未命名行程表',
+              type: 'file',
+              icon: '🗺️',
+              parentId: folderId,
+              createdAt: i.created_at,
+              dbType: 'itinerary',
+              dbId: i.id,
+            })
+          }
         }
         break
       }

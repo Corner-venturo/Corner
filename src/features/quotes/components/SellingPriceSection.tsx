@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { Save, Printer, Plus, X } from 'lucide-react'
+import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import {
   ParticipantCounts,
@@ -16,18 +18,22 @@ import {
   normalizeNumber,
   getRoomTypeCost,
   getRoomTypeProfit,
+  calculateTierParticipantCounts,
+  calculateTierCosts,
+  calculateIdentityProfits,
+  generateUniqueId,
 } from '../utils/priceCalculations'
 import { PriceInputRow } from './PriceInputRow'
-import { PriceSummaryCard } from './PriceSummaryCard'
-import { ParticipantCountEditor } from './ParticipantCountEditor'
 
 interface SellingPriceSectionProps {
   participantCounts: ParticipantCounts
+  setParticipantCounts: React.Dispatch<React.SetStateAction<ParticipantCounts>>
   identityCosts: IdentityCosts
   sellingPrices: SellingPrices
   setSellingPrices: React.Dispatch<React.SetStateAction<SellingPrices>>
   identityProfits: IdentityProfits
   isReadOnly: boolean
+  handleSave?: () => void
   handleGenerateQuotation: (
     tierParticipantCounts?: ParticipantCounts,
     tierSellingPrices?: SellingPrices,
@@ -51,11 +57,13 @@ interface SellingPriceSectionProps {
 
 export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
   participantCounts,
+  setParticipantCounts,
   identityCosts,
   sellingPrices,
   setSellingPrices,
   identityProfits,
   isReadOnly,
+  handleSave,
   handleGenerateQuotation,
   accommodationSummary,
   categories,
@@ -107,45 +115,128 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
     setTierPricings(prev => prev.filter(tier => tier.id !== id))
   }
 
-  const handleAddTier = (tier: TierPricing) => {
-    setTierPricings(prev => [...prev, tier])
+  // 新增檻次（預設人數為 0）
+  const handleAddTier = () => {
+    const newTier: TierPricing = {
+      id: generateUniqueId(),
+      participant_count: 0,
+      participant_counts: { adult: 0, child_with_bed: 0, child_no_bed: 0, single_room: 0, infant: 0 },
+      identity_costs: { adult: 0, child_with_bed: 0, child_no_bed: 0, single_room: 0, infant: 0 },
+      selling_prices: { ...sellingPrices },
+      identity_profits: { adult: 0, child_with_bed: 0, child_no_bed: 0, single_room: 0, infant: 0 },
+    }
+    setTierPricings(prev => [...prev, newTier])
   }
+
+  // 更新檻次人數並重新計算成本
+  const handleTierCountChange = (tierId: string, newCount: number) => {
+    setTierPricings(prev =>
+      prev.map(tier => {
+        if (tier.id !== tierId) return tier
+        const newCounts = calculateTierParticipantCounts(newCount, participantCounts)
+        const newCosts = calculateTierCosts(categories, newCounts, participantCounts)
+        return {
+          ...tier,
+          participant_count: newCount,
+          participant_counts: newCounts,
+          identity_costs: newCosts,
+          identity_profits: calculateIdentityProfits(tier.selling_prices, newCosts),
+        }
+      })
+    )
+  }
+
+  // 計算目前總人數
+  const currentTotalCount =
+    (participantCounts.adult || 0) +
+    (participantCounts.child_with_bed || 0) +
+    (participantCounts.child_no_bed || 0) +
+    (participantCounts.single_room || 0)
 
   return (
     <div className="lg:col-span-3 space-y-3 lg:sticky lg:top-0 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-2 lg:scrollbar-thin">
-      {/* 產生報價單按鈕 */}
-      <Button
-        onClick={() => {
-          const tierPricingsData = tierPricings.map(tier => ({
-            participant_count: tier.participant_count,
-            selling_prices: tier.selling_prices,
-          }))
-          handleGenerateQuotation(undefined, undefined, undefined, tierPricingsData)
-        }}
-        className="w-full h-9 text-sm bg-morandi-secondary hover:bg-morandi-secondary/90 text-white"
-        title="產生報價單預覽"
-        type="button"
-      >
-        產生報價單
-      </Button>
+      {/* 儲存與列印按鈕 */}
+      <div className="flex gap-2">
+        {handleSave && (
+          <Button
+            onClick={() => {
+              handleSave()
+              toast.success('已儲存')
+            }}
+            disabled={isReadOnly}
+            className="flex-1 h-9 text-sm bg-morandi-green hover:bg-morandi-green-hover text-white gap-1.5"
+            type="button"
+          >
+            <Save size={14} />
+            儲存
+          </Button>
+        )}
+        <Button
+          onClick={() => {
+            const tierPricingsData = tierPricings.map(tier => ({
+              participant_count: tier.participant_count,
+              selling_prices: tier.selling_prices,
+            }))
+            handleGenerateQuotation(undefined, undefined, undefined, tierPricingsData)
+          }}
+          className={cn(
+            "h-9 text-sm bg-morandi-secondary hover:bg-morandi-secondary/90 text-white gap-1.5",
+            handleSave ? "flex-1" : "w-full"
+          )}
+          type="button"
+        >
+          <Printer size={14} />
+          列印
+        </Button>
+      </div>
 
-      {/* 主要售價表格 */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+      {/* 新增檻次按鈕 */}
+      {!isReadOnly && (
+        <Button
+          onClick={handleAddTier}
+          variant="outline"
+          className="w-full h-9 text-sm gap-1.5 border-dashed"
+          type="button"
+        >
+          <Plus size={14} />
+          新增檻次
+        </Button>
+      )}
+
+      {/* 目前人數檻次卡片 */}
+      <div className="bg-card border border-morandi-gold/40 rounded-xl overflow-hidden shadow-sm">
+        <div className="bg-morandi-gold/15 px-4 py-2 flex items-center justify-between border-b border-morandi-gold/30">
+          <div className="flex items-center gap-1">
+            <input
+              type="text"
+              inputMode="decimal"
+              value={currentTotalCount}
+              onChange={e => {
+                const total = Number(normalizeNumber(e.target.value)) || 0
+                setParticipantCounts({
+                  adult: total,
+                  child_with_bed: 0,
+                  child_no_bed: 0,
+                  single_room: 0,
+                  infant: 0,
+                })
+              }}
+              disabled={isReadOnly}
+              className={cn(
+                'w-12 h-7 px-1 text-sm font-semibold text-center text-morandi-primary bg-white/50 border border-morandi-gold/30 rounded focus:outline-none focus:ring-1 focus:ring-morandi-gold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+                isReadOnly && 'cursor-not-allowed opacity-60'
+              )}
+            />
+            <span className="text-sm font-semibold text-morandi-primary">人</span>
+          </div>
+        </div>
         <table className="w-full text-sm">
           <thead className="border-b border-morandi-container/60">
             <tr>
-              <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">
-                身份
-              </th>
-              <th className="text-center py-3 px-4 text-sm font-medium text-morandi-secondary">
-                成本
-              </th>
-              <th className="text-center py-3 px-4 text-sm font-medium text-morandi-secondary">
-                售價
-              </th>
-              <th className="text-center py-3 px-4 text-sm font-medium text-morandi-secondary">
-                利潤
-              </th>
+              <th className="text-left py-2 px-4 text-xs font-medium text-morandi-secondary">身份</th>
+              <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">成本</th>
+              <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">售價</th>
+              <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">利潤</th>
             </tr>
           </thead>
           <tbody>
@@ -203,13 +294,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
                     label="成人"
                     cost={getRoomTypeCost(room.name, 'adult', accommodationSummary, identityCosts)}
                     sellingPrice={sellingPrices.room_types?.[room.name]?.adult || 0}
-                    profit={getRoomTypeProfit(
-                      room.name,
-                      'adult',
-                      sellingPrices,
-                      accommodationSummary,
-                      identityCosts
-                    )}
+                    profit={getRoomTypeProfit(room.name, 'adult', sellingPrices, accommodationSummary, identityCosts)}
                     onPriceChange={value => handleRoomTypePriceChange(room.name, 'adult', value)}
                     isReadOnly={isReadOnly}
                     indented
@@ -218,13 +303,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
                     label="小孩"
                     cost={getRoomTypeCost(room.name, 'child', accommodationSummary, identityCosts)}
                     sellingPrice={sellingPrices.room_types?.[room.name]?.child || 0}
-                    profit={getRoomTypeProfit(
-                      room.name,
-                      'child',
-                      sellingPrices,
-                      accommodationSummary,
-                      identityCosts
-                    )}
+                    profit={getRoomTypeProfit(room.name, 'child', sellingPrices, accommodationSummary, identityCosts)}
                     onPriceChange={value => handleRoomTypePriceChange(room.name, 'child', value)}
                     isReadOnly={isReadOnly}
                     indented
@@ -235,29 +314,103 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
         </table>
       </div>
 
-      {/* 新增檻次表 */}
-      {!isReadOnly && (
-        <ParticipantCountEditor
-          participantCounts={participantCounts}
-          sellingPrices={sellingPrices}
-          categories={categories}
-          onAddTier={handleAddTier}
-        />
-      )}
-
       {/* 檻次表列表 */}
       {tierPricings.map(tier => (
-        <PriceSummaryCard
-          key={tier.id}
-          tier={tier}
-          isReadOnly={isReadOnly}
-          onPriceChange={(identity, value) => handleTierPriceChange(tier.id, identity, value)}
-          onRemove={() => handleRemoveTier(tier.id)}
-          onGenerateQuotation={() => {
-            const tierLabel = `檻次報價 - ${tier.participant_count} 人`
-            handleGenerateQuotation(tier.participant_counts, tier.selling_prices, tierLabel)
-          }}
-        />
+        <div key={tier.id} className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+          <div className="bg-morandi-container/30 px-4 py-2 flex items-center justify-between border-b border-border">
+            <div className="flex items-center gap-1">
+              <input
+                type="text"
+                inputMode="decimal"
+                value={tier.participant_count}
+                onChange={e => {
+                  const newCount = Number(normalizeNumber(e.target.value)) || 0
+                  handleTierCountChange(tier.id, newCount)
+                }}
+                disabled={isReadOnly}
+                className={cn(
+                  'w-12 h-7 px-1 text-sm font-medium text-center text-morandi-primary bg-white/50 border border-border rounded focus:outline-none focus:ring-1 focus:ring-morandi-gold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+                  isReadOnly && 'cursor-not-allowed opacity-60'
+                )}
+              />
+              <span className="text-sm font-medium text-morandi-primary">人</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Button
+                onClick={() => {
+                  const tierLabel = `檻次報價 - ${tier.participant_count} 人`
+                  handleGenerateQuotation(tier.participant_counts, tier.selling_prices, tierLabel)
+                }}
+                size="sm"
+                className="h-6 px-2 text-xs bg-morandi-secondary hover:bg-morandi-secondary/90 text-white"
+                type="button"
+              >
+                列印
+              </Button>
+              {!isReadOnly && (
+                <button
+                  onClick={() => handleRemoveTier(tier.id)}
+                  className="text-morandi-red hover:bg-morandi-red/10 p-1 rounded transition-colors"
+                  type="button"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+          </div>
+          <table className="w-full text-sm">
+            <thead className="border-b border-border/60">
+              <tr>
+                <th className="text-left py-2 px-4 text-xs font-medium text-morandi-secondary">身份</th>
+                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">成本</th>
+                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">售價</th>
+                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">利潤</th>
+              </tr>
+            </thead>
+            <tbody>
+              <PriceInputRow
+                label="單人房"
+                cost={tier.identity_costs.single_room}
+                sellingPrice={tier.selling_prices.single_room}
+                profit={tier.identity_profits.single_room}
+                onPriceChange={value => handleTierPriceChange(tier.id, 'single_room', value)}
+                isReadOnly={isReadOnly}
+              />
+              <PriceInputRow
+                label="成人"
+                cost={tier.identity_costs.adult}
+                sellingPrice={tier.selling_prices.adult}
+                profit={tier.identity_profits.adult}
+                onPriceChange={value => handleTierPriceChange(tier.id, 'adult', value)}
+                isReadOnly={isReadOnly}
+              />
+              <PriceInputRow
+                label="小孩"
+                cost={tier.identity_costs.child_with_bed}
+                sellingPrice={tier.selling_prices.child_with_bed}
+                profit={tier.identity_profits.child_with_bed}
+                onPriceChange={value => handleTierPriceChange(tier.id, 'child_with_bed', value)}
+                isReadOnly={isReadOnly}
+              />
+              <PriceInputRow
+                label="不佔床"
+                cost={tier.identity_costs.child_no_bed}
+                sellingPrice={tier.selling_prices.child_no_bed}
+                profit={tier.identity_profits.child_no_bed}
+                onPriceChange={value => handleTierPriceChange(tier.id, 'child_no_bed', value)}
+                isReadOnly={isReadOnly}
+              />
+              <PriceInputRow
+                label="嬰兒"
+                cost={tier.identity_costs.infant}
+                sellingPrice={tier.selling_prices.infant}
+                profit={tier.identity_profits.infant}
+                onPriceChange={value => handleTierPriceChange(tier.id, 'infant', value)}
+                isReadOnly={isReadOnly}
+              />
+            </tbody>
+          </table>
+        </div>
       ))}
     </div>
   )

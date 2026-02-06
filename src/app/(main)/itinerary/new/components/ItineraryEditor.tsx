@@ -1,7 +1,6 @@
 'use client'
 
 import { TourForm } from '@/components/editor/TourForm'
-import { Cloud, CloudOff } from 'lucide-react'
 import type { LocalTourData, AutoSaveStatus } from '../hooks/useItineraryEditor'
 import type { TierPricing } from '@/stores/types/quote.types'
 import { logger } from '@/lib/utils/logger'
@@ -20,33 +19,6 @@ export function ItineraryEditor({ tourData, autoSaveStatus, isDirty, quoteTierPr
     <div className={`w-1/2 bg-card border-r border-border flex flex-col ${className || ''}`}>
       <div className="h-14 bg-morandi-gold/90 text-white px-6 flex items-center justify-between border-b border-border">
         <h2 className="text-lg font-semibold">編輯表單</h2>
-        {/* 自動存檔狀態指示 */}
-        <div className="flex items-center gap-2 text-sm">
-          {autoSaveStatus === 'saving' && (
-            <span className="flex items-center gap-1.5 text-white/80">
-              <Cloud size={14} className="animate-pulse" />
-              存檔中...
-            </span>
-          )}
-          {autoSaveStatus === 'saved' && (
-            <span className="flex items-center gap-1.5 text-white/80">
-              <Cloud size={14} />
-              已儲存
-            </span>
-          )}
-          {autoSaveStatus === 'error' && (
-            <span className="flex items-center gap-1.5 text-morandi-red/80">
-              <CloudOff size={14} />
-              存檔失敗
-            </span>
-          )}
-          {autoSaveStatus === 'idle' && isDirty && (
-            <span className="flex items-center gap-1.5 text-white/60">
-              <Cloud size={14} />
-              未儲存
-            </span>
-          )}
-        </div>
       </div>
       <div className="flex-1 overflow-y-auto bg-card">
         <TourForm

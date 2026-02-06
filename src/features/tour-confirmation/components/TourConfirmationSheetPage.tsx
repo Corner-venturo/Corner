@@ -15,9 +15,9 @@ import {
   Check,
   X,
   Download,
-  Printer,
   Send,
   AlertCircle,
+  Printer,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -87,6 +87,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
 
   const {
     sheet,
+    items,
     groupedItems,
     costSummary,
     loading,
@@ -231,6 +232,47 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
   }
   const destinationCurrency = getDestinationCurrency()
 
+  // 幣別中文名稱對照
+  const CURRENCY_NAME_MAP: Record<string, string> = {
+    'JPY': '日幣',
+    'THB': '泰銖',
+    'KRW': '韓元',
+    'VND': '越南盾',
+    'USD': '美金',
+    'SGD': '新幣',
+    'MYR': '馬幣',
+    'EUR': '歐元',
+    'GBP': '英鎊',
+    'AUD': '澳幣',
+    'CNY': '人民幣',
+    'HKD': '港幣',
+  }
+  const getCurrencyName = (code: string | null) => {
+    if (!code) return '外幣'
+    return CURRENCY_NAME_MAP[code] || code
+  }
+
+  // 幣別符號對照
+  const CURRENCY_SYMBOL_MAP: Record<string, string> = {
+    'JPY': '¥',
+    'THB': '฿',
+    'KRW': '₩',
+    'VND': '₫',
+    'USD': '$',
+    'SGD': 'S$',
+    'MYR': 'RM',
+    'EUR': '€',
+    'GBP': '£',
+    'AUD': 'A$',
+    'CNY': '¥',
+    'HKD': 'HK$',
+    'TWD': 'NT$',
+  }
+  const getCurrencySymbol = (code: string | null | undefined) => {
+    if (!code) return ''
+    return CURRENCY_SYMBOL_MAP[code] || code
+  }
+
   // 匯率設定對話框
   const [exchangeRateDialog, setExchangeRateDialog] = useState<{
     open: boolean
@@ -242,7 +284,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
   const [localExchangeRate, setLocalExchangeRate] = useState<number | null>(null)
   const effectiveExchangeRate = sheet?.exchange_rate ?? localExchangeRate
 
-  // 處理幣值轉換 - 點擊外幣按鈕時，自動用小計除以匯率更新預計支出
+  // 處理幣值轉換 - 點擊外幣按鈕時，將小計換算為外幣並更新備註
   const handleCurrencyConvert = async (itemId: string) => {
     if (!sheet) return
 
@@ -256,31 +298,44 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     const item = Object.values(groupedItems).flat().find(i => i.id === itemId)
     if (!item) return
 
-    // 計算小計（優先用資料庫的 subtotal，否則用 unit_price * quantity）
-    const subtotal = item.subtotal ?? ((item.unit_price || 0) * (item.quantity || 1))
-    if (subtotal <= 0) {
+    // 計算原始台幣小計（數量 × 單價）
+    const twdSubtotal = (item.unit_price || 0) * (item.quantity || 1)
+    if (twdSubtotal <= 0) {
       toast({ title: '小計為 0，無法換算', variant: 'destructive' })
       return
     }
 
-    // 換算：小計(TWD) / 匯率 = 外幣金額
-    const convertedAmount = Math.round(subtotal / effectiveExchangeRate)
+    // 換算：台幣小計 / 匯率 = 外幣金額
+    const foreignAmount = Math.round(twdSubtotal / effectiveExchangeRate)
+    const currencyName = getCurrencyName(destinationCurrency)
 
     try {
-      // 更新預計支出
-      await updateItem(itemId, { expected_cost: convertedAmount })
+      // 更新小計和預計支出為外幣金額，備註加上幣別說明
+      const currentTypeData = item.type_data as Record<string, unknown> | null
+      const updatedTypeData = {
+        ...currentTypeData,
+        original_twd_subtotal: twdSubtotal, // 保存原始台幣金額供參考
+        subtotal_currency: destinationCurrency, // 保存小計的幣別
+        expected_cost_formula: null, // 清除公式
+      }
+      await updateItem(itemId, {
+        subtotal: foreignAmount,
+        expected_cost: foreignAmount, // 預計支出也設為外幣金額，之後可手動調整
+        notes: `${currencyName}支出`,
+        type_data: updatedTypeData as unknown as Parameters<typeof updateItem>[1]['type_data'],
+      })
 
       // 同步更新 localExpectedCostsRef 以確保 UI 立即反映新值
-      localExpectedCostsRef.current[itemId] = { value: convertedAmount, dirty: false }
+      localExpectedCostsRef.current[itemId] = { value: foreignAmount, formula: undefined, dirty: false }
       forceUpdate(n => n + 1)
 
       toast({
-        title: `已更新預計支出`,
-        description: `${subtotal.toLocaleString()} TWD ÷ ${effectiveExchangeRate} = ${convertedAmount.toLocaleString()} ${destinationCurrency}`,
+        title: `已換算為${currencyName}`,
+        description: `${twdSubtotal.toLocaleString()} TWD ÷ ${effectiveExchangeRate} = ${foreignAmount.toLocaleString()} ${destinationCurrency}`,
       })
     } catch (err) {
-      logger.error('更新預計支出失敗:', err)
-      toast({ title: '更新失敗', variant: 'destructive' })
+      logger.error('換算失敗:', err)
+      toast({ title: '換算失敗', variant: 'destructive' })
     }
   }
 
@@ -1257,10 +1312,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     )
   }
 
-  // 列印功能
-  const handlePrint = () => {
-    window.print()
-  }
 
   // 計算未完成的需求數量
   const incompleteRequests = tourRequests.filter(
@@ -1317,6 +1368,11 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     }
   }
 
+  // 列印功能
+  const handlePrint = () => {
+    window.print()
+  }
+
   return (
     <div className="space-y-4">
       {/* 工具列 - 列印時隱藏 */}
@@ -1366,17 +1422,13 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
         </div>
       </div>
 
-      {/* 列印時顯示的標題 */}
-      <div className="hidden print:block print:mb-4">
-        <h1 className="text-xl font-bold text-center mb-2">團體確認單</h1>
-        <div className="text-center text-sm">
-          <p className="font-medium">{tour.code} {tour.name}</p>
-          <p>出發日期：{tour.departure_date} ~ {tour.return_date}</p>
-        </div>
-      </div>
-
-      {/* 團基本資訊 */}
-      <div className="border border-border rounded-lg overflow-hidden">
+      {/* 列印內容區域 */}
+      <div
+        id="print-content"
+        className="border border-border rounded-lg overflow-hidden print:border-0 print:rounded-none print:overflow-visible bg-white"
+      >
+        {/* 團基本資訊 */}
+      <div>
         <table className="w-full text-sm">
           <tbody>
             {/* 團名 / 團號 */}
@@ -1495,7 +1547,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
 
       {/* 每日行程表 */}
       {itinerary?.daily_itinerary && itinerary.daily_itinerary.length > 0 && (
-        <div className="border border-border rounded-lg overflow-hidden">
+        <div className="border-t border-border">
           <div className="flex items-center gap-2 px-4 py-2 bg-morandi-gold text-white">
             <span className="font-medium">每日行程</span>
             <span className="text-white/80 text-sm">({itinerary.daily_itinerary.length} 天)</span>
@@ -1672,7 +1724,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
         }
 
         return (
-          <div className="border border-border rounded-lg overflow-hidden">
+          <div className="border-t border-border">
             <div className="flex items-center justify-between px-4 py-2 bg-morandi-primary text-white">
               <div className="flex items-center gap-2">
                 <span className="font-medium">飯店確認</span>
@@ -1717,7 +1769,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
       })()}
 
       {/* 統一表格 */}
-      <div className="border border-border rounded-lg overflow-hidden print:border-black print:rounded-none">
+      <div className="border-t border-border">
         <table className="w-full text-sm table-fixed">
           {/* 表頭 */}
           <thead>
@@ -1771,7 +1823,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                   <tr className="bg-morandi-container/30 border-t border-border hidden print:table-row">
                     <td colSpan={10} className="px-3 py-1.5">
                       <span className="font-medium text-morandi-primary">{cat.label}</span>
-                      <span className="ml-2 text-xs text-morandi-secondary">({items.length})</span>
                     </td>
                   </tr>
                   {/* 項目列表 */}
@@ -1798,19 +1849,52 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                           <td className="px-2 py-2 text-sm border-r border-border/30">{item.title}</td>
                           <td className="px-2 py-2 text-right font-mono text-sm border-r border-border/30">{item.unit_price ? formatCurrency(item.unit_price) : '-'}</td>
                           <td className="px-2 py-2 text-center text-sm border-r border-border/30">{item.quantity || '-'}</td>
-                          <td className="px-2 py-2 text-right font-mono text-sm border-r border-border/30">{subtotal > 0 ? formatCurrency(subtotal) : '-'}</td>
-                          <td className="px-1 py-1 border-r border-border/30 print:hidden">
-                            <CalcInput
-                              value={item.id in localExpectedCostsRef.current ? localExpectedCostsRef.current[item.id].value : item.expected_cost}
-                              onChange={(val) => handleExpectedCostChange(item.id, val)}
-                              formula={localExpectedCostsRef.current[item.id]?.formula ?? (item.type_data as unknown as { expected_cost_formula?: string } | null)?.expected_cost_formula}
-                              onFormulaChange={(f) => handleExpectedCostFormulaChange(item.id, f)}
-                              onBlur={() => handleExpectedCostBlur(item.id, item.type_data)}
-                              className="w-full h-7 px-2 py-1 text-sm text-right font-mono bg-transparent border border-transparent hover:border-border focus:border-morandi-gold focus:ring-1 focus:ring-morandi-gold/30 rounded outline-none"
-                              placeholder="-"
-                            />
+                          <td className="px-2 py-2 text-right font-mono text-sm border-r border-border/30">
+                            {subtotal > 0 ? (
+                              (item.type_data as { subtotal_currency?: string } | null)?.subtotal_currency
+                                ? `${getCurrencySymbol((item.type_data as { subtotal_currency?: string }).subtotal_currency)} ${subtotal.toLocaleString()}`
+                                : formatCurrency(subtotal)
+                            ) : '-'}
                           </td>
-                          <td className="px-2 py-2 text-right font-mono text-sm border-r border-border/30 hidden print:table-cell">{item.expected_cost ? formatCurrency(item.expected_cost) : '-'}</td>
+                          <td className="px-1 py-1 border-r border-border/30 print:hidden">
+                            <div className="flex items-center">
+                              {(item.type_data as { subtotal_currency?: string } | null)?.subtotal_currency && (
+                                <span className="text-xs text-muted-foreground pl-1 shrink-0">
+                                  {getCurrencySymbol((item.type_data as { subtotal_currency?: string }).subtotal_currency)}
+                                </span>
+                              )}
+                              <CalcInput
+                                data-expected-cost-input={item.id}
+                                value={item.id in localExpectedCostsRef.current ? localExpectedCostsRef.current[item.id].value : item.expected_cost}
+                                onChange={(val) => handleExpectedCostChange(item.id, val)}
+                                formula={localExpectedCostsRef.current[item.id]?.formula ?? (item.type_data as unknown as { expected_cost_formula?: string } | null)?.expected_cost_formula}
+                                onFormulaChange={(f) => handleExpectedCostFormulaChange(item.id, f)}
+                                onBlur={() => handleExpectedCostBlur(item.id, item.type_data)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                                    e.preventDefault()
+                                    const inputs = document.querySelectorAll<HTMLInputElement>('[data-expected-cost-input]')
+                                    const inputsArray = Array.from(inputs)
+                                    const currentIndex = inputsArray.findIndex(input => input.dataset.expectedCostInput === item.id)
+                                    if (currentIndex === -1) return
+                                    const nextIndex = e.key === 'ArrowDown'
+                                      ? Math.min(currentIndex + 1, inputsArray.length - 1)
+                                      : Math.max(currentIndex - 1, 0)
+                                    inputsArray[nextIndex]?.focus()
+                                  }
+                                }}
+                                className="flex-1 h-7 px-2 py-1 text-sm text-right font-mono bg-transparent border border-transparent hover:border-border focus:border-morandi-gold focus:ring-1 focus:ring-morandi-gold/30 rounded outline-none"
+                                placeholder="-"
+                              />
+                            </div>
+                          </td>
+                          <td className="px-2 py-2 text-right font-mono text-sm border-r border-border/30 hidden print:table-cell">
+                            {item.expected_cost ? (
+                              (item.type_data as { subtotal_currency?: string } | null)?.subtotal_currency
+                                ? `${getCurrencySymbol((item.type_data as { subtotal_currency?: string }).subtotal_currency)} ${item.expected_cost.toLocaleString()}`
+                                : formatCurrency(item.expected_cost)
+                            ) : '-'}
+                          </td>
                           <td className="px-2 py-2 text-right font-mono text-sm border-r border-border/30">{item.actual_cost ? formatCurrency(item.actual_cost) : '-'}</td>
                           <td className="px-1 py-1 print:hidden">
                             <div className="flex items-center gap-1">
@@ -1825,7 +1909,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                               {destinationCurrency && (item.subtotal || (item.unit_price && item.quantity)) ? (
                                 <button
                                   type="button"
-                                  className="h-6 px-1.5 text-xs text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10 rounded shrink-0"
+                                  className="h-6 px-1.5 text-xs text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10 rounded shrink-0 print:hidden"
                                   onClick={() => handleCurrencyConvert(item.id)}
                                 >
                                   {destinationCurrency}
@@ -2210,31 +2294,41 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
           </tbody>
           {/* 總計 */}
           <tfoot>
-            <tr className="bg-morandi-container/50 border-t-2 border-border font-medium">
-              <td colSpan={6} className="px-2 py-2 text-right text-morandi-primary">
-                總計
-              </td>
-              <td className="px-2 py-2 text-right font-mono text-morandi-primary">
-                {formatCurrency(
-                  Object.values(groupedItems).flat().reduce((sum, item) =>
-                    sum + (item.subtotal ?? ((item.unit_price || 0) * (item.quantity || 0))), 0
-                  )
-                )}
-              </td>
-              <td className="px-2 py-2 text-right font-mono text-morandi-primary">
-                {formatCurrency(costSummary.total.expected)}
-              </td>
-              <td className="px-2 py-2 text-right font-mono text-morandi-primary">
-                {formatCurrency(costSummary.total.actual)}
-              </td>
-              <td className="px-2 py-2"></td>
-            </tr>
+            {(() => {
+              const allItems = Object.values(groupedItems).flat()
+              // 預計支出 (外幣)：只加有外幣標記的項目
+              const expectedForeign = allItems.reduce((sum, item) => {
+                const typeData = item.type_data as { subtotal_currency?: string } | null
+                if (typeData?.subtotal_currency === destinationCurrency) {
+                  return sum + (item.expected_cost || 0)
+                }
+                return sum
+              }, 0)
+              return (
+                <tr className="bg-morandi-container/50 border-t-2 border-border font-medium">
+                  <td colSpan={7} className="px-2 py-2 text-right text-morandi-primary">
+                    總計
+                  </td>
+                  <td className="px-2 py-2 text-right font-mono text-morandi-primary">
+                    {expectedForeign > 0 && (
+                      <div className="text-morandi-gold">
+                        {getCurrencySymbol(destinationCurrency)} {expectedForeign.toLocaleString()}
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-2 py-2 text-right font-mono text-morandi-primary">
+                    {formatCurrency(costSummary.total.actual)}
+                  </td>
+                  <td className="px-2 py-2"></td>
+                </tr>
+              )
+            })()}
           </tfoot>
         </table>
       </div>
 
       {/* 結算區塊 */}
-      <div className="mt-4 border border-border rounded-lg p-4 bg-morandi-container/20">
+      <div className="border-t border-border p-4 bg-morandi-container/20">
         <div className="flex items-center justify-between">
           <h3 className="font-medium text-morandi-primary">結算</h3>
           {destinationCurrency && (
@@ -2270,37 +2364,39 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
           )}
         </div>
 
-        <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="space-y-1">
-            <p className="text-xs text-morandi-secondary">預計支出 (TWD)</p>
-            <p className="text-lg font-mono font-medium text-morandi-primary">
-              {formatCurrency(costSummary.total.expected)}
-            </p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-xs text-morandi-secondary">實際支出 (TWD)</p>
-            <p className="text-lg font-mono font-medium text-morandi-primary">
-              {formatCurrency(costSummary.total.actual)}
-            </p>
-          </div>
-          {destinationCurrency && effectiveExchangeRate && (
-            <>
-              <div className="space-y-1">
-                <p className="text-xs text-morandi-secondary">預計支出 ({destinationCurrency})</p>
-                <p className="text-lg font-mono font-medium text-morandi-gold">
-                  {Math.round(costSummary.total.expected / effectiveExchangeRate).toLocaleString()}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs text-morandi-secondary">實際支出 ({destinationCurrency})</p>
-                <p className="text-lg font-mono font-medium text-morandi-gold">
-                  {Math.round(costSummary.total.actual / effectiveExchangeRate).toLocaleString()}
-                </p>
-              </div>
-            </>
-          )}
+        <div className="mt-3 grid grid-cols-2 gap-4">
+          {(() => {
+            const allItems = Object.values(groupedItems).flat()
+            // 計算預計支出 (外幣)：只加總有外幣標記的項目
+            const expectedForeign = allItems.reduce((sum, item) => {
+              const typeData = item.type_data as { subtotal_currency?: string } | null
+              if (typeData?.subtotal_currency === destinationCurrency) {
+                return sum + (item.expected_cost || 0)
+              }
+              return sum
+            }, 0)
+            return destinationCurrency && expectedForeign > 0 ? (
+              <>
+                <div className="space-y-1">
+                  <p className="text-xs text-morandi-secondary">預計支出 ({destinationCurrency})</p>
+                  <p className="text-2xl font-mono font-medium text-morandi-gold">
+                    {getCurrencySymbol(destinationCurrency)} {expectedForeign.toLocaleString()}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-morandi-secondary">實際支出 ({destinationCurrency})</p>
+                  <p className="text-2xl font-mono font-medium text-morandi-gold">
+                    {getCurrencySymbol(destinationCurrency)} 0
+                  </p>
+                </div>
+              </>
+            ) : (
+              <div className="text-sm text-morandi-secondary">尚無外幣支出項目</div>
+            )
+          })()}
         </div>
       </div>
+      </div>{/* 結束 print-content */}
 
       {/* 編輯對話框 */}
       <ItemEditDialog

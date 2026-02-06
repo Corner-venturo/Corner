@@ -221,6 +221,61 @@ export function useDailyItinerary({
     }
   }
 
+  // 從外部 URL 上傳圖片（Unsplash/Pexels）
+  const handleExternalImageUpload = async (
+    dayIndex: number,
+    actIndex: number,
+    imageUrl: string
+  ) => {
+    setUploadingActivityImage({ dayIndex, actIndex })
+
+    try {
+      // 下載圖片
+      const response = await fetch(imageUrl)
+      if (!response.ok) {
+        throw new Error('無法下載圖片')
+      }
+
+      const blob = await response.blob()
+      const fileExt = blob.type.split('/')[1] || 'jpg'
+      const fileName = `activity-${dayIndex + 1}-${actIndex + 1}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`
+      const filePath = `tour-activity-images/${fileName}`
+
+      // 上傳到 Supabase
+      const { error: uploadError } = await supabase.storage
+        .from('workspace-files')
+        .upload(filePath, blob)
+
+      if (uploadError) {
+        logger.error('上傳失敗:', uploadError)
+        toast.error(`圖片上傳失敗: ${uploadError.message}`)
+        return
+      }
+
+      const { data: urlData } = supabase.storage
+        .from('workspace-files')
+        .getPublicUrl(filePath)
+
+      updateActivity(dayIndex, actIndex, 'image', urlData.publicUrl)
+
+      const currentActivity = data.dailyItinerary?.[dayIndex]?.activities?.[actIndex]
+      const activityTitle = currentActivity?.title || '景點圖片'
+      setSaveToLibraryDialog({
+        isOpen: true,
+        filePath,
+        publicUrl: urlData.publicUrl,
+        activityTitle,
+      })
+      setLibraryImageName(activityTitle)
+      toast.success('圖片已儲存')
+    } catch (error) {
+      logger.error('外部圖片上傳失敗:', error)
+      toast.error('圖片下載或上傳失敗')
+    } finally {
+      setUploadingActivityImage(null)
+    }
+  }
+
   // 儲存到圖庫
   const handleSaveToLibrary = async () => {
     if (!saveToLibraryDialog || !workspaceId) {
@@ -296,6 +351,7 @@ export function useDailyItinerary({
     handleSelectHotels,
     handleSelectRestaurants,
     handleActivityImageUpload,
+    handleExternalImageUpload,
     handleSaveToLibrary,
   }
 }

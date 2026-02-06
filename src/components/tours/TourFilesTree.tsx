@@ -58,7 +58,13 @@ export function TourFilesTree({ tourId, tourCode, quoteId, itineraryId }: TourFi
 
         // 計算數量
         if (folder.dbType === 'quote') {
-          childCount = quoteId ? 1 : 0
+          // 用 tour_id 查詢，支援 1:N 關聯（排除快速報價）
+          const { count } = await supabase
+            .from('quotes')
+            .select('id', { count: 'exact', head: true })
+            .eq('tour_id', tourId)
+            .or('quote_type.is.null,quote_type.neq.quick')
+          childCount = count || 0
         } else if (folder.dbType === 'quick_quote') {
           const { count } = await supabase
             .from('quotes')
@@ -67,7 +73,12 @@ export function TourFilesTree({ tourId, tourCode, quoteId, itineraryId }: TourFi
             .eq('quote_type', 'quick')
           childCount = count || 0
         } else if (folder.dbType === 'itinerary') {
-          childCount = itineraryId ? 1 : 0
+          // 用 tour_id 查詢，支援 1:N 關聯
+          const { count } = await supabase
+            .from('itineraries')
+            .select('id', { count: 'exact', head: true })
+            .eq('tour_id', tourId)
+          childCount = count || 0
         } else if (folder.dbType === 'confirmation') {
           const { count } = await supabase
             .from('tour_confirmation_sheets')
@@ -116,20 +127,24 @@ export function TourFilesTree({ tourId, tourCode, quoteId, itineraryId }: TourFi
     const children: TreeItem[] = []
 
     try {
-      if (dbType === 'quote' && quoteId) {
+      if (dbType === 'quote') {
+        // 用 tour_id 查詢，支援 1:N 關聯（排除快速報價）
         const { data } = await supabase
           .from('quotes')
           .select('id, code, name')
-          .eq('id', quoteId)
-          .single()
+          .eq('tour_id', tourId)
+          .or('quote_type.is.null,quote_type.eq.standard')
+          .order('created_at', { ascending: false })
         if (data) {
-          children.push({
-            id: data.id,
-            name: data.name || data.code || '未命名報價單',
-            type: 'file',
-            icon: '📋',
-            data: { dbType: 'quote', dbId: data.id },
-          })
+          for (const q of data) {
+            children.push({
+              id: q.id,
+              name: q.name || q.code || '未命名報價單',
+              type: 'file',
+              icon: '📋',
+              data: { dbType: 'quote', dbId: q.id },
+            })
+          }
         }
       } else if (dbType === 'quick_quote') {
         const { data } = await supabase
@@ -149,20 +164,23 @@ export function TourFilesTree({ tourId, tourCode, quoteId, itineraryId }: TourFi
             })
           }
         }
-      } else if (dbType === 'itinerary' && itineraryId) {
+      } else if (dbType === 'itinerary') {
+        // 用 tour_id 查詢，支援 1:N 關聯
         const { data } = await supabase
           .from('itineraries')
           .select('id, title, code')
-          .eq('id', itineraryId)
-          .single()
+          .eq('tour_id', tourId)
+          .order('created_at', { ascending: false })
         if (data) {
-          children.push({
-            id: data.id,
-            name: data.title || data.code || '未命名行程表',
-            type: 'file',
-            icon: '🗺️',
-            data: { dbType: 'itinerary', dbId: data.id },
-          })
+          for (const i of data) {
+            children.push({
+              id: i.id,
+              name: i.title || i.code || '未命名行程表',
+              type: 'file',
+              icon: '🗺️',
+              data: { dbType: 'itinerary', dbId: i.id },
+            })
+          }
         }
       } else if (dbType === 'confirmation') {
         const { data } = await supabase

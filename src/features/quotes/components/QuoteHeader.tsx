@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { ArrowLeft, Save, Trash2, Map, Plane, Contact, X } from 'lucide-react'
+import { ArrowLeft, Save, Map, Plane, Contact, X } from 'lucide-react'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,43 +12,14 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
-import { ParticipantCounts, VersionRecord, CostCategory } from '../types'
+import { ParticipantCounts, CostCategory } from '../types'
 import { QuoteConfirmationSection } from './QuoteConfirmationSection'
 import type { QuoteConfirmationStatus } from '@/types/quote.types'
-import { stripHtml } from '@/lib/utils/string-utils'
 import type { Quote as StoreQuote } from '@/stores/types'
 import { Tour } from '@/types/tour.types'
-import { DocumentVersionPicker } from '@/components/documents'
-
-// 版本圖示
-function HistoryIcon({ size, className }: { size: number; className?: string }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-      <path d="M3 3v5h5"></path>
-      <path d="M12 7v5l4 2"></path>
-    </svg>
-  )
-}
 
 // 使用 CostCategory 而非 QuoteCategory，因為編輯器使用 CostCategory
 type QuoteWithCategories = Omit<StoreQuote, 'categories'> & {
-  categories?: CostCategory[]
-}
-
-type QuoteWithVersions = Omit<StoreQuote, 'versions' | 'categories'> & {
-  versions?: VersionRecord[]
-  current_version_index?: number
   categories?: CostCategory[]
   // 確認相關欄位
   confirmation_status?: QuoteConfirmationStatus
@@ -69,26 +40,20 @@ interface QuoteHeaderProps {
   isSpecialTour: boolean
   isReadOnly: boolean
   relatedTour: Tour | null | undefined
-  quote: QuoteWithVersions | null | undefined
+  quote: QuoteWithCategories | null | undefined
   quoteName: string
   setQuoteName: (name: string) => void
   participantCounts: ParticipantCounts
   setParticipantCounts: React.Dispatch<React.SetStateAction<ParticipantCounts>>
   saveSuccess: boolean
   setIsSaveDialogOpen: (open: boolean) => void
-  formatDateTime: (dateString: string) => string
-  handleLoadVersion: (versionIndex: number, versionData: VersionRecord) => void
   handleSave: () => void
-  handleSaveAsNewVersion: () => void
-  handleFinalize: () => void
   handleCreateTour: () => void
   handleGenerateQuotation: () => void
-  handleDeleteVersion: (versionIndex: number) => void
   handleCreateItinerary?: () => void
   handleSyncToItinerary?: () => void
   handleSyncAccommodationFromItinerary?: () => void
   onStatusChange?: (status: 'proposed' | 'approved', showLinkDialog?: boolean) => void
-  currentEditingVersion: number | null
   router: AppRouterInstance
   accommodationDays?: number
   // 聯絡資訊
@@ -111,19 +76,13 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
   setParticipantCounts,
   saveSuccess,
   setIsSaveDialogOpen,
-  formatDateTime,
-  handleLoadVersion,
   handleSave,
-  handleSaveAsNewVersion,
-  handleFinalize,
   handleCreateTour,
   handleGenerateQuotation,
-  handleDeleteVersion,
   handleCreateItinerary,
   handleSyncToItinerary,
   handleSyncAccommodationFromItinerary,
   onStatusChange,
-  currentEditingVersion,
   router,
   accommodationDays,
   contactInfo,
@@ -132,9 +91,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
   staffName,
   onConfirmationStatusChange,
 }) => {
-  const [hoveredVersionIndex, setHoveredVersionIndex] = useState<number | null>(null)
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false)
-  const [isVersionPickerOpen, setIsVersionPickerOpen] = useState(false)
   const [tempContactInfo, setTempContactInfo] = useState<ContactInfo>({
     contact_person: '',
     contact_phone: '',
@@ -221,61 +178,10 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
             )}
             placeholder="輸入團體名稱"
           />
-
-          {/* 聯絡資訊按鈕 */}
-          {onContactInfoChange && (
-            <button
-              onClick={handleOpenContactDialog}
-              disabled={isReadOnly}
-              className={cn(
-                'p-1.5 rounded-lg transition-colors',
-                hasContactInfo
-                  ? 'bg-morandi-gold/20 text-morandi-gold hover:bg-morandi-gold/30'
-                  : 'bg-morandi-container hover:bg-morandi-container/80 text-morandi-secondary',
-                isReadOnly && 'cursor-not-allowed opacity-60'
-              )}
-              title={hasContactInfo ? '編輯聯絡資訊' : '新增聯絡資訊'}
-            >
-              <Contact size={16} />
-            </button>
-          )}
         </div>
 
-        {/* 右區：功能區域 (原中+右合併) */}
+        {/* 右區：功能區域 */}
         <div className="flex items-center gap-2">
-          {/* 總人數 */}
-          <div className="flex items-center gap-1.5 whitespace-nowrap">
-            <span className="text-sm text-morandi-secondary">總人數</span>
-            <input
-              type="text" inputMode="decimal"
-              value={
-                participantCounts.adult +
-                participantCounts.child_with_bed +
-                participantCounts.child_no_bed +
-                participantCounts.child_no_bed +
-                participantCounts.single_room +
-                participantCounts.infant
-              }
-              onChange={e => {
-                const total = Number(e.target.value) || 0
-                // 簡化：所有人數設定為成人
-                setParticipantCounts({
-                  adult: total,
-                  child_with_bed: 0,
-                  child_no_bed: 0,
-                  single_room: 0,
-                  infant: 0,
-                })
-              }}
-              disabled={isReadOnly}
-              className={cn(
-                'w-10 h-8 px-1 text-sm text-center bg-morandi-container rounded leading-8 focus:outline-none focus:ring-1 focus:ring-morandi-gold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
-                isReadOnly && 'cursor-not-allowed opacity-60'
-              )}
-            />
-            <span className="text-sm text-morandi-secondary">人</span>
-          </div>
-
           {/* 報價確認 */}
           {quote && staffId && staffName && (
             <QuoteConfirmationSection
@@ -291,37 +197,6 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
               onConfirmationStatusChange={onConfirmationStatusChange}
               isReadOnly={isReadOnly}
             />
-          )}
-
-          <div className="h-4 w-px bg-morandi-container" />
-
-          {/* 儲存 - SVG only */}
-          <Button
-            onClick={() => handleSave()}
-            disabled={isReadOnly}
-            title="儲存"
-            className={cn(
-              'h-8 w-8 p-0 transition-all duration-200',
-              saveSuccess
-                ? 'bg-[var(--morandi-green)] hover:bg-[var(--morandi-green)] text-white'
-                : 'bg-[var(--morandi-green)] hover:bg-[var(--morandi-green-hover)] text-white',
-              isReadOnly && 'cursor-not-allowed opacity-60'
-            )}
-          >
-            <Save size={16} />
-          </Button>
-
-          {/* 版本 - 開啟報價單管理對話框 */}
-          {relatedTour && (
-            <Button
-              onClick={() => setIsVersionPickerOpen(true)}
-              variant="outline"
-              title="報價單管理"
-              className="h-8 px-2.5 text-sm gap-1"
-            >
-              <HistoryIcon size={14} />
-              版本
-            </Button>
           )}
 
           {/* 行程表 - SVG + 文字 */}
@@ -418,15 +293,6 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
         </DialogContent>
       </Dialog>
 
-      {/* 報價單管理對話框 */}
-      {relatedTour && (
-        <DocumentVersionPicker
-          isOpen={isVersionPickerOpen}
-          onClose={() => setIsVersionPickerOpen(false)}
-          tour={relatedTour as Tour & { id: string; code: string }}
-          currentQuoteId={quote?.id}
-        />
-      )}
     </>
   )
 }

@@ -106,7 +106,7 @@ function BlockEditorPageContent() {
     } else if (!itineraryId) {
       // 創建預設區塊
       const defaultData: TourFormData = {
-        tagline: 'Venturo Travel 2025',
+        tagline: `Venturo Travel ${new Date().getFullYear()}`,
         title: '',
         subtitle: '',
         description: '',
