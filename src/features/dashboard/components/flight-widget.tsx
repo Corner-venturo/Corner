@@ -106,16 +106,22 @@ export function FlightWidget() {
 
   // 查詢航班號
   const handleSearchFlight = () => {
+    console.log('[FlightWidget] handleSearchFlight called', { flightNumber, queryDate })
+
     if (!flightNumber.trim()) {
       setError('請輸入航班號碼')
       return
     }
 
     startTransition(async () => {
+      console.log('[FlightWidget] Starting flight search...')
       setError(null)
       setFlightData(null)
       setAirportFlights([])
       const result = await searchFlightAction(flightNumber, queryDate)
+
+      console.log('[FlightWidget] Flight search result:', result)
+
       if (result.error) {
         setError(result.error)
       } else if (result.data) {
@@ -127,12 +133,15 @@ export function FlightWidget() {
 
   // 查詢機場航班
   const handleSearchAirport = () => {
+    console.log('[FlightWidget] handleSearchAirport called', { airportCode, queryDate, destinationFilter })
+
     if (!airportCode.trim()) {
       setError('請選擇機場')
       return
     }
 
     startTransition(async () => {
+      console.log('[FlightWidget] Starting search...')
       setError(null)
       setFlightData(null)
       setAirportFlights([])
@@ -142,6 +151,8 @@ export function FlightWidget() {
         queryDate,
         destinationFilter || undefined
       )
+
+      console.log('[FlightWidget] Search result:', result)
 
       if (result.error) {
         setError(result.error)
