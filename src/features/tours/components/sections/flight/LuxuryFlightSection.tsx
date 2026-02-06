@@ -20,21 +20,56 @@ interface LuxuryFlightSectionProps {
   viewMode: 'desktop' | 'mobile'
 }
 
-// 格式化日期
+// 格式化日期（支援 MM/DD、MM/DD/YYYY、YYYY-MM-DD 格式）
 function formatFlightDate(dateStr: string | undefined | null): { date: string; day: string } {
   if (!dateStr) return { date: '--', day: '--' }
+
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
   try {
-    const date = new Date(dateStr)
-    if (isNaN(date.getTime())) return { date: '--', day: '--' }
-    const month = date.getMonth()
-    const dayOfMonth = date.getDate()
-    const dayOfWeek = date.getDay()
-    if (isNaN(month) || isNaN(dayOfMonth) || isNaN(dayOfWeek)) return { date: '--', day: '--' }
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-    return {
-      date: `${month + 1}.${dayOfMonth.toString().padStart(2, '0')}`,
-      day: days[dayOfWeek]
+    // 嘗試 MM/DD 格式（如 "04/06"）
+    const mmddMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})$/)
+    if (mmddMatch) {
+      const month = parseInt(mmddMatch[1], 10)
+      const dayOfMonth = parseInt(mmddMatch[2], 10)
+      if (month >= 1 && month <= 12 && dayOfMonth >= 1 && dayOfMonth <= 31) {
+        return {
+          date: `${month}.${dayOfMonth.toString().padStart(2, '0')}`,
+          day: '--' // 沒有年份無法計算星期幾
+        }
+      }
     }
+
+    // 嘗試 MM/DD/YYYY 格式
+    const mmddyyyyMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
+    if (mmddyyyyMatch) {
+      const month = parseInt(mmddyyyyMatch[1], 10) - 1
+      const dayOfMonth = parseInt(mmddyyyyMatch[2], 10)
+      const year = parseInt(mmddyyyyMatch[3], 10)
+      const date = new Date(year, month, dayOfMonth)
+      if (!isNaN(date.getTime())) {
+        return {
+          date: `${month + 1}.${dayOfMonth.toString().padStart(2, '0')}`,
+          day: days[date.getDay()]
+        }
+      }
+    }
+
+    // 嘗試 ISO 格式（YYYY-MM-DD）
+    const date = new Date(dateStr)
+    if (!isNaN(date.getTime())) {
+      const month = date.getMonth()
+      const dayOfMonth = date.getDate()
+      const year = date.getFullYear()
+      if (year >= 2020 && year <= 2100) {
+        return {
+          date: `${month + 1}.${dayOfMonth.toString().padStart(2, '0')}`,
+          day: days[date.getDay()]
+        }
+      }
+    }
+
+    return { date: '--', day: '--' }
   } catch {
     return { date: '--', day: '--' }
   }
