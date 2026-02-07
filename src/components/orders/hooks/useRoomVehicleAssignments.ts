@@ -93,27 +93,19 @@ export function useRoomVehicleAssignments({
         // 按成員分組所有房間分配
         const memberRooms: Record<string, { hotel: string; type: string; num: number; nightNum: number }[]> = {}
 
-        // 計算每個飯店內的房間編號
-        const hotelRoomCounters: Record<string, Record<string, number>> = {}
+        // 計算每個飯店內的房間編號（簡化版：直接按順序編號）
         const roomNumbers: Record<string, number> = {}
+        const counters: Record<string, number> = {}
         
+        // 房間已按 night_number + display_order 排序（來自 SQL）
         rooms.forEach(room => {
-          const hotel = room.hotel_name || '未指定'
-          const roomKey = `${hotel}_${room.room_type}_${room.night_number}`
-          if (!hotelRoomCounters[hotel]) {
-            hotelRoomCounters[hotel] = {}
+          // 用「飯店+房型+晚數」作為分組 key
+          const groupKey = `${room.hotel_name || ''}_${room.room_type}_${room.night_number}`
+          if (!counters[groupKey]) {
+            counters[groupKey] = 0
           }
-          if (!hotelRoomCounters[hotel][roomKey]) {
-            // 計算同飯店同房型的數量
-            const sameTypeRooms = rooms.filter(r => 
-              r.hotel_name === room.hotel_name && 
-              r.room_type === room.room_type && 
-              r.night_number === room.night_number &&
-              (r.display_order ?? 0) < (room.display_order ?? 0)
-            ).length
-            hotelRoomCounters[hotel][roomKey] = sameTypeRooms + 1
-          }
-          roomNumbers[room.id] = hotelRoomCounters[hotel][roomKey]++
+          counters[groupKey]++
+          roomNumbers[room.id] = counters[groupKey]
         })
 
         // 第一晚的房間用於排序
