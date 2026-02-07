@@ -31,6 +31,8 @@ interface MemberRowProps {
   departureDate: string | null
   roomAssignment?: string
   vehicleAssignment?: string
+  roomRowSpan?: number  // 分房欄位合併行數（0 表示被上方合併，不渲染）
+  vehicleRowSpan?: number  // 分車欄位合併行數
   pnrValue?: string
   customCostFields: CustomCostField[]
   mode: 'order' | 'tour'
@@ -58,6 +60,8 @@ export function MemberRow({
   departureDate,
   roomAssignment,
   vehicleAssignment,
+  roomRowSpan,
+  vehicleRowSpan,
   pnrValue,
   customCostFields,
   mode,
@@ -249,16 +253,22 @@ export function MemberRow({
         </td>
       )}
 
-      {/* 團體模式：分房欄位 */}
-      {mode === 'tour' && showRoomColumn && (
-        <td className="border border-morandi-gold/20 px-2 py-1 bg-emerald-50/50 text-xs">
+      {/* 團體模式：分房欄位（支援合併儲存格） */}
+      {mode === 'tour' && showRoomColumn && roomRowSpan !== 0 && (
+        <td 
+          className="border border-morandi-gold/20 px-2 py-1 bg-emerald-50/50 text-xs align-middle"
+          rowSpan={roomRowSpan && roomRowSpan > 1 ? roomRowSpan : undefined}
+        >
           {roomAssignment || '-'}
         </td>
       )}
 
-      {/* 團體模式：分車欄位 */}
-      {mode === 'tour' && showVehicleColumn && (
-        <td className="border border-morandi-gold/20 px-2 py-1 bg-amber-50/50 text-xs">
+      {/* 團體模式：分車欄位（支援合併儲存格） */}
+      {mode === 'tour' && showVehicleColumn && vehicleRowSpan !== 0 && (
+        <td 
+          className="border border-morandi-gold/20 px-2 py-1 bg-amber-50/50 text-xs align-middle"
+          rowSpan={vehicleRowSpan && vehicleRowSpan > 1 ? vehicleRowSpan : undefined}
+        >
           {vehicleAssignment || '-'}
         </td>
       )}
