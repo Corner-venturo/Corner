@@ -8,6 +8,7 @@ import { DayCard } from './DayCard'
 interface DayListProps {
   data: TourFormData
   dayLabels: string[]
+  isAccommodationLockedByQuote?: boolean  // 有關聯報價單時鎖定住宿編輯
   updateDailyItinerary: (index: number, field: string, value: unknown) => void
   removeDailyItinerary: (index: number) => void
   swapDailyItinerary?: (fromIndex: number, toIndex: number) => void
@@ -30,6 +31,7 @@ interface DayListProps {
 export function DayList({
   data,
   dayLabels,
+  isAccommodationLockedByQuote = false,
   updateDailyItinerary,
   removeDailyItinerary,
   swapDailyItinerary,
@@ -124,6 +126,7 @@ export function DayList({
           data={data}
           isCollapsed={collapsedDays.has(dayIndex)}
           onToggleCollapse={() => toggleDayCollapse(dayIndex)}
+          isAccommodationLockedByQuote={isAccommodationLockedByQuote}
           updateDailyItinerary={updateDailyItinerary}
           removeDailyItinerary={removeDailyItinerary}
           swapDailyItinerary={swapDailyItinerary}

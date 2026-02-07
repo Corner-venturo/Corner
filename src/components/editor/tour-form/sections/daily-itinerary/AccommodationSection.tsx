@@ -14,6 +14,7 @@ interface AccommodationSectionProps {
   data: TourFormData
   updateDailyItinerary: (index: number, field: string, value: unknown) => void
   onOpenHotelSelector: (dayIndex: number) => void
+  isLockedByQuote?: boolean  // 有關聯報價單時鎖定編輯
 }
 
 export function AccommodationSection({
@@ -22,11 +23,23 @@ export function AccommodationSection({
   data,
   updateDailyItinerary,
   onOpenHotelSelector,
+  isLockedByQuote = false,
 }: AccommodationSectionProps) {
+  // 如果有關聯報價單，飯店欄位鎖定
+  const isLocked = isLockedByQuote || day.isSameAccommodation
+  
   return (
     <div className="space-y-2">
+      {/* 報價單鎖定提示 */}
+      {isLockedByQuote && (
+        <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-md text-sm text-amber-700">
+          <span>🔒</span>
+          <span>住宿資訊已從報價單同步，請從報價單修改</span>
+        </div>
+      )}
+      
       {/* 續住勾選（第二天以後才顯示） */}
-      {dayIndex > 0 && (
+      {dayIndex > 0 && !isLockedByQuote && (
         <label className="flex items-center gap-2 cursor-pointer">
           <Checkbox
             checked={day.isSameAccommodation || false}
@@ -61,41 +74,43 @@ export function AccommodationSection({
           <Building2 size={14} />
           住宿
         </label>
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            onClick={() => onOpenHotelSelector(dayIndex)}
-            disabled={day.isSameAccommodation}
-            size="xs"
-            variant="default"
-            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white disabled:opacity-50"
-          >
-            從飯店庫選擇
-          </Button>
-          <Button
-            type="button"
-            onClick={() => {
-              // 清空欄位讓用戶手動輸入
-              updateDailyItinerary(dayIndex, 'accommodation', '')
-              updateDailyItinerary(dayIndex, 'accommodationUrl', '')
-              updateDailyItinerary(dayIndex, 'accommodationRating', 5)
-              // Focus 到輸入框
-              setTimeout(() => {
-                const input = document.querySelector(`#accommodation-input-${dayIndex}`) as HTMLInputElement
-                input?.focus()
-              }, 0)
-            }}
-            disabled={day.isSameAccommodation}
-            size="xs"
-            variant="secondary"
-          >
-            + 手動新增
-          </Button>
-        </div>
+        {!isLockedByQuote && (
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              onClick={() => onOpenHotelSelector(dayIndex)}
+              disabled={isLocked}
+              size="xs"
+              variant="default"
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white disabled:opacity-50"
+            >
+              從飯店庫選擇
+            </Button>
+            <Button
+              type="button"
+              onClick={() => {
+                // 清空欄位讓用戶手動輸入
+                updateDailyItinerary(dayIndex, 'accommodation', '')
+                updateDailyItinerary(dayIndex, 'accommodationUrl', '')
+                updateDailyItinerary(dayIndex, 'accommodationRating', 5)
+                // Focus 到輸入框
+                setTimeout(() => {
+                  const input = document.querySelector(`#accommodation-input-${dayIndex}`) as HTMLInputElement
+                  input?.focus()
+                }, 0)
+              }}
+              disabled={isLocked}
+              size="xs"
+              variant="secondary"
+            >
+              + 手動新增
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* 住宿輸入欄位 */}
-      <div className={`flex flex-wrap gap-3 ${day.isSameAccommodation ? 'opacity-50' : ''}`}>
+      <div className={`flex flex-wrap gap-3 ${isLocked ? 'opacity-50' : ''}`}>
         <div className="flex-1 min-w-[200px]">
           <label className="block text-xs font-medium text-morandi-primary mb-1">住宿名稱</label>
           <Input
@@ -103,7 +118,7 @@ export function AccommodationSection({
             type="text"
             value={day.accommodation || ''}
             onChange={e => updateDailyItinerary(dayIndex, 'accommodation', e.target.value)}
-            disabled={day.isSameAccommodation}
+            disabled={isLocked}
             className="h-8 text-sm"
             placeholder="飯店名稱"
           />
@@ -115,7 +130,7 @@ export function AccommodationSection({
             onValueChange={val => {
               updateDailyItinerary(dayIndex, 'accommodationRating', val === '0' ? 0 : Number(val))
             }}
-            disabled={day.isSameAccommodation}
+            disabled={isLocked}
           >
             <SelectTrigger className="h-8 text-sm">
               <SelectValue />
@@ -136,7 +151,7 @@ export function AccommodationSection({
             type="url"
             value={day.accommodationUrl || ''}
             onChange={e => updateDailyItinerary(dayIndex, 'accommodationUrl', e.target.value)}
-            disabled={day.isSameAccommodation}
+            disabled={isLocked}
             className="h-8 text-sm"
             placeholder="https://..."
           />

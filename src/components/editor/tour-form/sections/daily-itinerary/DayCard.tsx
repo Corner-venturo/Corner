@@ -20,6 +20,7 @@ export function DayCard({
   data,
   isCollapsed = false,
   onToggleCollapse,
+  isAccommodationLockedByQuote = false,
   updateDailyItinerary,
   removeDailyItinerary,
   swapDailyItinerary,
@@ -296,6 +297,7 @@ export function DayCard({
         data={data}
         updateDailyItinerary={updateDailyItinerary}
         onOpenHotelSelector={onOpenHotelSelector}
+        isLockedByQuote={isAccommodationLockedByQuote}
       />
 
       {/* 每日圖片 */}

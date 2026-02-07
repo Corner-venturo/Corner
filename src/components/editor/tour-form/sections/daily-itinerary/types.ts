@@ -86,6 +86,8 @@ export interface DayCardProps {
   // Collapse state
   isCollapsed?: boolean
   onToggleCollapse?: () => void
+  // 鎖定狀態（有關聯報價單時鎖定住宿編輯）
+  isAccommodationLockedByQuote?: boolean
   // Actions
   updateDailyItinerary: (index: number, field: string, value: unknown) => void
   removeDailyItinerary: (index: number) => void
