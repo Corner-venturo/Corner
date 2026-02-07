@@ -115,6 +115,8 @@ export function MemberRow({
     ticket_number: true,  // 預設顯示機票號碼
     ticketing_deadline: false,
     flight_cost: false,   // 機票金額預設關閉
+    room: true,   // 分房欄位
+    vehicle: true,  // 分車欄位
   }
 
   // 處理數字輸入

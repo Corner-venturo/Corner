@@ -84,6 +84,8 @@ export interface ColumnVisibility {
   ticket_number: boolean
   ticketing_deadline: boolean
   flight_cost: boolean  // 機票金額（成本）
+  room: boolean  // 分房欄位
+  vehicle: boolean  // 分車欄位
 }
 
 // 預設欄位顯示設定（訂金/尾款/應付金額 預設關閉）
@@ -103,6 +105,8 @@ const defaultColumnVisibility: ColumnVisibility = {
   ticket_number: true,  // 預設顯示機票號碼
   ticketing_deadline: false,
   flight_cost: false,   // 機票金額預設關閉
+  room: true,   // 分房欄位預設顯示（有資料時）
+  vehicle: true,  // 分車欄位預設顯示（有資料時）
 }
 
 // 欄位標籤對照
@@ -122,6 +126,8 @@ const columnLabels: Record<keyof ColumnVisibility, string> = {
   ticket_number: '機票號碼',
   ticketing_deadline: '開票期限',
   flight_cost: '機票金額',
+  room: '分房',
+  vehicle: '分車',
 }
 
 export function OrderMembersExpandable({
@@ -734,6 +740,21 @@ export function OrderMembersExpandable({
                   >
                     {columnLabels.flight_cost}
                   </DropdownMenuCheckboxItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuCheckboxItem
+                    checked={columnVisibility.room && roomVehicle.showRoomColumn}
+                    onCheckedChange={() => roomVehicle.showRoomColumn && toggleColumnVisibility('room')}
+                    className={!roomVehicle.showRoomColumn ? 'opacity-50 cursor-not-allowed' : ''}
+                  >
+                    {columnLabels.room} {!roomVehicle.showRoomColumn && '(無資料)'}
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={columnVisibility.vehicle && roomVehicle.showVehicleColumn}
+                    onCheckedChange={() => roomVehicle.showVehicleColumn && toggleColumnVisibility('vehicle')}
+                    className={!roomVehicle.showVehicleColumn ? 'opacity-50 cursor-not-allowed' : ''}
+                  >
+                    {columnLabels.vehicle} {!roomVehicle.showVehicleColumn && '(無資料)'}
+                  </DropdownMenuCheckboxItem>
                 </>
               )}
             </DropdownMenuContent>
@@ -757,8 +778,8 @@ export function OrderMembersExpandable({
               orderCount={membersData.orderCount}
               showIdentityColumn={showIdentityColumn}
               showPnrColumn={columnVisibility.pnr}
-              showRoomColumn={roomVehicle.showRoomColumn}
-              showVehicleColumn={roomVehicle.showVehicleColumn}
+              showRoomColumn={roomVehicle.showRoomColumn && columnVisibility.room}
+              showVehicleColumn={roomVehicle.showVehicleColumn && columnVisibility.vehicle}
               customCostFields={customCostFields}
               columnVisibility={columnVisibility}
               isEditMode={isAllEditMode}
@@ -776,8 +797,8 @@ export function OrderMembersExpandable({
                     isEditMode={isAllEditMode}
                     showIdentityColumn={showIdentityColumn}
                     showPnrColumn={columnVisibility.pnr}
-                    showRoomColumn={roomVehicle.showRoomColumn}
-                    showVehicleColumn={roomVehicle.showVehicleColumn}
+                    showRoomColumn={roomVehicle.showRoomColumn && columnVisibility.room}
+                    showVehicleColumn={roomVehicle.showVehicleColumn && columnVisibility.vehicle}
                     showOrderCode={mode === 'tour' && membersData.orderCount > 1}
                     departureDate={membersData.departureDate}
                     roomAssignment={roomVehicle.roomAssignments[member.id]}
