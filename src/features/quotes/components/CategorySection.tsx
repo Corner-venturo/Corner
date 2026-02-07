@@ -444,11 +444,29 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 groupedByDay[day].push(item)
               })
 
+              // 找出每天的第一個飯店名稱（用於續住顯示）
+              const dayHotelNames: Record<number, string> = {}
+              Object.keys(groupedByDay)
+                .sort((a, b) => Number(a) - Number(b))
+                .forEach(dayStr => {
+                  const day = Number(dayStr)
+                  const dayItems = groupedByDay[day]
+                  // 取第一個非續住的飯店名稱
+                  const firstItem = dayItems.find(item => !item.is_same_as_previous)
+                  if (firstItem) {
+                    dayHotelNames[day] = firstItem.name
+                  } else if (day > 1 && dayHotelNames[day - 1]) {
+                    // 如果全部都是續住，則用前一天的
+                    dayHotelNames[day] = dayHotelNames[day - 1]
+                  }
+                })
+
               return Object.keys(groupedByDay)
                 .sort((a, b) => Number(a) - Number(b))
                 .map(dayStr => {
                   const day = Number(dayStr)
                   const dayItems = groupedByDay[day]
+                  const prevDayHotelName = day > 1 ? dayHotelNames[day - 1] : undefined
 
                   return dayItems.map((item, roomIndex) => (
                     <AccommodationItemRow
@@ -457,8 +475,18 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                       categoryId={category.id}
                       day={day}
                       roomIndex={roomIndex}
+                      prevDayHotelName={prevDayHotelName}
+                      isReadOnly={isReadOnly}
                       handleUpdateItem={handleUpdateItem}
                       handleRemoveItem={handleRemoveItem}
+                      onToggleSameAsPrevious={(itemId, isSame, prevHotel) => {
+                        // 切換續住狀態
+                        handleUpdateItem(category.id, itemId, 'is_same_as_previous', isSame)
+                        if (isSame && prevHotel) {
+                          // 勾選續住時，自動帶入前一天的飯店名稱
+                          handleUpdateItem(category.id, itemId, 'name', prevHotel)
+                        }
+                      }}
                     />
                   ))
                 })

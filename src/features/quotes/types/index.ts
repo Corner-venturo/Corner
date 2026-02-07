@@ -16,6 +16,7 @@ export interface CostItem {
   // 住宿專用：天數和房型數據
   day?: number // 第幾天
   room_type?: string // 房型名稱（如：雙人房、三人房）
+  is_same_as_previous?: boolean // 續住（與前一天相同飯店）
   // 交通和領隊導遊專用：團體分攤
   is_group_cost?: boolean // 是否為團體費用
   // 餐飲專用：自理餐標記
