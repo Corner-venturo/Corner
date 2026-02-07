@@ -167,20 +167,62 @@ export function OrderMembersExpandable({
     })
   )
 
-  // 處理拖曳結束
+  // 處理拖曳結束（支援整間房一起移動）
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event
 
     if (!over || active.id === over.id) return
 
-    const oldIndex = membersData.members.findIndex(m => m.id === active.id)
-    const newIndex = membersData.members.findIndex(m => m.id === over.id)
-
-    if (oldIndex !== -1 && newIndex !== -1) {
-      const newMembers = arrayMove(membersData.members, oldIndex, newIndex)
-      membersData.handleReorderMembers(newMembers)
+    const draggedId = active.id as string
+    const targetId = over.id as string
+    
+    // 找出被拖曳成員的房間分配
+    const draggedRoom = roomVehicle.roomAssignments[draggedId]
+    
+    // 如果有分房，找出所有同房成員
+    let draggedMembers: string[] = [draggedId]
+    if (draggedRoom && roomVehicle.showRoomColumn) {
+      // 找出所有同房的成員 ID（按目前順序）
+      draggedMembers = membersData.members
+        .filter(m => roomVehicle.roomAssignments[m.id] === draggedRoom)
+        .map(m => m.id)
     }
-  }, [membersData])
+    
+    // 計算新位置
+    const targetIndex = membersData.members.findIndex(m => m.id === targetId)
+    if (targetIndex === -1) return
+    
+    // 移除被拖曳的成員們
+    let newMembers = membersData.members.filter(m => !draggedMembers.includes(m.id))
+    
+    // 重新計算插入位置（因為移除了成員，index 可能改變）
+    const targetMember = membersData.members.find(m => m.id === targetId)
+    let insertIndex = newMembers.findIndex(m => m.id === targetId)
+    
+    // 如果目標成員被移除了（是同房成員），找最近的位置
+    if (insertIndex === -1) {
+      insertIndex = Math.min(targetIndex, newMembers.length)
+    }
+    
+    // 判斷是往上還是往下移動
+    const oldFirstIndex = membersData.members.findIndex(m => m.id === draggedMembers[0])
+    const isMovingDown = targetIndex > oldFirstIndex
+    
+    // 插入整組成員
+    const draggedMemberObjects = draggedMembers
+      .map(id => membersData.members.find(m => m.id === id))
+      .filter(Boolean) as typeof membersData.members
+    
+    if (isMovingDown) {
+      // 往下移動：插入到目標後面
+      newMembers.splice(insertIndex + 1, 0, ...draggedMemberObjects)
+    } else {
+      // 往上移動：插入到目標前面
+      newMembers.splice(insertIndex, 0, ...draggedMemberObjects)
+    }
+    
+    membersData.handleReorderMembers(newMembers)
+  }, [membersData, roomVehicle.roomAssignments, roomVehicle.showRoomColumn])
 
   // 從 localStorage 讀取欄位顯示設定（v2: 2026-01-05 重置預設值）
   const COLUMN_VISIBILITY_KEY = 'memberListColumnVisibility_v2'
