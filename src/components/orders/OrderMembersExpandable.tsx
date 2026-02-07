@@ -515,8 +515,39 @@ export function OrderMembersExpandable({
   const rowSpans = useMemo(() => {
     const roomSpans: Record<string, number> = {}
     const vehicleSpans: Record<string, number> = {}
+    const roomSpansByHotel: Record<string, Record<string, number>> = {}
     
-    // 計算分房合併
+    // 計算每個飯店的分房合併
+    roomVehicle.hotelColumns.forEach(hotel => {
+      const hotelAssignments = roomVehicle.roomAssignmentsByHotel[hotel.id] || {}
+      roomSpansByHotel[hotel.id] = {}
+      
+      let i = 0
+      while (i < sortedMembers.length) {
+        const currentRoom = hotelAssignments[sortedMembers[i].id]
+        if (!currentRoom) {
+          roomSpansByHotel[hotel.id][sortedMembers[i].id] = 1
+          i++
+          continue
+        }
+        
+        // 計算連續相同房間的成員數
+        let count = 1
+        while (i + count < sortedMembers.length && 
+               hotelAssignments[sortedMembers[i + count].id] === currentRoom) {
+          count++
+        }
+        
+        // 第一個成員設定 rowSpan，其他設為 0
+        roomSpansByHotel[hotel.id][sortedMembers[i].id] = count
+        for (let j = 1; j < count; j++) {
+          roomSpansByHotel[hotel.id][sortedMembers[i + j].id] = 0
+        }
+        i += count
+      }
+    })
+    
+    // 舊的單欄位模式合併（fallback）
     let i = 0
     while (i < sortedMembers.length) {
       const currentRoom = roomVehicle.roomAssignments[sortedMembers[i].id]
@@ -564,8 +595,8 @@ export function OrderMembersExpandable({
       i += count
     }
     
-    return { roomSpans, vehicleSpans }
-  }, [sortedMembers, roomVehicle.roomAssignments, roomVehicle.vehicleAssignments])
+    return { roomSpans, vehicleSpans, roomSpansByHotel }
+  }, [sortedMembers, roomVehicle.roomAssignments, roomVehicle.vehicleAssignments, roomVehicle.hotelColumns, roomVehicle.roomAssignmentsByHotel])
 
   return (
     <div className={`flex flex-col h-full overflow-hidden ${embedded ? '' : 'border border-border rounded-xl bg-card'}`}>
@@ -808,6 +839,7 @@ export function OrderMembersExpandable({
                     vehicleRowSpan={rowSpans.vehicleSpans[member.id]}
                     hotelColumns={roomVehicle.hotelColumns}
                     roomAssignmentsByHotel={roomVehicle.roomAssignmentsByHotel}
+                    roomRowSpansByHotel={rowSpans.roomSpansByHotel}
                     pnrValue={pnrValues[member.id]}
                     customCostFields={customCostFields}
                     mode={mode}

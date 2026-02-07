@@ -37,7 +37,7 @@ interface MemberRowProps {
   vehicleRowSpan?: number  // 分車欄位合併行數
   hotelColumns?: HotelColumn[]  // 飯店欄位列表
   roomAssignmentsByHotel?: Record<string, Record<string, string>>  // 按飯店分組的分房
-  roomRowSpansByHotel?: Record<string, number>  // 按飯店的合併行數
+  roomRowSpansByHotel?: Record<string, Record<string, number>>  // 按飯店的合併行數: hotelId -> memberId -> rowSpan
   pnrValue?: string
   customCostFields: CustomCostField[]
   mode: 'order' | 'tour'
@@ -265,7 +265,8 @@ export function MemberRow({
 
       {/* 團體模式：分房欄位（按飯店分欄位） */}
       {mode === 'tour' && showRoomColumn && hotelColumns.length > 0 && hotelColumns.map(hotel => {
-        const hotelRoomSpan = roomRowSpansByHotel[hotel.id]
+        const hotelSpans = roomRowSpansByHotel[hotel.id] || {}
+        const hotelRoomSpan = hotelSpans[member.id]
         if (hotelRoomSpan === 0) return null  // 被合併，不渲染
         const assignment = roomAssignmentsByHotel[hotel.id]?.[member.id]
         return (
