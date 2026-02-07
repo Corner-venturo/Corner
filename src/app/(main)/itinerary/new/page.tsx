@@ -40,6 +40,8 @@ function NewItineraryPageContent() {
     setQuoteTierPricings,
     isHandedOff,
     setIsHandedOff,
+    hasLinkedQuote,
+    setHasLinkedQuote,
   } = useItineraryEditor()
 
   const { items: itineraries } = useItineraries()
@@ -52,6 +54,7 @@ function NewItineraryPageContent() {
     setCurrentVersionIndex,
     setQuoteTierPricings,
     setIsHandedOff,
+    setHasLinkedQuote,
   })
 
   // 版本切換處理
@@ -269,6 +272,7 @@ function NewItineraryPageContent() {
             autoSaveStatus={autoSaveStatus}
             isDirty={isDirty}
             quoteTierPricings={quoteTierPricings}
+            hasLinkedQuote={hasLinkedQuote}
             className={isHandedOff ? 'pointer-events-none opacity-60' : ''}
             onChange={(newData) => {
               if (isHandedOff) return // 已交接，禁止編輯

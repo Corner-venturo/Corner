@@ -24,6 +24,7 @@ interface TourFormProps {
   data: TourFormData
   onChange: (data: TourFormData) => void
   quoteTierPricings?: TierPricing[]
+  hasLinkedQuote?: boolean  // 是否有關聯報價單（用於鎖定住宿編輯）
 }
 
 // 導覽項目配置
@@ -61,7 +62,7 @@ function calculateDayLabels(itinerary: TourFormData['dailyItinerary']): string[]
   return labels
 }
 
-export function TourForm({ data, onChange, quoteTierPricings }: TourFormProps) {
+export function TourForm({ data, onChange, quoteTierPricings, hasLinkedQuote }: TourFormProps) {
   const { user } = useAuthStore()
   const [activeSection, setActiveSection] = useState('section-cover')
   const [showDayNav, setShowDayNav] = useState(false)
@@ -363,6 +364,7 @@ export function TourForm({ data, onChange, quoteTierPricings }: TourFormProps) {
             addRecommendation={handlers.addRecommendation}
             updateRecommendation={handlers.updateRecommendation}
             removeRecommendation={handlers.removeRecommendation}
+            isAccommodationLockedByQuote={hasLinkedQuote}
           />
         </div>
 

@@ -78,6 +78,7 @@ export function useItineraryEditor() {
   const [currentVersionIndex, setCurrentVersionIndex] = useState(-1)
   const [quoteTierPricings, setQuoteTierPricings] = useState<TierPricing[]>([])
   const [isHandedOff, setIsHandedOff] = useState(false) // 是否已交接（唯讀）
+  const [hasLinkedQuote, setHasLinkedQuote] = useState(false) // 是否有關聯報價單（住宿鎖定）
 
   const { user } = useAuthStore()
   const tourDataRef = useRef(tourData)
@@ -290,6 +291,8 @@ export function useItineraryEditor() {
     setQuoteTierPricings,
     isHandedOff,
     setIsHandedOff,
+    hasLinkedQuote,
+    setHasLinkedQuote,
   }
 }
 

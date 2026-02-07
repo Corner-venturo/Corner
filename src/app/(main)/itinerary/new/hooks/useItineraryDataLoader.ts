@@ -17,6 +17,7 @@ interface UseItineraryDataLoaderProps {
   setCurrentVersionIndex: (index: number) => void
   setQuoteTierPricings?: (tierPricings: TierPricing[]) => void
   setIsHandedOff?: (isHandedOff: boolean) => void
+  setHasLinkedQuote?: (hasLinkedQuote: boolean) => void
 }
 
 export function useItineraryDataLoader({
@@ -25,6 +26,7 @@ export function useItineraryDataLoader({
   setCurrentVersionIndex,
   setQuoteTierPricings,
   setIsHandedOff,
+  setHasLinkedQuote,
 }: UseItineraryDataLoaderProps) {
   const searchParams = useSearchParams()
   const tourId = searchParams.get('tour_id')
@@ -171,6 +173,11 @@ export function useItineraryDataLoader({
       if (quote?.tier_pricings && quote.tier_pricings.length > 0) {
         setQuoteTierPricings(quote.tier_pricings as TierPricing[])
       }
+    }
+    
+    // 設定是否有關聯報價單（用於鎖定住宿編輯）
+    if (setHasLinkedQuote) {
+      setHasLinkedQuote(!!itinerary.quote_id)
     }
 
     setLoading(false)
