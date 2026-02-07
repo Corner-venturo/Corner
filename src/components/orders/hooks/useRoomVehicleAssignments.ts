@@ -62,21 +62,48 @@ export function useRoomVehicleAssignments({
         const map: Record<string, string> = {}
         const sortKeys: Record<string, number> = {}
 
-        // 只處理第一晚的房間順序（作為主要排序依據）
-        const firstNightRooms = rooms.filter(r => r.night_number === 1)
+        // 收集所有不同的飯店（按 night_number 排序）
+        const uniqueHotels = [...new Map(
+          rooms.sort((a, b) => a.night_number - b.night_number)
+               .map(r => [r.hotel_name, r.night_number])
+        ).entries()]
 
-        // 計算每種房型的編號（用於顯示）
-        const roomCounters: Record<string, number> = {}
-        const roomNumbers: Record<string, number> = {}
-        firstNightRooms.forEach(room => {
-          const roomKey = `${room.hotel_name || ''}_${room.room_type}`
-          if (!roomCounters[roomKey]) {
-            roomCounters[roomKey] = 1
+        // 為每個飯店創建縮寫（取前2個字）
+        const hotelAbbrev: Record<string, string> = {}
+        uniqueHotels.forEach(([name]) => {
+          if (name) {
+            hotelAbbrev[name] = name.slice(0, 2)
           }
-          roomNumbers[room.id] = roomCounters[roomKey]++
         })
 
-        // 建立 room_id -> display_order 的映射（用於排序）
+        // 按成員分組所有房間分配
+        const memberRooms: Record<string, { hotel: string; type: string; num: number; nightNum: number }[]> = {}
+
+        // 計算每個飯店內的房間編號
+        const hotelRoomCounters: Record<string, Record<string, number>> = {}
+        const roomNumbers: Record<string, number> = {}
+        
+        rooms.forEach(room => {
+          const hotel = room.hotel_name || '未指定'
+          const roomKey = `${hotel}_${room.room_type}_${room.night_number}`
+          if (!hotelRoomCounters[hotel]) {
+            hotelRoomCounters[hotel] = {}
+          }
+          if (!hotelRoomCounters[hotel][roomKey]) {
+            // 計算同飯店同房型的數量
+            const sameTypeRooms = rooms.filter(r => 
+              r.hotel_name === room.hotel_name && 
+              r.room_type === room.room_type && 
+              r.night_number === room.night_number &&
+              (r.display_order ?? 0) < (room.display_order ?? 0)
+            ).length
+            hotelRoomCounters[hotel][roomKey] = sameTypeRooms + 1
+          }
+          roomNumbers[room.id] = hotelRoomCounters[hotel][roomKey]++
+        })
+
+        // 第一晚的房間用於排序
+        const firstNightRooms = rooms.filter(r => r.night_number === 1)
         const roomOrderMap: Record<string, number> = {}
         firstNightRooms.forEach((room, index) => {
           roomOrderMap[room.id] = index
@@ -85,25 +112,52 @@ export function useRoomVehicleAssignments({
         assignments.forEach(a => {
           const room = rooms.find(r => r.id === a.room_id)
           if (room) {
-            // 只有第一晚的房間用於顯示和排序
-            if (room.night_number === 1) {
-              const roomNum = roomNumbers[room.id] || 1
-              // 房型標籤（簡化顯示）
-              const typeLabel = room.room_type === 'single' ? '單人房' :
-                               room.room_type === 'double' ? '雙人房' :
-                               room.room_type === 'twin' ? '雙床房' :
-                               room.room_type === 'triple' ? '三人房' :
-                               room.room_type === 'quad' ? '四人房' :
-                               room.room_type === 'suite' ? '套房' : 
-                               room.room_type.length > 10 ? room.room_type.slice(0, 10) + '...' : room.room_type
-              // 只顯示房型和編號，不含飯店名稱
-              map[a.order_member_id] = `${typeLabel} ${roomNum}`
+            const memberId = a.order_member_id
+            if (!memberRooms[memberId]) {
+              memberRooms[memberId] = []
+            }
+            
+            // 房型標籤（簡化）
+            const typeLabel = room.room_type === 'single' ? '單' :
+                             room.room_type === 'double' ? '雙' :
+                             room.room_type === 'twin' ? '雙床' :
+                             room.room_type === 'triple' ? '三' :
+                             room.room_type === 'quad' ? '四' :
+                             room.room_type === 'suite' ? '套' : 
+                             room.room_type.slice(0, 2)
+            
+            memberRooms[memberId].push({
+              hotel: room.hotel_name || '',
+              type: typeLabel,
+              num: roomNumbers[room.id] || 1,
+              nightNum: room.night_number
+            })
 
-              // 設定排序權重：房間順序 * 10 + 房間內成員順序
+            // 用第一晚的房間做排序
+            if (room.night_number === 1) {
               const roomOrder = roomOrderMap[room.id] ?? 999
               const existingSortKeys = Object.values(sortKeys).filter(v => Math.floor(v / 10) === roomOrder)
-              sortKeys[a.order_member_id] = roomOrder * 10 + existingSortKeys.length
+              sortKeys[memberId] = roomOrder * 10 + existingSortKeys.length
             }
+          }
+        })
+
+        // 組合顯示文字
+        Object.entries(memberRooms).forEach(([memberId, roomList]) => {
+          // 按 nightNum 排序，去重（同飯店只顯示一次）
+          const uniqueByHotel = roomList
+            .sort((a, b) => a.nightNum - b.nightNum)
+            .filter((r, i, arr) => arr.findIndex(x => x.hotel === r.hotel) === i)
+          
+          if (uniqueByHotel.length === 1) {
+            // 只有一間飯店，顯示房型+編號
+            const r = uniqueByHotel[0]
+            map[memberId] = `${r.type}${r.num}`
+          } else {
+            // 多間飯店，顯示縮寫
+            map[memberId] = uniqueByHotel
+              .map(r => `${hotelAbbrev[r.hotel] || ''}${r.type}${r.num}`)
+              .join(' / ')
           }
         })
 
