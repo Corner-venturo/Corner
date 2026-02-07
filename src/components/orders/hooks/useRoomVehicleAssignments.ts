@@ -88,12 +88,16 @@ export function useRoomVehicleAssignments({
             // 只有第一晚的房間用於顯示和排序
             if (room.night_number === 1) {
               const roomNum = roomNumbers[room.id] || 1
+              // 房型標籤（簡化顯示）
               const typeLabel = room.room_type === 'single' ? '單人房' :
                                room.room_type === 'double' ? '雙人房' :
+                               room.room_type === 'twin' ? '雙床房' :
                                room.room_type === 'triple' ? '三人房' :
-                               room.room_type === 'quad' ? '四人房' : room.room_type
-              const prefix = room.hotel_name ? `${room.hotel_name} ` : ''
-              map[a.order_member_id] = `${prefix}${typeLabel} ${roomNum}`
+                               room.room_type === 'quad' ? '四人房' :
+                               room.room_type === 'suite' ? '套房' : 
+                               room.room_type.length > 10 ? room.room_type.slice(0, 10) + '...' : room.room_type
+              // 只顯示房型和編號，不含飯店名稱
+              map[a.order_member_id] = `${typeLabel} ${roomNum}`
 
               // 設定排序權重：房間順序 * 10 + 房間內成員順序
               const roomOrder = roomOrderMap[room.id] ?? 999
