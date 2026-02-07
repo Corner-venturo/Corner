@@ -171,7 +171,7 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
     if (itineraries.length > 0 || !loading) {
       loadItinerary()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [tour.id, tour.country_id, tour.main_city_id, itineraries, countries, cities])
 
   // 載入行程表資料的函數

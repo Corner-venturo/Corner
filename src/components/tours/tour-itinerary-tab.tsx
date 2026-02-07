@@ -187,7 +187,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
     }
 
     loadItinerary()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [tour.id, itineraries, tour.name, tour.departure_date, tour.return_date])
 
   // 更新每日行程

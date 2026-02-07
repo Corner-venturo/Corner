@@ -3,12 +3,14 @@
 /**
  * RoomingListExport - 分房總表輸出元件
  * 輸出給飯店的分房表格（PDF/列印）
+ * 支援選擇單一飯店輸出（隱私保護）
  */
 
 import React, { useState, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { FileText, Printer, Download } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { FileText, Printer, Hotel } from 'lucide-react'
 import type { TourRoomStatus, TourRoomAssignment } from '@/types/room-vehicle.types'
 import type { OrderMember } from '@/components/orders/order-member.types'
 
@@ -48,6 +50,16 @@ export function RoomingListExport({
   assignments,
   members,
 }: RoomingListExportProps) {
+  const [selectedHotel, setSelectedHotel] = useState<string>('all')
+  
+  // 取得所有飯店名稱（用於選擇器）
+  const hotelNames = useMemo(() => {
+    const names = new Set<string>()
+    rooms.forEach(room => {
+      names.add(room.hotel_name || '未指定飯店')
+    })
+    return Array.from(names)
+  }, [rooms])
   
   // 將房間按飯店分組，連續入住合併
   const hotelGroups = useMemo(() => {
@@ -118,6 +130,12 @@ export function RoomingListExport({
     return groups
   }, [rooms, assignments, members, departureDate])
   
+  // 根據選擇過濾飯店
+  const filteredGroups = useMemo(() => {
+    if (selectedHotel === 'all') return hotelGroups
+    return hotelGroups.filter(g => g.hotelName === selectedHotel)
+  }, [hotelGroups, selectedHotel])
+  
   // 房型中英文對照
   const roomTypeLabels: Record<string, string> = {
     single: '單人房 Single',
@@ -130,7 +148,7 @@ export function RoomingListExport({
   
   // 列印功能
   const handlePrint = () => {
-    const printContent = hotelGroups.map(group => `
+    const printContent = filteredGroups.map(group => `
       <div class="hotel-page">
         <div class="header">
           <h1>分房總表 / Rooming List</h1>
@@ -280,6 +298,29 @@ export function RoomingListExport({
         </DialogHeader>
         
         <div className="space-y-6">
+          {/* 飯店選擇器 */}
+          {hotelNames.length > 1 && (
+            <div className="flex items-center gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <Hotel className="h-5 w-5 text-amber-600" />
+              <span className="text-sm text-amber-800">選擇輸出飯店：</span>
+              <Select value={selectedHotel} onValueChange={setSelectedHotel}>
+                <SelectTrigger className="w-[280px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">全部飯店（內部用）</SelectItem>
+                  {hotelNames.map(name => (
+                    <SelectItem key={name} value={name}>{name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedHotel !== 'all' && (
+                <span className="text-xs text-amber-600 ml-2">
+                  ⚠️ 只會列印選定飯店的分房
+                </span>
+              )}
+            </div>
+          )}
           {/* 預覽區域 */}
           <div className="border rounded-lg p-6 bg-white">
             <div className="text-center mb-6 pb-4 border-b-2 border-gray-800">
@@ -288,7 +329,7 @@ export function RoomingListExport({
               <p className="text-sm"><strong>團名:</strong> {tourName}</p>
             </div>
             
-            {hotelGroups.map((group, idx) => (
+            {filteredGroups.map((group, idx) => (
               <div key={idx} className="mb-8">
                 <div className="bg-gray-100 p-4 rounded-lg mb-4">
                   <h2 className="text-lg font-semibold">🏨 {group.hotelName}</h2>
