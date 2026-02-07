@@ -19,6 +19,8 @@ import type { OrderMember, CustomCostField } from '../order-member.types'
 import type { ColumnVisibility } from '../OrderMembersExpandable'
 import { MemberBasicInfo, MemberPassportInfo, MemberActions } from './member-row'
 
+import type { HotelColumn } from '../hooks/useRoomVehicleAssignments'
+
 interface MemberRowProps {
   member: OrderMember
   index: number
@@ -33,6 +35,9 @@ interface MemberRowProps {
   vehicleAssignment?: string
   roomRowSpan?: number  // 分房欄位合併行數（0 表示被上方合併，不渲染）
   vehicleRowSpan?: number  // 分車欄位合併行數
+  hotelColumns?: HotelColumn[]  // 飯店欄位列表
+  roomAssignmentsByHotel?: Record<string, Record<string, string>>  // 按飯店分組的分房
+  roomRowSpansByHotel?: Record<string, number>  // 按飯店的合併行數
   pnrValue?: string
   customCostFields: CustomCostField[]
   mode: 'order' | 'tour'
@@ -62,6 +67,9 @@ export function MemberRow({
   vehicleAssignment,
   roomRowSpan,
   vehicleRowSpan,
+  hotelColumns = [],
+  roomAssignmentsByHotel = {},
+  roomRowSpansByHotel = {},
   pnrValue,
   customCostFields,
   mode,
@@ -255,8 +263,23 @@ export function MemberRow({
         </td>
       )}
 
-      {/* 團體模式：分房欄位（支援合併儲存格） */}
-      {mode === 'tour' && showRoomColumn && roomRowSpan !== 0 && (
+      {/* 團體模式：分房欄位（按飯店分欄位） */}
+      {mode === 'tour' && showRoomColumn && hotelColumns.length > 0 && hotelColumns.map(hotel => {
+        const hotelRoomSpan = roomRowSpansByHotel[hotel.id]
+        if (hotelRoomSpan === 0) return null  // 被合併，不渲染
+        const assignment = roomAssignmentsByHotel[hotel.id]?.[member.id]
+        return (
+          <td 
+            key={hotel.id}
+            className="border border-morandi-gold/20 px-2 py-1 bg-emerald-50/50 text-xs align-middle"
+            rowSpan={hotelRoomSpan && hotelRoomSpan > 1 ? hotelRoomSpan : undefined}
+          >
+            {assignment || '-'}
+          </td>
+        )
+      })}
+      {/* 單欄位模式（沒有飯店欄位資訊時的後備） */}
+      {mode === 'tour' && showRoomColumn && hotelColumns.length === 0 && roomRowSpan !== 0 && (
         <td 
           className="border border-morandi-gold/20 px-2 py-1 bg-emerald-50/50 text-xs align-middle"
           rowSpan={roomRowSpan && roomRowSpan > 1 ? roomRowSpan : undefined}

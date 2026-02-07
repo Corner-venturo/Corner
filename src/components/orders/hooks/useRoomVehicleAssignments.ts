@@ -8,6 +8,16 @@ interface UseRoomVehicleAssignmentsParams {
   tourId: string
 }
 
+// 飯店欄位資訊
+export interface HotelColumn {
+  id: string  // hotel_name 作為 id
+  name: string
+  shortName: string  // 縮寫（前2字）
+  checkIn: string
+  checkOut: string
+  nightNumbers: number[]
+}
+
 interface UseRoomVehicleAssignmentsReturn {
   showRoomManager: boolean
   setShowRoomManager: (show: boolean) => void
@@ -17,7 +27,9 @@ interface UseRoomVehicleAssignmentsReturn {
   setShowRoomColumn: (show: boolean) => void
   showVehicleColumn: boolean
   setShowVehicleColumn: (show: boolean) => void
-  roomAssignments: Record<string, string>
+  roomAssignments: Record<string, string>  // 舊格式，合併顯示
+  roomAssignmentsByHotel: Record<string, Record<string, string>>  // 新格式：hotelName -> memberId -> 房型
+  hotelColumns: HotelColumn[]  // 飯店欄位列表
   roomSortKeys: Record<string, number>
   vehicleAssignments: Record<string, string>
   loadRoomAssignments: () => Promise<void>
@@ -33,6 +45,8 @@ export function useRoomVehicleAssignments({
   const [showRoomColumn, setShowRoomColumn] = useState(false)
   const [showVehicleColumn, setShowVehicleColumn] = useState(false)
   const [roomAssignments, setRoomAssignments] = useState<Record<string, string>>({})
+  const [roomAssignmentsByHotel, setRoomAssignmentsByHotel] = useState<Record<string, Record<string, string>>>({})
+  const [hotelColumns, setHotelColumns] = useState<HotelColumn[]>([])
   const [roomSortKeys, setRoomSortKeys] = useState<Record<string, number>>({})
   const [vehicleAssignments, setVehicleAssignments] = useState<Record<string, string>>({})
 
@@ -142,7 +156,7 @@ export function useRoomVehicleAssignments({
           }
         })
 
-        // 組合顯示文字
+        // 組合顯示文字（舊格式，合併顯示）
         Object.entries(memberRooms).forEach(([memberId, roomList]) => {
           // 按 nightNum 排序，去重（同飯店只顯示一次）
           const uniqueByHotel = roomList
@@ -161,7 +175,47 @@ export function useRoomVehicleAssignments({
           }
         })
 
+        // 建立飯店欄位資訊
+        const hotelColsMap = new Map<string, HotelColumn>()
+        rooms.forEach(room => {
+          const hotelName = room.hotel_name || '未指定'
+          if (!hotelColsMap.has(hotelName)) {
+            hotelColsMap.set(hotelName, {
+              id: hotelName,
+              name: hotelName,
+              shortName: hotelName.slice(0, 4),  // 取前4字作為縮寫
+              checkIn: '',
+              checkOut: '',
+              nightNumbers: []
+            })
+          }
+          const col = hotelColsMap.get(hotelName)!
+          if (!col.nightNumbers.includes(room.night_number)) {
+            col.nightNumbers.push(room.night_number)
+          }
+        })
+        
+        // 排序並計算入住/退房日期
+        const sortedHotelCols = Array.from(hotelColsMap.values())
+          .sort((a, b) => Math.min(...a.nightNumbers) - Math.min(...b.nightNumbers))
+        
+        // 按飯店分組的分房資料
+        const byHotel: Record<string, Record<string, string>> = {}
+        Object.entries(memberRooms).forEach(([memberId, roomList]) => {
+          roomList.forEach(r => {
+            if (!byHotel[r.hotel]) {
+              byHotel[r.hotel] = {}
+            }
+            // 只保留每個飯店第一次出現的房間（因為同飯店多晚房間相同）
+            if (!byHotel[r.hotel][memberId]) {
+              byHotel[r.hotel][memberId] = `${r.type}${r.num}`
+            }
+          })
+        })
+
         setRoomAssignments(map)
+        setRoomAssignmentsByHotel(byHotel)
+        setHotelColumns(sortedHotelCols)
         setRoomSortKeys(sortKeys)
         // 有分房資料時自動顯示欄位
         if (Object.keys(map).length > 0) {
@@ -218,6 +272,8 @@ export function useRoomVehicleAssignments({
     showVehicleColumn,
     setShowVehicleColumn,
     roomAssignments,
+    roomAssignmentsByHotel,
+    hotelColumns,
     roomSortKeys,
     vehicleAssignments,
     loadRoomAssignments,

@@ -6,6 +6,7 @@
 
 import React from 'react'
 import type { ColumnVisibility } from '../OrderMembersExpandable'
+import type { HotelColumn } from '../hooks/useRoomVehicleAssignments'
 
 interface MemberTableHeaderProps {
   mode: 'order' | 'tour'
@@ -14,6 +15,7 @@ interface MemberTableHeaderProps {
   showPnrColumn: boolean
   showRoomColumn: boolean
   showVehicleColumn: boolean
+  hotelColumns?: HotelColumn[]  // 飯店欄位列表
   customCostFields: Array<{ id: string; name: string; values: Record<string, string> }>
   columnVisibility?: ColumnVisibility
   isEditMode?: boolean
@@ -31,6 +33,7 @@ export function MemberTableHeader({
   showPnrColumn,
   showRoomColumn,
   showVehicleColumn,
+  hotelColumns = [],
   customCostFields,
   columnVisibility,
   isEditMode = false,
@@ -48,6 +51,8 @@ export function MemberTableHeader({
     deposit_amount: false,
     balance: false,
     remarks: true,
+    room: true,
+    vehicle: true,
     pnr: false,
     ticket_number: true,  // 預設顯示機票號碼
     ticketing_deadline: false,
@@ -101,8 +106,16 @@ export function MemberTableHeader({
         {/* 備註 */}
         {cv.remarks && <th className={`${thClass} min-w-[120px]`}>備註</th>}
 
-        {/* 團體模式：分房 */}
-        {mode === 'tour' && showRoomColumn && (
+        {/* 團體模式：分房（按飯店分欄位） */}
+        {mode === 'tour' && showRoomColumn && hotelColumns.length > 0 && hotelColumns.map(hotel => (
+          <th key={hotel.id} className={`${thClass} min-w-[80px]`} title={hotel.name}>
+            <div className="text-xs leading-tight">
+              <div className="font-medium">{hotel.shortName}</div>
+            </div>
+          </th>
+        ))}
+        {/* 單欄位模式（沒有飯店資訊時） */}
+        {mode === 'tour' && showRoomColumn && hotelColumns.length === 0 && (
           <th className={`${thClass} min-w-[100px]`}>分房</th>
         )}
 

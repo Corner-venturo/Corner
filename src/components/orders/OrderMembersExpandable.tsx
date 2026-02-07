@@ -780,6 +780,7 @@ export function OrderMembersExpandable({
               showPnrColumn={columnVisibility.pnr}
               showRoomColumn={roomVehicle.showRoomColumn && columnVisibility.room}
               showVehicleColumn={roomVehicle.showVehicleColumn && columnVisibility.vehicle}
+              hotelColumns={roomVehicle.hotelColumns}
               customCostFields={customCostFields}
               columnVisibility={columnVisibility}
               isEditMode={isAllEditMode}
@@ -805,6 +806,8 @@ export function OrderMembersExpandable({
                     vehicleAssignment={roomVehicle.vehicleAssignments[member.id]}
                     roomRowSpan={rowSpans.roomSpans[member.id]}
                     vehicleRowSpan={rowSpans.vehicleSpans[member.id]}
+                    hotelColumns={roomVehicle.hotelColumns}
+                    roomAssignmentsByHotel={roomVehicle.roomAssignmentsByHotel}
                     pnrValue={pnrValues[member.id]}
                     customCostFields={customCostFields}
                     mode={mode}
