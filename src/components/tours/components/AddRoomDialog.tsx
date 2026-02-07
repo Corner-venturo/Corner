@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -38,6 +38,7 @@ interface AddRoomDialogProps {
   continueFromPrevious: Set<number>
   onToggleContinue: (night: number) => void
   onSuccess: () => void
+  defaultHotelName?: string  // 從行程表自動帶入的飯店名稱
 }
 
 export function AddRoomDialog({
@@ -50,10 +51,24 @@ export function AddRoomDialog({
   continueFromPrevious,
   onToggleContinue,
   onSuccess,
+  defaultHotelName = '',
 }: AddRoomDialogProps) {
   const [newRoomRows, setNewRoomRows] = useState<NewRoomRow[]>([
-    { id: generateUUID(), roomName: '', capacity: 0, count: 0, amount: '', bookingCode: '' }
+    { id: generateUUID(), roomName: defaultHotelName, capacity: 0, count: 0, amount: '', bookingCode: '' }
   ])
+  
+  // 當 defaultHotelName 變更時，更新第一列的飯店名稱（如果用戶還沒改過）
+  useEffect(() => {
+    if (defaultHotelName && open) {
+      setNewRoomRows(prev => {
+        // 只更新空白的 roomName
+        if (prev.length === 1 && !prev[0].roomName) {
+          return [{ ...prev[0], roomName: defaultHotelName }]
+        }
+        return prev
+      })
+    }
+  }, [defaultHotelName, open])
 
   const getNightDate = (nightNumber: number): string => {
     if (!tour?.departure_date) return ''
@@ -65,7 +80,7 @@ export function AddRoomDialog({
 
   const resetForm = () => {
     setNewRoomRows([
-      { id: generateUUID(), roomName: '', capacity: 0, count: 0, amount: '', bookingCode: '' }
+      { id: generateUUID(), roomName: defaultHotelName, capacity: 0, count: 0, amount: '', bookingCode: '' }
     ])
   }
 
@@ -185,7 +200,9 @@ export function AddRoomDialog({
         <div className="border border-border/60 rounded-lg overflow-hidden mt-4">
           {/* 標題列 */}
           <div className="grid grid-cols-12 px-3 py-2 bg-muted/50 text-sm font-medium text-muted-foreground">
-            <div className="col-span-4 border-r border-border/20 pr-2">名稱</div>
+            <div className="col-span-4 border-r border-border/20 pr-2">
+              飯店/房型 {defaultHotelName && <span className="text-xs text-morandi-gold ml-1">(已從行程表帶入)</span>}
+            </div>
             <div className="col-span-2 border-r border-border/20 px-2 text-center">入住人數</div>
             <div className="col-span-1 border-r border-border/20 px-2 text-center">間數</div>
             <div className="col-span-2 border-r border-border/20 px-2 text-right">金額</div>

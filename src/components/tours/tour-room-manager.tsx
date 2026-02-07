@@ -16,6 +16,7 @@ import type { OrderMember } from '@/components/orders/order-member.types'
 import { useRoomData } from './hooks/useRoomData'
 import { useRoomConfig } from './hooks/useRoomConfig'
 import { useRoomAssignment } from './hooks/useRoomAssignment'
+import { useItineraryHotels } from './hooks/useItineraryHotels'
 
 // Components
 import { RoomList } from './components/RoomList'
@@ -56,6 +57,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
 
   // 使用自定義 Hooks
   const { rooms, assignments, loading, reload } = useRoomData({ tourId, open })
+  const itineraryHotels = useItineraryHotels({ tourId, open })
 
   const {
     continueFromPrevious,
@@ -291,6 +293,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
         continueFromPrevious={continueFromPrevious}
         onToggleContinue={toggleContinueFromPrevious}
         onSuccess={reload}
+        defaultHotelName={itineraryHotels.getHotelForNight(selectedNight)}
       />
 
       {/* 編輯房間對話框 */}
