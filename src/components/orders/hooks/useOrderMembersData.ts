@@ -121,6 +121,7 @@ export function useOrderMembersData({
             .from('order_members')
             .select('*')
             .in('order_id', orderIds)
+            .order('sort_order', { ascending: true })
             .order('created_at', { ascending: true })
 
           if (membersError) throw membersError
@@ -132,6 +133,7 @@ export function useOrderMembersData({
           .from('order_members')
           .select('*')
           .eq('order_id', orderId)
+          .order('sort_order', { ascending: true })
           .order('created_at', { ascending: true })
 
         if (membersError) throw membersError
@@ -278,6 +280,37 @@ export function useOrderMembersData({
   }
 
   /**
+   * 重新排序成員
+   */
+  const handleReorderMembers = async (reorderedMembers: OrderMember[]) => {
+    // 更新本地狀態
+    setMembers(reorderedMembers)
+
+    // 批次更新資料庫中的 sort_order
+    try {
+      const updates = reorderedMembers.map((member, index) => ({
+        id: member.id,
+        sort_order: index + 1,
+      }))
+
+      // 使用 Promise.all 批次更新
+      await Promise.all(
+        updates.map(({ id, sort_order }) =>
+          supabase
+            .from('order_members')
+            .update({ sort_order })
+            .eq('id', id)
+        )
+      )
+    } catch (error) {
+      logger.error('更新排序失敗:', error)
+      toast.error('排序更新失敗')
+      // 重新載入以恢復正確順序
+      loadMembers()
+    }
+  }
+
+  /**
    * 刪除成員
    */
   const handleDeleteMember = async (memberId: string) => {
@@ -399,6 +432,7 @@ export function useOrderMembersData({
     handleAddMember,
     confirmAddMembers,
     handleDeleteMember,
+    handleReorderMembers,
 
     // 新增成員對話框狀態
     isAddDialogOpen,

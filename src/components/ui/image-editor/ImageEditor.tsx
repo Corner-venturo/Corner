@@ -21,7 +21,7 @@ import { logger } from '@/lib/utils/logger'
 
 // 拆分模組
 import { AdjustmentSlider } from './AdjustmentSlider'
-import { applyAdjustmentsToImage, cropImage, uploadBase64ToStorage } from './image-utils'
+import { applyAdjustmentsToImage, applyTransformToImage, cropImage, uploadBase64ToStorage } from './image-utils'
 import {
   type ImageAdjustments,
   type ImageEditorSettings,
@@ -88,6 +88,7 @@ export function ImageEditor({
   const [isDragging, setIsDragging] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [aiProcessing, setAiProcessing] = useState<AiEditAction | null>(null)
+  const [transformedSrc, setTransformedSrc] = useState(imageSrc)
   const [previewSrc, setPreviewSrc] = useState(imageSrc)
 
   // Refs
@@ -107,18 +108,32 @@ export function ImageEditor({
           ...initialSettings?.adjustments,
         },
       })
+      setTransformedSrc(imageSrc)
       setPreviewSrc(imageSrc)
     }
   }, [open, imageSrc, initialSettings])
 
-  // 色彩調整預覽（debounce）
+  // 旋轉/翻轉變換預覽
+  useEffect(() => {
+    let cancelled = false
+    async function applyTransform() {
+      const transformed = await applyTransformToImage(imageSrc, settings.rotation, settings.flipH)
+      if (!cancelled) {
+        setTransformedSrc(transformed)
+      }
+    }
+    applyTransform()
+    return () => { cancelled = true }
+  }, [imageSrc, settings.rotation, settings.flipH])
+
+  // 色彩調整預覽（debounce）- 使用已變換的圖片作為來源
   useEffect(() => {
     const timeout = setTimeout(async () => {
-      const processed = await applyAdjustmentsToImage(imageSrc, settings.adjustments)
+      const processed = await applyAdjustmentsToImage(transformedSrc, settings.adjustments)
       setPreviewSrc(processed)
     }, 150)
     return () => clearTimeout(timeout)
-  }, [imageSrc, settings.adjustments])
+  }, [transformedSrc, settings.adjustments])
 
   // ============ 滾輪縮放 ============
   const handleWheel = useCallback((e: React.WheelEvent) => {
@@ -282,7 +297,13 @@ export function ImageEditor({
 
     setIsProcessing(true)
     try {
-      const blob = await cropImage(previewSrc, settings, aspectRatio)
+      // previewSrc 已經包含旋轉/翻轉，所以傳遞不含旋轉的設定給 cropImage
+      const settingsForCrop = {
+        ...settings,
+        rotation: 0,
+        flipH: false,
+      }
+      const blob = await cropImage(previewSrc, settingsForCrop, aspectRatio)
       onCropAndSave(blob, settings)
       onClose()
     } catch (error) {
@@ -324,7 +345,7 @@ export function ImageEditor({
                 className="w-full h-full object-cover pointer-events-none"
                 style={{
                   objectPosition: `${settings.x}% ${settings.y}%`,
-                  transform: `scale(${settings.scale}) rotate(${settings.rotation}deg) ${settings.flipH ? 'scaleX(-1)' : ''}`,
+                  transform: `scale(${settings.scale})`,
                   transformOrigin: `${settings.x}% ${settings.y}%`,
                 }}
                 draggable={false}

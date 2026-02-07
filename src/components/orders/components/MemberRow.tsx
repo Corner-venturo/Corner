@@ -11,7 +11,9 @@
 'use client'
 
 import React, { useState, useCallback } from 'react'
-import { Check } from 'lucide-react'
+import { Check, GripVertical } from 'lucide-react'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
 import type { OrderMember, CustomCostField } from '../order-member.types'
 import type { ColumnVisibility } from '../OrderMembersExpandable'
@@ -72,6 +74,26 @@ export function MemberRow({
 }: MemberRowProps) {
   const [isComposing, setIsComposing] = useState(false)
 
+  // 拖曳排序功能
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: member.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  // 編輯模式下的 sticky 位置需要考慮拖曳欄位
+  const seqLeft = isEditMode ? 'left-[28px]' : 'left-0'
+  const nameLeft = isEditMode ? 'left-[68px]' : 'left-[40px]'
+
   // 預設欄位顯示設定（訂金/尾款/應付金額 預設關閉）
   const cv = columnVisibility || {
     passport_name: true,
@@ -98,7 +120,22 @@ export function MemberRow({
   }, [member.id, onUpdateField])
 
   return (
-    <tr className="group relative hover:bg-morandi-container/20 transition-colors">
+    <tr
+      ref={setNodeRef}
+      style={style}
+      className="group relative hover:bg-morandi-container/20 transition-colors"
+    >
+      {/* 編輯模式：拖曳把手 */}
+      {isEditMode && (
+        <td
+          className="border border-morandi-gold/20 px-1 py-1 bg-[#f5f3f0] sticky left-0 z-10 cursor-grab active:cursor-grabbing"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical size={14} className="text-morandi-secondary/50 hover:text-morandi-secondary" />
+        </td>
+      )}
+
       {/* 基本資訊欄位 */}
       <MemberBasicInfo
         member={member}
@@ -144,7 +181,7 @@ export function MemberRow({
               }}
               data-member={member.id}
               data-field="special_meal"
-              className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
+              className="bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
             />
           ) : (
             <span className="text-xs text-morandi-primary">{member.special_meal || '-'}</span>
@@ -160,7 +197,7 @@ export function MemberRow({
             inputMode="numeric"
             value={member.total_payable || ''}
             onChange={e => handleNumberInput('total_payable', e.target.value)}
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
+            className="bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
           />
         </td>
       )}
@@ -173,7 +210,7 @@ export function MemberRow({
             inputMode="numeric"
             value={member.deposit_amount || ''}
             onChange={e => handleNumberInput('deposit_amount', e.target.value)}
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
+            className="bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
           />
         </td>
       )}
@@ -204,7 +241,7 @@ export function MemberRow({
               }}
               data-member={member.id}
               data-field="remarks"
-              className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
+              className="bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
             />
           ) : (
             <span className="text-xs text-morandi-primary">{member.remarks || '-'}</span>
@@ -233,7 +270,7 @@ export function MemberRow({
             type="text"
             value={pnrValue || ''}
             onChange={e => onPnrChange(member.id, e.target.value)}
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
+            className="bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
                       />
         </td>
       )}
@@ -245,7 +282,7 @@ export function MemberRow({
             type="text"
             value={member.ticket_number || ''}
             onChange={e => onUpdateField(member.id, 'ticket_number', e.target.value)}
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
+            className="bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
                       />
         </td>
       )}
@@ -263,7 +300,7 @@ export function MemberRow({
               type="date"
               value={member.ticketing_deadline ? member.ticketing_deadline.slice(0, 10) : ''}
               onChange={e => onUpdateField(member.id, 'ticketing_deadline', e.target.value || null)}
-              className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
+              className="bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
             />
           )}
         </td>
@@ -286,7 +323,7 @@ export function MemberRow({
             type="text"
             value={field.values[member.id] || ''}
             onChange={e => onCustomCostChange(field.id, member.id, e.target.value)}
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
+            className="bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
                       />
         </td>
       ))}

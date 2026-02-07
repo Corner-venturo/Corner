@@ -28,6 +28,7 @@ interface DailyItineraryDay {
 const proposalPackagesDb = () => dynamicFrom('proposal_packages')
 const itinerariesDb = () => dynamicFrom('itineraries')
 const quotesDb = () => dynamicFrom('quotes')
+const toursDb = () => dynamicFrom('tours')
 
 /**
  * 將行程表的每日餐食轉換為報價單的 meals 分類格式
@@ -40,12 +41,12 @@ function convertDailyItineraryToMeals(dailyItinerary: DailyItineraryDay[]): Cost
     const day = dailyItinerary[i]
     const dayNum = i + 1
 
-    // 早餐
-    if (day.meals?.breakfast) {
+    // 早餐（飯店早餐不列入，因為包含在住宿費用）
+    if (day.meals?.breakfast && day.meals.breakfast !== '飯店早餐') {
       items.push({
         id: generateUUID(),
         name: `Day${dayNum} 早餐：${day.meals.breakfast}`,
-        quantity: 1,
+        quantity: null,
         unit_price: 0,
         total: 0,
         day: dayNum,
@@ -57,7 +58,7 @@ function convertDailyItineraryToMeals(dailyItinerary: DailyItineraryDay[]): Cost
       items.push({
         id: generateUUID(),
         name: `Day${dayNum} 午餐：${day.meals.lunch}`,
-        quantity: 1,
+        quantity: null,
         unit_price: 0,
         total: 0,
         day: dayNum,
@@ -69,7 +70,7 @@ function convertDailyItineraryToMeals(dailyItinerary: DailyItineraryDay[]): Cost
       items.push({
         id: generateUUID(),
         name: `Day${dayNum} 晚餐：${day.meals.dinner}`,
-        quantity: 1,
+        quantity: null,
         unit_price: 0,
         total: 0,
         day: dayNum,
@@ -82,25 +83,41 @@ function convertDailyItineraryToMeals(dailyItinerary: DailyItineraryDay[]): Cost
 
 /**
  * 將行程表的住宿資訊轉換為報價單的 accommodation 分類格式
+ * - 每天獨立一筆（quantity 用於房間數，不是晚數）
+ * - 續住（同上）會解析成實際飯店名稱
+ * - 最後一天不住宿
  */
 function convertDailyItineraryToAccommodation(dailyItinerary: DailyItineraryDay[]): CostItem[] {
   const items: CostItem[] = []
 
+  // 解析「同上 (xxx)」格式，取得實際飯店名稱
+  const getActualHotelName = (accommodation: string): string => {
+    const match = accommodation.match(/^同上\s*\((.+)\)$/)
+    if (match) return match[1]
+    return accommodation
+  }
+
   for (let i = 0; i < dailyItinerary.length; i++) {
     const day = dailyItinerary[i]
     const dayNum = i + 1
+    const isLastDay = i === dailyItinerary.length - 1
 
-    // 住宿（最後一天通常不住宿，但如果有填就加入）
-    if (day.accommodation) {
-      items.push({
-        id: generateUUID(),
-        name: day.accommodation,
-        quantity: 1,
-        unit_price: 0,
-        total: 0,
-        day: dayNum,
-      })
-    }
+    // 最後一天通常不住宿，跳過
+    if (isLastDay) break
+
+    if (!day.accommodation) continue
+
+    // 解析實際飯店名稱（處理「同上」格式）
+    const hotelName = getActualHotelName(day.accommodation)
+
+    items.push({
+      id: generateUUID(),
+      name: hotelName,
+      quantity: null,
+      unit_price: 0,
+      total: 0,
+      day: dayNum,
+    })
   }
 
   return items
@@ -175,15 +192,15 @@ export async function syncItineraryToQuote(
     let quoteId: string | null = null
     let dailyData: DailyItineraryDay[] = dailyItinerary || []
 
-    // 1. 先嘗試從行程表本身取得 quote_id 或 proposal_package_id
+    // 1. 先嘗試從行程表本身取得 proposal_package_id 或 tour_id
     const { data: itineraryData } = await itinerariesDb()
-      .select('quote_id, proposal_package_id, daily_itinerary')
+      .select('proposal_package_id, tour_id, daily_itinerary')
       .eq('id', itineraryId)
       .single()
 
     const itinerary = itineraryData as {
-      quote_id: string | null
       proposal_package_id: string | null
+      tour_id: string | null
       daily_itinerary: DailyItineraryDay[] | null
     } | null
 
@@ -197,17 +214,26 @@ export async function syncItineraryToQuote(
       return
     }
 
-    // 嘗試獲取 quote_id
-    if (itinerary?.quote_id) {
-      // 行程表直接關聯報價單
-      quoteId = itinerary.quote_id
-      logger.log('從行程表取得 quote_id:', quoteId)
-    } else {
-      // 使用傳入的 proposalPackageId 或從行程表取得
+    // 嘗試獲取 quote_id（優先順序：tour > proposal_package）
+    // 1. 嘗試透過 tour_id 查找（旅遊團路徑）
+    if (itinerary?.tour_id) {
+      const { data: tour } = await toursDb()
+        .select('quote_id')
+        .eq('id', itinerary.tour_id)
+        .single()
+
+      const tourData = tour as { quote_id: string | null } | null
+      if (tourData?.quote_id) {
+        quoteId = tourData.quote_id
+        logger.log('從 tour 取得 quote_id:', quoteId)
+      }
+    }
+
+    // 2. 如果還是沒有 quote_id，嘗試透過 proposal_package_id 查找（提案路徑）
+    if (!quoteId) {
       const pkgId = proposalPackageId || itinerary?.proposal_package_id
 
       if (pkgId) {
-        // 透過 proposal_package 查找報價單
         const { data: pkg } = await proposalPackagesDb()
           .select('quote_id')
           .eq('id', pkgId)

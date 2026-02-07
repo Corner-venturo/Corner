@@ -55,6 +55,10 @@ export function MemberBasicInfo({
     remarks: true,
   }
 
+  // 編輯模式下的 sticky 位置需要考慮拖曳欄位（28px）
+  const seqLeft = isEditMode ? 'left-[28px]' : 'left-0'
+  const nameLeft = isEditMode ? 'left-[68px]' : 'left-[40px]'
+
   // 處理日期輸入（自動格式化）
   const handleDateInput = (value: string) => {
     const digitsOnly = value.replace(/\D/g, '')
@@ -76,47 +80,54 @@ export function MemberBasicInfo({
   return (
     <>
       {/* 序號 - 凍結欄位（使用實色背景避免內容穿透） */}
-      <td className="border border-morandi-gold/20 px-2 py-1 bg-[#f5f3f0] text-center sticky left-0 z-10">
+      <td className={cn(
+        "border border-morandi-gold/20 px-2 py-1 bg-[#f5f3f0] text-center sticky z-10",
+        seqLeft
+      )}>
         <span className="text-xs text-morandi-secondary">{index + 1}</span>
       </td>
 
       {/* 中文姓名 - 凍結欄位（使用實色背景避免內容穿透） */}
       <td className={cn(
-        "border border-morandi-gold/20 px-2 py-1 sticky left-[40px] z-10",
+        "border border-morandi-gold/20 px-2 py-1 sticky z-10",
+        nameLeft,
         isEditMode ? 'bg-card' : (member.customer_verification_status === 'unverified' ? 'bg-[#fde8e8]' : 'bg-[#f5f3f0]')
       )}>
-        {isEditMode ? (
-          <input
-            type="text"
-            value={member.chinese_name || ''}
-            onChange={e => {
-              onUpdateField(member.id, 'chinese_name', e.target.value)
-            }}
-            onCompositionStart={() => setIsComposing(true)}
-            onCompositionEnd={e => {
-              setIsComposing(false)
-              const value = e.currentTarget.value
-              setTimeout(() => {
-                onUpdateField(member.id, 'chinese_name', value)
-              }, 0)
-            }}
-            onKeyDown={e => {
-              // 輸入法組字中，不處理任何鍵盤事件
-              if (isComposing) return
-              // 按 Enter 時觸發搜尋（避免輸入新客戶時被打斷）
-              if (e.key === 'Enter') {
-                e.preventDefault()
-                onNameSearch?.(member.id, member.chinese_name || '')
-              } else {
-                onKeyDown(e, index, 'chinese_name')
-              }
-            }}
-            data-member={member.id}
-            data-field="chinese_name"
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
-                      />
-        ) : (
-          <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1">
+          {isEditMode ? (
+            <input
+              type="text"
+              value={member.chinese_name || ''}
+              onChange={e => {
+                onUpdateField(member.id, 'chinese_name', e.target.value)
+              }}
+              onCompositionStart={() => setIsComposing(true)}
+              onCompositionEnd={e => {
+                setIsComposing(false)
+                const value = e.currentTarget.value
+                setTimeout(() => {
+                  onUpdateField(member.id, 'chinese_name', value)
+                }, 0)
+              }}
+              onKeyDown={e => {
+                // 輸入法組字中，不處理任何鍵盤事件
+                if (isComposing) return
+                // 按 Enter 時觸發搜尋（避免輸入新客戶時被打斷）
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  onNameSearch?.(member.id, member.chinese_name || '')
+                } else {
+                  onKeyDown(e, index, 'chinese_name')
+                }
+              }}
+              data-member={member.id}
+              data-field="chinese_name"
+              className={cn(
+                "flex-1 bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 min-w-0",
+                member.customer_verification_status === 'unverified' ? 'text-status-danger font-medium' : 'text-morandi-primary'
+              )}
+            />
+          ) : (
             <span
               className={cn(
                 "flex-1 text-xs",
@@ -126,18 +137,18 @@ export function MemberBasicInfo({
             >
               {member.chinese_name || '-'}
             </span>
-            {member.passport_image_url && (
-              <button
-                type="button"
-                onClick={() => onPreview(member)}
-                className="p-0.5 text-morandi-gold hover:text-morandi-gold/80 transition-colors"
-                title="查看護照照片"
-              >
-                <Eye size={12} />
-              </button>
-            )}
-          </div>
-        )}
+          )}
+          {member.passport_image_url && (
+            <button
+              type="button"
+              onClick={() => onPreview(member)}
+              className="p-0.5 text-morandi-gold hover:text-morandi-gold/80 transition-colors flex-shrink-0"
+              title="查看護照照片"
+            >
+              <Eye size={12} />
+            </button>
+          )}
+        </div>
       </td>
 
       {/* 團體模式：訂單序號 */}
@@ -185,7 +196,7 @@ export function MemberBasicInfo({
               }}
               data-member={member.id}
               data-field="passport_name"
-              className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
+              className="bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
             />
           ) : (
             <span className="text-xs text-morandi-primary">{member.passport_name || '-'}</span>
@@ -204,8 +215,7 @@ export function MemberBasicInfo({
               onKeyDown={e => onKeyDown(e, index, 'birth_date')}
               data-member={member.id}
               data-field="birth_date"
-              className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
-              placeholder="YYYYMMDD"
+              className="bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
             />
           ) : (
             <span className="text-xs text-morandi-primary">{member.birth_date || '-'}</span>
@@ -222,7 +232,7 @@ export function MemberBasicInfo({
               onChange={e => onUpdateField(member.id, 'gender', e.target.value)}
               data-member={member.id}
               data-field="gender"
-              className="w-full bg-transparent text-xs text-center border-none outline-none shadow-none"
+              className="bg-transparent text-xs text-center border-none outline-none shadow-none cursor-pointer"
             >
               <option value="">-</option>
               <option value="M">男</option>
@@ -257,7 +267,7 @@ export function MemberBasicInfo({
               }}
               data-member={member.id}
               data-field="id_number"
-              className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
+              className="bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
                           />
           ) : (
             <span className="text-xs text-morandi-primary">{member.id_number || '-'}</span>

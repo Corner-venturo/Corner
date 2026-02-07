@@ -6,6 +6,48 @@ import { logger } from '@/lib/utils/logger'
 import type { ImageAdjustments, ImageEditorSettings } from './types'
 
 /**
+ * 應用旋轉和翻轉到圖片（用於預覽）
+ */
+export async function applyTransformToImage(
+  src: string,
+  rotation: number,
+  flipH: boolean
+): Promise<string> {
+  // 如果沒有變換，直接返回原圖
+  if (rotation === 0 && !flipH) return src
+
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      if (!ctx) {
+        resolve(src)
+        return
+      }
+
+      // 計算旋轉後的畫布尺寸
+      const isRotated90 = rotation === 90 || rotation === 270
+      canvas.width = isRotated90 ? img.height : img.width
+      canvas.height = isRotated90 ? img.width : img.height
+
+      // 移動到中心，應用變換
+      ctx.translate(canvas.width / 2, canvas.height / 2)
+      ctx.rotate((rotation * Math.PI) / 180)
+      if (flipH) {
+        ctx.scale(-1, 1)
+      }
+      ctx.drawImage(img, -img.width / 2, -img.height / 2)
+
+      resolve(canvas.toDataURL('image/jpeg', 0.85))
+    }
+    img.onerror = () => resolve(src)
+    img.src = src
+  })
+}
+
+/**
  * 應用色彩調整到圖片
  */
 export async function applyAdjustmentsToImage(

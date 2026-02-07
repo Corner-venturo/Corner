@@ -115,6 +115,14 @@ interface ApiFlightData {
     terminal?: string
     gate?: string
   }
+  // Airport Departures/Arrivals API 使用 movement 結構
+  movement?: {
+    airport?: { iata?: string; name?: string }
+    scheduledTime?: { local?: string; utc?: string }
+    revisedTime?: { local?: string; utc?: string }
+    terminal?: string
+    gate?: string
+  }
   status?: string
 }
 
@@ -453,22 +461,27 @@ export async function searchAirportDeparturesAction(
     const departures = allDepartures
 
     // 轉換資料格式
+    // 注意：Airport Departures API 使用 movement 結構，而非 departure/arrival
     let flights: AirportFlightItem[] = departures.map((flight: ApiFlightData) => {
-      const depTime = flight.departure?.scheduledTime?.local || flight.departure?.scheduledTime?.utc
-      const estTime = flight.departure?.revisedTime?.local || flight.departure?.revisedTime?.utc
+      // 優先使用 movement（Airport API），fallback 到 departure（Flight API）
+      const movement = flight.movement || flight.departure
+      const depTime = movement?.scheduledTime?.local || movement?.scheduledTime?.utc
+      const estTime = movement?.revisedTime?.local || movement?.revisedTime?.utc
       const airlineCode = flight.airline?.iata || ''
-      const destIata = flight.arrival?.airport?.iata || ''
+      // 目的地：movement.airport 是目的地機場（對於出發航班）
+      const destAirport = flight.movement?.airport || flight.arrival?.airport
+      const destIata = destAirport?.iata || ''
       return {
         flightNumber: flight.number || '',
         airline: getAirlineChineseName(airlineCode, flight.airline?.name || ''),
         airlineCode: airlineCode,
-        destination: getAirportChineseName(destIata, flight.arrival?.airport?.name || ''),
+        destination: getAirportChineseName(destIata, destAirport?.name || ''),
         destinationIata: destIata,
         scheduledTime: formatTime(depTime),
         estimatedTime: estTime ? formatTime(estTime) : undefined,
         status: getStatusText(flight.status || 'Unknown'),
-        terminal: flight.departure?.terminal,
-        gate: flight.departure?.gate,
+        terminal: movement?.terminal,
+        gate: movement?.gate,
       }
     })
 
@@ -547,24 +560,31 @@ export async function searchAirportArrivalsAction(
     const apiData = await response.json()
     const arrivals = apiData.arrivals || []
 
+    // 注意：Airport Arrivals API 使用 movement 結構
+    // movement.airport 是出發機場（航班從哪裡來）
+    // movement.scheduledTime 是抵達時間
     let flights: AirportFlightItem[] = arrivals.map((flight: ApiFlightData) => {
-      const arrTime = flight.arrival?.scheduledTime?.local || flight.arrival?.scheduledTime?.utc
-      const estTime = flight.arrival?.revisedTime?.local || flight.arrival?.revisedTime?.utc
+      // 優先使用 movement（Airport API），fallback 到 arrival（Flight API）
+      const movement = flight.movement || flight.arrival
+      const arrTime = movement?.scheduledTime?.local || movement?.scheduledTime?.utc
+      const estTime = movement?.revisedTime?.local || movement?.revisedTime?.utc
       const airlineCode = flight.airline?.iata || ''
-      const originIata = flight.departure?.airport?.iata || ''
+      // 出發地：movement.airport 是出發機場（對於抵達航班）
+      const originAirport = flight.movement?.airport || flight.departure?.airport
+      const originIata = originAirport?.iata || ''
       return {
         flightNumber: flight.number || '',
         airline: getAirlineChineseName(airlineCode, flight.airline?.name || ''),
         airlineCode: airlineCode,
-        origin: getAirportChineseName(originIata, flight.departure?.airport?.name || ''),
+        origin: getAirportChineseName(originIata, originAirport?.name || ''),
         originIata: originIata,
         destination: getAirportChineseName(cleanAirportCode, cleanAirportCode),
         destinationIata: cleanAirportCode,
         scheduledTime: formatTime(arrTime),
         estimatedTime: estTime ? formatTime(estTime) : undefined,
         status: getStatusText(flight.status || 'Unknown'),
-        terminal: flight.arrival?.terminal,
-        gate: flight.arrival?.gate,
+        terminal: movement?.terminal,
+        gate: movement?.gate,
       }
     })
 

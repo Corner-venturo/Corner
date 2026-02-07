@@ -16,6 +16,7 @@ interface MemberTableHeaderProps {
   showVehicleColumn: boolean
   customCostFields: Array<{ id: string; name: string; values: Record<string, string> }>
   columnVisibility?: ColumnVisibility
+  isEditMode?: boolean
 }
 
 const thClass = "border border-morandi-gold/20 px-2 py-2 text-left text-xs font-medium text-morandi-primary bg-morandi-gold/10"
@@ -32,6 +33,7 @@ export function MemberTableHeader({
   showVehicleColumn,
   customCostFields,
   columnVisibility,
+  isEditMode = false,
 }: MemberTableHeaderProps) {
   // 預設欄位顯示設定（訂金/尾款/應付金額 預設關閉）
   const cv = columnVisibility || {
@@ -52,14 +54,23 @@ export function MemberTableHeader({
     flight_cost: false,   // 機票金額預設關閉
   }
 
+  // 編輯模式下顯示拖曳欄位，需要調整序號和中文姓名的 left 位置
+  const seqLeft = isEditMode ? 'left-[28px]' : 'left-0'
+  const nameLeft = isEditMode ? 'left-[68px]' : 'left-[40px]'
+
   return (
     <thead className="sticky top-0 z-20 bg-[#f6f4f1]">
       <tr>
+        {/* 編輯模式：拖曳把手欄位 */}
+        {isEditMode && (
+          <th className={`${thStickyClass} left-0 min-w-[28px] w-[28px]`}></th>
+        )}
+
         {/* 凍結欄位：序號 */}
-        <th className={`${thStickyClass} left-0 min-w-[40px]`}>序</th>
+        <th className={`${thStickyClass} ${seqLeft} min-w-[40px]`}>序</th>
 
         {/* 凍結欄位：中文姓名 */}
-        <th className={`${thStickyClass} left-[40px] min-w-[80px]`}>中文姓名</th>
+        <th className={`${thStickyClass} ${nameLeft} min-w-[80px]`}>中文姓名</th>
 
         {/* 團體模式：訂單編號 */}
         {mode === 'tour' && orderCount > 1 && (

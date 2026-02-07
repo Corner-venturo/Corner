@@ -15,6 +15,21 @@ import { Plus, Printer, Hotel, Bus, Coins, Settings, Pencil, Plane, RefreshCw } 
 import { toast } from 'sonner'
 import { prompt } from '@/lib/ui/alert-dialog'
 import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuCheckboxItem,
@@ -139,6 +154,33 @@ export function OrderMembersExpandable({
   const effectiveOrderId = orderId || membersData.selectedOrderIdForAdd || (membersData.tourOrders.length === 1 ? membersData.tourOrders[0]?.id : undefined)
   const passportUpload = usePassportUpload({ orderId: effectiveOrderId, workspaceId, onSuccess: membersData.loadMembers })
   const { isRecognizing, recognizePassport } = useOcrRecognition()
+
+  // DnD Kit sensors for drag-and-drop sorting
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  // 處理拖曳結束
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (!over || active.id === over.id) return
+
+    const oldIndex = membersData.members.findIndex(m => m.id === active.id)
+    const newIndex = membersData.members.findIndex(m => m.id === over.id)
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      const newMembers = arrayMove(membersData.members, oldIndex, newIndex)
+      membersData.handleReorderMembers(newMembers)
+    }
+  }, [membersData])
 
   // 從 localStorage 讀取欄位顯示設定（v2: 2026-01-05 重置預設值）
   const COLUMN_VISIBILITY_KEY = 'memberListColumnVisibility_v2'
@@ -352,6 +394,28 @@ export function OrderMembersExpandable({
         return
       }
     }
+
+    // 領隊自動排第一：當設為領隊時，把該成員的 sort_order 改成 0
+    if (field === 'identity' && value === '領隊') {
+      const currentMember = membersData.members.find(m => m.id === memberId)
+      if (currentMember) {
+        // 更新本地狀態：領隊排第一，其他人順序不變
+        membersData.setMembers(membersData.members.map(m => 
+          m.id === memberId 
+            ? { ...m, identity: '領隊', sort_order: 0 } 
+            : m
+        ))
+        // 更新資料庫
+        try {
+          await supabase.from('order_members').update({ identity: '領隊', sort_order: 0 }).eq('id', memberId)
+          logger.info(`已將 ${currentMember.chinese_name} 設為領隊並排到第一位`)
+        } catch (error) {
+          logger.error('設定領隊失敗:', error)
+        }
+        return
+      }
+    }
+
     // 一般欄位更新
     membersData.setMembers(membersData.members.map(m => m.id === memberId ? { ...m, [field]: value } : m))
     try {
@@ -395,7 +459,8 @@ export function OrderMembersExpandable({
         return aKey - bKey
       })
     }
-    return membersData.members
+    // 按 sort_order 排序（領隊會是 0，排在最前面）
+    return [...membersData.members].sort((a, b) => (a.sort_order ?? 999) - (b.sort_order ?? 999))
   }, [membersData.members, roomVehicle.showRoomColumn, roomVehicle.roomSortKeys])
 
   return (
@@ -583,38 +648,48 @@ export function OrderMembersExpandable({
 
       {/* Table */}
       <div className="flex-1 overflow-auto">
-        <table className="w-full border-collapse text-sm">
-          <MemberTableHeader
-            mode={mode}
-            orderCount={membersData.orderCount}
-            showIdentityColumn={showIdentityColumn}
-            showPnrColumn={columnVisibility.pnr}
-            showRoomColumn={roomVehicle.showRoomColumn}
-            showVehicleColumn={roomVehicle.showVehicleColumn}
-            customCostFields={customCostFields}
-            columnVisibility={columnVisibility}
-          />
-          <tbody>
-            {sortedMembers.map((member, index) => (
-              <MemberRow
-                key={member.id}
-                member={member}
-                index={index}
-                isEditMode={isAllEditMode}
-                showIdentityColumn={showIdentityColumn}
-                showPnrColumn={columnVisibility.pnr}
-                showRoomColumn={roomVehicle.showRoomColumn}
-                showVehicleColumn={roomVehicle.showVehicleColumn}
-                showOrderCode={mode === 'tour' && membersData.orderCount > 1}
-                departureDate={membersData.departureDate}
-                roomAssignment={roomVehicle.roomAssignments[member.id]}
-                vehicleAssignment={roomVehicle.vehicleAssignments[member.id]}
-                pnrValue={pnrValues[member.id]}
-                customCostFields={customCostFields}
-                mode={mode}
-                columnVisibility={columnVisibility}
-                onUpdateField={handleUpdateField}
-                onDelete={membersData.handleDeleteMember}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <table className="w-full border-collapse text-sm member-table-inline">
+            <MemberTableHeader
+              mode={mode}
+              orderCount={membersData.orderCount}
+              showIdentityColumn={showIdentityColumn}
+              showPnrColumn={columnVisibility.pnr}
+              showRoomColumn={roomVehicle.showRoomColumn}
+              showVehicleColumn={roomVehicle.showVehicleColumn}
+              customCostFields={customCostFields}
+              columnVisibility={columnVisibility}
+              isEditMode={isAllEditMode}
+            />
+            <SortableContext
+              items={sortedMembers.map(m => m.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <tbody>
+                {sortedMembers.map((member, index) => (
+                  <MemberRow
+                    key={member.id}
+                    member={member}
+                    index={index}
+                    isEditMode={isAllEditMode}
+                    showIdentityColumn={showIdentityColumn}
+                    showPnrColumn={columnVisibility.pnr}
+                    showRoomColumn={roomVehicle.showRoomColumn}
+                    showVehicleColumn={roomVehicle.showVehicleColumn}
+                    showOrderCode={mode === 'tour' && membersData.orderCount > 1}
+                    departureDate={membersData.departureDate}
+                    roomAssignment={roomVehicle.roomAssignments[member.id]}
+                    vehicleAssignment={roomVehicle.vehicleAssignments[member.id]}
+                    pnrValue={pnrValues[member.id]}
+                    customCostFields={customCostFields}
+                    mode={mode}
+                    columnVisibility={columnVisibility}
+                    onUpdateField={handleUpdateField}
+                    onDelete={membersData.handleDeleteMember}
                 onEdit={memberEdit.openEditDialog}
                 onPreview={(member) => setPreviewMember(member)}
                 onPnrChange={(id, val) => setPnrValues({ ...pnrValues, [id]: val })}
@@ -629,10 +704,12 @@ export function OrderMembersExpandable({
                 onIdNumberSearch={(memberId, value, memberIndex) => {
                   customerMatch.checkCustomerMatchByIdNumber(value, memberIndex, membersData.members[memberIndex])
                 }}
-              />
-            ))}
-          </tbody>
-        </table>
+                  />
+                ))}
+              </tbody>
+            </SortableContext>
+          </table>
+        </DndContext>
       </div>
 
       {/* Dialogs */}

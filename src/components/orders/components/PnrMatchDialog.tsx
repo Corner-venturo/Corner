@@ -387,12 +387,23 @@ export function PnrMatchDialog({
 
       // 1. 更新現有成員的 PNR 和機票號碼
       if (matchedMembers.length > 0) {
-        const updates = matchedMembers.map(r => {
+        const updates = matchedMembers.map((r, idx) => {
           // 嘗試從解析結果找到該旅客的機票號碼
-          const ticketInfo = parsedPnr.ticketNumbers.find(t =>
-            t.passenger === r.pnrPassenger ||
-            t.passenger.includes(r.pnrPassenger.split('/')[0])
+          // 1. 先嘗試用旅客姓名匹配
+          let ticketInfo = parsedPnr.ticketNumbers.find(t =>
+            t.passenger && (
+              t.passenger === r.pnrPassenger ||
+              t.passenger.includes(r.pnrPassenger.split('/')[0])
+            )
           )
+          // 2. 如果沒找到，且票號數量與旅客數量相符，按順序配對
+          if (!ticketInfo && parsedPnr.ticketNumbers.length === matchedMembers.length) {
+            ticketInfo = parsedPnr.ticketNumbers[idx]
+          }
+          // 3. 如果只有一個票號，直接使用（單人 PNR 常見情況）
+          if (!ticketInfo && parsedPnr.ticketNumbers.length === 1) {
+            ticketInfo = parsedPnr.ticketNumbers[0]
+          }
           return {
             id: r.matchedMember!.id,
             pnr: recordLocator,
@@ -423,7 +434,8 @@ export function PnrMatchDialog({
 
       // 2. 從選擇的客戶建立新成員
       if (selectedCustomers.length > 0 && workspaceId) {
-        for (const result of selectedCustomers) {
+        for (let idx = 0; idx < selectedCustomers.length; idx++) {
+          const result = selectedCustomers[idx]
           const customer = result.suggestedCustomers.find(c => c.id === result.selectedCustomerId)
           if (!customer) continue
 
@@ -435,10 +447,21 @@ export function PnrMatchDialog({
           if (!targetOrderId) continue
 
           // 嘗試從解析結果找到該旅客的機票號碼
-          const ticketInfo = parsedPnr.ticketNumbers.find(t =>
-            t.passenger === result.pnrPassenger ||
-            t.passenger.includes(result.pnrPassenger.split('/')[0])
+          // 1. 先嘗試用旅客姓名匹配
+          let ticketInfo = parsedPnr.ticketNumbers.find(t =>
+            t.passenger && (
+              t.passenger === result.pnrPassenger ||
+              t.passenger.includes(result.pnrPassenger.split('/')[0])
+            )
           )
+          // 2. 如果沒找到，且票號數量與旅客數量相符，按順序配對
+          if (!ticketInfo && parsedPnr.ticketNumbers.length === selectedCustomers.length) {
+            ticketInfo = parsedPnr.ticketNumbers[idx]
+          }
+          // 3. 如果只有一個票號，直接使用
+          if (!ticketInfo && parsedPnr.ticketNumbers.length === 1) {
+            ticketInfo = parsedPnr.ticketNumbers[0]
+          }
 
           const newMember = {
             order_id: targetOrderId,

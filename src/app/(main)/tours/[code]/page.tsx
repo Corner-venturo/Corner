@@ -72,8 +72,6 @@ export default function TourDetailPage() {
         <ResponsiveHeader
           title="載入中..."
           icon={MapPin}
-          showBackButton
-          onBack={handleBack}
           breadcrumb={[
             { label: '首頁', href: '/' },
             { label: '旅遊團管理', href: '/tours' },
@@ -94,8 +92,6 @@ export default function TourDetailPage() {
         <ResponsiveHeader
           title="找不到旅遊團"
           icon={MapPin}
-          showBackButton
-          onBack={handleBack}
           breadcrumb={[
             { label: '首頁', href: '/' },
             { label: '旅遊團管理', href: '/tours' },
@@ -117,8 +113,6 @@ export default function TourDetailPage() {
       <ResponsiveHeader
         title={tour.name}
         icon={MapPin}
-        showBackButton
-        onBack={handleBack}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '旅遊團管理', href: '/tours' },

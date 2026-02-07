@@ -1413,6 +1413,29 @@ table input[type='number']:focus {
   outline: none;
 }
 
+/* 表格內嵌 select */
+table select {
+  background-color: transparent;
+  border: 0;
+  padding: 0.25rem 0.5rem;
+  height: auto;
+  width: 100%;
+  font-size: 0.875rem;
+  color: var(--input-text);
+  outline: none;
+}
+
+/* 團員名單表格 - 編輯模式與檢視模式樣式一致 */
+table.member-table-inline input[type='text'],
+table.member-table-inline input[type='number'],
+table.member-table-inline select {
+  font-size: 0.75rem !important; /* text-xs: 12px */
+  padding: 0 !important;
+  line-height: 1.25 !important;
+  font-family: inherit !important;
+  height: auto !important;
+}
+
 /* 無 focus 樣式的輸入框（用於文青風表格等場景） */
 .input-no-focus,
 .input-no-focus:focus,

@@ -15,6 +15,7 @@ import {
   ChevronDown,
   PlaneTakeoff,
   PlaneLanding,
+  X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
@@ -25,6 +26,12 @@ import {
 } from '../actions/flight-actions'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 type SearchMode = 'flight' | 'airport'
 type AirportDirection = 'departure' | 'arrival'
@@ -68,6 +75,7 @@ export function FlightWidget() {
   const [direction, setDirection] = useState<AirportDirection>('departure')
   const [destinationFilter, setDestinationFilter] = useState('')
   const [airportFlights, setAirportFlights] = useState<AirportFlightItem[]>([])
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   // 共用狀態
   const [error, setError] = useState<string | null>(null)
@@ -106,21 +114,16 @@ export function FlightWidget() {
 
   // 查詢航班號
   const handleSearchFlight = () => {
-    console.log('[FlightWidget] handleSearchFlight called', { flightNumber, queryDate })
-
     if (!flightNumber.trim()) {
       setError('請輸入航班號碼')
       return
     }
 
     startTransition(async () => {
-      console.log('[FlightWidget] Starting flight search...')
       setError(null)
       setFlightData(null)
       setAirportFlights([])
       const result = await searchFlightAction(flightNumber, queryDate)
-
-      console.log('[FlightWidget] Flight search result:', result)
 
       if (result.error) {
         setError(result.error)
@@ -133,15 +136,12 @@ export function FlightWidget() {
 
   // 查詢機場航班
   const handleSearchAirport = () => {
-    console.log('[FlightWidget] handleSearchAirport called', { airportCode, queryDate, destinationFilter })
-
     if (!airportCode.trim()) {
       setError('請選擇機場')
       return
     }
 
     startTransition(async () => {
-      console.log('[FlightWidget] Starting search...')
       setError(null)
       setFlightData(null)
       setAirportFlights([])
@@ -152,12 +152,11 @@ export function FlightWidget() {
         destinationFilter || undefined
       )
 
-      console.log('[FlightWidget] Search result:', result)
-
       if (result.error) {
         setError(result.error)
       } else if (result.data) {
         setAirportFlights(result.data)
+        setIsDialogOpen(true)
         saveQuery()
       }
     })
@@ -268,16 +267,16 @@ export function FlightWidget() {
                 />
               </div>
             ) : (
-              /* 機場查詢表單 */
-              <>
+              /* 機場查詢表單 - 出發和目的地左右並排 */
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5">
-                    <Building2 className="w-3.5 h-3.5" />
-                    出發機場
+                    <PlaneTakeoff className="w-3.5 h-3.5" />
+                    出發
                   </label>
                   <Select value={airportCode} onValueChange={setAirportCode}>
                     <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm">
-                      <SelectValue placeholder="選擇機場" />
+                      <SelectValue placeholder="選擇" />
                     </SelectTrigger>
                     <SelectContent>
                       {COMMON_AIRPORTS.map(airport => (
@@ -291,18 +290,18 @@ export function FlightWidget() {
                 <div>
                   <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5">
                     <PlaneLanding className="w-3.5 h-3.5" />
-                    目的地（選填）
+                    目的地
                   </label>
                   <input
                     type="text"
                     value={destinationFilter}
                     onChange={e => setDestinationFilter(toHalfWidth(e.target.value).toUpperCase())}
                     onKeyPress={handleKeyPress}
-                    placeholder="例如: NRT, Tokyo"
+                    placeholder="NRT"
                     className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm placeholder:text-morandi-secondary/50"
                   />
                 </div>
-              </>
+              </div>
             )}
 
             {/* 日期選擇 */}
@@ -449,66 +448,81 @@ export function FlightWidget() {
             </div>
           )}
 
-          {/* 機場航班列表結果 */}
-          {airportFlights.length > 0 && !error && (
-            <div className="flex-1 rounded-xl bg-card/70 shadow-md border border-border/40 overflow-hidden flex flex-col">
-              {/* 標題列 */}
-              <div className="px-4 py-2.5 bg-card/50 border-b border-border/40 flex items-center justify-between">
-                <p className="text-xs font-semibold text-morandi-primary">
-                  {airportCode} 出發航班
-                </p>
-                <p className="text-xs text-morandi-secondary">
-                  共 {airportFlights.length} 班
-                </p>
-              </div>
-
-              {/* 航班列表 */}
-              <div className="flex-1 overflow-auto">
-                <table className="w-full text-xs">
-                  <thead className="bg-card/30 sticky top-0">
-                    <tr>
-                      <th className="px-3 py-2 text-left font-semibold text-morandi-secondary">時間</th>
-                      <th className="px-3 py-2 text-left font-semibold text-morandi-secondary">航班</th>
-                      <th className="px-3 py-2 text-left font-semibold text-morandi-secondary">目的地</th>
-                      <th className="px-3 py-2 text-left font-semibold text-morandi-secondary">狀態</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/30">
-                    {airportFlights.map((flight, idx) => (
-                      <tr key={`${flight.flightNumber}-${idx}`} className="hover:bg-card/30">
-                        <td className="px-3 py-2 font-medium text-morandi-primary">
-                          {flight.scheduledTime}
-                        </td>
-                        <td className="px-3 py-2">
-                          <div>
-                            <p className="font-medium text-morandi-primary">{flight.flightNumber}</p>
-                            <p className="text-[10px] text-morandi-secondary truncate max-w-[80px]">
-                              {flight.airline}
-                            </p>
-                          </div>
-                        </td>
-                        <td className="px-3 py-2">
-                          <div>
-                            <p className="font-medium text-morandi-primary">{flight.destinationIata}</p>
-                            <p className="text-[10px] text-morandi-secondary truncate max-w-[80px]">
-                              {flight.destination}
-                            </p>
-                          </div>
-                        </td>
-                        <td className="px-3 py-2">
-                          <span className={cn('text-[10px] px-1.5 py-0.5 rounded font-medium', getStatusColor(flight.status))}>
-                            {flight.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
         </div>
       </div>
+
+      {/* 機場航班列表 Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent level={1} className="max-w-4xl max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-morandi-gold/10">
+                <PlaneTakeoff className="w-5 h-5 text-morandi-gold" />
+              </div>
+              <div>
+                <span className="text-lg font-semibold text-morandi-primary">
+                  {COMMON_AIRPORTS.find(a => a.code === airportCode)?.name || airportCode} 機場出發航班
+                </span>
+                <p className="text-sm text-morandi-secondary font-normal mt-0.5">
+                  {queryDate} · 共 {airportFlights.length} 班航班
+                </p>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="flex-1 overflow-auto mt-4 rounded-lg border border-border">
+            <table className="w-full text-sm">
+              <thead className="bg-muted sticky top-0">
+                <tr>
+                  <th className="px-3 py-3 text-left font-semibold text-morandi-primary">時間</th>
+                  <th className="px-3 py-3 text-left font-semibold text-morandi-primary">航班</th>
+                  <th className="px-3 py-3 text-center font-semibold text-morandi-primary">出發</th>
+                  <th className="px-2 py-3 text-center font-semibold text-morandi-secondary w-8"></th>
+                  <th className="px-3 py-3 text-center font-semibold text-morandi-primary">抵達</th>
+                  <th className="px-3 py-3 text-left font-semibold text-morandi-primary">航廈</th>
+                  <th className="px-3 py-3 text-left font-semibold text-morandi-primary">狀態</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {airportFlights.map((flight, idx) => (
+                  <tr key={`${flight.flightNumber}-${idx}`} className="hover:bg-muted/50 transition-colors">
+                    <td className="px-3 py-3">
+                      <p className="font-semibold text-morandi-primary">{flight.scheduledTime}</p>
+                      {flight.estimatedTime && flight.estimatedTime !== flight.scheduledTime && (
+                        <p className="text-xs text-morandi-secondary">預計 {flight.estimatedTime}</p>
+                      )}
+                    </td>
+                    <td className="px-3 py-3">
+                      <p className="font-mono font-medium text-morandi-primary">{flight.flightNumber}</p>
+                      <p className="text-xs text-morandi-secondary truncate max-w-[100px]">{flight.airline}</p>
+                    </td>
+                    <td className="px-3 py-3 text-center">
+                      <p className="font-bold text-morandi-primary">{airportCode}</p>
+                      <p className="text-xs text-morandi-secondary">{COMMON_AIRPORTS.find(a => a.code === airportCode)?.name || ''}</p>
+                    </td>
+                    <td className="px-2 py-3 text-center">
+                      <ArrowRight className="w-4 h-4 text-morandi-secondary/50 mx-auto" />
+                    </td>
+                    <td className="px-3 py-3 text-center">
+                      <p className="font-bold text-morandi-primary">{flight.destinationIata}</p>
+                      <p className="text-xs text-morandi-secondary truncate max-w-[80px] mx-auto">{flight.destination}</p>
+                    </td>
+                    <td className="px-3 py-3 text-morandi-secondary text-xs">
+                      {flight.terminal ? `T${flight.terminal}` : '-'}
+                      {flight.gate && ` · ${flight.gate}`}
+                    </td>
+                    <td className="px-3 py-3">
+                      <span className={cn('text-xs px-2 py-1 rounded-full font-medium', getStatusColor(flight.status))}>
+                        {flight.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

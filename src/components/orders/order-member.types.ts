@@ -52,6 +52,8 @@ export interface OrderMember {
   customer_verification_status?: string | null
   // 團體模式額外欄位
   order_code?: string | null
+  // 排序順序
+  sort_order?: number | null
 }
 
 // ============================================

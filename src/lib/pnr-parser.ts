@@ -615,14 +615,37 @@ export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
       continue;
     }
 
-    // 7. 解析機票號碼 FA 行 (e.g., "11 FA PAX 731-6328181969/ETMF/TWD44194/02JAN26/...")
+    // 7. 解析機票號碼 FA 行 (e.g., "11 FA PAX 731-6328181969/ETMF/TWD44194/02JAN26/.../P1")
+    // FA 行可能跨兩行，P1/P2 在行末或下一行
     const faMatch = line.match(/(?:^\d+\s+)?FA\s+PAX\s+(\d{3})-?(\d{10,})/i);
     if (faMatch) {
+      const ticketNumber = `${faMatch[1]}-${faMatch[2]}`;
+      // 嘗試從當前行或下一行提取 /P1, /P2 等旅客編號
+      let passengerIndex: number | null = null;
+      const pMatch = line.match(/\/P(\d+)\s*$/i);
+      if (pMatch) {
+        passengerIndex = parseInt(pMatch[1], 10);
+      } else {
+        // 檢查下一行是否有 /P1, /P2
+        const nextLineIndex = lines.indexOf(line) + 1;
+        if (nextLineIndex < lines.length) {
+          const nextLine = lines[nextLineIndex];
+          const nextPMatch = nextLine.match(/\/P(\d+)\s*$/i);
+          if (nextPMatch) {
+            passengerIndex = parseInt(nextPMatch[1], 10);
+          }
+        }
+      }
+      // 根據旅客編號找到對應的旅客姓名
+      let passengerName = '';
+      if (passengerIndex !== null && passengerIndex > 0 && passengerIndex <= result.passengerNames.length) {
+        passengerName = result.passengerNames[passengerIndex - 1]; // P1 = index 0
+      }
       result.ticketNumbers.push({
-        number: `${faMatch[1]}-${faMatch[2]}`,
-        passenger: '',
+        number: ticketNumber,
+        passenger: passengerName,
       });
-      logger.log('    ✅ 找到機票號碼:', `${faMatch[1]}-${faMatch[2]}`);
+      logger.log('    ✅ 找到機票號碼:', ticketNumber, passengerIndex ? `(P${passengerIndex}: ${passengerName})` : '');
       continue;
     }
   }

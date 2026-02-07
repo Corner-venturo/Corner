@@ -8075,6 +8075,7 @@ export type Database = {
           profit: number | null
           remarks: string | null
           selling_price: number | null
+          sort_order: number | null
           special_meal: string | null
           ticket_number: string | null
           ticketing_deadline: string | null
@@ -8122,6 +8123,7 @@ export type Database = {
           profit?: number | null
           remarks?: string | null
           selling_price?: number | null
+          sort_order?: number | null
           special_meal?: string | null
           ticket_number?: string | null
           ticketing_deadline?: string | null
@@ -8169,6 +8171,7 @@ export type Database = {
           profit?: number | null
           remarks?: string | null
           selling_price?: number | null
+          sort_order?: number | null
           special_meal?: string | null
           ticket_number?: string | null
           ticketing_deadline?: string | null
