@@ -12,6 +12,7 @@ import type { CostCategory, CostItem } from '../types'
 // 支援兩種 daily itinerary 類型
 interface DailyItineraryItem {
   accommodation?: string
+  isSameAccommodation?: boolean
   [key: string]: unknown
 }
 import type { Json } from '@/lib/supabase/types'
@@ -72,18 +73,29 @@ export async function syncHotelsFromQuoteToItinerary(
 
     const dailyItinerary = (itinerary.daily_itinerary || []) as unknown as DailyItineraryItem[]
 
-    // 3. 根據報價單住宿項目更新行程表
+    // 3. 根據報價單住宿項目更新行程表（包含續住標記）
     let updated = false
     const updatedDailyItinerary = dailyItinerary.map((day, index) => {
       const dayNumber = index + 1
-      // 找到對應天數的住宿項目
+      // 找到對應天數的住宿項目（取第一個，通常是主要的飯店名稱）
       const hotelItem = accommodationItems.find(item => item.day === dayNumber)
 
-      if (hotelItem && hotelItem.name && day.accommodation !== hotelItem.name) {
+      if (!hotelItem) return day
+
+      // 檢查是否為續住
+      const isSameAsPrevious = hotelItem.is_same_as_previous || false
+      
+      // 檢查是否需要更新
+      const needsUpdate = 
+        (hotelItem.name && day.accommodation !== hotelItem.name) ||
+        (day.isSameAccommodation !== isSameAsPrevious)
+
+      if (needsUpdate) {
         updated = true
         return {
           ...day,
-          accommodation: hotelItem.name,
+          accommodation: hotelItem.name || day.accommodation,
+          isSameAccommodation: isSameAsPrevious,
         }
       }
       return day
@@ -188,12 +200,20 @@ export async function syncHotelsFromItineraryToQuote(
     const updatedItems = accommodationCategory.items.map(item => {
       if (item.day && item.day > 0 && item.day <= dailyItinerary.length) {
         const dayItinerary = dailyItinerary[item.day - 1]
-        if (dayItinerary.accommodation && item.name !== dayItinerary.accommodation) {
+        const isSameAsPrevious = Boolean(dayItinerary.isSameAccommodation)
+        
+        // 檢查是否需要更新（名稱或續住標記）
+        const needsUpdate = 
+          (dayItinerary.accommodation && item.name !== dayItinerary.accommodation) ||
+          (Boolean(item.is_same_as_previous) !== isSameAsPrevious)
+        
+        if (needsUpdate) {
           updated = true
           return {
             ...item,
-            name: dayItinerary.accommodation,
-          }
+            name: dayItinerary.accommodation || item.name,
+            is_same_as_previous: isSameAsPrevious,
+          } as CostItem
         }
       }
       return item
