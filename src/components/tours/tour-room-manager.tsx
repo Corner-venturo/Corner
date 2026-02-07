@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Hotel, Plus, Check, Loader2 } from 'lucide-react'
+import { Hotel, Plus, Check, Loader2, FileText } from 'lucide-react'
 import { toast } from 'sonner'
 import { confirm } from '@/lib/ui/alert-dialog'
 import type { TourRoomStatus } from '@/types/room-vehicle.types'
@@ -22,12 +22,15 @@ import { RoomList } from './components/RoomList'
 import { MemberAssignmentPanel } from './components/MemberAssignmentPanel'
 import { AddRoomDialog } from './components/AddRoomDialog'
 import { EditRoomDialog } from './components/EditRoomDialog'
+import { RoomingListExport } from './components/RoomingListExport'
 
 // 此元件只需要 OrderMember 的部分欄位
 type MemberBasic = Pick<OrderMember, 'id' | 'chinese_name' | 'passport_name'>
 
 interface TourInfo {
   id: string
+  code?: string
+  name?: string
   departure_date: string
   return_date: string
 }
@@ -49,6 +52,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
   const [addRoomOpen, setAddRoomOpen] = useState(false)
   const [editRoomOpen, setEditRoomOpen] = useState(false)
   const [editingRoom, setEditingRoom] = useState<TourRoomStatus | null>(null)
+  const [roomingListOpen, setRoomingListOpen] = useState(false)
 
   // 使用自定義 Hooks
   const { rooms, assignments, loading, reload } = useRoomData({ tourId, open })
@@ -219,6 +223,14 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
               <div className="flex items-center gap-2 ml-auto">
                 <Button
                   variant="outline"
+                  onClick={() => setRoomingListOpen(true)}
+                  className="gap-1.5"
+                >
+                  <FileText className="h-4 w-4" />
+                  輸出分房總表
+                </Button>
+                <Button
+                  variant="outline"
                   onClick={() => setAddRoomOpen(true)}
                   className="gap-1.5"
                 >
@@ -287,6 +299,19 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
         open={editRoomOpen}
         onOpenChange={setEditRoomOpen}
         onSuccess={reload}
+      />
+
+      {/* 輸出分房總表 */}
+      <RoomingListExport
+        open={roomingListOpen}
+        onOpenChange={setRoomingListOpen}
+        tourCode={tour?.code || ''}
+        tourName={tour?.name || ''}
+        departureDate={tour?.departure_date || ''}
+        returnDate={tour?.return_date || ''}
+        rooms={rooms}
+        assignments={assignments}
+        members={members}
       />
     </>
   )

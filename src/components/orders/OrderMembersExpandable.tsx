@@ -811,6 +811,8 @@ export function OrderMembersExpandable({
         tourId={tourId}
         tour={membersData.departureDate && membersData.returnDate ? {
           id: tourId,
+          code: effectiveTour?.code,
+          name: effectiveTour?.name,
           departure_date: membersData.departureDate,
           return_date: membersData.returnDate,
         } : undefined}
