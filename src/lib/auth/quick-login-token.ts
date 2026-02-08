@@ -3,9 +3,9 @@
  * 使用 HMAC-SHA256 簽名防止偽造
  */
 
-// 🔧 使用固定 secret（內部系統，不需要從環境變數讀取）
-// 這確保瀏覽器和 middleware 使用相同的 secret
-const QUICK_LOGIN_SECRET = 'venturo_quick_login_secret_2024_internal_system'
+// Quick Login Secret - 用於 client 和 middleware 共用
+// ⚠️ 使用 NEXT_PUBLIC_ 讓 client 可存取，Production 請設定強密鑰
+const QUICK_LOGIN_SECRET = process.env.NEXT_PUBLIC_QUICK_LOGIN_SECRET || 'venturo_dev_quick_login_local_only'
 const TOKEN_EXPIRY_MS = 8 * 60 * 60 * 1000 // 8 小時
 
 /**

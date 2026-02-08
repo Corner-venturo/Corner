@@ -284,7 +284,7 @@ export function TourPrintDialog({
     XLSX.writeFile(workbook, fileName)
   }
 
-  // ==================== 列印航班確認單 ====================
+  // ==================== 列印航班確認單（電子機票格式）====================
   const handlePrintFlightConfirmation = () => {
     const printMembers = members.filter(m => selectedMembers.has(m.id))
 
@@ -300,7 +300,7 @@ export function TourPrintDialog({
       const year = new Date().getFullYear()
       const date = new Date(year, month, day)
       const days = ['日', '一', '二', '三', '四', '五', '六']
-      return `${String(month + 1).padStart(2, '0')}月${String(day).padStart(2, '0')}日(${days[date.getDay()]})`
+      return `${String(month + 1).padStart(2, '0')}月${String(day).padStart(2, '0')}日 (${days[date.getDay()]})`
     }
 
     // 格式化時間 (e.g., "1110" -> "11:10")
@@ -311,58 +311,57 @@ export function TourPrintDialog({
 
     // 產生每位旅客的確認單
     const pages = printMembers.map((member, index) => {
-      const passengerName = member.passport_name?.toUpperCase() || member.chinese_name || '未知'
+      // 格式化護照姓名：LEE/WAILAN → LEE / WAILAN
+      const formatPassportName = (name: string) => {
+        return name.toUpperCase().replace('/', ' / ')
+      }
+      const passengerName = member.passport_name
+        ? formatPassportName(member.passport_name)
+        : member.chinese_name || '未知'
 
       // 找到該旅客的 PNR
       const memberPnr = pnrData.find(p => p.record_locator === member.pnr)
       const segments: PNRSegment[] = memberPnr?.segments || []
 
-      // 航班資訊行
-      const flightRows: string[] = []
+      // 航班卡片 HTML
+      const flightCards: string[] = []
 
       if (segments.length > 0) {
         // 從 PNR segments 產生航班資訊
         segments.forEach((seg) => {
-          const airlineName = getAirlineName(seg.airline)
-          // 優先使用儲存的 duration，否則計算
           const duration = seg.duration || calculateDuration(seg.departureTime, seg.arrivalTime)
           const className = getClassName(seg.class)
-          const statusName = getStatusName(seg.status)
-          // 新增欄位
-          const depTerminal = seg.departureTerminal ? `航站${seg.departureTerminal}` : ''
-          const arrTerminal = seg.arrivalTerminal ? `航站${seg.arrivalTerminal}` : ''
-          const directFlight = seg.isDirect ? '/直飛' : ''
-          const mealInfo = seg.meal ? `/${seg.meal}` : ''
-          // 經停資訊
-          const viaInfo = seg.via && seg.via.length > 0
-            ? `<div class="via-info">經停: ${seg.via.map(v => `${v.city}${v.duration ? ` (${v.duration})` : ''}`).join(', ')}</div>`
-            : ''
+          const depCity = getAirportName(seg.origin) || seg.origin
+          const arrCity = getAirportName(seg.destination) || seg.destination
 
-          flightRows.push(`
-            <tr class="flight-header">
-              <td colspan="2">
-                <div class="flight-main">
-                  <strong>${airlineName}(${seg.airline}${seg.flightNumber})</strong>
-                  <span class="flight-meta">${duration ? `飛行${duration}` : ''}${directFlight}</span>
+          flightCards.push(`
+            <div class="flight-card">
+              <div class="flight-header-row">
+                <span class="flight-number">${seg.airline}${seg.flightNumber}</span>
+                <span class="flight-date">${formatPnrDate(seg.departureDate)}</span>
+              </div>
+              <div class="flight-content">
+                <div class="flight-departure">
+                  <div class="flight-label">出發 DEPART</div>
+                  <div class="flight-time">${formatTime(seg.departureTime)}</div>
+                  <div class="flight-airport">${seg.origin} ${depCity}</div>
                 </div>
-              </td>
-              <td class="flight-extra">
-                <span>/${className}</span>
-                <span>/${statusName}</span>
-              </td>
-            </tr>
-            <tr class="flight-detail">
-              <td class="flight-date">${formatPnrDate(seg.departureDate)}</td>
-              <td class="flight-times">
-                <div>${formatTime(seg.departureTime)} 出發: ${seg.origin ? `${getAirportName(seg.origin)}(${seg.origin})` : '待確認'}${depTerminal ? ` ${depTerminal}` : ''}</div>
-                <div>${formatTime(seg.arrivalTime)} 抵達: ${seg.destination ? `${getAirportName(seg.destination)}(${seg.destination})` : '待確認'}${arrTerminal ? ` ${arrTerminal}` : ''}</div>
-                ${viaInfo}
-              </td>
-              <td class="flight-extra">
-                ${seg.aircraft ? `<span>/${seg.aircraft}</span>` : ''}
-                ${mealInfo ? `<span>${mealInfo}</span>` : ''}
-              </td>
-            </tr>
+                <div class="flight-middle">
+                  <div class="flight-path">
+                    <span class="path-line"></span>
+                    <span class="path-icon">✈</span>
+                    <span class="path-line with-arrow"></span>
+                  </div>
+                  <div class="flight-duration">${duration || ''}</div>
+                  <div class="flight-class">經濟艙 ${className}</div>
+                </div>
+                <div class="flight-arrival">
+                  <div class="flight-label">抵達 ARRIVE</div>
+                  <div class="flight-time">${formatTime(seg.arrivalTime)}</div>
+                  <div class="flight-airport">${arrCity} ${seg.destination}</div>
+                </div>
+              </div>
+            </div>
           `)
         })
       } else if (tour.outbound_flight || tour.return_flight) {
@@ -371,109 +370,122 @@ export function TourPrintDialog({
         const returnFlight = tour.return_flight
 
         if (outbound) {
-          const airlineCode = outbound.airline || ''
-          const airlineName = getAirlineName(airlineCode)
-          flightRows.push(`
-            <tr class="flight-header">
-              <td colspan="2">
-                <div class="flight-main">
-                  <strong>${airlineName}(${airlineCode}${outbound.flightNumber})</strong>
-                  <span class="flight-meta">${outbound.duration ? `飛行${outbound.duration}` : ''}</span>
+          const depCity = getAirportName(outbound.departureAirport || '') || outbound.departureAirport
+          const arrCity = getAirportName(outbound.arrivalAirport || '') || outbound.arrivalAirport
+          flightCards.push(`
+            <div class="flight-card">
+              <div class="flight-header-row">
+                <span class="flight-number">${outbound.airline}${outbound.flightNumber}</span>
+                <span class="flight-date">${tour.departure_date || ''}</span>
+              </div>
+              <div class="flight-content">
+                <div class="flight-departure">
+                  <div class="flight-label">出發 DEPART</div>
+                  <div class="flight-time">${outbound.departureTime || '--:--'}</div>
+                  <div class="flight-airport">${outbound.departureAirport} ${depCity}</div>
                 </div>
-              </td>
-              <td class="flight-extra"></td>
-            </tr>
-            <tr class="flight-detail">
-              <td class="flight-date">${tour.departure_date}</td>
-              <td class="flight-times">
-                <div>${outbound.departureTime} 出發: ${outbound.departureAirport ? `${getAirportName(outbound.departureAirport)}(${outbound.departureAirport})` : '待確認'}</div>
-                <div>${outbound.arrivalTime} 抵達: ${outbound.arrivalAirport ? `${getAirportName(outbound.arrivalAirport)}(${outbound.arrivalAirport})` : '待確認'}</div>
-              </td>
-              <td class="flight-extra"></td>
-            </tr>
+                <div class="flight-middle">
+                  <div class="flight-path">
+                    <span class="path-line"></span>
+                    <span class="path-icon">✈</span>
+                    <span class="path-line with-arrow"></span>
+                  </div>
+                  <div class="flight-duration">${outbound.duration || ''}</div>
+                  <div class="flight-class">經濟艙 Economy</div>
+                </div>
+                <div class="flight-arrival">
+                  <div class="flight-label">抵達 ARRIVE</div>
+                  <div class="flight-time">${outbound.arrivalTime || '--:--'}</div>
+                  <div class="flight-airport">${arrCity} ${outbound.arrivalAirport}</div>
+                </div>
+              </div>
+            </div>
           `)
         }
 
         if (returnFlight) {
-          const airlineCode = returnFlight.airline || ''
-          const airlineName = getAirlineName(airlineCode)
-          flightRows.push(`
-            <tr class="flight-header">
-              <td colspan="2">
-                <div class="flight-main">
-                  <strong>${airlineName}(${airlineCode}${returnFlight.flightNumber})</strong>
-                  <span class="flight-meta">${returnFlight.duration ? `飛行${returnFlight.duration}` : ''}</span>
+          const depCity = getAirportName(returnFlight.departureAirport || '') || returnFlight.departureAirport
+          const arrCity = getAirportName(returnFlight.arrivalAirport || '') || returnFlight.arrivalAirport
+          flightCards.push(`
+            <div class="flight-card">
+              <div class="flight-header-row">
+                <span class="flight-number">${returnFlight.airline}${returnFlight.flightNumber}</span>
+                <span class="flight-date">${tour.return_date || ''}</span>
+              </div>
+              <div class="flight-content">
+                <div class="flight-departure">
+                  <div class="flight-label">出發 DEPART</div>
+                  <div class="flight-time">${returnFlight.departureTime || '--:--'}</div>
+                  <div class="flight-airport">${returnFlight.departureAirport} ${depCity}</div>
                 </div>
-              </td>
-              <td class="flight-extra"></td>
-            </tr>
-            <tr class="flight-detail">
-              <td class="flight-date">${tour.return_date}</td>
-              <td class="flight-times">
-                <div>${returnFlight.departureTime} 出發: ${returnFlight.departureAirport ? `${getAirportName(returnFlight.departureAirport)}(${returnFlight.departureAirport})` : '待確認'}</div>
-                <div>${returnFlight.arrivalTime} 抵達: ${returnFlight.arrivalAirport ? `${getAirportName(returnFlight.arrivalAirport)}(${returnFlight.arrivalAirport})` : '待確認'}</div>
-              </td>
-              <td class="flight-extra"></td>
-            </tr>
+                <div class="flight-middle">
+                  <div class="flight-path">
+                    <span class="path-line"></span>
+                    <span class="path-icon">✈</span>
+                    <span class="path-line with-arrow"></span>
+                  </div>
+                  <div class="flight-duration">${returnFlight.duration || ''}</div>
+                  <div class="flight-class">經濟艙 Economy</div>
+                </div>
+                <div class="flight-arrival">
+                  <div class="flight-label">抵達 ARRIVE</div>
+                  <div class="flight-time">${returnFlight.arrivalTime || '--:--'}</div>
+                  <div class="flight-airport">${arrCity} ${returnFlight.arrivalAirport}</div>
+                </div>
+              </div>
+            </div>
           `)
         }
       }
 
       return `
         <div class="page" style="${index > 0 ? 'page-break-before: always;' : ''}">
+          <!-- Watermark - 潮牌風格垂直貼右邊 -->
+          <div class="watermark">
+            <img src="/corner-logo.png" alt="" />
+          </div>
+
+          <!-- Content Area -->
           <div class="content">
+            <!-- Header -->
             <div class="header">
-              <div class="company">角落旅行社股份有限公司</div>
-              <div class="address">台北市大同區重慶北路一段67號八樓之二</div>
-              <table class="contact-table">
-                <tr>
-                  <td>電話: 886-2-77516051</td>
-                  <td>承辦人: -</td>
-                </tr>
-                <tr>
-                  <td>傳真: 886-2-25553098</td>
-                  <td>電子郵件: sales@cornertravel.com.tw</td>
-                </tr>
-              </table>
+              <div class="header-left">
+                <div class="company-name">角落旅行社股份有限公司</div>
+                <div class="ticket-label">電子機票號碼 E-TICKET NUMBER</div>
+                <div class="ticket-number">${member.ticket_number || '尚未開票'}</div>
+              </div>
+              <div class="header-right">
+                <div class="pnr-label">電腦代號 PNR</div>
+                <div class="pnr-box">${member.pnr || '-'}</div>
+              </div>
             </div>
 
-            <div class="pnr-info">
-              電腦代號：${member.pnr || '-'}
+            <!-- Divider -->
+            <div class="divider"></div>
+
+            <!-- Passenger Name -->
+            <div class="passenger-section">
+              <div class="passenger-label">旅客姓名 PASSENGER NAME</div>
+              <div class="passenger-name">
+                <span class="name-bar"></span>
+                ${passengerName}
+              </div>
             </div>
 
-            <div class="notice">
-              **** 此文件資訊僅提供參考, 實際資訊以航空公司及相關旅遊供應商為準 ****
-            </div>
-
-            <div class="passenger">
-              旅客姓名: ${passengerName}
-              ${member.special_meal ? `<span class="meal">(餐食: ${member.special_meal})</span>` : ''}
-            </div>
-
-            <table class="flight-table">
-              <thead>
-                <tr>
-                  <th style="width: 85px;">日期</th>
-                  <th>時間 / 航班資訊</th>
-                  <th style="width: 80px;">其他訊息</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${flightRows.length > 0 ? flightRows.join('') : '<tr><td colspan="3" style="padding: 20px; text-align: center; color: #999;">尚無航班資訊</td></tr>'}
-              </tbody>
-            </table>
-
-            <div class="ticket-info">
-              機票號碼: ${member.ticket_number || '尚未開票'} - ${passengerName}
+            <!-- Flight Cards -->
+            <div class="flights-section">
+              ${flightCards.length > 0 ? flightCards.join('') : '<div class="no-flight">尚無航班資訊</div>'}
             </div>
           </div>
 
+          <!-- Footer - 固定在底部 -->
           <div class="footer">
-            <div class="footer-line"></div>
-            <div class="footer-content">
-              <img src="/corner-logo.png" alt="Corner Travel" class="footer-logo" onerror="this.style.display='none'" />
-              <div class="slogan-cn">如果可以，讓我們一起探索世界的每個角落</div>
-              <div class="copyright">角落旅行社股份有限公司 © ${new Date().getFullYear()}</div>
+            <div class="footer-notice">**** 此文件資訊僅供參考，實際資訊以航空公司及相關旅遊供應商為準 ****</div>
+            <div class="footer-contact">
+              <span>📍 台北市大同區重慶北路一段67號八樓之二</span>
+              <span>📞 886-2-77516051</span>
+              <span>📠 886-2-25553098</span>
+              <span>✉ sales@cornertravel.com.tw</span>
             </div>
           </div>
         </div>
@@ -484,184 +496,310 @@ export function TourPrintDialog({
       <!DOCTYPE html>
       <html>
         <head>
-          <title>航班確認單 - ${tour.code}</title>
+          <title>電子機票 - ${tour.code}</title>
           <style>
             @page {
               size: A4;
-              margin: 10mm;
+              margin: 15mm;
             }
             * {
               box-sizing: border-box;
-            }
-            html, body {
               margin: 0;
               padding: 0;
+            }
+            html, body {
               width: 210mm;
               min-height: 297mm;
             }
             body {
-              font-family: 'Microsoft JhengHei', Arial, sans-serif;
-              font-size: 13px;
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+              font-size: 14px;
               line-height: 1.5;
               background: white;
+              color: #333;
             }
             .page {
               width: 210mm;
-              min-height: 297mm;
-              padding: 15mm 20mm;
+              height: 297mm;
+              padding: 18mm 20mm;
+              position: relative;
               display: flex;
               flex-direction: column;
+              overflow: hidden;
+              box-sizing: border-box;
             }
             .content {
               flex: 1;
+              min-height: 0;
             }
-            .header { margin-bottom: 15px; }
-            .company { font-size: 16px; font-weight: bold; }
-            .address { font-size: 11px; color: #666; margin-top: 2px; }
-            .contact-table {
-              width: 100%;
-              font-size: 11px;
-              margin-top: 8px;
-              border-collapse: collapse;
-            }
-            .contact-table td { padding: 1px 0; }
-            .pnr-info {
-              margin: 12px 0;
-              padding: 8px 10px;
-              background: #f5f5f5;
-              font-family: monospace;
-              font-size: 12px;
-            }
-            .notice {
-              text-align: center;
-              color: #999;
-              font-size: 10px;
-              margin: 10px 0;
-            }
-            .passenger {
-              font-size: 13px;
-              font-weight: bold;
-              margin: 12px 0;
-            }
-            .passenger .meal {
-              font-weight: normal;
-              color: #666;
-              font-size: 11px;
-            }
-            .flight-table {
-              width: 100%;
-              border-collapse: collapse;
-              border: 1px solid #ddd;
-              margin: 10px 0;
-            }
-            .flight-table th {
-              background: #f0f0f0;
-              padding: 8px;
-              text-align: left;
-              border: 1px solid #ddd;
-              font-size: 12px;
-            }
-            .flight-table td {
-              padding: 6px 8px;
-              vertical-align: top;
-              font-size: 12px;
-            }
-            .ticket-info {
-              margin-top: 15px;
-              padding: 8px 10px;
-              background: #fffbe6;
-              border: 1px solid #ffe58f;
-              font-size: 12px;
-            }
-            /* Flight table styles */
-            .flight-header td {
-              padding: 8px 8px 3px;
-              border-bottom: 1px dashed #ccc;
-              vertical-align: top;
-            }
-            .flight-detail td {
-              padding: 3px 8px 8px;
-              vertical-align: top;
-            }
-            .flight-main {
+
+            /* Header */
+            .header {
               display: flex;
               justify-content: space-between;
-              align-items: center;
-            }
-            .flight-meta {
-              color: #666;
-              font-size: 11px;
-            }
-            .flight-date {
-              width: 90px;
-              white-space: nowrap;
-            }
-            .flight-times {
-              line-height: 1.6;
-            }
-            .flight-extra {
-              width: 80px;
-              text-align: right;
-              font-size: 11px;
-              color: #666;
-            }
-            .flight-extra span {
-              display: block;
-            }
-            .via-info {
-              margin-top: 4px;
-              padding: 3px 8px;
-              background: #fff7e6;
-              border: 1px solid #ffd591;
-              border-radius: 3px;
-              color: #d46b08;
-              font-size: 11px;
-            }
-            /* Footer styles */
-            .footer {
-              margin-top: auto;
-              padding-top: 20px;
-              text-align: center;
-            }
-            .footer-line {
-              width: 100%;
-              height: 1px;
-              background: #ddd;
+              align-items: flex-start;
               margin-bottom: 20px;
             }
-            .footer-content {
+            .header-left {}
+            .company-name {
+              font-size: 18px;
+              font-weight: bold;
+              margin-bottom: 16px;
+            }
+            .ticket-label {
+              font-size: 10px;
+              color: #888;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              margin-bottom: 4px;
+            }
+            .ticket-number {
+              font-size: 22px;
+              font-weight: 300;
+              letter-spacing: 2px;
+            }
+            .header-right {
+              text-align: right;
+            }
+            .pnr-label {
+              font-size: 10px;
+              color: #888;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              margin-bottom: 4px;
+            }
+            .pnr-box {
+              border: 1px solid #999;
+              padding: 8px 16px;
+              font-size: 16px;
+              font-weight: bold;
+              letter-spacing: 3px;
+              font-family: monospace;
+            }
+
+            /* Divider */
+            .divider {
+              border-top: 1px solid #ddd;
+              margin: 20px 0;
+            }
+
+            /* Passenger */
+            .passenger-section {
+              margin-bottom: 30px;
+            }
+            .passenger-label {
+              font-size: 10px;
+              color: #888;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              margin-bottom: 8px;
+            }
+            .passenger-name {
+              font-size: 26px;
+              font-weight: 500;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+            }
+            .name-bar {
+              width: 4px;
+              height: 28px;
+              background: #333;
+            }
+
+            /* Flight Cards */
+            .flights-section {
+              margin-bottom: 40px;
+            }
+            .flight-card {
+              margin-bottom: 30px;
+            }
+            .flight-header-row {
+              display: flex;
+              align-items: center;
+              gap: 16px;
+              margin-bottom: 12px;
+            }
+            .flight-number {
+              background: #333;
+              color: white;
+              padding: 4px 12px;
+              font-size: 13px;
+              font-weight: 500;
+            }
+            .flight-date {
+              font-size: 13px;
+              color: #666;
+            }
+            .flight-content {
+              display: flex;
+              align-items: flex-start;
+              justify-content: space-between;
+            }
+            .flight-departure,
+            .flight-arrival {
+              width: 120px;
+            }
+            .flight-departure {
+              text-align: left;
+            }
+            .flight-arrival {
+              text-align: right;
+            }
+            .flight-label {
+              font-size: 11px;
+              color: #888;
+              margin-bottom: 4px;
+            }
+            .flight-time {
+              font-size: 38px;
+              font-weight: 300;
+              line-height: 1;
+              margin-bottom: 8px;
+            }
+            .flight-airport {
+              font-size: 12px;
+              color: #666;
+            }
+            .flight-middle {
+              flex: 1;
               display: flex;
               flex-direction: column;
               align-items: center;
-              gap: 6px;
+              padding-top: 24px;
             }
-            .footer-logo {
-              height: 50px;
-              width: auto;
-              object-fit: contain;
+            .flight-path {
+              display: flex;
+              align-items: center;
+              width: 100%;
+              margin-bottom: 8px;
             }
-            .slogan-cn {
-              font-size: 12px;
-              letter-spacing: 0.5px;
-              color: #c9aa7c;
+            .path-line {
+              flex: 1;
+              height: 1px;
+              background: #ccc;
             }
-            .copyright {
-              font-size: 10px;
+            .path-line.with-arrow {
+              position: relative;
+            }
+            .path-line.with-arrow::after {
+              content: '›';
+              position: absolute;
+              right: 0;
+              top: -8px;
+              font-size: 16px;
               color: #999;
             }
+            .path-icon {
+              margin: 0 8px;
+              font-size: 14px;
+              color: #666;
+            }
+            .flight-duration {
+              font-size: 11px;
+              color: #888;
+              margin-bottom: 6px;
+            }
+            .flight-class {
+              border: 1px solid #ccc;
+              padding: 3px 10px;
+              font-size: 10px;
+              color: #666;
+            }
+            .no-flight {
+              text-align: center;
+              padding: 40px;
+              color: #999;
+            }
+
+            /* Watermark - 潮牌風格，C從底部分割線開始往上貼著右邊 */
+            .watermark {
+              position: absolute;
+              right: -195px;
+              bottom: 420px;
+              pointer-events: none;
+              z-index: 0;
+            }
+            .watermark img {
+              width: 650px;
+              height: auto;
+              opacity: 0.1;
+              transform: rotate(270deg);
+              transform-origin: center;
+            }
+
+            /* Footer */
+            .footer {
+              margin-top: auto;
+              padding-top: 30px;
+              border-top: 1px solid #eee;
+            }
+            .footer-notice {
+              text-align: center;
+              font-size: 10px;
+              color: #999;
+              margin-bottom: 12px;
+            }
+            .footer-contact {
+              display: flex;
+              justify-content: center;
+              gap: 20px;
+              font-size: 9px;
+              color: #aaa;
+            }
+
             @media print {
+              * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+              }
               html, body {
                 width: 100%;
-                min-height: auto;
+                background: white !important;
+                margin: 0;
+                padding: 0;
               }
               .page {
                 width: 100%;
-                min-height: auto;
-                padding: 0;
+                height: 100vh;
+                padding: 12mm 15mm;
                 page-break-after: always;
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                box-sizing: border-box;
               }
               .page:last-child {
                 page-break-after: auto;
+              }
+              .content {
+                flex: 1;
+                min-height: 0;
+              }
+              .flight-number {
+                background: #333 !important;
+                color: white !important;
+              }
+              .name-bar {
+                background: #333 !important;
+              }
+              .watermark {
+                position: absolute;
+                right: -200px;
+                bottom: 410px;
+              }
+              .watermark img {
+                width: 600px;
+                opacity: 0.1 !important;
+                transform: rotate(270deg);
+                transform-origin: center;
+              }
+              .footer {
+                margin-top: auto;
+                padding-top: 15px;
+                border-top: 1px solid #eee;
               }
             }
             @media screen {

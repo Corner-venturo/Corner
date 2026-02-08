@@ -3,7 +3,12 @@ import type { NextRequest } from 'next/server'
 import { jwtVerify } from 'jose'
 import { verifyQuickLoginToken } from '@/lib/auth/quick-login-token'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'venturo_app_jwt_secret_key_change_in_production_2024'
+// JWT Secret - Production 環境必須設定環境變數
+const JWT_SECRET = process.env.JWT_SECRET
+if (!JWT_SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error('JWT_SECRET environment variable is required in production')
+}
+const JWT_SECRET_KEY = JWT_SECRET || 'venturo_dev_jwt_secret_local_only'
 
 /**
  * Next.js Middleware - 伺服器端路由保護
@@ -40,7 +45,7 @@ async function verifyAuthToken(token: string): Promise<boolean> {
   } catch {
     // base64 失敗，嘗試 JWT 驗證
     try {
-      const secret = new TextEncoder().encode(JWT_SECRET)
+      const secret = new TextEncoder().encode(JWT_SECRET_KEY)
       await jwtVerify(token, secret, {
         issuer: 'venturo-app',
       })
