@@ -16,6 +16,7 @@ import type { Account, AccountType } from '@/types/accounting.types'
 const typeConfig: Record<AccountType, { label: string; color: string }> = {
   asset: { label: '資產', color: 'bg-status-info-bg text-status-info' },
   liability: { label: '負債', color: 'bg-status-danger-bg text-status-danger' },
+  equity: { label: '權益', color: 'bg-teal-50 text-teal-600' },
   revenue: { label: '收入', color: 'bg-status-success-bg text-status-success' },
   expense: { label: '費用', color: 'bg-status-warning-bg text-status-warning' },
   cost: { label: '成本', color: 'bg-purple-50 text-purple-600' },

@@ -355,9 +355,9 @@ export function usePayroll() {
           }
         }
 
-        // 計算加班費（時薪 * 1.33）
+        // 計算加班費（依台灣勞基法分段計算）
         const hourlyRate = baseSalary / 30 / 8
-        const overtimePay = Math.round(hourlyRate * 1.33 * overtimeHours)
+        const overtimePay = calculateOvertimePay(hourlyRate, overtimeHours)
 
         // 計算無薪假扣款
         const dailyRate = baseSalary / 30
@@ -578,6 +578,42 @@ export function usePayroll() {
 // ============================================
 // 工具函式
 // ============================================
+
+/**
+ * 計算加班費（依台灣勞基法分段計算）
+ * 
+ * 台灣勞基法規定：
+ * - 前 2 小時：1.34 倍（時薪 × 4/3）
+ * - 第 3-4 小時：1.67 倍（時薪 × 5/3）
+ * - 超過 4 小時或休息日：2 倍
+ * 
+ * @param hourlyRate 時薪
+ * @param overtimeHours 加班時數
+ * @returns 加班費總額
+ */
+function calculateOvertimePay(hourlyRate: number, overtimeHours: number): number {
+  if (overtimeHours <= 0) return 0
+
+  let totalPay = 0
+
+  // 前 2 小時：1.34 倍
+  const tier1Hours = Math.min(overtimeHours, 2)
+  totalPay += hourlyRate * 1.34 * tier1Hours
+
+  // 第 3-4 小時：1.67 倍
+  if (overtimeHours > 2) {
+    const tier2Hours = Math.min(overtimeHours - 2, 2)
+    totalPay += hourlyRate * 1.67 * tier2Hours
+  }
+
+  // 超過 4 小時：2 倍
+  if (overtimeHours > 4) {
+    const tier3Hours = overtimeHours - 4
+    totalPay += hourlyRate * 2.0 * tier3Hours
+  }
+
+  return Math.round(totalPay)
+}
 
 /**
  * 計算工作天數（不含週末）

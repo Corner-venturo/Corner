@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { Eye, RotateCcw } from 'lucide-react'
+import { Eye, RotateCcw, Plus, Pencil } from 'lucide-react'
 import { EnhancedTable, type Column } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useJournalVouchers } from '../hooks'
 import { VoucherDetailDialog } from './VoucherDetailDialog'
 import { ReverseVoucherDialog } from './ReverseVoucherDialog'
+import { VoucherFormDialog } from './VoucherFormDialog'
 import type { JournalVoucher, VoucherStatus } from '@/types/accounting.types'
 
 const statusConfig: Record<VoucherStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
@@ -22,6 +23,18 @@ export function VouchersPage() {
   const [selectedVoucher, setSelectedVoucher] = useState<JournalVoucher | null>(null)
   const [showDetailDialog, setShowDetailDialog] = useState(false)
   const [showReverseDialog, setShowReverseDialog] = useState(false)
+  const [showFormDialog, setShowFormDialog] = useState(false)
+  const [editingVoucher, setEditingVoucher] = useState<JournalVoucher | null>(null)
+
+  const handleCreate = () => {
+    setEditingVoucher(null)
+    setShowFormDialog(true)
+  }
+
+  const handleEdit = (voucher: JournalVoucher) => {
+    setEditingVoucher(voucher)
+    setShowFormDialog(true)
+  }
 
   const handleViewDetail = (voucher: JournalVoucher) => {
     setSelectedVoucher(voucher)
@@ -90,22 +103,34 @@ export function VouchersPage() {
     {
       key: 'actions',
       label: '操作',
-      width: '120px',
+      width: '140px',
       render: (_: unknown, row: JournalVoucher) => (
         <div className="flex gap-1">
           <Button
             size="sm"
             variant="ghost"
             onClick={() => handleViewDetail(row)}
+            title="查看"
           >
             <Eye size={14} />
           </Button>
+          {row.status === 'draft' && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => handleEdit(row)}
+              title="編輯"
+            >
+              <Pencil size={14} />
+            </Button>
+          )}
           {row.status === 'posted' && (
             <Button
               size="sm"
               variant="ghost"
               onClick={() => handleReverse(row)}
               className="text-destructive hover:text-destructive"
+              title="反沖"
             >
               <RotateCcw size={14} />
             </Button>
@@ -117,6 +142,14 @@ export function VouchersPage() {
 
   return (
     <div className="h-full flex flex-col">
+      {/* 工具列 */}
+      <div className="flex justify-end p-4 border-b">
+        <Button onClick={handleCreate} className="gap-2">
+          <Plus size={16} />
+          新增傳票
+        </Button>
+      </div>
+
       <div className="flex-1 overflow-auto">
         <EnhancedTable
           columns={columns}
@@ -144,6 +177,17 @@ export function VouchersPage() {
           />
         </>
       )}
+
+      {/* 傳票表單對話框 */}
+      <VoucherFormDialog
+        open={showFormDialog}
+        onOpenChange={setShowFormDialog}
+        voucher={editingVoucher}
+        onSuccess={() => {
+          fetchAll()
+          setShowFormDialog(false)
+        }}
+      />
     </div>
   )
 }

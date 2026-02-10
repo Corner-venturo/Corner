@@ -6,7 +6,7 @@
 // 基本類型
 // ============================================
 
-export type AccountType = 'asset' | 'liability' | 'revenue' | 'expense' | 'cost'
+export type AccountType = 'asset' | 'liability' | 'equity' | 'revenue' | 'expense' | 'cost'
 
 export type AccountingEventType =
   | 'customer_receipt_posted'    // 客戶收款過帳
@@ -299,6 +299,10 @@ export const DEFAULT_ACCOUNTS: Omit<Account, 'id' | 'workspace_id' | 'created_at
   { code: '2200', name: '代收稅金（應付）', account_type: 'liability', type: 'liability', parent_id: null, is_system_locked: true, is_active: true, description: '12% 代收稅金' },
   { code: '2300', name: '獎金應付帳款', account_type: 'liability', type: 'liability', parent_id: null, is_system_locked: true, is_active: true, description: null },
   { code: '2400', name: '代收款－員工自付', account_type: 'liability', type: 'liability', parent_id: null, is_system_locked: true, is_active: true, description: '勞健保等' },
+  // 權益
+  { code: '3100', name: '股本', account_type: 'equity', type: 'equity', parent_id: null, is_system_locked: true, is_active: true, description: '實收資本' },
+  { code: '3200', name: '本期損益', account_type: 'equity', type: 'equity', parent_id: null, is_system_locked: true, is_active: true, description: '期末結轉用，匯集損益科目餘額' },
+  { code: '3300', name: '保留盈餘', account_type: 'equity', type: 'equity', parent_id: null, is_system_locked: true, is_active: true, description: '累積盈虧，本期損益結轉至此' },
   // 收入
   { code: '4100', name: '團費收入', account_type: 'revenue', type: 'revenue', parent_id: null, is_system_locked: true, is_active: true, description: '結團才認列' },
   { code: '4200', name: '其他收入－行政費收入', account_type: 'revenue', type: 'revenue', parent_id: null, is_system_locked: true, is_active: true, description: null },

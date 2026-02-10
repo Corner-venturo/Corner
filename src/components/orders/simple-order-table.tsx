@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/stores'
 import { deleteOrder } from '@/data'
-import { User, Trash2, FileText } from 'lucide-react'
+import { User, Trash2, FileText, Pencil } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Order, Tour } from '@/stores/types'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
@@ -22,6 +22,8 @@ interface SimpleOrderTableProps {
   onQuickPaymentRequest?: (order: Order) => void
   /** 開發票 callback */
   onQuickInvoice?: (order: Order) => void
+  /** 編輯訂單 callback */
+  onEdit?: (order: Order) => void
 }
 
 export const SimpleOrderTable = React.memo(function SimpleOrderTable({
@@ -32,6 +34,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
   onQuickReceipt,
   onQuickPaymentRequest,
   onQuickInvoice,
+  onEdit,
 }: SimpleOrderTableProps) {
   const router = useRouter()
   const workspaceId = useAuthStore(state => state.user?.workspace_id) || ''
@@ -214,6 +217,22 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                     >
                       ¥
                     </Button>
+
+                    {/* 編輯按鈕 */}
+                    {onEdit && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={e => {
+                          e.stopPropagation()
+                          onEdit(order)
+                        }}
+                        className="h-8 w-8 p-0 text-morandi-secondary hover:text-morandi-blue hover:bg-morandi-blue/10"
+                        title="編輯訂單"
+                      >
+                        <Pencil size={14} />
+                      </Button>
+                    )}
 
                     {/* 刪除按鈕 */}
                     <Button

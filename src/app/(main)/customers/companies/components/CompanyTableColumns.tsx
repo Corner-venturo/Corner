@@ -3,7 +3,7 @@
  */
 
 import { useMemo } from 'react'
-import { Building2, Phone, Mail, CreditCard } from 'lucide-react'
+import { Building2, Phone, Mail, CreditCard, Edit, Trash2 } from 'lucide-react'
 import type { TableColumn } from '@/components/ui/enhanced-table'
 import type { Company } from '@/stores'
 import { PAYMENT_METHOD_LABELS, VIP_LEVEL_LABELS } from '@/types/company.types'
@@ -12,9 +12,11 @@ import { DateCell, CurrencyCell } from '@/components/table-cells'
 
 interface UseCompanyColumnsProps {
   onView: (company: Company) => void
+  onEdit?: (company: Company) => void
+  onDelete?: (company: Company) => void
 }
 
-export function useCompanyColumns({ onView }: UseCompanyColumnsProps) {
+export function useCompanyColumns({ onView, onEdit, onDelete }: UseCompanyColumnsProps) {
   return useMemo<TableColumn[]>(
     () => [
       {
@@ -148,7 +150,43 @@ export function useCompanyColumns({ onView }: UseCompanyColumnsProps) {
           />
         ),
       },
+      {
+        key: 'actions',
+        label: '操作',
+        width: '80px',
+        render: (_value, row) => {
+          const company = row as Company
+          return (
+            <div className="flex items-center gap-1">
+              {onEdit && (
+                <button
+                  className="p-1 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
+                  title="編輯企業"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onEdit(company)
+                  }}
+                >
+                  <Edit size={14} />
+                </button>
+              )}
+              {onDelete && (
+                <button
+                  className="p-1 text-morandi-secondary hover:text-status-danger hover:bg-status-danger-bg rounded transition-colors"
+                  title="刪除企業"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onDelete(company)
+                  }}
+                >
+                  <Trash2 size={14} />
+                </button>
+              )}
+            </div>
+          )
+        },
+      },
     ],
-    [onView]
+    [onView, onEdit, onDelete]
   )
 }

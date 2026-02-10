@@ -9,6 +9,7 @@ import { useWorkspaceChannels } from '@/stores/workspace-store'
 import { ShoppingCart, AlertCircle, CheckCircle, Clock, Shield, Wifi } from 'lucide-react'
 import { SimpleOrderTable } from '@/components/orders/simple-order-table'
 import { AddOrderForm } from '@/components/orders/add-order-form'
+import { OrderEditDialog } from '@/components/orders/order-edit-dialog'
 import { InvoiceDialog } from '@/components/finance/invoice-dialog'
 import type { Order } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
@@ -31,6 +32,10 @@ export default function OrdersPage() {
   // 發票對話框狀態
   const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false)
   const [selectedOrderForInvoice, setSelectedOrderForInvoice] = useState<Order | null>(null)
+
+  // 編輯對話框狀態
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [selectedOrderForEdit, setSelectedOrderForEdit] = useState<Order | null>(null)
 
   // 🔥 載入 workspace（只執行一次）
   useEffect(() => {
@@ -174,6 +179,10 @@ export default function OrdersPage() {
             setSelectedOrderForInvoice(order)
             setIsInvoiceDialogOpen(true)
           }}
+          onEdit={order => {
+            setSelectedOrderForEdit(order)
+            setIsEditDialogOpen(true)
+          }}
         />
       </div>
 
@@ -213,6 +222,17 @@ export default function OrdersPage() {
         }}
         defaultOrderId={selectedOrderForInvoice?.id}
         defaultTourId={selectedOrderForInvoice?.tour_id || undefined}
+      />
+
+      {/* 編輯訂單對話框 */}
+      <OrderEditDialog
+        open={isEditDialogOpen}
+        onOpenChange={open => {
+          setIsEditDialogOpen(open)
+          if (!open) setSelectedOrderForEdit(null)
+        }}
+        order={selectedOrderForEdit}
+        level={1}
       />
     </div>
   )

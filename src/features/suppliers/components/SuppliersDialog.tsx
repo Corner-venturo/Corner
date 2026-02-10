@@ -25,6 +25,7 @@ interface SuppliersDialogProps {
     value: SupplierFormData[K]
   ) => void
   onSubmit: () => void
+  isEditMode?: boolean
 }
 
 export const SuppliersDialog: React.FC<SuppliersDialogProps> = ({
@@ -33,15 +34,16 @@ export const SuppliersDialog: React.FC<SuppliersDialogProps> = ({
   formData,
   onFormFieldChange,
   onSubmit,
+  isEditMode = false,
 }) => {
   return (
     <FormDialog
       open={isOpen}
       onOpenChange={open => !open && onClose()}
-      title="新增供應商"
-      subtitle="請填寫供應商基本資訊"
+      title={isEditMode ? '編輯供應商' : '新增供應商'}
+      subtitle={isEditMode ? '修改供應商資訊' : '請填寫供應商基本資訊'}
       onSubmit={onSubmit}
-      submitLabel="新增供應商"
+      submitLabel={isEditMode ? '儲存變更' : '新增供應商'}
       submitDisabled={!formData.name || !formData.bank_name || !formData.bank_account}
       maxWidth="lg"
     >

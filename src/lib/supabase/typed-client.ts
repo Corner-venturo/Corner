@@ -117,3 +117,63 @@ export function castRows<T>(data: unknown): T[] {
   // 透過 unknown 中轉並處理 null/undefined，保持類型安全
   return (data ?? []) as T[]
 }
+
+/**
+ * Supabase RPC 函數名稱的聯合類型
+ */
+export type SupabaseRpcName = keyof Database['public']['Functions']
+
+/**
+ * 獲取 RPC 函數的參數類型
+ */
+export type RpcArgs<T extends SupabaseRpcName> = Database['public']['Functions'][T]['Args']
+
+/**
+ * 獲取 RPC 函數的回傳類型
+ */
+export type RpcReturns<T extends SupabaseRpcName> = Database['public']['Functions'][T]['Returns']
+
+/**
+ * 類型安全的 Supabase RPC 調用
+ *
+ * @example
+ * const { data } = await typedRpc('sync_passport_to_order_members', {
+ *   p_customer_id: customerId,
+ *   p_passport_number: passportData.passport_number,
+ * })
+ */
+export function typedRpc<T extends SupabaseRpcName>(
+  fnName: T,
+  args: RpcArgs<T>
+) {
+  return supabase.rpc(fnName, args)
+}
+
+/**
+ * 動態 RPC 調用（用於運行時變數或未定義類型的 RPC）
+ *
+ * 當 RPC 函數名是運行時變數或未在 Database 類型中定義時使用
+ *
+ * @example
+ * const fnName = config.rpcName // 運行時變數
+ * const { data } = await dynamicRpc(fnName, { p_id: '123' })
+ */
+export function dynamicRpc(fnName: string, args: Record<string, unknown>) {
+  return supabase.rpc(fnName as SupabaseRpcName, args as RpcArgs<SupabaseRpcName>)
+}
+
+/**
+ * 將插入資料轉換為表的 Insert 類型
+ *
+ * 用於動態建構的 insertData 需要類型斷言的情況
+ * 接受 Record<string, unknown> 以處理運行時建構的物件
+ *
+ * @example
+ * const insertData = { name: 'test', ... }
+ * await supabase.from('folders').insert(asInsert<'folders'>(insertData))
+ */
+export function asInsert<T extends SupabaseTableName>(
+  data: Record<string, unknown>
+): TableInsert<T> {
+  return data as unknown as TableInsert<T>
+}

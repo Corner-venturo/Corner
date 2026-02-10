@@ -46,7 +46,52 @@ export function TourPrintDialog({
   const [loadingPnr, setLoadingPnr] = useState(false)
 
   // 從資料庫取得機場和航空公司名稱（統一來源）
-  const { getAirportName, getAirlineName } = useReferenceData({ enabled: false })
+  const { getAirportName: getAirportNameFromDb, getAirlineName: getAirlineNameFromDb } = useReferenceData({ enabled: false })
+
+  // 常用機場中文名稱（備援）
+  const AIRPORT_NAMES: Record<string, string> = {
+    TPE: '台北桃園', TSA: '台北松山', KHH: '高雄', RMQ: '台中',
+    HKG: '香港', MFM: '澳門',
+    NRT: '東京成田', HND: '東京羽田', KIX: '大阪關西', NGO: '名古屋', FUK: '福岡', CTS: '札幌', OKA: '沖繩',
+    ICN: '首爾仁川', GMP: '首爾金浦', PUS: '釜山',
+    BKK: '曼谷', CNX: '清邁', HKT: '普吉島',
+    SIN: '新加坡', KUL: '吉隆坡',
+    PVG: '上海浦東', SHA: '上海虹橋', PEK: '北京首都', PKX: '北京大興', CAN: '廣州', SZX: '深圳',
+    MNL: '馬尼拉', SGN: '胡志明市', HAN: '河內',
+    LAX: '洛杉磯', SFO: '舊金山', JFK: '紐約乾迺迪', SEA: '西雅圖',
+    LHR: '倫敦希斯洛', CDG: '巴黎戴高樂', FRA: '法蘭克福', AMS: '阿姆斯特丹',
+    SYD: '雪梨', MEL: '墨爾本', AKL: '奧克蘭',
+  }
+
+  // 常用航空公司中文名稱（備援）
+  const AIRLINE_NAMES: Record<string, string> = {
+    CI: '中華航空', BR: '長榮航空', JX: '星宇航空', IT: '台灣虎航', B7: '立榮航空', AE: '華信航空',
+    CX: '國泰航空', KA: '國泰港龍', HX: '香港航空', UO: '香港快運',
+    JL: '日本航空', NH: '全日空', MM: '樂桃航空', BC: '天馬航空',
+    KE: '大韓航空', OZ: '韓亞航空', TW: '德威航空', LJ: '真航空', '7C': '濟州航空',
+    SQ: '新加坡航空', TR: '酷航', MH: '馬來西亞航空', AK: '亞洲航空',
+    TG: '泰國航空', FD: '泰亞航空', VZ: '泰越捷',
+    VN: '越南航空', PR: '菲律賓航空',
+    CA: '中國國航', MU: '東方航空', CZ: '南方航空', HU: '海南航空',
+    UA: '聯合航空', AA: '美國航空', DL: '達美航空',
+    BA: '英國航空', AF: '法國航空', LH: '漢莎航空', KL: '荷蘭皇家',
+    EK: '阿聯酋航空', QR: '卡達航空', EY: '阿提哈德',
+    QF: '澳洲航空', NZ: '紐西蘭航空',
+  }
+
+  // 取得機場名稱（優先用資料庫，再用本地對照表）
+  const getAirportName = (code: string) => {
+    const dbName = getAirportNameFromDb(code)
+    if (dbName && dbName !== code) return dbName
+    return AIRPORT_NAMES[code] || code
+  }
+
+  // 取得航空公司名稱（優先用資料庫，再用本地對照表）
+  const getAirlineName = (code: string) => {
+    const dbName = getAirlineNameFromDb(code)
+    if (dbName && dbName !== code) return dbName
+    return AIRLINE_NAMES[code] || code
+  }
 
   // 載入 PNR 資料 - 先用 tour_id，再用成員的 PNR 代號
   useEffect(() => {
@@ -331,20 +376,25 @@ export function TourPrintDialog({
         segments.forEach((seg) => {
           const duration = seg.duration || calculateDuration(seg.departureTime, seg.arrivalTime)
           const className = getClassName(seg.class)
-          const depCity = getAirportName(seg.origin) || seg.origin
-          const arrCity = getAirportName(seg.destination) || seg.destination
+          const depAirportName = getAirportName(seg.origin) || seg.origin
+          const arrAirportName = getAirportName(seg.destination) || seg.destination
+          const airlineName = getAirlineName(seg.airline) || seg.airline
+          const depTerminal = seg.departureTerminal ? `第${seg.departureTerminal}航廈` : ''
+          const arrTerminal = seg.arrivalTerminal ? `第${seg.arrivalTerminal}航廈` : ''
 
           flightCards.push(`
             <div class="flight-card">
               <div class="flight-header-row">
                 <span class="flight-number">${seg.airline}${seg.flightNumber}</span>
+                <span class="flight-airline">${airlineName}</span>
                 <span class="flight-date">${formatPnrDate(seg.departureDate)}</span>
               </div>
               <div class="flight-content">
                 <div class="flight-departure">
                   <div class="flight-label">出發 DEPART</div>
                   <div class="flight-time">${formatTime(seg.departureTime)}</div>
-                  <div class="flight-airport">${seg.origin} ${depCity}</div>
+                  <div class="flight-airport">${depAirportName}</div>
+                  <div class="flight-terminal">${seg.origin}${depTerminal ? ' ' + depTerminal : ''}</div>
                 </div>
                 <div class="flight-middle">
                   <div class="flight-path">
@@ -353,12 +403,13 @@ export function TourPrintDialog({
                     <span class="path-line with-arrow"></span>
                   </div>
                   <div class="flight-duration">${duration || ''}</div>
-                  <div class="flight-class">經濟艙 ${className}</div>
+                  <div class="flight-class">${className}</div>
                 </div>
                 <div class="flight-arrival">
                   <div class="flight-label">抵達 ARRIVE</div>
                   <div class="flight-time">${formatTime(seg.arrivalTime)}</div>
-                  <div class="flight-airport">${arrCity} ${seg.destination}</div>
+                  <div class="flight-airport">${arrAirportName}</div>
+                  <div class="flight-terminal">${seg.destination}${arrTerminal ? ' ' + arrTerminal : ''}</div>
                 </div>
               </div>
             </div>
@@ -627,9 +678,15 @@ export function TourPrintDialog({
               font-size: 13px;
               font-weight: 500;
             }
+            .flight-airline {
+              font-size: 13px;
+              color: #666;
+              margin-left: 8px;
+            }
             .flight-date {
               font-size: 13px;
               color: #666;
+              margin-left: auto;
             }
             .flight-content {
               display: flex;
@@ -661,6 +718,11 @@ export function TourPrintDialog({
               font-size: 12px;
               color: #666;
             }
+            .flight-terminal {
+              font-size: 11px;
+              color: #999;
+              margin-top: 2px;
+            }
             .flight-middle {
               flex: 1;
               display: flex;
@@ -685,9 +747,11 @@ export function TourPrintDialog({
             .path-line.with-arrow::after {
               content: '›';
               position: absolute;
-              right: 0;
-              top: -8px;
+              right: -4px;
+              top: 50%;
+              transform: translateY(-50%);
               font-size: 16px;
+              line-height: 1;
               color: #999;
             }
             .path-icon {

@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { FileText, BookOpen, Scale, TrendingUp, Wallet, Banknote } from 'lucide-react'
+import { FileText, BookOpen, Scale, TrendingUp, Wallet, Banknote, ClipboardList } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 
 const reports = [

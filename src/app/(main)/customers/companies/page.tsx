@@ -18,12 +18,13 @@ import { Button } from '@/components/ui/button'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { Plus } from 'lucide-react'
 import { useAuthStore, type Company } from '@/stores'
-import { useCompanies, createCompany, updateCompany } from '@/data'
+import { useCompanies, createCompany, updateCompany, deleteCompany } from '@/data'
 import { useCompanyColumns } from './components/CompanyTableColumns'
 import { CompanyFormDialog } from './components/CompanyFormDialog'
 import { CompanyDetailDialog } from './components/CompanyDetailDialog'
 import type { CreateCompanyData } from '@/types/company.types'
-import { alert } from '@/lib/ui/alert-dialog'
+import { alert, confirm } from '@/lib/ui/alert-dialog'
+import { supabase } from '@/lib/supabase/client'
 
 export default function CompaniesPage() {
   const { items: companies } = useCompanies()
@@ -89,8 +90,74 @@ export default function CompaniesPage() {
     setIsDialogOpen(true)
   }
 
+  // 開啟編輯對話框
+  const handleOpenEditDialog = (company: Company) => {
+    setEditingCompany(company)
+    setIsDialogOpen(true)
+  }
+
+  // 刪除企業客戶
+  const handleDeleteCompany = async (company: Company) => {
+    try {
+      // 檢查是否有關聯的聯絡人
+      const { data: contacts, error: contactsError } = await supabase
+        .from('company_contacts')
+        .select('id, name')
+        .eq('company_id', company.id)
+        .limit(5)
+
+      if (contactsError) {
+        logger.error('檢查聯絡人時發生錯誤:', contactsError)
+      }
+
+      // 如果有關聯的聯絡人，提示用戶
+      if (contacts && contacts.length > 0) {
+        const contactNames = contacts.map(c => c.name).join('、')
+        const contactInfo = contacts.length > 5 
+          ? `${contactNames}... 等 ${contacts.length} 位聯絡人`
+          : contactNames
+
+        const confirmed = await confirm(
+          `此企業有 ${contacts.length} 位關聯的聯絡人（${contactInfo}），刪除企業將同時刪除這些聯絡人。\n\n確定要刪除企業「${company.company_name}」嗎？`,
+          {
+            title: '刪除企業客戶',
+            type: 'warning',
+            confirmText: '確定刪除',
+            cancelText: '取消',
+          }
+        )
+
+        if (!confirmed) return
+      } else {
+        // 沒有關聯的聯絡人，直接確認刪除
+        const confirmed = await confirm(
+          `確定要刪除企業「${company.company_name}」嗎？`,
+          {
+            title: '刪除企業客戶',
+            type: 'warning',
+            confirmText: '確定刪除',
+            cancelText: '取消',
+          }
+        )
+
+        if (!confirmed) return
+      }
+
+      // 執行刪除
+      await deleteCompany(company.id)
+      await alert('企業客戶刪除成功', 'success')
+    } catch (error) {
+      logger.error('刪除企業客戶失敗:', error)
+      await alert('刪除企業客戶失敗', 'error')
+    }
+  }
+
   // 表格欄位
-  const columns = useCompanyColumns({ onView: handleViewDetail })
+  const columns = useCompanyColumns({ 
+    onView: handleViewDetail,
+    onEdit: handleOpenEditDialog,
+    onDelete: handleDeleteCompany,
+  })
 
   return (
     <div className="h-full flex flex-col">

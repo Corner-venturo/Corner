@@ -152,13 +152,14 @@ export const SuppliersPage: React.FC = () => {
         />
       </div>
 
-      {/* 新增供應商對話框 */}
+      {/* 新增/編輯供應商對話框 */}
       <SuppliersDialog
         isOpen={isAddDialogOpen}
         onClose={handleCloseDialog}
         formData={formData}
         onFormFieldChange={handleFormFieldChange}
         onSubmit={handleSubmit}
+        isEditMode={isEditMode}
       />
     </div>
   )

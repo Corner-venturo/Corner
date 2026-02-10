@@ -283,14 +283,18 @@ export function useOrderMembersData({
    * 重新排序成員
    */
   const handleReorderMembers = async (reorderedMembers: OrderMember[]) => {
-    // 更新本地狀態
-    setMembers(reorderedMembers)
+    // 更新本地狀態（同時更新每個成員的 sort_order）
+    const membersWithNewOrder = reorderedMembers.map((member, index) => ({
+      ...member,
+      sort_order: index + 1,
+    }))
+    setMembers(membersWithNewOrder)
 
     // 批次更新資料庫中的 sort_order
     try {
-      const updates = reorderedMembers.map((member, index) => ({
+      const updates = membersWithNewOrder.map((member) => ({
         id: member.id,
-        sort_order: index + 1,
+        sort_order: member.sort_order,
       }))
 
       // 使用 Promise.all 批次更新

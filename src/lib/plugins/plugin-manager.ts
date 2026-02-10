@@ -5,6 +5,7 @@
 
 import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
+import { dynamicFrom } from '@/lib/supabase/typed-client'
 import type {
   Plugin,
   PluginContext,
@@ -286,9 +287,7 @@ export class PluginManager {
 
   private async getPluginStorage<T>(pluginId: string, key: string): Promise<T | null> {
     // plugin_storage 表尚未加入 Supabase 型別定義（需先執行 migration）
-     
-    const { data, error } = await (supabase as any)
-      .from('plugin_storage')
+    const { data, error } = await dynamicFrom('plugin_storage')
       .select('value')
       .eq('workspace_id', this.workspaceId)
       .eq('plugin_id', pluginId)
@@ -301,9 +300,7 @@ export class PluginManager {
 
   private async setPluginStorage<T>(pluginId: string, key: string, value: T): Promise<void> {
     // plugin_storage 表尚未加入 Supabase 型別定義（需先執行 migration）
-     
-    await (supabase as any)
-      .from('plugin_storage')
+    await dynamicFrom('plugin_storage')
       .upsert({
         workspace_id: this.workspaceId,
         plugin_id: pluginId,
@@ -315,9 +312,7 @@ export class PluginManager {
 
   private async deletePluginStorage(pluginId: string, key: string): Promise<void> {
     // plugin_storage 表尚未加入 Supabase 型別定義（需先執行 migration）
-     
-    await (supabase as any)
-      .from('plugin_storage')
+    await dynamicFrom('plugin_storage')
       .delete()
       .eq('workspace_id', this.workspaceId)
       .eq('plugin_id', pluginId)
@@ -326,9 +321,7 @@ export class PluginManager {
 
   private async savePluginConfig(pluginId: string, config: PluginConfig): Promise<void> {
     // plugin_configs 表尚未加入 Supabase 型別定義（需先執行 migration）
-     
-    await (supabase as any)
-      .from('plugin_configs')
+    await dynamicFrom('plugin_configs')
       .upsert({
         workspace_id: this.workspaceId,
         plugin_id: pluginId,

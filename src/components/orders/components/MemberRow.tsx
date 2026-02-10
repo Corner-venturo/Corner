@@ -19,7 +19,8 @@ import type { OrderMember, CustomCostField } from '../order-member.types'
 import type { ColumnVisibility } from '../OrderMembersExpandable'
 import { MemberBasicInfo, MemberPassportInfo, MemberActions } from './member-row'
 
-import type { HotelColumn } from '../hooks/useRoomVehicleAssignments'
+import type { HotelColumn, RoomOption, RoomMemberInfo } from '../hooks/useRoomVehicleAssignments'
+import { RoomAssignmentCell } from './member-row/RoomAssignmentCell'
 
 interface MemberRowProps {
   member: OrderMember
@@ -37,6 +38,9 @@ interface MemberRowProps {
   vehicleRowSpan?: number  // 分車欄位合併行數
   hotelColumns?: HotelColumn[]  // 飯店欄位列表
   roomAssignmentsByHotel?: Record<string, Record<string, string>>  // 按飯店分組的分房
+  roomIdByHotelMember?: Record<string, Record<string, string>>  // hotelName -> memberId -> roomId
+  roomMembersByHotelRoom?: Record<string, Record<string, RoomMemberInfo[]>>  // hotelName -> roomId -> 成員列表
+  roomOptionsByHotel?: Record<string, RoomOption[]>  // 每個飯店的房間選項
   roomRowSpansByHotel?: Record<string, Record<string, number>>  // 按飯店的合併行數: hotelId -> memberId -> rowSpan
   pnrValue?: string
   customCostFields: CustomCostField[]
@@ -51,6 +55,8 @@ interface MemberRowProps {
   onKeyDown: (e: React.KeyboardEvent, memberIndex: number, field: string) => void
   onNameSearch?: (memberId: string, value: string) => void
   onIdNumberSearch?: (memberId: string, value: string, memberIndex: number) => void
+  onRoomAssign?: (memberId: string, hotelName: string, roomId: string | null, memberBirthDate?: string | null) => void
+  onRemoveMemberFromRoom?: (memberId: string, hotelName: string) => void  // 移除單一成員（不影響室友）
 }
 
 export function MemberRow({
@@ -70,6 +76,7 @@ export function MemberRow({
   hotelColumns = [],
   roomAssignmentsByHotel = {},
   roomRowSpansByHotel = {},
+  roomMembersByHotelRoom = {},
   pnrValue,
   customCostFields,
   mode,
@@ -83,6 +90,10 @@ export function MemberRow({
   onKeyDown,
   onNameSearch,
   onIdNumberSearch,
+  roomIdByHotelMember = {},
+  roomOptionsByHotel = {},
+  onRoomAssign,
+  onRemoveMemberFromRoom,
 }: MemberRowProps) {
   const [isComposing, setIsComposing] = useState(false)
 
@@ -102,9 +113,9 @@ export function MemberRow({
     opacity: isDragging ? 0.5 : 1,
   }
 
-  // 編輯模式下的 sticky 位置需要考慮拖曳欄位
-  const seqLeft = isEditMode ? 'left-[28px]' : 'left-0'
-  const nameLeft = isEditMode ? 'left-[68px]' : 'left-[40px]'
+  // sticky 位置（拖曳欄位一直存在）
+  const seqLeft = 'left-[28px]'
+  const nameLeft = 'left-[68px]'
 
   // 預設欄位顯示設定（訂金/尾款/應付金額 預設關閉）
   const cv = columnVisibility || {
@@ -139,16 +150,14 @@ export function MemberRow({
       style={style}
       className="group relative hover:bg-morandi-container/20 transition-colors"
     >
-      {/* 編輯模式：拖曳把手 */}
-      {isEditMode && (
-        <td
-          className="border border-morandi-gold/20 px-1 py-1 bg-[#f5f3f0] sticky left-0 z-10 cursor-grab active:cursor-grabbing"
-          {...attributes}
-          {...listeners}
-        >
-          <GripVertical size={14} className="text-morandi-secondary/50 hover:text-morandi-secondary" />
-        </td>
-      )}
+      {/* 拖曳把手（一直顯示） */}
+      <td
+        className="border border-morandi-gold/20 px-1 py-1 bg-[#f5f3f0] sticky left-0 z-10 cursor-grab active:cursor-grabbing"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical size={14} className="text-morandi-secondary/50 hover:text-morandi-secondary" />
+      </td>
 
       {/* 基本資訊欄位 */}
       <MemberBasicInfo
@@ -269,14 +278,27 @@ export function MemberRow({
         const hotelRoomSpan = hotelSpans[member.id]
         if (hotelRoomSpan === 0) return null  // 被合併，不渲染
         const assignment = roomAssignmentsByHotel[hotel.id]?.[member.id]
+        const currentRoomId = roomIdByHotelMember[hotel.id]?.[member.id] || ''
+        const options = roomOptionsByHotel[hotel.id] || []
+        const roomMembers = currentRoomId ? (roomMembersByHotelRoom[hotel.id]?.[currentRoomId] || []) : []
+
         return (
-          <td 
+          <RoomAssignmentCell
             key={hotel.id}
-            className="border border-morandi-gold/20 px-2 py-1 bg-emerald-50/50 text-xs align-middle"
+            memberId={member.id}
+            memberName={member.chinese_name || member.passport_name || ''}
+            memberBirthDate={member.birth_date}
+            hotelId={hotel.id}
+            hotelName={hotel.id}
+            currentRoomId={currentRoomId}
+            currentRoomLabel={assignment || ''}
+            roomOptions={options}
+            roomMembers={roomMembers}
             rowSpan={hotelRoomSpan && hotelRoomSpan > 1 ? hotelRoomSpan : undefined}
-          >
-            {assignment || '-'}
-          </td>
+            onAssign={onRoomAssign || (() => {})}
+            onRemoveMember={onRemoveMemberFromRoom}
+            departureDate={departureDate}
+          />
         )
       })}
       {/* 單欄位模式（沒有飯店欄位資訊時的後備） */}

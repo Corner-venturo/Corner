@@ -5,6 +5,7 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
+import { dynamicFrom, asInsert } from '@/lib/supabase/typed-client'
 import type {
   Folder,
   VenturoFile,
@@ -291,9 +292,8 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
           const { data: { user } } = await supabase.auth.getUser()
           if (!user) throw new Error('未登入')
 
-           
-          const { data: member } = await (supabase as any)
-            .from('workspace_members')
+          // workspace_members 表尚未加入 Supabase 型別定義
+          const { data: member } = await dynamicFrom('workspace_members')
             .select('workspace_id')
             .eq('user_id', user.id)
             .single()
@@ -312,8 +312,7 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
           }
           const { data: folder, error } = await supabase
             .from('folders')
-             
-            .insert(insertData as any)
+            .insert(asInsert<'folders'>(insertData))
             .select()
             .single()
 

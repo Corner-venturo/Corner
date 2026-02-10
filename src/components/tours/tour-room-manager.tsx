@@ -1,29 +1,36 @@
 'use client'
 
-import { useState } from 'react'
+/**
+ * TourRoomManager - 簡化版分房管理
+ * 只保留新增/刪除房間功能，分配由成員名單的行內下拉選單處理
+ */
+
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
+import { useAuthStore } from '@/stores'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Hotel, Plus, Check, Loader2, FileText } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Hotel, Plus, Trash2, X, Bed } from 'lucide-react'
 import { toast } from 'sonner'
 import { confirm } from '@/lib/ui/alert-dialog'
+import { ROOM_TYPES } from '@/types/room-vehicle.types'
+
+// 房型容量對照
+const ROOM_CAPACITY: Record<string, number> = {
+  single: 1,
+  double: 2,
+  twin: 2,
+  triple: 3,
+  quad: 4,
+  suite: 2,
+}
 import type { TourRoomStatus } from '@/types/room-vehicle.types'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
 import type { OrderMember } from '@/components/orders/order-member.types'
-
-// Hooks
-import { useRoomData } from './hooks/useRoomData'
-import { useRoomConfig } from './hooks/useRoomConfig'
-import { useRoomAssignment } from './hooks/useRoomAssignment'
-import { useItineraryHotels } from './hooks/useItineraryHotels'
-
-// Components
-import { RoomList } from './components/RoomList'
-import { MemberAssignmentPanel } from './components/MemberAssignmentPanel'
-import { AddRoomDialog } from './components/AddRoomDialog'
-import { EditRoomDialog } from './components/EditRoomDialog'
-import { RoomingListExport } from './components/RoomingListExport'
 
 // 此元件只需要 OrderMember 的部分欄位
 type MemberBasic = Pick<OrderMember, 'id' | 'chinese_name' | 'passport_name'>
@@ -46,103 +53,75 @@ interface TourRoomManagerProps {
 }
 
 export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onClose }: TourRoomManagerProps) {
+  const user = useAuthStore(state => state.user)
+  const [rooms, setRooms] = useState<TourRoomStatus[]>([])
+  const [loading, setLoading] = useState(true)
+  const [showAddRoom, setShowAddRoom] = useState(false)
   const [selectedNight, setSelectedNight] = useState(1)
-  const [isSorting, setIsSorting] = useState(false)
-  const [showFullRooms, setShowFullRooms] = useState(true)
-  const [selectedRoomType, setSelectedRoomType] = useState<string | null>(null)
-  const [addRoomOpen, setAddRoomOpen] = useState(false)
-  const [editRoomOpen, setEditRoomOpen] = useState(false)
-  const [editingRoom, setEditingRoom] = useState<TourRoomStatus | null>(null)
-  const [roomingListOpen, setRoomingListOpen] = useState(false)
 
-  // 使用自定義 Hooks
-  const { rooms, assignments, loading, reload } = useRoomData({ tourId, open })
-  const itineraryHotels = useItineraryHotels({ tourId, open })
+  // 計算旅遊天數
+  const tourNights = tour?.departure_date && tour?.return_date
+    ? Math.ceil((new Date(tour.return_date).getTime() - new Date(tour.departure_date).getTime()) / (1000 * 60 * 60 * 24))
+    : 1
 
-  const {
-    continueFromPrevious,
-    tourNights,
-    maxNight,
-    toggleContinueFromPrevious,
-  } = useRoomConfig({ tour, tourId, rooms, assignments, reload })
+  const [newRoom, setNewRoom] = useState({
+    room_type: 'twin',
+    capacity: 2,
+    hotel_name: '',
+  })
 
-  const {
-    getRoomMembers,
-    getUnassignedMembers,
-    handleAssignMember,
-    handleRemoveAssignment,
-    handleClearRoom,
-  } = useRoomAssignment({ rooms, assignments, members, reload })
+  useEffect(() => {
+    if (open) {
+      loadRooms()
+    }
+  }, [open, tourId])
 
-  const handleSortAndClose = async () => {
-    setIsSorting(true)
+  const loadRooms = async () => {
     try {
-      const nightNumbers = [...new Set(rooms.map(r => r.night_number))]
-      const allUpdates = []
+      const { data, error } = await supabase
+        .from('tour_rooms_status')
+        .select('*')
+        .eq('tour_id', tourId)
+        .order('night_number')
+        .order('display_order')
 
-      for (const night of nightNumbers) {
-        const nightRooms = rooms.filter(r => r.night_number === night)
-        const roomSortKeys = new Map<string, number>()
-
-        for (const room of nightRooms) {
-          const roomAssignments = assignments.filter(a => a.room_id === room.id)
-          const memberIdsInRoom = roomAssignments.map(a => a.order_member_id)
-
-          if (memberIdsInRoom.length === 0) {
-            roomSortKeys.set(room.id, Infinity)
-            continue
-          }
-
-          const minIndex = Math.min(
-            ...memberIdsInRoom.map(memberId => {
-              const index = members.findIndex(m => m.id === memberId)
-              return index === -1 ? Infinity : index
-            })
-          )
-          roomSortKeys.set(room.id, minIndex)
-        }
-
-        const sortedNightRooms = [...nightRooms].sort((a, b) => {
-          const keyA = roomSortKeys.get(a.id) ?? Infinity
-          const keyB = roomSortKeys.get(b.id) ?? Infinity
-          return keyA - keyB
-        })
-
-        const nightUpdates = sortedNightRooms.map((room, index) => ({
-          id: room.id,
-          display_order: index,
-        }))
-
-        allUpdates.push(...nightUpdates)
-      }
-
-      if (allUpdates.length > 0) {
-        // 使用批量 update 而非 upsert，因為只更新 display_order
-        for (const update of allUpdates) {
-          const { error } = await supabase
-            .from('tour_rooms')
-            .update({ display_order: update.display_order })
-            .eq('id', update.id)
-          if (error) {
-            logger.error('Supabase update error:', error)
-            throw error
-          }
-        }
-      }
-
-      toast.success("房間順序已儲存")
-      onOpenChange(false)
-      onClose?.()
+      if (error) throw error
+      setRooms((data || []) as TourRoomStatus[])
     } catch (error) {
-      logger.error("排序失敗:", error)
-      toast.error("儲存排序失敗")
+      logger.error('載入房間失敗:', error)
     } finally {
-      setIsSorting(false)
+      setLoading(false)
+    }
+  }
+
+  const handleAddRoom = async () => {
+    try {
+      const currentNightRooms = rooms.filter(r => r.night_number === selectedNight)
+
+      const { error } = await supabase.from('tour_rooms').insert({
+        tour_id: tourId,
+        room_type: newRoom.room_type,
+        capacity: newRoom.capacity,
+        hotel_name: newRoom.hotel_name || null,
+        night_number: selectedNight,
+        display_order: currentNightRooms.length,
+        workspace_id: user?.workspace_id,
+      })
+
+      if (error) throw error
+
+      toast.success('房間已新增')
+      setShowAddRoom(false)
+      setNewRoom({ room_type: 'twin', capacity: 2, hotel_name: '' })
+      loadRooms()
+    } catch (error) {
+      logger.error('新增房間失敗:', error)
+      toast.error('新增房間失敗')
     }
   }
 
   const handleDeleteRoom = async (roomId: string) => {
-    const confirmed = await confirm('確定要刪除這個房間嗎？已分配的團員將會被移除。', {
+    const confirmed = await confirm('確定要刪除這個房間嗎？', {
       title: '刪除房間',
       type: 'warning',
     })
@@ -156,26 +135,15 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
 
       if (error) throw error
 
-      setSelectedRoomType(null)
       toast.success('房間已刪除')
-      reload()
+      loadRooms()
     } catch (error) {
       logger.error('刪除房間失敗:', error)
       toast.error('刪除房間失敗')
     }
   }
 
-  const handleEditRoom = (room: TourRoomStatus) => {
-    setEditingRoom(room)
-    setEditRoomOpen(true)
-  }
-
-  const currentNightRooms = rooms.filter(r => r.night_number === selectedNight)
-  const unassignedMembers = getUnassignedMembers(selectedNight)
-  const totalAssigned = currentNightRooms.reduce((sum, r) => sum + r.assigned_count, 0)
-  const totalCapacity = currentNightRooms.reduce((sum, r) => sum + r.capacity, 0)
-
-  // 處理對話框關閉（包含自動排序觸發）
+  // 處理對話框關閉
   const handleOpenChange = (newOpen: boolean) => {
     onOpenChange(newOpen)
     if (!newOpen) {
@@ -183,139 +151,186 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
     }
   }
 
+  const currentNightRooms = rooms.filter(r => r.night_number === selectedNight)
+  const totalCapacity = currentNightRooms.reduce((sum, r) => sum + r.capacity, 0)
+  const totalAssigned = currentNightRooms.reduce((sum, r) => sum + r.assigned_count, 0)
+
   return (
     <>
-      {/* 主 Dialog：level={2} 因為從 TourDetailDialog 打開 */}
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent level={2} className="max-w-6xl w-[95vw] h-[85vh] overflow-hidden flex flex-col">
+        <DialogContent level={2} className="max-w-2xl">
           <DialogHeader className="pb-3 border-b border-border">
             <DialogTitle className="flex items-center gap-2 text-morandi-primary">
               <Hotel className="h-5 w-5 text-morandi-gold" />
-              分房管理
+              房間管理
               {tourNights > 0 && (
                 <span className="text-sm font-normal text-morandi-muted">
                   {tourNights + 1} 天 {tourNights} 夜
                 </span>
               )}
-
-              {/* 夜晚選擇按鈕 */}
-              <div className="flex items-center gap-1.5 ml-4">
-                {[...Array(maxNight)].map((_, i) => {
-                  const nightNum = i + 1
-                  const isCont = continueFromPrevious.has(nightNum)
-
-                  return (
-                    <button
-                      key={nightNum}
-                      onClick={() => setSelectedNight(nightNum)}
-                      className={cn(
-                        "px-4 py-1.5 rounded-md text-sm font-normal transition-all whitespace-nowrap border",
-                        selectedNight === nightNum
-                          ? "border-morandi-gold bg-morandi-gold/10 text-morandi-gold"
-                          : "border-border text-morandi-secondary hover:border-morandi-gold hover:text-morandi-gold",
-                        isCont && "border-dashed"
-                      )}
-                    >
-                      第{nightNum}晚{isCont && '續'}
-                    </button>
-                  )
-                })}
-              </div>
-
-              <div className="flex items-center gap-2 ml-auto">
-                <Button
-                  variant="outline"
-                  onClick={() => setRoomingListOpen(true)}
-                  className="gap-1.5"
-                >
-                  <FileText className="h-4 w-4" />
-                  輸出分房總表
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setAddRoomOpen(true)}
-                  className="gap-1.5"
-                >
-                  <Plus className="h-4 w-4" />
-                  新增房間
-                </Button>
-                <Button
-                  onClick={handleSortAndClose}
-                  disabled={isSorting}
-                  className="gap-1.5"
-                >
-                  {isSorting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-                  完成並排序
-                </Button>
-              </div>
             </DialogTitle>
           </DialogHeader>
 
-          <div className="flex-1 overflow-hidden grid grid-cols-3 gap-4 mt-4">
-            {/* 左側：房間列表 */}
-            <RoomList
-              rooms={rooms}
-              selectedNight={selectedNight}
-              showFullRooms={showFullRooms}
-              selectedRoomType={selectedRoomType}
-              continueFromPrevious={continueFromPrevious}
-              getRoomMembers={getRoomMembers}
-              onToggleShowFull={() => setShowFullRooms(!showFullRooms)}
-              onToggleContinue={toggleContinueFromPrevious}
-              onClearRoom={handleClearRoom}
-              onEditRoom={handleEditRoom}
-              onDeleteRoom={handleDeleteRoom}
-              onRemoveAssignment={handleRemoveAssignment}
-              onRoomTypeFilter={setSelectedRoomType}
-            />
+          {/* 夜晚選擇 */}
+          <div className="flex items-center gap-2 py-3 border-b border-border">
+            {[...Array(tourNights)].map((_, i) => {
+              const nightNum = i + 1
+              const nightRooms = rooms.filter(r => r.night_number === nightNum)
+              return (
+                <button
+                  key={nightNum}
+                  onClick={() => setSelectedNight(nightNum)}
+                  className={cn(
+                    "px-3 py-1.5 rounded-md text-sm transition-all border",
+                    selectedNight === nightNum
+                      ? "border-morandi-gold bg-morandi-gold/10 text-morandi-gold"
+                      : "border-border text-morandi-secondary hover:border-morandi-gold"
+                  )}
+                >
+                  第{nightNum}晚 ({nightRooms.length}房)
+                </button>
+              )
+            })}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowAddRoom(true)}
+              className="ml-auto gap-1"
+            >
+              <Plus className="h-4 w-4" />
+              新增房間
+            </Button>
+          </div>
 
-            {/* 右側：分配團員 */}
-            <MemberAssignmentPanel
-              rooms={rooms}
-              selectedNight={selectedNight}
-              unassignedMembers={unassignedMembers}
-              totalAssigned={totalAssigned}
-              totalCapacity={totalCapacity}
-              onAssignMember={handleAssignMember}
-            />
+          {/* 房間列表 */}
+          <div className="py-4 space-y-2 max-h-[400px] overflow-auto">
+            {currentNightRooms.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-morandi-muted">
+                <Bed className="h-8 w-8 mb-2" />
+                <p className="text-sm">尚未設定房間</p>
+                <p className="text-xs mt-1">點擊「新增房間」開始設定</p>
+              </div>
+            ) : (
+              <>
+                <div className="text-xs text-morandi-muted mb-2">
+                  共 {currentNightRooms.length} 間房，容量 {totalCapacity} 人，已分配 {totalAssigned} 人
+                </div>
+                {currentNightRooms.map((room, index) => {
+                  const roomTypeLabel = ROOM_TYPES.find(t => t.value === room.room_type)?.label || room.room_type
+                  return (
+                    <div
+                      key={room.id}
+                      className={cn(
+                        "flex items-center justify-between p-3 rounded-lg border",
+                        room.is_full
+                          ? "border-morandi-green bg-morandi-green/5"
+                          : "border-border bg-card"
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-medium text-morandi-primary">
+                          {roomTypeLabel} {index + 1}
+                        </span>
+                        {room.hotel_name && (
+                          <span className="text-xs text-morandi-muted">
+                            {room.hotel_name}
+                          </span>
+                        )}
+                        <span className={cn(
+                          "text-xs px-2 py-0.5 rounded-full",
+                          room.is_full
+                            ? "bg-morandi-green/10 text-morandi-green"
+                            : "bg-morandi-container text-morandi-secondary"
+                        )}>
+                          {room.assigned_count}/{room.capacity} 人
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 text-morandi-muted hover:text-morandi-red"
+                        onClick={() => handleDeleteRoom(room.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )
+                })}
+              </>
+            )}
+          </div>
+
+          <div className="pt-3 border-t border-border text-xs text-morandi-muted">
+            提示：團員分房請在成員名單中使用下拉選單操作
           </div>
         </DialogContent>
       </Dialog>
 
       {/* 新增房間 Dialog */}
-      <AddRoomDialog
-        open={addRoomOpen}
-        onOpenChange={setAddRoomOpen}
-        tourId={tourId}
-        selectedNight={selectedNight}
-        tour={tour}
-        currentRoomCount={currentNightRooms.length}
-        continueFromPrevious={continueFromPrevious}
-        onToggleContinue={toggleContinueFromPrevious}
-        onSuccess={reload}
-        defaultHotelName={itineraryHotels.getHotelForNight(selectedNight)}
-      />
-
-      {/* 編輯房間對話框 */}
-      <EditRoomDialog
-        room={editingRoom}
-        open={editRoomOpen}
-        onOpenChange={setEditRoomOpen}
-        onSuccess={reload}
-      />
-
-      {/* 輸出分房總表 */}
-      <RoomingListExport
-        open={roomingListOpen}
-        onOpenChange={setRoomingListOpen}
-        tourCode={tour?.code || ''}
-        tourName={tour?.name || ''}
-        departureDate={tour?.departure_date || ''}
-        returnDate={tour?.return_date || ''}
-        rooms={rooms}
-        assignments={assignments}
-        members={members}
-      />
+      <Dialog open={showAddRoom} onOpenChange={setShowAddRoom}>
+        <DialogContent level={3} className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-morandi-primary">
+              <Plus className="h-5 w-5 text-morandi-gold" />
+              新增房間（第{selectedNight}晚）
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-morandi-primary">房型</Label>
+                <Select
+                  value={newRoom.room_type}
+                  onValueChange={value => {
+                    setNewRoom({
+                      ...newRoom,
+                      room_type: value,
+                      capacity: ROOM_CAPACITY[value] || 2
+                    })
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ROOM_TYPES.map(type => (
+                      <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-morandi-primary">容納人數</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={6}
+                  value={newRoom.capacity}
+                  onChange={e => setNewRoom({ ...newRoom, capacity: parseInt(e.target.value) || 2 })}
+                />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-morandi-primary">飯店名稱（選填）</Label>
+              <Input
+                value={newRoom.hotel_name}
+                onChange={e => setNewRoom({ ...newRoom, hotel_name: e.target.value })}
+                placeholder="例如：清邁香格里拉"
+              />
+            </div>
+            <div className="flex justify-end gap-2 pt-3 border-t border-border">
+              <Button variant="outline" onClick={() => setShowAddRoom(false)} className="gap-2">
+                <X size={16} />
+                取消
+              </Button>
+              <Button onClick={handleAddRoom} className="gap-2">
+                <Plus size={16} />
+                新增
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

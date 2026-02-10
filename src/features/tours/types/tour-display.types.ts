@@ -132,40 +132,17 @@ export interface TourPageData {
 
 /**
  * TourPageProps - TourPage 組件的 props
- *
- * @remarks
- * 🔧 技術債：data 使用 any（待統一 39 個 section 元件的類型後改用 TourPageData）
- *
- * 原因：39 個 section 元件各自定義不同的 TourDisplayData
- * - TourHeroSection 需要 title: string (必填)
- * - TourFlightSection 需要不同的 FlightInfo 格式
- * - 其他元件也有各自的類型要求
- *
- * 解決方案：逐步將所有 section 改用統一的 TourPageData
- * 追蹤：TODO.md「Tour Section 類型統一」
- *
- * @see TourPageData 完整欄位定義（供參考）
  */
 export interface TourPageProps {
-  /**
-   * 技術債：待統一 39 個 section 類型後改用 TourPageData
-   * 目前各 section 有不同的必填欄位要求，強制類型會導致大量錯誤
-   */
-   
-  data: any
+  data: TourPageData
   isPreview?: boolean
   viewMode?: 'desktop' | 'mobile'
 }
 
 /**
  * TourPreviewProps - TourPreview 組件的 props
- * @see TourPageProps
  */
 export interface TourPreviewProps {
-  /**
-   * 技術債：待統一 39 個 section 類型後改用 TourPageData
-   */
-   
-  data: any
+  data: TourPageData
   viewMode?: 'desktop' | 'mobile'
 }

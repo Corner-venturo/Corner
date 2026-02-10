@@ -6,6 +6,7 @@
  */
 
 import { supabase } from '@/lib/supabase/client'
+import { typedRpc } from '@/lib/supabase/typed-client'
 import { logger } from '@/lib/utils/logger'
 
 // 護照資料同步欄位
@@ -132,16 +133,15 @@ export async function syncPassportDataToMembers(
 ): Promise<number> {
   try {
     // 使用 RPC 函數處理 uuid/text 類型轉換
-     
-    const { data, error } = await (supabase.rpc as any)('sync_passport_to_order_members', {
+    const { data, error } = await typedRpc('sync_passport_to_order_members', {
       p_customer_id: customerId,
-      p_passport_number: passportData.passport_number ?? null,
-      p_passport_name: passportData.passport_name ?? null,
-      p_passport_expiry: passportData.passport_expiry ?? null,
-      p_passport_image_url: passportData.passport_image_url ?? null,
-      p_birth_date: passportData.birth_date ?? null,
-      p_gender: passportData.gender ?? null,
-      p_id_number: passportData.national_id ?? null,
+      p_passport_number: passportData.passport_number ?? undefined,
+      p_passport_name: passportData.passport_name ?? undefined,
+      p_passport_expiry: passportData.passport_expiry ?? undefined,
+      p_passport_image_url: passportData.passport_image_url ?? undefined,
+      p_birth_date: passportData.birth_date ?? undefined,
+      p_gender: passportData.gender ?? undefined,
+      p_id_number: passportData.national_id ?? undefined,
     })
 
     if (error) {

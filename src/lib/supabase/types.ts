@@ -14399,6 +14399,67 @@ export type Database = {
         }
         Relationships: []
       }
+      tour_meal_settings: {
+        Row: {
+          created_at: string | null
+          day_number: number
+          display_order: number | null
+          enabled: boolean | null
+          id: string
+          meal_type: string
+          restaurant_name: string | null
+          tour_id: string
+          updated_at: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          day_number: number
+          display_order?: number | null
+          enabled?: boolean | null
+          id?: string
+          meal_type: string
+          restaurant_name?: string | null
+          tour_id: string
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          day_number?: number
+          display_order?: number | null
+          enabled?: boolean | null
+          id?: string
+          meal_type?: string
+          restaurant_name?: string | null
+          tour_id?: string
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_meal_settings_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_meal_settings_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_meal_settings_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tour_member_fields: {
         Row: {
           created_at: string | null
@@ -15118,6 +15179,121 @@ export type Database = {
             columns: ["tour_id"]
             isOneToOne: false
             referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_table_assignments: {
+        Row: {
+          created_at: string | null
+          id: string
+          order_member_id: string
+          table_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          order_member_id: string
+          table_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          order_member_id?: string
+          table_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_table_assignments_order_member_id_fkey"
+            columns: ["order_member_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["order_member_id"]
+          },
+          {
+            foreignKeyName: "tour_table_assignments_order_member_id_fkey"
+            columns: ["order_member_id"]
+            isOneToOne: false
+            referencedRelation: "order_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_table_assignments_table_id_fkey"
+            columns: ["table_id"]
+            isOneToOne: false
+            referencedRelation: "tour_tables"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_table_assignments_table_id_fkey"
+            columns: ["table_id"]
+            isOneToOne: false
+            referencedRelation: "tour_tables_status"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_tables: {
+        Row: {
+          capacity: number
+          created_at: string | null
+          display_order: number | null
+          id: string
+          meal_setting_id: string
+          table_number: number
+          tour_id: string
+          updated_at: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          capacity?: number
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          meal_setting_id: string
+          table_number: number
+          tour_id: string
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          capacity?: number
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          meal_setting_id?: string
+          table_number?: number
+          tour_id?: string
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_tables_meal_setting_id_fkey"
+            columns: ["meal_setting_id"]
+            isOneToOne: false
+            referencedRelation: "tour_meal_settings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_tables_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_tables_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_tables_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -18569,6 +18745,52 @@ export type Database = {
             columns: ["tour_id"]
             isOneToOne: false
             referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_tables_status: {
+        Row: {
+          assigned_count: number | null
+          capacity: number | null
+          day_number: number | null
+          display_order: number | null
+          id: string | null
+          is_full: boolean | null
+          meal_setting_id: string | null
+          meal_type: string | null
+          restaurant_name: string | null
+          table_number: number | null
+          tour_id: string | null
+          workspace_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_tables_meal_setting_id_fkey"
+            columns: ["meal_setting_id"]
+            isOneToOne: false
+            referencedRelation: "tour_meal_settings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_tables_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_tables_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_tables_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]

@@ -55,9 +55,9 @@ export function MemberBasicInfo({
     remarks: true,
   }
 
-  // 編輯模式下的 sticky 位置需要考慮拖曳欄位（28px）
-  const seqLeft = isEditMode ? 'left-[28px]' : 'left-0'
-  const nameLeft = isEditMode ? 'left-[68px]' : 'left-[40px]'
+  // sticky 位置（拖曳欄位一直存在）
+  const seqLeft = 'left-[28px]'
+  const nameLeft = 'left-[68px]'
 
   // 處理日期輸入（自動格式化）
   const handleDateInput = (value: string) => {

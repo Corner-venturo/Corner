@@ -1,0 +1,90 @@
+/**
+ * VersionDropdown - 版本選擇下拉選單
+ */
+
+'use client'
+
+import { History, ChevronDown } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import type { ItineraryVersionRecord, Itinerary } from '@/stores/types'
+import { stripHtml } from '@/lib/utils/string-utils'
+
+interface VersionDropdownProps {
+  existingItinerary: Itinerary | undefined
+  versionRecords: ItineraryVersionRecord[]
+  selectedVersionIndex: number
+  currentVersionName: string
+  onVersionChange: (index: number) => void
+}
+
+export function VersionDropdown({
+  existingItinerary,
+  versionRecords,
+  selectedVersionIndex,
+  currentVersionName,
+  onVersionChange,
+}: VersionDropdownProps) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" className="h-7 px-2 text-[11px] gap-1">
+          <History size={12} />
+          {currentVersionName}
+          <ChevronDown size={10} />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56 mb-2" align="start">
+        <div className="px-2 py-1.5 text-xs font-medium text-morandi-primary border-b border-border">
+          版本歷史 ({versionRecords.length > 0 ? versionRecords.length : 1})
+        </div>
+        {/* 主版本（當前狀態） */}
+        <DropdownMenuItem
+          className="flex items-center justify-between py-2 px-2 cursor-pointer hover:bg-morandi-container/50"
+          onClick={() => onVersionChange(-1)}
+        >
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1.5">
+              <span className="font-medium text-sm">{stripHtml(existingItinerary?.title) || '主版本'}</span>
+              <span className="text-[10px] text-morandi-secondary bg-morandi-container px-1.5 py-0.5 rounded">主版本</span>
+            </div>
+            <span className="text-xs text-morandi-secondary">
+              {existingItinerary?.updated_at ? new Date(existingItinerary.updated_at).toLocaleString('zh-TW') : '當前編輯中'}
+            </span>
+          </div>
+          {selectedVersionIndex === -1 && (
+            <div className="text-xs bg-morandi-gold text-white px-1.5 py-0.5 rounded">當前</div>
+          )}
+        </DropdownMenuItem>
+        {/* 其他版本記錄 */}
+        {versionRecords.map((record, index) => {
+          const isCurrentVersion = selectedVersionIndex === index
+          return (
+            <DropdownMenuItem
+              key={record.id}
+              className="flex items-center justify-between py-2 px-2 cursor-pointer hover:bg-morandi-container/50"
+              onClick={() => onVersionChange(index)}
+            >
+              <div className="flex flex-col">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-medium text-sm">{record.note || `版本 ${record.version}`}</span>
+                </div>
+                <span className="text-xs text-morandi-secondary">
+                  {record.created_at ? new Date(record.created_at).toLocaleString('zh-TW') : ''}
+                </span>
+              </div>
+              {isCurrentVersion && (
+                <div className="text-xs bg-morandi-gold text-white px-1.5 py-0.5 rounded">當前</div>
+              )}
+            </DropdownMenuItem>
+          )
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}

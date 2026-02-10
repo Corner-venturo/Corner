@@ -7,8 +7,6 @@
 
 import React, { useCallback, useEffect, useState, useMemo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import dynamic from 'next/dynamic'
-import { Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 import { useQuotesListSlim } from '@/hooks/useListSlim'
 import { useTourOperations } from '../hooks/useTourOperations'
@@ -38,18 +36,6 @@ import { useProposalOperations } from '../hooks/useProposalOperations'
 import { ProposalDialogsWrapper } from './ProposalDialogsWrapper'
 import type { Proposal } from '@/types/proposal.types'
 
-const TourDetailDialog = dynamic(
-  () => import('@/components/tours/TourDetailDialog').then(m => m.TourDetailDialog),
-  {
-    /* eslint-disable venturo/no-custom-modal -- 動態載入時的 loading 狀態 */
-    loading: () => (
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9000]">
-        <Loader2 className="animate-spin text-white" size={32} />
-      </div>
-    ),
-    ssr: false
-  }
-)
 
 export const ToursPage: React.FC = () => {
   const searchParams = useSearchParams()
@@ -127,10 +113,6 @@ export const ToursPage: React.FC = () => {
     contractDialogState,
     openContractDialog,
     closeContractDialog,
-    detailDialogTourId,
-    detailDialogDefaultTab,
-    openDetailDialog,
-    closeDetailDialog,
     archiveDialogTour,
     openArchiveDialog,
     closeArchiveDialog,
@@ -311,7 +293,7 @@ export const ToursPage: React.FC = () => {
     return [...proposalsAsTours, ...filteredTours]
   }, [activeStatusTab, filteredTours, proposals, searchQuery])
 
-  // 點擊整列打開詳情浮動視窗
+  // 點擊整列導航到詳情頁面
   const handleRowClick = useCallback((row: unknown) => {
     const item = row as Tour & { __isProposal?: boolean; __originalProposal?: Proposal }
 
@@ -321,10 +303,9 @@ export const ToursPage: React.FC = () => {
       return
     }
 
-    // 否則是旅遊團，打開旅遊團詳情
-    setSelectedTour(item as Tour)
-    openDetailDialog(item.id)
-  }, [setSelectedTour, openDetailDialog, handleProposalClick])
+    // 否則是旅遊團，導航到詳情頁面
+    router.push(`/tours/${item.code}`)
+  }, [router, handleProposalClick])
 
   useEffect(() => {
     handleNavigationEffect()
@@ -448,13 +429,6 @@ export const ToursPage: React.FC = () => {
         />
       )}
 
-      <TourDetailDialog
-        isOpen={!!detailDialogTourId}
-        onClose={closeDetailDialog}
-        tourId={detailDialogTourId}
-        defaultTab={detailDialogDefaultTab}
-        onDataChange={() => {}}
-      />
 
 
       {closingDialogTour && (

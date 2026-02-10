@@ -1,10 +1,11 @@
 /**
  * MemberTableHeader - 成員表格標題列
+ * 支援拖拉調整欄位寬度
  */
 
 'use client'
 
-import React from 'react'
+import React, { useCallback, useRef } from 'react'
 import type { ColumnVisibility } from '../OrderMembersExpandable'
 import type { HotelColumn } from '../hooks/useRoomVehicleAssignments'
 
@@ -15,16 +16,107 @@ interface MemberTableHeaderProps {
   showPnrColumn: boolean
   showRoomColumn: boolean
   showVehicleColumn: boolean
-  hotelColumns?: HotelColumn[]  // 飯店欄位列表
+  hotelColumns?: HotelColumn[]
   customCostFields: Array<{ id: string; name: string; values: Record<string, string> }>
   columnVisibility?: ColumnVisibility
   isEditMode?: boolean
+  columnWidths?: Record<string, number>
+  onColumnResize?: (columnId: string, width: number) => void
 }
 
-const thClass = "border border-morandi-gold/20 px-2 py-2 text-left text-xs font-medium text-morandi-primary bg-morandi-gold/10"
-// 凍結欄位必須使用實色背景，避免滾動時內容穿透
-// z-30: 比資料列凍結欄位(z-10)高，這樣向下滾動時表頭會在上面
-const thStickyClass = "border border-morandi-gold/20 px-2 py-2 text-left text-xs font-medium text-morandi-primary bg-[#f0ebe3] sticky z-30"
+// 預設欄位寬度
+const DEFAULT_WIDTHS: Record<string, number> = {
+  drag: 28,
+  seq: 40,
+  chinese_name: 80,
+  order_code: 60,
+  identity: 60,
+  passport_name: 120,
+  birth_date: 100,
+  gender: 50,
+  id_number: 100,
+  passport_number: 100,
+  passport_expiry: 100,
+  special_meal: 80,
+  total_payable: 80,
+  deposit_amount: 80,
+  balance: 80,
+  remarks: 120,
+  room: 100,
+  vehicle: 80,
+  pnr: 80,
+  ticket_number: 120,
+  ticketing_deadline: 100,
+  flight_cost: 100,
+  actions: 80,
+}
+
+const thBaseClass = "border border-morandi-gold/20 px-2 py-2 text-left text-xs font-medium text-morandi-primary bg-morandi-gold/10 relative"
+const thStickyClass = "border border-morandi-gold/20 px-2 py-2 text-left text-xs font-medium text-morandi-primary bg-[#f0ebe3] sticky z-30 relative"
+
+// 可調整寬度的表頭元件
+function ResizableTh({
+  columnId,
+  width,
+  onResize,
+  className,
+  children,
+  title,
+  style,
+}: {
+  columnId: string
+  width: number
+  onResize?: (columnId: string, width: number) => void
+  className: string
+  children: React.ReactNode
+  title?: string
+  style?: React.CSSProperties
+}) {
+  const startXRef = useRef(0)
+  const startWidthRef = useRef(0)
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (!onResize) return
+    e.preventDefault()
+    e.stopPropagation()
+    startXRef.current = e.clientX
+    startWidthRef.current = width
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const diff = moveEvent.clientX - startXRef.current
+      const newWidth = Math.max(30, startWidthRef.current + diff)
+      onResize(columnId, newWidth)
+    }
+
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+  }, [columnId, width, onResize])
+
+  return (
+    <th
+      className={className}
+      style={{ width: `${width}px`, minWidth: `${width}px`, maxWidth: `${width}px`, ...style }}
+      title={title}
+    >
+      <div className="truncate pr-2">{children}</div>
+      {onResize && (
+        <div
+          className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-morandi-gold/50 z-40"
+          onMouseDown={handleMouseDown}
+        />
+      )}
+    </th>
+  )
+}
 
 export function MemberTableHeader({
   mode,
@@ -36,9 +128,9 @@ export function MemberTableHeader({
   hotelColumns = [],
   customCostFields,
   columnVisibility,
-  isEditMode = false,
+  columnWidths = {},
+  onColumnResize,
 }: MemberTableHeaderProps) {
-  // 預設欄位顯示設定（訂金/尾款/應付金額 預設關閉）
   const cv = columnVisibility || {
     passport_name: true,
     birth_date: true,
@@ -54,107 +146,195 @@ export function MemberTableHeader({
     room: true,
     vehicle: true,
     pnr: false,
-    ticket_number: true,  // 預設顯示機票號碼
+    ticket_number: true,
     ticketing_deadline: false,
-    flight_cost: false,   // 機票金額預設關閉
+    flight_cost: false,
   }
 
-  // 編輯模式下顯示拖曳欄位，需要調整序號和中文姓名的 left 位置
-  const seqLeft = isEditMode ? 'left-[28px]' : 'left-0'
-  const nameLeft = isEditMode ? 'left-[68px]' : 'left-[40px]'
+  const getWidth = (id: string) => columnWidths[id] || DEFAULT_WIDTHS[id] || 80
+
+  // sticky 位置（拖曳欄位一直存在）
+  const seqLeft = 'left-[28px]'
+  const nameLeft = 'left-[68px]'
 
   return (
     <thead className="sticky top-0 z-20 bg-[#f6f4f1]">
       <tr>
-        {/* 編輯模式：拖曳把手欄位 */}
-        {isEditMode && (
-          <th className={`${thStickyClass} left-0 min-w-[28px] w-[28px]`}></th>
-        )}
+        {/* 拖曳把手欄位（固定寬度，不可調整） */}
+        <th className={`${thStickyClass} left-0`} style={{ width: '28px', minWidth: '28px' }}></th>
 
         {/* 凍結欄位：序號 */}
-        <th className={`${thStickyClass} ${seqLeft} min-w-[40px]`}>序</th>
+        <ResizableTh
+          columnId="seq"
+          width={getWidth('seq')}
+          onResize={onColumnResize}
+          className={`${thStickyClass} ${seqLeft}`}
+        >
+          序
+        </ResizableTh>
 
         {/* 凍結欄位：中文姓名 */}
-        <th className={`${thStickyClass} ${nameLeft} min-w-[80px]`}>中文姓名</th>
+        <ResizableTh
+          columnId="chinese_name"
+          width={getWidth('chinese_name')}
+          onResize={onColumnResize}
+          className={`${thStickyClass} ${nameLeft}`}
+        >
+          中文姓名
+        </ResizableTh>
 
         {/* 團體模式：訂單編號 */}
         {mode === 'tour' && orderCount > 1 && (
-          <th className={`${thClass} min-w-[60px]`}>單號</th>
+          <ResizableTh columnId="order_code" width={getWidth('order_code')} onResize={onColumnResize} className={thBaseClass}>
+            單號
+          </ResizableTh>
         )}
 
         {/* 可選：身份 */}
         {showIdentityColumn && (
-          <th className={`${thClass} min-w-[60px]`}>身份</th>
+          <ResizableTh columnId="identity" width={getWidth('identity')} onResize={onColumnResize} className={thBaseClass}>
+            身份
+          </ResizableTh>
         )}
-        {cv.passport_name && <th className={`${thClass} min-w-[120px]`}>護照拼音</th>}
-        {cv.birth_date && <th className={`${thClass} min-w-[100px]`}>出生年月日</th>}
-        {cv.gender && <th className={`${thClass} min-w-[50px]`}>性別</th>}
-        {cv.id_number && <th className={`${thClass} min-w-[100px]`}>身分證號</th>}
+
+        {cv.passport_name && (
+          <ResizableTh columnId="passport_name" width={getWidth('passport_name')} onResize={onColumnResize} className={thBaseClass}>
+            護照拼音
+          </ResizableTh>
+        )}
+        {cv.birth_date && (
+          <ResizableTh columnId="birth_date" width={getWidth('birth_date')} onResize={onColumnResize} className={thBaseClass}>
+            出生年月日
+          </ResizableTh>
+        )}
+        {cv.gender && (
+          <ResizableTh columnId="gender" width={getWidth('gender')} onResize={onColumnResize} className={thBaseClass}>
+            性別
+          </ResizableTh>
+        )}
+        {cv.id_number && (
+          <ResizableTh columnId="id_number" width={getWidth('id_number')} onResize={onColumnResize} className={thBaseClass}>
+            身分證號
+          </ResizableTh>
+        )}
 
         {/* 護照資訊 */}
-        {cv.passport_number && <th className={`${thClass} min-w-[100px]`}>護照號碼</th>}
-        {cv.passport_expiry && <th className={`${thClass} min-w-[100px]`}>護照效期</th>}
+        {cv.passport_number && (
+          <ResizableTh columnId="passport_number" width={getWidth('passport_number')} onResize={onColumnResize} className={thBaseClass}>
+            護照號碼
+          </ResizableTh>
+        )}
+        {cv.passport_expiry && (
+          <ResizableTh columnId="passport_expiry" width={getWidth('passport_expiry')} onResize={onColumnResize} className={thBaseClass}>
+            護照效期
+          </ResizableTh>
+        )}
 
         {/* 其他資訊 */}
-        {cv.special_meal && <th className={`${thClass} min-w-[80px]`}>飲食禁忌</th>}
+        {cv.special_meal && (
+          <ResizableTh columnId="special_meal" width={getWidth('special_meal')} onResize={onColumnResize} className={thBaseClass}>
+            飲食禁忌
+          </ResizableTh>
+        )}
 
         {/* 金額 */}
-        {cv.total_payable && <th className={`${thClass} min-w-[80px]`}>應付金額</th>}
-        {cv.deposit_amount && <th className={`${thClass} min-w-[80px]`}>訂金</th>}
-        {cv.balance && <th className={`${thClass} min-w-[80px]`}>尾款</th>}
+        {cv.total_payable && (
+          <ResizableTh columnId="total_payable" width={getWidth('total_payable')} onResize={onColumnResize} className={thBaseClass}>
+            應付金額
+          </ResizableTh>
+        )}
+        {cv.deposit_amount && (
+          <ResizableTh columnId="deposit_amount" width={getWidth('deposit_amount')} onResize={onColumnResize} className={thBaseClass}>
+            訂金
+          </ResizableTh>
+        )}
+        {cv.balance && (
+          <ResizableTh columnId="balance" width={getWidth('balance')} onResize={onColumnResize} className={thBaseClass}>
+            尾款
+          </ResizableTh>
+        )}
 
         {/* 備註 */}
-        {cv.remarks && <th className={`${thClass} min-w-[120px]`}>備註</th>}
+        {cv.remarks && (
+          <ResizableTh columnId="remarks" width={getWidth('remarks')} onResize={onColumnResize} className={thBaseClass}>
+            備註
+          </ResizableTh>
+        )}
 
         {/* 團體模式：分房（按飯店分欄位） */}
         {mode === 'tour' && showRoomColumn && hotelColumns.length > 0 && hotelColumns.map(hotel => (
-          <th key={hotel.id} className={`${thClass} min-w-[80px]`} title={hotel.name}>
+          <ResizableTh
+            key={hotel.id}
+            columnId={`hotel_${hotel.id}`}
+            width={getWidth(`hotel_${hotel.id}`) || 100}
+            onResize={onColumnResize}
+            className={thBaseClass}
+            title={hotel.name}
+          >
             <div className="text-xs leading-tight">
               <div className="font-medium">{hotel.shortName}</div>
             </div>
-          </th>
+          </ResizableTh>
         ))}
         {/* 單欄位模式（沒有飯店資訊時） */}
         {mode === 'tour' && showRoomColumn && hotelColumns.length === 0 && (
-          <th className={`${thClass} min-w-[100px]`}>分房</th>
+          <ResizableTh columnId="room" width={getWidth('room')} onResize={onColumnResize} className={thBaseClass}>
+            分房
+          </ResizableTh>
         )}
 
         {/* 團體模式：分車 */}
         {mode === 'tour' && showVehicleColumn && (
-          <th className={`${thClass} min-w-[80px]`}>分車</th>
+          <ResizableTh columnId="vehicle" width={getWidth('vehicle')} onResize={onColumnResize} className={thBaseClass}>
+            分車
+          </ResizableTh>
         )}
 
         {/* 團體模式：PNR */}
         {mode === 'tour' && showPnrColumn && (
-          <th className={`${thClass} min-w-[80px]`}>PNR</th>
+          <ResizableTh columnId="pnr" width={getWidth('pnr')} onResize={onColumnResize} className={thBaseClass}>
+            PNR
+          </ResizableTh>
         )}
 
         {/* 團體模式：機票號碼 */}
         {mode === 'tour' && cv.ticket_number && (
-          <th className={`${thClass} min-w-[120px]`}>機票號碼</th>
+          <ResizableTh columnId="ticket_number" width={getWidth('ticket_number')} onResize={onColumnResize} className={thBaseClass}>
+            機票號碼
+          </ResizableTh>
         )}
 
         {/* 團體模式：開票期限 */}
         {mode === 'tour' && cv.ticketing_deadline && (
-          <th className={`${thClass} min-w-[100px]`}>開票期限</th>
+          <ResizableTh columnId="ticketing_deadline" width={getWidth('ticketing_deadline')} onResize={onColumnResize} className={thBaseClass}>
+            開票期限
+          </ResizableTh>
         )}
 
         {/* 團體模式：機票金額 */}
         {mode === 'tour' && cv.flight_cost && (
-          <th className={`${thClass} min-w-[100px]`}>機票金額</th>
+          <ResizableTh columnId="flight_cost" width={getWidth('flight_cost')} onResize={onColumnResize} className={thBaseClass}>
+            機票金額
+          </ResizableTh>
         )}
 
         {/* 團體模式：自訂費用欄位 */}
         {mode === 'tour' && customCostFields.map(field => (
-          <th key={field.id} className={`${thClass} min-w-[80px]`}>
+          <ResizableTh
+            key={field.id}
+            columnId={`custom_${field.id}`}
+            width={getWidth(`custom_${field.id}`) || 80}
+            onResize={onColumnResize}
+            className={thBaseClass}
+          >
             {field.name}
-          </th>
+          </ResizableTh>
         ))}
 
         {/* 操作 */}
-        <th className={`${thClass} min-w-[80px] text-center`}>
+        <ResizableTh columnId="actions" width={getWidth('actions')} onResize={onColumnResize} className={`${thBaseClass} text-center`}>
           操作
-        </th>
+        </ResizableTh>
       </tr>
     </thead>
   )

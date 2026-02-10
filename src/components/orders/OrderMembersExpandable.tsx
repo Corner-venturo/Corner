@@ -43,8 +43,7 @@ import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { useOcrRecognition } from '@/hooks'
 import { useCustomers, useTour } from '@/data'
-import { TourRoomManager } from '@/components/tours/tour-room-manager'
-import { TourVehicleManager } from '@/components/tours/tour-vehicle-manager'
+import { TourAssignmentManager } from '@/components/tours/TourAssignmentManager'
 import {
   useOrderMembersData,
   useRoomVehicleAssignments,
@@ -52,6 +51,7 @@ import {
   useMemberExport,
   useMemberEditDialog,
   usePassportUpload,
+  useColumnWidths,
 } from './hooks'
 import {
   MemberRow,
@@ -152,7 +152,7 @@ export function OrderMembersExpandable({
   const { item: fetchedTour } = useTour(tour ? null : tourId)
   const effectiveTour = tour || fetchedTour
   const membersData = useOrderMembersData({ orderId, tourId, workspaceId, mode })
-  const roomVehicle = useRoomVehicleAssignments({ tourId })
+  const roomVehicle = useRoomVehicleAssignments({ tourId, departureDate: membersData.departureDate })
   const customerMatch = useCustomerMatch(customers, membersData.members, membersData.setMembers)
   const memberExport = useMemberExport(membersData.members)
   const memberEdit = useMemberEditDialog({ members: membersData.members, setMembers: membersData.setMembers })
@@ -160,6 +160,7 @@ export function OrderMembersExpandable({
   const effectiveOrderId = orderId || membersData.selectedOrderIdForAdd || (membersData.tourOrders.length === 1 ? membersData.tourOrders[0]?.id : undefined)
   const passportUpload = usePassportUpload({ orderId: effectiveOrderId, workspaceId, onSuccess: membersData.loadMembers })
   const { isRecognizing, recognizePassport } = useOcrRecognition()
+  const { columnWidths, setColumnWidth } = useColumnWidths()
 
   // DnD Kit sensors for drag-and-drop sorting
   const sensors = useSensors(
@@ -181,44 +182,47 @@ export function OrderMembersExpandable({
 
     const draggedId = active.id as string
     const targetId = over.id as string
-    
-    // 找出被拖曳成員的房間分配
-    const draggedRoom = roomVehicle.roomAssignments[draggedId]
-    
-    // 如果有分房，找出所有同房成員
+
+    // 找出所有同房成員（檢查所有飯店的分房）
     let draggedMembers: string[] = [draggedId]
-    if (draggedRoom && roomVehicle.showRoomColumn) {
-      // 找出所有同房的成員 ID（按目前順序）
-      draggedMembers = membersData.members
-        .filter(m => roomVehicle.roomAssignments[m.id] === draggedRoom)
-        .map(m => m.id)
+    if (roomVehicle.showRoomColumn && roomVehicle.hotelColumns.length > 0) {
+      // 用第一個飯店的分房來判斷同房關係
+      const firstHotel = roomVehicle.hotelColumns[0]
+      const hotelAssignments = roomVehicle.roomAssignmentsByHotel[firstHotel.id] || {}
+      const draggedRoom = hotelAssignments[draggedId]
+
+      if (draggedRoom) {
+        // 找出所有同房的成員 ID（按目前順序）
+        draggedMembers = membersData.members
+          .filter(m => hotelAssignments[m.id] === draggedRoom)
+          .map(m => m.id)
+      }
     }
-    
+
     // 計算新位置
     const targetIndex = membersData.members.findIndex(m => m.id === targetId)
     if (targetIndex === -1) return
-    
+
     // 移除被拖曳的成員們
-    let newMembers = membersData.members.filter(m => !draggedMembers.includes(m.id))
-    
+    const newMembers = membersData.members.filter(m => !draggedMembers.includes(m.id))
+
     // 重新計算插入位置（因為移除了成員，index 可能改變）
-    const targetMember = membersData.members.find(m => m.id === targetId)
     let insertIndex = newMembers.findIndex(m => m.id === targetId)
-    
+
     // 如果目標成員被移除了（是同房成員），找最近的位置
     if (insertIndex === -1) {
       insertIndex = Math.min(targetIndex, newMembers.length)
     }
-    
+
     // 判斷是往上還是往下移動
     const oldFirstIndex = membersData.members.findIndex(m => m.id === draggedMembers[0])
     const isMovingDown = targetIndex > oldFirstIndex
-    
+
     // 插入整組成員
     const draggedMemberObjects = draggedMembers
       .map(id => membersData.members.find(m => m.id === id))
       .filter(Boolean) as typeof membersData.members
-    
+
     if (isMovingDown) {
       // 往下移動：插入到目標後面
       newMembers.splice(insertIndex + 1, 0, ...draggedMemberObjects)
@@ -226,9 +230,14 @@ export function OrderMembersExpandable({
       // 往上移動：插入到目標前面
       newMembers.splice(insertIndex, 0, ...draggedMemberObjects)
     }
-    
+
     membersData.handleReorderMembers(newMembers)
-  }, [membersData, roomVehicle.roomAssignments, roomVehicle.showRoomColumn])
+
+    // 如果有分房，同步更新房間的 display_order
+    if (roomVehicle.showRoomColumn && Object.keys(roomVehicle.roomSortKeys).length > 0) {
+      roomVehicle.reorderRoomsByMembers(newMembers.map(m => m.id))
+    }
+  }, [membersData, roomVehicle])
 
   // 從 localStorage 讀取欄位顯示設定（v2: 2026-01-05 重置預設值）
   const COLUMN_VISIBILITY_KEY = 'memberListColumnVisibility_v2'
@@ -500,6 +509,7 @@ export function OrderMembersExpandable({
   }, [isComposing, editableFields, membersData])
 
   const sortedMembers = useMemo(() => {
+    // 有分房時按房間排序（同房的人排在一起）
     if (roomVehicle.showRoomColumn && Object.keys(roomVehicle.roomSortKeys).length > 0) {
       return [...membersData.members].sort((a, b) => {
         const aKey = roomVehicle.roomSortKeys[a.id] ?? 9999
@@ -507,7 +517,7 @@ export function OrderMembersExpandable({
         return aKey - bKey
       })
     }
-    // 按 sort_order 排序（領隊會是 0，排在最前面）
+    // 沒有分房時按 sort_order 排序
     return [...membersData.members].sort((a, b) => (a.sort_order ?? 999) - (b.sort_order ?? 999))
   }, [membersData.members, roomVehicle.showRoomColumn, roomVehicle.roomSortKeys])
 
@@ -611,16 +621,11 @@ export function OrderMembersExpandable({
           <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => setShowPnrMatchDialog(true)}>
             <Plane size={14} className="mr-1" />PNR 配對
           </Button>
-          {/* 分房、分車按鈕：僅在 tour 模式顯示 */}
+          {/* 分配按鈕（分房、分車、分桌）：僅在 tour 模式顯示 */}
           {mode === 'tour' && (
-            <>
-              <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => roomVehicle.setShowRoomManager(true)}>
-                <Hotel size={14} className="mr-1" />分房
-              </Button>
-              <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => roomVehicle.setShowVehicleManager(true)}>
-                <Bus size={14} className="mr-1" />分車
-              </Button>
-            </>
+            <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => roomVehicle.setShowRoomManager(true)}>
+              <Hotel size={14} className="mr-1" />分配
+            </Button>
           )}
           <Button
             variant="ghost"
@@ -803,7 +808,7 @@ export function OrderMembersExpandable({
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
-          <table className="w-full border-collapse text-sm member-table-inline">
+          <table className="border-collapse text-sm member-table-inline table-fixed">
             <MemberTableHeader
               mode={mode}
               orderCount={membersData.orderCount}
@@ -815,6 +820,8 @@ export function OrderMembersExpandable({
               customCostFields={customCostFields}
               columnVisibility={columnVisibility}
               isEditMode={isAllEditMode}
+              columnWidths={columnWidths}
+              onColumnResize={setColumnWidth}
             />
             <SortableContext
               items={sortedMembers.map(m => m.id)}
@@ -839,8 +846,13 @@ export function OrderMembersExpandable({
                     vehicleRowSpan={rowSpans.vehicleSpans[member.id]}
                     hotelColumns={roomVehicle.hotelColumns}
                     roomAssignmentsByHotel={roomVehicle.roomAssignmentsByHotel}
+                    roomIdByHotelMember={roomVehicle.roomIdByHotelMember}
+                    roomMembersByHotelRoom={roomVehicle.roomMembersByHotelRoom}
+                    roomOptionsByHotel={roomVehicle.roomOptionsByHotel}
                     roomRowSpansByHotel={rowSpans.roomSpansByHotel}
                     pnrValue={pnrValues[member.id]}
+                    onRoomAssign={roomVehicle.assignMemberToRoom}
+                    onRemoveMemberFromRoom={roomVehicle.removeMemberFromRoom}
                     customCostFields={customCostFields}
                     mode={mode}
                     columnVisibility={columnVisibility}
@@ -963,7 +975,7 @@ export function OrderMembersExpandable({
           onClose={() => memberExport.setIsExportDialogOpen(false)}
         />
       )}
-      <TourRoomManager
+      <TourAssignmentManager
         tourId={tourId}
         tour={membersData.departureDate && membersData.returnDate ? {
           id: tourId,
@@ -980,20 +992,10 @@ export function OrderMembersExpandable({
         open={roomVehicle.showRoomManager}
         onOpenChange={(open) => {
           roomVehicle.setShowRoomManager(open)
-          if (!open) roomVehicle.loadRoomAssignments()
-        }}
-      />
-      <TourVehicleManager
-        tourId={tourId}
-        members={membersData.members.map(m => ({
-          id: m.id,
-          chinese_name: m.chinese_name ?? null,
-          passport_name: m.passport_name ?? null,
-        }))}
-        open={roomVehicle.showVehicleManager}
-        onOpenChange={(open) => {
-          roomVehicle.setShowVehicleManager(open)
-          if (!open) roomVehicle.loadVehicleAssignments()
+          if (!open) {
+            roomVehicle.loadRoomAssignments()
+            roomVehicle.loadVehicleAssignments()
+          }
         }}
       />
     </div>

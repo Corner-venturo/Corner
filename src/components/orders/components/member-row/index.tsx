@@ -5,3 +5,4 @@
 export { MemberBasicInfo } from './MemberBasicInfo'
 export { MemberPassportInfo } from './MemberPassportInfo'
 export { MemberActions } from './MemberActions'
+export { RoomAssignmentCell } from './RoomAssignmentCell'

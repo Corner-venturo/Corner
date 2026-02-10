@@ -5,6 +5,7 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
+import { asInsert } from '@/lib/supabase/typed-client'
 import type {
   Email,
   EmailAttachment,
@@ -595,8 +596,7 @@ export const useEmailStore = create<EmailStoreState>()(
           }
           const { data, error } = await supabase
             .from('emails')
-             
-            .insert(insertData as any)
+            .insert(asInsert<'emails'>(insertData))
             .select()
             .single()
 

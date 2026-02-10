@@ -124,11 +124,11 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
 
       {/* Flight Section - 風格跟隨 coverStyle */}
       <div id="flight">
-        <TourFlightSection data={{ ...data, flightStyle: style }} viewMode={viewMode} coverStyle={style} />
+        <TourFlightSection data={data} viewMode={viewMode} />
       </div>
 
       {/* Features Section */}
-      {data.showFeatures !== false && data.features?.length > 0 && (
+      {data.showFeatures !== false && (data.features?.length ?? 0) > 0 && (
         <>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="border-t border-border"></div>

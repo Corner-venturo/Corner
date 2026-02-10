@@ -14,7 +14,6 @@ import {
   RefreshCw,
   Check,
   X,
-  Download,
   Send,
   AlertCircle,
   Printer,
@@ -23,33 +22,34 @@ import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { CalcInput } from '@/components/ui/calc-input'
 import { useToast } from '@/components/ui/use-toast'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { useAuthStore } from '@/stores/auth-store'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { syncTripToOnline } from '../services/syncToOnline'
 import { useTourConfirmationSheet } from '../hooks/useTourConfirmationSheet'
+import { useTourSheetData } from '../hooks/useTourSheetData'
 import { ItemEditDialog } from './ItemEditDialog'
-import type { Tour, Itinerary, DailyItineraryDay } from '@/stores/types'
+import {
+  TourInfoSection,
+  DailyItinerarySection,
+  HotelConfirmationSection,
+  SettlementSection,
+  ExchangeRateDialog,
+} from './sections'
+import {
+  getDestinationCurrency,
+  getCurrencyName,
+  getCurrencySymbol,
+  formatCurrency,
+  formatDate,
+} from '../constants/currency'
+import type { Tour } from '@/stores/types'
 import type {
   TourConfirmationItem,
   ConfirmationItemCategory,
   CreateConfirmationItem,
-  CostSummary,
   ResourceType,
 } from '@/types/tour-confirmation-sheet.types'
-import type { Database } from '@/lib/supabase/types'
-
-// tour_requests Row type
-type TourRequestRow = Database['public']['Tables']['tour_requests']['Row']
 
 // 新行的初始狀態
 const EMPTY_NEW_ITEM = {
@@ -85,6 +85,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
   const { toast } = useToast()
   const workspaceId = tour.workspace_id || user?.workspace_id || ''
 
+  // 主要 hook
   const {
     sheet,
     items,
@@ -101,18 +102,42 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     reload,
   } = useTourConfirmationSheet({ tourId: tour.id })
 
-  // 預計支出的 local state（用 useRef 確保 blur 時讀取最新值）
-  const localExpectedCostsRef = useRef<Record<string, { value: number | null; formula?: string; dirty: boolean }>>({})
-  const [, forceUpdate] = useState(0) // 用於觸發重新渲染
+  // 資料載入 hook
+  const {
+    itinerary,
+    itineraryLoading,
+    tourRequests,
+    requestsLoading,
+    vehicleRequests,
+    incompleteRequests,
+    quoteItems,
+    quoteItemsLoading,
+    tourOrders,
+    ordersLoading,
+    primaryContact,
+    calculateAgeGroups,
+    tourRooms,
+    quoteRoomItems,
+  } = useTourSheetData({
+    tourId: tour.id,
+    quoteId: tour.quote_id,
+    departureDate: tour.departure_date,
+  })
 
-  // 處理預計支出的 inline 更新（只在 blur 時儲存到資料庫）
+  const ageGroups = calculateAgeGroups(tour.departure_date)
+  const destinationCurrency = getDestinationCurrency(tour.location, tour.code)
+
+  // 預計支出的 local state
+  const localExpectedCostsRef = useRef<Record<string, { value: number | null; formula?: string; dirty: boolean }>>({})
+  const [, forceUpdate] = useState(0)
+
   const handleExpectedCostChange = (itemId: string, value: number | null) => {
     localExpectedCostsRef.current[itemId] = {
       ...localExpectedCostsRef.current[itemId],
       value,
       dirty: true
     }
-    forceUpdate(n => n + 1) // 觸發重新渲染以顯示新值
+    forceUpdate(n => n + 1)
   }
 
   const handleExpectedCostFormulaChange = (itemId: string, formula: string | undefined) => {
@@ -125,19 +150,17 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
 
   const handleExpectedCostBlur = async (itemId: string, currentTypeData?: unknown) => {
     const local = localExpectedCostsRef.current[itemId]
-    if (!local?.dirty) return // 沒有修改過就不儲存
+    if (!local?.dirty) return
 
     try {
       const updates: Record<string, unknown> = { expected_cost: local.value }
-      // 如果有公式變更，也一併更新
       if (local.formula !== undefined) {
         updates.type_data = {
           ...((currentTypeData as Record<string, unknown>) || {}),
-          expected_cost_formula: local.formula || null // 清空公式時設為 null
+          expected_cost_formula: local.formula || null
         }
       }
       await updateItem(itemId, updates as Parameters<typeof updateItem>[1])
-      // 儲存成功，標記為非 dirty（但保留值避免閃爍）
       localExpectedCostsRef.current[itemId] = { ...local, dirty: false }
     } catch (err) {
       logger.error('更新預計支出失敗:', err)
@@ -166,7 +189,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     }
   }
 
-  // 編輯對話框狀態（僅用於編輯現有項目）
+  // 編輯對話框狀態
   const [editDialog, setEditDialog] = useState<{
     open: boolean
     category: ConfirmationItemCategory
@@ -177,155 +200,51 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     item: null,
   })
 
-  // 幣值轉換相關
-  // 機場代碼 / 城市 / 國家 對應幣別
-  const DESTINATION_CURRENCY_MAP: Record<string, string> = {
-    // 日本
-    '日本': 'JPY', 'Japan': 'JPY',
-    'NRT': 'JPY', 'HND': 'JPY', 'KIX': 'JPY', 'NGO': 'JPY', 'CTS': 'JPY', 'FUK': 'JPY', 'OKA': 'JPY',
-    '東京': 'JPY', '大阪': 'JPY', '京都': 'JPY', '北海道': 'JPY', '沖繩': 'JPY', '名古屋': 'JPY', '福岡': 'JPY',
-    // 泰國
-    '泰國': 'THB', 'Thailand': 'THB',
-    'BKK': 'THB', 'CNX': 'THB', 'HKT': 'THB',
-    '曼谷': 'THB', '清邁': 'THB', '普吉': 'THB',
-    // 韓國
-    '韓國': 'KRW', 'Korea': 'KRW',
-    'ICN': 'KRW', 'GMP': 'KRW', 'PUS': 'KRW',
-    '首爾': 'KRW', '釜山': 'KRW',
-    // 越南
-    '越南': 'VND', 'Vietnam': 'VND',
-    'SGN': 'VND', 'HAN': 'VND', 'DAD': 'VND',
-    '胡志明': 'VND', '河內': 'VND', '峴港': 'VND',
-    // 美國
-    '美國': 'USD', 'USA': 'USD',
-    'LAX': 'USD', 'JFK': 'USD', 'SFO': 'USD',
-    // 新加坡
-    '新加坡': 'SGD', 'Singapore': 'SGD', 'SIN': 'SGD',
-    // 馬來西亞
-    '馬來西亞': 'MYR', 'Malaysia': 'MYR', 'KUL': 'MYR',
-    // 中國
-    '中國': 'CNY', 'China': 'CNY',
-    'PVG': 'CNY', 'PEK': 'CNY', 'CAN': 'CNY',
-    '上海': 'CNY', '北京': 'CNY', '廣州': 'CNY',
-    // 香港
-    '香港': 'HKD', 'Hong Kong': 'HKD', 'HKG': 'HKD',
-    // 澳門
-    '澳門': 'MOP', 'Macau': 'MOP', 'MFM': 'MOP',
-    // 歐洲
-    '歐洲': 'EUR', 'Europe': 'EUR',
-  }
-
-  // 從團的目的地取得幣別
-  const getDestinationCurrency = () => {
-    // 1. 先從 tour.location 查找
-    if (tour.location && DESTINATION_CURRENCY_MAP[tour.location]) {
-      return DESTINATION_CURRENCY_MAP[tour.location]
-    }
-    // 2. 從團號前三碼（機場代碼）查找
-    if (tour.code) {
-      const airportCode = tour.code.substring(0, 3).toUpperCase()
-      if (DESTINATION_CURRENCY_MAP[airportCode]) {
-        return DESTINATION_CURRENCY_MAP[airportCode]
-      }
-    }
-    return null
-  }
-  const destinationCurrency = getDestinationCurrency()
-
-  // 幣別中文名稱對照
-  const CURRENCY_NAME_MAP: Record<string, string> = {
-    'JPY': '日幣',
-    'THB': '泰銖',
-    'KRW': '韓元',
-    'VND': '越南盾',
-    'USD': '美金',
-    'SGD': '新幣',
-    'MYR': '馬幣',
-    'EUR': '歐元',
-    'GBP': '英鎊',
-    'AUD': '澳幣',
-    'CNY': '人民幣',
-    'HKD': '港幣',
-  }
-  const getCurrencyName = (code: string | null) => {
-    if (!code) return '外幣'
-    return CURRENCY_NAME_MAP[code] || code
-  }
-
-  // 幣別符號對照
-  const CURRENCY_SYMBOL_MAP: Record<string, string> = {
-    'JPY': '¥',
-    'THB': '฿',
-    'KRW': '₩',
-    'VND': '₫',
-    'USD': '$',
-    'SGD': 'S$',
-    'MYR': 'RM',
-    'EUR': '€',
-    'GBP': '£',
-    'AUD': 'A$',
-    'CNY': '¥',
-    'HKD': 'HK$',
-    'TWD': 'NT$',
-  }
-  const getCurrencySymbol = (code: string | null | undefined) => {
-    if (!code) return ''
-    return CURRENCY_SYMBOL_MAP[code] || code
-  }
-
   // 匯率設定對話框
   const [exchangeRateDialog, setExchangeRateDialog] = useState<{
     open: boolean
     itemId: string | null
   }>({ open: false, itemId: null })
   const [exchangeRateInput, setExchangeRateInput] = useState('')
-
-  // 本地匯率狀態（當資料庫欄位不存在時使用）
   const [localExchangeRate, setLocalExchangeRate] = useState<number | null>(null)
   const effectiveExchangeRate = sheet?.exchange_rate ?? localExchangeRate
 
-  // 處理幣值轉換 - 點擊外幣按鈕時，將小計換算為外幣並更新備註
+  // 幣值轉換
   const handleCurrencyConvert = async (itemId: string) => {
     if (!sheet) return
 
-    // 如果還沒設定匯率，打開對話框設定
     if (!effectiveExchangeRate) {
       setExchangeRateDialog({ open: true, itemId })
       return
     }
 
-    // 找到該項目
     const item = Object.values(groupedItems).flat().find(i => i.id === itemId)
     if (!item) return
 
-    // 計算原始台幣小計（數量 × 單價）
     const twdSubtotal = (item.unit_price || 0) * (item.quantity || 1)
     if (twdSubtotal <= 0) {
       toast({ title: '小計為 0，無法換算', variant: 'destructive' })
       return
     }
 
-    // 換算：台幣小計 / 匯率 = 外幣金額
     const foreignAmount = Math.round(twdSubtotal / effectiveExchangeRate)
     const currencyName = getCurrencyName(destinationCurrency)
 
     try {
-      // 更新小計和預計支出為外幣金額，備註加上幣別說明
       const currentTypeData = item.type_data as Record<string, unknown> | null
       const updatedTypeData = {
         ...currentTypeData,
-        original_twd_subtotal: twdSubtotal, // 保存原始台幣金額供參考
-        subtotal_currency: destinationCurrency, // 保存小計的幣別
-        expected_cost_formula: null, // 清除公式
+        original_twd_subtotal: twdSubtotal,
+        subtotal_currency: destinationCurrency,
+        expected_cost_formula: null,
       }
       await updateItem(itemId, {
         subtotal: foreignAmount,
-        expected_cost: foreignAmount, // 預計支出也設為外幣金額，之後可手動調整
+        expected_cost: foreignAmount,
         notes: `${currencyName}支出`,
         type_data: updatedTypeData as unknown as Parameters<typeof updateItem>[1]['type_data'],
       })
 
-      // 同步更新 localExpectedCostsRef 以確保 UI 立即反映新值
       localExpectedCostsRef.current[itemId] = { value: foreignAmount, formula: undefined, dirty: false }
       forceUpdate(n => n + 1)
 
@@ -354,7 +273,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
       })
       toast({ title: '匯率設定成功', description: `1 ${destinationCurrency} = ${rate} TWD` })
     } catch (err) {
-      // 如果資料庫欄位不存在，改用本地狀態
       logger.warn('無法儲存匯率到資料庫，使用本地狀態:', err)
       setLocalExchangeRate(rate)
       toast({ title: '匯率已設定（本次有效）', description: `1 ${destinationCurrency} = ${rate} TWD` })
@@ -363,7 +281,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     setExchangeRateDialog({ open: false, itemId: null })
     setExchangeRateInput('')
 
-    // 如果有指定項目，執行轉換
     if (exchangeRateDialog.itemId) {
       const item = Object.values(groupedItems).flat().find(i => i.id === exchangeRateDialog.itemId)
       if (item?.expected_cost) {
@@ -381,417 +298,27 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
   const [newItemData, setNewItemData] = useState(EMPTY_NEW_ITEM)
   const [savingNew, setSavingNew] = useState(false)
   const firstInputRef = useRef<HTMLInputElement>(null)
-
-  // 交通類型選擇狀態
   const [transportSubType, setTransportSubType] = useState<TransportSubType>(null)
-
-  // 手動填寫航班狀態
   const [manualFlightMode, setManualFlightMode] = useState(false)
   const [manualFlight, setManualFlight] = useState({
     outbound: { airline: '', flightNumber: '', departureAirport: '', arrivalAirport: '' },
     return: { airline: '', flightNumber: '', departureAirport: '', arrivalAirport: '' },
   })
 
-  // 行程表資料（用於自動帶入）
-  const [itinerary, setItinerary] = useState<Itinerary | null>(null)
-  const [itineraryLoading, setItineraryLoading] = useState(false)
-
-  // 需求單資料（用於顯示已送出的需求）
-  const [tourRequests, setTourRequests] = useState<TourRequestRow[]>([])
-  const [requestsLoading, setRequestsLoading] = useState(false)
-
-  // 報價單項目（用於自動帶入，這是主要資料來源）
-  interface QuoteItem {
-    category: string
-    supplierName: string
-    title: string
-    serviceDate: string | null
-    quantity: number
-    resourceType?: string | null
-    resourceId?: string | null
-    latitude?: number | null
-    longitude?: number | null
-    googleMapsUrl?: string | null
-    quotedPrice?: number | null
-  }
-  const [quoteItems, setQuoteItems] = useState<QuoteItem[]>([])
-  const [quoteItemsLoading, setQuoteItemsLoading] = useState(false)
-
-  // 訂單和團員資料（用於聯絡人和人數配置）
-  interface OrderMember {
-    id: string
-    chinese_name: string | null
-    birth_date: string | null
-  }
-  interface TourOrder {
-    id: string
-    code: string
-    contact_person: string | null
-    contact_phone: string | null
-    contact_email: string | null
-    members: OrderMember[]
-  }
-  const [tourOrders, setTourOrders] = useState<TourOrder[]>([])
-  const [ordersLoading, setOrdersLoading] = useState(false)
-
-  // 房型配置資料（從 tour_rooms 表或報價單取得）
-  interface TourRoom {
-    id: string
-    night_number: number
-    hotel_name: string | null
-    room_type: string
-    room_number: string | null
-    amount: number | null
-    notes: string | null
-  }
-  const [tourRooms, setTourRooms] = useState<TourRoom[]>([])
-
-  // 報價單房型資料（從報價單住宿項目取得）
-  interface QuoteRoomItem {
-    day: number
-    room_type: string
-    quantity: number
-  }
-  const [quoteRoomItems, setQuoteRoomItems] = useState<QuoteRoomItem[]>([])
-
-  // 從需求單取得遊覽車資訊
-  const vehicleRequests = tourRequests.filter(
-    req => req.category === 'vehicle' || req.category === 'transport'
-  )
-
-  // 計算人數分組（6歲以下、65歲以上、其他）
-  const calculateAgeGroups = () => {
-    const allMembers = tourOrders.flatMap(o => o.members)
-    const today = new Date()
-    const departureDate = tour.departure_date ? new Date(tour.departure_date) : today
-
-    let under6 = 0
-    let over65 = 0
-    let others = 0
-
-    allMembers.forEach(member => {
-      if (!member.birth_date) {
-        others++
-        return
-      }
-      const birthDate = new Date(member.birth_date)
-      const age = Math.floor((departureDate.getTime() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000))
-      if (age < 6) {
-        under6++
-      } else if (age >= 65) {
-        over65++
-      } else {
-        others++
-      }
-    })
-
-    return { under6, over65, others, total: allMembers.length }
-  }
-
-  const ageGroups = calculateAgeGroups()
-
-  // 取得主要聯絡人（第一筆訂單）
-  const primaryContact = tourOrders.length > 0 ? tourOrders[0] : null
-
   // 交接狀態
   const [handingOver, setHandingOver] = useState(false)
 
-  // 每日說明展開狀態
-  const [expandedDays, setExpandedDays] = useState<Record<number, boolean>>({})
-  // 每日說明文字
-  const [dayNotes, setDayNotes] = useState<Record<number, string>>({})
-
-  // 切換說明展開
-  const toggleDayNote = (dayIdx: number) => {
-    setExpandedDays(prev => ({ ...prev, [dayIdx]: !prev[dayIdx] }))
-  }
-
-  // 更新說明文字
-  const updateDayNote = (dayIdx: number, note: string) => {
-    setDayNotes(prev => ({ ...prev, [dayIdx]: note }))
-  }
-
-  // 載入行程表
-  useEffect(() => {
-    const loadItinerary = async () => {
-      if (!tour.id) return
-      setItineraryLoading(true)
-      try {
-        const { data } = await supabase
-          .from('itineraries')
-          .select('*')
-          .eq('tour_id', tour.id)
-          .maybeSingle()
-        if (data) {
-          setItinerary(data as unknown as Itinerary)
-        }
-      } finally {
-        setItineraryLoading(false)
-      }
-    }
-    loadItinerary()
-  }, [tour.id])
-
-  // 載入需求單（顯示所有狀態，除了取消的）
-  useEffect(() => {
-    const loadTourRequests = async () => {
-      if (!tour.id) return
-      setRequestsLoading(true)
-      try {
-        const { data } = await supabase
-          .from('tour_requests')
-          .select('*')
-          .eq('tour_id', tour.id)
-          .neq('status', 'cancelled')
-          .order('service_date')
-        if (data) {
-          setTourRequests(data)
-        }
-      } finally {
-        setRequestsLoading(false)
-      }
-    }
-    loadTourRequests()
-  }, [tour.id])
-
-  // 載入報價單項目（自動帶入的主要資料來源）
-  useEffect(() => {
-    const loadQuoteItems = async () => {
-      if (!tour.quote_id) return
-      setQuoteItemsLoading(true)
-      try {
-        const { data: quote } = await supabase
-          .from('quotes')
-          .select('categories, start_date')
-          .eq('id', tour.quote_id)
-          .single()
-
-        if (!quote?.categories) {
-          setQuoteItems([])
-          return
-        }
-
-        const categories = quote.categories as Array<{
-          id: string
-          items?: Array<{
-            name?: string
-            day?: number
-            quantity?: number | null
-            unit_price?: number | null
-            is_self_arranged?: boolean
-            resource_type?: string | null
-            resource_id?: string | null
-            resource_latitude?: number | null
-            resource_longitude?: number | null
-            resource_google_maps_url?: string | null
-          }>
-        }>
-
-        const startDate = quote.start_date || tour.departure_date
-        const calculateDate = (dayNum: number): string | null => {
-          if (!startDate) return null
-          const date = new Date(startDate)
-          date.setDate(date.getDate() + dayNum - 1)
-          return date.toISOString().split('T')[0]
-        }
-
-        const items: QuoteItem[] = []
-        const CATEGORY_MAP: Record<string, string> = {
-          'transport': 'transport',
-          'group-transport': 'transport',
-          'accommodation': 'accommodation',
-          'meals': 'meal',
-          'activities': 'activity',
-          'others': 'other',
-        }
-
-        for (const cat of categories) {
-          const mappedCategory = CATEGORY_MAP[cat.id]
-          if (!mappedCategory || !cat.items) continue
-
-          for (const item of cat.items) {
-            if (!item.name) continue
-            // 跳過自理項目
-            if (item.is_self_arranged || item.name.includes('自理')) continue
-            // 跳過身份票種和領隊分攤
-            if (['成人', '兒童', '嬰兒', '領隊分攤'].includes(item.name)) continue
-
-            let supplierName = ''
-            let title = item.name
-            let serviceDate: string | null = null
-
-            if (mappedCategory === 'accommodation') {
-              supplierName = item.name
-              title = item.name
-              if (item.day) serviceDate = calculateDate(item.day)
-            } else if (mappedCategory === 'meal') {
-              const match = item.name.match(/Day\s*(\d+)\s*(早餐|午餐|晚餐)\s*(?:[：:]|\s*-\s*)\s*(.+)/)
-              if (match) {
-                const dayNum = parseInt(match[1])
-                supplierName = match[3].trim()
-                title = match[2]
-                serviceDate = calculateDate(dayNum)
-              } else {
-                supplierName = item.name
-              }
-            } else if (mappedCategory === 'activity') {
-              supplierName = item.name
-              title = item.name
-              if (item.day) serviceDate = calculateDate(item.day)
-            } else {
-              supplierName = item.name
-              title = item.name
-            }
-
-            items.push({
-              category: mappedCategory,
-              supplierName,
-              title,
-              serviceDate,
-              quantity: item.quantity || 1,
-              resourceType: item.resource_type,
-              resourceId: item.resource_id,
-              latitude: item.resource_latitude,
-              longitude: item.resource_longitude,
-              googleMapsUrl: item.resource_google_maps_url,
-              quotedPrice: item.unit_price,
-            })
-          }
-        }
-
-        setQuoteItems(items)
-      } finally {
-        setQuoteItemsLoading(false)
-      }
-    }
-    loadQuoteItems()
-  }, [tour.quote_id, tour.departure_date])
-
-  // 載入訂單和團員資料
-  useEffect(() => {
-    const loadOrdersAndMembers = async () => {
-      if (!tour.id) return
-      setOrdersLoading(true)
-      try {
-        // 載入訂單
-        const { data: orders } = await supabase
-          .from('orders')
-          .select('id, code, contact_person, contact_phone, contact_email')
-          .eq('tour_id', tour.id)
-          .order('created_at')
-
-        if (orders && orders.length > 0) {
-          // 載入每個訂單的成員
-          const ordersWithMembers: TourOrder[] = []
-          for (const order of orders) {
-            const { data: members } = await supabase
-              .from('order_members')
-              .select('id, chinese_name, birth_date')
-              .eq('order_id', order.id)
-
-            ordersWithMembers.push({
-              ...order,
-              members: members || [],
-            })
-          }
-          setTourOrders(ordersWithMembers)
-        }
-      } finally {
-        setOrdersLoading(false)
-      }
-    }
-    loadOrdersAndMembers()
-  }, [tour.id])
-
-  // 載入房型配置資料
-  useEffect(() => {
-    const loadTourRooms = async () => {
-      if (!tour.id) return
-      try {
-        const { data } = await supabase
-          .from('tour_rooms')
-          .select('id, night_number, hotel_name, room_type, room_number, amount, notes')
-          .eq('tour_id', tour.id)
-          .order('night_number')
-          .order('room_type')
-        if (data) {
-          setTourRooms(data)
-        }
-      } catch (err) {
-        logger.error('載入房型配置失敗:', err)
-      }
-    }
-    loadTourRooms()
-  }, [tour.id])
-
-  // 載入報價單房型資料
-  useEffect(() => {
-    const loadQuoteRoomItems = async () => {
-      if (!tour.quote_id) return
-      try {
-        const { data: quote } = await supabase
-          .from('quotes')
-          .select('versions')
-          .eq('id', tour.quote_id)
-          .maybeSingle()
-
-        if (!quote?.versions) return
-
-        // 取得最新版本的 categories
-        const versions = quote.versions as Array<{
-          categories?: Array<{
-            id: string
-            name: string
-            items?: Array<{
-              name?: string // 房型名稱存在 name 欄位（如：雙人房、三人房）
-              day?: number
-              quantity?: number | null
-            }>
-          }>
-        }>
-        if (!versions || versions.length === 0) return
-
-        const latestVersion = versions[versions.length - 1]
-        if (!latestVersion?.categories) return
-
-        // 找住宿類別（id 為 'accommodation' 或名稱包含住宿）
-        const accommodationCategory = latestVersion.categories.find(
-          cat => cat.id === 'accommodation' || cat.name === '住宿'
-        )
-        if (!accommodationCategory?.items) return
-
-        // 房型名稱存在 item.name 欄位，day 欄位表示第幾天
-        const roomItems: QuoteRoomItem[] = accommodationCategory.items
-          .filter(item => item.day && item.name)
-          .map(item => ({
-            day: item.day!,
-            room_type: item.name!, // 房型名稱在 name 欄位
-            quantity: item.quantity || 1,
-          }))
-
-        setQuoteRoomItems(roomItems)
-      } catch (err) {
-        logger.error('載入報價單房型資料失敗:', err)
-      }
-    }
-    loadQuoteRoomItems()
-  }, [tour.quote_id])
-
-  // 當開始新增時，聚焦到第一個輸入框
+  // 聚焦到第一個輸入框
   useEffect(() => {
     if (addingCategory && firstInputRef.current) {
       firstInputRef.current.focus()
     }
   }, [addingCategory])
 
-  // 注意：不再自動建立或帶入資料
-  // 使用者需要在「需求總攬」點擊「產生團確單」來建立/更新團確單
-
   // 開啟 inline 新增模式
   const handleAdd = (category: ConfirmationItemCategory) => {
     setAddingCategory(category)
     setNewItemData(EMPTY_NEW_ITEM)
-    // 交通類別需要先選擇子類型
     if (category === 'transport') {
       setTransportSubType(null)
     }
@@ -807,10 +334,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
   // 選擇交通子類型
   const handleSelectTransportType = (type: TransportSubType) => {
     setTransportSubType(type)
-    if (type === 'flight' && tour.outbound_flight) {
-      // 自動帶入航班資訊 - 會創建兩筆（去程+回程）
-      // 這裡先不自動填入，讓用戶確認後再創建
-    }
   }
 
   // 從航班資訊創建項目
@@ -819,7 +342,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
 
     setSavingNew(true)
     try {
-      // 創建去程航班項目
       if (tour.outbound_flight) {
         const outbound = tour.outbound_flight
         await addItem({
@@ -848,7 +370,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
         })
       }
 
-      // 創建回程航班項目
       if (tour.return_flight) {
         const returnFlight = tour.return_flight
         await addItem({
@@ -883,13 +404,12 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     }
   }
 
-  // 儲存手動填寫的航班資訊並新增項目
+  // 儲存手動填寫的航班
   const handleSaveManualFlight = async () => {
     if (!sheet?.id) return
 
     setSavingNew(true)
     try {
-      // 準備航班資料
       const outboundFlight = manualFlight.outbound.airline ? {
         airline: manualFlight.outbound.airline,
         flightNumber: manualFlight.outbound.flightNumber,
@@ -904,7 +424,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
         arrivalAirport: manualFlight.return.arrivalAirport,
       } : null
 
-      // 更新 tour 的航班資訊
       const { error: updateError } = await supabase
         .from('tours')
         .update({
@@ -915,7 +434,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
 
       if (updateError) throw updateError
 
-      // 新增交通項目
       if (outboundFlight) {
         await addItem({
           sheet_id: sheet.id,
@@ -970,7 +488,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
         })
       }
 
-      // 重置狀態
       setManualFlightMode(false)
       setManualFlight({
         outbound: { airline: '', flightNumber: '', departureAirport: '', arrivalAirport: '' },
@@ -1080,7 +597,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
       for (const day of itinerary.daily_itinerary) {
         if (day.activities && day.activities.length > 0) {
           for (const activity of day.activities) {
-            // 只帶入有標題的景點
             if (activity.title) {
               await addItem({
                 sheet_id: sheet.id,
@@ -1116,11 +632,10 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     }
   }
 
-  // 從需求單帶入（包含資源關聯）
+  // 從需求單帶入
   const handleImportFromRequests = async (category: ConfirmationItemCategory) => {
     if (!sheet?.id) return
 
-    // 根據分類過濾需求單
     const categoryMap: Record<ConfirmationItemCategory, string[]> = {
       transport: ['transport', 'vehicle'],
       meal: ['meal', 'restaurant'],
@@ -1161,12 +676,9 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
           sort_order: 0,
           notes: req.notes || null,
           workspace_id: workspaceId,
-          // 關聯需求單
           request_id: req.id,
-          // 資源關聯（餐廳/飯店/景點）
           resource_type: req.resource_type as ResourceType | null,
           resource_id: req.resource_id || null,
-          // GPS 資訊（供領隊導航）
           latitude: req.latitude || null,
           longitude: req.longitude || null,
           google_maps_url: req.google_maps_url || null,
@@ -1190,13 +702,12 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     return tourRequests.some((req) => categoryMap[category].includes(req.category))
   }
 
-  // 儲存新項目（inline）
+  // 儲存新項目
   const handleSaveNewItem = async () => {
     if (!sheet?.id || !addingCategory) return
 
     setSavingNew(true)
     try {
-      // 計算標題（車子根據是否有結束日期判斷單日/區間）
       let title = newItemData.title || '新項目'
       const hasDateRange = newItemData.service_date_end && newItemData.service_date_end !== newItemData.service_date
       if (addingCategory === 'transport' && transportSubType === 'vehicle') {
@@ -1251,7 +762,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     })
   }
 
-  // 儲存編輯的項目（Dialog 模式）
+  // 儲存編輯的項目
   const handleSave = async (data: CreateConfirmationItem) => {
     if (editDialog.item) {
       await updateItem(editDialog.item.id, data)
@@ -1266,19 +777,55 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     }
   }
 
-  // 格式化金額
-  const formatCurrency = (value: number | null | undefined) => {
-    if (value == null) return '-'
-    return new Intl.NumberFormat('zh-TW').format(value)
+  // 檢查是否已設定領隊
+  const hasLeader = sheet?.tour_leader_name && sheet.tour_leader_name.trim() !== ''
+
+  // 交接功能
+  const handleHandoff = async () => {
+    if (incompleteRequests.length > 0) return
+
+    if (!hasLeader) {
+      const proceed = window.confirm(
+        '⚠️ 尚未設定領隊\n\n' +
+        '如果此團需要領隊，請先在上方填寫領隊姓名。\n' +
+        '如果此團不需要領隊（如包車），可以繼續交接。\n\n' +
+        '確定要繼續交接嗎？'
+      )
+      if (!proceed) return
+    }
+
+    setHandingOver(true)
+    try {
+      if (sheet) {
+        const { error: sheetError } = await supabase
+          .from('tour_confirmation_sheets')
+          .update({
+            status: 'completed',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', sheet.id)
+
+        if (sheetError) throw sheetError
+      }
+
+      const syncResult = await syncTripToOnline(tour.id)
+      if (!syncResult.success) {
+        logger.warn('同步到 Online 失敗:', syncResult.message)
+      }
+
+      alert('交接完成！\n\n確認單狀態已更新。\n行程已同步到 Online App。')
+      reload()
+    } catch (error) {
+      logger.error('交接失敗:', error)
+      alert('交接失敗，請稍後再試')
+    } finally {
+      setHandingOver(false)
+    }
   }
 
-  // 格式化日期
-  const formatDate = (dateStr: string | null | undefined) => {
-    if (!dateStr) return '-'
-    return new Date(dateStr).toLocaleDateString('zh-TW', {
-      month: '2-digit',
-      day: '2-digit',
-    })
+  // 列印功能
+  const handlePrint = () => {
+    window.print()
   }
 
   // Loading 狀態
@@ -1312,66 +859,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     )
   }
 
-
-  // 計算未完成的需求數量
-  const incompleteRequests = tourRequests.filter(
-    req => req.status !== 'confirmed' && req.status !== 'replied'
-  )
-
-  // 檢查是否已設定領隊
-  const hasLeader = sheet?.tour_leader_name && sheet.tour_leader_name.trim() !== ''
-
-  // 交接功能
-  const handleHandoff = async () => {
-    if (incompleteRequests.length > 0) return
-
-    // 檢查領隊
-    if (!hasLeader) {
-      const proceed = window.confirm(
-        '⚠️ 尚未設定領隊\n\n' +
-        '如果此團需要領隊，請先在上方填寫領隊姓名。\n' +
-        '如果此團不需要領隊（如包車），可以繼續交接。\n\n' +
-        '確定要繼續交接嗎？'
-      )
-      if (!proceed) return
-    }
-
-    setHandingOver(true)
-    try {
-      // 1. 更新確認表狀態為已交接
-      if (sheet) {
-        const { error: sheetError } = await supabase
-          .from('tour_confirmation_sheets')
-          .update({
-            status: 'completed',
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', sheet.id)
-
-        if (sheetError) throw sheetError
-      }
-
-      // 2. 同步行程到 Online
-      const syncResult = await syncTripToOnline(tour.id)
-      if (!syncResult.success) {
-        logger.warn('同步到 Online 失敗:', syncResult.message)
-      }
-
-      // 3. 顯示成功訊息
-      alert('交接完成！\n\n確認單狀態已更新。\n行程已同步到 Online App。')
-      reload()
-    } catch (error) {
-      logger.error('交接失敗:', error)
-      alert('交接失敗，請稍後再試')
-    } finally {
-      setHandingOver(false)
-    }
-  }
-
-  // 列印功能
-  const handlePrint = () => {
-    window.print()
-  }
+  const allItems = Object.values(groupedItems).flat()
 
   return (
     <div className="space-y-4">
@@ -1391,7 +879,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
             列印
           </Button>
 
-          {/* 確認交接按鈕 */}
           {incompleteRequests.length > 0 ? (
             <Button
               variant="outline"
@@ -1428,747 +915,506 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
         className="border border-border rounded-lg overflow-hidden print:border-0 print:rounded-none print:overflow-visible bg-white"
       >
         {/* 團基本資訊 */}
-      <div>
-        <table className="w-full text-sm">
-          <tbody>
-            {/* 團名 / 團號 */}
-            <tr className="border-b border-border">
-              <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium w-[100px]">團名</td>
-              <td className="px-4 py-2 w-[40%]">{tour.name || '-'}</td>
-              <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium w-[100px]">團號</td>
-              <td className="px-4 py-2">{tour.code || '-'}</td>
-            </tr>
-            {/* 出團日期 / 隨團領隊 */}
-            <tr className="border-b border-border">
-              <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">出團日期</td>
-              <td className="px-4 py-2 w-[40%]">
-                {tour.departure_date && tour.return_date
-                  ? `${tour.departure_date} ~ ${tour.return_date}`
-                  : tour.departure_date || '-'}
-              </td>
-              <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium w-[100px]">隨團領隊</td>
-              <td className="px-4 py-2">{sheet?.tour_leader_name || '-'}</td>
-            </tr>
-            {/* 聯絡人+航班（去程） */}
-            {(() => {
-              const outbound = itinerary?.outbound_flight || tour.outbound_flight
-              const returnFlight = itinerary?.return_flight || tour.return_flight
-              const formatFlightDate = (dateStr: string | null | undefined) => {
-                if (!dateStr) return ''
-                const date = new Date(dateStr)
-                return `${date.getMonth() + 1}/${String(date.getDate()).padStart(2, '0')}`
-              }
-              const outboundFlight = outbound && typeof outbound === 'object' ? outbound as { airline?: string; flightNumber?: string; departureAirport?: string; arrivalAirport?: string; departureTime?: string; arrivalTime?: string } : null
-              const returnFlightData = returnFlight && typeof returnFlight === 'object' ? returnFlight as { airline?: string; flightNumber?: string; departureAirport?: string; arrivalAirport?: string; departureTime?: string; arrivalTime?: string } : null
+        <TourInfoSection
+          tour={tour}
+          sheet={sheet}
+          itinerary={itinerary}
+          primaryContact={primaryContact}
+          ageGroups={ageGroups}
+          vehicleRequests={vehicleRequests}
+        />
 
-              return (
-                <>
-                  <tr className="border-b border-border">
-                    <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">聯絡人</td>
-                    <td className="px-4 py-2">{primaryContact?.contact_person || '-'}</td>
-                    <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium w-[60px]">
-                      <span className="text-morandi-green">去程</span>
-                    </td>
-                    <td className="px-4 py-2">
-                      {outboundFlight?.flightNumber
-                        ? `${formatFlightDate(tour.departure_date)} ${outboundFlight.airline} ${outboundFlight.flightNumber} ${outboundFlight.departureAirport} ${outboundFlight.departureTime} → ${outboundFlight.arrivalAirport} ${outboundFlight.arrivalTime}`
-                        : '-'}
-                    </td>
-                  </tr>
-                  <tr className="border-b border-border">
-                    <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">聯絡電話</td>
-                    <td className="px-4 py-2">{primaryContact?.contact_phone || '-'}</td>
-                    <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">
-                      <span className="text-morandi-gold">回程</span>
-                    </td>
-                    <td className="px-4 py-2">
-                      {returnFlightData?.flightNumber
-                        ? `${formatFlightDate(tour.return_date)} ${returnFlightData.airline} ${returnFlightData.flightNumber} ${returnFlightData.departureAirport} ${returnFlightData.departureTime} → ${returnFlightData.arrivalAirport} ${returnFlightData.arrivalTime}`
-                        : '-'}
-                    </td>
-                  </tr>
-                </>
-              )
-            })()}
-            {/* 人數配置 */}
-            <tr className="border-b border-border">
-              <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">團體人數</td>
-              <td className="px-4 py-2" colSpan={3}>
-                <div className="flex items-center gap-6">
-                  <span className="font-medium">{ageGroups.total} 人</span>
-                  <span className="text-morandi-secondary">
-                    <span className="text-morandi-green">6歲以下：{ageGroups.under6}</span>
-                    <span className="mx-2">|</span>
-                    <span className="text-morandi-gold">65歲以上：{ageGroups.over65}</span>
-                    <span className="mx-2">|</span>
-                    <span>一般：{ageGroups.others}</span>
-                  </span>
-                </div>
-              </td>
-            </tr>
-            {/* 交通（有資料才顯示） */}
-            {vehicleRequests.length > 0 && (
-              <tr>
-                <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium align-top w-[100px]">交通</td>
-                <td colSpan={3}>
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="bg-morandi-container/20">
-                        <th className="px-3 py-1.5 text-left font-medium text-morandi-secondary w-[180px]">公司名稱</th>
-                        <th className="px-3 py-1.5 text-left font-medium text-morandi-secondary w-[100px]">司機</th>
-                        <th className="px-3 py-1.5 text-left font-medium text-morandi-secondary w-[120px]">車號</th>
-                        <th className="px-3 py-1.5 text-left font-medium text-morandi-secondary">手機電話</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {vehicleRequests.map((req, idx) => {
-                        const reqAny = req as TourRequestRow & {
-                          driver_name?: string | null
-                          plate_number?: string | null
-                          driver_phone?: string | null
-                        }
-                        return (
-                          <tr key={req.id} className={idx % 2 === 1 ? 'bg-morandi-container/5' : ''}>
-                            <td className="px-3 py-1.5">{req.supplier_name || '-'}</td>
-                            <td className="px-3 py-1.5">{reqAny.driver_name || '-'}</td>
-                            <td className="px-3 py-1.5">{reqAny.plate_number || '-'}</td>
-                            <td className="px-3 py-1.5">{reqAny.driver_phone || '-'}</td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+        {/* 每日行程表 */}
+        {itinerary && <DailyItinerarySection itinerary={itinerary} />}
 
-      {/* 每日行程表 */}
-      {itinerary?.daily_itinerary && itinerary.daily_itinerary.length > 0 && (
+        {/* 飯店確認 */}
+        {itinerary && (
+          <HotelConfirmationSection
+            itinerary={itinerary}
+            tourRequests={tourRequests}
+            tourRooms={tourRooms}
+            quoteRoomItems={quoteRoomItems}
+          />
+        )}
+
+        {/* 統一表格 */}
         <div className="border-t border-border">
-          <div className="flex items-center gap-2 px-4 py-2 bg-morandi-gold text-white">
-            <span className="font-medium">每日行程</span>
-            <span className="text-white/80 text-sm">({itinerary.daily_itinerary.length} 天)</span>
-          </div>
-          <table className="w-full text-sm">
+          <table className="w-full text-sm table-fixed">
+            {/* 表頭 */}
             <thead>
               <tr className="bg-morandi-container/50 border-b border-border">
-                <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[80px]">日期</th>
-                <th className="px-3 py-2 text-left font-medium text-morandi-primary">行程</th>
+                <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[4%] border-r border-border/30">分類</th>
+                <th className="px-1 py-2 text-left font-medium text-morandi-primary w-[5%] border-r border-border/30">日期</th>
+                <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[12%] border-r border-border/30">供應商</th>
+                <th className="px-2 py-2 text-left font-medium text-morandi-primary border-r border-border/30">項目說明</th>
+                <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[6%] border-r border-border/30">單價</th>
+                <th className="px-1 py-2 text-center font-medium text-morandi-primary w-[4%] border-r border-border/30">數量</th>
+                <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[6%] border-r border-border/30">小計</th>
+                <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[7%] border-r border-border/30">預計支出</th>
+                <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[7%] border-r border-border/30">實際支出</th>
+                <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[28%]">備註</th>
               </tr>
             </thead>
             <tbody>
-              {itinerary.daily_itinerary.map((day, idx) => {
-                const isExpanded = expandedDays[idx]
-                const noteText = dayNotes[idx] || ''
-
-                // 組合行程字串
-                const itineraryStr = day.activities && day.activities.length > 0
-                  ? `${day.dayLabel}｜${day.activities.map(a => a.title).filter(Boolean).join(' > ')}`
-                  : `${day.dayLabel}｜${day.title || ''}`
+              {CATEGORIES.map((cat) => {
+                const categoryItems = groupedItems[cat.key]
 
                 return (
-                  <React.Fragment key={idx}>
-                    {/* 第一行：日期 + 行程 */}
-                    <tr className="border-t border-border/50 bg-card hover:bg-morandi-container/10">
-                      <td className="px-3 py-2 align-top">
-                        <div className="text-sm font-medium text-morandi-primary">{day.date}</div>
+                  <React.Fragment key={cat.key}>
+                    {/* 分類標題行 */}
+                    <tr className="bg-morandi-container/30 border-t border-border print:hidden">
+                      <td colSpan={9} className="px-3 py-1.5">
+                        <span className="font-medium text-morandi-primary">{cat.label}</span>
+                        <span className="ml-2 text-xs text-morandi-secondary">({categoryItems.length})</span>
                       </td>
-                      <td className="px-3 py-2">
-                        <div className="text-morandi-primary">{itineraryStr}</div>
-                      </td>
-                    </tr>
-                    {/* 第二行：[+] 按鈕 + 餐食住宿（固定欄位間距） */}
-                    <tr className="border-t border-border/30 bg-morandi-container/5">
-                      <td className="px-3 py-2 align-top">
-                        <button
-                          onClick={() => toggleDayNote(idx)}
-                          className="flex items-center gap-1 text-xs text-morandi-gold hover:text-morandi-gold-hover"
-                          title={isExpanded ? '收起說明' : '新增說明'}
+                      <td className="px-2 py-1.5 text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleAdd(cat.key)}
+                          className="h-6 px-2 text-xs text-morandi-gold hover:text-morandi-gold-hover"
                         >
-                          <Plus size={14} className={`transition-transform ${isExpanded ? 'rotate-45' : ''}`} />
-                          說明
-                        </button>
-                      </td>
-                      <td className="px-3 py-2">
-                        <div className="flex text-sm text-morandi-secondary">
-                          <span className="w-[150px] flex items-center">
-                            早：{day.meals?.breakfast || 'X'}
-                            {day.meals?.breakfast === '飯店早餐' && (
-                              <Check size={14} className="ml-1 text-morandi-green/40" />
-                            )}
-                          </span>
-                          <span className="w-[150px] flex items-center">
-                            午：{day.meals?.lunch || 'X'}
-                          </span>
-                          <span className="w-[150px] flex items-center">
-                            晚：{day.meals?.dinner || 'X'}
-                          </span>
-                          {day.accommodation && day.accommodation !== '溫暖的家' && (
-                            <span className="flex-1 flex items-center">
-                              住：{day.accommodation}
-                              {(day.isSameAccommodation || day.accommodation.includes('同上')) && (
-                                <Check size={14} className="ml-1 text-morandi-green/40" />
-                              )}
-                            </span>
-                          )}
-                        </div>
+                          <Plus size={12} className="mr-1" />
+                          新增
+                        </Button>
                       </td>
                     </tr>
-                    {/* 第三行：說明（展開時顯示） */}
-                    {isExpanded && (
-                      <tr className="border-t border-border/30 bg-morandi-gold/5">
-                        <td className="px-3 py-2 align-top">
-                          <span className="text-xs text-morandi-secondary">備註</span>
-                        </td>
-                        <td className="px-3 py-2">
-                          <textarea
-                            value={noteText}
-                            onChange={(e) => updateDayNote(idx, e.target.value)}
-                            placeholder="輸入說明文字，例如：提醒客戶帶護照..."
-                            className="w-full px-2 py-1.5 text-sm border border-border rounded bg-card focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 resize-none"
-                            rows={2}
-                          />
+                    <tr className="bg-morandi-container/30 border-t border-border hidden print:table-row">
+                      <td colSpan={10} className="px-3 py-1.5">
+                        <span className="font-medium text-morandi-primary">{cat.label}</span>
+                      </td>
+                    </tr>
+
+                    {/* 項目列表 */}
+                    {categoryItems.length === 0 && addingCategory !== cat.key ? (
+                      <tr className="border-t border-border/50">
+                        <td colSpan={10} className="px-3 py-3 text-center text-morandi-secondary text-xs">
+                          尚無{cat.label}項目
                         </td>
                       </tr>
-                    )}
-                  </React.Fragment>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* 飯店確認 */}
-      {(() => {
-        // 從行程表取得每天的住宿資訊
-        if (!itinerary?.daily_itinerary || itinerary.daily_itinerary.length === 0) {
-          return null
-        }
-
-        // 建立每晚住宿清單（排除最後一天和「溫暖的家」）
-        const nightlyAccommodations: Array<{
-          nightNumber: number
-          date: string
-          dayLabel: string
-          hotelName: string
-          isSameAsPrevious: boolean
-        }> = []
-
-        itinerary.daily_itinerary.forEach((day, idx) => {
-          // 最後一天通常不住宿
-          if (idx === itinerary.daily_itinerary.length - 1) return
-          if (!day.accommodation || day.accommodation === '溫暖的家') return
-
-          const isSame = day.isSameAccommodation || day.accommodation.includes('同上')
-          // 提取實際飯店名稱（去掉「同上」前綴）
-          let hotelName = day.accommodation
-          if (isSame && day.accommodation.includes('(')) {
-            hotelName = day.accommodation.replace(/同上\s*\(([^)]+)\)/, '$1').trim()
-          }
-
-          nightlyAccommodations.push({
-            nightNumber: idx + 1,
-            date: day.date || '',
-            dayLabel: day.dayLabel || `Day ${idx + 1}`,
-            hotelName: hotelName,
-            isSameAsPrevious: isSame,
-          })
-        })
-
-        if (nightlyAccommodations.length === 0) {
-          return null
-        }
-
-        // 從需求單取得住宿確認狀態
-        const accommodationRequests = tourRequests.filter(
-          req => req.category === 'accommodation' || req.category === 'hotel'
-        )
-
-        // 取得每晚的房型配置（優先使用報價單，其次使用 tour_rooms）
-        const getRoomTypesForNight = (nightNumber: number) => {
-          // 優先從報價單取得房型
-          const quoteRooms = quoteRoomItems.filter(r => r.day === nightNumber)
-          if (quoteRooms.length > 0) {
-            return quoteRooms
-              .map(r => `${r.room_type} x${r.quantity}`)
-              .join('、')
-          }
-
-          // 其次從 tour_rooms 表取得
-          const rooms = tourRooms.filter(r => r.night_number === nightNumber)
-          if (rooms.length === 0) return '-'
-          // 統計各房型數量
-          const roomCounts: Record<string, number> = {}
-          rooms.forEach(r => {
-            const type = r.room_type || '未指定'
-            roomCounts[type] = (roomCounts[type] || 0) + 1
-          })
-          return Object.entries(roomCounts)
-            .map(([type, count]) => `${type} x${count}`)
-            .join('、')
-        }
-
-        // 取得飯店的確認狀態
-        const getHotelStatus = (hotelName: string) => {
-          const req = accommodationRequests.find(r =>
-            r.supplier_name?.includes(hotelName) || r.title?.includes(hotelName)
-          )
-          if (!req) return { status: 'pending', label: '待確認', color: 'bg-morandi-gold/20 text-morandi-gold' }
-          if (req.status === 'confirmed') return { status: 'confirmed', label: '已確認', color: 'bg-morandi-green/20 text-morandi-green' }
-          if (req.status === 'replied') return { status: 'replied', label: '已回覆', color: 'bg-morandi-container text-morandi-primary' }
-          return { status: 'pending', label: '待確認', color: 'bg-morandi-gold/20 text-morandi-gold' }
-        }
-
-        return (
-          <div className="border-t border-border">
-            <div className="flex items-center justify-between px-4 py-2 bg-morandi-primary text-white">
-              <div className="flex items-center gap-2">
-                <span className="font-medium">飯店確認</span>
-                <span className="text-white/80 text-sm">({nightlyAccommodations.length} 晚)</span>
-              </div>
-            </div>
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-morandi-container/50 border-b border-border">
-                  <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[80px]">日期</th>
-                  <th className="px-3 py-2 text-left font-medium text-morandi-primary">飯店名稱</th>
-                  <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[200px]">房型配置</th>
-                  <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[80px]">狀態</th>
-                </tr>
-              </thead>
-              <tbody>
-                {nightlyAccommodations.map((night, idx) => {
-                  const status = getHotelStatus(night.hotelName)
-                  const roomTypes = getRoomTypesForNight(night.nightNumber)
-                  return (
-                    <tr key={idx} className={`border-t border-border/50 hover:bg-morandi-container/10 ${idx % 2 === 1 ? 'bg-morandi-container/5' : ''}`}>
-                      <td className="px-3 py-2 text-morandi-secondary">{night.date}</td>
-                      <td className="px-3 py-2">
-                        <span className="font-medium">{night.hotelName}</span>
-                        {night.isSameAsPrevious && (
-                          <span className="ml-2 text-xs text-morandi-secondary">(續住)</span>
-                        )}
-                      </td>
-                      <td className="px-3 py-2 text-morandi-secondary">{roomTypes}</td>
-                      <td className="px-3 py-2">
-                        <span className={`px-1.5 py-0.5 rounded text-xs ${status.color}`}>
-                          {status.label}
-                        </span>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        )
-      })()}
-
-      {/* 統一表格 */}
-      <div className="border-t border-border">
-        <table className="w-full text-sm table-fixed">
-          {/* 表頭 */}
-          <thead>
-            <tr className="bg-morandi-container/50 border-b border-border">
-              <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[4%] border-r border-border/30">分類</th>
-              <th className="px-1 py-2 text-left font-medium text-morandi-primary w-[5%] border-r border-border/30">日期</th>
-              <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[12%] border-r border-border/30">供應商</th>
-              <th className="px-2 py-2 text-left font-medium text-morandi-primary border-r border-border/30">項目說明</th>
-              <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[6%] border-r border-border/30">單價</th>
-              <th className="px-1 py-2 text-center font-medium text-morandi-primary w-[4%] border-r border-border/30">數量</th>
-              <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[6%] border-r border-border/30">小計</th>
-              <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[7%] border-r border-border/30">預計支出</th>
-              <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[7%] border-r border-border/30">實際支出</th>
-              <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[28%]">備註</th>
-            </tr>
-          </thead>
-          <tbody>
-            {CATEGORIES.map((cat) => {
-              const items = groupedItems[cat.key]
-
-              // 判斷是否可從行程表帶入
-              const canImport = itinerary?.daily_itinerary && itinerary.daily_itinerary.length > 0
-              const getImportHandler = () => {
-                if (cat.key === 'meal') return handleImportMeals
-                if (cat.key === 'accommodation') return handleImportAccommodation
-                if (cat.key === 'activity') return handleImportActivities
-                return null
-              }
-              const importHandler = getImportHandler()
-
-              return (
-                <React.Fragment key={cat.key}>
-                  {/* 分類標題行 */}
-                  <tr className="bg-morandi-container/30 border-t border-border print:hidden">
-                    <td colSpan={9} className="px-3 py-1.5">
-                      <span className="font-medium text-morandi-primary">{cat.label}</span>
-                      <span className="ml-2 text-xs text-morandi-secondary">({items.length})</span>
-                    </td>
-                    <td className="px-2 py-1.5 text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleAdd(cat.key)}
-                        className="h-6 px-2 text-xs text-morandi-gold hover:text-morandi-gold-hover"
-                      >
-                        <Plus size={12} className="mr-1" />
-                        新增
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr className="bg-morandi-container/30 border-t border-border hidden print:table-row">
-                    <td colSpan={10} className="px-3 py-1.5">
-                      <span className="font-medium text-morandi-primary">{cat.label}</span>
-                    </td>
-                  </tr>
-                  {/* 項目列表 */}
-                  {items.length === 0 && addingCategory !== cat.key ? (
-                    <tr className="border-t border-border/50">
-                      <td colSpan={10} className="px-3 py-3 text-center text-morandi-secondary text-xs">
-                        尚無{cat.label}項目
-                      </td>
-                    </tr>
-                  ) : (
-                    items.map((item, idx) => {
-                      // 優先使用資料庫的 subtotal，否則計算
-                      const subtotal = item.subtotal ?? ((item.unit_price || 0) * (item.quantity || 0))
-                      return (
-                        <tr
-                          key={item.id}
-                          className={`border-t border-border/50 hover:bg-morandi-container/10 ${
-                            idx % 2 === 1 ? 'bg-morandi-container/5' : ''
-                          }`}
-                        >
-                          <td className="px-2 py-2 text-morandi-secondary text-xs border-r border-border/30">{cat.label}</td>
-                          <td className="px-1 py-2 text-xs border-r border-border/30">{formatDate(item.service_date)}</td>
-                          <td className="px-2 py-2 text-sm border-r border-border/30">{item.supplier_name}</td>
-                          <td className="px-2 py-2 text-sm border-r border-border/30">{item.title}</td>
-                          <td className="px-2 py-2 text-right font-mono text-sm border-r border-border/30">{item.unit_price ? formatCurrency(item.unit_price) : '-'}</td>
-                          <td className="px-2 py-2 text-center text-sm border-r border-border/30">{item.quantity || '-'}</td>
-                          <td className="px-2 py-2 text-right font-mono text-sm border-r border-border/30">
-                            {subtotal > 0 ? (
-                              (item.type_data as { subtotal_currency?: string } | null)?.subtotal_currency
-                                ? `${getCurrencySymbol((item.type_data as { subtotal_currency?: string }).subtotal_currency)} ${subtotal.toLocaleString()}`
-                                : formatCurrency(subtotal)
-                            ) : '-'}
-                          </td>
-                          <td className="px-1 py-1 border-r border-border/30 print:hidden">
-                            <div className="flex items-center">
-                              {(item.type_data as { subtotal_currency?: string } | null)?.subtotal_currency && (
-                                <span className="text-xs text-muted-foreground pl-1 shrink-0">
-                                  {getCurrencySymbol((item.type_data as { subtotal_currency?: string }).subtotal_currency)}
-                                </span>
-                              )}
-                              <CalcInput
-                                data-expected-cost-input={item.id}
-                                value={item.id in localExpectedCostsRef.current ? localExpectedCostsRef.current[item.id].value : item.expected_cost}
-                                onChange={(val) => handleExpectedCostChange(item.id, val)}
-                                formula={localExpectedCostsRef.current[item.id]?.formula ?? (item.type_data as unknown as { expected_cost_formula?: string } | null)?.expected_cost_formula}
-                                onFormulaChange={(f) => handleExpectedCostFormulaChange(item.id, f)}
-                                onBlur={() => handleExpectedCostBlur(item.id, item.type_data)}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-                                    e.preventDefault()
-                                    const inputs = document.querySelectorAll<HTMLInputElement>('[data-expected-cost-input]')
-                                    const inputsArray = Array.from(inputs)
-                                    const currentIndex = inputsArray.findIndex(input => input.dataset.expectedCostInput === item.id)
-                                    if (currentIndex === -1) return
-                                    const nextIndex = e.key === 'ArrowDown'
-                                      ? Math.min(currentIndex + 1, inputsArray.length - 1)
-                                      : Math.max(currentIndex - 1, 0)
-                                    inputsArray[nextIndex]?.focus()
-                                  }
-                                }}
-                                className="flex-1 h-7 px-2 py-1 text-sm text-right font-mono bg-transparent border border-transparent hover:border-border focus:border-morandi-gold focus:ring-1 focus:ring-morandi-gold/30 rounded outline-none"
-                                placeholder="-"
-                              />
-                            </div>
-                          </td>
-                          <td className="px-2 py-2 text-right font-mono text-sm border-r border-border/30 hidden print:table-cell">
-                            {item.expected_cost ? (
-                              (item.type_data as { subtotal_currency?: string } | null)?.subtotal_currency
-                                ? `${getCurrencySymbol((item.type_data as { subtotal_currency?: string }).subtotal_currency)} ${item.expected_cost.toLocaleString()}`
-                                : formatCurrency(item.expected_cost)
-                            ) : '-'}
-                          </td>
-                          <td className="px-2 py-2 text-right font-mono text-sm border-r border-border/30">{item.actual_cost ? formatCurrency(item.actual_cost) : '-'}</td>
-                          <td className="px-1 py-1 print:hidden">
-                            <div className="flex items-center gap-1">
-                              <input
-                                type="text"
-                                value={item.id in localNotesRef.current ? localNotesRef.current[item.id].value : (item.notes || '')}
-                                onChange={(e) => handleNotesChange(item.id, e.target.value)}
-                                onBlur={() => handleNotesBlur(item.id)}
-                                className="flex-1 h-7 px-2 py-1 text-xs bg-transparent border border-transparent hover:border-border focus:border-morandi-gold focus:ring-1 focus:ring-morandi-gold/30 rounded outline-none"
-                                placeholder="備註..."
-                              />
-                              {destinationCurrency && (item.subtotal || (item.unit_price && item.quantity)) ? (
-                                <button
-                                  type="button"
-                                  className="h-6 px-1.5 text-xs text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10 rounded shrink-0 print:hidden"
-                                  onClick={() => handleCurrencyConvert(item.id)}
-                                >
-                                  {destinationCurrency}
-                                </button>
-                              ) : null}
-                            </div>
-                          </td>
-                          <td className="px-2 py-2 text-xs text-morandi-secondary hidden print:table-cell">
-                            {item.notes || '-'}
-                          </td>
-                        </tr>
-                      )
-                    })
-                  )}
-
-                  {/* Inline 新增行 - 交通類別：下拉選單選類型 */}
-                  {addingCategory === cat.key && cat.key === 'transport' && (
-                    <tr className="border-t border-border/50 bg-morandi-gold/10">
-                      {/* 分類欄位：下拉選單 */}
-                      <td className="px-3 py-2 border-r border-border/30">
-                        <select
-                          value={transportSubType || ''}
-                          onChange={(e) => handleSelectTransportType(e.target.value as TransportSubType)}
-                          className="text-sm bg-transparent border-0 outline-none cursor-pointer -ml-1"
-                          style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none', paddingRight: '16px', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%238b8680\' stroke-width=\'2\'%3E%3Cpath d=\'m6 9 6 6 6-6\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right center' }}
-                        >
-                          <option value="">選擇</option>
-                          <option value="flight">航班</option>
-                          <option value="vehicle">車子</option>
-                        </select>
-                      </td>
-                      {/* 未選擇類型：只顯示取消按鈕 */}
-                      {!transportSubType && (
-                        <>
-                          <td colSpan={8} className="px-3 py-2"></td>
-                          <td className="px-2 py-2 text-right">
-                            <button
-                              onClick={() => { setAddingCategory(null); setTransportSubType(null) }}
-                              className="text-morandi-red hover:underline text-xs"
-                            >
-                              取消
-                            </button>
-                          </td>
-                        </>
-                      )}
-                      {/* 航班：顯示帶入按鈕或手動填寫 */}
-                      {transportSubType === 'flight' && (
-                        <>
-                          <td colSpan={8} className="px-4 py-2">
-                            {tour.outbound_flight || tour.return_flight ? (
-                              // 有航班資訊：顯示並確認帶入
-                              <div className="flex items-center gap-4">
-                                <div className="text-sm space-x-4">
-                                  {tour.outbound_flight && (
-                                    <span>
-                                      <span className="text-morandi-green">去程</span> {tour.outbound_flight.airline} {tour.outbound_flight.flightNumber} {tour.outbound_flight.departureAirport}→{tour.outbound_flight.arrivalAirport}
-                                    </span>
-                                  )}
-                                  {tour.return_flight && (
-                                    <span>
-                                      <span className="text-morandi-gold">回程</span> {tour.return_flight.airline} {tour.return_flight.flightNumber} {tour.return_flight.departureAirport}→{tour.return_flight.arrivalAirport}
-                                    </span>
-                                  )}
-                                </div>
-                                <button
-                                  onClick={handleAddFlightItems}
-                                  disabled={savingNew}
-                                  className="px-3 py-1 text-xs font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded disabled:opacity-50"
-                                >
-                                  {savingNew ? '新增中...' : '確認帶入'}
-                                </button>
-                                <button
-                                  onClick={() => { setAddingCategory(null); setTransportSubType(null) }}
-                                  className="text-morandi-red hover:underline text-xs"
-                                >
-                                  取消
-                                </button>
+                    ) : (
+                      categoryItems.map((item, idx) => {
+                        const subtotal = item.subtotal ?? ((item.unit_price || 0) * (item.quantity || 0))
+                        return (
+                          <tr
+                            key={item.id}
+                            className={`border-t border-border/50 hover:bg-morandi-container/10 ${
+                              idx % 2 === 1 ? 'bg-morandi-container/5' : ''
+                            }`}
+                          >
+                            <td className="px-2 py-2 text-morandi-secondary text-xs border-r border-border/30">{cat.label}</td>
+                            <td className="px-1 py-2 text-xs border-r border-border/30">{formatDate(item.service_date)}</td>
+                            <td className="px-2 py-2 text-sm border-r border-border/30">{item.supplier_name}</td>
+                            <td className="px-2 py-2 text-sm border-r border-border/30">{item.title}</td>
+                            <td className="px-2 py-2 text-right font-mono text-sm border-r border-border/30">{item.unit_price ? formatCurrency(item.unit_price) : '-'}</td>
+                            <td className="px-2 py-2 text-center text-sm border-r border-border/30">{item.quantity || '-'}</td>
+                            <td className="px-2 py-2 text-right font-mono text-sm border-r border-border/30">
+                              {subtotal > 0 ? (
+                                (item.type_data as { subtotal_currency?: string } | null)?.subtotal_currency
+                                  ? `${getCurrencySymbol((item.type_data as { subtotal_currency?: string }).subtotal_currency)} ${subtotal.toLocaleString()}`
+                                  : formatCurrency(subtotal)
+                              ) : '-'}
+                            </td>
+                            <td className="px-1 py-1 border-r border-border/30 print:hidden">
+                              <div className="flex items-center">
+                                {(item.type_data as { subtotal_currency?: string } | null)?.subtotal_currency && (
+                                  <span className="text-xs text-muted-foreground pl-1 shrink-0">
+                                    {getCurrencySymbol((item.type_data as { subtotal_currency?: string }).subtotal_currency)}
+                                  </span>
+                                )}
+                                <CalcInput
+                                  data-expected-cost-input={item.id}
+                                  value={item.id in localExpectedCostsRef.current ? localExpectedCostsRef.current[item.id].value : item.expected_cost}
+                                  onChange={(val) => handleExpectedCostChange(item.id, val)}
+                                  formula={localExpectedCostsRef.current[item.id]?.formula ?? (item.type_data as unknown as { expected_cost_formula?: string } | null)?.expected_cost_formula}
+                                  onFormulaChange={(f) => handleExpectedCostFormulaChange(item.id, f)}
+                                  onBlur={() => handleExpectedCostBlur(item.id, item.type_data)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                                      e.preventDefault()
+                                      const inputs = document.querySelectorAll<HTMLInputElement>('[data-expected-cost-input]')
+                                      const inputsArray = Array.from(inputs)
+                                      const currentIndex = inputsArray.findIndex(input => input.dataset.expectedCostInput === item.id)
+                                      if (currentIndex === -1) return
+                                      const nextIndex = e.key === 'ArrowDown'
+                                        ? Math.min(currentIndex + 1, inputsArray.length - 1)
+                                        : Math.max(currentIndex - 1, 0)
+                                      inputsArray[nextIndex]?.focus()
+                                    }
+                                  }}
+                                  className="flex-1 h-7 px-2 py-1 text-sm text-right font-mono bg-transparent border border-transparent hover:border-border focus:border-morandi-gold focus:ring-1 focus:ring-morandi-gold/30 rounded outline-none"
+                                  placeholder="-"
+                                />
                               </div>
-                            ) : manualFlightMode ? (
-                              // 手動填寫模式
-                              <div className="space-y-2">
-                                <div className="flex items-center gap-2 text-sm">
-                                  <span className="text-morandi-green font-medium w-10">去程</span>
-                                  <input
-                                    placeholder="航空"
-                                    value={manualFlight.outbound.airline}
-                                    onChange={(e) => setManualFlight(prev => ({ ...prev, outbound: { ...prev.outbound, airline: e.target.value } }))}
-                                    className="w-20 px-2 py-1 border border-border rounded text-sm"
-                                  />
-                                  <input
-                                    placeholder="航班"
-                                    value={manualFlight.outbound.flightNumber}
-                                    onChange={(e) => setManualFlight(prev => ({ ...prev, outbound: { ...prev.outbound, flightNumber: e.target.value } }))}
-                                    className="w-20 px-2 py-1 border border-border rounded text-sm"
-                                  />
-                                  <input
-                                    placeholder="起飛"
-                                    value={manualFlight.outbound.departureAirport}
-                                    onChange={(e) => setManualFlight(prev => ({ ...prev, outbound: { ...prev.outbound, departureAirport: e.target.value } }))}
-                                    className="w-16 px-2 py-1 border border-border rounded text-sm"
-                                  />
-                                  <span>→</span>
-                                  <input
-                                    placeholder="抵達"
-                                    value={manualFlight.outbound.arrivalAirport}
-                                    onChange={(e) => setManualFlight(prev => ({ ...prev, outbound: { ...prev.outbound, arrivalAirport: e.target.value } }))}
-                                    className="w-16 px-2 py-1 border border-border rounded text-sm"
-                                  />
-                                </div>
-                                <div className="flex items-center gap-2 text-sm">
-                                  <span className="text-morandi-gold font-medium w-10">回程</span>
-                                  <input
-                                    placeholder="航空"
-                                    value={manualFlight.return.airline}
-                                    onChange={(e) => setManualFlight(prev => ({ ...prev, return: { ...prev.return, airline: e.target.value } }))}
-                                    className="w-20 px-2 py-1 border border-border rounded text-sm"
-                                  />
-                                  <input
-                                    placeholder="航班"
-                                    value={manualFlight.return.flightNumber}
-                                    onChange={(e) => setManualFlight(prev => ({ ...prev, return: { ...prev.return, flightNumber: e.target.value } }))}
-                                    className="w-20 px-2 py-1 border border-border rounded text-sm"
-                                  />
-                                  <input
-                                    placeholder="起飛"
-                                    value={manualFlight.return.departureAirport}
-                                    onChange={(e) => setManualFlight(prev => ({ ...prev, return: { ...prev.return, departureAirport: e.target.value } }))}
-                                    className="w-16 px-2 py-1 border border-border rounded text-sm"
-                                  />
-                                  <span>→</span>
-                                  <input
-                                    placeholder="抵達"
-                                    value={manualFlight.return.arrivalAirport}
-                                    onChange={(e) => setManualFlight(prev => ({ ...prev, return: { ...prev.return, arrivalAirport: e.target.value } }))}
-                                    className="w-16 px-2 py-1 border border-border rounded text-sm"
-                                  />
-                                </div>
-                                <div className="flex items-center gap-2 pt-1">
+                            </td>
+                            <td className="px-2 py-2 text-right font-mono text-sm border-r border-border/30 hidden print:table-cell">
+                              {item.expected_cost ? (
+                                (item.type_data as { subtotal_currency?: string } | null)?.subtotal_currency
+                                  ? `${getCurrencySymbol((item.type_data as { subtotal_currency?: string }).subtotal_currency)} ${item.expected_cost.toLocaleString()}`
+                                  : formatCurrency(item.expected_cost)
+                              ) : '-'}
+                            </td>
+                            <td className="px-2 py-2 text-right font-mono text-sm border-r border-border/30">{item.actual_cost ? formatCurrency(item.actual_cost) : '-'}</td>
+                            <td className="px-1 py-1 print:hidden">
+                              <div className="flex items-center gap-1">
+                                <input
+                                  type="text"
+                                  value={item.id in localNotesRef.current ? localNotesRef.current[item.id].value : (item.notes || '')}
+                                  onChange={(e) => handleNotesChange(item.id, e.target.value)}
+                                  onBlur={() => handleNotesBlur(item.id)}
+                                  className="flex-1 h-7 px-2 py-1 text-xs bg-transparent border border-transparent hover:border-border focus:border-morandi-gold focus:ring-1 focus:ring-morandi-gold/30 rounded outline-none"
+                                  placeholder="備註..."
+                                />
+                                {destinationCurrency && (item.subtotal || (item.unit_price && item.quantity)) ? (
                                   <button
-                                    onClick={handleSaveManualFlight}
-                                    disabled={savingNew || (!manualFlight.outbound.airline && !manualFlight.return.airline)}
+                                    type="button"
+                                    className="h-6 px-1.5 text-xs text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10 rounded shrink-0 print:hidden"
+                                    onClick={() => handleCurrencyConvert(item.id)}
+                                  >
+                                    {destinationCurrency}
+                                  </button>
+                                ) : null}
+                              </div>
+                            </td>
+                            <td className="px-2 py-2 text-xs text-morandi-secondary hidden print:table-cell">
+                              {item.notes || '-'}
+                            </td>
+                          </tr>
+                        )
+                      })
+                    )}
+
+                    {/* Inline 新增行 - 交通類別 */}
+                    {addingCategory === cat.key && cat.key === 'transport' && (
+                      <tr className="border-t border-border/50 bg-morandi-gold/10">
+                        <td className="px-3 py-2 border-r border-border/30">
+                          <select
+                            value={transportSubType || ''}
+                            onChange={(e) => handleSelectTransportType(e.target.value as TransportSubType)}
+                            className="text-sm bg-transparent border-0 outline-none cursor-pointer -ml-1"
+                            style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none', paddingRight: '16px', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%238b8680\' stroke-width=\'2\'%3E%3Cpath d=\'m6 9 6 6 6-6\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right center' }}
+                          >
+                            <option value="">選擇</option>
+                            <option value="flight">航班</option>
+                            <option value="vehicle">車子</option>
+                          </select>
+                        </td>
+                        {!transportSubType && (
+                          <>
+                            <td colSpan={8} className="px-3 py-2"></td>
+                            <td className="px-2 py-2 text-right">
+                              <button
+                                onClick={() => { setAddingCategory(null); setTransportSubType(null) }}
+                                className="text-morandi-red hover:underline text-xs"
+                              >
+                                取消
+                              </button>
+                            </td>
+                          </>
+                        )}
+                        {transportSubType === 'flight' && (
+                          <>
+                            <td colSpan={8} className="px-4 py-2">
+                              {tour.outbound_flight || tour.return_flight ? (
+                                <div className="flex items-center gap-4">
+                                  <div className="text-sm space-x-4">
+                                    {tour.outbound_flight && (
+                                      <span>
+                                        <span className="text-morandi-green">去程</span> {tour.outbound_flight.airline} {tour.outbound_flight.flightNumber} {tour.outbound_flight.departureAirport}→{tour.outbound_flight.arrivalAirport}
+                                      </span>
+                                    )}
+                                    {tour.return_flight && (
+                                      <span>
+                                        <span className="text-morandi-gold">回程</span> {tour.return_flight.airline} {tour.return_flight.flightNumber} {tour.return_flight.departureAirport}→{tour.return_flight.arrivalAirport}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <button
+                                    onClick={handleAddFlightItems}
+                                    disabled={savingNew}
                                     className="px-3 py-1 text-xs font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded disabled:opacity-50"
                                   >
-                                    {savingNew ? '儲存中...' : '確認儲存'}
+                                    {savingNew ? '新增中...' : '確認帶入'}
                                   </button>
                                   <button
-                                    onClick={() => { setManualFlightMode(false); setAddingCategory(null); setTransportSubType(null) }}
+                                    onClick={() => { setAddingCategory(null); setTransportSubType(null) }}
                                     className="text-morandi-red hover:underline text-xs"
                                   >
                                     取消
                                   </button>
                                 </div>
+                              ) : manualFlightMode ? (
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-2 text-sm">
+                                    <span className="text-morandi-green font-medium w-10">去程</span>
+                                    <input
+                                      placeholder="航空"
+                                      value={manualFlight.outbound.airline}
+                                      onChange={(e) => setManualFlight(prev => ({ ...prev, outbound: { ...prev.outbound, airline: e.target.value } }))}
+                                      className="w-20 px-2 py-1 border border-border rounded text-sm"
+                                    />
+                                    <input
+                                      placeholder="航班"
+                                      value={manualFlight.outbound.flightNumber}
+                                      onChange={(e) => setManualFlight(prev => ({ ...prev, outbound: { ...prev.outbound, flightNumber: e.target.value } }))}
+                                      className="w-20 px-2 py-1 border border-border rounded text-sm"
+                                    />
+                                    <input
+                                      placeholder="起飛"
+                                      value={manualFlight.outbound.departureAirport}
+                                      onChange={(e) => setManualFlight(prev => ({ ...prev, outbound: { ...prev.outbound, departureAirport: e.target.value } }))}
+                                      className="w-16 px-2 py-1 border border-border rounded text-sm"
+                                    />
+                                    <span>→</span>
+                                    <input
+                                      placeholder="抵達"
+                                      value={manualFlight.outbound.arrivalAirport}
+                                      onChange={(e) => setManualFlight(prev => ({ ...prev, outbound: { ...prev.outbound, arrivalAirport: e.target.value } }))}
+                                      className="w-16 px-2 py-1 border border-border rounded text-sm"
+                                    />
+                                  </div>
+                                  <div className="flex items-center gap-2 text-sm">
+                                    <span className="text-morandi-gold font-medium w-10">回程</span>
+                                    <input
+                                      placeholder="航空"
+                                      value={manualFlight.return.airline}
+                                      onChange={(e) => setManualFlight(prev => ({ ...prev, return: { ...prev.return, airline: e.target.value } }))}
+                                      className="w-20 px-2 py-1 border border-border rounded text-sm"
+                                    />
+                                    <input
+                                      placeholder="航班"
+                                      value={manualFlight.return.flightNumber}
+                                      onChange={(e) => setManualFlight(prev => ({ ...prev, return: { ...prev.return, flightNumber: e.target.value } }))}
+                                      className="w-20 px-2 py-1 border border-border rounded text-sm"
+                                    />
+                                    <input
+                                      placeholder="起飛"
+                                      value={manualFlight.return.departureAirport}
+                                      onChange={(e) => setManualFlight(prev => ({ ...prev, return: { ...prev.return, departureAirport: e.target.value } }))}
+                                      className="w-16 px-2 py-1 border border-border rounded text-sm"
+                                    />
+                                    <span>→</span>
+                                    <input
+                                      placeholder="抵達"
+                                      value={manualFlight.return.arrivalAirport}
+                                      onChange={(e) => setManualFlight(prev => ({ ...prev, return: { ...prev.return, arrivalAirport: e.target.value } }))}
+                                      className="w-16 px-2 py-1 border border-border rounded text-sm"
+                                    />
+                                  </div>
+                                  <div className="flex items-center gap-2 pt-1">
+                                    <button
+                                      onClick={handleSaveManualFlight}
+                                      disabled={savingNew || (!manualFlight.outbound.airline && !manualFlight.return.airline)}
+                                      className="px-3 py-1 text-xs font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded disabled:opacity-50"
+                                    >
+                                      {savingNew ? '儲存中...' : '確認儲存'}
+                                    </button>
+                                    <button
+                                      onClick={() => { setManualFlightMode(false); setAddingCategory(null); setTransportSubType(null) }}
+                                      className="text-morandi-red hover:underline text-xs"
+                                    >
+                                      取消
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-4">
+                                  <span className="text-sm text-morandi-secondary">尚無航班資訊</span>
+                                  <button
+                                    onClick={() => setManualFlightMode(true)}
+                                    className="px-3 py-1 text-xs font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded"
+                                  >
+                                    手動填寫
+                                  </button>
+                                  <button
+                                    onClick={() => { setAddingCategory(null); setTransportSubType(null) }}
+                                    className="text-morandi-red hover:underline text-xs"
+                                  >
+                                    取消
+                                  </button>
+                                </div>
+                              )}
+                            </td>
+                          </>
+                        )}
+                        {transportSubType === 'vehicle' && (
+                          <>
+                            <td className="p-1 border-r border-border/30">
+                              <div className="flex items-center gap-1">
+                                <DatePicker
+                                  value={newItemData.service_date}
+                                  onChange={(date) => handleNewItemChange('service_date', date)}
+                                  placeholder="開始"
+                                  buttonClassName="h-8 text-xs border-0 shadow-none"
+                                />
+                                <span className="text-morandi-secondary text-xs">~</span>
+                                <DatePicker
+                                  value={newItemData.service_date_end}
+                                  onChange={(date) => handleNewItemChange('service_date_end', date)}
+                                  placeholder="結束(選填)"
+                                  buttonClassName="h-8 text-xs border-0 shadow-none"
+                                  clearable
+                                />
                               </div>
-                            ) : (
-                              // 無航班資訊：顯示手動填寫按鈕
-                              <div className="flex items-center gap-4">
-                                <span className="text-sm text-morandi-secondary">尚無航班資訊</span>
+                            </td>
+                            <td className="p-0 border-r border-border/30" style={{ maxWidth: '100px' }}>
+                              <input
+                                value={newItemData.supplier_name}
+                                onChange={(e) => handleNewItemChange('supplier_name', e.target.value)}
+                                placeholder="車行..."
+                                className="w-full h-full px-2 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                              />
+                            </td>
+                            <td className="p-0 border-r border-border/30">
+                              <input
+                                value={newItemData.title}
+                                onChange={(e) => handleNewItemChange('title', e.target.value)}
+                                placeholder={newItemData.service_date_end ? '全程用車' : '單日用車'}
+                                className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                              />
+                            </td>
+                            <td className="p-0 border-r border-border/30">
+                              <input
+                                type="number"
+                                value={newItemData.unit_price}
+                                onChange={(e) => handleNewItemChange('unit_price', e.target.value)}
+                                placeholder="0"
+                                className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                              />
+                            </td>
+                            <td className="p-0 border-r border-border/30">
+                              <input
+                                type="number"
+                                value={newItemData.quantity}
+                                onChange={(e) => handleNewItemChange('quantity', e.target.value)}
+                                placeholder="0"
+                                className="w-full h-full px-3 py-2 text-sm text-center bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                              />
+                            </td>
+                            <td className="p-0 border-r border-border/30">
+                              <input
+                                type="number"
+                                value={newItemData.expected_cost}
+                                onChange={(e) => handleNewItemChange('expected_cost', e.target.value)}
+                                placeholder="0"
+                                className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                              />
+                            </td>
+                            <td className="p-0 border-r border-border/30">
+                              <input
+                                type="number"
+                                value={newItemData.actual_cost}
+                                onChange={(e) => handleNewItemChange('actual_cost', e.target.value)}
+                                placeholder="0"
+                                className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                              />
+                            </td>
+                            <td className="p-0 border-r border-border/30">
+                              <input
+                                value={newItemData.notes}
+                                onChange={(e) => handleNewItemChange('notes', e.target.value)}
+                                placeholder="備註..."
+                                className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                              />
+                            </td>
+                            <td className="px-2 py-2">
+                              <div className="flex items-center gap-1 justify-end">
                                 <button
-                                  onClick={() => setManualFlightMode(true)}
-                                  className="px-3 py-1 text-xs font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded"
+                                  onClick={handleSaveNewItem}
+                                  disabled={savingNew}
+                                  className="p-1.5 text-white bg-morandi-green hover:bg-morandi-green/80 rounded disabled:opacity-50"
+                                  title="儲存"
                                 >
-                                  手動填寫
+                                  {savingNew ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                                 </button>
                                 <button
-                                  onClick={() => { setAddingCategory(null); setTransportSubType(null) }}
-                                  className="text-morandi-red hover:underline text-xs"
+                                  onClick={handleCancelAdd}
+                                  disabled={savingNew}
+                                  className="p-1.5 text-white bg-morandi-red hover:bg-morandi-red/80 rounded disabled:opacity-50"
+                                  title="取消"
                                 >
-                                  取消
+                                  <X size={14} />
                                 </button>
                               </div>
-                            )}
-                          </td>
-                        </>
-                      )}
-                      {/* 車子：日期選擇（一個日期=單日，兩個日期=區間） */}
-                      {transportSubType === 'vehicle' && (
-                        <>
-                          <td className="p-1 border-r border-border/30">
-                            <div className="flex items-center gap-1">
-                              <DatePicker
-                                value={newItemData.service_date}
-                                onChange={(date) => handleNewItemChange('service_date', date)}
-                                placeholder="開始"
-                                buttonClassName="h-8 text-xs border-0 shadow-none"
-                              />
-                              <span className="text-morandi-secondary text-xs">~</span>
-                              <DatePicker
-                                value={newItemData.service_date_end}
-                                onChange={(date) => handleNewItemChange('service_date_end', date)}
-                                placeholder="結束(選填)"
-                                buttonClassName="h-8 text-xs border-0 shadow-none"
-                                clearable
-                              />
-                            </div>
-                          </td>
-                          <td className="p-0 border-r border-border/30" style={{ maxWidth: '100px' }}>
-                            <input
-                              value={newItemData.supplier_name}
-                              onChange={(e) => handleNewItemChange('supplier_name', e.target.value)}
-                              placeholder="車行..."
-                              className="w-full h-full px-2 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
-                            />
-                          </td>
-                          <td className="p-0 border-r border-border/30">
-                            <input
-                              value={newItemData.title}
-                              onChange={(e) => handleNewItemChange('title', e.target.value)}
-                              placeholder={newItemData.service_date_end ? '全程用車' : '單日用車'}
-                              className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
-                            />
-                          </td>
-                          <td className="p-0 border-r border-border/30">
-                            <input
-                              type="number"
-                              value={newItemData.unit_price}
-                              onChange={(e) => handleNewItemChange('unit_price', e.target.value)}
-                              placeholder="0"
-                              className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
-                            />
-                          </td>
-                          <td className="p-0 border-r border-border/30">
-                            <input
-                              type="number"
-                              value={newItemData.quantity}
-                              onChange={(e) => handleNewItemChange('quantity', e.target.value)}
-                              placeholder="0"
-                              className="w-full h-full px-3 py-2 text-sm text-center bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
-                            />
-                          </td>
-                          <td className="p-0 border-r border-border/30">
-                            <input
-                              type="number"
-                              value={newItemData.expected_cost}
-                              onChange={(e) => handleNewItemChange('expected_cost', e.target.value)}
-                              placeholder="0"
-                              className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
-                            />
-                          </td>
-                          <td className="p-0 border-r border-border/30">
-                            <input
-                              type="number"
-                              value={newItemData.actual_cost}
-                              onChange={(e) => handleNewItemChange('actual_cost', e.target.value)}
-                              placeholder="0"
-                              className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
-                            />
-                          </td>
-                          <td className="p-0 border-r border-border/30">
-                            <input
-                              value={newItemData.notes}
-                              onChange={(e) => handleNewItemChange('notes', e.target.value)}
-                              placeholder="備註..."
-                              className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
-                            />
-                          </td>
-                        </>
-                      )}
-                      {/* 車子模式的操作按鈕 */}
-                      {transportSubType === 'vehicle' && (
+                            </td>
+                          </>
+                        )}
+                      </tr>
+                    )}
+
+                    {/* 其他類別的 Inline 新增行 */}
+                    {addingCategory === cat.key && cat.key !== 'transport' && (
+                      <tr className="border-t border-border/50 bg-morandi-gold/10">
+                        <td className="px-3 py-2 text-morandi-secondary text-xs border-r border-border/30">{cat.label}</td>
+                        <td className="p-0 border-r border-border/30">
+                          <input
+                            ref={firstInputRef}
+                            type="date"
+                            value={newItemData.service_date}
+                            onChange={(e) => handleNewItemChange('service_date', e.target.value)}
+                            className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50"
+                          />
+                        </td>
+                        <td className="p-0 border-r border-border/30">
+                          <input
+                            value={newItemData.supplier_name}
+                            onChange={(e) => handleNewItemChange('supplier_name', e.target.value)}
+                            placeholder="輸入供應商..."
+                            className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                          />
+                        </td>
+                        <td className="p-0 border-r border-border/30">
+                          <input
+                            value={newItemData.title}
+                            onChange={(e) => handleNewItemChange('title', e.target.value)}
+                            placeholder="輸入項目說明..."
+                            className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                          />
+                        </td>
+                        <td className="p-0 border-r border-border/30">
+                          <input
+                            type="number"
+                            value={newItemData.unit_price}
+                            onChange={(e) => handleNewItemChange('unit_price', e.target.value)}
+                            placeholder="0"
+                            className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                          />
+                        </td>
+                        <td className="p-0 border-r border-border/30">
+                          <input
+                            type="number"
+                            value={newItemData.quantity}
+                            onChange={(e) => handleNewItemChange('quantity', e.target.value)}
+                            placeholder="0"
+                            className="w-full h-full px-3 py-2 text-sm text-center bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                          />
+                        </td>
+                        <td className="p-0 border-r border-border/30">
+                          <input
+                            type="number"
+                            value={newItemData.expected_cost}
+                            onChange={(e) => handleNewItemChange('expected_cost', e.target.value)}
+                            placeholder="0"
+                            className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                          />
+                        </td>
+                        <td className="p-0 border-r border-border/30">
+                          <input
+                            type="number"
+                            value={newItemData.actual_cost}
+                            onChange={(e) => handleNewItemChange('actual_cost', e.target.value)}
+                            placeholder="0"
+                            className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                          />
+                        </td>
+                        <td className="p-0 border-r border-border/30">
+                          <input
+                            value={newItemData.notes}
+                            onChange={(e) => handleNewItemChange('notes', e.target.value)}
+                            placeholder="輸入備註..."
+                            className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                          />
+                        </td>
                         <td className="px-2 py-2">
                           <div className="flex items-center gap-1 justify-end">
                             <button
@@ -2189,213 +1435,56 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                             </button>
                           </div>
                         </td>
-                      )}
-                    </tr>
-                  )}
-
-                  {/* 其他類別：一般新增行 */}
-                  {addingCategory === cat.key && cat.key !== 'transport' && (
-                    <tr className="border-t border-border/50 bg-morandi-gold/10">
-                      <td className="px-3 py-2 text-morandi-secondary text-xs border-r border-border/30">{cat.label}</td>
-                      <td className="p-0 border-r border-border/30">
-                        <input
-                          ref={firstInputRef}
-                          type="date"
-                          value={newItemData.service_date}
-                          onChange={(e) => handleNewItemChange('service_date', e.target.value)}
-                          className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50"
-                        />
-                      </td>
-                      <td className="p-0 border-r border-border/30">
-                        <input
-                          value={newItemData.supplier_name}
-                          onChange={(e) => handleNewItemChange('supplier_name', e.target.value)}
-                          placeholder="輸入供應商..."
-                          className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
-                        />
-                      </td>
-                      <td className="p-0 border-r border-border/30">
-                        <input
-                          value={newItemData.title}
-                          onChange={(e) => handleNewItemChange('title', e.target.value)}
-                          placeholder="輸入項目說明..."
-                          className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
-                        />
-                      </td>
-                      <td className="p-0 border-r border-border/30">
-                        <input
-                          type="number"
-                          value={newItemData.unit_price}
-                          onChange={(e) => handleNewItemChange('unit_price', e.target.value)}
-                          placeholder="0"
-                          className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
-                        />
-                      </td>
-                      <td className="p-0 border-r border-border/30">
-                        <input
-                          type="number"
-                          value={newItemData.quantity}
-                          onChange={(e) => handleNewItemChange('quantity', e.target.value)}
-                          placeholder="0"
-                          className="w-full h-full px-3 py-2 text-sm text-center bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
-                        />
-                      </td>
-                      <td className="p-0 border-r border-border/30">
-                        <input
-                          type="number"
-                          value={newItemData.expected_cost}
-                          onChange={(e) => handleNewItemChange('expected_cost', e.target.value)}
-                          placeholder="0"
-                          className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
-                        />
-                      </td>
-                      <td className="p-0 border-r border-border/30">
-                        <input
-                          type="number"
-                          value={newItemData.actual_cost}
-                          onChange={(e) => handleNewItemChange('actual_cost', e.target.value)}
-                          placeholder="0"
-                          className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
-                        />
-                      </td>
-                      <td className="p-0 border-r border-border/30">
-                        <input
-                          value={newItemData.notes}
-                          onChange={(e) => handleNewItemChange('notes', e.target.value)}
-                          placeholder="輸入備註..."
-                          className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
-                        />
-                      </td>
-                      <td className="px-2 py-2">
-                        <div className="flex items-center gap-1 justify-end">
-                          <button
-                            onClick={handleSaveNewItem}
-                            disabled={savingNew}
-                            className="p-1.5 text-white bg-morandi-green hover:bg-morandi-green/80 rounded disabled:opacity-50"
-                            title="儲存"
-                          >
-                            {savingNew ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-                          </button>
-                          <button
-                            onClick={handleCancelAdd}
-                            disabled={savingNew}
-                            className="p-1.5 text-white bg-morandi-red hover:bg-morandi-red/80 rounded disabled:opacity-50"
-                            title="取消"
-                          >
-                            <X size={14} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </React.Fragment>
-              )
-            })}
-          </tbody>
-          {/* 總計 */}
-          <tfoot>
-            {(() => {
-              const allItems = Object.values(groupedItems).flat()
-              // 預計支出 (外幣)：只加有外幣標記的項目
-              const expectedForeign = allItems.reduce((sum, item) => {
-                const typeData = item.type_data as { subtotal_currency?: string } | null
-                if (typeData?.subtotal_currency === destinationCurrency) {
-                  return sum + (item.expected_cost || 0)
-                }
-                return sum
-              }, 0)
-              return (
-                <tr className="bg-morandi-container/50 border-t-2 border-border font-medium">
-                  <td colSpan={7} className="px-2 py-2 text-right text-morandi-primary">
-                    總計
-                  </td>
-                  <td className="px-2 py-2 text-right font-mono text-morandi-primary">
-                    {expectedForeign > 0 && (
-                      <div className="text-morandi-gold">
-                        {getCurrencySymbol(destinationCurrency)} {expectedForeign.toLocaleString()}
-                      </div>
+                      </tr>
                     )}
-                  </td>
-                  <td className="px-2 py-2 text-right font-mono text-morandi-primary">
-                    {formatCurrency(costSummary.total.actual)}
-                  </td>
-                  <td className="px-2 py-2"></td>
-                </tr>
-              )
-            })()}
-          </tfoot>
-        </table>
-      </div>
-
-      {/* 結算區塊 */}
-      <div className="border-t border-border p-4 bg-morandi-container/20">
-        <div className="flex items-center justify-between">
-          <h3 className="font-medium text-morandi-primary">結算</h3>
-          {destinationCurrency && (
-            <div className="flex items-center gap-2 text-sm">
-              {effectiveExchangeRate ? (
-                <>
-                  <span className="text-morandi-secondary">
-                    匯率：1 {destinationCurrency} = {effectiveExchangeRate} TWD
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 px-2 text-xs text-morandi-gold hover:text-morandi-gold-hover"
-                    onClick={() => {
-                      setExchangeRateInput(effectiveExchangeRate?.toString() || '')
-                      setExchangeRateDialog({ open: true, itemId: null })
-                    }}
-                  >
-                    修改
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 text-xs"
-                  onClick={() => setExchangeRateDialog({ open: true, itemId: null })}
-                >
-                  設定 {destinationCurrency} 匯率
-                </Button>
-              )}
-            </div>
-          )}
+                  </React.Fragment>
+                )
+              })}
+            </tbody>
+            {/* 總計 */}
+            <tfoot>
+              {(() => {
+                const expectedForeign = allItems.reduce((sum, item) => {
+                  const typeData = item.type_data as { subtotal_currency?: string } | null
+                  if (typeData?.subtotal_currency === destinationCurrency) {
+                    return sum + (item.expected_cost || 0)
+                  }
+                  return sum
+                }, 0)
+                return (
+                  <tr className="bg-morandi-container/50 border-t-2 border-border font-medium">
+                    <td colSpan={7} className="px-2 py-2 text-right text-morandi-primary">
+                      總計
+                    </td>
+                    <td className="px-2 py-2 text-right font-mono text-morandi-primary">
+                      {expectedForeign > 0 && (
+                        <div className="text-morandi-gold">
+                          {getCurrencySymbol(destinationCurrency)} {expectedForeign.toLocaleString()}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-2 py-2 text-right font-mono text-morandi-primary">
+                      {formatCurrency(costSummary.total.actual)}
+                    </td>
+                    <td className="px-2 py-2"></td>
+                  </tr>
+                )
+              })()}
+            </tfoot>
+          </table>
         </div>
 
-        <div className="mt-3 grid grid-cols-2 gap-4">
-          {(() => {
-            const allItems = Object.values(groupedItems).flat()
-            // 計算預計支出 (外幣)：只加總有外幣標記的項目
-            const expectedForeign = allItems.reduce((sum, item) => {
-              const typeData = item.type_data as { subtotal_currency?: string } | null
-              if (typeData?.subtotal_currency === destinationCurrency) {
-                return sum + (item.expected_cost || 0)
-              }
-              return sum
-            }, 0)
-            return destinationCurrency && expectedForeign > 0 ? (
-              <>
-                <div className="space-y-1">
-                  <p className="text-xs text-morandi-secondary">預計支出 ({destinationCurrency})</p>
-                  <p className="text-2xl font-mono font-medium text-morandi-gold">
-                    {getCurrencySymbol(destinationCurrency)} {expectedForeign.toLocaleString()}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-morandi-secondary">實際支出 ({destinationCurrency})</p>
-                  <p className="text-2xl font-mono font-medium text-morandi-gold">
-                    {getCurrencySymbol(destinationCurrency)} 0
-                  </p>
-                </div>
-              </>
-            ) : (
-              <div className="text-sm text-morandi-secondary">尚無外幣支出項目</div>
-            )
-          })()}
-        </div>
-      </div>
+        {/* 結算區塊 */}
+        <SettlementSection
+          items={allItems}
+          destinationCurrency={destinationCurrency}
+          effectiveExchangeRate={effectiveExchangeRate}
+          onEditExchangeRate={() => {
+            setExchangeRateInput(effectiveExchangeRate?.toString() || '')
+            setExchangeRateDialog({ open: true, itemId: null })
+          }}
+          onSetExchangeRate={() => setExchangeRateDialog({ open: true, itemId: null })}
+        />
       </div>{/* 結束 print-content */}
 
       {/* 編輯對話框 */}
@@ -2410,41 +1499,14 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
       />
 
       {/* 匯率設定對話框 */}
-      <Dialog open={exchangeRateDialog.open} onOpenChange={(open) => !open && setExchangeRateDialog({ open: false, itemId: null })}>
-        <DialogContent level={1} className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>設定匯率</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <p className="text-sm text-morandi-secondary">
-              設定 {destinationCurrency || '外幣'} 對台幣的匯率，用於換算預計支出
-            </p>
-            <div className="space-y-2">
-              <Label htmlFor="exchange-rate">1 {destinationCurrency || '外幣'} = ? TWD</Label>
-              <Input
-                id="exchange-rate"
-                type="number"
-                step="0.001"
-                placeholder="例如：0.22（日圓）或 0.9（泰銖）"
-                value={exchangeRateInput}
-                onChange={(e) => setExchangeRateInput(e.target.value)}
-              />
-              <p className="text-xs text-morandi-secondary">
-                例：日圓約 0.22，泰銖約 0.9，韓元約 0.024
-              </p>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setExchangeRateDialog({ open: false, itemId: null })}>
-              取消
-            </Button>
-            <Button onClick={handleSaveExchangeRate}>
-              確認
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ExchangeRateDialog
+        open={exchangeRateDialog.open}
+        onOpenChange={(open) => !open && setExchangeRateDialog({ open: false, itemId: null })}
+        destinationCurrency={destinationCurrency}
+        exchangeRateInput={exchangeRateInput}
+        onExchangeRateInputChange={setExchangeRateInput}
+        onSave={handleSaveExchangeRate}
+      />
     </div>
   )
 }
-

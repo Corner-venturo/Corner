@@ -8,6 +8,7 @@
 import React from 'react'
 import { cn } from '@/lib/utils'
 import { formatPassportExpiryWithStatus } from '@/lib/utils/passport-expiry'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 import type { OrderMember } from '../../order-member.types'
 import type { ColumnVisibility } from '../../OrderMembersExpandable'
 
@@ -101,14 +102,34 @@ export function MemberPassportInfo({
           ) : (
             (() => {
               const expiryInfo = formatPassportExpiryWithStatus(member.passport_expiry, departureDate)
+              if (expiryInfo.statusLabel) {
+                // 計算護照至少要有效到的日期（出發日 + 6個月）
+                const getRequiredDate = () => {
+                  if (!departureDate) return ''
+                  const d = new Date(departureDate)
+                  d.setMonth(d.getMonth() + 6)
+                  return `${d.getMonth() + 1}/${d.getDate()}`
+                }
+                // 詳細說明
+                const detailLabel = expiryInfo.statusLabel === '效期不足'
+                  ? `護照需有效至 ${getRequiredDate()}`
+                  : '護照已過期'
+                return (
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <span className={cn("text-xs cursor-help", expiryInfo.className)}>
+                        {expiryInfo.text}
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                      {detailLabel}
+                    </TooltipContent>
+                  </Tooltip>
+                )
+              }
               return (
                 <span className={cn("text-xs", expiryInfo.className)}>
                   {expiryInfo.text}
-                  {expiryInfo.statusLabel && (
-                    <span className="ml-1 text-[10px] font-medium">
-                      ({expiryInfo.statusLabel})
-                    </span>
-                  )}
                 </span>
               )
             })()
