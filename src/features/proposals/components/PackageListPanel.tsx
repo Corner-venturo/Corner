@@ -30,6 +30,7 @@ import { PackageItineraryDialog } from './PackageItineraryDialog'
 import { BrochurePreviewDialog } from './BrochurePreviewDialog'
 import { RequirementSyncDialog } from './RequirementSyncDialog'
 import type { Proposal, ProposalPackage, CreatePackageData } from '@/types/proposal.types'
+import { PROPOSAL_LABELS } from '../constants'
 
 interface PackageListPanelProps {
   proposal: Proposal
@@ -105,7 +106,7 @@ export function PackageListPanel({
   const handleCreatePackage = useCallback(
     async (data: CreatePackageData | Partial<CreatePackageData>) => {
       if (!user?.id) {
-        await alert('無法取得使用者資訊', 'error')
+        await alert(PROPOSAL_LABELS.packageList.cannotGetUserInfo, 'error')
         return
       }
 
@@ -115,7 +116,7 @@ export function PackageListPanel({
         onPackagesChange()
         setAddDialogOpen(false)
       } catch (error) {
-        await alert('建立套件失敗', 'error')
+        await alert(PROPOSAL_LABELS.packageList.createPackageFailed, 'error')
       }
     },
     [user?.id, user?.workspace_id, onPackagesChange]
@@ -132,7 +133,7 @@ export function PackageListPanel({
         setEditDialogOpen(false)
         setSelectedPackage(null)
       } catch (error) {
-        await alert('更新套件失敗', 'error')
+        await alert(PROPOSAL_LABELS.packageList.updatePackageFailed, 'error')
       }
     },
     [selectedPackage, user?.id, onPackagesChange]
@@ -143,12 +144,12 @@ export function PackageListPanel({
     async (pkg: ProposalPackage) => {
       if (!user?.id) return
 
-      const newVersionName = `${pkg.version_name} (複製)`
+      const newVersionName = `${pkg.version_name} ${PROPOSAL_LABELS.packageList.copySuffix}`
       try {
         await duplicatePackage(pkg.id, newVersionName, user.id)
         onPackagesChange()
       } catch (error) {
-        await alert('複製套件失敗', 'error')
+        await alert(PROPOSAL_LABELS.packageList.copyPackageFailed, 'error')
       }
     },
     [user?.id, user?.workspace_id, onPackagesChange]

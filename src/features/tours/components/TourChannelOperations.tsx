@@ -115,19 +115,15 @@ export function useTourChannelOperations({ actions }: UseTourChannelOperationsPa
 
       // 自動將創建者加入為頻道擁有者
       try {
-        const { error: memberError } = await supabase.from('channel_members').insert({
+        const { createChannelMember } = await import('@/data/entities/channel-members')
+        await createChannelMember({
           workspace_id: workspaces.id,
           channel_id: newChannel.id,
           employee_id: auth.user!.id,
           role: 'owner',
           status: 'active',
-        })
-
-        if (memberError) {
-          logger.warn('⚠️ [建立頻道] 加入成員失敗（可能已存在）:', memberError)
-        } else {
-          logger.log('✅ [建立頻道] 創建者已加入為擁有者')
-        }
+        } as Record<string, unknown>)
+        logger.log('✅ [建立頻道] 創建者已加入為擁有者')
       } catch (memberErr) {
         logger.warn('⚠️ [建立頻道] 加入成員異常:', memberErr)
       }

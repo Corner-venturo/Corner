@@ -200,7 +200,7 @@ export function ProposalDialog({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                    出發日期
+                    {PROPOSAL_LABELS.proposalDialog.departDateLabel}
                   </label>
                   <DatePicker
                     value={startDate}
@@ -212,13 +212,13 @@ export function ProposalDialog({
                         setEndDate(newStartDate)
                       }
                     }}
-                    placeholder="選擇日期"
+                    placeholder={PROPOSAL_LABELS.proposalDialog.datePlaceholder}
                   />
                 </div>
 
                 <div>
                   <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                    回程日期
+                    {PROPOSAL_LABELS.proposalDialog.returnDateLabel}
                   </label>
                   <DatePicker
                     value={endDate}
@@ -231,7 +231,7 @@ export function ProposalDialog({
                         setEndDate(newEndDate)
                       }
                     }}
-                    placeholder="選擇日期"
+                    placeholder={PROPOSAL_LABELS.proposalDialog.datePlaceholder}
                     minDate={startDate ? new Date(startDate) : undefined}
                   />
                 </div>
@@ -239,7 +239,7 @@ export function ProposalDialog({
 
               <div>
                 <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                  預計人數
+                  {PROPOSAL_LABELS.proposalDialog.groupSizeLabel}
                 </label>
                 <Input
                   type="number"
@@ -248,18 +248,18 @@ export function ProposalDialog({
                   onChange={e =>
                     setGroupSize(e.target.value ? parseInt(e.target.value, 10) : null)
                   }
-                  placeholder="人數"
+                  placeholder={PROPOSAL_LABELS.proposalDialog.groupSizePlaceholder}
                 />
               </div>
 
               <div>
                 <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                  備註
+                  {PROPOSAL_LABELS.proposalDialog.notesLabel}
                 </label>
                 <Textarea
                   value={notes}
                   onChange={e => setNotes(e.target.value)}
-                  placeholder="版本相關備註..."
+                  placeholder={PROPOSAL_LABELS.proposalDialog.notesPlaceholder}
                   rows={2}
                 />
               </div>
@@ -276,7 +276,7 @@ export function ProposalDialog({
             className="gap-2"
           >
             <X size={16} />
-            取消
+            {PROPOSAL_LABELS.proposalDialog.cancel}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -284,7 +284,7 @@ export function ProposalDialog({
             className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
             <Save size={16} />
-            {submitting ? '建立中...' : mode === 'create' ? '建立提案' : '儲存'}
+            {submitting ? PROPOSAL_LABELS.proposalDialog.creating : mode === 'create' ? PROPOSAL_LABELS.proposalDialog.createProposal : PROPOSAL_LABELS.proposalDialog.save}
           </Button>
         </div>
       </DialogContent>

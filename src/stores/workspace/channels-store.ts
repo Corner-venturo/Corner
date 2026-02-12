@@ -7,6 +7,7 @@
 import { create } from 'zustand'
 import { v4 as uuidv4 } from 'uuid'
 import { supabase } from '@/lib/supabase/client'
+import { createChannelMember } from '@/data/entities/channel-members'
 import { useChannelStore } from './channel-store'
 import { useChannelGroupStore } from './channel-group-store'
 import { createStore } from '../core/create-store'
@@ -182,13 +183,13 @@ export const useChannelsStore = () => {
       // 🔥 自動將創建者加入為頻道擁有者
       if (newChannel.created_by) {
         try {
-          await supabase.from('channel_members').insert({
+          await createChannelMember({
             workspace_id: newChannel.workspace_id,
             channel_id: newChannel.id,
             employee_id: newChannel.created_by,
             role: 'owner',
             status: 'active',
-          })
+          } as Record<string, unknown>)
         } catch (error) {
           logger.warn('[ChannelsStore] 加入頻道擁有者失敗:', error)
         }

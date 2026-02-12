@@ -162,15 +162,16 @@ export function useEmployeeForm(onSubmit: () => void) {
 
           // 將新員工加入公開頻道
           if (channels && channels.length > 0) {
-            const channelMembers = channels.map(channel => ({
-              workspace_id: targetWorkspaceId,
-              channel_id: channel.id,
-              employee_id: newEmployee.id,
-              role: 'member',
-              status: 'active',
-            }))
-
-            await supabase.from('channel_members').insert(channelMembers)
+            const { createChannelMember } = await import('@/data/entities/channel-members')
+            await Promise.all(channels.map(channel =>
+              createChannelMember({
+                workspace_id: targetWorkspaceId,
+                channel_id: channel.id,
+                employee_id: newEmployee.id,
+                role: 'member',
+                status: 'active',
+              } as Record<string, unknown>)
+            ))
             logger.log(`✅ 已將新員工加入 ${channels.length} 個公開頻道`)
           }
         } catch (channelError) {
