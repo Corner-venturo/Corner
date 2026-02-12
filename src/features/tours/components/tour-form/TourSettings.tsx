@@ -6,6 +6,7 @@ import { useEmployeesSlim } from '@/data'
 import type { Employee } from '@/stores/types'
 import type { SyncableEntity } from '@/types'
 import type { NewTourData } from '../../types'
+import { TOUR_SETTINGS } from '../../constants'
 
 type EmployeeWithSync = Employee & Partial<SyncableEntity>
 
@@ -38,7 +39,7 @@ export function TourSettings({ newTour, setNewTour }: TourSettingsProps) {
       {/* 團控人員選擇（選填） */}
       <div>
         <label className="block text-sm font-medium text-morandi-primary mb-1">
-          團控人員 <span className="text-morandi-secondary font-normal">(選填)</span>
+          {TOUR_SETTINGS.controller_label} <span className="text-morandi-secondary font-normal">{TOUR_SETTINGS.controller_optional}</span>
         </label>
         <Combobox
           options={controllers.map(emp => ({
@@ -47,8 +48,8 @@ export function TourSettings({ newTour, setNewTour }: TourSettingsProps) {
           }))}
           value={newTour.controller_id || ''}
           onChange={value => setNewTour(prev => ({ ...prev, controller_id: value || undefined }))}
-          placeholder="選擇團控人員..."
-          emptyMessage="找不到團控人員"
+          placeholder={TOUR_SETTINGS.controller_placeholder}
+          emptyMessage={TOUR_SETTINGS.controller_empty}
           showSearchIcon={true}
           showClearButton={true}
           disablePortal={true}
@@ -66,7 +67,7 @@ export function TourSettings({ newTour, setNewTour }: TourSettingsProps) {
             className="rounded"
           />
           <label htmlFor="isSpecial" className="text-sm text-morandi-primary">
-            特殊團
+            {TOUR_SETTINGS.special_tour}
           </label>
         </div>
       </div>

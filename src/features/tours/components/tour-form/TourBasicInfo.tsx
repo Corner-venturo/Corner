@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { SimpleDateInput } from '@/components/ui/simple-date-input'
 import { CountryAirportSelector } from '@/components/selectors/CountryAirportSelector'
 import type { NewTourData } from '../../types'
+import { TOUR_BASIC_INFO } from '../../constants'
 
 interface TourBasicInfoProps {
   newTour: NewTourData
@@ -39,7 +40,7 @@ export function TourBasicInfo({
   return (
     <div className="space-y-4">
       <div>
-        <label className="text-sm font-medium text-morandi-primary">旅遊團名稱</label>
+        <label className="text-sm font-medium text-morandi-primary">{TOUR_BASIC_INFO.label_name}</label>
         <Input
           value={newTour.name}
           onChange={e => setNewTour(prev => ({ ...prev, name: e.target.value }))}
@@ -59,7 +60,7 @@ export function TourBasicInfo({
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium text-morandi-primary">出發日期</label>
+          <label className="text-sm font-medium text-morandi-primary">{TOUR_BASIC_INFO.label_departure}</label>
           <SimpleDateInput
             value={newTour.departure_date}
             onChange={departure_date => {
@@ -82,7 +83,7 @@ export function TourBasicInfo({
           />
         </div>
         <div>
-          <label className="text-sm font-medium text-morandi-primary">返回日期</label>
+          <label className="text-sm font-medium text-morandi-primary">{TOUR_BASIC_INFO.label_return}</label>
           <SimpleDateInput
             value={newTour.return_date}
             onChange={return_date => {
@@ -97,7 +98,7 @@ export function TourBasicInfo({
       </div>
 
       <div>
-        <label className="text-sm font-medium text-morandi-primary">描述</label>
+        <label className="text-sm font-medium text-morandi-primary">{TOUR_BASIC_INFO.label_description}</label>
         <Input
           value={newTour.description || ''}
           onChange={e => setNewTour(prev => ({ ...prev, description: e.target.value }))}

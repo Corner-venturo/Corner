@@ -98,3 +98,44 @@ export const TOUR_FORM = {
   submit_create_with_order: '新增旅遊團 & 訂單',
   submit_create: '新增旅遊團',
 } as const
+
+// ============================================================
+// TourBasicInfo
+// ============================================================
+export const TOUR_BASIC_INFO = {
+  label_name: '旅遊團名稱',
+  label_departure: '出發日期',
+  label_return: '返回日期',
+  label_description: '描述',
+} as const
+
+// ============================================================
+// TourFlightInfo
+// ============================================================
+export const TOUR_FLIGHT_INFO = {
+  section_title: '航班資訊（選填）',
+  outbound_label: '去程航班',
+  return_label: '回程航班',
+  flight_number_placeholder: '航班號碼',
+  search_button: '查詢',
+  flight_text_placeholder: '查詢後自動帶入，或手動輸入',
+} as const
+
+// ============================================================
+// TourOrderSection
+// ============================================================
+export const TOUR_ORDER_SECTION = {
+  title: '同時新增訂單（選填）',
+  hint: '提示：如果填寫了聯絡人，將會同時建立一筆訂單。如果留空，則只建立旅遊團。',
+} as const
+
+// ============================================================
+// TourSettings
+// ============================================================
+export const TOUR_SETTINGS = {
+  controller_label: '團控人員',
+  controller_optional: '(選填)',
+  controller_placeholder: '選擇團控人員...',
+  controller_empty: '找不到團控人員',
+  special_tour: '特殊團',
+} as const
