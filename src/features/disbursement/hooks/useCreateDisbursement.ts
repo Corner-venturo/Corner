@@ -18,6 +18,7 @@ import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { generateId } from '@/lib/data/create-data-store'
+import { createDisbursementSchema } from '@/lib/validations/schemas'
 
 // 計算下一個週四
 function getNextThursday(): Date {
@@ -139,8 +140,12 @@ export function useCreateDisbursement({ pendingRequests, onSuccess }: UseCreateD
 
   // 建立出納單
   const handleCreate = useCallback(async () => {
-    if (selectedRequestIds.length === 0) {
-      void alert('請選擇至少一張請款單', 'warning')
+    const validation = createDisbursementSchema.safeParse({
+      selectedRequestIds,
+      disbursementDate,
+    })
+    if (!validation.success) {
+      void alert(validation.error.issues[0].message, 'warning')
       return
     }
 

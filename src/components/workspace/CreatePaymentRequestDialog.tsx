@@ -20,6 +20,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { CurrencyCell } from '@/components/table-cells'
+import { createPaymentRequestSchema } from '@/lib/validations/schemas'
 
 interface CreatePaymentRequestDialogProps {
   items: AdvanceItem | AdvanceItem[] // 單項或批次
@@ -71,8 +72,12 @@ export function CreatePaymentRequestDialog({
   }, [])
 
   const handleCreate = async () => {
-    if (!selectedTourId) {
-      void alert('請選擇關聯旅遊團', 'warning')
+    const validation = createPaymentRequestSchema.safeParse({
+      selectedTourId,
+      amount: totalAmount,
+    })
+    if (!validation.success) {
+      void alert(validation.error.issues[0].message, 'warning')
       return
     }
 
