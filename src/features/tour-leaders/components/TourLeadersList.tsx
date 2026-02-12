@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Pencil, Trash2, Calendar } from 'lucide-react'
 import type { TourLeader } from '@/types/tour-leader.types'
+import { TOUR_LEADERS_LABELS } from '../constants/labels'
 
 interface TourLeadersListProps {
   items: TourLeader[]
@@ -20,8 +21,8 @@ interface TourLeadersListProps {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
-  active: { label: '合作中', variant: 'default' },
-  inactive: { label: '停止合作', variant: 'secondary' },
+  active: { label: TOUR_LEADERS_LABELS.STATUS_ACTIVE, variant: 'default' },
+  inactive: { label: TOUR_LEADERS_LABELS.STATUS_INACTIVE, variant: 'secondary' },
 }
 
 export const TourLeadersList: React.FC<TourLeadersListProps> = ({
@@ -34,7 +35,7 @@ export const TourLeadersList: React.FC<TourLeadersListProps> = ({
   const columns: TableColumn[] = [
     {
       key: 'code',
-      label: '編號',
+      label: TOUR_LEADERS_LABELS.COL_NUMBER,
       sortable: true,
       render: value => (
         <span className="font-mono text-sm text-morandi-secondary">{String(value || '-')}</span>
@@ -42,7 +43,7 @@ export const TourLeadersList: React.FC<TourLeadersListProps> = ({
     },
     {
       key: 'name',
-      label: '姓名',
+      label: TOUR_LEADERS_LABELS.COL_NAME,
       sortable: true,
       render: (value, row) => {
         const item = row as TourLeader
@@ -58,13 +59,13 @@ export const TourLeadersList: React.FC<TourLeadersListProps> = ({
     },
     {
       key: 'phone',
-      label: '電話',
+      label: TOUR_LEADERS_LABELS.COL_PHONE,
       sortable: false,
       render: value => <span className="text-morandi-primary">{String(value || '-')}</span>,
     },
     {
       key: 'languages',
-      label: '語言能力',
+      label: TOUR_LEADERS_LABELS.COL_LANGUAGES,
       sortable: false,
       render: value => {
         const languages = value as string[] | null
@@ -87,7 +88,7 @@ export const TourLeadersList: React.FC<TourLeadersListProps> = ({
     },
     {
       key: 'specialties',
-      label: '專長地區',
+      label: TOUR_LEADERS_LABELS.COL_SPECIALTY,
       sortable: false,
       render: value => {
         const specialties = value as string[] | null
@@ -110,7 +111,7 @@ export const TourLeadersList: React.FC<TourLeadersListProps> = ({
     },
     {
       key: 'license_number',
-      label: '領隊證號',
+      label: TOUR_LEADERS_LABELS.COL_LICENSE,
       sortable: false,
       render: value => (
         <span className="text-sm text-morandi-secondary">{String(value || '-')}</span>
@@ -118,7 +119,7 @@ export const TourLeadersList: React.FC<TourLeadersListProps> = ({
     },
     {
       key: 'status',
-      label: '狀態',
+      label: TOUR_LEADERS_LABELS.COL_STATUS,
       sortable: true,
       render: value => {
         const status = String(value || 'active')
@@ -147,7 +148,7 @@ export const TourLeadersList: React.FC<TourLeadersListProps> = ({
                   onAvailability(item)
                 }}
                 className="text-morandi-gold hover:bg-morandi-gold/10"
-                title="檔期管理"
+                title={TOUR_LEADERS_LABELS.SCHEDULE_MANAGEMENT}
               >
                 <Calendar size={16} />
               </Button>
@@ -161,7 +162,7 @@ export const TourLeadersList: React.FC<TourLeadersListProps> = ({
                   onEdit(item)
                 }}
                 className="text-morandi-blue hover:bg-morandi-blue/10"
-                title="編輯"
+                title={TOUR_LEADERS_LABELS.EDIT}
               >
                 <Pencil size={16} />
               </Button>
@@ -175,7 +176,7 @@ export const TourLeadersList: React.FC<TourLeadersListProps> = ({
                   onDelete(item)
                 }}
                 className="text-morandi-red hover:bg-morandi-red/10"
-                title="刪除"
+                title={TOUR_LEADERS_LABELS.DELETE}
               >
                 <Trash2 size={16} />
               </Button>

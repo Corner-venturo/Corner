@@ -14,6 +14,7 @@ import { LeaderAvailabilityDialog } from './LeaderAvailabilityDialog'
 import { useTourLeaders, createTourLeader, updateTourLeader, deleteTourLeader } from '@/data'
 import type { TourLeader, TourLeaderFormData } from '@/types/tour-leader.types'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { TOUR_LEADERS_LABELS } from '../constants/labels'
 
 const emptyFormData: TourLeaderFormData = {
   name: '',
@@ -101,18 +102,18 @@ export const TourLeadersPage: React.FC = () => {
 
   const handleDelete = useCallback(
     async (item: TourLeader) => {
-      const confirmed = await confirm(`確定要刪除領隊「${item.name}」嗎？`, {
-        title: '刪除領隊',
+      const confirmed = await confirm(`${TOUR_LEADERS_LABELS.CONFIRM_DELETE_LEADER}${item.name}${TOUR_LEADERS_LABELS.CONFIRM_DELETE_SUFFIX}`, {
+        title: TOUR_LEADERS_LABELS.DELETE_LEADER_TITLE,
         type: 'warning',
       })
       if (!confirmed) return
 
       try {
         await deleteTourLeader(item.id)
-        await alert('領隊已刪除', 'success')
+        await alert(TOUR_LEADERS_LABELS.LEADER_DELETED, 'success')
       } catch (error) {
         logger.error('Delete TourLeader Error:', error)
-        await alert('刪除失敗，請稍後再試', 'error')
+        await alert(TOUR_LEADERS_LABELS.DELETE_FAILED, 'error')
       }
     },
     []
@@ -159,34 +160,34 @@ export const TourLeadersPage: React.FC = () => {
 
       if (isEditMode && editingItem) {
         await updateTourLeader(editingItem.id, data)
-        await alert('領隊資料更新成功', 'success')
+        await alert(TOUR_LEADERS_LABELS.LEADER_UPDATED, 'success')
       } else {
         await createTourLeader(data)
-        await alert('領隊資料建立成功', 'success')
+        await alert(TOUR_LEADERS_LABELS.LEADER_CREATED, 'success')
       }
       handleCloseDialog()
     } catch (error) {
       logger.error('Save TourLeader Error:', error)
-      await alert('儲存失敗，請稍後再試', 'error')
+      await alert(TOUR_LEADERS_LABELS.SAVE_FAILED, 'error')
     }
   }, [formData, isEditMode, editingItem, handleCloseDialog])
 
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="領隊資料"
+        title={TOUR_LEADERS_LABELS.PAGE_TITLE}
         icon={Users}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '資料庫管理', href: '/database' },
-          { label: '領隊資料', href: '/database/tour-leaders' },
+          { label: TOUR_LEADERS_LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: TOUR_LEADERS_LABELS.BREADCRUMB_DATABASE, href: '/database' },
+          { label: TOUR_LEADERS_LABELS.BREADCRUMB_TOUR_LEADERS, href: '/database/tour-leaders' },
         ]}
         showSearch
         searchTerm={searchQuery}
         onSearchChange={setSearchQuery}
-        searchPlaceholder="搜尋領隊姓名、電話..."
+        searchPlaceholder={TOUR_LEADERS_LABELS.SEARCH_PLACEHOLDER}
         onAdd={handleOpenAddDialog}
-        addLabel="新增領隊"
+        addLabel={TOUR_LEADERS_LABELS.ADD_LEADER}
       />
 
       <div className="flex-1 overflow-auto">

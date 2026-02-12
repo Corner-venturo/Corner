@@ -26,6 +26,7 @@ import {
   type LeaderAvailabilityStatus,
 } from '@/stores/leader-availability-store'
 import type { TourLeader } from '@/types/tour-leader.types'
+import { TOUR_LEADERS_LABELS } from '../constants/labels'
 
 interface LeaderAvailabilityDialogProps {
   isOpen: boolean
@@ -98,31 +99,31 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
   }, [])
 
   const handleDelete = useCallback(async (item: LeaderAvailability) => {
-    const confirmed = await confirm('確定要刪除此檔期嗎？', {
-      title: '刪除檔期',
+    const confirmed = await confirm(TOUR_LEADERS_LABELS.CONFIRM_DELETE_AVAILABILITY, {
+      title: TOUR_LEADERS_LABELS.DELETE_AVAILABILITY_TITLE,
       type: 'warning',
     })
     if (!confirmed) return
 
     try {
       await deleteItem(item.id)
-      await alert('檔期已刪除', 'success')
+      await alert(TOUR_LEADERS_LABELS.AVAILABILITY_DELETED, 'success')
     } catch (error) {
       logger.error('Delete availability error:', error)
-      await alert('刪除失敗', 'error')
+      await alert(TOUR_LEADERS_LABELS.DELETE_AVAILABILITY_FAILED, 'error')
     }
   }, [deleteItem])
 
   const handleSubmit = useCallback(async () => {
     if (!leader) return
     if (!formData.available_start_date || !formData.available_end_date) {
-      await alert('請填寫開始和結束日期', 'warning')
+      await alert(TOUR_LEADERS_LABELS.FILL_DATES, 'warning')
       return
     }
 
     // 驗證日期順序
     if (formData.available_start_date > formData.available_end_date) {
-      await alert('結束日期必須在開始日期之後', 'warning')
+      await alert(TOUR_LEADERS_LABELS.END_AFTER_START, 'warning')
       return
     }
 
@@ -137,16 +138,16 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
 
       if (editingId) {
         await update(editingId, data)
-        await alert('檔期已更新', 'success')
+        await alert(TOUR_LEADERS_LABELS.AVAILABILITY_UPDATED, 'success')
       } else {
         await create(data as Parameters<typeof create>[0])
-        await alert('檔期已新增', 'success')
+        await alert(TOUR_LEADERS_LABELS.AVAILABILITY_ADDED, 'success')
       }
 
       handleCancelForm()
     } catch (error) {
       logger.error('Save availability error:', error)
-      await alert('儲存失敗', 'error')
+      await alert(TOUR_LEADERS_LABELS.SAVE_AVAILABILITY_FAILED, 'error')
     }
   }, [leader, formData, editingId, create, update, handleCancelForm])
 
@@ -165,7 +166,7 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-morandi-gold" />
-            {leader.name} - 檔期管理
+            {leader.name}{TOUR_LEADERS_LABELS.AVAILABILITY_SUFFIX}
           </DialogTitle>
         </DialogHeader>
 
