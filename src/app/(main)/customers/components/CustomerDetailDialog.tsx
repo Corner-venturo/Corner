@@ -10,6 +10,7 @@ import { DateCell } from '@/components/table-cells'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import type { Customer } from '@/types/customer.types'
+import { CUSTOMER_DETAIL_LABELS as L } from '../constants/labels'
 
 interface CustomerDetailDialogProps {
   open: boolean
@@ -46,7 +47,7 @@ export function CustomerDetailDialog({
               {customer.passport_image_url ? (
                 <Image
                   src={customer.passport_image_url}
-                  alt={`${customer.name} 護照照片`}
+                  alt={L.passport_alt(customer.name)}
                   width={256}
                   height={341}
                   className="w-full h-full object-cover"
@@ -55,7 +56,7 @@ export function CustomerDetailDialog({
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center text-morandi-muted">
                   <ImageOff size={48} className="mb-2" />
-                  <span className="text-sm">尚無護照照片</span>
+                  <span className="text-sm">{L.no_passport_photo}</span>
                 </div>
               )}
             </div>
@@ -66,14 +67,14 @@ export function CustomerDetailDialog({
             {/* 基本資料 */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-xs text-morandi-muted">電話</label>
+                <label className="text-xs text-morandi-muted">{L.label_phone}</label>
                 <div className="flex items-center gap-2 mt-1">
                   <Phone size={14} className="text-morandi-muted" />
                   <span className="text-morandi-primary">{customer.phone || '-'}</span>
                 </div>
               </div>
               <div>
-                <label className="text-xs text-morandi-muted">Email</label>
+                <label className="text-xs text-morandi-muted">{L.label_email}</label>
                 <div className="flex items-center gap-2 mt-1">
                   <Mail size={14} className="text-morandi-muted" />
                   <span className="text-morandi-primary text-sm break-all">{customer.email || '-'}</span>
@@ -83,18 +84,18 @@ export function CustomerDetailDialog({
 
             {/* 護照資料 */}
             <div className="border-t pt-4">
-              <h4 className="text-sm font-medium text-morandi-primary mb-3">護照資料</h4>
+              <h4 className="text-sm font-medium text-morandi-primary mb-3">{L.section_passport}</h4>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-morandi-muted">護照號碼</label>
+                  <label className="text-xs text-morandi-muted">{L.label_passport_number}</label>
                   <div className="font-mono text-morandi-primary mt-1">{customer.passport_number || '-'}</div>
                 </div>
                 <div>
-                  <label className="text-xs text-morandi-muted">護照拼音</label>
+                  <label className="text-xs text-morandi-muted">{L.label_passport_name}</label>
                   <div className="font-mono text-morandi-primary mt-1">{customer.passport_name || '-'}</div>
                 </div>
                 <div>
-                  <label className="text-xs text-morandi-muted">護照效期</label>
+                  <label className="text-xs text-morandi-muted">{L.label_passport_expiry}</label>
                   <div className="mt-1">
                     <DateCell
                       date={customer.passport_expiry}
@@ -104,17 +105,17 @@ export function CustomerDetailDialog({
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs text-morandi-muted">驗證狀態</label>
+                  <label className="text-xs text-morandi-muted">{L.label_verification}</label>
                   <div className="flex items-center gap-1 mt-1">
                     {customer.verification_status === 'verified' ? (
                       <>
                         <Check size={14} className="text-status-success" />
-                        <span className="text-status-success">已驗證</span>
+                        <span className="text-status-success">{L.status_verified}</span>
                       </>
                     ) : (
                       <>
                         <AlertTriangle size={14} className="text-status-warning" />
-                        <span className="text-status-warning">待驗證</span>
+                        <span className="text-status-warning">{L.status_unverified}</span>
                       </>
                     )}
                   </div>
@@ -124,14 +125,14 @@ export function CustomerDetailDialog({
 
             {/* 身分資料 */}
             <div className="border-t pt-4">
-              <h4 className="text-sm font-medium text-morandi-primary mb-3">身分資料</h4>
+              <h4 className="text-sm font-medium text-morandi-primary mb-3">{L.section_identity}</h4>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-morandi-muted">身分證號</label>
+                  <label className="text-xs text-morandi-muted">{L.label_national_id}</label>
                   <div className="font-mono text-morandi-primary mt-1">{customer.national_id || '-'}</div>
                 </div>
                 <div>
-                  <label className="text-xs text-morandi-muted">生日</label>
+                  <label className="text-xs text-morandi-muted">{L.label_birthday}</label>
                   <div className="mt-1">
                     <DateCell
                       date={customer.birth_date}
@@ -145,7 +146,7 @@ export function CustomerDetailDialog({
 
             {/* 飲食禁忌 */}
             <div className="border-t pt-4">
-              <label className="text-xs text-morandi-muted">飲食禁忌</label>
+              <label className="text-xs text-morandi-muted">{L.label_dietary}</label>
               <div className={`mt-1 ${customer.dietary_restrictions ? 'text-morandi-gold bg-status-warning-bg px-2 py-1 rounded inline-block' : 'text-morandi-primary'}`}>
                 {customer.dietary_restrictions || '-'}
               </div>
@@ -156,7 +157,7 @@ export function CustomerDetailDialog({
         <div className="flex justify-end gap-2 pt-4 border-t">
           <Button variant="outline" onClick={() => onOpenChange(false)} className="gap-2">
             <X size={16} />
-            關閉
+            {L.btn_close}
           </Button>
           <Button
             onClick={() => {
@@ -164,7 +165,7 @@ export function CustomerDetailDialog({
               onOpenChange(false)
             }}
           >
-            編輯資料
+            {L.btn_edit}
           </Button>
         </div>
       </DialogContent>

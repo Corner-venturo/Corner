@@ -38,6 +38,7 @@ import {
   CustomerDetailDialog,
   ResetPasswordDialog,
 } from './components'
+import { CUSTOMER_PAGE_LABELS as L } from './constants/labels'
 
 export default function CustomersPage() {
   const router = useRouter()
@@ -116,16 +117,16 @@ export default function CustomersPage() {
     if (linkedMembers && linkedMembers.length > 0) {
       const orderInfo = linkedMembers.map(m => {
         const order = m.orders as { code?: string; tour_name?: string } | null
-        return order?.code || order?.tour_name || '未知訂單'
+        return order?.code || order?.tour_name || L.unknown_order
       }).join('、')
 
       const goToOrder = await confirm(
-        `此顧客已被以下訂單使用：${orderInfo}\n\n請先到訂單中移除該成員後，再刪除顧客。`,
+        L.cannot_delete_msg(orderInfo),
         {
-          title: '無法刪除顧客',
+          title: L.cannot_delete_title,
           type: 'warning',
-          confirmText: '前往訂單',
-          cancelText: '取消',
+          confirmText: L.btn_go_to_order,
+          cancelText: L.btn_cancel,
         }
       )
 
@@ -135,8 +136,8 @@ export default function CustomersPage() {
       return
     }
 
-    const confirmed = await confirm(`確定要刪除顧客「${customer.name}」嗎？`, {
-      title: '刪除顧客',
+    const confirmed = await confirm(L.confirm_delete(customer.name), {
+      title: L.confirm_delete_title,
       type: 'warning',
     })
     if (confirmed) {
@@ -149,7 +150,7 @@ export default function CustomersPage() {
     () => [
       {
         key: 'code',
-        label: '編號',
+        label: L.col_code,
         sortable: true,
         render: (_value, customer: Customer) => (
           <div className="flex items-center gap-2">
@@ -162,7 +163,7 @@ export default function CustomersPage() {
       },
       {
         key: 'name',
-        label: '中文姓名',
+        label: L.col_name,
         sortable: true,
         render: (_value, customer: Customer) => (
           <div className="text-sm font-medium text-morandi-primary">{customer.name}</div>
@@ -170,7 +171,7 @@ export default function CustomersPage() {
       },
       {
         key: 'passport_name',
-        label: '護照拼音',
+        label: L.col_passport_name,
         sortable: false,
         render: (_value, customer: Customer) => (
           <div className="text-xs text-morandi-primary font-mono">
@@ -180,7 +181,7 @@ export default function CustomersPage() {
       },
       {
         key: 'phone',
-        label: '電話',
+        label: L.col_phone,
         sortable: false,
         render: (_value, customer: Customer) => (
           <div className="text-xs text-morandi-primary">{customer.phone || '-'}</div>
@@ -188,7 +189,7 @@ export default function CustomersPage() {
       },
       {
         key: 'passport_number',
-        label: '護照號碼',
+        label: L.col_passport_number,
         sortable: false,
         render: (_value, customer: Customer) => (
           <div className="text-xs text-morandi-primary font-mono">
@@ -198,7 +199,7 @@ export default function CustomersPage() {
       },
       {
         key: 'passport_expiry',
-        label: '護照效期',
+        label: L.col_passport_expiry,
         sortable: false,
         render: (_value, customer: Customer) => {
           const expiryInfo = formatPassportExpiryWithStatus(customer.passport_expiry)
@@ -218,7 +219,7 @@ export default function CustomersPage() {
       },
       {
         key: 'national_id',
-        label: '身分證號',
+        label: L.col_national_id,
         sortable: false,
         render: (_value, customer: Customer) => (
           <div className="text-xs text-morandi-primary font-mono">{customer.national_id || '-'}</div>
@@ -226,7 +227,7 @@ export default function CustomersPage() {
       },
       {
         key: 'birth_date',
-        label: '生日',
+        label: L.col_birthday,
         sortable: false,
         render: (_value, customer: Customer) => (
           <DateCell
@@ -238,7 +239,7 @@ export default function CustomersPage() {
       },
       {
         key: 'dietary_restrictions',
-        label: '飲食禁忌',
+        label: L.col_dietary,
         sortable: false,
         render: (_value, customer: Customer) => (
           <div className={`text-xs ${customer.dietary_restrictions ? 'text-morandi-gold bg-status-warning-bg px-1.5 py-0.5 rounded' : 'text-morandi-secondary'}`}>
@@ -255,7 +256,7 @@ export default function CustomersPage() {
             {customer.is_vip ? (
               <span className="text-morandi-gold font-medium">VIP</span>
             ) : (
-              '一般'
+              L.vip_normal
             )}
           </div>
         ),
@@ -294,7 +295,7 @@ export default function CustomersPage() {
 
   return (
     <div className="h-full flex flex-col">
-      <ResponsiveHeader title="顧客管理">
+      <ResponsiveHeader title={L.page_title}>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -303,7 +304,7 @@ export default function CustomersPage() {
             className="gap-2"
           >
             <Users size={16} />
-            <span className="hidden sm:inline">群組</span>
+            <span className="hidden sm:inline">{L.btn_groups}</span>
           </Button>
 
           <Button
@@ -313,7 +314,7 @@ export default function CustomersPage() {
             className="gap-2"
           >
             <Search size={16} />
-            <span className="hidden sm:inline">進階搜尋</span>
+            <span className="hidden sm:inline">{L.btn_advanced_search}</span>
           </Button>
 
           {hasActiveFilters && (
@@ -324,7 +325,7 @@ export default function CustomersPage() {
               className="gap-2 text-morandi-red"
             >
               <X size={16} />
-              <span className="hidden sm:inline">清除條件</span>
+              <span className="hidden sm:inline">{L.btn_clear_filters}</span>
             </Button>
           )}
 
@@ -334,7 +335,7 @@ export default function CustomersPage() {
             size="sm"
           >
             <Plus size={16} />
-            <span className="hidden sm:inline">新增顧客</span>
+            <span className="hidden sm:inline">{L.btn_add_customer}</span>
           </Button>
         </div>
       </ResponsiveHeader>
@@ -342,8 +343,7 @@ export default function CustomersPage() {
       {hasActiveFilters && (
         <div className="px-4 py-2 bg-morandi-container/20 border-b border-border">
           <div className="text-xs text-morandi-secondary">
-            已套用 {Object.keys(searchParams).length} 個篩選條件 | 顯示 {filteredCustomers.length} /{' '}
-            {customers.length} 位顧客
+            {L.filter_applied(Object.keys(searchParams).length, filteredCustomers.length, customers.length)}
           </div>
         </div>
       )}
@@ -359,7 +359,7 @@ export default function CustomersPage() {
                 {customer.verification_status === 'unverified' && customer.passport_image_url && (
                   <button
                     className="p-1 text-status-warning hover:text-status-warning hover:bg-status-warning-bg rounded transition-colors"
-                    title="驗證顧客資料"
+                    title={L.title_verify}
                     onClick={(e) => {
                       e.stopPropagation()
                       customerVerify.openDialog(customer)
@@ -370,7 +370,7 @@ export default function CustomersPage() {
                 )}
                 <button
                   className="p-1 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
-                  title="編輯顧客"
+                  title={L.title_edit}
                   onClick={(e) => {
                     e.stopPropagation()
                     customerVerify.openDialog(customer)
@@ -380,7 +380,7 @@ export default function CustomersPage() {
                 </button>
                 <button
                   className="p-1 text-morandi-secondary hover:text-status-danger hover:bg-status-danger-bg rounded transition-colors"
-                  title="刪除顧客"
+                  title={L.title_delete}
                   onClick={(e) => {
                     e.stopPropagation()
                     handleDelete(customer)

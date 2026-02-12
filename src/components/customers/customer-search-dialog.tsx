@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Search, X } from 'lucide-react'
+import { CUSTOMER_SEARCH_LABELS as L } from '@/app/(main)/customers/constants/labels'
 
 export interface CustomerSearchParams {
   query?: string // 姓名/身份證號/護照號碼
@@ -83,51 +84,51 @@ export function CustomerSearchDialog({
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold flex items-center gap-2">
             <Search size={20} className="text-morandi-gold" />
-            進階搜尋
+            {L.title}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
           {/* 基本資訊 */}
           <div>
-            <h3 className="text-sm font-semibold text-morandi-primary mb-3">基本資訊</h3>
+            <h3 className="text-sm font-semibold text-morandi-primary mb-3">{L.section_basic}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm text-morandi-primary mb-2 block">
-                  姓名 / 身份證號 / 護照號碼
+                  {L.label_keyword}
                 </label>
                 <Input
                   value={searchParams.query || ''}
                   onChange={e => updateParam('query', e.target.value)}
-                  placeholder="輸入姓名、身份證號或護照號碼"
+                  placeholder={L.placeholder_keyword}
                 />
               </div>
 
               <div>
-                <label className="text-sm text-morandi-primary mb-2 block">電話</label>
+                <label className="text-sm text-morandi-primary mb-2 block">{L.label_phone}</label>
                 <Input
                   value={searchParams.phone || ''}
                   onChange={e => updateParam('phone', e.target.value)}
-                  placeholder="輸入電話號碼"
+                  placeholder={L.placeholder_phone}
                 />
               </div>
 
               <div>
-                <label className="text-sm text-morandi-primary mb-2 block">Email</label>
+                <label className="text-sm text-morandi-primary mb-2 block">{L.label_email}</label>
                 <Input
                   type="email"
                   value={searchParams.email || ''}
                   onChange={e => updateParam('email', e.target.value)}
-                  placeholder="輸入 Email"
+                  placeholder={L.placeholder_email}
                 />
               </div>
 
               <div>
-                <label className="text-sm text-morandi-primary mb-2 block">城市</label>
+                <label className="text-sm text-morandi-primary mb-2 block">{L.label_city}</label>
                 <Input
                   value={searchParams.city || ''}
                   onChange={e => updateParam('city', e.target.value)}
-                  placeholder="輸入城市"
+                  placeholder={L.placeholder_city}
                 />
               </div>
             </div>
@@ -135,31 +136,31 @@ export function CustomerSearchDialog({
 
           {/* 護照資訊 */}
           <div>
-            <h3 className="text-sm font-semibold text-morandi-primary mb-3">護照資訊</h3>
+            <h3 className="text-sm font-semibold text-morandi-primary mb-3">{L.section_passport}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm text-morandi-primary mb-2 block">
-                  護照拼音（姓氏/名字）
+                  {L.label_passport_name}
                 </label>
                 <Input
                   value={searchParams.passport_name || ''}
                   onChange={e => updateParam('passport_name', e.target.value)}
-                  placeholder="例如：WANG/XIAOMING"
+                  placeholder={L.placeholder_passport_name}
                 />
               </div>
 
               <div className="col-span-1 md:col-span-2">
-                <label className="text-sm text-morandi-primary mb-2 block">護照效期範圍</label>
+                <label className="text-sm text-morandi-primary mb-2 block">{L.label_passport_expiry}</label>
                 <div className="grid grid-cols-2 gap-2">
                   <DatePicker
                     value={searchParams.passport_expiry_start || ''}
                     onChange={(date) => updateParam('passport_expiry_start', date)}
-                    placeholder="起始日"
+                    placeholder={L.placeholder_start}
                   />
                   <DatePicker
                     value={searchParams.passport_expiry_end || ''}
                     onChange={(date) => updateParam('passport_expiry_end', date)}
-                    placeholder="結束日"
+                    placeholder={L.placeholder_end}
                   />
                 </div>
               </div>
@@ -168,10 +169,10 @@ export function CustomerSearchDialog({
 
           {/* VIP 與來源 */}
           <div>
-            <h3 className="text-sm font-semibold text-morandi-primary mb-3">VIP 與來源</h3>
+            <h3 className="text-sm font-semibold text-morandi-primary mb-3">{L.section_vip_source}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="text-sm text-morandi-primary mb-2 block">VIP 狀態</label>
+                <label className="text-sm text-morandi-primary mb-2 block">{L.label_vip}</label>
                 <Select
                   value={searchParams.is_vip?.toString() || 'all'}
                   onValueChange={value =>
@@ -179,18 +180,18 @@ export function CustomerSearchDialog({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="全部" />
+                    <SelectValue placeholder={L.option_all} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">全部</SelectItem>
-                    <SelectItem value="true">VIP</SelectItem>
-                    <SelectItem value="false">非 VIP</SelectItem>
+                    <SelectItem value="all">{L.option_all}</SelectItem>
+                    <SelectItem value="true">{L.option_vip}</SelectItem>
+                    <SelectItem value="false">{L.option_non_vip}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
-                <label className="text-sm text-morandi-primary mb-2 block">VIP 等級</label>
+                <label className="text-sm text-morandi-primary mb-2 block">{L.label_vip_level}</label>
                 <Select
                   value={searchParams.vip_level || 'all'}
                   onValueChange={value =>
@@ -198,20 +199,20 @@ export function CustomerSearchDialog({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="全部" />
+                    <SelectValue placeholder={L.option_all} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">全部</SelectItem>
-                    <SelectItem value="bronze">銅卡</SelectItem>
-                    <SelectItem value="silver">銀卡</SelectItem>
-                    <SelectItem value="gold">金卡</SelectItem>
-                    <SelectItem value="platinum">白金卡</SelectItem>
+                    <SelectItem value="all">{L.option_all}</SelectItem>
+                    <SelectItem value="bronze">{L.option_bronze}</SelectItem>
+                    <SelectItem value="silver">{L.option_silver}</SelectItem>
+                    <SelectItem value="gold">{L.option_gold}</SelectItem>
+                    <SelectItem value="platinum">{L.option_platinum}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
-                <label className="text-sm text-morandi-primary mb-2 block">客戶來源</label>
+                <label className="text-sm text-morandi-primary mb-2 block">{L.label_source}</label>
                 <Select
                   value={searchParams.source || 'all'}
                   onValueChange={value =>
@@ -219,18 +220,18 @@ export function CustomerSearchDialog({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="全部" />
+                    <SelectValue placeholder={L.option_all} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">全部</SelectItem>
-                    <SelectItem value="website">官網</SelectItem>
+                    <SelectItem value="all">{L.option_all}</SelectItem>
+                    <SelectItem value="website">{L.option_website}</SelectItem>
                     <SelectItem value="facebook">Facebook</SelectItem>
                     <SelectItem value="instagram">Instagram</SelectItem>
                     <SelectItem value="line">LINE</SelectItem>
-                    <SelectItem value="referral">推薦</SelectItem>
-                    <SelectItem value="phone">電話</SelectItem>
-                    <SelectItem value="walk_in">現場</SelectItem>
-                    <SelectItem value="other">其他</SelectItem>
+                    <SelectItem value="referral">{L.option_referral}</SelectItem>
+                    <SelectItem value="phone">{L.option_phone}</SelectItem>
+                    <SelectItem value="walk_in">{L.option_walk_in}</SelectItem>
+                    <SelectItem value="other">{L.option_other}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -241,18 +242,18 @@ export function CustomerSearchDialog({
         <DialogFooter className="flex justify-end gap-2">
           <Button variant="outline" onClick={handleReset} className="gap-2">
             <X size={16} />
-            重置
+            {L.btn_reset}
           </Button>
           <Button variant="outline" onClick={onClose} className="gap-1">
             <X size={16} />
-            取消
+            {L.btn_close}
           </Button>
           <Button
             onClick={handleSearch}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
             <Search size={16} />
-            搜尋
+            {L.btn_search}
           </Button>
         </DialogFooter>
       </DialogContent>

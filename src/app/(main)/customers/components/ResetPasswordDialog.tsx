@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import type { Customer } from '@/types/customer.types'
+import { RESET_PASSWORD_LABELS as L } from '../constants/labels'
 
 interface ResetPasswordDialogProps {
   open: boolean
@@ -35,21 +36,21 @@ export function ResetPasswordDialog({
 
   const handleReset = async () => {
     if (!customer?.email || !newPassword) {
-      toast.error('請輸入新密碼')
+      toast.error(L.toast_enter_password)
       return
     }
 
     if (newPassword.length < 6) {
-      toast.error('密碼至少需要 6 個字元')
+      toast.error(L.toast_min_length)
       return
     }
 
     const confirmed = await confirm(
-      `確定要將 ${customer.name} 的密碼重置為新密碼嗎？`,
+      L.confirm_msg(customer.name),
       {
-        title: '確認重置密碼',
-        confirmText: '確認重置',
-        cancelText: '取消',
+        title: L.confirm_title,
+        confirmText: L.confirm_text,
+        cancelText: L.btn_cancel,
       }
     )
 
@@ -69,14 +70,14 @@ export function ResetPasswordDialog({
       const result = await res.json()
 
       if (!res.ok) {
-        throw new Error(result.error || '重置密碼失敗')
+        throw new Error(result.error || L.toast_failed)
       }
 
-      toast.success('密碼已重置成功')
+      toast.success(L.toast_success)
       handleClose()
     } catch (error) {
       logger.error('Reset password error:', error)
-      toast.error(error instanceof Error ? error.message : '重置密碼失敗')
+      toast.error(error instanceof Error ? error.message : L.toast_failed)
     } finally {
       setIsResetting(false)
     }
@@ -90,35 +91,35 @@ export function ResetPasswordDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Key size={20} className="text-morandi-gold" />
-            重置會員密碼
+            {L.title}
           </DialogTitle>
         </DialogHeader>
 
         <div className="py-4 space-y-4">
           <div>
             <p className="text-sm text-morandi-secondary mb-2">
-              正在為 <span className="font-medium text-morandi-primary">{customer.name}</span> 重置密碼
+              {L.resetting_for} <span className="font-medium text-morandi-primary">{customer.name}</span> {L.reset_password_suffix}
             </p>
             <p className="text-xs text-morandi-secondary">
-              會員帳號：{customer.email || '無 Email'}
+              {L.account_label}{customer.email || L.no_email}
             </p>
           </div>
 
           {customer.email ? (
             <div>
-              <label className="text-xs font-medium text-morandi-primary">新密碼</label>
+              <label className="text-xs font-medium text-morandi-primary">{L.label_new_password}</label>
               <Input
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="請輸入新密碼（至少 6 個字元）"
+                placeholder={L.placeholder_password}
                 className="mt-1"
               />
             </div>
           ) : (
             <div className="p-3 bg-status-warning-bg border border-status-warning/30 rounded-lg">
               <p className="text-sm text-status-warning">
-                此顧客沒有設定 Email，無法重置密碼。請先在顧客資料中填寫 Email。
+                {L.no_email_warning}
               </p>
             </div>
           )}
@@ -127,7 +128,7 @@ export function ResetPasswordDialog({
         <div className="flex justify-end gap-2 pt-2 border-t">
           <Button variant="outline" onClick={handleClose} className="gap-2">
             <X size={16} />
-            取消
+            {L.btn_cancel}
           </Button>
           <Button
             onClick={handleReset}
@@ -135,7 +136,7 @@ export function ResetPasswordDialog({
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
             <Check size={16} />
-            {isResetting ? '重置中...' : '確認重置'}
+            {isResetting ? L.btn_resetting : L.btn_confirm}
           </Button>
         </div>
       </DialogContent>

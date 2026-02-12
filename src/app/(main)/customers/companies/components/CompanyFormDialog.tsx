@@ -9,6 +9,7 @@ import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { COMPANY_LABELS as L } from '../../constants/labels'
 import {
   Select,
   SelectContent,
@@ -110,7 +111,7 @@ export function CompanyFormDialog({
 
   const handleSubmit = async () => {
     if (!formData.company_name.trim()) {
-      await alert('請輸入企業名稱', 'warning')
+      await alert(L.alert_enter_name, 'warning')
       return
     }
 
@@ -122,32 +123,32 @@ export function CompanyFormDialog({
     <FormDialog
       open={isOpen}
       onOpenChange={open => !open && onClose()}
-      title={company ? '編輯企業客戶' : '新增企業客戶'}
-      subtitle={company ? `編輯 ${company.company_name}` : '新增企業客戶資料'}
+      title={company ? L.dialog_title_edit : L.dialog_title_add}
+      subtitle={company ? L.dialog_subtitle_edit(company.company_name) : L.dialog_subtitle_add}
       onSubmit={handleSubmit}
-      submitLabel={company ? '儲存' : '新增'}
+      submitLabel={company ? L.btn_save : L.btn_submit_add}
       maxWidth="2xl"
     >
       <div className="space-y-6">
         {/* 基本資訊 */}
         <div className="space-y-4">
-          <h3 className="text-sm font-medium text-morandi-primary border-b pb-2">基本資訊</h3>
+          <h3 className="text-sm font-medium text-morandi-primary border-b pb-2">{L.section_basic}</h3>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
               <Label htmlFor="company_name">
-                企業名稱 <span className="text-morandi-red">*</span>
+                {L.label_company_name} <span className="text-morandi-red">*</span>
               </Label>
               <Input
                 id="company_name"
                 value={formData.company_name}
                 onChange={e => setFormData({ ...formData, company_name: e.target.value })}
-                placeholder="請輸入企業名稱"
+                placeholder={L.placeholder_company_name}
               />
             </div>
 
             <div>
-              <Label htmlFor="tax_id">統一編號</Label>
+              <Label htmlFor="tax_id">{L.label_tax_id}</Label>
               <Input
                 id="tax_id"
                 value={formData.tax_id || ''}
@@ -158,7 +159,7 @@ export function CompanyFormDialog({
             </div>
 
             <div>
-              <Label htmlFor="vip_level">VIP 等級</Label>
+              <Label htmlFor="vip_level">{L.label_vip_level}</Label>
               <Select
                 value={formData.vip_level.toString()}
                 onValueChange={value => setFormData({ ...formData, vip_level: parseInt(value) })}
@@ -167,7 +168,7 @@ export function CompanyFormDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="0">普通客戶</SelectItem>
+                  <SelectItem value="0">{L.option_normal}</SelectItem>
                   <SelectItem value="1">VIP 1</SelectItem>
                   <SelectItem value="2">VIP 2</SelectItem>
                   <SelectItem value="3">VIP 3</SelectItem>
@@ -178,7 +179,7 @@ export function CompanyFormDialog({
             </div>
 
             <div>
-              <Label htmlFor="phone">聯絡電話</Label>
+              <Label htmlFor="phone">{L.label_phone}</Label>
               <Input
                 id="phone"
                 value={formData.phone || ''}
@@ -199,7 +200,7 @@ export function CompanyFormDialog({
             </div>
 
             <div className="col-span-2">
-              <Label htmlFor="website">網站</Label>
+              <Label htmlFor="website">{L.label_website}</Label>
               <Input
                 id="website"
                 value={formData.website || ''}
@@ -212,11 +213,11 @@ export function CompanyFormDialog({
 
         {/* 付款資訊 */}
         <div className="space-y-4">
-          <h3 className="text-sm font-medium text-morandi-primary border-b pb-2">付款資訊</h3>
+          <h3 className="text-sm font-medium text-morandi-primary border-b pb-2">{L.section_payment}</h3>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="payment_method">付款方式</Label>
+              <Label htmlFor="payment_method">{L.label_payment_method}</Label>
               <Select
                 value={formData.payment_method}
                 onValueChange={value =>
@@ -240,7 +241,7 @@ export function CompanyFormDialog({
             </div>
 
             <div>
-              <Label htmlFor="payment_terms">付款期限</Label>
+              <Label htmlFor="payment_terms">{L.label_payment_terms}</Label>
               <Select
                 value={formData.payment_terms.toString()}
                 onValueChange={value =>
@@ -261,7 +262,7 @@ export function CompanyFormDialog({
             </div>
 
             <div className="col-span-2">
-              <Label htmlFor="credit_limit">信用額度 (NT$)</Label>
+              <Label htmlFor="credit_limit">{L.label_credit_limit}</Label>
               <Input
                 id="credit_limit"
                 type="number"
@@ -278,35 +279,35 @@ export function CompanyFormDialog({
 
         {/* 發票資訊 */}
         <div className="space-y-4">
-          <h3 className="text-sm font-medium text-morandi-primary border-b pb-2">發票資訊</h3>
+          <h3 className="text-sm font-medium text-morandi-primary border-b pb-2">{L.section_invoice}</h3>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
-              <Label htmlFor="invoice_title">發票抬頭</Label>
+              <Label htmlFor="invoice_title">{L.label_invoice_title}</Label>
               <Input
                 id="invoice_title"
                 value={formData.invoice_title || ''}
                 onChange={e =>
                   setFormData({ ...formData, invoice_title: e.target.value || null })
                 }
-                placeholder="請輸入發票抬頭"
+                placeholder={L.placeholder_invoice_title}
               />
             </div>
 
             <div className="col-span-2">
-              <Label htmlFor="invoice_address">發票地址</Label>
+              <Label htmlFor="invoice_address">{L.label_invoice_address}</Label>
               <Input
                 id="invoice_address"
                 value={formData.invoice_address || ''}
                 onChange={e =>
                   setFormData({ ...formData, invoice_address: e.target.value || null })
                 }
-                placeholder="請輸入發票地址"
+                placeholder={L.placeholder_invoice_address}
               />
             </div>
 
             <div className="col-span-2">
-              <Label htmlFor="invoice_email">發票 Email</Label>
+              <Label htmlFor="invoice_email">{L.label_invoice_email}</Label>
               <Input
                 id="invoice_email"
                 type="email"

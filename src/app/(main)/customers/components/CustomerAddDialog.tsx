@@ -17,6 +17,7 @@ import { FormField } from '@/components/ui/form-field'
 import { ManagedDialog, useDirtyState } from '@/components/dialog'
 import type { Customer } from '@/types/customer.types'
 import { usePassportUpload } from '../hooks/usePassportUpload'
+import { CUSTOMER_ADD_LABELS as L } from '../constants/labels'
 
 interface NewCustomerData {
   name: string
@@ -118,15 +119,15 @@ export function CustomerAddDialog({
     <ManagedDialog
       open={open}
       onOpenChange={onOpenChange}
-      title="新增顧客"
+      title={L.title}
       maxWidth="4xl"
       contentClassName="max-h-[90vh] overflow-y-auto"
       showFooter={false}
       confirmOnDirtyClose
-      confirmCloseTitle="放棄新增？"
-      confirmCloseMessage="已輸入的顧客資料尚未保存，確定要關閉嗎？"
-      confirmCloseLabel="放棄"
-      cancelCloseLabel="繼續填寫"
+      confirmCloseTitle={L.confirm_close_title}
+      confirmCloseMessage={L.confirm_close_msg}
+      confirmCloseLabel={L.confirm_close_label}
+      cancelCloseLabel={L.cancel_close_label}
       externalDirty={isDirty || passportUpload.files.length > 0}
       onAfterClose={() => {
         setNewCustomer(INITIAL_CUSTOMER)
@@ -138,26 +139,26 @@ export function CustomerAddDialog({
         <div className="space-y-4 border-r border-border pr-6">
           <div className="flex items-center gap-2 text-morandi-primary font-medium">
             <Edit size={18} />
-            <span>手動輸入</span>
+            <span>{L.section_manual}</span>
           </div>
-          <p className="text-sm text-morandi-secondary">手動填寫顧客基本資訊與護照資料</p>
+          <p className="text-sm text-morandi-secondary">{L.section_manual_desc}</p>
 
           {/* 基本資訊 - 使用 FormField 組件 */}
           <div className="space-y-3">
-            <FormField label="姓名" required labelClassName="text-xs">
+            <FormField label={L.label_name} required labelClassName="text-xs">
               <Input
                 value={newCustomer.name}
                 onChange={(e) => updateField('name', e.target.value)}
-                placeholder="輸入顧客姓名"
+                placeholder={L.placeholder_name}
                 className="h-8 text-sm"
               />
             </FormField>
 
-            <FormField label="電話" required labelClassName="text-xs">
+            <FormField label={L.label_phone} required labelClassName="text-xs">
               <Input
                 value={newCustomer.phone}
                 onChange={(e) => updateField('phone', e.target.value)}
-                placeholder="輸入聯絡電話"
+                placeholder={L.placeholder_phone}
                 className="h-8 text-sm"
               />
             </FormField>
@@ -172,50 +173,50 @@ export function CustomerAddDialog({
                   className="h-8 text-sm"
                 />
               </FormField>
-              <FormField label="身份證字號" labelClassName="text-xs">
+              <FormField label={L.label_national_id} labelClassName="text-xs">
                 <Input
                   value={newCustomer.national_id}
                   onChange={(e) => updateField('national_id', e.target.value)}
-                  placeholder="身份證字號"
+                  placeholder={L.placeholder_national_id}
                   className="h-8 text-sm"
                 />
               </FormField>
             </div>
 
-            <FormField label="護照拼音" labelClassName="text-xs">
+            <FormField label={L.label_passport_name} labelClassName="text-xs">
               <Input
                 value={newCustomer.passport_name}
                 onChange={(e) => updateField('passport_name', e.target.value.toUpperCase())}
-                placeholder="例如：WANG/XIAOMING"
+                placeholder={L.placeholder_passport_name}
                 className="h-8 text-sm"
               />
             </FormField>
 
             <div className="grid grid-cols-2 gap-2">
-              <FormField label="護照號碼" labelClassName="text-xs">
+              <FormField label={L.label_passport_number} labelClassName="text-xs">
                 <Input
                   value={newCustomer.passport_number}
                   onChange={(e) => updateField('passport_number', e.target.value)}
-                  placeholder="護照號碼"
+                  placeholder={L.placeholder_passport_number}
                   className="h-8 text-sm"
                 />
               </FormField>
-              <FormField label="護照效期" labelClassName="text-xs">
+              <FormField label={L.label_passport_expiry} labelClassName="text-xs">
                 <DatePicker
                   value={newCustomer.passport_expiry}
                   onChange={(date) => updateField('passport_expiry', date)}
                   className="h-8 text-sm"
-                  placeholder="選擇日期"
+                  placeholder={L.placeholder_date}
                 />
               </FormField>
             </div>
 
-            <FormField label="出生日期" labelClassName="text-xs">
+            <FormField label={L.label_birth_date} labelClassName="text-xs">
               <DatePicker
                 value={newCustomer.birth_date}
                 onChange={(date) => updateField('birth_date', date)}
                 className="h-8 text-sm"
-                placeholder="選擇日期"
+                placeholder={L.placeholder_date}
               />
             </FormField>
           </div>
@@ -226,7 +227,7 @@ export function CustomerAddDialog({
             className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
             <Plus size={16} />
-            手動新增顧客
+            {L.btn_add_manual}
           </Button>
         </div>
 
@@ -234,9 +235,9 @@ export function CustomerAddDialog({
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-morandi-primary font-medium">
             <Upload size={18} />
-            <span>上傳護照辨識</span>
+            <span>{L.section_ocr}</span>
           </div>
-          <p className="text-sm text-morandi-secondary">上傳護照圖片，自動辨識並建立顧客資料</p>
+          <p className="text-sm text-morandi-secondary">{L.section_ocr_desc}</p>
 
           {/* 上傳區域 - 固定在上方 */}
           <label
@@ -253,9 +254,9 @@ export function CustomerAddDialog({
             <div className="flex flex-col items-center justify-center py-4">
               <Upload className="w-6 h-6 mb-2 text-morandi-secondary" />
               <p className="text-sm text-morandi-primary">
-                <span className="font-semibold">點擊上傳</span> 或拖曳檔案
+                <span className="font-semibold">{L.upload_click}</span> {L.upload_drag}
               </p>
-              <p className="text-xs text-morandi-secondary">支援 JPG, PNG, PDF（可多選）</p>
+              <p className="text-xs text-morandi-secondary">{L.upload_formats}</p>
             </div>
             <input
               id="passport-upload"
@@ -277,8 +278,8 @@ export function CustomerAddDialog({
             >
               <Upload size={16} />
               {passportUpload.isUploading
-                ? '辨識中...'
-                : `辨識並建立 ${passportUpload.files.length} 位顧客`}
+                ? L.ocr_processing
+                : L.ocr_process_btn(passportUpload.files.length)}
             </Button>
           )}
 
@@ -286,7 +287,7 @@ export function CustomerAddDialog({
           {passportUpload.files.length > 0 && (
             <div className="space-y-2">
               <div className="text-xs text-morandi-secondary">
-                已選擇 {passportUpload.files.length} 個檔案：
+                {L.files_selected(passportUpload.files.length)}
               </div>
               <div className="max-h-40 overflow-y-auto space-y-2">
                 {passportUpload.files.map((file, index) => (
@@ -326,7 +327,7 @@ export function CustomerAddDialog({
               onClick={() => setShowReminder(!showReminder)}
               className="w-full flex items-center justify-between p-2 bg-status-info-bg hover:bg-status-info-bg/80 transition-colors"
             >
-              <span className="text-xs font-medium text-morandi-primary">重要提醒</span>
+              <span className="text-xs font-medium text-morandi-primary">{L.section_reminder}</span>
               {showReminder ? (
                 <ChevronDown size={14} className="text-morandi-secondary" />
               ) : (
@@ -335,9 +336,9 @@ export function CustomerAddDialog({
             </button>
             {showReminder && (
               <ul className="text-xs text-morandi-secondary space-y-1 p-3 pt-2">
-                <li>OCR 辨識的資料會自動標記為<strong>「待驗證」</strong></li>
-                <li>請務必<strong>人工檢查護照資訊</strong></li>
-                <li>支援所有國家護照（TWN、USA、JPN 等）</li>
+                <li>{L.reminder_1}<strong>{L.reminder_1_strong}</strong></li>
+                <li>{L.reminder_2_prefix}<strong>{L.reminder_2_strong}</strong></li>
+                <li>{L.reminder_3}</li>
               </ul>
             )}
           </div>
@@ -349,7 +350,7 @@ export function CustomerAddDialog({
               onClick={() => setShowTips(!showTips)}
               className="w-full flex items-center justify-between p-2 bg-status-warning-bg hover:bg-status-warning-bg/80 transition-colors"
             >
-              <span className="text-xs font-medium text-morandi-primary">拍攝建議</span>
+              <span className="text-xs font-medium text-morandi-primary">{L.section_tips}</span>
               {showTips ? (
                 <ChevronDown size={14} className="text-morandi-secondary" />
               ) : (
@@ -358,9 +359,9 @@ export function CustomerAddDialog({
             </button>
             {showTips && (
               <ul className="text-xs text-morandi-secondary space-y-1 p-3 pt-2">
-                <li>確保護照<strong>最下方兩排文字</strong>清晰可見</li>
-                <li>光線充足，避免反光或陰影</li>
-                <li>拍攝角度正面，避免傾斜</li>
+                <li>{L.tip_1_prefix}<strong>{L.tip_1_strong}</strong>{L.tip_1_suffix}</li>
+                <li>{L.tip_2}</li>
+                <li>{L.tip_3}</li>
               </ul>
             )}
           </div>
@@ -370,7 +371,7 @@ export function CustomerAddDialog({
       <div className="flex justify-end pt-2 border-t">
         <Button variant="outline" onClick={handleClose} className="gap-2">
           <X size={16} />
-          取消
+          {L.btn_cancel}
         </Button>
       </div>
     </ManagedDialog>
