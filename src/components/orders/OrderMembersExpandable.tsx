@@ -63,7 +63,9 @@ import {
   MemberTableHeader,
   PnrMatchDialog,
 } from './components'
-import { TourPrintDialog } from '@/components/tours/TourPrintDialog'
+import dynamic from 'next/dynamic'
+
+const TourPrintDialog = dynamic(() => import('@/components/tours/TourPrintDialog').then(m => m.TourPrintDialog), { ssr: false })
 import type { OrderMember, OrderMembersExpandableProps, CustomCostField } from './order-member.types'
 import type { EditFormData } from './components/MemberEditDialog'
 

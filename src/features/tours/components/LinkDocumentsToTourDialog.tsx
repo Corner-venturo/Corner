@@ -38,7 +38,9 @@ import { stripHtml } from '@/lib/utils/string-utils'
 import { supabase } from '@/lib/supabase/client'
 import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { syncTimelineToQuote } from '@/lib/utils/itinerary-quote-sync'
-import { ItineraryDialog } from '@/features/proposals/components/ItineraryDialog'
+import dynamic from 'next/dynamic'
+
+const ItineraryDialog = dynamic(() => import('@/features/proposals/components/ItineraryDialog').then(m => m.ItineraryDialog), { ssr: false })
 import { PackageItineraryDialog } from '@/features/proposals/components/PackageItineraryDialog'
 import { toast } from 'sonner'
 import type { Proposal } from '@/types/proposal.types'

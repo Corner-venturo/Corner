@@ -5,7 +5,9 @@ import { Tour, Order } from '@/stores/types'
 import { supabase } from '@/lib/supabase/client'
 import { SimpleOrderTable } from '@/components/orders/simple-order-table'
 import { AddReceiptDialog } from '@/features/finance/payments'
-import { AddRequestDialog } from '@/features/finance/requests/components/AddRequestDialog'
+import dynamic from 'next/dynamic'
+
+const AddRequestDialog = dynamic(() => import('@/features/finance/requests/components/AddRequestDialog').then(m => m.AddRequestDialog), { ssr: false })
 import { InvoiceDialog } from '@/components/finance/invoice-dialog'
 import type { Order as OrderType } from '@/types/order.types'
 import { logger } from '@/lib/utils/logger'
