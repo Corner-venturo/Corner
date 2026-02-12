@@ -12,7 +12,7 @@
  * | useOrderStore            | useOrders                    |
  * | useCustomerStore         | useCustomers                 |
  * | useTourLeaderStore ⚠️    | useTourLeaders (已遷移)      |
- * | useRegionsStore ⚠️       | useCountries, useCities      |
+ * | (removed region-store)   | useCountries, useCities      |
  * | usePaymentRequestStore   | usePaymentRequests (進行中)  |
  * | ...                      | ...                          |
  *
@@ -303,21 +303,9 @@ export const useCompanyContactStore = createStore<import('./types').CompanyConta
   workspaceScoped: false,
 })
 
-/**
- * 地區 Store（舊版，保留向後相容）
- * ⚠️ 不啟用 Workspace 隔離（全局共享基礎資料）
- */
-export const useRegionStore = createStore<import('./region-store').Region>({
-  tableName: 'regions',
-  workspaceScoped: false,
-})
-
-// 地區 Store（新版，三層架構）
-// 支援 Countries > Regions > Cities 三層架構
-// 使用 createStore 工廠，提供統一的快取優先架構
-export { useRegionsStore } from './region-store'
-export type { Country, City, RegionStats } from './region-store'
-export type { Region as RegionNew } from './region-store'
+// 地區 Store 已遷移到 @/data (useCountries, useCities, useRegions)
+// 僅保留型別 re-export 供既有 import 使用
+export type { Country, City, Region as RegionNew, RegionStats } from './region-store'
 
 // 景點 Store - 已遷移到 @/data (useAttractions)
 
