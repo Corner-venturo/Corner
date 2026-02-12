@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { TourExtraFields } from '../types'
 import { prompt } from '@/lib/ui/alert-dialog'
+import { TOUR_OPS_ADD } from '../constants'
 
 interface TourOperationsAddButtonProps {
   tour: Tour
@@ -40,17 +41,17 @@ export function TourOperationsAddButton({
     <>
       {/* Room assignment statistics */}
       <span className="px-2 py-1 bg-morandi-green/20 text-morandi-green rounded text-xs">
-        已分房: {assignedMembers}人
+        {TOUR_OPS_ADD.room_assigned(assignedMembers)}
       </span>
 
       {/* Add button */}
       <button
         onClick={() => setIsDialogOpen(true)}
         className="bg-morandi-gold hover:bg-morandi-gold-hover text-white px-3 py-1.5 rounded text-sm font-medium flex items-center transition-colors"
-        title="新增項目"
+        title={TOUR_OPS_ADD.add_item_title}
       >
         <Plus size={14} className="mr-1" />
-        新增欄位
+        {TOUR_OPS_ADD.add_field}
       </button>
 
       {/* Dialog */}
@@ -118,9 +119,9 @@ function TourOperationsAddDialog({
           break
 
         case 'blank':
-          const fieldName = await prompt('請輸入欄位名稱', {
-            title: '新增自訂欄位',
-            placeholder: '輸入名稱...',
+          const fieldName = await prompt(TOUR_OPS_ADD.custom_field_prompt, {
+            title: TOUR_OPS_ADD.custom_field_title,
+            placeholder: TOUR_OPS_ADD.custom_field_placeholder,
           })
           if (fieldName && fieldName.trim()) {
             const fieldId = Date.now().toString()
@@ -146,24 +147,24 @@ function TourOperationsAddDialog({
   const options = [
     {
       id: 'blank',
-      label: '空白欄位',
-      description: '新增自定義空白項目',
+      label: TOUR_OPS_ADD.blank_field,
+      description: TOUR_OPS_ADD.blank_field_desc,
       icon: FileText,
       color: 'text-morandi-secondary',
       bgColor: 'hover:bg-morandi-container/30',
     },
     {
       id: 'addon',
-      label: '加購項目',
-      description: '新增額外購買項目',
+      label: TOUR_OPS_ADD.addon_field,
+      description: TOUR_OPS_ADD.addon_field_desc,
       icon: Package,
       color: 'text-morandi-blue',
       bgColor: 'hover:bg-morandi-blue/10',
     },
     {
       id: 'refund',
-      label: '退費項目',
-      description: '新增退款相關項目',
+      label: TOUR_OPS_ADD.refund_field,
+      description: TOUR_OPS_ADD.refund_field_desc,
       icon: RefreshCw,
       color: 'text-morandi-red',
       bgColor: 'hover:bg-morandi-red/10',
@@ -174,12 +175,12 @@ function TourOperationsAddDialog({
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
       <DialogContent level={1} className="max-w-md" aria-describedby={undefined}>
         <DialogHeader>
-          <DialogTitle>新增項目</DialogTitle>
+          <DialogTitle>{TOUR_OPS_ADD.dialog_title}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-3">
           <div className="text-sm text-morandi-secondary mb-4">
-            為旅遊團「{tour.name}」選擇要新增的項目類型：
+            {TOUR_OPS_ADD.dialog_desc(tour.name)}
           </div>
 
           {options.map(option => {
@@ -216,7 +217,7 @@ function TourOperationsAddDialog({
         <div className="flex justify-end pt-4">
           <Button variant="outline" onClick={onClose} className="gap-2">
             <X size={16} />
-            取消
+            {TOUR_OPS_ADD.cancel}
           </Button>
         </div>
       </DialogContent>

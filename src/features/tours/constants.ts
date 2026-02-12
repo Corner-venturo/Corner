@@ -139,3 +139,136 @@ export const TOUR_SETTINGS = {
   controller_empty: '找不到團控人員',
   special_tour: '特殊團',
 } as const
+
+// ============================================================
+// TourOverviewTab
+// ============================================================
+export const TOUR_OVERVIEW = {
+  section_basic: '基本資訊',
+  label_code: '團號:',
+  label_destination: '目的地:',
+  label_departure: '出發日期:',
+  label_return: '返回日期:',
+  label_created: '建立時間:',
+  section_revenue: '報價與收入',
+  label_quote_price: '報價單價格:',
+  label_receivable: '應收帳款:',
+  label_received: '實收帳款:',
+  label_collection_rate: '收款率:',
+  label_outstanding: '待收餘額:',
+  section_cost: '成本與利潤',
+  label_total_cost: '總成本:',
+  label_gross_profit: '毛利潤:',
+  label_net_profit: '淨利潤:',
+  label_profit_rate: '利潤率:',
+  financial_status: '財務狀況',
+  status_profit: '盈利中',
+  status_loss: '虧損中',
+  budget_title: '預算 vs 實際支出明細',
+  budget_basis: (n: number) => `基準：${n}人團體`,
+  col_category: '類別',
+  col_budget_pp: '單人預算',
+  col_budget_total: '預算總額',
+  col_actual: '實際支出',
+  col_variance: '差額',
+  col_variance_rate: '差額率',
+  badge_over: '超支',
+  badge_save: '節省',
+  total: '總計',
+  note_title: '說明：',
+  note_green: '綠色數字表示節省預算',
+  note_red: '紅色數字表示超出預算',
+  note_threshold: '差額率超過20%會特別標示',
+} as const
+
+// ============================================================
+// TourUnlockDialog
+// ============================================================
+export const TOUR_UNLOCK = {
+  title: '解鎖確認',
+  subtitle: '請輸入您的登入密碼以解鎖此團進行修改',
+  warning: '解鎖後可修改報價單和行程，完成後請記得重新鎖定。',
+  label_password: '登入密碼',
+  password_placeholder: '請輸入您的登入密碼',
+  label_reason: '修改原因（選填）',
+  reason_placeholder: '例如：客戶要求變更行程日期',
+  cancel: '取消',
+  confirm: '確認解鎖',
+} as const
+
+// ============================================================
+// TourOperationsAddButton
+// ============================================================
+export const TOUR_OPS_ADD = {
+  room_assigned: (n: number) => `已分房: ${n}人`,
+  add_item_title: '新增項目',
+  add_field: '新增欄位',
+  custom_field_prompt: '請輸入欄位名稱',
+  custom_field_title: '新增自訂欄位',
+  custom_field_placeholder: '輸入名稱...',
+  blank_field: '空白欄位',
+  blank_field_desc: '新增自定義空白項目',
+  addon_field: '加購項目',
+  addon_field_desc: '新增額外購買項目',
+  refund_field: '退費項目',
+  refund_field_desc: '新增退款相關項目',
+  dialog_title: '新增項目',
+  dialog_desc: (name: string) => `為旅遊團「${name}」選擇要新增的項目類型：`,
+  cancel: '取消',
+} as const
+
+// ============================================================
+// TourConfirmationDialog
+// ============================================================
+export const TOUR_CONFIRMATION = {
+  title: (code: string, name: string) => `團確單管理 - ${code} ${name}`,
+} as const
+
+// ============================================================
+// TourConfirmationWizard
+// ============================================================
+export const TOUR_WIZARD = {
+  step_quote: '選擇報價單',
+  step_itinerary: '選擇行程',
+  step_confirm: '確認鎖定',
+  title: (name: string) => `確認精靈 - ${name}`,
+  subtitle: '選擇要鎖定的報價單和行程版本，確認後將無法自由修改',
+  select_quote: '選擇報價單版本',
+  no_quote: '此團尚無報價單',
+  skip_step: '可跳過此步驟繼續',
+  unnamed_quote: '未命名報價單',
+  select_itinerary: '選擇行程版本',
+  no_itinerary: '此團尚無行程',
+  unnamed_itinerary: '未命名行程',
+  last_updated: '最後更新:',
+  confirm_lock_title: '確認鎖定版本',
+  confirm_lock_desc: '鎖定後，報價單和行程將無法自由修改。如需修改，須先輸入密碼解鎖。',
+  selected_quote: '選定報價單',
+  unnamed: '未命名',
+  not_selected: '未選擇',
+  selected_itinerary: '選定行程',
+  prev_step: '上一步',
+  cancel: '取消',
+  next_step: '下一步',
+  confirm_lock: '確認鎖定',
+} as const
+
+// ============================================================
+// LinkItineraryToTourDialog
+// ============================================================
+export const TOUR_LINK_ITINERARY = {
+  button_label: '設計',
+  days_suffix: (n: number) => `(${n} 天)`,
+  select_type: '選擇設計類型',
+  brochure: '手冊',
+  brochure_desc: '製作精美的行程手冊，可列印或分享 PDF',
+  web_itinerary: '網頁行程表',
+  web_itinerary_desc: '互動式網頁行程，可產生連結分享給客戶',
+} as const
+
+// ============================================================
+// TourItineraryDialog
+// ============================================================
+export const TOUR_ITINERARY_DIALOG = {
+  loading: '載入行程表...',
+} as const

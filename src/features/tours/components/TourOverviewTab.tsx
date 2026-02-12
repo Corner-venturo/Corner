@@ -2,6 +2,7 @@ import { Tour, Quote } from '@/stores/types'
 import { useQuotes, useOrdersSlim } from '@/data'
 import { cn } from '@/lib/utils'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
+import { TOUR_OVERVIEW } from '../constants'
 
 const paymentStore: { payment_requests: unknown[] } = { payment_requests: [] }
 
@@ -81,27 +82,27 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
         {/* Basic information */}
         <div className="space-y-3">
           <div className="text-lg font-medium text-morandi-primary border-b border-border pb-2">
-            基本資訊
+            {TOUR_OVERVIEW.section_basic}
           </div>
           <div className="space-y-2">
             <div className="flex justify-between">
-              <span className="text-morandi-secondary">團號:</span>
+              <span className="text-morandi-secondary">{TOUR_OVERVIEW.label_code}</span>
               <span className="text-morandi-primary font-medium">{tour.code}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-morandi-secondary">目的地:</span>
+              <span className="text-morandi-secondary">{TOUR_OVERVIEW.label_destination}</span>
               <span className="text-morandi-primary">{tour.location}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-morandi-secondary">出發日期:</span>
+              <span className="text-morandi-secondary">{TOUR_OVERVIEW.label_departure}</span>
               <DateCell date={tour.departure_date} showIcon={false} />
             </div>
             <div className="flex justify-between">
-              <span className="text-morandi-secondary">返回日期:</span>
+              <span className="text-morandi-secondary">{TOUR_OVERVIEW.label_return}</span>
               <DateCell date={tour.return_date} showIcon={false} />
             </div>
             <div className="flex justify-between">
-              <span className="text-morandi-secondary">建立時間:</span>
+              <span className="text-morandi-secondary">{TOUR_OVERVIEW.label_created}</span>
               <DateCell date={tour.created_at} fallback="-" showIcon={false} className="text-morandi-secondary text-sm" />
             </div>
           </div>
@@ -110,23 +111,23 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
         {/* Quote and revenue */}
         <div className="space-y-3">
           <div className="text-lg font-medium text-morandi-primary border-b border-border pb-2">
-            報價與收入
+            {TOUR_OVERVIEW.section_revenue}
           </div>
           <div className="space-y-2">
             <div className="flex justify-between">
-              <span className="text-morandi-secondary">報價單價格:</span>
+              <span className="text-morandi-secondary">{TOUR_OVERVIEW.label_quote_price}</span>
               <CurrencyCell amount={quotePrice || 0} className="font-medium" />
             </div>
             <div className="flex justify-between">
-              <span className="text-morandi-secondary">應收帳款:</span>
+              <span className="text-morandi-secondary">{TOUR_OVERVIEW.label_receivable}</span>
               <CurrencyCell amount={expectedRevenue} className="text-morandi-blue font-medium" />
             </div>
             <div className="flex justify-between">
-              <span className="text-morandi-secondary">實收帳款:</span>
+              <span className="text-morandi-secondary">{TOUR_OVERVIEW.label_received}</span>
               <CurrencyCell amount={actualRevenue} variant="income" className="font-semibold" />
             </div>
             <div className="flex justify-between pt-2 border-t border-border">
-              <span className="text-morandi-secondary">收款率:</span>
+              <span className="text-morandi-secondary">{TOUR_OVERVIEW.label_collection_rate}</span>
               <span
                 className={cn(
                   'font-medium',
@@ -143,7 +144,7 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-morandi-secondary">待收餘額:</span>
+              <span className="text-morandi-secondary">{TOUR_OVERVIEW.label_outstanding}</span>
               <CurrencyCell
                 amount={expectedRevenue - actualRevenue}
                 className={cn(
@@ -158,15 +159,15 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
         {/* Cost and profit */}
         <div className="space-y-3">
           <div className="text-lg font-medium text-morandi-primary border-b border-border pb-2">
-            成本與利潤
+            {TOUR_OVERVIEW.section_cost}
           </div>
           <div className="space-y-2">
             <div className="flex justify-between">
-              <span className="text-morandi-secondary">總成本:</span>
+              <span className="text-morandi-secondary">{TOUR_OVERVIEW.label_total_cost}</span>
               <CurrencyCell amount={tour.total_cost} variant="expense" className="font-medium" />
             </div>
             <div className="flex justify-between pt-2 border-t border-border">
-              <span className="text-morandi-secondary">毛利潤:</span>
+              <span className="text-morandi-secondary">{TOUR_OVERVIEW.label_gross_profit}</span>
               <CurrencyCell
                 amount={grossProfit}
                 className={cn(
@@ -176,7 +177,7 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
               />
             </div>
             <div className="flex justify-between">
-              <span className="text-morandi-secondary">淨利潤:</span>
+              <span className="text-morandi-secondary">{TOUR_OVERVIEW.label_net_profit}</span>
               <CurrencyCell
                 amount={netProfit}
                 className={cn(
@@ -186,7 +187,7 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
               />
             </div>
             <div className="flex justify-between">
-              <span className="text-morandi-secondary">利潤率:</span>
+              <span className="text-morandi-secondary">{TOUR_OVERVIEW.label_profit_rate}</span>
               <span
                 className={cn(
                   'font-medium',
@@ -200,7 +201,7 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
 
           {/* Status indicator */}
           <div className="mt-4 p-3 rounded-lg border border-border bg-morandi-container/10">
-            <div className="text-sm font-medium text-morandi-secondary mb-2">財務狀況</div>
+            <div className="text-sm font-medium text-morandi-secondary mb-2">{TOUR_OVERVIEW.financial_status}</div>
             <div className="flex items-center space-x-2">
               {netProfit >= 0 ? (
                 <div className="w-3 h-3 rounded-full bg-morandi-green"></div>
@@ -213,7 +214,7 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
                   netProfit >= 0 ? 'text-morandi-green' : 'text-morandi-red'
                 )}
               >
-                {netProfit >= 0 ? '盈利中' : '虧損中'}
+                {netProfit >= 0 ? TOUR_OVERVIEW.status_profit : TOUR_OVERVIEW.status_loss}
               </span>
             </div>
           </div>
@@ -223,8 +224,8 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
       {/* Bottom section: Budget vs actual expenses table */}
       <div className="border border-border rounded-xl shadow-sm p-8">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-semibold text-morandi-primary">預算 vs 實際支出明細</h3>
-          <div className="text-sm text-morandi-secondary">基準：{currentParticipants}人團體</div>
+          <h3 className="text-xl font-semibold text-morandi-primary">{TOUR_OVERVIEW.budget_title}</h3>
+          <div className="text-sm text-morandi-secondary">{TOUR_OVERVIEW.budget_basis(currentParticipants)}</div>
         </div>
 
         <div className="overflow-x-auto">
@@ -232,22 +233,22 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
             <thead className="bg-morandi-container/20 border-b border-border">
               <tr>
                 <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-primary">
-                  類別
+                  {TOUR_OVERVIEW.col_category}
                 </th>
                 <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-primary">
-                  單人預算
+                  {TOUR_OVERVIEW.col_budget_pp}
                 </th>
                 <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-primary">
-                  預算總額
+                  {TOUR_OVERVIEW.col_budget_total}
                 </th>
                 <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-primary">
-                  實際支出
+                  {TOUR_OVERVIEW.col_actual}
                 </th>
                 <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-primary">
-                  差額
+                  {TOUR_OVERVIEW.col_variance}
                 </th>
                 <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-primary">
-                  差額率
+                  {TOUR_OVERVIEW.col_variance_rate}
                 </th>
               </tr>
             </thead>
@@ -275,7 +276,7 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
                                 : 'bg-morandi-green/10 text-morandi-green'
                             )}
                           >
-                            {varianceRate > 20 ? '超支' : '節省'}
+                            {varianceRate > 20 ? TOUR_OVERVIEW.badge_over : TOUR_OVERVIEW.badge_save}
                           </span>
                         )}
                       </div>
@@ -332,7 +333,7 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
 
               {/* Total row */}
               <tr className="bg-morandi-container/10 font-semibold">
-                <td className="py-4 px-4 text-morandi-primary">總計</td>
+                <td className="py-4 px-4 text-morandi-primary">{TOUR_OVERVIEW.total}</td>
                 <td className="py-4 px-4 text-right text-morandi-secondary">
                   <CurrencyCell
                     amount={actualExpenses.reduce((sum, exp) => sum + exp.budgetPerPerson, 0)}
@@ -377,11 +378,11 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
         <div className="mt-4 p-3 bg-morandi-container/5 rounded-lg text-sm text-morandi-secondary">
           <div className="flex items-center space-x-4">
             <span>
-              💡 <strong>說明：</strong>
+              💡 <strong>{TOUR_OVERVIEW.note_title}</strong>
             </span>
-            <span>綠色數字表示節省預算</span>
-            <span>紅色數字表示超出預算</span>
-            <span>差額率超過20%會特別標示</span>
+            <span>{TOUR_OVERVIEW.note_green}</span>
+            <span>{TOUR_OVERVIEW.note_red}</span>
+            <span>{TOUR_OVERVIEW.note_threshold}</span>
           </div>
         </div>
       </div>

@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog'
 import { TourConfirmationSheetPage } from '@/features/tour-confirmation'
 import type { Tour } from '@/stores/types'
+import { TOUR_CONFIRMATION } from '../constants'
 
 interface TourConfirmationDialogProps {
   open: boolean
@@ -34,7 +35,7 @@ export function TourConfirmationDialog({
       <DialogContent level={2} className="max-w-[95vw] w-[1400px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            團確單管理 - {tour.code} {tour.name}
+            {TOUR_CONFIRMATION.title(tour.code, tour.name)}
           </DialogTitle>
         </DialogHeader>
         <TourConfirmationSheetPage tour={tour} />

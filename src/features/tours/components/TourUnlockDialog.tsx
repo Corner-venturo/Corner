@@ -18,6 +18,7 @@ import { toast } from 'sonner'
 import { Unlock, Loader2, AlertTriangle, Eye, EyeOff, X, Check } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import { TOUR_UNLOCK } from '../constants'
 
 interface TourUnlockDialogProps {
   tour: Tour
@@ -103,10 +104,10 @@ export function TourUnlockDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg">
             <Unlock className="h-5 w-5 text-morandi-gold" />
-            解鎖確認
+            {TOUR_UNLOCK.title}
           </DialogTitle>
           <DialogDescription>
-            請輸入您的登入密碼以解鎖此團進行修改
+            {TOUR_UNLOCK.subtitle}
           </DialogDescription>
         </DialogHeader>
 
@@ -117,14 +118,14 @@ export function TourUnlockDialog({
               <AlertTriangle className="h-4 w-4 text-status-warning flex-shrink-0 mt-0.5" />
               <div className="text-sm text-morandi-primary">
                 <p className="font-medium">{tour.name}</p>
-                <p className="mt-1">解鎖後可修改報價單和行程，完成後請記得重新鎖定。</p>
+                <p className="mt-1">{TOUR_UNLOCK.warning}</p>
               </div>
             </div>
           </div>
 
           {/* 密碼輸入 */}
           <div className="space-y-2">
-            <Label htmlFor="password">登入密碼</Label>
+            <Label htmlFor="password">{TOUR_UNLOCK.label_password}</Label>
             <div className="relative">
               <Input
                 id="password"
@@ -134,7 +135,7 @@ export function TourUnlockDialog({
                   setPassword(e.target.value)
                   setError(null)
                 }}
-                placeholder="請輸入您的登入密碼"
+                placeholder={TOUR_UNLOCK.password_placeholder}
                 className="pr-10"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -154,12 +155,12 @@ export function TourUnlockDialog({
 
           {/* 修改原因 */}
           <div className="space-y-2">
-            <Label htmlFor="reason">修改原因（選填）</Label>
+            <Label htmlFor="reason">{TOUR_UNLOCK.label_reason}</Label>
             <Textarea
               id="reason"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="例如：客戶要求變更行程日期"
+              placeholder={TOUR_UNLOCK.reason_placeholder}
               rows={2}
             />
           </div>
@@ -175,7 +176,7 @@ export function TourUnlockDialog({
         <DialogFooter>
           <Button variant="outline" onClick={handleClose} disabled={submitting} className="gap-1">
             <X size={16} />
-            取消
+            {TOUR_UNLOCK.cancel}
           </Button>
           <Button
             onClick={handleUnlock}
@@ -184,7 +185,7 @@ export function TourUnlockDialog({
           >
             <Check size={16} className={submitting ? 'hidden' : ''} />
             <Loader2 className={submitting ? 'h-4 w-4 animate-spin' : 'hidden'} />
-            確認解鎖
+            {TOUR_UNLOCK.confirm}
           </Button>
         </DialogFooter>
       </DialogContent>

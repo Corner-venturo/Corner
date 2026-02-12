@@ -19,6 +19,7 @@ import type { Tour } from '@/stores/types'
 import type { ProposalPackage } from '@/types/proposal.types'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import { TOUR_LINK_ITINERARY } from '../constants'
 
 interface LinkItineraryToTourDialogProps {
   isOpen: boolean
@@ -116,7 +117,7 @@ export function LinkItineraryToTourDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Palette className="w-5 h-5 text-morandi-gold" />
-            <span>設計</span>
+            <span>{TOUR_LINK_ITINERARY.button_label}</span>
             <span className="text-sm text-morandi-secondary font-normal">- {tour.code}</span>
           </DialogTitle>
         </DialogHeader>
@@ -138,7 +139,7 @@ export function LinkItineraryToTourDialog({
                     </span>
                     {linkedPackage.days && (
                       <span className="text-xs text-morandi-secondary">
-                        ({linkedPackage.days} 天)
+                        {TOUR_LINK_ITINERARY.days_suffix(linkedPackage.days)}
                       </span>
                     )}
                   </div>
@@ -146,7 +147,7 @@ export function LinkItineraryToTourDialog({
               )}
 
               <p className="text-sm text-morandi-secondary text-center">
-                選擇設計類型
+                {TOUR_LINK_ITINERARY.select_type}
               </p>
 
               <div className="grid grid-cols-2 gap-3">
@@ -160,9 +161,9 @@ export function LinkItineraryToTourDialog({
                       <BookOpen className="w-5 h-5 text-morandi-gold" />
                     </div>
                   </div>
-                  <span className="font-medium text-morandi-primary block mb-1">手冊</span>
+                  <span className="font-medium text-morandi-primary block mb-1">{TOUR_LINK_ITINERARY.brochure}</span>
                   <p className="text-xs text-morandi-secondary">
-                    製作精美的行程手冊，可列印或分享 PDF
+                    {TOUR_LINK_ITINERARY.brochure_desc}
                   </p>
                 </button>
 
@@ -176,9 +177,9 @@ export function LinkItineraryToTourDialog({
                       <Globe className="w-5 h-5 text-morandi-gold" />
                     </div>
                   </div>
-                  <span className="font-medium text-morandi-primary block mb-1">網頁行程表</span>
+                  <span className="font-medium text-morandi-primary block mb-1">{TOUR_LINK_ITINERARY.web_itinerary}</span>
                   <p className="text-xs text-morandi-secondary">
-                    互動式網頁行程，可產生連結分享給客戶
+                    {TOUR_LINK_ITINERARY.web_itinerary_desc}
                   </p>
                 </button>
               </div>

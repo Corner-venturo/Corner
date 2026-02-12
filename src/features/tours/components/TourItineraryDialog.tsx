@@ -14,6 +14,7 @@ import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { PackageItineraryDialog } from '@/features/proposals/components/PackageItineraryDialog'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
+import { TOUR_ITINERARY_DIALOG } from '../constants'
 
 interface TourItineraryDialogProps {
   isOpen: boolean
@@ -154,7 +155,7 @@ export function TourItineraryDialog({
       <div className="fixed inset-0 z-[9100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
         <div className="bg-white rounded-lg p-6 flex items-center gap-3">
           <Loader2 className="w-5 h-5 animate-spin text-morandi-gold" />
-          <span className="text-sm text-morandi-secondary">載入行程表...</span>
+          <span className="text-sm text-morandi-secondary">{TOUR_ITINERARY_DIALOG.loading}</span>
         </div>
       </div>
     )

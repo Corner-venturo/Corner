@@ -30,6 +30,7 @@ import {
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
+import { TOUR_WIZARD } from '../constants'
 
 // 報價單資訊
 interface QuoteInfo {
@@ -62,9 +63,9 @@ interface TourConfirmationWizardProps {
 type WizardStep = 'quote' | 'itinerary' | 'confirm'
 
 const STEPS: { key: WizardStep; label: string; icon: typeof FileText }[] = [
-  { key: 'quote', label: '選擇報價單', icon: FileText },
-  { key: 'itinerary', label: '選擇行程', icon: Map },
-  { key: 'confirm', label: '確認鎖定', icon: Lock },
+  { key: 'quote', label: TOUR_WIZARD.step_quote, icon: FileText },
+  { key: 'itinerary', label: TOUR_WIZARD.step_itinerary, icon: Map },
+  { key: 'confirm', label: TOUR_WIZARD.step_confirm, icon: Lock },
 ]
 
 export function TourConfirmationWizard({
@@ -205,10 +206,10 @@ export function TourConfirmationWizard({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg">
             <Lock className="h-5 w-5 text-morandi-gold" />
-            確認精靈 - {tour.name}
+            {TOUR_WIZARD.title(tour.name)}
           </DialogTitle>
           <DialogDescription>
-            選擇要鎖定的報價單和行程版本，確認後將無法自由修改
+            {TOUR_WIZARD.subtitle}
           </DialogDescription>
         </DialogHeader>
 
@@ -256,13 +257,13 @@ export function TourConfirmationWizard({
                 <div className="space-y-4">
                   <h3 className="font-medium flex items-center gap-2">
                     <FileText className="h-4 w-4" />
-                    選擇報價單版本
+                    {TOUR_WIZARD.select_quote}
                   </h3>
                   {quotes.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
                       <FileText className="h-12 w-12 mx-auto mb-2 opacity-30" />
-                      <p>此團尚無報價單</p>
-                      <p className="text-sm">可跳過此步驟繼續</p>
+                      <p>{TOUR_WIZARD.no_quote}</p>
+                      <p className="text-sm">{TOUR_WIZARD.skip_step}</p>
                     </div>
                   ) : (
                     <div className="space-y-2">
@@ -280,7 +281,7 @@ export function TourConfirmationWizard({
                           <div className="flex items-center justify-between">
                             <div>
                               <div className="font-medium">
-                                {quote.name || quote.code || '未命名報價單'}
+                                {quote.name || quote.code || TOUR_WIZARD.unnamed_quote}
                                 <span className="ml-2 text-xs text-muted-foreground">
                                   v{quote.version}
                                 </span>
@@ -312,13 +313,13 @@ export function TourConfirmationWizard({
                 <div className="space-y-4">
                   <h3 className="font-medium flex items-center gap-2">
                     <Map className="h-4 w-4" />
-                    選擇行程版本
+                    {TOUR_WIZARD.select_itinerary}
                   </h3>
                   {itineraries.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
                       <Map className="h-12 w-12 mx-auto mb-2 opacity-30" />
-                      <p>此團尚無行程</p>
-                      <p className="text-sm">可跳過此步驟繼續</p>
+                      <p>{TOUR_WIZARD.no_itinerary}</p>
+                      <p className="text-sm">{TOUR_WIZARD.skip_step}</p>
                     </div>
                   ) : (
                     <div className="space-y-2">
@@ -336,13 +337,13 @@ export function TourConfirmationWizard({
                           <div className="flex items-center justify-between">
                             <div>
                               <div className="font-medium">
-                                {itinerary.title || '未命名行程'}
+                                {itinerary.title || TOUR_WIZARD.unnamed_itinerary}
                                 <span className="ml-2 text-xs text-muted-foreground">
                                   v{itinerary.version}
                                 </span>
                               </div>
                               <div className="text-sm text-muted-foreground flex items-center gap-1">
-                                最後更新: <DateCell date={itinerary.updated_at} showIcon={false} />
+                                {TOUR_WIZARD.last_updated} <DateCell date={itinerary.updated_at} showIcon={false} />
                               </div>
                             </div>
                             <div className="text-xs text-muted-foreground">
@@ -363,9 +364,9 @@ export function TourConfirmationWizard({
                     <div className="flex gap-3">
                       <AlertTriangle className="h-5 w-5 text-status-warning flex-shrink-0 mt-0.5" />
                       <div>
-                        <h4 className="font-medium text-morandi-primary">確認鎖定版本</h4>
+                        <h4 className="font-medium text-morandi-primary">{TOUR_WIZARD.confirm_lock_title}</h4>
                         <p className="text-sm text-morandi-secondary mt-1">
-                          鎖定後，報價單和行程將無法自由修改。如需修改，須先輸入密碼解鎖。
+                          {TOUR_WIZARD.confirm_lock_desc}
                         </p>
                       </div>
                     </div>
@@ -373,27 +374,27 @@ export function TourConfirmationWizard({
 
                   <div className="space-y-4">
                     <div className="p-4 rounded-lg border bg-muted/30">
-                      <div className="text-sm text-muted-foreground mb-1">選定報價單</div>
+                      <div className="text-sm text-muted-foreground mb-1">{TOUR_WIZARD.selected_quote}</div>
                       <div className="font-medium">
                         {selectedQuote ? (
                           <>
-                            {selectedQuote.name || selectedQuote.code || '未命名'} (v{selectedQuote.version})
+                            {selectedQuote.name || selectedQuote.code || TOUR_WIZARD.unnamed} (v{selectedQuote.version})
                           </>
                         ) : (
-                          <span className="text-muted-foreground">未選擇</span>
+                          <span className="text-muted-foreground">{TOUR_WIZARD.not_selected}</span>
                         )}
                       </div>
                     </div>
 
                     <div className="p-4 rounded-lg border bg-muted/30">
-                      <div className="text-sm text-muted-foreground mb-1">選定行程</div>
+                      <div className="text-sm text-muted-foreground mb-1">{TOUR_WIZARD.selected_itinerary}</div>
                       <div className="font-medium">
                         {selectedItinerary ? (
                           <>
-                            {selectedItinerary.title || '未命名'} (v{selectedItinerary.version})
+                            {selectedItinerary.title || TOUR_WIZARD.unnamed} (v{selectedItinerary.version})
                           </>
                         ) : (
-                          <span className="text-muted-foreground">未選擇</span>
+                          <span className="text-muted-foreground">{TOUR_WIZARD.not_selected}</span>
                         )}
                       </div>
                     </div>
@@ -410,18 +411,18 @@ export function TourConfirmationWizard({
             {currentStep !== 'quote' && (
               <Button variant="outline" onClick={handleBack} disabled={submitting} className="gap-2">
                 <ArrowLeft size={16} />
-                上一步
+                {TOUR_WIZARD.prev_step}
               </Button>
             )}
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting} className="gap-2">
               <X size={16} />
-              取消
+              {TOUR_WIZARD.cancel}
             </Button>
             {currentStep !== 'confirm' ? (
               <Button onClick={handleNext} disabled={loading} className="gap-2">
-                下一步
+                {TOUR_WIZARD.next_step}
                 <ArrowRight size={16} />
               </Button>
             ) : (
@@ -435,7 +436,7 @@ export function TourConfirmationWizard({
                 ) : (
                   <Lock className="h-4 w-4 mr-2" />
                 )}
-                確認鎖定
+                {TOUR_WIZARD.confirm_lock}
               </Button>
             )}
           </div>
