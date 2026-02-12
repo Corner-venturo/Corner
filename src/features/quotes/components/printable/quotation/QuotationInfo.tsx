@@ -6,6 +6,7 @@
 
 import React from 'react'
 import { formatDateTW } from '@/lib/utils/format-date'
+import { QUOTATION_INFO_LABELS } from '../../../constants/labels';
 
 interface QuotationInfoProps {
   quoteName: string
@@ -41,7 +42,7 @@ export const QuotationInfo: React.FC<QuotationInfoProps> = ({
         <div className="flex">
           <span className="font-semibold w-32">行程名稱：</span>
           <span className="flex-1 border-b border-border">
-            {quoteName || '精選旅遊行程'}
+            {quoteName || QUOTATION_INFO_LABELS.精選旅遊行程}
           </span>
         </div>
         <div className="flex">

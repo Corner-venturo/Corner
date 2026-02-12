@@ -6,6 +6,7 @@
 
 import React from 'react'
 import { MORANDI_COLORS } from './print-styles'
+import { PRINTABLE_QUICK_QUOTE_LABELS } from '../../../constants/labels';
 
 interface PrintHeaderProps {
   logoUrl?: string
@@ -31,7 +32,7 @@ export const PrintHeader: React.FC<PrintHeaderProps> = ({
         >
           <img
             src={logoUrl}
-            alt="角落旅行社 Logo"
+            alt={PRINTABLE_QUICK_QUOTE_LABELS.角落旅行社_Logo}
             style={{
               width: '100%',
               height: '100%',

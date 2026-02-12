@@ -13,6 +13,7 @@ import { QuickQuoteItem } from '@/types/quote.types'
 import { cn } from '@/lib/utils'
 import { DatePicker } from '@/components/ui/date-picker'
 import { CurrencyCell } from '@/components/table-cells'
+import { ACCOMMODATION_ITEM_ROW_LABELS, QUICK_QUOTE_DIALOG_LABELS, QUICK_QUOTE_SECTION_LABELS } from '../constants/labels';
 
 interface QuickQuoteSectionProps {
   items: QuickQuoteItem[]
@@ -140,7 +141,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
                 onChange={e => setField('customer_name', e.target.value)}
                 disabled={isReadOnly}
                 className="mt-1 h-8 text-sm"
-                placeholder="客戶名稱"
+                placeholder={QUICK_QUOTE_SECTION_LABELS.客戶名稱}
               />
             </div>
             <div>
@@ -150,7 +151,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
                 onChange={e => setField('contact_phone', e.target.value)}
                 disabled={isReadOnly}
                 className="mt-1 h-8 text-sm"
-                placeholder="聯絡電話"
+                placeholder={QUICK_QUOTE_SECTION_LABELS.聯絡電話}
               />
             </div>
             <div>
@@ -160,7 +161,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
                 onChange={e => setField('tour_code', e.target.value)}
                 disabled={isReadOnly}
                 className="mt-1 h-8 text-sm"
-                placeholder="團體編號"
+                placeholder={QUICK_QUOTE_SECTION_LABELS.團體編號}
               />
             </div>
             <div>
@@ -170,7 +171,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
                 onChange={e => setField('contact_address', e.target.value)}
                 disabled={isReadOnly}
                 className="mt-1 h-8 text-sm"
-                placeholder="通訊地址"
+                placeholder={QUICK_QUOTE_SECTION_LABELS.通訊地址}
               />
             </div>
             <div>
@@ -180,7 +181,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
                 onChange={e => setField('handler_name', e.target.value)}
                 disabled={isReadOnly}
                 className="mt-1 h-8 text-sm"
-                placeholder="承辦業務"
+                placeholder={QUICK_QUOTE_SECTION_LABELS.承辦業務}
               />
             </div>
             <div>
@@ -189,7 +190,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
                 value={customerInfo.issue_date}
                 onChange={(date) => setField('issue_date', date || '')}
                 disabled={isReadOnly}
-                placeholder="選擇日期"
+                placeholder={QUICK_QUOTE_DIALOG_LABELS.選擇日期}
                 className="mt-1 h-8 text-sm"
               />
             </div>
@@ -227,7 +228,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
                         <Input
                           value={item.description}
                           onChange={e => updateItem(item.id, 'description', e.target.value)}
-                          placeholder="項目說明"
+                          placeholder={QUICK_QUOTE_DIALOG_LABELS.項目說明}
                           disabled={isReadOnly}
                           className="h-7 text-sm"
                         />
@@ -288,7 +289,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
                         <Input
                           value={item.notes}
                           onChange={e => updateItem(item.id, 'notes', e.target.value)}
-                          placeholder="備註"
+                          placeholder={ACCOMMODATION_ITEM_ROW_LABELS.備註}
                           disabled={isReadOnly}
                           className="h-7 text-sm"
                         />
@@ -312,7 +313,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
                         colSpan={isReadOnly ? 5 : 8}
                         className="px-2 py-4 text-center text-sm text-morandi-secondary"
                       >
-                        尚無項目{!isReadOnly && '，點擊「新增」開始'}
+                        尚無項目{!isReadOnly && QUICK_QUOTE_SECTION_LABELS.點擊_新增_開始}
                       </td>
                     </tr>
                   )}
@@ -327,7 +328,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
             <textarea
               value={customerInfo.expense_description}
               onChange={e => setField('expense_description', e.target.value)}
-              placeholder="輸入整體報價說明，例如：含機票、住宿、餐食..."
+              placeholder={QUICK_QUOTE_SECTION_LABELS.輸入整體報價說明_例如_含機票_住宿_餐食}
               disabled={isReadOnly}
               className="w-full mt-1 min-h-[60px] p-2 border border-border rounded-md text-sm resize-y focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 disabled:bg-morandi-container/20"
             />

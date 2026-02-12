@@ -12,6 +12,7 @@ import { QuotationPricingTable } from './QuotationPricingTable'
 import { QuotationInclusions } from './QuotationInclusions'
 import { QuotationTerms } from './QuotationTerms'
 import { Quote } from '@/types/models.types'
+import { PRINTABLE_QUOTATION_LABELS } from '../../../constants/labels';
 
 interface TierPricingForPrint {
   participant_count: number
@@ -62,7 +63,7 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       onPrint={onPrint}
-      title="旅遊報價單"
+      title={PRINTABLE_QUOTATION_LABELS.旅遊報價單}
       subtitle="QUOTATION"
     >
       <QuotationInfo

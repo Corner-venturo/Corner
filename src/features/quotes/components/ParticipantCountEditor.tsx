@@ -13,6 +13,7 @@ import {
   generateUniqueId,
   calculateIdentityProfits,
 } from '../utils/priceCalculations'
+import { PARTICIPANT_COUNT_EDITOR_LABELS } from '../constants/labels';
 
 interface ParticipantCountEditorProps {
   participantCounts: ParticipantCounts
@@ -32,7 +33,7 @@ export const ParticipantCountEditor: React.FC<ParticipantCountEditorProps> = ({
   const handleAddTier = () => {
     const count = Number(newTierCount)
     if (!count || count <= 0) {
-      void alert('請輸入有效的人數', 'warning')
+      void alert(PARTICIPANT_COUNT_EDITOR_LABELS.請輸入有效的人數, 'warning')
       return
     }
 
@@ -69,7 +70,7 @@ export const ParticipantCountEditor: React.FC<ParticipantCountEditorProps> = ({
           inputMode="decimal"
           value={newTierCount}
           onChange={e => handleInputChange(e.target.value)}
-          placeholder="輸入人數（如：20、30、40）"
+          placeholder={PARTICIPANT_COUNT_EDITOR_LABELS.輸入人數_如_20_30_40}
           className="flex-1 h-9 text-sm"
           onKeyDown={e => {
             if (e.key === 'Enter') handleAddTier()

@@ -7,6 +7,7 @@ import { CostItem, CostItemResourceType } from '../types'
 import { RestaurantSelector, CombinedRestaurant } from '@/components/editor/RestaurantSelector'
 import { HotelSelector } from '@/components/editor/hotel-selector'
 import { AttractionSelector } from '@/components/editor/attraction-selector'
+import { RESOURCE_SELECT_BUTTON_LABELS } from '../constants/labels';
 
 interface ResourceSelectButtonProps {
   categoryId: string
@@ -132,9 +133,9 @@ export const ResourceSelectButton: React.FC<ResourceSelectButtonProps> = ({
 
   // 按鈕提示文字
   const buttonTitleMap: Record<string, string> = {
-    restaurant: '選擇餐廳',
-    hotel: '選擇飯店',
-    attraction: '選擇景點',
+    restaurant: RESOURCE_SELECT_BUTTON_LABELS.選擇餐廳,
+    hotel: RESOURCE_SELECT_BUTTON_LABELS.選擇飯店,
+    attraction: RESOURCE_SELECT_BUTTON_LABELS.選擇景點,
   }
   const buttonTitle = buttonTitleMap[resourceType]
 

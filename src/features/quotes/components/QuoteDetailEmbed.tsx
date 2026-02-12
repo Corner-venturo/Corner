@@ -47,6 +47,7 @@ import {
   generateUniqueId,
 } from '@/features/quotes/utils/priceCalculations'
 import { costCategories, TierPricing } from '@/features/quotes/types'
+import { QUOTE_DETAIL_EMBED_LABELS } from '../constants/labels';
 
 interface QuoteDetailEmbedProps {
   quoteId: string
@@ -76,7 +77,7 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
 
   // 檢查是否為特殊團報價單
   const relatedTour = quote?.tour_id ? tours.find(t => t.id === quote.tour_id) : null
-  const isSpecialTour = relatedTour?.status === '特殊團'
+  const isSpecialTour = relatedTour?.status === QUOTE_DETAIL_EMBED_LABELS.特殊團
   const isReadOnly = isSpecialTour
 
   // State
@@ -225,7 +226,7 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
     try {
       await updateQuote(quote.id, { confirmation_status: status })
     } catch {
-      toast.error('更新狀態失敗，請稍後再試')
+      toast.error(QUOTE_DETAIL_EMBED_LABELS.更新狀態失敗_請稍後再試)
     }
   }, [quote, updateQuote])
 
@@ -284,7 +285,7 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
 
   // Sync operations (simplified)
   const handleSyncToItinerary = useCallback(() => {
-    toast.info('同步功能開發中')
+    toast.info(QUOTE_DETAIL_EMBED_LABELS.同步功能開發中)
   }, [])
 
   const handleSyncAccommodationFromItinerary = useCallback(() => {
@@ -320,7 +321,7 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
 
   const handleOpenMealsImportDialog = useCallback(() => {
     if (!quote?.itinerary_id) {
-      toast.error('此報價單沒有關聯的行程表')
+      toast.error(QUOTE_DETAIL_EMBED_LABELS.此報價單沒有關聯的行程表)
       return
     }
     setShowImportMealsDialog(true)
@@ -380,7 +381,7 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
       const groupTransportCategory = newCategories.find(cat => cat.id === 'group-transport')
       if (groupTransportCategory) {
         groupTransportCategory.items = groupTransportCategory.items.filter(
-          item => !item.name.startsWith('Local 報價')
+          item => !item.name.startsWith(QUOTE_DETAIL_EMBED_LABELS.Local_報價)
         )
         const newItem: CostItem = {
           id: `local-${Date.now()}`,
@@ -440,7 +441,7 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
       <EditingWarningBanner
         resourceType="quote"
         resourceId={quote.id}
-        resourceName="此報價單"
+        resourceName={QUOTE_DETAIL_EMBED_LABELS.此報價單}
       />
 
       {showHeader && (

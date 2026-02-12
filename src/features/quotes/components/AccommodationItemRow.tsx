@@ -2,6 +2,7 @@ import React from 'react'
 import { CostItem } from '../types'
 import { CalcInput } from '@/components/ui/calc-input'
 import { cn } from '@/lib/utils'
+import { ACCOMMODATION_ITEM_ROW_LABELS } from '../constants/labels';
 
 interface AccommodationItemRowProps {
   item: CostItem
@@ -78,7 +79,7 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
             value={item.name}
             onChange={e => handleUpdateItem(categoryId, item.id, 'name', e.target.value)}
             className={`${inputClass} text-center`}
-            placeholder="房型名稱"
+            placeholder={ACCOMMODATION_ITEM_ROW_LABELS.房型名稱}
             disabled={isReadOnly}
           />
         )}
@@ -92,7 +93,7 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
           formula={item.quantity_formula}
           onFormulaChange={f => handleUpdateItem(categoryId, item.id, 'quantity_formula', f)}
           className={`${inputClass} text-center`}
-          placeholder="人"
+          placeholder={ACCOMMODATION_ITEM_ROW_LABELS.人}
           disabled={isReadOnly}
         />
       </td>
@@ -105,7 +106,7 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
           formula={item.unit_price_formula}
           onFormulaChange={f => handleUpdateItem(categoryId, item.id, 'unit_price_formula', f)}
           className={`${inputClass} text-center`}
-          placeholder="單價"
+          placeholder={ACCOMMODATION_ITEM_ROW_LABELS.單價}
           disabled={isReadOnly}
         />
       </td>
@@ -120,17 +121,17 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
         <div className="flex items-center justify-between">
           <input
             type="text"
-            value={isSameAsPrevious ? '續住' : (item.note || '')}
+            value={isSameAsPrevious ? ACCOMMODATION_ITEM_ROW_LABELS.續住 : (item.note || '')}
             onChange={e => handleUpdateItem(categoryId, item.id, 'note', e.target.value)}
             className={`${inputClass} flex-1`}
-            placeholder="備註"
+            placeholder={ACCOMMODATION_ITEM_ROW_LABELS.備註}
             disabled={isReadOnly || isSameAsPrevious}
           />
           {!isReadOnly && (
             <button
               onClick={() => handleRemoveItem(categoryId, item.id)}
               className="ml-2 w-4 h-4 flex items-center justify-center text-xs text-morandi-secondary hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-all flex-shrink-0"
-              title="刪除"
+              title={ACCOMMODATION_ITEM_ROW_LABELS.刪除}
             >
               ×
             </button>

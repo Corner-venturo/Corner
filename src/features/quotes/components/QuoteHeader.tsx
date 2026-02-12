@@ -17,6 +17,7 @@ import { QuoteConfirmationSection } from './QuoteConfirmationSection'
 import type { QuoteConfirmationStatus } from '@/types/quote.types'
 import type { Quote as StoreQuote } from '@/stores/types'
 import { Tour } from '@/types/tour.types'
+import { QUOTE_DIALOG_LABELS, QUOTE_HEADER_LABELS } from '../constants/labels';
 
 // 使用 CostCategory 而非 QuoteCategory，因為編輯器使用 CostCategory
 type QuoteWithCategories = Omit<StoreQuote, 'categories'> & {
@@ -153,7 +154,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
               }
             }}
             className="p-2 hover:bg-morandi-container rounded-lg transition-colors"
-            title={relatedTour ? '返回旅遊團' : '返回'}
+            title={relatedTour ? QUOTE_HEADER_LABELS.返回旅遊團 : QUOTE_HEADER_LABELS.返回}
           >
             <ArrowLeft size={20} className="text-morandi-secondary" />
           </button>
@@ -161,7 +162,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
           {/* 顯示旅遊團編號（如果有關聯） */}
           {relatedTour && (
             <div className="text-sm font-mono text-morandi-secondary">
-              <span className="text-morandi-gold" title="旅遊團編號">
+              <span className="text-morandi-gold" title={QUOTE_HEADER_LABELS.旅遊團編號}>
                 {relatedTour.code || '-'}
               </span>
             </div>
@@ -176,7 +177,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
               'text-lg font-bold text-morandi-primary bg-transparent border-0 focus:outline-none focus:bg-card px-2 py-1 rounded w-[180px]',
               isReadOnly && 'cursor-not-allowed opacity-60'
             )}
-            placeholder="輸入團體名稱"
+            placeholder={QUOTE_DIALOG_LABELS.輸入團體名稱}
           />
         </div>
 
@@ -204,7 +205,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
             <Button
               onClick={handleCreateItinerary}
               variant="outline"
-              title="建立行程表"
+              title={QUOTE_HEADER_LABELS.建立行程表}
               className="h-8 px-2.5 text-sm gap-1"
             >
               <Map size={14} />
@@ -244,7 +245,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
                 type="text"
                 value={tempContactInfo.contact_person}
                 onChange={e => setTempContactInfo(prev => ({ ...prev, contact_person: e.target.value }))}
-                placeholder="請輸入聯絡人姓名"
+                placeholder={QUOTE_HEADER_LABELS.請輸入聯絡人姓名}
                 className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
               />
             </div>
@@ -257,7 +258,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
                 type="text"
                 value={tempContactInfo.contact_phone}
                 onChange={e => setTempContactInfo(prev => ({ ...prev, contact_phone: e.target.value }))}
-                placeholder="請輸入聯絡電話"
+                placeholder={QUOTE_HEADER_LABELS.請輸入聯絡電話}
                 className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
               />
             </div>
@@ -270,7 +271,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
                 type="text"
                 value={tempContactInfo.contact_address}
                 onChange={e => setTempContactInfo(prev => ({ ...prev, contact_address: e.target.value }))}
-                placeholder="請輸入通訊地址"
+                placeholder={QUOTE_HEADER_LABELS.請輸入通訊地址}
                 className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
               />
             </div>

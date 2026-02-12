@@ -24,6 +24,7 @@ import {
 } from 'lucide-react'
 import { useToursSlim, invalidateTours } from '@/data'
 import type { Tour } from '@/stores/types'
+import { LINK_TOUR_DIALOG_LABELS } from '../constants/labels';
 
 interface LinkTourDialogProps {
   isOpen: boolean
@@ -60,7 +61,7 @@ export function LinkTourDialog({
   // 過濾可用的旅遊團（尚未關聯報價單的）
   const availableTours = useMemo(() => {
     return tours
-      .filter(t => !t.quote_id && t.status !== '取消')
+      .filter(t => !t.quote_id && t.status !== LINK_TOUR_DIALOG_LABELS.取消)
       .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
   }, [tours])
 
@@ -161,7 +162,7 @@ export function LinkTourDialog({
                         <div className="flex items-center gap-2">
                           <span className="font-mono text-sm text-[var(--morandi-gold)]">{tour.code}</span>
                           <span className="font-medium text-[var(--morandi-text)] truncate">
-                            {tour.name || '未命名旅遊團'}
+                            {tour.name || LINK_TOUR_DIALOG_LABELS.未命名旅遊團}
                           </span>
                         </div>
                         <div className="flex items-center gap-3 text-xs text-[var(--morandi-secondary)] mt-1">

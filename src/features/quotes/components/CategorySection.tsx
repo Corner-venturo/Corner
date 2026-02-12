@@ -25,6 +25,7 @@ import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { RatesDetailDialog } from '@/features/transportation-rates/components/RatesDetailDialog'
 import { TransportationRate } from '@/types/transportation-rates.types'
 import type { Country as FullCountry } from '@/stores/region-store'
+import { CATEGORY_SECTION_LABELS } from '../constants/labels';
 
 const categoryIcons: Record<string, React.ElementType> = {
   transport: Car,
@@ -175,7 +176,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
     logger.log('🔄 [CategorySection] 插入車資:', rate)
 
     // 建立描述：使用 route（例如「包車1天（100公里／10小時）」）
-    const description = rate.route || rate.category || rate.vehicle_type || '車資'
+    const description = rate.route || rate.category || rate.vehicle_type || CATEGORY_SECTION_LABELS.車資
 
     // 建立完整的 CostItem
     const newItem: CostItem = {
@@ -207,7 +208,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
               className="p-0.5 hover:bg-morandi-gold/10 rounded transition-colors"
-              title={isCollapsed ? '展開' : '收合'}
+              title={isCollapsed ? CATEGORY_SECTION_LABELS.展開 : CATEGORY_SECTION_LABELS.收合}
             >
               {isCollapsed ? (
                 <ChevronRight size={14} className="text-morandi-secondary" />
@@ -222,7 +223,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
             {category.id === 'group-transport' && (
               <button
                 className="p-1 hover:bg-morandi-gold/10 rounded transition-colors"
-                title="查看參考報價"
+                title={CATEGORY_SECTION_LABELS.查看參考報價}
                 onClick={fetchCountriesWithRates}
               >
                 <DollarSign size={14} className="text-morandi-gold" />
@@ -519,7 +520,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
               } else if (category.id === 'transport') {
                 // 機票小計：只計算成人
                 const adultTicketTotal = category.items
-                  .filter(item => item.name === '成人')
+                  .filter(item => item.name === CATEGORY_SECTION_LABELS.成人)
                   .reduce((sum, item) => sum + (item.total || 0), 0)
                 return adultTicketTotal.toLocaleString()
               } else {

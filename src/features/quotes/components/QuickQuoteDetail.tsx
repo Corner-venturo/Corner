@@ -20,6 +20,7 @@ import {
   QuickQuoteSummary,
 } from './quick-quote'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { QUICK_QUOTE_DETAIL_LABELS } from '../constants/labels';
 
 interface QuickQuoteDetailProps {
   quote: Quote
@@ -64,7 +65,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
   const handleDeleteVersion = async (versionIndex: number) => {
     const versions = quote.versions || []
     if (versions.length <= 1) {
-      await alert('至少需要保留一個版本', 'warning')
+      await alert(QUICK_QUOTE_DETAIL_LABELS.至少需要保留一個版本, 'warning')
       return
     }
 
@@ -72,7 +73,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
       const newVersions = versions.filter((_, idx) => idx !== versionIndex)
       await onUpdate({ versions: newVersions })
     } catch (error) {
-      await alert('刪除版本失敗', 'error')
+      await alert(QUICK_QUOTE_DETAIL_LABELS.刪除版本失敗, 'error')
     }
   }
 
@@ -152,7 +153,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                   className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
                 >
                   <Save className="h-4 w-4" />
-                  {isSaving ? '儲存中...' : '儲存'}
+                  {isSaving ? QUICK_QUOTE_DETAIL_LABELS.儲存中 : QUICK_QUOTE_DETAIL_LABELS.儲存}
                 </Button>
               </>
             )}

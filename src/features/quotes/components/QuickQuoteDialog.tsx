@@ -12,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Plus, X } from 'lucide-react'
 import { CurrencyCell } from '@/components/table-cells'
+import { ACCOMMODATION_ITEM_ROW_LABELS, QUICK_QUOTE_DIALOG_LABELS } from '../constants/labels';
 
 interface QuickQuoteItem {
   id: string
@@ -134,7 +135,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               <Input
                 value={formData.customer_name}
                 onChange={e => setFormField('customer_name', e.target.value)}
-                placeholder="輸入客戶姓名"
+                placeholder={QUICK_QUOTE_DIALOG_LABELS.輸入客戶姓名}
                 className="mt-1"
                 required
               />
@@ -144,7 +145,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               <Input
                 value={formData.contact_phone}
                 onChange={e => setFormField('contact_phone', e.target.value)}
-                placeholder="輸入聯絡電話"
+                placeholder={QUICK_QUOTE_DIALOG_LABELS.輸入聯絡電話}
                 className="mt-1"
               />
             </div>
@@ -153,7 +154,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               <Input
                 value={formData.contact_address}
                 onChange={e => setFormField('contact_address', e.target.value)}
-                placeholder="輸入通訊地址"
+                placeholder={QUICK_QUOTE_DIALOG_LABELS.輸入通訊地址}
                 className="mt-1"
               />
             </div>
@@ -162,7 +163,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               <Input
                 value={formData.tour_code}
                 onChange={e => setFormField('tour_code', e.target.value)}
-                placeholder="輸入團體編號"
+                placeholder={QUICK_QUOTE_DIALOG_LABELS.輸入團體編號}
                 className="mt-1"
               />
             </div>
@@ -171,7 +172,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               <Input
                 value={formData.handler_name}
                 onChange={e => setFormField('handler_name', e.target.value)}
-                placeholder="輸入承辦業務"
+                placeholder={QUICK_QUOTE_DIALOG_LABELS.輸入承辦業務}
                 className="mt-1"
               />
             </div>
@@ -180,7 +181,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               <DatePicker
                 value={formData.issue_date}
                 onChange={(date) => setFormField('issue_date', date || '')}
-                placeholder="選擇日期"
+                placeholder={QUICK_QUOTE_DIALOG_LABELS.選擇日期}
                 className="mt-1"
               />
             </div>
@@ -215,7 +216,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
                           type="text"
                           value={item.description || ''}
                           onChange={e => updateItem(item.id, 'description', e.target.value)}
-                          placeholder="項目說明"
+                          placeholder={QUICK_QUOTE_DIALOG_LABELS.項目說明}
                           className="h-8 w-full px-2 border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-morandi-gold"
                           autoComplete="off"
                         />
@@ -270,7 +271,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
                           type="text"
                           value={item.notes || ''}
                           onChange={e => updateItem(item.id, 'notes', e.target.value)}
-                          placeholder="備註"
+                          placeholder={ACCOMMODATION_ITEM_ROW_LABELS.備註}
                           className="h-8 w-full px-2 border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-morandi-gold"
                           autoComplete="off"
                         />

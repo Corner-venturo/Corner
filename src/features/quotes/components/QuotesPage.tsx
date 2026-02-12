@@ -16,11 +16,12 @@ import type { Tour, Quote } from '@/stores/types'
 import { cn } from '@/lib/utils'
 import { formatDateTW } from '@/lib/utils/format-date'
 import { CurrencyCell } from '@/components/table-cells'
+import { LOCAL_PRICING_DIALOG_LABELS, QUOTES_PAGE_LABELS, QUOTE_CONFIRMATION_SECTION_LABELS } from '../constants/labels';
 
 // 狀態篩選
 const STATUS_TABS = [
-  { value: 'all', label: '依團顯示', icon: LayoutList },
-  { value: 'standalone', label: '獨立報價單', icon: Archive },
+  { value: 'all', label: QUOTES_PAGE_LABELS.依團顯示, icon: LayoutList },
+  { value: 'standalone', label: QUOTES_PAGE_LABELS.獨立報價單, icon: Archive },
 ]
 
 export const QuotesPage: React.FC = () => {
@@ -96,7 +97,7 @@ export const QuotesPage: React.FC = () => {
   const tourColumns = [
     {
       key: 'code',
-      label: '團號',
+      label: QUOTES_PAGE_LABELS.團號,
       width: '140px',
       render: (_: unknown, row: Tour) => (
         <span className="font-mono text-sm text-morandi-gold font-medium">
@@ -106,7 +107,7 @@ export const QuotesPage: React.FC = () => {
     },
     {
       key: 'name',
-      label: '團名',
+      label: QUOTES_PAGE_LABELS.團名,
       render: (_: unknown, row: Tour) => (
         <div className="flex items-center gap-2">
           <span className="text-sm text-morandi-primary truncate">
@@ -117,7 +118,7 @@ export const QuotesPage: React.FC = () => {
     },
     {
       key: 'location',
-      label: '目的地',
+      label: QUOTES_PAGE_LABELS.目的地,
       width: '120px',
       render: (_: unknown, row: Tour) => (
         <div className="flex items-center gap-1 text-sm text-morandi-secondary">
@@ -128,7 +129,7 @@ export const QuotesPage: React.FC = () => {
     },
     {
       key: 'departure_date',
-      label: '出發日期',
+      label: QUOTES_PAGE_LABELS.出發日期,
       width: '120px',
       render: (_: unknown, row: Tour) => (
         <div className="flex items-center gap-1 text-sm text-morandi-secondary">
@@ -139,7 +140,7 @@ export const QuotesPage: React.FC = () => {
     },
     {
       key: 'max_participants',
-      label: '人數',
+      label: LOCAL_PRICING_DIALOG_LABELS.人數,
       width: '80px',
       render: (_: unknown, row: Tour) => (
         <div className="flex items-center gap-1 text-sm text-morandi-secondary">
@@ -150,7 +151,7 @@ export const QuotesPage: React.FC = () => {
     },
     {
       key: 'quote_count',
-      label: '報價單',
+      label: QUOTES_PAGE_LABELS.報價單,
       width: '100px',
       render: (_: unknown, row: Tour) => {
         const count = tourQuoteCounts[row.id] || 0
@@ -173,7 +174,7 @@ export const QuotesPage: React.FC = () => {
   const standaloneColumns = [
     {
       key: 'code',
-      label: '編號',
+      label: QUOTES_PAGE_LABELS.編號,
       width: '120px',
       render: (_: unknown, row: Quote) => (
         <span className="font-mono text-sm text-morandi-gold font-medium">
@@ -183,7 +184,7 @@ export const QuotesPage: React.FC = () => {
     },
     {
       key: 'name',
-      label: '報價單名稱',
+      label: QUOTES_PAGE_LABELS.報價單名稱,
       render: (_: unknown, row: Quote) => (
         <span className="text-sm text-morandi-primary">
           {row.name || '-'}
@@ -192,7 +193,7 @@ export const QuotesPage: React.FC = () => {
     },
     {
       key: 'customer_name',
-      label: '客戶',
+      label: QUOTE_CONFIRMATION_SECTION_LABELS.客戶,
       width: '150px',
       render: (_: unknown, row: Quote) => (
         <span className="text-sm text-morandi-secondary">
@@ -213,7 +214,7 @@ export const QuotesPage: React.FC = () => {
     },
     {
       key: 'total_amount',
-      label: '金額',
+      label: QUOTES_PAGE_LABELS.金額,
       width: '140px',
       render: (_: unknown, row: Quote) => (
         <CurrencyCell amount={(row as Quote & { total_amount?: number }).total_amount || row.total_cost || 0} />
@@ -221,7 +222,7 @@ export const QuotesPage: React.FC = () => {
     },
     {
       key: 'created_at',
-      label: '建立日期',
+      label: QUOTES_PAGE_LABELS.建立日期,
       width: '120px',
       render: (_: unknown, row: Quote) => (
         <div className="flex items-center gap-1 text-sm text-morandi-secondary">
@@ -237,11 +238,11 @@ export const QuotesPage: React.FC = () => {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="報價單管理"
+        title={QUOTES_PAGE_LABELS.報價單管理}
         icon={Calculator}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '報價單管理', href: '/quotes' },
+          { label: QUOTES_PAGE_LABELS.首頁, href: '/' },
+          { label: QUOTES_PAGE_LABELS.報價單管理, href: '/quotes' },
         ]}
         tabs={STATUS_TABS}
         activeTab={statusFilter}
@@ -249,7 +250,7 @@ export const QuotesPage: React.FC = () => {
         showSearch
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        searchPlaceholder="搜尋團號、團名..."
+        searchPlaceholder={QUOTES_PAGE_LABELS.搜尋團號_團名}
       />
 
       <div className="flex-1 overflow-hidden">
@@ -258,7 +259,7 @@ export const QuotesPage: React.FC = () => {
             columns={standaloneColumns}
             data={standaloneQuotes as Quote[]}
             loading={loading}
-            emptyMessage="尚無獨立報價單"
+            emptyMessage={QUOTES_PAGE_LABELS.尚無獨立報價單}
             onRowClick={(row) => {
               const quote = row as Quote & { quote_type?: string }
               // 根據報價單類型跳轉到不同頁面
@@ -275,7 +276,7 @@ export const QuotesPage: React.FC = () => {
             columns={tourColumns}
             data={filteredTours as Tour[]}
             loading={loading}
-            emptyMessage="尚無報價單資料"
+            emptyMessage={QUOTES_PAGE_LABELS.尚無報價單資料}
             onRowClick={(row) => setSelectedTour(row as Tour)}
             rowClassName={() => "cursor-pointer hover:bg-morandi-gold/5"}
           />

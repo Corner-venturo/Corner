@@ -15,6 +15,7 @@ import { QUOTE_STATUS_LABELS } from '@/lib/constants/quote-status'
 import { STATUS_COLORS } from '../constants'
 import { stripHtml } from '@/lib/utils/string-utils'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
+import { LOCAL_PRICING_DIALOG_LABELS, QUOTES_LIST_LABELS } from '../constants/labels';
 
 interface QuotesListProps {
   quotes: Quote[]
@@ -43,7 +44,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
     () => [
       {
         key: 'name',
-        label: '團體名稱',
+        label: QUOTES_LIST_LABELS.團體名稱,
         sortable: true,
         render: (value, row) => {
           const quote = row as Quote
@@ -67,7 +68,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
       },
       {
         key: 'created_by_name',
-        label: '作者',
+        label: QUOTES_LIST_LABELS.作者,
         sortable: true,
         render: (value, row) => {
           const quote = row as Quote
@@ -80,7 +81,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
       },
       {
         key: 'status',
-        label: '狀態',
+        label: QUOTES_LIST_LABELS.狀態,
         sortable: true,
         render: (value, row) => {
           const quote = row as Quote
@@ -98,7 +99,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
       },
       {
         key: 'group_size',
-        label: '人數',
+        label: LOCAL_PRICING_DIALOG_LABELS.人數,
         sortable: true,
         render: (value, row) => {
           const quote = row as Quote
@@ -112,7 +113,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
       },
       {
         key: 'total_cost',
-        label: '總成本',
+        label: QUOTES_LIST_LABELS.總成本,
         sortable: true,
         render: (value, row) => {
           const quote = row as Quote
@@ -121,7 +122,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
       },
       {
         key: 'created_at',
-        label: '建立時間',
+        label: QUOTES_LIST_LABELS.建立時間,
         sortable: true,
         render: (value, row) => {
           const quote = row as Quote
@@ -154,7 +155,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
                   ? 'text-morandi-gold hover:bg-morandi-gold/10'
                   : 'text-morandi-secondary hover:bg-morandi-secondary/10'
               )}
-              title={quote.is_pinned ? '取消置頂' : '設為置頂範本'}
+              title={quote.is_pinned ? QUOTES_LIST_LABELS.取消置頂 : QUOTES_LIST_LABELS.設為置頂範本}
             >
               <Pin size={16} />
             </Button>
@@ -164,7 +165,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
               size="iconSm"
               onClick={e => onPreview(quote.id, e)}
               className="text-morandi-green hover:bg-morandi-green/10"
-              title="預覽報價單"
+              title={QUOTES_LIST_LABELS.預覽報價單}
             >
               <Eye size={16} />
             </Button>
@@ -177,7 +178,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
                 onQuoteClick(quote.id)
               }}
               className="text-morandi-gold hover:bg-morandi-gold/10"
-              title="編輯報價單"
+              title={QUOTES_LIST_LABELS.編輯報價單}
             >
               <Calculator size={16} />
             </Button>
@@ -187,7 +188,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
               size="iconSm"
               onClick={e => onDuplicate(quote.id, e)}
               className="text-morandi-blue hover:bg-morandi-blue/10"
-              title="複製報價單"
+              title={QUOTES_LIST_LABELS.複製報價單}
             >
               <Copy size={16} />
             </Button>
@@ -198,7 +199,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
                 size="iconSm"
                 onClick={e => onReject(quote.id, e)}
                 className="text-morandi-secondary hover:bg-morandi-secondary/10"
-                title="作廢報價單"
+                title={QUOTES_LIST_LABELS.作廢報價單}
               >
                 <Archive size={16} />
               </Button>
@@ -209,7 +210,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
               size="iconSm"
               onClick={e => onDelete(quote.id, e)}
               className="text-morandi-red hover:bg-morandi-red/10"
-              title="刪除報價單"
+              title={QUOTES_LIST_LABELS.刪除報價單}
             >
               <Trash2 size={16} />
             </Button>

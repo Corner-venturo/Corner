@@ -13,6 +13,7 @@ import { X, Printer } from 'lucide-react'
 import { Quote, QuickQuoteItem } from '@/types/quote.types'
 import { supabase } from '@/lib/supabase/client'
 import { COMPANY } from '@/lib/constants/company'
+import { PRINTABLE_QUICK_QUOTE_LABELS } from '../constants/labels';
 
 interface PrintableQuickQuoteProps {
   quote: Quote
@@ -431,7 +432,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
               <div className="logo" style={{ position: 'absolute', left: 0, top: 0, width: '120px', height: '40px' }}>
                 <img
                   src={logoUrl}
-                  alt="角落旅行社 Logo"
+                  alt={PRINTABLE_QUICK_QUOTE_LABELS.角落旅行社_Logo}
                   style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left top' }}
                 />
               </div>

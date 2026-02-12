@@ -2,6 +2,7 @@ import React from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, RefreshCw, X } from 'lucide-react'
+import { SYNC_TO_ITINERARY_DIALOG_LABELS } from '../constants/labels';
 
 export interface MealDiff {
   day: number
@@ -35,7 +36,7 @@ export const SyncToItineraryDialog: React.FC<SyncToItineraryDialogProps> = ({
     <FormDialog
       open={isOpen}
       onOpenChange={onClose}
-      title="同步餐飲到行程表"
+      title={SYNC_TO_ITINERARY_DIALOG_LABELS.同步餐飲到行程表}
       onSubmit={handleConfirm}
       onCancel={onClose}
       submitDisabled={diffs.length === 0}
@@ -96,7 +97,7 @@ export const SyncToItineraryDialog: React.FC<SyncToItineraryDialogProps> = ({
                         <ArrowRight size={14} className="text-morandi-gold inline" />
                       </td>
                       <td className="py-2 px-3">
-                        <span className={diff.newValue === '自理' ? 'text-status-warning font-medium' : 'text-morandi-green font-medium'}>
+                        <span className={diff.newValue === SYNC_TO_ITINERARY_DIALOG_LABELS.自理 ? 'text-status-warning font-medium' : 'text-morandi-green font-medium'}>
                           {diff.newValue || <span className="text-morandi-muted">（空）</span>}
                         </span>
                       </td>

@@ -23,6 +23,7 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
+import { ACCOMMODATION_ITEM_ROW_LABELS, QUICK_QUOTE_DIALOG_LABELS, QUICK_QUOTE_ITEMS_TABLE_LABELS } from '../../constants/labels';
 
 interface QuickQuoteItemsTableProps {
   items: QuickQuoteItem[]
@@ -166,7 +167,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
           onKeyDown={handleKeyDown}
           onCompositionStart={handleCompositionStart}
           onCompositionEnd={e => handleCompositionEnd(item.id, 'description', e)}
-          placeholder="項目說明"
+          placeholder={QUICK_QUOTE_DIALOG_LABELS.項目說明}
           disabled={!isEditing}
           className={inputClass}
         />
@@ -189,7 +190,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
           onFocus={() => handleFocus('quantity', setQuantityExpr)}
           onBlur={() => handleExpressionCommit('quantity', quantityExpr, setQuantityExpr)}
           disabled={!isEditing}
-          placeholder="可輸入算式"
+          placeholder={QUICK_QUOTE_ITEMS_TABLE_LABELS.可輸入算式}
           className={cn(
             inputClass,
             'text-center',
@@ -216,7 +217,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
             }}
             onFocus={() => handleFocus('cost', setCostExpr)}
             onBlur={() => handleExpressionCommit('cost', costExpr, setCostExpr)}
-            placeholder="可輸入算式"
+            placeholder={QUICK_QUOTE_ITEMS_TABLE_LABELS.可輸入算式}
             className={cn(
               inputClass,
               'text-right',
@@ -244,7 +245,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
           onFocus={() => handleFocus('unit_price', setUnitPriceExpr)}
           onBlur={() => handleExpressionCommit('unit_price', unitPriceExpr, setUnitPriceExpr)}
           disabled={!isEditing}
-          placeholder="可輸入算式"
+          placeholder={QUICK_QUOTE_ITEMS_TABLE_LABELS.可輸入算式}
           className={cn(
             inputClass,
             'text-right',
@@ -270,7 +271,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
           onKeyDown={handleKeyDown}
           onCompositionStart={handleCompositionStart}
           onCompositionEnd={e => handleCompositionEnd(item.id, 'notes', e)}
-          placeholder="備註"
+          placeholder={ACCOMMODATION_ITEM_ROW_LABELS.備註}
           disabled={!isEditing}
           className={inputClass}
         />
@@ -474,7 +475,7 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
                     className="px-3 py-8 text-center text-morandi-secondary border border-morandi-gold/20"
                   >
                     尚無項目
-                    {isEditing && '，點擊「新增項目」開始'}
+                    {isEditing && QUICK_QUOTE_ITEMS_TABLE_LABELS.點擊_新增項目_開始}
                   </td>
                 </tr>
               )}

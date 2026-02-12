@@ -22,6 +22,7 @@ import { QuoteVersion } from '@/stores/types'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { stripHtml } from '@/lib/utils/string-utils'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
+import { QUICK_QUOTE_DETAIL_LABELS, QUICK_QUOTE_VERSION_PANEL_LABELS } from '../../constants/labels';
 
 interface QuickQuoteVersionPanelProps {
   versions: QuoteVersion[]
@@ -63,7 +64,7 @@ export const QuickQuoteVersionPanel: React.FC<QuickQuoteVersionPanelProps> = ({
     const confirmed = await confirm(
       `確定要刪除「${stripHtml(versions[versionIndex].name) || `版本 ${versions[versionIndex].version}`}」嗎？`,
       {
-        title: '刪除版本',
+        title: QUICK_QUOTE_VERSION_PANEL_LABELS.刪除版本,
         type: 'warning',
       }
     )
@@ -130,7 +131,7 @@ export const QuickQuoteVersionPanel: React.FC<QuickQuoteVersionPanelProps> = ({
                               handleDeleteVersion(originalIndex)
                             }}
                             className="p-1 hover:bg-status-danger-bg rounded transition-colors"
-                            title="刪除版本"
+                            title={QUICK_QUOTE_VERSION_PANEL_LABELS.刪除版本}
                           >
                             <Trash2 className="h-4 w-4 text-status-danger" />
                           </button>
@@ -159,7 +160,7 @@ export const QuickQuoteVersionPanel: React.FC<QuickQuoteVersionPanelProps> = ({
           </DialogHeader>
           <div className="py-4">
             <Input
-              placeholder="版本名稱"
+              placeholder={QUICK_QUOTE_VERSION_PANEL_LABELS.版本名稱}
               value={versionName}
               onChange={(e) => onSetVersionName(e.target.value)}
               onKeyDown={(e) => {
@@ -179,7 +180,7 @@ export const QuickQuoteVersionPanel: React.FC<QuickQuoteVersionPanelProps> = ({
               disabled={isSaving || !versionName.trim()}
               className="bg-morandi-gold hover:bg-morandi-gold-hover"
             >
-              {isSaving ? '儲存中...' : '儲存'}
+              {isSaving ? QUICK_QUOTE_DETAIL_LABELS.儲存中 : QUICK_QUOTE_DETAIL_LABELS.儲存}
             </Button>
           </DialogFooter>
         </DialogContent>

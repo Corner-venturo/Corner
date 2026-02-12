@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import type { Tour } from '@/types/tour.types'
+import { QUOTE_DIALOG_LABELS } from '../constants/labels';
 
 interface QuoteDialogProps {
   open: boolean
@@ -80,7 +81,7 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
             <label className="text-sm font-medium text-morandi-primary">關聯旅遊團（選填）</label>
             <Combobox
               options={[
-                { value: '', label: '獨立報價單（無旅遊團）' },
+                { value: '', label: QUOTE_DIALOG_LABELS.獨立報價單_無旅遊團 },
                 ...tours
                   .filter(t => !t._deleted)
                   .map(tour => ({
@@ -113,8 +114,8 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
                   }
                 }
               }}
-              placeholder="搜尋或選擇旅遊團..."
-              emptyMessage="找不到旅遊團"
+              placeholder={QUOTE_DIALOG_LABELS.搜尋或選擇旅遊團}
+              emptyMessage={QUOTE_DIALOG_LABELS.找不到旅遊團}
               className="mt-1"
             />
             <p className="text-xs text-morandi-secondary mt-1">
@@ -128,7 +129,7 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
             <Input
               value={formData.name}
               onChange={e => setFormField('name', e.target.value)}
-              placeholder="輸入團體名稱"
+              placeholder={QUOTE_DIALOG_LABELS.輸入團體名稱}
               className="mt-1"
             />
           </div>
@@ -184,7 +185,7 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
                 <Input
                   value={formData.code}
                   onChange={e => setFormField('code', e.target.value)}
-                  placeholder="例如：JP-BASIC, EU-LUXURY"
+                  placeholder={QUOTE_DIALOG_LABELS.例如_JP_BASIC_EU_LUXURY}
                   className="mt-1"
                 />
                 <p className="text-xs text-morandi-secondary mt-1">不填寫則自動生成 Q 開頭的編號</p>

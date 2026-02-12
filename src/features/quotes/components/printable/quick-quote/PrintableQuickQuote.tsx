@@ -12,6 +12,7 @@ import { QuickQuoteItemsTable } from './QuickQuoteItemsTable'
 import { QuickQuoteSummary } from './QuickQuoteSummary'
 import { QuickQuotePaymentInfo } from './QuickQuotePaymentInfo'
 import { QuickQuoteReceiptInfo } from './QuickQuoteReceiptInfo'
+import { PRINTABLE_QUICK_QUOTE_LABELS } from '../../../constants/labels';
 
 interface PrintableQuickQuoteProps {
   quote: Quote
@@ -35,7 +36,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       onPrint={onPrint}
-      title="報價請款單"
+      title={PRINTABLE_QUICK_QUOTE_LABELS.報價請款單}
       subtitle="QUOTATION"
     >
       <QuickQuoteCustomerInfo quote={quote} />

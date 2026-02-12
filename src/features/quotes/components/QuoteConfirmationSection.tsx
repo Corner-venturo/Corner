@@ -23,6 +23,7 @@ import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import type { QuoteConfirmationStatus, QuoteConfirmationLog, ConfirmationResult } from '@/types/quote.types'
 import { DateCell } from '@/components/table-cells'
+import { QUOTE_CONFIRMATION_SECTION_LABELS } from '../constants/labels';
 
 interface QuoteConfirmationSectionProps {
   quoteId: string
@@ -40,11 +41,11 @@ interface QuoteConfirmationSectionProps {
 
 // 確認狀態配置
 const confirmationStatusConfig: Record<QuoteConfirmationStatus, { label: string; color: string; bgColor: string }> = {
-  draft: { label: '未確認', color: 'text-morandi-secondary', bgColor: 'bg-morandi-container' },
-  pending: { label: '待確認', color: 'text-status-warning', bgColor: 'bg-status-warning-bg' },
-  customer_confirmed: { label: '客戶已確認', color: 'text-status-success', bgColor: 'bg-status-success-bg' },
-  staff_confirmed: { label: '業務已確認', color: 'text-morandi-gold', bgColor: 'bg-morandi-gold/10' },
-  closed: { label: '已成交', color: 'text-morandi-green', bgColor: 'bg-morandi-green/10' },
+  draft: { label: QUOTE_CONFIRMATION_SECTION_LABELS.未確認, color: 'text-morandi-secondary', bgColor: 'bg-morandi-container' },
+  pending: { label: QUOTE_CONFIRMATION_SECTION_LABELS.待確認, color: 'text-status-warning', bgColor: 'bg-status-warning-bg' },
+  customer_confirmed: { label: QUOTE_CONFIRMATION_SECTION_LABELS.客戶已確認, color: 'text-status-success', bgColor: 'bg-status-success-bg' },
+  staff_confirmed: { label: QUOTE_CONFIRMATION_SECTION_LABELS.業務已確認, color: 'text-morandi-gold', bgColor: 'bg-morandi-gold/10' },
+  closed: { label: QUOTE_CONFIRMATION_SECTION_LABELS.已成交, color: 'text-morandi-green', bgColor: 'bg-morandi-green/10' },
 }
 
 export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> = ({
@@ -84,7 +85,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
   // 發送確認連結
   const handleSendConfirmationLink = async () => {
     if (!staffId) {
-      toast.error('請先登入')
+      toast.error(QUOTE_CONFIRMATION_SECTION_LABELS.請先登入)
       return
     }
 
@@ -103,18 +104,18 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
       const result: ConfirmationResult = await response.json()
 
       if (!result.success) {
-        toast.error(result.error || '發送失敗')
+        toast.error(result.error || QUOTE_CONFIRMATION_SECTION_LABELS.發送失敗)
         return
       }
 
-      toast.success('確認連結已產生')
+      toast.success(QUOTE_CONFIRMATION_SECTION_LABELS.確認連結已產生)
       onConfirmationStatusChange?.('pending')
 
       // 自動複製連結
       if (result.token) {
         const url = `${window.location.origin}/confirm/${result.token}`
         await navigator.clipboard.writeText(url)
-        toast.success('連結已複製到剪貼簿')
+        toast.success(QUOTE_CONFIRMATION_SECTION_LABELS.連結已複製到剪貼簿)
       }
     } catch (error) {
       logger.error('發送確認連結失敗:', error)
@@ -131,10 +132,10 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
     try {
       await navigator.clipboard.writeText(confirmationUrl)
       setCopied(true)
-      toast.success('連結已複製')
+      toast.success(QUOTE_CONFIRMATION_SECTION_LABELS.連結已複製)
       setTimeout(() => setCopied(false), 2000)
     } catch {
-      toast.error('複製失敗')
+      toast.error(QUOTE_CONFIRMATION_SECTION_LABELS.複製失敗)
     }
   }
 
@@ -161,11 +162,11 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
       const result: ConfirmationResult = await response.json()
 
       if (!result.success) {
-        toast.error(result.error || '確認失敗')
+        toast.error(result.error || QUOTE_CONFIRMATION_SECTION_LABELS.確認失敗)
         return
       }
 
-      toast.success('報價單已確認')
+      toast.success(QUOTE_CONFIRMATION_SECTION_LABELS.報價單已確認)
       onConfirmationStatusChange?.('staff_confirmed')
       setShowStaffConfirmDialog(false)
       setConfirmNotes('')
@@ -196,12 +197,12 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
 
   // 動作標籤
   const actionLabels: Record<string, string> = {
-    send_link: '發送確認連結',
-    resend_link: '重新發送連結',
-    customer_confirmed: '客戶確認',
-    staff_confirmed: '業務確認',
-    revoked: '撤銷確認',
-    expired: '連結過期',
+    send_link: QUOTE_CONFIRMATION_SECTION_LABELS.發送確認連結,
+    resend_link: QUOTE_CONFIRMATION_SECTION_LABELS.重新發送連結,
+    customer_confirmed: QUOTE_CONFIRMATION_SECTION_LABELS.客戶確認,
+    staff_confirmed: QUOTE_CONFIRMATION_SECTION_LABELS.業務確認,
+    revoked: QUOTE_CONFIRMATION_SECTION_LABELS.撤銷確認,
+    expired: QUOTE_CONFIRMATION_SECTION_LABELS.連結過期,
   }
 
   return (
@@ -243,7 +244,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
                       <div className="font-medium">
                         {confirmedByName}
                         <span className="text-xs text-morandi-secondary ml-1">
-                          ({confirmedByType === 'customer' ? '客戶' : '業務'})
+                          ({confirmedByType === 'customer' ? QUOTE_CONFIRMATION_SECTION_LABELS.客戶 : QUOTE_CONFIRMATION_SECTION_LABELS.業務})
                         </span>
                       </div>
                     </>
@@ -345,7 +346,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
               <textarea
                 value={confirmNotes}
                 onChange={e => setConfirmNotes(e.target.value)}
-                placeholder="例如：客戶電話確認同意"
+                placeholder={QUOTE_CONFIRMATION_SECTION_LABELS.例如_客戶電話確認同意}
                 rows={3}
                 className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 resize-none"
               />
@@ -367,7 +368,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
             >
               <Check size={16} />
-              {isLoading ? '確認中...' : '確認報價'}
+              {isLoading ? QUOTE_CONFIRMATION_SECTION_LABELS.確認中 : QUOTE_CONFIRMATION_SECTION_LABELS.確認報價}
             </Button>
           </DialogFooter>
         </DialogContent>

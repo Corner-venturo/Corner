@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Loader2, MapPin, X, Download } from 'lucide-react'
 import { CostItem } from '../types'
+import { IMPORT_ACTIVITIES_DIALOG_LABELS } from '../constants/labels';
 
 interface ActivityItem {
   day: number
@@ -121,7 +122,7 @@ export function ImportActivitiesDialog({
               onClick={handleSelectAll}
               className="text-xs text-[var(--morandi-gold)] hover:underline"
             >
-              {selectedActivities.size === activities.length ? '取消全選' : '全選'}
+              {selectedActivities.size === activities.length ? IMPORT_ACTIVITIES_DIALOG_LABELS.取消全選 : IMPORT_ACTIVITIES_DIALOG_LABELS.全選}
             </button>
           </div>
 

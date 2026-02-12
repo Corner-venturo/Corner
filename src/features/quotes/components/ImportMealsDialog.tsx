@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Loader2, UtensilsCrossed, Sun, Cloud, Moon, X, Download } from 'lucide-react'
 import { CostItem } from '../types'
+import { IMPORT_ACTIVITIES_DIALOG_LABELS, IMPORT_MEALS_DIALOG_LABELS } from '../constants/labels';
 
 interface MealItem {
   day: number
@@ -158,7 +159,7 @@ export function ImportMealsDialog({
               onClick={handleSelectAll}
               className="text-xs text-[var(--morandi-gold)] hover:underline"
             >
-              {selectedMeals.size === filteredMeals.length ? '取消全選' : '全選'}
+              {selectedMeals.size === filteredMeals.length ? IMPORT_ACTIVITIES_DIALOG_LABELS.取消全選 : IMPORT_ACTIVITIES_DIALOG_LABELS.全選}
             </button>
           </div>
 

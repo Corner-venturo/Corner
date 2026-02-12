@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { X } from 'lucide-react'
 import { PriceInputRow } from './PriceInputRow'
 import { TierPricing } from '../types'
+import { CATEGORY_SECTION_LABELS, COST_ITEM_ROW_LABELS, PRICE_SUMMARY_CARD_LABELS } from '../constants/labels';
 
 interface PriceSummaryCardProps {
   tier: TierPricing
@@ -67,7 +68,7 @@ export const PriceSummaryCard: React.FC<PriceSummaryCardProps> = ({
         </thead>
         <tbody>
           <PriceInputRow
-            label="單人房"
+            label={PRICE_SUMMARY_CARD_LABELS.單人房}
             cost={tier.identity_costs.single_room}
             sellingPrice={tier.selling_prices.single_room}
             profit={tier.identity_profits.single_room}
@@ -75,7 +76,7 @@ export const PriceSummaryCard: React.FC<PriceSummaryCardProps> = ({
             isReadOnly={isReadOnly}
           />
           <PriceInputRow
-            label="成人"
+            label={CATEGORY_SECTION_LABELS.成人}
             cost={tier.identity_costs.adult}
             sellingPrice={tier.selling_prices.adult}
             profit={tier.identity_profits.adult}
@@ -83,7 +84,7 @@ export const PriceSummaryCard: React.FC<PriceSummaryCardProps> = ({
             isReadOnly={isReadOnly}
           />
           <PriceInputRow
-            label="小孩"
+            label={PRICE_SUMMARY_CARD_LABELS.小孩}
             cost={tier.identity_costs.child_with_bed}
             sellingPrice={tier.selling_prices.child_with_bed}
             profit={tier.identity_profits.child_with_bed}
@@ -91,7 +92,7 @@ export const PriceSummaryCard: React.FC<PriceSummaryCardProps> = ({
             isReadOnly={isReadOnly}
           />
           <PriceInputRow
-            label="不佔床"
+            label={PRICE_SUMMARY_CARD_LABELS.不佔床}
             cost={tier.identity_costs.child_no_bed}
             sellingPrice={tier.selling_prices.child_no_bed}
             profit={tier.identity_profits.child_no_bed}
@@ -99,7 +100,7 @@ export const PriceSummaryCard: React.FC<PriceSummaryCardProps> = ({
             isReadOnly={isReadOnly}
           />
           <PriceInputRow
-            label="嬰兒"
+            label={COST_ITEM_ROW_LABELS.嬰兒}
             cost={tier.identity_costs.infant}
             sellingPrice={tier.selling_prices.infant}
             profit={tier.identity_profits.infant}

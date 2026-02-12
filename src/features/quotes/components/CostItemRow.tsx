@@ -2,6 +2,7 @@ import React from 'react'
 import { CostItem } from '../types'
 import { ResourceSelectButton } from './ResourceSelectButton'
 import { CalcInput } from '@/components/ui/calc-input'
+import { ACCOMMODATION_ITEM_ROW_LABELS, CATEGORY_SECTION_LABELS, COST_ITEM_ROW_LABELS } from '../constants/labels';
 
 interface CostItemRowProps {
   item: CostItem
@@ -22,7 +23,7 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
   handleRemoveItem,
 }) => {
   // 判斷是否為兒童或嬰兒（顯示為灰色）
-  const isChildOrInfantTicket = item.name === '兒童' || item.name === '嬰兒'
+  const isChildOrInfantTicket = item.name === COST_ITEM_ROW_LABELS.兒童 || item.name === COST_ITEM_ROW_LABELS.嬰兒
   // 判斷是否為餐飲類別（顯示自理選項）
   const isMealItem = categoryId === 'meals'
   // 判斷是否為自理餐（顯示為淡色）
@@ -44,7 +45,7 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
           value={item.name}
           onChange={e => handleUpdateItem(categoryId, item.id, 'name', e.target.value)}
           className={`${inputClass} text-center`}
-          placeholder="輸入項目名稱"
+          placeholder={COST_ITEM_ROW_LABELS.輸入項目名稱}
         />
       </td>
       <td className="py-3 px-4 text-sm text-morandi-secondary text-center table-divider">
@@ -57,14 +58,14 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
         />
       </td>
       <td className="py-3 px-4 text-sm text-morandi-secondary text-center table-divider">
-        {item.name === '成人' ? (
+        {item.name === CATEGORY_SECTION_LABELS.成人 ? (
           <CalcInput
             value={item.adult_price}
             onChange={val => handleUpdateItem(categoryId, item.id, 'adult_price', val)}
             formula={item.adult_price_formula}
             onFormulaChange={f => handleUpdateItem(categoryId, item.id, 'adult_price_formula', f)}
             className={`${inputClass} text-center`}
-            placeholder="成人票價"
+            placeholder={COST_ITEM_ROW_LABELS.成人票價}
           />
         ) : item.name === '兒童' ? (
           <CalcInput
@@ -73,7 +74,7 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
             formula={item.child_price_formula}
             onFormulaChange={f => handleUpdateItem(categoryId, item.id, 'child_price_formula', f)}
             className={`${inputClass} text-center`}
-            placeholder="兒童票價"
+            placeholder={COST_ITEM_ROW_LABELS.兒童票價}
           />
         ) : item.name === '嬰兒' ? (
           <CalcInput
@@ -82,7 +83,7 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
             formula={item.infant_price_formula}
             onFormulaChange={f => handleUpdateItem(categoryId, item.id, 'infant_price_formula', f)}
             className={`${inputClass} text-center`}
-            placeholder="嬰兒票價"
+            placeholder={COST_ITEM_ROW_LABELS.嬰兒票價}
           />
         ) : (
           <CalcInput
@@ -106,7 +107,7 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
             value={item.note || ''}
             onChange={e => handleUpdateItem(categoryId, item.id, 'note', e.target.value)}
             className={`${inputClass} flex-1`}
-            placeholder="備註"
+            placeholder={ACCOMMODATION_ITEM_ROW_LABELS.備註}
           />
           <div className="flex items-center gap-1 ml-2 flex-shrink-0">
             {/* 資源選擇按鈕（餐廳/飯店/景點） */}
@@ -124,7 +125,7 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
                     ? 'bg-morandi-gold text-white'
                     : 'bg-morandi-container/50 text-morandi-secondary hover:bg-morandi-container'
                 }`}
-                title={item.is_self_arranged ? '取消自理' : '設為自理'}
+                title={item.is_self_arranged ? COST_ITEM_ROW_LABELS.取消自理 : COST_ITEM_ROW_LABELS.設為自理}
               >
                 自理
               </button>
@@ -132,7 +133,7 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
             <button
               onClick={() => handleRemoveItem(categoryId, item.id)}
               className="w-4 h-4 flex items-center justify-center text-xs text-morandi-secondary hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-all"
-              title="刪除"
+              title={ACCOMMODATION_ITEM_ROW_LABELS.刪除}
             >
               ×
             </button>

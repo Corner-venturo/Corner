@@ -6,6 +6,7 @@
 
 import React from 'react'
 import { MORANDI_COLORS, TABLE_STYLES } from '../shared/print-styles'
+import { CATEGORY_SECTION_LABELS, COST_ITEM_ROW_LABELS, QUOTATION_PRICING_TABLE_LABELS } from '../../../constants/labels';
 
 interface SellingPrices {
   adult: number
@@ -30,11 +31,11 @@ export const QuotationPricingTable: React.FC<QuotationPricingTableProps> = ({
   tierPricings = [],
 }) => {
   const priceItems = [
-    { key: 'adult', label: '成人', value: sellingPrices.adult },
-    { key: 'child_with_bed', label: '小孩佔床', value: sellingPrices.child_with_bed },
-    { key: 'child_no_bed', label: '小孩不佔床', value: sellingPrices.child_no_bed },
-    { key: 'single_room', label: '單人房差價', value: sellingPrices.single_room },
-    { key: 'infant', label: '嬰兒', value: sellingPrices.infant },
+    { key: 'adult', label: CATEGORY_SECTION_LABELS.成人, value: sellingPrices.adult },
+    { key: 'child_with_bed', label: QUOTATION_PRICING_TABLE_LABELS.小孩佔床, value: sellingPrices.child_with_bed },
+    { key: 'child_no_bed', label: QUOTATION_PRICING_TABLE_LABELS.小孩不佔床, value: sellingPrices.child_no_bed },
+    { key: 'single_room', label: QUOTATION_PRICING_TABLE_LABELS.單人房差價, value: sellingPrices.single_room },
+    { key: 'infant', label: COST_ITEM_ROW_LABELS.嬰兒, value: sellingPrices.infant },
   ]
 
   return (

@@ -3,6 +3,7 @@
 import React from 'react'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
+import { QUICK_QUOTE_DIALOG_LABELS } from '../../constants/labels';
 
 interface FormData {
   customer_name: string
@@ -91,7 +92,7 @@ export const QuickQuoteHeader: React.FC<QuickQuoteHeaderProps> = ({
             value={formData.issue_date}
             onChange={(date) => onFieldChange('issue_date', date || '')}
             disabled={!isEditing}
-            placeholder="選擇日期"
+            placeholder={QUICK_QUOTE_DIALOG_LABELS.選擇日期}
             className="mt-1"
           />
         </div>

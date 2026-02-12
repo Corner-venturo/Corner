@@ -3,6 +3,7 @@
 import React from 'react'
 import { Input } from '@/components/ui/input'
 import { CurrencyCell } from '@/components/table-cells'
+import { QUICK_QUOTE_SECTION_LABELS } from '../../constants/labels';
 
 interface QuickQuoteSummaryProps {
   totalCost: number
@@ -52,7 +53,7 @@ export const QuickQuoteSummary: React.FC<QuickQuoteSummaryProps> = ({
             <textarea
               value={expenseDescription}
               onChange={e => onExpenseDescriptionChange(e.target.value)}
-              placeholder="輸入整體報價說明，例如：含機票、住宿、餐食..."
+              placeholder={QUICK_QUOTE_SECTION_LABELS.輸入整體報價說明_例如_含機票_住宿_餐食}
               className="w-full min-h-[100px] p-3 border border-border rounded-md text-sm resize-y focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
             />
           ) : (

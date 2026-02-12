@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog'
 import { Plus, Trash2, MapPin, AlertTriangle, X, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ACCOMMODATION_ITEM_ROW_LABELS, LOCAL_PRICING_DIALOG_LABELS } from '../constants/labels';
 
 export interface LocalTier {
   id: string
@@ -163,14 +164,14 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
                     type="number"
                     value={tier.participants || ''}
                     onChange={e => handleUpdateTier(tier.id, 'participants', e.target.value)}
-                    placeholder="人數"
+                    placeholder={LOCAL_PRICING_DIALOG_LABELS.人數}
                     className="h-9 text-sm"
                   />
                   <Input
                     type="number"
                     value={tier.unitPrice || ''}
                     onChange={e => handleUpdateTier(tier.id, 'unitPrice', e.target.value)}
-                    placeholder="單價"
+                    placeholder={ACCOMMODATION_ITEM_ROW_LABELS.單價}
                     className="h-9 text-sm"
                   />
                   <button

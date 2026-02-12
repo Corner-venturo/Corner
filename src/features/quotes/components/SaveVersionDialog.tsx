@@ -3,6 +3,7 @@ import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Save, X } from 'lucide-react'
+import { SAVE_VERSION_DIALOG_LABELS } from '../constants/labels';
 
 interface SaveVersionDialogProps {
   isOpen: boolean
@@ -34,7 +35,7 @@ export const SaveVersionDialog: React.FC<SaveVersionDialogProps> = ({
     <FormDialog
       open={isOpen}
       onOpenChange={onClose}
-      title="保存版本"
+      title={SAVE_VERSION_DIALOG_LABELS.保存版本}
       onSubmit={handleSubmit}
       onCancel={handleCancel}
       submitDisabled={!versionName.trim()}
@@ -61,7 +62,7 @@ export const SaveVersionDialog: React.FC<SaveVersionDialogProps> = ({
         <Input
           value={versionName}
           onChange={e => setVersionName(e.target.value)}
-          placeholder="例如：初版、修正版、最終版等"
+          placeholder={SAVE_VERSION_DIALOG_LABELS.例如_初版_修正版_最終版等}
           className="mt-1"
           autoFocus
         />
