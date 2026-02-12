@@ -265,6 +265,17 @@ export function useTourOperations(params: UseTourOperationsParams) {
           return { success: false, error: errorMsg }
         }
 
+        // 檢查是否有已付款訂單
+        const { data: paidOrders } = await supabase
+          .from('orders')
+          .select('id, payment_status')
+          .eq('tour_id', tour.id)
+          .neq('payment_status', 'unpaid')
+
+        if (paidOrders && paidOrders.length > 0) {
+          return { success: false, error: `此團有 ${paidOrders.length} 筆已付款訂單，無法刪除` }
+        }
+
         // 刪除關聯的訂單（沒有團員的空訂單可以刪）
         await supabase.from('orders').delete().eq('tour_id', tour.id)
 
