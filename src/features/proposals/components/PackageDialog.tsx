@@ -120,7 +120,9 @@ export function PackageDialog({
 
   // 處理提交
   const handleSubmit = async () => {
-    if (!formData.version_name.trim()) {
+    const { createPackageSchema } = await import('@/lib/validations/schemas')
+    const validation = createPackageSchema.safeParse({ version_name: formData.version_name.trim() })
+    if (!validation.success) {
       return
     }
 

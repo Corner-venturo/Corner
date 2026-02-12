@@ -36,6 +36,7 @@ import {
   WORKSPACE_TYPE_CONFIG,
   type WorkspaceType,
 } from '@/hooks/useSupplierWorkspaces'
+import { addManualRequestSchema } from '@/lib/validations/schemas'
 import { RestaurantSelector, type CombinedRestaurant } from '@/components/editor/RestaurantSelector'
 import { HotelSelector } from '@/components/editor/hotel-selector'
 import { AttractionSelector } from '@/components/editor/attraction-selector'
@@ -220,8 +221,12 @@ export function AddManualRequestDialog({
       return
     }
 
-    if (!formData.title.trim()) {
-      toast({ title: '請填寫項目說明', variant: 'destructive' })
+    const validation = addManualRequestSchema.safeParse({
+      title: formData.title.trim(),
+      category: formData.category,
+    })
+    if (!validation.success) {
+      toast({ title: validation.error.issues[0].message, variant: 'destructive' })
       return
     }
 

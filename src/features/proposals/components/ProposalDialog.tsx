@@ -13,6 +13,8 @@ import type {
   CreateProposalData,
   UpdateProposalData,
 } from '@/types/proposal.types'
+import { createProposalSchema } from '@/lib/validations/schemas'
+import { alert } from '@/lib/ui/alert-dialog'
 
 // 擴展的提案資料（包含第一個版本）
 export interface CreateProposalWithPackageData extends CreateProposalData {
@@ -90,6 +92,14 @@ export function ProposalDialog({
 
   // 處理提交
   const handleSubmit = async () => {
+    if (mode === 'create') {
+      const validation = createProposalSchema.safeParse({ versionName: versionName.trim() })
+      if (!validation.success) {
+        void alert(validation.error.issues[0].message, 'warning')
+        return
+      }
+    }
+
     setSubmitting(true)
     try {
       if (mode === 'create') {
