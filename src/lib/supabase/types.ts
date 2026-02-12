@@ -270,7 +270,7 @@ export type Database = {
           period_end: string
           period_start: string
           period_type: string
-          workspace_id: string
+          workspace_id: string | null
         }
         Insert: {
           closed_at?: string | null
@@ -282,7 +282,7 @@ export type Database = {
           period_end: string
           period_start: string
           period_type: string
-          workspace_id: string
+          workspace_id?: string | null
         }
         Update: {
           closed_at?: string | null
@@ -294,7 +294,7 @@ export type Database = {
           period_end?: string
           period_start?: string
           period_type?: string
-          workspace_id?: string
+          workspace_id?: string | null
         }
         Relationships: [
           {
@@ -830,6 +830,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      ai_messages: {
+        Row: {
+          created_at: string | null
+          from_agent: string
+          id: string
+          is_read: boolean | null
+          message: string
+          message_type: string | null
+          metadata: Json | null
+          to_agent: string
+        }
+        Insert: {
+          created_at?: string | null
+          from_agent: string
+          id?: string
+          is_read?: boolean | null
+          message: string
+          message_type?: string | null
+          metadata?: Json | null
+          to_agent: string
+        }
+        Update: {
+          created_at?: string | null
+          from_agent?: string
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          message_type?: string | null
+          metadata?: Json | null
+          to_agent?: string
+        }
+        Relationships: []
       }
       ai_settings: {
         Row: {
@@ -1462,7 +1495,7 @@ export type Database = {
           type: string
           updated_at: string
           updated_by: string | null
-          workspace_id: string
+          workspace_id: string | null
         }
         Insert: {
           created_at?: string
@@ -1481,7 +1514,7 @@ export type Database = {
           type?: string
           updated_at?: string
           updated_by?: string | null
-          workspace_id: string
+          workspace_id?: string | null
         }
         Update: {
           created_at?: string
@@ -1500,7 +1533,7 @@ export type Database = {
           type?: string
           updated_at?: string
           updated_by?: string | null
-          workspace_id?: string
+          workspace_id?: string | null
         }
         Relationships: [
           {
@@ -7845,7 +7878,7 @@ export type Database = {
           type: string
           updated_at: string
           updated_by: string | null
-          workspace_id: string
+          workspace_id: string | null
         }
         Insert: {
           created_at?: string
@@ -7857,7 +7890,7 @@ export type Database = {
           type: string
           updated_at?: string
           updated_by?: string | null
-          workspace_id: string
+          workspace_id?: string | null
         }
         Update: {
           created_at?: string
@@ -7869,7 +7902,7 @@ export type Database = {
           type?: string
           updated_at?: string
           updated_by?: string | null
-          workspace_id?: string
+          workspace_id?: string | null
         }
         Relationships: [
           {
@@ -13742,7 +13775,7 @@ export type Database = {
           type_data: Json | null
           unit_price: number | null
           updated_at: string | null
-          workspace_id: string
+          workspace_id: string | null
         }
         Insert: {
           actual_cost?: number | null
@@ -13779,7 +13812,7 @@ export type Database = {
           type_data?: Json | null
           unit_price?: number | null
           updated_at?: string | null
-          workspace_id: string
+          workspace_id?: string | null
         }
         Update: {
           actual_cost?: number | null
@@ -13816,7 +13849,7 @@ export type Database = {
           type_data?: Json | null
           unit_price?: number | null
           updated_at?: string | null
-          workspace_id?: string
+          workspace_id?: string | null
         }
         Relationships: [
           {
@@ -15734,7 +15767,7 @@ export type Database = {
           updated_at: string | null
           updated_by: string | null
           vehicle_type: string
-          workspace_id: string
+          workspace_id: string | null
         }
         Insert: {
           category?: string | null
@@ -15763,7 +15796,7 @@ export type Database = {
           updated_at?: string | null
           updated_by?: string | null
           vehicle_type: string
-          workspace_id: string
+          workspace_id?: string | null
         }
         Update: {
           category?: string | null
@@ -15792,7 +15825,7 @@ export type Database = {
           updated_at?: string | null
           updated_by?: string | null
           vehicle_type?: string
-          workspace_id?: string
+          workspace_id?: string | null
         }
         Relationships: [
           {
