@@ -40,7 +40,6 @@ interface ItemEditDialogProps {
   category: ConfirmationItemCategory
   item: TourConfirmationItem | null
   sheetId: string
-  workspaceId: string
   onClose: () => void
   onSave: (data: CreateConfirmationItem) => Promise<void>
 }
@@ -66,7 +65,6 @@ export function ItemEditDialog({
   category,
   item,
   sheetId,
-  workspaceId,
   onClose,
   onSave,
 }: ItemEditDialogProps) {
@@ -105,7 +103,6 @@ export function ItemEditDialog({
           type_data: item.type_data || undefined,
           sort_order: item.sort_order,
           notes: item.notes || undefined,
-          workspace_id: item.workspace_id,
           // 領隊記帳欄位
           leader_expense: item.leader_expense || undefined,
           leader_expense_note: item.leader_expense_note || undefined,
@@ -123,11 +120,10 @@ export function ItemEditDialog({
           quantity: 1,
           booking_status: 'pending',
           sort_order: 0,
-          workspace_id: workspaceId,
         })
       }
     }
-  }, [open, item, category, sheetId, workspaceId])
+  }, [open, item, category, sheetId])
 
   // 計算小計
   const subtotal = useMemo(() => {
@@ -203,7 +199,6 @@ export function ItemEditDialog({
         category,
         subtotal,
         expected_cost: formData.expected_cost ?? subtotal,
-        workspace_id: workspaceId,
         receipt_images: receiptImages,
       } as CreateConfirmationItem)
     } finally {

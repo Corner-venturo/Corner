@@ -6,12 +6,12 @@ import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/r
 
 export async function POST(request: NextRequest) {
   try {
-    // 🔒 認證：從 session 取得 workspaceId 和 employeeId
+    // 🔒 認證：從 session 取得 employeeId
     const auth = await getServerAuth()
     if (!auth.success) {
       return errorResponse(auth.error.error, 401, ErrorCode.UNAUTHORIZED)
     }
-    const { workspaceId, employeeId } = auth.data
+    const { employeeId } = auth.data
 
     const body = await request.json() as {
       voucher_id: string
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
       return ApiError.validation('缺少傳票 ID 或反沖原因')
     }
 
-    const result = await reverseVoucher(workspaceId, employeeId, voucher_id, reason)
+    const result = await reverseVoucher(employeeId, voucher_id, reason)
 
     if (!result.success) {
       return errorResponse(result.error || '反沖失敗', 400, ErrorCode.OPERATION_FAILED)

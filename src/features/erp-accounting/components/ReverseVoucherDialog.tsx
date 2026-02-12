@@ -50,7 +50,6 @@ export function ReverseVoucherDialog({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          workspace_id: user.workspace_id,
           user_id: user.id,
           voucher_id: voucher.id,
           reason: reason.trim(),

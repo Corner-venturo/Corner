@@ -171,7 +171,6 @@ export function useTourConfirmationSheet({ tourId }: UseTourConfirmationSheetPro
         service_date: item.service_date,
         supplier_name: item.supplier_name,
         title: item.title,
-        workspace_id: item.workspace_id,
         currency: item.currency || 'TWD',
         booking_status: item.booking_status || 'pending',
         sort_order: item.sort_order || 0,

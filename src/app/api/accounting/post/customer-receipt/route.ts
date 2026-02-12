@@ -7,12 +7,12 @@ import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/r
 
 export async function POST(request: NextRequest) {
   try {
-    // 🔒 認證：從 session 取得 workspaceId 和 employeeId
+    // 🔒 認證：從 session 取得 employeeId
     const auth = await getServerAuth()
     if (!auth.success) {
       return errorResponse(auth.error.error, 401, ErrorCode.UNAUTHORIZED)
     }
-    const { workspaceId, employeeId } = auth.data
+    const { employeeId } = auth.data
 
     const requestData = await request.json() as PostCustomerReceiptRequest
 
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       return ApiError.validation('缺少必要欄位')
     }
 
-    const result = await postCustomerReceipt(workspaceId, employeeId, requestData)
+    const result = await postCustomerReceipt(employeeId, requestData)
 
     if (!result.success) {
       return errorResponse(result.error || '過帳失敗', 400, ErrorCode.OPERATION_FAILED)

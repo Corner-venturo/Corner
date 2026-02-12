@@ -34,14 +34,13 @@ type JournalLineInsert = {
 /**
  * 生成傳票編號
  */
-async function generateVoucherNo(workspaceId: string): Promise<string> {
+async function generateVoucherNo(): Promise<string> {
   const today = new Date()
   const prefix = `JV${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}`
 
   const { data } = await supabase
     .from('journal_vouchers')
     .select('voucher_no')
-    .eq('workspace_id', workspaceId)
     .like('voucher_no', `${prefix}%`)
     .order('voucher_no', { ascending: false })
     .limit(1)
@@ -62,11 +61,10 @@ async function generateVoucherNo(workspaceId: string): Promise<string> {
 /**
  * 根據科目代碼獲取科目 ID
  */
-async function getAccountId(workspaceId: string, code: string): Promise<string | null> {
+async function getAccountId(code: string): Promise<string | null> {
   const { data } = await supabase
     .from('chart_of_accounts')
     .select('id')
-    .eq('workspace_id', workspaceId)
     .eq('code', code)
     .single()
 
@@ -111,7 +109,6 @@ interface PostingResult {
  *   Cr 預收團款 gross_amount
  */
 export async function postCustomerReceipt(
-  workspaceId: string,
   userId: string,
   request: PostCustomerReceiptRequest
 ): Promise<PostingResult> {
@@ -139,7 +136,6 @@ export async function postCustomerReceipt(
     .from('accounting_events')
     .insert({
       id: eventId,
-      workspace_id: workspaceId,
       event_type: 'customer_receipt_posted' as AccountingEventType,
       source_type: 'payment_receipt',
       source_id: request.receipt_id,
@@ -157,23 +153,22 @@ export async function postCustomerReceipt(
   }
 
   // 生成傳票編號
-  const voucherNo = await generateVoucherNo(workspaceId)
+  const voucherNo = await generateVoucherNo()
   const voucherId = generateUUID()
 
   // 獲取科目 ID
   const bankAccountCode = payment_method === 'cash' ? '1110' : '1100'
   const bankAcctId = bank_account_id
     ? await getBankAccountId(bank_account_id)
-    : await getAccountId(workspaceId, bankAccountCode)
-  const prepaidAcctId = await getAccountId(workspaceId, '2100') // 預收團款
-  const feeAcctId = await getAccountId(workspaceId, '6100') // 刷卡手續費
+    : await getAccountId(bankAccountCode)
+  const prepaidAcctId = await getAccountId('2100') // 預收團款
+  const feeAcctId = await getAccountId('6100') // 刷卡手續費
 
   // 建立傳票
   const { error: voucherError } = await supabase
     .from('journal_vouchers')
     .insert({
       id: voucherId,
-      workspace_id: workspaceId,
       voucher_no: voucherNo,
       voucher_date: eventDate,
       memo: memo || `客戶收款 - ${payment_method === 'credit_card' ? '刷卡' : payment_method === 'cash' ? '現金' : '匯款'}`,
@@ -256,7 +251,6 @@ export async function postCustomerReceipt(
  * Cr 銀行存款 amount
  */
 export async function postSupplierPayment(
-  workspaceId: string,
   userId: string,
   request: PostSupplierPaymentRequest
 ): Promise<PostingResult> {
@@ -272,7 +266,6 @@ export async function postSupplierPayment(
     .from('accounting_events')
     .insert({
       id: eventId,
-      workspace_id: workspaceId,
       event_type: 'supplier_payment_posted' as AccountingEventType,
       source_type: 'payout',
       source_id: request.payout_id,
@@ -290,17 +283,16 @@ export async function postSupplierPayment(
   }
 
   // 生成傳票
-  const voucherNo = await generateVoucherNo(workspaceId)
+  const voucherNo = await generateVoucherNo()
   const voucherId = generateUUID()
 
-  const prepaidCostAcctId = await getAccountId(workspaceId, '1200') // 預付團務成本
+  const prepaidCostAcctId = await getAccountId('1200') // 預付團務成本
   const bankAcctId = await getBankAccountId(bank_account_id)
 
   const { error: voucherError } = await supabase
     .from('journal_vouchers')
     .insert({
       id: voucherId,
-      workspace_id: workspaceId,
       voucher_no: voucherNo,
       voucher_date: eventDate,
       memo: memo || '供應商付款',
@@ -366,7 +358,6 @@ export async function postSupplierPayment(
  * 結團過帳 - 一次性產生結團傳票
  */
 export async function postGroupSettlement(
-  workspaceId: string,
   userId: string,
   request: PostGroupSettlementRequest
 ): Promise<PostingResult> {
@@ -411,7 +402,6 @@ export async function postGroupSettlement(
     .from('accounting_events')
     .insert({
       id: eventId,
-      workspace_id: workspaceId,
       event_type: 'group_settlement_posted' as AccountingEventType,
       source_type: 'group',
       tour_id,
@@ -428,7 +418,7 @@ export async function postGroupSettlement(
   }
 
   // 生成傳票
-  const voucherNo = await generateVoucherNo(workspaceId)
+  const voucherNo = await generateVoucherNo()
   const voucherId = generateUUID()
 
   // 計算借貸總額
@@ -439,7 +429,6 @@ export async function postGroupSettlement(
     .from('journal_vouchers')
     .insert({
       id: voucherId,
-      workspace_id: workspaceId,
       voucher_no: voucherNo,
       voucher_date: eventDate,
       memo: memo || '結團過帳',
@@ -458,18 +447,18 @@ export async function postGroupSettlement(
 
   // 獲取所有需要的科目
   const accounts = await Promise.all([
-    getAccountId(workspaceId, '2100'), // 預收團款
-    getAccountId(workspaceId, '4100'), // 團費收入
-    getAccountId(workspaceId, '1200'), // 預付團務成本
-    getAccountId(workspaceId, '5100'), // 團務成本
-    getAccountId(workspaceId, '5110'), // 團務成本-行政費
-    getAccountId(workspaceId, '4200'), // 其他收入-行政費收入
-    getAccountId(workspaceId, '5120'), // 團務成本-代收稅金
-    getAccountId(workspaceId, '2200'), // 代收稅金（應付）
-    getAccountId(workspaceId, '5130'), // 團務成本-業務獎金
-    getAccountId(workspaceId, '5140'), // 團務成本-OP獎金
-    getAccountId(workspaceId, '5150'), // 團務成本-團績獎金
-    getAccountId(workspaceId, '2300'), // 獎金應付帳款
+    getAccountId('2100'), // 預收團款
+    getAccountId('4100'), // 團費收入
+    getAccountId('1200'), // 預付團務成本
+    getAccountId('5100'), // 團務成本
+    getAccountId('5110'), // 團務成本-行政費
+    getAccountId('4200'), // 其他收入-行政費收入
+    getAccountId('5120'), // 團務成本-代收稅金
+    getAccountId('2200'), // 代收稅金（應付）
+    getAccountId('5130'), // 團務成本-業務獎金
+    getAccountId('5140'), // 團務成本-OP獎金
+    getAccountId('5150'), // 團務成本-團績獎金
+    getAccountId('2300'), // 獎金應付帳款
     getBankAccountId(bank_account_id), // 銀行帳戶
   ])
 
@@ -692,7 +681,6 @@ export async function postGroupSettlement(
  * 反沖傳票
  */
 export async function reverseVoucher(
-  workspaceId: string,
   userId: string,
   voucherId: string,
   reason: string
@@ -730,7 +718,6 @@ export async function reverseVoucher(
     .from('accounting_events')
     .insert({
       id: eventId,
-      workspace_id: workspaceId,
       event_type: 'manual_voucher' as AccountingEventType,
       source_type: 'reversal',
       source_id: voucherId,
@@ -747,14 +734,13 @@ export async function reverseVoucher(
   }
 
   // 生成反沖傳票
-  const voucherNo = await generateVoucherNo(workspaceId)
+  const voucherNo = await generateVoucherNo()
   const newVoucherId = generateUUID()
 
   const { error: voucherError } = await supabase
     .from('journal_vouchers')
     .insert({
       id: newVoucherId,
-      workspace_id: workspaceId,
       voucher_no: voucherNo,
       voucher_date: eventDate,
       memo: `反沖 ${originalVoucher.voucher_no}：${reason}`,

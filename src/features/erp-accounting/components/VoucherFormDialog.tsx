@@ -49,7 +49,7 @@ const createEmptyLine = (): VoucherLine => ({
 /**
  * 生成傳票編號
  */
-async function generateVoucherNo(workspaceId: string): Promise<string> {
+async function generateVoucherNo(): Promise<string> {
   const today = new Date()
   const prefix = `JV${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}`
 
@@ -238,13 +238,12 @@ export function VoucherFormDialog({
       } else {
         // 新增模式：建立傳票
         voucherId = generateUUID()
-        voucherNo = await generateVoucherNo(user.workspace_id)
+        voucherNo = await generateVoucherNo()
 
         const { error: insertError } = await supabase
           .from('journal_vouchers')
           .insert({
             id: voucherId,
-            workspace_id: user.workspace_id,
             voucher_no: voucherNo,
             voucher_date: voucherDate,
             memo: memo || null,

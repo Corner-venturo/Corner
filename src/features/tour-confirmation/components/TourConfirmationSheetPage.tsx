@@ -366,7 +366,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
           type_data: null,
           sort_order: 0,
           notes: outbound.duration || null,
-          workspace_id: workspaceId,
         })
       }
 
@@ -394,7 +393,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
           type_data: null,
           sort_order: 1,
           notes: returnFlight.duration || null,
-          workspace_id: workspaceId,
         })
       }
 
@@ -457,7 +455,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
           type_data: null,
           sort_order: 0,
           notes: null,
-          workspace_id: workspaceId,
         })
       }
 
@@ -484,7 +481,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
           type_data: null,
           sort_order: 1,
           notes: null,
-          workspace_id: workspaceId,
         })
       }
 
@@ -537,7 +533,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
               type_data: null,
               sort_order: 0,
               notes: null,
-              workspace_id: workspaceId,
             })
           }
         }
@@ -578,7 +573,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
             type_data: null,
             sort_order: 0,
             notes: day.accommodationRating ? `${day.accommodationRating}星級` : null,
-            workspace_id: workspaceId,
           })
         }
       }
@@ -620,7 +614,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                 type_data: null,
                 sort_order: 0,
                 notes: null,
-                workspace_id: workspaceId,
               })
             }
           }
@@ -675,7 +668,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
           type_data: null,
           sort_order: 0,
           notes: req.notes || null,
-          workspace_id: workspaceId,
           request_id: req.id,
           resource_type: req.resource_type as ResourceType | null,
           resource_id: req.resource_id || null,
@@ -740,7 +732,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
         type_data: null,
         sort_order: 0,
         notes: newItemData.notes || null,
-        workspace_id: workspaceId,
       })
       handleCancelAdd()
     } finally {
@@ -1493,7 +1484,6 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
         category={editDialog.category}
         item={editDialog.item}
         sheetId={sheet?.id || ''}
-        workspaceId={workspaceId}
         onClose={() => setEditDialog({ open: false, category: 'transport', item: null })}
         onSave={handleSave}
       />

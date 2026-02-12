@@ -44,7 +44,6 @@ export function TourItinerarySelector({
       const { data } = await supabase
         .from('tours')
         .select('id, code, name, status, archived')
-        .eq('workspace_id', workspaceId)
         .or('archived.is.null,archived.eq.false')
         .order('created_at', { ascending: false })
         .limit(100)
