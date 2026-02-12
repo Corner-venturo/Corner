@@ -115,7 +115,7 @@ export function useProposalOperations(): UseProposalOperationsReturn {
   // 新增提案（含第一個版本）
   const handleCreateProposal = useCallback(
     async (data: CreateProposalWithPackageData | UpdateProposalData) => {
-      if (!user?.workspace_id || !user?.id) {
+      if (!user?.id) {
         await alert('無法取得使用者資訊', 'error')
         return
       }
@@ -125,24 +125,28 @@ export function useProposalOperations(): UseProposalOperationsReturn {
         const proposalWithPackage = data as CreateProposalWithPackageData
         const { firstPackage, ...proposalData } = proposalWithPackage
 
+        logger.log('[useProposalOperations] 開始建立提案, proposalData:', JSON.stringify(proposalData))
+        logger.log('[useProposalOperations] firstPackage:', JSON.stringify(firstPackage))
+
         // 1. 建立提案
-        const newProposal = await createProposal(proposalData as CreateProposalData, user.workspace_id, user.id)
+        const newProposal = await createProposal(proposalData as CreateProposalData, user.id)
+        logger.log('[useProposalOperations] 提案建立成功:', newProposal?.id)
 
         // 2. 如果有第一個版本資料，建立版本
         if (newProposal && firstPackage) {
-          await createPackage(
-            {
-              proposal_id: newProposal.id,
-              version_name: firstPackage.version_name,
-              destination: firstPackage.country ? `${firstPackage.country}${firstPackage.airport_code ? ` (${firstPackage.airport_code})` : ''}` : undefined,
-              start_date: firstPackage.start_date || undefined,
-              end_date: firstPackage.end_date || undefined,
-              group_size: firstPackage.group_size || undefined,
-              notes: firstPackage.notes || undefined,
-            },
-            user.id,
-            user.workspace_id
-          )
+          const packageData = {
+            proposal_id: newProposal.id,
+            version_name: firstPackage.version_name,
+            destination: firstPackage.country ? `${firstPackage.country}${firstPackage.airport_code ? ` (${firstPackage.airport_code})` : ''}` : undefined,
+            start_date: firstPackage.start_date || undefined,
+            end_date: firstPackage.end_date || undefined,
+            group_size: firstPackage.group_size || undefined,
+            notes: firstPackage.notes || undefined,
+          }
+          logger.log('[useProposalOperations] 開始建立版本, packageData:', JSON.stringify(packageData))
+          logger.log('[useProposalOperations] userId:', user.id, 'workspaceId:', user.workspace_id)
+          await createPackage(packageData, user.id)
+          logger.log('[useProposalOperations] 版本建立成功')
         }
 
         setProposalDialogOpen(false)
@@ -155,10 +159,11 @@ export function useProposalOperations(): UseProposalOperationsReturn {
         }
       } catch (error) {
         logger.error('[useProposalOperations] 建立提案失敗:', error)
-        await alert('建立提案失敗', 'error')
+        logger.error('[useProposalOperations] 錯誤詳情:', JSON.stringify(error, Object.getOwnPropertyNames(error as object)))
+        await alert(`建立提案失敗: ${error instanceof Error ? error.message : JSON.stringify(error)}`, 'error')
       }
     },
-    [user?.workspace_id, user?.id, refreshProposals]
+    [user?.id, refreshProposals]
   )
 
   // 更新提案

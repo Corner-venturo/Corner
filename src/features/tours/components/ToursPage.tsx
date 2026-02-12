@@ -187,7 +187,6 @@ export const ToursPage: React.FC = () => {
             contact_person: newOrder.contact_person || undefined,
             contact_phone: proposalConvertData.proposal.customer_phone || undefined,
           },
-          user.workspace_id,
           user.id
         )
 

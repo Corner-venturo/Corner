@@ -34,22 +34,19 @@ const itinerariesDb = () => dynamicFrom('itineraries')
  */
 export async function createProposal(
   data: CreateProposalData,
-  workspaceId: string,
   userId: string
 ): Promise<Proposal> {
-  // 1. 取得現有提案以生成編號
+  // 1. 取得現有提案以生成編號（RLS 自動過濾 workspace）
   const { data: existingProposals } = await proposalsDb()
     .select('code')
-    .eq('workspace_id', workspaceId)
 
   const code = generateProposalCode((existingProposals || []) as { code?: string }[])
 
-  // 2. 建立提案
+  // 2. 建立提案（workspace_id 由 DB trigger 自動設定）
   const proposalData = {
     code,
     ...data,
     status: 'draft',
-    workspace_id: workspaceId,
     created_by: userId,
     updated_by: userId,
   }
@@ -234,8 +231,7 @@ export async function getProposalWithPackages(id: string): Promise<Proposal | nu
  */
 export async function createPackage(
   data: CreatePackageData,
-  userId: string,
-  workspaceId?: string
+  userId: string
 ): Promise<ProposalPackage> {
   // 1. 取得現有套件以決定版本號
   const { data: existingPackages } = await packagesDb()
@@ -259,7 +255,7 @@ export async function createPackage(
     nights = days - 1
   }
 
-  // 3. 建立套件（proposal_packages 沒有 workspace_id 欄位，透過 proposal_id 關聯）
+  // 3. 建立套件（workspace_id 由 DB trigger 自動設定）
   const packageData = {
     ...data,
     version_number: versionNumber,
@@ -271,14 +267,17 @@ export async function createPackage(
     updated_by: userId,
   }
 
+  logger.log('[createPackage] 插入資料:', JSON.stringify(packageData))
+
   const { data: pkg, error } = await packagesDb()
     .insert(packageData)
     .select()
     .single()
 
   if (error) {
-    logger.error('建立套件失敗:', error)
-    throw new Error(`建立套件失敗: ${error.message}`)
+    logger.error('[createPackage] 建立套件失敗:', JSON.stringify(error))
+    logger.error('[createPackage] 錯誤碼:', error.code, '訊息:', error.message, '詳情:', error.details)
+    throw new Error(`建立套件失敗: ${error.message} (code: ${error.code})`)
   }
 
   return pkg as unknown as ProposalPackage
@@ -316,8 +315,7 @@ export async function updatePackage(
 export async function duplicatePackage(
   sourceId: string,
   newVersionName: string,
-  userId: string,
-  workspaceId?: string
+  userId: string
 ): Promise<ProposalPackage> {
   // 1. 取得來源套件
   const { data: source, error: sourceError } = await packagesDb()
@@ -331,18 +329,7 @@ export async function duplicatePackage(
 
   const sourceData = source as unknown as ProposalPackage
 
-  // 2. 如果沒有提供 workspaceId，從 proposal 取得
-  let finalWorkspaceId = workspaceId
-  if (!finalWorkspaceId && sourceData.proposal_id) {
-    const { data: proposal } = await supabase
-      .from('proposals')
-      .select('workspace_id')
-      .eq('id', sourceData.proposal_id)
-      .single()
-    finalWorkspaceId = proposal?.workspace_id
-  }
-
-  // 3. 建立新版本
+  // 2. 建立新版本（workspace_id 由 DB trigger 自動設定）
   const newPackage = await createPackage(
     {
       proposal_id: sourceData.proposal_id,
@@ -358,8 +345,7 @@ export async function duplicatePackage(
       participant_counts: sourceData.participant_counts || undefined,
       notes: sourceData.notes || undefined,
     },
-    userId,
-    finalWorkspaceId
+    userId
   )
 
   return newPackage
@@ -418,7 +404,6 @@ export async function deletePackage(id: string): Promise<void> {
  */
 export async function convertToTour(
   data: ConvertToTourData,
-  workspaceId: string,
   userId: string
 ): Promise<ConvertToTourResult> {
   const response = await fetch('/api/proposals/convert-to-tour', {
@@ -429,7 +414,6 @@ export async function convertToTour(
     credentials: 'include', // 確保帶上認證 cookies
     body: JSON.stringify({
       ...data,
-      workspace_id: workspaceId,
       user_id: userId,
     }),
   })
@@ -463,10 +447,9 @@ export async function convertToTour(
  */
 export async function createQuoteForPackage(
   packageId: string,
-  workspaceId: string,
   userId: string
 ): Promise<string> {
-  logger.log('createQuoteForPackage called with:', { packageId, workspaceId, userId })
+  logger.log('createQuoteForPackage called with:', { packageId, userId })
 
   // 取得套件資訊（明確指定外鍵關聯）
   const { data: pkgData, error: pkgError } = await packagesDb()
@@ -510,7 +493,6 @@ export async function createQuoteForPackage(
       group_size: pkg.group_size || pkg.proposal?.group_size,
       proposal_package_id: packageId,
       itinerary_id: pkg.itinerary_id || null, // 關聯行程表（用於載入航班資訊）
-      workspace_id: workspaceId,
       created_by: userId,
     })
     .select()
@@ -533,7 +515,6 @@ export async function createQuoteForPackage(
  */
 export async function createItineraryForPackage(
   packageId: string,
-  workspaceId: string,
   userId: string
 ): Promise<string> {
   // 取得套件資訊（明確指定外鍵關聯）
@@ -563,7 +544,6 @@ export async function createItineraryForPackage(
       country: pkg.destination || pkg.proposal?.destination || '',
       city: pkg.destination || pkg.proposal?.destination || '',
       proposal_package_id: packageId,
-      workspace_id: workspaceId,
       created_by: userId,
     })
     .select()
