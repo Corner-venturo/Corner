@@ -30,6 +30,7 @@ import {
   PaginatedResult,
   DictionaryResult,
   DEFAULT_CACHE_CONFIG,
+  EntityCreateData,
 } from './types'
 
 // ============================================

@@ -222,7 +222,7 @@ export function useTourDetails(tour_id: string) {
     profitMargin: 30,
   } : null
 
-  const updateTourStatus = async (newStatus: Tour['status']) => {
+  const updateTourStatus = async (newStatus: NonNullable<Tour['status']>) => {
     if (!tour_id) return null
 
     // 狀態轉換驗證
@@ -245,8 +245,9 @@ export function useTourDetails(tour_id: string) {
 
     if (fetchError || !current) throw new Error('無法取得目前狀態')
 
-    if (!current.status || !VALID_TOUR_TRANSITIONS[current.status]?.includes(newStatus)) {
-      throw new Error(`無法從「${current.status ?? '未知'}」轉為「${newStatus}」`)
+    const currentStatus = current.status ?? ''
+    if (!currentStatus || !VALID_TOUR_TRANSITIONS[currentStatus]?.includes(newStatus)) {
+      throw new Error(`無法從「${currentStatus || '未知'}」轉為「${newStatus}」`)
     }
 
     const now = new Date().toISOString()

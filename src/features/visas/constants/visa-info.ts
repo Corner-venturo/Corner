@@ -1,3 +1,5 @@
+import { formatCurrency } from '@/lib/utils/format-currency'
+
 export interface DeliveryOption {
   method: string
   adult: number

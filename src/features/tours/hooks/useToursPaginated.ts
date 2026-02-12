@@ -268,7 +268,7 @@ export function useTourDetailsPaginated(tourId: string | null) {
     }
   )
 
-  const updateStatus = async (newStatus: Tour['status']) => {
+  const updateStatus = async (newStatus: NonNullable<Tour['status']>) => {
     if (!tourId) return null
 
     // 狀態轉換驗證
@@ -291,8 +291,9 @@ export function useTourDetailsPaginated(tourId: string | null) {
 
     if (fetchError || !current) throw new Error('無法取得目前狀態')
 
-    if (!current.status || !VALID_TOUR_TRANSITIONS[current.status]?.includes(newStatus)) {
-      throw new Error(`無法從「${current.status ?? '未知'}」轉為「${newStatus}」`)
+    const currentStatus = current.status ?? ''
+    if (!currentStatus || !VALID_TOUR_TRANSITIONS[currentStatus]?.includes(newStatus)) {
+      throw new Error(`無法從「${currentStatus || '未知'}」轉為「${newStatus}」`)
     }
 
     const { data, error: updateError } = await supabase

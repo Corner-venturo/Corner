@@ -137,7 +137,6 @@ export function useTourConfirmationSheet({ tourId }: UseTourConfirmationSheetPro
       }
       const { data, error } = await supabase
         .from('tour_confirmation_sheets')
-        // @ts-expect-error — Partial<Row> 含 computed fields，DB Update type 較嚴格
         .update(updatePayload)
         .eq('id', sheet.id)
         .select()
