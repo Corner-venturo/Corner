@@ -8,7 +8,7 @@ export interface AuthPayload {
 }
 
 // 生成 token（瀏覽器相容版本，使用 base64 編碼）
-// 注意：jsonwebtoken 只能在 Node.js 環境使用，這裡改用簡單的 base64 編碼
+// 注意：瀏覽器環境不支援 Node.js crypto，這裡改用簡單的 base64 編碼（jose 用於 middleware）
 export function generateToken(payload: AuthPayload, rememberMe: boolean = false): string {
   // rememberMe: true = 30 天，false = 8 小時
   const expirationMs = rememberMe

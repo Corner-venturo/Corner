@@ -280,7 +280,7 @@ export const ToursPage: React.FC = () => {
       name: p.title || '-',
       departure_date: p.expected_start_date || null,
       return_date: null,
-      status: '提案',
+      status: 'proposed',
       // 🔧 優化：直接使用提案的 destination 欄位，不需要 ID→名稱轉換
       destination: p.destination || '-',
       // 標記這是提案，用於 click handler 區分

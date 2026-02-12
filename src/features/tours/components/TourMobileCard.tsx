@@ -19,7 +19,7 @@ export function TourMobileCard({ tour: tourProp, onClick, getStatusColor }: Tour
   const tour = tourProp as Tour & Record<string, unknown>
 
   // 狀態值（已為中文）
-  const statusValue = String(tour.status || '提案')
+  const statusValue = String(tour.status || 'proposed')
 
   return (
     <div
