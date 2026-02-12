@@ -14,6 +14,7 @@ import { useProposalPackages } from '@/data'
 import { PackageListPanel } from './PackageListPanel'
 import { PackageItineraryDialog } from './PackageItineraryDialog'
 import type { Proposal, ProposalStatus, ProposalPackage } from '@/types/proposal.types'
+import { PROPOSAL_LABELS } from '../constants'
 
 // 狀態配色
 const STATUS_COLORS: Record<ProposalStatus, string> = {
@@ -23,12 +24,7 @@ const STATUS_COLORS: Record<ProposalStatus, string> = {
   archived: 'text-morandi-muted bg-morandi-muted/10',
 }
 
-const STATUS_LABELS: Record<ProposalStatus, string> = {
-  draft: '草稿',
-  negotiating: '洽談中',
-  converted: '已轉團',
-  archived: '已封存',
-}
+const STATUS_LABELS = PROPOSAL_LABELS.status
 
 interface ProposalDetailDialogProps {
   open: boolean
@@ -98,13 +94,13 @@ export function ProposalDetailDialog({
       <Dialog open={open} onOpenChange={onOpenChange}>
           <DialogContent level={1} className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-6">
             <VisuallyHidden>
-              <DialogTitle>提案詳情 - {proposal.code}</DialogTitle>
+              <DialogTitle>{PROPOSAL_LABELS.detailDialog.title(proposal.code)}</DialogTitle>
             </VisuallyHidden>
             {/* 標題區 - pr-8 為關閉按鈕留空間 */}
             <div className="flex items-center justify-between pr-8 pb-4 border-b border-border">
               <div className="flex items-center gap-3">
                 <span className="text-morandi-gold font-mono text-lg">{proposal.code}</span>
-                <span className="text-morandi-primary font-medium">{proposal.title || '(未命名)'}</span>
+                <span className="text-morandi-primary font-medium">{proposal.title || PROPOSAL_LABELS.detailDialog.unnamed}</span>
                 <span
                   className={`px-2 py-0.5 rounded text-xs ${STATUS_COLORS[proposal.status]}`}
                 >
@@ -118,7 +114,7 @@ export function ProposalDetailDialog({
                   onClick={() => setShowAddDialog(true)}
                 >
                   <Plus size={14} />
-                  新增版本
+                  {PROPOSAL_LABELS.detailDialog.addVersion}
                 </Button>
               )}
             </div>

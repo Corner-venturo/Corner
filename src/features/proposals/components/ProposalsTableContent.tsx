@@ -22,6 +22,7 @@ import type {
   CreateProposalData,
   UpdateProposalData,
 } from '@/types/proposal.types'
+import { PROPOSAL_LABELS } from '../constants'
 
 // 狀態配色
 const STATUS_COLORS: Record<ProposalStatus, string> = {
@@ -31,12 +32,7 @@ const STATUS_COLORS: Record<ProposalStatus, string> = {
   archived: 'text-morandi-muted bg-morandi-muted/10',
 }
 
-const STATUS_LABELS: Record<ProposalStatus, string> = {
-  draft: '草稿',
-  negotiating: '洽談中',
-  converted: '已轉團',
-  archived: '已封存',
-}
+const STATUS_LABELS = PROPOSAL_LABELS.status
 
 interface ProposalsTableContentProps {
   searchQuery?: string
@@ -93,7 +89,7 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
   const handleUpdateProposal = useCallback(
     async (data: CreateProposalData | UpdateProposalData) => {
       if (!selectedProposal || !user?.id) {
-        await alert('無法取得資訊', 'error')
+        await alert(PROPOSAL_LABELS.table.cannotGetInfo, 'error')
         return
       }
 
@@ -103,7 +99,7 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
         setEditDialogOpen(false)
         setSelectedProposal(null)
       } catch (error) {
-        await alert('更新提案失敗', 'error')
+        await alert(PROPOSAL_LABELS.table.updateFailed, 'error')
       }
     },
     [selectedProposal, user?.id, refreshProposals]
@@ -113,11 +109,11 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
   const handleDeleteProposal = useCallback(
     async (proposal: Proposal) => {
       const packages = getProposalPackages(proposal.id)
-      const packageInfo = packages.length > 0 ? `\n\n注意：此提案有 ${packages.length} 個套件，將一併刪除` : ''
+      const packageInfo = packages.length > 0 ? PROPOSAL_LABELS.table.deletePackageWarning(packages.length) : ''
 
-      const confirmed = await confirm(`確定要刪除提案「${proposal.title}」嗎？${packageInfo}`, {
+      const confirmed = await confirm(`${PROPOSAL_LABELS.table.deleteConfirm(proposal.title)}${packageInfo}`, {
         type: 'warning',
-        title: '刪除提案',
+        title: PROPOSAL_LABELS.table.deleteTitle,
       })
 
       if (confirmed) {
@@ -140,7 +136,7 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
           refreshProposals()
           refreshPackages()
         } catch (error) {
-          await alert('刪除提案失敗', 'error')
+          await alert(PROPOSAL_LABELS.table.deleteFailed, 'error')
         }
       }
     },
@@ -158,7 +154,7 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
         setArchiveDialogOpen(false)
         setSelectedProposal(null)
       } catch (error) {
-        await alert('封存提案失敗', 'error')
+        await alert(PROPOSAL_LABELS.table.archiveFailed, 'error')
       }
     },
     [selectedProposal, user?.id, refreshProposals]
@@ -181,7 +177,7 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
     () => [
       {
         key: 'code',
-        label: '團號',
+        label: PROPOSAL_LABELS.table.codeCol,
         sortable: true,
         width: '110px',
         render: (_, proposal) => (
@@ -190,7 +186,7 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
       },
       {
         key: 'title',
-        label: '旅遊團名稱',
+        label: PROPOSAL_LABELS.table.titleCol,
         sortable: true,
         width: '180px',
         render: (_, proposal) => (
@@ -199,7 +195,7 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
       },
       {
         key: 'expected_start_date',
-        label: '出發日期',
+        label: PROPOSAL_LABELS.table.departDateCol,
         sortable: true,
         width: '100px',
         render: (_, proposal) => (
@@ -208,7 +204,7 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
       },
       {
         key: 'destination',
-        label: '目的地',
+        label: PROPOSAL_LABELS.table.destinationCol,
         sortable: true,
         width: '80px',
         render: (_, proposal) => (
