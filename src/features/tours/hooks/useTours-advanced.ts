@@ -245,8 +245,8 @@ export function useTourDetails(tour_id: string) {
 
     if (fetchError || !current) throw new Error('無法取得目前狀態')
 
-    if (!VALID_TOUR_TRANSITIONS[current.status]?.includes(newStatus)) {
-      throw new Error(`無法從「${current.status}」轉為「${newStatus}」`)
+    if (!current.status || !VALID_TOUR_TRANSITIONS[current.status]?.includes(newStatus)) {
+      throw new Error(`無法從「${current.status ?? '未知'}」轉為「${newStatus}」`)
     }
 
     const now = new Date().toISOString()

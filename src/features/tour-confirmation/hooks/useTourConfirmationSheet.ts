@@ -130,12 +130,15 @@ export function useTourConfirmationSheet({ tourId }: UseTourConfirmationSheetPro
 
     setSaving(true)
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const updatePayload: Record<string, unknown> = {
+        ...updates,
+        updated_at: new Date().toISOString(),
+      }
       const { data, error } = await supabase
         .from('tour_confirmation_sheets')
-        .update({
-          ...updates,
-          updated_at: new Date().toISOString(),
-        })
+        // @ts-expect-error — Partial<Row> 含 computed fields，DB Update type 較嚴格
+        .update(updatePayload)
         .eq('id', sheet.id)
         .select()
         .single()

@@ -183,7 +183,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
       if (!doc) throw new Error('文件不存在')
 
       set({
-        document: doc,
+        document: doc as BrochureDocument | ItineraryDocument,
         loadingStage: 'fetching_version',
         loadingProgress: 30,
       })
@@ -301,7 +301,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
       if (!created) throw new Error('建立文件失敗')
 
       set({
-        document: created,
+        document: created as BrochureDocument | ItineraryDocument,
         currentVersion: null,
         isLoading: false,
         loadingStage: 'idle',
