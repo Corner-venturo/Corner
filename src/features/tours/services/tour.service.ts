@@ -222,10 +222,19 @@ class TourService extends BaseService<Tour & BaseEntity> {
     //          ↓
     //    (解鎖回提案)
     const ALLOWED_STATUS_TRANSITIONS: Record<string, string[]> = {
-      '提案': ['進行中', '取消'],
-      '進行中': ['結案', '取消', '提案'], // 可解鎖回提案
-      '結案': [], // 終態
-      '取消': [], // 終態
+      // 英文狀態值（新規範）
+      'proposed': ['draft', 'cancelled'],
+      'draft': ['published', 'cancelled'],
+      'published': ['departed', 'cancelled', 'draft'],
+      'departed': ['completed'],
+      'completed': ['archived'],
+      'cancelled': ['draft'],
+      'archived': [],
+      // 相容舊中文狀態值
+      '提案': ['進行中', '取消', 'draft', 'cancelled'],
+      '進行中': ['結案', '取消', '提案', 'completed', 'cancelled'],
+      '結案': [],
+      '取消': [],
     };
 
     const allowedTransitions = ALLOWED_STATUS_TRANSITIONS[currentStatus || ''] || [];
