@@ -5,7 +5,7 @@ import { FileText } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CurrencyCell } from '@/components/table-cells'
-import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 
 interface OrderInvoiceCardProps {
@@ -40,8 +40,6 @@ export function OrderInvoiceCard({ orderId, onIssue }: OrderInvoiceCardProps) {
   const loadInvoiceInfo = async () => {
     try {
       setLoading(true)
-      const supabase = getSupabaseAdminClient()
-
       // 查詢訂單發票摘要
       const { data: summaryData } = await supabase
         .from('orders_invoice_summary')
