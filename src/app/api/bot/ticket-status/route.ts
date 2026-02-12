@@ -142,8 +142,27 @@ function formatNotificationMessage(tours: TourStats[]): string {
   return header + body + footer
 }
 
+// Bot API 驗證
+function validateBotSecret(request: NextRequest): NextResponse | null {
+  const BOT_API_SECRET = process.env.BOT_API_SECRET
+  if (!BOT_API_SECRET) {
+    if (process.env.NODE_ENV === 'production') {
+      return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 })
+    }
+  } else {
+    const authHeader = request.headers.get('x-bot-secret')
+    if (authHeader !== BOT_API_SECRET) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+  }
+  return null
+}
+
 // GET - 查詢開票狀態
 export async function GET(request: NextRequest) {
+  const authError = validateBotSecret(request)
+  if (authError) return authError
+
   try {
     const supabase = getSupabaseAdminClient()
     const searchParams = request.nextUrl.searchParams
@@ -324,6 +343,9 @@ export async function GET(request: NextRequest) {
 
 // POST - 執行檢查並發送通知
 export async function POST(request: NextRequest) {
+  const authError = validateBotSecret(request)
+  if (authError) return authError
+
   try {
     const supabase = getSupabaseAdminClient()
     const body = await request.json()
@@ -492,7 +514,7 @@ export async function POST(request: NextRequest) {
         try {
           await fetch(`${request.nextUrl.origin}/api/bot-notification`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...(process.env.BOT_API_SECRET && { 'x-bot-secret': process.env.BOT_API_SECRET }) },
             body: JSON.stringify({
               recipient_id: salesId,
               message: summaryMessage,
@@ -573,7 +595,7 @@ export async function POST(request: NextRequest) {
         try {
           await fetch(`${request.nextUrl.origin}/api/bot-notification`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...(process.env.BOT_API_SECRET && { 'x-bot-secret': process.env.BOT_API_SECRET }) },
             body: JSON.stringify({
               recipient_id: assistantId,
               message: summaryMessage,
@@ -637,6 +659,9 @@ export async function POST(request: NextRequest) {
 
 // PATCH - 標記機票自理
 export async function PATCH(request: NextRequest) {
+  const authError = validateBotSecret(request)
+  if (authError) return authError
+
   try {
     const supabase = getSupabaseAdminClient()
     const body = await request.json()

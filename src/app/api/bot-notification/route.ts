@@ -18,6 +18,19 @@ interface NotificationRequest {
 }
 
 export async function POST(request: NextRequest) {
+  // Bot API 驗證
+  const BOT_API_SECRET = process.env.BOT_API_SECRET
+  if (!BOT_API_SECRET) {
+    if (process.env.NODE_ENV === 'production') {
+      return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 })
+    }
+  } else {
+    const authHeader = request.headers.get('x-bot-secret')
+    if (authHeader !== BOT_API_SECRET) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+  }
+
   try {
     const body = await request.json() as NotificationRequest
     const { recipient_id, message, type = 'info', metadata } = body
