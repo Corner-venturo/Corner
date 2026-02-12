@@ -26,6 +26,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { confirm } from '@/lib/ui/alert-dialog'
+import { COMPANY_ASSETS_LABELS } from '../constants/labels'
 
 interface CompanyAssetFolder {
   id: string
@@ -93,8 +94,8 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
       if (assetError) throw assetError
       setAssets(assetData || [])
     } catch (err) {
-      logger.error('載入公司資源失敗', err)
-      toast.error('載入失敗')
+      logger.error(COMPANY_ASSETS_LABELS.載入公司資源失敗, err)
+      toast.error(COMPANY_ASSETS_LABELS.載入失敗)
     } finally {
       setLoading(false)
     }
@@ -207,10 +208,10 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
         .eq('id', assetId)
 
       if (error) {
-        toast.error('移動失敗')
+        toast.error(COMPANY_ASSETS_LABELS.移動失敗)
         return
       }
-      toast.success('已移動')
+      toast.success(COMPANY_ASSETS_LABELS.已移動)
       loadData()
     }
   }, [loadData])
@@ -218,11 +219,11 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
   // 新增資料夾
   const handleCreateFolder = useCallback(async () => {
     if (!newFolderName.trim()) {
-      toast.error('請輸入資料夾名稱')
+      toast.error(COMPANY_ASSETS_LABELS.請輸入資料夾名稱)
       return
     }
     if (!workspaceId) {
-      toast.error('無法取得 workspace，請重新整理頁面')
+      toast.error(COMPANY_ASSETS_LABELS.無法取得_workspace_請重新整理頁面)
       return
     }
     if (creatingFolder) return // 防止重複點擊
@@ -237,7 +238,7 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
           .eq('id', editingFolder.id)
 
         if (error) throw error
-        toast.success('已更新')
+        toast.success(COMPANY_ASSETS_LABELS.已更新)
       } else {
         // 新增模式
         const { error } = await supabase
@@ -249,7 +250,7 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
           })
 
         if (error) throw error
-        toast.success('資料夾已建立')
+        toast.success(COMPANY_ASSETS_LABELS.資料夾已建立)
       }
 
       setShowFolderDialog(false)
@@ -258,8 +259,8 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
       setEditingFolder(null)
       loadData()
     } catch (err) {
-      logger.error('建立資料夾失敗', err)
-      toast.error('建立失敗')
+      logger.error(COMPANY_ASSETS_LABELS.建立資料夾失敗, err)
+      toast.error(COMPANY_ASSETS_LABELS.建立失敗)
     } finally {
       setCreatingFolder(false)
     }
@@ -267,8 +268,8 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
 
   // 刪除資料夾
   const handleDeleteFolder = useCallback(async (folderId: string) => {
-    const confirmed = await confirm('確定要刪除此資料夾嗎？資料夾內的檔案會移到根目錄。', {
-      title: '刪除資料夾',
+    const confirmed = await confirm(COMPANY_ASSETS_LABELS.確定要刪除此資料夾嗎_資料夾內的檔案會移到根目錄, {
+      title: COMPANY_ASSETS_LABELS.刪除資料夾,
       type: 'warning',
     })
     if (!confirmed) return
@@ -287,11 +288,11 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
         .eq('id', folderId)
 
       if (error) throw error
-      toast.success('資料夾已刪除')
+      toast.success(COMPANY_ASSETS_LABELS.資料夾已刪除)
       loadData()
     } catch (err) {
-      logger.error('刪除資料夾失敗', err)
-      toast.error('刪除失敗')
+      logger.error(COMPANY_ASSETS_LABELS.刪除資料夾失敗, err)
+      toast.error(COMPANY_ASSETS_LABELS.刪除失敗)
     }
   }, [loadData])
 
@@ -381,12 +382,12 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
         <DialogContent level={1} className="max-w-sm">
           <DialogHeader>
             <DialogTitle>
-              {editingFolder ? '重命名資料夾' : '新增資料夾'}
+              {editingFolder ? COMPANY_ASSETS_LABELS.重命名資料夾 : COMPANY_ASSETS_LABELS.新增資料夾}
             </DialogTitle>
           </DialogHeader>
           <div className="py-4">
             <Input
-              placeholder="資料夾名稱"
+              placeholder={COMPANY_ASSETS_LABELS.資料夾名稱}
               value={newFolderName}
               onChange={(e) => setNewFolderName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleCreateFolder()}
@@ -398,7 +399,7 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
               取消
             </Button>
             <Button onClick={handleCreateFolder} disabled={!newFolderName.trim() || creatingFolder}>
-              {creatingFolder ? '處理中...' : (editingFolder ? '儲存' : '建立')}
+              {creatingFolder ? COMPANY_ASSETS_LABELS.處理中 : (editingFolder ? COMPANY_ASSETS_LABELS.儲存 : COMPANY_ASSETS_LABELS.建立)}
             </Button>
           </DialogFooter>
         </DialogContent>

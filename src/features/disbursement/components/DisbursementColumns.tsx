@@ -17,6 +17,7 @@ import {
   DISBURSEMENT_STATUS_COLORS,
 } from '../constants'
 import { DisbursementOrder, PaymentRequest } from '../types'
+import { DISBURSEMENT_LABELS } from '../constants/labels'
 
 type PendingTableRow = PaymentRequest & {
   tour_name?: string
@@ -54,19 +55,19 @@ export function usePendingColumns({ selectedRequests, onSelectRequest }: UsePend
       },
       {
         key: 'request_number',
-        label: '請款單號',
+        label: DISBURSEMENT_LABELS.請款單號,
         sortable: true,
         render: (value: unknown) => <div className="font-medium text-morandi-primary">{value as string}</div>,
       },
       {
         key: 'code',
-        label: '團號',
+        label: DISBURSEMENT_LABELS.團號,
         sortable: true,
         render: (value: unknown) => <div className="font-medium">{value as string}</div>,
       },
       {
         key: 'tour_name',
-        label: '團體名稱',
+        label: DISBURSEMENT_LABELS.團體名稱,
         sortable: true,
         render: (value: unknown) => (
           <div className="text-sm text-morandi-secondary truncate max-w-[200px]">{value as string}</div>
@@ -74,19 +75,19 @@ export function usePendingColumns({ selectedRequests, onSelectRequest }: UsePend
       },
       {
         key: 'amount',
-        label: '金額',
+        label: DISBURSEMENT_LABELS.金額,
         sortable: true,
         render: (value: unknown) => <CurrencyCell amount={value as number} />,
       },
       {
         key: 'request_date',
-        label: '請款日期',
+        label: DISBURSEMENT_LABELS.請款日期,
         sortable: true,
         render: (value: unknown) => <DateCell date={value as string} />,
       },
       {
         key: 'status',
-        label: '狀態',
+        label: DISBURSEMENT_LABELS.狀態,
         render: (value: unknown) => (
           <Badge className={cn('text-white', PAYMENT_REQUEST_STATUS_COLORS[value as keyof typeof PAYMENT_REQUEST_STATUS_COLORS])}>
             {PAYMENT_REQUEST_STATUS_LABELS[value as keyof typeof PAYMENT_REQUEST_STATUS_LABELS]}
@@ -108,19 +109,19 @@ export function useCurrentOrderColumns({ currentOrder, onRemove }: UseCurrentOrd
     () => [
       {
         key: 'request_number',
-        label: '請款單號',
+        label: DISBURSEMENT_LABELS.請款單號,
         sortable: true,
         render: (value: unknown) => <div className="font-medium text-morandi-primary">{value as string}</div>,
       },
       {
         key: 'code',
-        label: '團號',
+        label: DISBURSEMENT_LABELS.團號,
         sortable: true,
         render: (value: unknown) => <div className="font-medium">{value as string}</div>,
       },
       {
         key: 'tour_name',
-        label: '團體名稱',
+        label: DISBURSEMENT_LABELS.團體名稱,
         sortable: true,
         render: (value: unknown) => (
           <div className="text-sm text-morandi-secondary truncate max-w-[200px]">{value as string}</div>
@@ -128,19 +129,19 @@ export function useCurrentOrderColumns({ currentOrder, onRemove }: UseCurrentOrd
       },
       {
         key: 'amount',
-        label: '金額',
+        label: DISBURSEMENT_LABELS.金額,
         sortable: true,
         render: (value: unknown) => <CurrencyCell amount={value as number} />,
       },
       {
         key: 'request_date',
-        label: '請款日期',
+        label: DISBURSEMENT_LABELS.請款日期,
         sortable: true,
         render: (value: unknown) => <DateCell date={value as string} />,
       },
       {
         key: 'actions',
-        label: '操作',
+        label: DISBURSEMENT_LABELS.操作,
         width: '80px',
         render: (_value: unknown, row: unknown) => {
           const typedRow = row as CurrentOrderTableRow
@@ -149,7 +150,7 @@ export function useCurrentOrderColumns({ currentOrder, onRemove }: UseCurrentOrd
               actions={[
                 {
                   icon: X,
-                  label: '移除',
+                  label: DISBURSEMENT_LABELS.移除,
                   onClick: () => onRemove(typedRow.id),
                   variant: 'danger',
                   disabled: currentOrder?.status !== 'pending',
@@ -173,30 +174,30 @@ export function useHistoryColumns({ onPrintPDF }: UseHistoryColumnsProps) {
     () => [
       {
         key: 'order_number',
-        label: '出納單號',
+        label: DISBURSEMENT_LABELS.出納單號,
         sortable: true,
         render: (value: unknown) => <div className="font-medium text-morandi-primary">{value as string}</div>,
       },
       {
         key: 'disbursement_date',
-        label: '出帳日期',
+        label: DISBURSEMENT_LABELS.出帳日期,
         sortable: true,
         render: (value: unknown) => <DateCell date={value as string} />,
       },
       {
         key: 'amount',
-        label: '總金額',
+        label: DISBURSEMENT_LABELS.總金額,
         sortable: true,
         render: (value: unknown) => <CurrencyCell amount={value as number} />,
       },
       {
         key: 'payment_request_ids',
-        label: '請款單數',
+        label: DISBURSEMENT_LABELS.請款單數,
         render: (value: unknown) => <div className="text-center">{(value as string[]).length} 筆</div>,
       },
       {
         key: 'status',
-        label: '狀態',
+        label: DISBURSEMENT_LABELS.狀態,
         render: (value: unknown) => (
           <Badge
             className={cn(
@@ -210,13 +211,13 @@ export function useHistoryColumns({ onPrintPDF }: UseHistoryColumnsProps) {
       },
       {
         key: 'created_at',
-        label: '建立時間',
+        label: DISBURSEMENT_LABELS.建立時間,
         sortable: true,
         render: (value: unknown) => <DateCell date={value as string} format="long" />,
       },
       {
         key: 'actions',
-        label: '操作',
+        label: DISBURSEMENT_LABELS.操作,
         width: '100px',
         render: (_value: unknown, row: unknown) => {
           const typedRow = row as HistoryTableRow

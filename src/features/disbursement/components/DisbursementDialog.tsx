@@ -15,6 +15,7 @@ import { FileText } from 'lucide-react'
 import { formatDateTW } from '@/lib/utils/format-date'
 import { PaymentRequest } from '../types'
 import { useMemo } from 'react'
+import { DISBURSEMENT_LABELS } from '../constants/labels'
 
 interface DisbursementDialogProps {
   open: boolean
@@ -72,31 +73,31 @@ export function DisbursementDialog({
       },
       {
         key: 'request_number',
-        label: '請款單號',
+        label: DISBURSEMENT_LABELS.請款單號,
         sortable: true,
         render: (value) => <div className="font-medium text-morandi-primary">{String(value || '')}</div>,
       },
       {
         key: 'code',
-        label: '團號',
+        label: DISBURSEMENT_LABELS.團號,
         sortable: true,
         render: (value) => <div className="font-medium">{String(value || '')}</div>,
       },
       {
         key: 'tour_name',
-        label: '團名',
+        label: DISBURSEMENT_LABELS.團名,
         sortable: true,
         render: (value) => <div className="text-morandi-secondary">{String(value || '')}</div>,
       },
       {
         key: 'request_date',
-        label: '請款日期',
+        label: DISBURSEMENT_LABELS.請款日期,
         sortable: true,
         render: (value) => <div className="text-sm text-morandi-secondary">{String(value || '')}</div>,
       },
       {
         key: 'amount',
-        label: '金額',
+        label: DISBURSEMENT_LABELS.金額,
         sortable: true,
         render: (value: unknown) => (
           <div className="font-bold text-morandi-primary text-right">
@@ -112,7 +113,7 @@ export function DisbursementDialog({
     <FormDialog
       open={open}
       onOpenChange={onOpenChange}
-      title="新增出納單"
+      title={DISBURSEMENT_LABELS.新增出納單}
       subtitle={`${orderNumber} • ${typeof nextThursday === 'string' ? nextThursday : formatDateTW(nextThursday)}`}
       onSubmit={onCreate}
       onCancel={onCancel}
@@ -148,7 +149,7 @@ export function DisbursementDialog({
               <div className="flex items-center space-x-2">
                 <Input
                   type="text"
-                  placeholder="搜尋請款單號、團號或團名..."
+                  placeholder={DISBURSEMENT_LABELS.搜尋請款單號_團號或團名}
                   value={searchTerm}
                   onChange={e => onSearchChange(e.target.value)}
                   className="w-64"

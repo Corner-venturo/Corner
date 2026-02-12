@@ -1,3 +1,4 @@
+import { WORKSPACES_LABELS } from './constants/labels'
 /**
  * Workspace Management Types
  */
@@ -28,7 +29,7 @@ export interface CreateWorkspaceData {
 }
 
 export const WORKSPACE_TYPE_LABELS: Record<WorkspaceType, string> = {
-  travel_agency: '旅行社',
-  vehicle_supplier: '車行',
-  guide_supplier: '領隊公司',
+  travel_agency: WORKSPACES_LABELS.旅行社,
+  vehicle_supplier: WORKSPACES_LABELS.車行,
+  guide_supplier: WORKSPACES_LABELS.領隊公司,
 }

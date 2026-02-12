@@ -9,6 +9,7 @@ import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
 import { Bus, Edit2 } from 'lucide-react'
 import { TransportationRate } from '@/types/transportation-rates.types'
+import { TRANSPORTATION_RATES_LABELS } from '../constants/labels'
 
 interface CountryListProps {
   rates: TransportationRate[]
@@ -27,7 +28,7 @@ export const CountryList: React.FC<CountryListProps> = ({ rates, loading = false
     const groups = new Map<string, number>()
 
     rates.forEach(rate => {
-      const country = rate.country_name || '未分類'
+      const country = rate.country_name || TRANSPORTATION_RATES_LABELS.未分類
       groups.set(country, (groups.get(country) || 0) + 1)
     })
 
@@ -40,7 +41,7 @@ export const CountryList: React.FC<CountryListProps> = ({ rates, loading = false
   const columns: TableColumn[] = [
     {
       key: 'country',
-      label: '國家',
+      label: TRANSPORTATION_RATES_LABELS.國家,
       sortable: true,
       render: (_value, rowData) => {
         const row = rowData as CountryGroup
@@ -57,7 +58,7 @@ export const CountryList: React.FC<CountryListProps> = ({ rates, loading = false
     },
     {
       key: 'count',
-      label: '車資筆數',
+      label: TRANSPORTATION_RATES_LABELS.車資筆數,
       sortable: true,
       render: (_value, rowData) => {
         const row = rowData as CountryGroup
@@ -72,7 +73,7 @@ export const CountryList: React.FC<CountryListProps> = ({ rates, loading = false
       columns={columns}
       data={countryGroups}
       loading={loading}
-      emptyMessage="尚無車資資料"
+      emptyMessage={TRANSPORTATION_RATES_LABELS.尚無車資資料}
       onRowClick={(rowData) => {
         const row = rowData as CountryGroup
         onOpenCountry(row.country, false)
@@ -88,7 +89,7 @@ export const CountryList: React.FC<CountryListProps> = ({ rates, loading = false
               onOpenCountry(row.country, true)
             }}
             className="h-8 w-8 p-0 text-morandi-blue hover:bg-morandi-blue/10"
-            title="編輯車資"
+            title={TRANSPORTATION_RATES_LABELS.編輯車資}
           >
             <Edit2 size={16} />
           </Button>

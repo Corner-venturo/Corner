@@ -19,6 +19,7 @@ import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { generateId } from '@/lib/data/create-data-store'
 import { createDisbursementSchema } from '@/lib/validations/schemas'
+import { DISBURSEMENT_LABELS } from '../constants/labels'
 
 // 計算下一個週四
 function getNextThursday(): Date {
@@ -172,7 +173,7 @@ export function useCreateDisbursement({ pendingRequests, onSuccess }: UseCreateD
         .single()
 
       if (error) {
-        logger.error('Supabase 錯誤:', error)
+        logger.error(DISBURSEMENT_LABELS.Supabase_錯誤, error)
         throw new Error(error.message)
       }
 
@@ -190,8 +191,8 @@ export function useCreateDisbursement({ pendingRequests, onSuccess }: UseCreateD
       resetForm()
       onSuccess()
     } catch (error) {
-      logger.error('建立出納單失敗:', error)
-      const errorMessage = error instanceof Error ? error.message : '未知錯誤'
+      logger.error(DISBURSEMENT_LABELS.建立出納單失敗, error)
+      const errorMessage = error instanceof Error ? error.message : DISBURSEMENT_LABELS.未知錯誤
       await alert(`建立出納單失敗: ${errorMessage}`, 'error')
     } finally {
       setIsSubmitting(false)

@@ -15,6 +15,7 @@ import {
   deleteDisbursementOrder as deleteDisbursementOrderApi,
 } from '@/data'
 import { PaymentRequest, DisbursementOrder } from '../types'
+import { DISBURSEMENT_LABELS } from '../constants/labels'
 
 // 計算下一個週四
 function getNextThursday(): Date {
@@ -123,7 +124,7 @@ export function useDisbursementData() {
       const items = requestItemsByRequestId.get(request.id) || []
       items.forEach(item => {
         const supplierId = item.supplier_id || 'unknown'
-        const supplierName = item.supplier_name || '無供應商'
+        const supplierName = item.supplier_name || DISBURSEMENT_LABELS.無供應商
 
         if (!groups[supplierId]) {
           groups[supplierId] = {

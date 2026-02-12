@@ -24,6 +24,7 @@ import { PaymentRequest } from '@/stores/types'
 import { useCreateDisbursement } from '../hooks/useCreateDisbursement'
 import { DisbursementForm } from './create-dialog/DisbursementForm'
 import { DisbursementItemList } from './create-dialog/DisbursementItemList'
+import { DISBURSEMENT_LABELS } from '../constants/labels'
 
 interface CreateDisbursementDialogProps {
   open: boolean
@@ -110,7 +111,7 @@ export function CreateDisbursementDialog({
             disabled={selectedRequestIds.length === 0 || isSubmitting}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
-            {isSubmitting ? '建立中...' : `建立出納單（${selectedRequestIds.length} 筆）`}
+            {isSubmitting ? DISBURSEMENT_LABELS.建立中 : `建立出納單（${selectedRequestIds.length} 筆）`}
           </Button>
         </DialogFooter>
       </DialogContent>

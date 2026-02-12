@@ -8,6 +8,7 @@ import { useCallback } from 'react'
 import { generateDisbursementPDF } from '@/lib/pdf/disbursement-pdf'
 import { usePaymentRequests, usePaymentRequestItems } from '@/data'
 import type { DisbursementOrder } from '../types'
+import { DISBURSEMENT_LABELS } from '../constants/labels'
 
 export function useDisbursementPDF() {
   // 使用 @/data hooks（SWR 自動載入）
@@ -29,12 +30,12 @@ export function useDisbursementPDF() {
         )
 
         if (relatedRequests.length === 0) {
-          alert('⚠️ 找不到關聯的請款單資料')
+          alert(DISBURSEMENT_LABELS.找不到關聯的請款單資料)
           return
         }
 
         if (relatedItems.length === 0) {
-          alert('⚠️ 找不到請款項目資料')
+          alert(DISBURSEMENT_LABELS.找不到請款項目資料)
           return
         }
 
@@ -45,8 +46,8 @@ export function useDisbursementPDF() {
           paymentRequestItems: relatedItems,
         })
       } catch (error) {
-        logger.error('生成 PDF 失敗:', error)
-        alert('❌ 生成 PDF 失敗，請稍後再試')
+        logger.error(DISBURSEMENT_LABELS.生成_PDF_失敗, error)
+        alert(DISBURSEMENT_LABELS.生成_PDF_失敗_請稍後再試)
       }
     },
     [paymentRequests, paymentRequestItems]

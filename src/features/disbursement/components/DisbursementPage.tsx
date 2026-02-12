@@ -32,6 +32,7 @@ import { DisbursementPrintDialog } from './DisbursementPrintDialog'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { DISBURSEMENT_STATUS } from '../constants'
+import { DISBURSEMENT_LABELS } from '../constants/labels'
 
 export function DisbursementPage() {
   // 使用 @/data hooks（SWR 自動載入）
@@ -66,15 +67,15 @@ export function DisbursementPage() {
   const columns: TableColumn<DisbursementOrder>[] = useMemo(() => [
     {
       key: 'order_number',
-      label: '出納單號',
+      label: DISBURSEMENT_LABELS.出納單號,
       sortable: true,
       render: (value) => (
-        <div className="font-medium text-morandi-primary">{String(value || '自動產生')}</div>
+        <div className="font-medium text-morandi-primary">{String(value || DISBURSEMENT_LABELS.自動產生)}</div>
       ),
     },
     {
       key: 'disbursement_date',
-      label: '出帳日期',
+      label: DISBURSEMENT_LABELS.出帳日期,
       sortable: true,
       render: (value) => (
         <DateCell date={value as string | null} showIcon={false} className="text-morandi-secondary" />
@@ -82,7 +83,7 @@ export function DisbursementPage() {
     },
     {
       key: 'payment_request_ids',
-      label: '請款單數',
+      label: DISBURSEMENT_LABELS.請款單數,
       render: (value) => (
         <div className="text-center">
           {Array.isArray(value) ? value.length : 0} 筆
@@ -91,7 +92,7 @@ export function DisbursementPage() {
     },
     {
       key: 'amount',
-      label: '總金額',
+      label: DISBURSEMENT_LABELS.總金額,
       sortable: true,
       render: (value) => (
         <div className="text-right">
@@ -101,7 +102,7 @@ export function DisbursementPage() {
     },
     {
       key: 'status',
-      label: '狀態',
+      label: DISBURSEMENT_LABELS.狀態,
       sortable: true,
       render: (value) => {
         const status = DISBURSEMENT_STATUS[value as keyof typeof DISBURSEMENT_STATUS] || DISBURSEMENT_STATUS.pending
@@ -114,7 +115,7 @@ export function DisbursementPage() {
     },
     {
       key: 'created_at',
-      label: '建立時間',
+      label: DISBURSEMENT_LABELS.建立時間,
       sortable: true,
       render: (value) => (
         <DateCell date={value as string | null} showIcon={false} className="text-morandi-secondary" />
@@ -122,7 +123,7 @@ export function DisbursementPage() {
     },
     {
       key: 'actions',
-      label: '操作',
+      label: DISBURSEMENT_LABELS.操作,
       width: '120px',
       render: (_value, row) => (
         <div className="flex items-center gap-2">
@@ -181,17 +182,17 @@ export function DisbursementPage() {
   // 刪除出納單
   const handleDelete = useCallback(async (order: DisbursementOrder) => {
     const confirmed = await confirm(`確定要刪除出納單 ${order.order_number} 嗎？`, {
-      title: '刪除出納單',
+      title: DISBURSEMENT_LABELS.刪除出納單,
       type: 'warning',
     })
     if (!confirmed) return
 
     try {
       await deleteDisbursementOrderApi(order.id)
-      await alert('出納單已刪除', 'success')
+      await alert(DISBURSEMENT_LABELS.出納單已刪除, 'success')
     } catch (error) {
-      logger.error('刪除出納單失敗:', error)
-      await alert('刪除出納單失敗', 'error')
+      logger.error(DISBURSEMENT_LABELS.刪除出納單失敗_2, error)
+      await alert(DISBURSEMENT_LABELS.刪除出納單失敗, 'error')
     }
   }, [])
 
@@ -221,13 +222,13 @@ export function DisbursementPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="出納單管理"
+        title={DISBURSEMENT_LABELS.出納單管理}
         onAdd={() => setIsCreateDialogOpen(true)}
-        addLabel="新增出納單"
+        addLabel={DISBURSEMENT_LABELS.新增出納單}
         showSearch={true}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        searchPlaceholder="搜尋出納單號..."
+        searchPlaceholder={DISBURSEMENT_LABELS.搜尋出納單號}
       >
         {/* 統計資訊 */}
         <div className="flex items-center gap-6 text-sm">

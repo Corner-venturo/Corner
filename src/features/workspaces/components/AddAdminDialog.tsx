@@ -22,6 +22,7 @@ import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import bcrypt from 'bcryptjs'
 import type { WorkspaceWithDetails } from '../types'
+import { WORKSPACES_LABELS } from '../constants/labels'
 
 interface AddAdminDialogProps {
   open: boolean
@@ -58,15 +59,15 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
 
     // 驗證
     if (!formData.name.trim()) {
-      await alert('請輸入姓名', 'error')
+      await alert(WORKSPACES_LABELS.請輸入姓名, 'error')
       return
     }
     if (!formData.employee_number.trim()) {
-      await alert('請輸入員工編號', 'error')
+      await alert(WORKSPACES_LABELS.請輸入員工編號, 'error')
       return
     }
     if (!formData.password.trim()) {
-      await alert('請輸入密碼', 'error')
+      await alert(WORKSPACES_LABELS.請輸入密碼, 'error')
       return
     }
 
@@ -87,7 +88,7 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
 
       if (error) {
         if (error.code === '23505') {
-          await alert('此員工編號已存在', 'error')
+          await alert(WORKSPACES_LABELS.此員工編號已存在, 'error')
           return
         }
         throw error
@@ -97,8 +98,8 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
       onOpenChange(false)
       onSuccess()
     } catch (error) {
-      logger.error('新增管理員失敗:', error)
-      await alert('新增失敗，請稍後再試', 'error')
+      logger.error(WORKSPACES_LABELS.新增管理員失敗, error)
+      await alert(WORKSPACES_LABELS.新增失敗_請稍後再試, 'error')
     } finally {
       setIsSubmitting(false)
     }
@@ -127,7 +128,7 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
             <Input
               value={formData.name}
               onChange={(e) => handleFieldChange('name', e.target.value)}
-              placeholder="例：王大明"
+              placeholder={WORKSPACES_LABELS.例_王大明}
             />
           </div>
 
@@ -136,7 +137,7 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
             <Input
               value={formData.employee_number}
               onChange={(e) => handleFieldChange('employee_number', e.target.value)}
-              placeholder="例：E002"
+              placeholder={WORKSPACES_LABELS.例_E002}
               className="uppercase"
             />
           </div>
@@ -147,7 +148,7 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
               type="password"
               value={formData.password}
               onChange={(e) => handleFieldChange('password', e.target.value)}
-              placeholder="請設定密碼"
+              placeholder={WORKSPACES_LABELS.請設定密碼}
             />
           </div>
         </div>

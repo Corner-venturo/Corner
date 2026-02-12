@@ -13,6 +13,7 @@ import { UniverBackToListSlidesPlugin } from '../plugins/back-to-list-slides-plu
 // Locale imports
 import DesignZhTW from '@univerjs/design/lib/locale/zh-TW.js'
 import UIZhTW from '@univerjs/ui/lib/locale/zh-TW.js'
+import { OFFICE_LABELS } from '../constants/labels'
 
 // CSS imports
 import '@univerjs/design/lib/index.css'
@@ -28,7 +29,7 @@ function createEmptySlidesData() {
   const pageId = 'slide-page-' + Date.now()
   return {
     id: 'slides-' + Date.now(),
-    title: '未命名簡報',
+    title: OFFICE_LABELS.未命名簡報,
     pageSize: {
       width: 960,
       height: 540,
@@ -38,7 +39,7 @@ function createEmptySlidesData() {
         id: pageId,
         pageType: 0, // Normal page
         zIndex: 1,
-        title: '投影片 1',
+        title: OFFICE_LABELS.投影片_1,
         description: '',
         pageBackgroundFill: {
           rgb: 'rgb(255, 255, 255)',
@@ -94,7 +95,7 @@ export function UniverSlides({ className }: UniverSlidesProps) {
         // 在簡報建立後註冊返回列表 plugin
         univer.registerPlugin(UniverBackToListSlidesPlugin)
       } catch (error) {
-        logger.error('Univer Slides 初始化失敗:', error)
+        logger.error(OFFICE_LABELS.Univer_Slides_初始化失敗, error)
       }
     }, 100)
 

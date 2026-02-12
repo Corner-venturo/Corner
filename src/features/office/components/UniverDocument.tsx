@@ -8,6 +8,7 @@ import PresetDocsZhTW from '@univerjs/presets/preset-docs-core/locales/zh-TW'
 import type { Univer } from '@univerjs/core'
 import type { FUniver } from '@univerjs/core/facade'
 import { UniverBackToListDocPlugin } from '../plugins/back-to-list-doc-plugin'
+import { OFFICE_LABELS } from '../constants/labels'
 
 // CSS
 import '@univerjs/presets/lib/styles/preset-docs-core.css'
@@ -50,7 +51,7 @@ export function UniverDocument({ className }: UniverDocumentProps) {
         // 在文件建立後註冊返回列表 plugin
         univer.registerPlugin(UniverBackToListDocPlugin)
       } catch (error) {
-        logger.error('Univer Document 初始化失敗:', error)
+        logger.error(OFFICE_LABELS.Univer_Document_初始化失敗, error)
       }
     }, 100)
 

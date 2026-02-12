@@ -9,6 +9,7 @@ import {
   invalidatePaymentRequests,
   invalidatePaymentRequestItems,
 } from '@/data'
+import { PAYMENTS_LABELS } from '../constants/labels'
 
 class PaymentRequestService extends BaseService<PaymentRequest> {
   protected resourceName = 'payment_requests'
@@ -82,18 +83,18 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
 
   protected validate(data: Partial<PaymentRequest>): void {
     if (data.tour_id && !data.tour_id.trim()) {
-      throw new ValidationError('tour_id', '必須關聯旅遊團')
+      throw new ValidationError('tour_id', PAYMENTS_LABELS.必須關聯旅遊團)
     }
 
     if (data.amount !== undefined && data.amount < 0) {
-      throw new ValidationError('amount', '總金額不能為負數')
+      throw new ValidationError('amount', PAYMENTS_LABELS.總金額不能為負數)
     }
 
     if (data.created_at) {
       const requestDate = new Date(data.created_at)
       const dayOfWeek = requestDate.getDay()
       if (dayOfWeek !== 4) {
-        throw new ValidationError('created_at', '請款日期必須為週四')
+        throw new ValidationError('created_at', PAYMENTS_LABELS.請款日期必須為週四)
       }
     }
   }
@@ -326,10 +327,10 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       code,
       request_number: code,
       request_date: requestDate,
-      request_type: '從報價單自動生成',
+      request_type: PAYMENTS_LABELS.從報價單自動生成,
       amount: 0,
       status: 'pending' as const,
-      note: '從報價單自動生成',
+      note: PAYMENTS_LABELS.從報價單自動生成,
     }
 
     return await this.create(requestData)
@@ -410,7 +411,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
     }
 
     if (request.status === 'paid') {
-      throw new Error('此請款單已付款')
+      throw new Error(PAYMENTS_LABELS.此請款單已付款)
     }
 
     const now = this.now()
@@ -439,13 +440,13 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
           description: `${request.request_number || ''} - 付款`,
         })
 
-        logger.info('✅ 付款傳票已自動產生', {
+        logger.info(PAYMENTS_LABELS.付款傳票已自動產生, {
           requestId,
           requestNumber: request.request_number,
           amount: request.amount,
         })
       } catch (error) {
-        logger.error('❌ 傳票產生失敗（不影響付款確認）:', error)
+        logger.error(PAYMENTS_LABELS.傳票產生失敗_不影響付款確認, error)
         // 不阻斷付款流程
       }
     }
@@ -461,7 +462,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
     }
 
     if (request.status !== 'paid') {
-      throw new Error('只能取消已付款的請款單')
+      throw new Error(PAYMENTS_LABELS.只能取消已付款的請款單)
     }
 
     await this.update(requestId, {
@@ -470,7 +471,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       updated_at: this.now(),
     })
 
-    logger.warn('⚠️ 付款已取消，請手動作廢相關傳票', { requestId })
+    logger.warn(PAYMENTS_LABELS.付款已取消_請手動作廢相關傳票, { requestId })
   }
 }
 

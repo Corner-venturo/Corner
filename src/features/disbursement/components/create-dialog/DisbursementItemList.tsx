@@ -14,6 +14,7 @@ import { Search, X, Calendar } from 'lucide-react'
 import { PaymentRequest } from '@/stores/types'
 import { cn } from '@/lib/utils'
 import { statusLabels } from '@/features/finance/requests/types'
+import { DISBURSEMENT_LABELS } from '../../constants/labels'
 
 interface DisbursementItemListProps {
   filteredRequests: PaymentRequest[]
@@ -76,7 +77,7 @@ export function DisbursementItemList({
             <Input
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="搜尋請款編號或團名"
+              placeholder={DISBURSEMENT_LABELS.搜尋請款編號或團名}
               className="pl-9 w-56"
             />
           </div>
@@ -84,7 +85,7 @@ export function DisbursementItemList({
           <DatePicker
             value={dateFilter}
             onChange={onDateFilterChange}
-            placeholder="搜尋出帳日期"
+            placeholder={DISBURSEMENT_LABELS.搜尋出帳日期}
             className="w-40"
           />
           {/* 當日按鈕 */}
@@ -158,7 +159,7 @@ export function DisbursementItemList({
                     </span>
                   </td>
                   <td className="py-3 px-4 text-morandi-primary max-w-[200px] truncate">
-                    {request.request_category === 'company' ? '公司' : (request.tour_name || '-')}
+                    {request.request_category === 'company' ? DISBURSEMENT_LABELS.公司 : (request.tour_name || '-')}
                   </td>
                   <td className="py-3 px-4 text-morandi-secondary">
                     {request.created_at?.split('T')[0] || '-'}

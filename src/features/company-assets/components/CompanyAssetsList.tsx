@@ -13,6 +13,7 @@ import { supabase } from '@/lib/supabase/client'
 import { format } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 import type { CompanyAsset, CompanyAssetType } from '@/types/company-asset.types'
+import { COMPANY_ASSETS_LABELS } from '../constants/labels'
 
 interface CompanyAssetsListProps {
   assets: CompanyAsset[]
@@ -26,9 +27,9 @@ interface CompanyAssetsListProps {
 
 // 檔案類型中文對應
 const TYPE_LABELS: Record<CompanyAssetType, string> = {
-  document: '文件',
-  image: '圖片',
-  video: '影片',
+  document: COMPANY_ASSETS_LABELS.文件,
+  image: COMPANY_ASSETS_LABELS.圖片,
+  video: COMPANY_ASSETS_LABELS.影片,
 }
 
 // 檔案類型圖示
@@ -55,7 +56,7 @@ export const CompanyAssetsList: React.FC<CompanyAssetsListProps> = ({
   const columns: TableColumn[] = [
     {
       key: 'thumbnail',
-      label: '縮圖',
+      label: COMPANY_ASSETS_LABELS.縮圖,
       width: '80px',
       render: (_value, row) => {
         const asset = row as CompanyAsset
@@ -86,7 +87,7 @@ export const CompanyAssetsList: React.FC<CompanyAssetsListProps> = ({
     },
     {
       key: 'name',
-      label: '檔案名稱',
+      label: COMPANY_ASSETS_LABELS.檔案名稱,
       sortable: true,
       render: (value, row) => {
         const asset = row as CompanyAsset
@@ -105,7 +106,7 @@ export const CompanyAssetsList: React.FC<CompanyAssetsListProps> = ({
     },
     {
       key: 'asset_type',
-      label: '檔案類型',
+      label: COMPANY_ASSETS_LABELS.檔案類型,
       sortable: true,
       width: '100px',
       render: value => {
@@ -121,7 +122,7 @@ export const CompanyAssetsList: React.FC<CompanyAssetsListProps> = ({
     },
     {
       key: 'created_at',
-      label: '上傳時間',
+      label: COMPANY_ASSETS_LABELS.上傳時間,
       sortable: true,
       width: '150px',
       render: value => (
@@ -151,7 +152,7 @@ export const CompanyAssetsList: React.FC<CompanyAssetsListProps> = ({
                   onPreview(asset)
                 }}
                 className="text-morandi-secondary hover:bg-morandi-container/20"
-                title="預覽"
+                title={COMPANY_ASSETS_LABELS.預覽}
               >
                 <Eye size={16} />
               </Button>
@@ -165,7 +166,7 @@ export const CompanyAssetsList: React.FC<CompanyAssetsListProps> = ({
                   onDownload(asset)
                 }}
                 className="text-morandi-green hover:bg-morandi-green/10"
-                title="下載"
+                title={COMPANY_ASSETS_LABELS.下載}
               >
                 <Download size={16} />
               </Button>
@@ -179,7 +180,7 @@ export const CompanyAssetsList: React.FC<CompanyAssetsListProps> = ({
                   onEdit(asset)
                 }}
                 className="text-morandi-blue hover:bg-morandi-blue/10"
-                title="編輯"
+                title={COMPANY_ASSETS_LABELS.編輯}
               >
                 <Pencil size={16} />
               </Button>
@@ -193,7 +194,7 @@ export const CompanyAssetsList: React.FC<CompanyAssetsListProps> = ({
                   onDelete(asset)
                 }}
                 className="text-morandi-red hover:bg-morandi-red/10"
-                title="刪除"
+                title={COMPANY_ASSETS_LABELS.刪除}
               >
                 <Trash2 size={16} />
               </Button>

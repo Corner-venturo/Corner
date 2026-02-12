@@ -17,6 +17,7 @@ import {
   RibbonStartGroup,
 } from '@univerjs/ui'
 import type { IMenuButtonItem } from '@univerjs/ui'
+import { OFFICE_LABELS } from '../constants/labels'
 
 // ============================================
 // Command IDs
@@ -211,8 +212,8 @@ function SaveMenuItemFactory(): IMenuButtonItem<string> {
   return {
     id: SAVE_COMMAND_ID,
     type: MenuItemType.BUTTON,
-    title: '儲存',
-    tooltip: '儲存文件 (Ctrl+S)',
+    title: OFFICE_LABELS.儲存,
+    tooltip: OFFICE_LABELS.儲存文件_Ctrl_S,
     icon: 'SaveIcon',
   }
 }
@@ -221,8 +222,8 @@ function SaveAsMenuItemFactory(): IMenuButtonItem<string> {
   return {
     id: SAVE_AS_COMMAND_ID,
     type: MenuItemType.BUTTON,
-    title: '另存新檔',
-    tooltip: '另存新檔',
+    title: OFFICE_LABELS.另存新檔,
+    tooltip: OFFICE_LABELS.另存新檔,
     icon: 'SaveAsIcon',
   }
 }
@@ -231,8 +232,8 @@ function ExportExcelMenuItemFactory(): IMenuButtonItem<string> {
   return {
     id: EXPORT_EXCEL_COMMAND_ID,
     type: MenuItemType.BUTTON,
-    title: '匯出',
-    tooltip: '匯出 Excel',
+    title: OFFICE_LABELS.匯出,
+    tooltip: OFFICE_LABELS.匯出_Excel,
     icon: 'ExportExcelIcon',
   }
 }
@@ -241,8 +242,8 @@ function AutoSumMenuItemFactory(): IMenuButtonItem<string> {
   return {
     id: AUTO_SUM_COMMAND_ID,
     type: MenuItemType.BUTTON,
-    title: 'Σ 加總',
-    tooltip: '選取範圍後，在下方自動插入 SUM 公式',
+    title: OFFICE_LABELS.加總,
+    tooltip: OFFICE_LABELS.選取範圍後_在下方自動插入_SUM_公式,
     icon: 'AutoSumIcon',
   }
 }

@@ -19,6 +19,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { Bus, Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { TRANSPORTATION_RATES_LABELS } from '../constants/labels'
 
 interface RatesDetailDialogProps {
   isOpen: boolean
@@ -46,29 +47,29 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
   const handleUpdate = async (id: string, updates: Partial<TransportationRate>) => {
     try {
       await updateTransportationRate(id, updates as any)
-      toast.success('更新成功')
+      toast.success(TRANSPORTATION_RATES_LABELS.更新成功)
       onUpdate()
     } catch (error) {
       logger.error('Error updating rate:', error)
-      toast.error('更新失敗')
+      toast.error(TRANSPORTATION_RATES_LABELS.更新失敗)
     }
   }
 
   // 刪除資料
   const handleDelete = async (id: string) => {
-    const confirmed = await confirm('確定要刪除這筆車資資料嗎？', {
-      title: '刪除車資',
+    const confirmed = await confirm(TRANSPORTATION_RATES_LABELS.確定要刪除這筆車資資料嗎, {
+      title: TRANSPORTATION_RATES_LABELS.刪除車資,
       type: 'warning',
     })
     if (!confirmed) return
 
     try {
       await deleteTransportationRate(id)
-      toast.success('刪除成功')
+      toast.success(TRANSPORTATION_RATES_LABELS.刪除成功)
       onUpdate()
     } catch (error) {
       logger.error('Error deleting rate:', error)
-      toast.error('刪除失敗')
+      toast.error(TRANSPORTATION_RATES_LABELS.刪除失敗)
     }
   }
 
@@ -91,11 +92,11 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
         is_active: true,
         display_order: 0,
       } as any)
-      toast.success('新增成功')
+      toast.success(TRANSPORTATION_RATES_LABELS.新增成功)
       onUpdate()
     } catch (error) {
       logger.error('Error creating rate:', error)
-      toast.error('新增失敗')
+      toast.error(TRANSPORTATION_RATES_LABELS.新增失敗)
     }
   }
 
@@ -115,7 +116,7 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
               className="gap-2"
             >
               {hideKKDAYColumns ? <Eye size={16} /> : <EyeOff size={16} />}
-              {hideKKDAYColumns ? '顯示 KKDAY 欄位' : '隱藏 KKDAY 欄位'}
+              {hideKKDAYColumns ? TRANSPORTATION_RATES_LABELS.顯示_KKDAY_欄位 : TRANSPORTATION_RATES_LABELS.隱藏_KKDAY_欄位}
             </Button>
           </div>
         </DialogHeader>

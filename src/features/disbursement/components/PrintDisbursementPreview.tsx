@@ -15,6 +15,7 @@
 import React, { forwardRef, useMemo } from 'react'
 import type { DisbursementOrder, PaymentRequest, PaymentRequestItem } from '@/stores/types'
 import { formatDate } from '@/lib/utils'
+import { DISBURSEMENT_LABELS } from '../constants/labels'
 
 // Morandi 色系
 const COLORS = {
@@ -59,7 +60,7 @@ function processItems(
     const isCompany = request?.request_category === 'company'
     // 公司請款顯示費用類型，團體請款顯示團名
     const tourName = isCompany
-      ? (request?.request_type || '公司')
+      ? (request?.request_type || DISBURSEMENT_LABELS.公司)
       : (request?.tour_name || '-')
 
     return {
@@ -67,7 +68,7 @@ function processItems(
       createdBy: request?.created_by_name || '-',
       tourName,
       description: item.description || item.category || '-',
-      payFor: item.supplier_name || '未指定供應商',
+      payFor: item.supplier_name || DISBURSEMENT_LABELS.未指定供應商,
       amount: item.subtotal || 0,
       isCompany,
     }
@@ -191,7 +192,7 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
           }}>
             <img
               src="/corner-logo.png"
-              alt="角落旅行社"
+              alt={DISBURSEMENT_LABELS.角落旅行社}
               style={{
                 height: '36px',
                 width: 'auto',

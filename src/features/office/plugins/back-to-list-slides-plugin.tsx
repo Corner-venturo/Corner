@@ -14,6 +14,7 @@ import {
   RibbonStartGroup,
 } from '@univerjs/ui'
 import type { IMenuButtonItem } from '@univerjs/ui'
+import { OFFICE_LABELS } from '../constants/labels'
 
 // Command ID
 const BACK_TO_LIST_SLIDES_COMMAND_ID = 'office.command.back-to-list-slides'
@@ -35,8 +36,8 @@ function BackToListSlidesMenuItemFactory(): IMenuButtonItem<string> {
   return {
     id: BACK_TO_LIST_SLIDES_COMMAND_ID,
     type: MenuItemType.BUTTON,
-    title: '← 返回',
-    tooltip: '返回文件列表',
+    title: OFFICE_LABELS.返回,
+    tooltip: OFFICE_LABELS.返回文件列表,
   }
 }
 

@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import type { CompanyAssetType } from '@/types/company-asset.types'
+import { COMPANY_ASSETS_LABELS } from '../constants/labels'
 
 type AssetFormData = {
   name: string
@@ -47,10 +48,10 @@ export const CompanyAssetsDialog: React.FC<CompanyAssetsDialogProps> = ({
     <FormDialog
       open={isOpen}
       onOpenChange={open => !open && onClose()}
-      title={isEditMode ? '編輯資源' : '新增資源'}
-      subtitle="管理公司 Logo、合約章、發票章、文件等資源"
+      title={isEditMode ? COMPANY_ASSETS_LABELS.編輯資源 : COMPANY_ASSETS_LABELS.新增資源}
+      subtitle={COMPANY_ASSETS_LABELS.管理公司_Logo_合約章_發票章_文件等資源}
       onSubmit={onSubmit}
-      submitLabel={isLoading ? '儲存中...' : isEditMode ? '更新' : '新增'}
+      submitLabel={isLoading ? COMPANY_ASSETS_LABELS.儲存中 : isEditMode ? COMPANY_ASSETS_LABELS.更新 : COMPANY_ASSETS_LABELS.新增}
       submitDisabled={!formData.name || (!isEditMode && !formData.file) || isLoading}
       maxWidth="md"
     >
@@ -63,7 +64,7 @@ export const CompanyAssetsDialog: React.FC<CompanyAssetsDialogProps> = ({
           <Input
             value={formData.name}
             onChange={e => onFormFieldChange('name', e.target.value)}
-            placeholder="例如：公司合約章、發票專用章..."
+            placeholder={COMPANY_ASSETS_LABELS.例如_公司合約章_發票專用章}
             className="mt-1"
           />
         </div>
@@ -91,7 +92,7 @@ export const CompanyAssetsDialog: React.FC<CompanyAssetsDialogProps> = ({
         {/* 上傳檔案 */}
         <div>
           <label className="text-sm font-medium text-morandi-primary">
-            {isEditMode ? '更換檔案（選填）' : '上傳檔案'}{' '}
+            {isEditMode ? COMPANY_ASSETS_LABELS.更換檔案_選填 : COMPANY_ASSETS_LABELS.上傳檔案}{' '}
             {!isEditMode && <span className="text-morandi-red">*</span>}
           </label>
           <Input

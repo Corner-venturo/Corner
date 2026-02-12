@@ -20,6 +20,7 @@ import { supabase } from '@/lib/supabase/client'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import type { WorkspaceWithDetails } from '../types'
+import { WORKSPACES_LABELS } from '../constants/labels'
 
 interface EditWorkspaceDialogProps {
   open: boolean
@@ -56,15 +57,15 @@ export function EditWorkspaceDialog({ open, onOpenChange, workspace, onSuccess }
 
     // 驗證
     if (!formData.name.trim()) {
-      await alert('請輸入公司名稱', 'error')
+      await alert(WORKSPACES_LABELS.請輸入公司名稱, 'error')
       return
     }
     if (!formData.employee_number_prefix.trim()) {
-      await alert('請輸入員工編號前綴', 'error')
+      await alert(WORKSPACES_LABELS.請輸入員工編號前綴, 'error')
       return
     }
     if (!formData.default_password.trim()) {
-      await alert('請輸入預設密碼', 'error')
+      await alert(WORKSPACES_LABELS.請輸入預設密碼, 'error')
       return
     }
 
@@ -82,12 +83,12 @@ export function EditWorkspaceDialog({ open, onOpenChange, workspace, onSuccess }
 
       if (error) throw error
 
-      await alert('設定已更新', 'success')
+      await alert(WORKSPACES_LABELS.設定已更新, 'success')
       onOpenChange(false)
       onSuccess()
     } catch (error) {
-      logger.error('更新公司設定失敗:', error)
-      await alert('更新失敗，請稍後再試', 'error')
+      logger.error(WORKSPACES_LABELS.更新公司設定失敗, error)
+      await alert(WORKSPACES_LABELS.更新失敗_請稍後再試, 'error')
     } finally {
       setIsSubmitting(false)
     }
@@ -116,7 +117,7 @@ export function EditWorkspaceDialog({ open, onOpenChange, workspace, onSuccess }
             <Input
               value={formData.name}
               onChange={(e) => handleFieldChange('name', e.target.value)}
-              placeholder="例：角落旅遊"
+              placeholder={WORKSPACES_LABELS.例_角落旅遊}
             />
           </div>
 
@@ -125,7 +126,7 @@ export function EditWorkspaceDialog({ open, onOpenChange, workspace, onSuccess }
             <Input
               value={formData.employee_number_prefix}
               onChange={(e) => handleFieldChange('employee_number_prefix', e.target.value)}
-              placeholder="例：E、TP、JY"
+              placeholder={WORKSPACES_LABELS.例_E_TP_JY}
               className="uppercase"
               maxLength={5}
             />
@@ -139,7 +140,7 @@ export function EditWorkspaceDialog({ open, onOpenChange, workspace, onSuccess }
             <Input
               value={formData.default_password}
               onChange={(e) => handleFieldChange('default_password', e.target.value)}
-              placeholder="新員工的預設密碼"
+              placeholder={WORKSPACES_LABELS.新員工的預設密碼}
             />
             <p className="text-xs text-morandi-secondary">
               新增員工時的預設密碼，員工可自行更改

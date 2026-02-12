@@ -15,6 +15,7 @@ import {
   RibbonStartGroup,
 } from '@univerjs/ui'
 import type { IMenuButtonItem } from '@univerjs/ui'
+import { OFFICE_LABELS } from '../constants/labels'
 
 // Command ID
 const BACK_TO_LIST_COMMAND_ID = 'office.command.back-to-list'
@@ -45,8 +46,8 @@ function BackToListMenuItemFactory(): IMenuButtonItem<string> {
   return {
     id: BACK_TO_LIST_COMMAND_ID,
     type: MenuItemType.BUTTON,
-    title: '返回列表',
-    tooltip: '返回文件列表',
+    title: OFFICE_LABELS.返回列表,
+    tooltip: OFFICE_LABELS.返回文件列表,
     icon: 'BackToListIcon',
   }
 }

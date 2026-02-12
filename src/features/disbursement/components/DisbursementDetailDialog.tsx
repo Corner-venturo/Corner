@@ -29,6 +29,7 @@ import { DisbursementPrintDialog } from './DisbursementPrintDialog'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { DISBURSEMENT_STATUS } from '../constants'
+import { DISBURSEMENT_LABELS } from '../constants/labels'
 
 interface DisbursementDetailDialogProps {
   order: DisbursementOrder | null
@@ -74,7 +75,7 @@ export function DisbursementDetailDialog({
   // 追加請款單
   const handleAddRequests = async () => {
     if (selectedToAdd.length === 0) {
-      await alert('請選擇要追加的請款單', 'warning')
+      await alert(DISBURSEMENT_LABELS.請選擇要追加的請款單, 'warning')
       return
     }
 
@@ -106,8 +107,8 @@ export function DisbursementDetailDialog({
       setIsAddingMode(false)
       setSelectedToAdd([])
     } catch (error) {
-      logger.error('追加請款單失敗:', error)
-      await alert('追加請款單失敗', 'error')
+      logger.error(DISBURSEMENT_LABELS.追加請款單失敗_2, error)
+      await alert(DISBURSEMENT_LABELS.追加請款單失敗, 'error')
     }
   }
 
@@ -124,7 +125,7 @@ export function DisbursementDetailDialog({
     if (!request) return
 
     const confirmed = await confirm(`確定要從此出納單移除「${request.code}」嗎？`, {
-      title: '移除請款單',
+      title: DISBURSEMENT_LABELS.移除請款單,
       type: 'warning',
     })
     if (!confirmed) return
@@ -147,17 +148,17 @@ export function DisbursementDetailDialog({
       // SWR 快取失效，自動重新載入
       await invalidateDisbursementOrders()
 
-      await alert('已移除請款單', 'success')
+      await alert(DISBURSEMENT_LABELS.已移除請款單, 'success')
     } catch (error) {
-      logger.error('移除請款單失敗:', error)
-      await alert('移除請款單失敗', 'error')
+      logger.error(DISBURSEMENT_LABELS.移除請款單失敗_2, error)
+      await alert(DISBURSEMENT_LABELS.移除請款單失敗, 'error')
     }
   }
 
   // 確認出帳
   const handleConfirmPaid = async () => {
-    const confirmed = await confirm('確定要將此出納單標記為「已出帳」嗎？', {
-      title: '確認出帳',
+    const confirmed = await confirm(DISBURSEMENT_LABELS.確定要將此出納單標記為_已出帳_嗎, {
+      title: DISBURSEMENT_LABELS.確認出帳,
       type: 'warning',
     })
     if (!confirmed) return
@@ -178,11 +179,11 @@ export function DisbursementDetailDialog({
         })
       }
 
-      await alert('出納單已標記為已出帳', 'success')
+      await alert(DISBURSEMENT_LABELS.出納單已標記為已出帳, 'success')
       onOpenChange(false)
     } catch (error) {
-      logger.error('更新出納單失敗:', error)
-      await alert('更新出納單失敗', 'error')
+      logger.error(DISBURSEMENT_LABELS.更新出納單失敗_2, error)
+      await alert(DISBURSEMENT_LABELS.更新出納單失敗, 'error')
     }
   }
 
@@ -214,12 +215,12 @@ export function DisbursementDetailDialog({
         <div className="space-y-6 mt-4">
           {/* 基本資訊 */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-morandi-background/50 rounded-lg">
-            <InfoItem label="出納單號" value={order.order_number || '-'} />
+            <InfoItem label={DISBURSEMENT_LABELS.出納單號} value={order.order_number || '-'} />
             <div>
               <p className="text-xs text-morandi-muted mb-1">出帳日期</p>
               <DateCell date={order.disbursement_date} showIcon={false} className="text-sm" />
             </div>
-            <InfoItem label="請款單數" value={`${order.payment_request_ids?.length || 0} 筆`} />
+            <InfoItem label={DISBURSEMENT_LABELS.請款單數} value={`${order.payment_request_ids?.length || 0} 筆`} />
             <div>
               <p className="text-xs text-morandi-muted mb-1">總金額</p>
               <CurrencyCell amount={order.amount || 0} className="font-semibold text-morandi-gold" />

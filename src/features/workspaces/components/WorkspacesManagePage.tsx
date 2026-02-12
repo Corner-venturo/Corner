@@ -18,6 +18,7 @@ import { AddAdminDialog } from './AddAdminDialog'
 import { EditWorkspaceDialog } from './EditWorkspaceDialog'
 import type { WorkspaceWithDetails } from '../types'
 import { WORKSPACE_TYPE_LABELS } from '../types'
+import { WORKSPACES_LABELS } from '../constants/labels'
 
 export function WorkspacesManagePage() {
   const [workspaces, setWorkspaces] = useState<WorkspaceWithDetails[]>([])
@@ -42,8 +43,8 @@ export function WorkspacesManagePage() {
 
       setWorkspaces(workspacesData || [])
     } catch (error) {
-      logger.error('載入公司列表失敗:', error)
-      await alert('載入公司列表失敗', 'error')
+      logger.error(WORKSPACES_LABELS.載入公司列表失敗_2, error)
+      await alert(WORKSPACES_LABELS.載入公司列表失敗, 'error')
     } finally {
       setIsLoading(false)
     }
@@ -75,7 +76,7 @@ export function WorkspacesManagePage() {
     }
 
     const confirmed = await confirm(`確定要刪除公司「${workspace.name}」嗎？`, {
-      title: '刪除公司',
+      title: WORKSPACES_LABELS.刪除公司,
       type: 'warning',
     })
     if (!confirmed) return
@@ -88,11 +89,11 @@ export function WorkspacesManagePage() {
 
       if (error) throw error
 
-      await alert('公司已刪除', 'success')
+      await alert(WORKSPACES_LABELS.公司已刪除, 'success')
       fetchWorkspaces()
     } catch (error) {
-      logger.error('刪除公司失敗:', error)
-      await alert('刪除失敗', 'error')
+      logger.error(WORKSPACES_LABELS.刪除公司失敗, error)
+      await alert(WORKSPACES_LABELS.刪除失敗, 'error')
     }
   }, [fetchWorkspaces])
 
@@ -112,7 +113,7 @@ export function WorkspacesManagePage() {
   const columns = [
     {
       key: 'name',
-      label: '名稱',
+      label: WORKSPACES_LABELS.名稱,
       width: '200',
       render: (_: unknown, row: WorkspaceWithDetails) => (
         <div>
@@ -123,7 +124,7 @@ export function WorkspacesManagePage() {
     },
     {
       key: 'type',
-      label: '類型',
+      label: WORKSPACES_LABELS.類型,
       width: '100',
       render: (_: unknown, row: WorkspaceWithDetails) => (
         <span className="text-sm text-morandi-secondary">
@@ -133,7 +134,7 @@ export function WorkspacesManagePage() {
     },
     {
       key: 'settings',
-      label: '設定',
+      label: WORKSPACES_LABELS.設定,
       width: '150',
       render: (_: unknown, row: WorkspaceWithDetails) => (
         <div className="text-xs text-morandi-secondary">
@@ -144,7 +145,7 @@ export function WorkspacesManagePage() {
     },
     {
       key: 'is_active',
-      label: '狀態',
+      label: WORKSPACES_LABELS.狀態,
       width: '100',
       render: (_: unknown, row: WorkspaceWithDetails) => (
         <span className={`px-2 py-1 rounded-full text-xs ${
@@ -152,13 +153,13 @@ export function WorkspacesManagePage() {
             ? 'bg-status-success-bg text-morandi-green'
             : 'bg-status-error-bg text-morandi-red'
         }`}>
-          {row.is_active ? '啟用' : '停用'}
+          {row.is_active ? WORKSPACES_LABELS.啟用 : WORKSPACES_LABELS.停用}
         </span>
       ),
     },
     {
       key: 'created_at',
-      label: '建立時間',
+      label: WORKSPACES_LABELS.建立時間,
       width: '150',
       render: (_: unknown, row: WorkspaceWithDetails) => (
         <DateCell date={row.created_at} format="short" />
@@ -173,17 +174,17 @@ export function WorkspacesManagePage() {
           actions={[
             {
               icon: Settings,
-              label: '設定',
+              label: WORKSPACES_LABELS.設定,
               onClick: () => handleEdit(row),
             },
             {
               icon: UserPlus,
-              label: '新增管理員',
+              label: WORKSPACES_LABELS.新增管理員,
               onClick: () => handleAddAdmin(row),
             },
             {
               icon: Trash2,
-              label: '刪除',
+              label: WORKSPACES_LABELS.刪除,
               onClick: () => handleDelete(row),
               variant: 'danger' as const,
             },
@@ -196,19 +197,19 @@ export function WorkspacesManagePage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="公司管理"
+        title={WORKSPACES_LABELS.公司管理}
         icon={Building2}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '資料庫管理', href: '/database' },
-          { label: '公司管理', href: '/database/workspaces' },
+          { label: WORKSPACES_LABELS.首頁, href: '/' },
+          { label: WORKSPACES_LABELS.資料庫管理, href: '/database' },
+          { label: WORKSPACES_LABELS.公司管理, href: '/database/workspaces' },
         ]}
         showSearch
         searchTerm={searchQuery}
         onSearchChange={setSearchQuery}
-        searchPlaceholder="搜尋公司名稱或代號..."
+        searchPlaceholder={WORKSPACES_LABELS.搜尋公司名稱或代號}
         onAdd={() => setIsAddDialogOpen(true)}
-        addLabel="新增公司"
+        addLabel={WORKSPACES_LABELS.新增公司}
       />
 
       <div className="flex-1 overflow-auto">
@@ -216,7 +217,7 @@ export function WorkspacesManagePage() {
           columns={columns}
           data={filteredWorkspaces}
           isLoading={isLoading}
-          emptyMessage="尚無公司資料"
+          emptyMessage={WORKSPACES_LABELS.尚無公司資料}
         />
       </div>
 

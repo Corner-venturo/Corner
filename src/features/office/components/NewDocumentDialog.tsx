@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { OFFICE_LABELS } from '../constants/labels'
 
 type DocumentType = 'spreadsheet' | 'document' | 'slides'
 
@@ -23,15 +24,15 @@ interface DocumentTypeOption {
 const documentTypes: DocumentTypeOption[] = [
   {
     type: 'spreadsheet',
-    label: '試算表',
-    description: '類似 Excel，適合數據計算、表格整理',
+    label: OFFICE_LABELS.試算表,
+    description: OFFICE_LABELS.類似_Excel_適合數據計算_表格整理,
     icon: FileSpreadsheet,
     color: 'text-green-600 bg-green-50 hover:bg-green-100',
   },
   {
     type: 'document',
-    label: '文件',
-    description: '類似 Word，適合撰寫報告、合約',
+    label: OFFICE_LABELS.文件,
+    description: OFFICE_LABELS.類似_Word_適合撰寫報告_合約,
     icon: FileText,
     color: 'text-blue-600 bg-blue-50 hover:bg-blue-100',
   },
@@ -58,7 +59,7 @@ export function NewDocumentDialog({ open, onOpenChange }: NewDocumentDialogProps
   const handleCreate = () => {
     if (!selectedType) return
 
-    const name = docName.trim() || '未命名文件'
+    const name = docName.trim() || OFFICE_LABELS.未命名文件
     router.push(`/office/editor?name=${encodeURIComponent(name)}&type=${selectedType}`)
     onOpenChange(false)
     setDocName('')
@@ -88,7 +89,7 @@ export function NewDocumentDialog({ open, onOpenChange }: NewDocumentDialogProps
               type="text"
               value={docName}
               onChange={(e) => setDocName(e.target.value)}
-              placeholder="未命名文件"
+              placeholder={OFFICE_LABELS.未命名文件}
               className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
             />
           </div>

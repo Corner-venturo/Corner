@@ -30,6 +30,7 @@ import { logger } from '@/lib/utils/logger'
 import bcrypt from 'bcryptjs'
 import type { WorkspaceType } from '../types'
 import { WORKSPACE_TYPE_LABELS } from '../types'
+import { WORKSPACES_LABELS } from '../constants/labels'
 
 interface AddWorkspaceDialogProps {
   open: boolean
@@ -70,23 +71,23 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
   const handleSubmit = useCallback(async () => {
     // 驗證
     if (!formData.name.trim()) {
-      await alert('請輸入公司名稱', 'error')
+      await alert(WORKSPACES_LABELS.請輸入公司名稱, 'error')
       return
     }
     if (!formData.code.trim()) {
-      await alert('請輸入公司代號', 'error')
+      await alert(WORKSPACES_LABELS.請輸入公司代號, 'error')
       return
     }
     if (!formData.admin_name.trim()) {
-      await alert('請輸入管理員姓名', 'error')
+      await alert(WORKSPACES_LABELS.請輸入管理員姓名, 'error')
       return
     }
     if (!formData.admin_employee_number.trim()) {
-      await alert('請輸入管理員帳號', 'error')
+      await alert(WORKSPACES_LABELS.請輸入管理員帳號, 'error')
       return
     }
     if (!formData.admin_password.trim()) {
-      await alert('請輸入管理員密碼', 'error')
+      await alert(WORKSPACES_LABELS.請輸入管理員密碼, 'error')
       return
     }
 
@@ -108,7 +109,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
 
       if (wsError) {
         if (wsError.code === '23505') {
-          await alert('此公司代號已存在', 'error')
+          await alert(WORKSPACES_LABELS.此公司代號已存在, 'error')
           return
         }
         throw wsError
@@ -154,7 +155,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
 
         if (authResponse.ok) {
           const authResult = await authResponse.json()
-          logger.log('✅ Auth 帳號已建立:', authResult)
+          logger.log(WORKSPACES_LABELS.Auth_帳號已建立, authResult)
 
           // 綁定 supabase_user_id
           if (authResult.data?.user?.id && employee?.id) {
@@ -162,14 +163,14 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
               .from('employees')
               .update({ supabase_user_id: authResult.data.user.id })
               .eq('id', employee.id)
-            logger.log('✅ supabase_user_id 已綁定')
+            logger.log(WORKSPACES_LABELS.supabase_user_id_已綁定)
           }
         } else {
           const error = await authResponse.json()
-          logger.warn('⚠️ 建立 Auth 帳號失敗:', error)
+          logger.warn(WORKSPACES_LABELS.建立_Auth_帳號失敗, error)
         }
       } catch (authError) {
-        logger.warn('⚠️ 建立 Auth 帳號失敗（不影響公司建立）:', authError)
+        logger.warn(WORKSPACES_LABELS.建立_Auth_帳號失敗_不影響公司建立, authError)
       }
 
       await alert(`公司「${formData.name}」已建立，管理員帳號為 ${employeeNumber}`, 'success')
@@ -177,8 +178,8 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
       onOpenChange(false)
       onSuccess()
     } catch (error) {
-      logger.error('建立公司失敗:', error)
-      await alert('建立公司失敗，請稍後再試', 'error')
+      logger.error(WORKSPACES_LABELS.建立公司失敗, error)
+      await alert(WORKSPACES_LABELS.建立公司失敗_請稍後再試, 'error')
     } finally {
       setIsSubmitting(false)
     }
@@ -207,7 +208,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
                 <Input
                   value={formData.name}
                   onChange={(e) => handleFieldChange('name', e.target.value)}
-                  placeholder="例：角落旅遊 台北"
+                  placeholder={WORKSPACES_LABELS.例_角落旅遊_台北}
                 />
               </div>
 
@@ -216,7 +217,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
                 <Input
                   value={formData.code}
                   onChange={(e) => handleFieldChange('code', e.target.value.toLowerCase())}
-                  placeholder="例：corner（小寫）"
+                  placeholder={WORKSPACES_LABELS.例_corner_小寫}
                 />
                 <p className="text-xs text-morandi-secondary">登入時使用，自動轉為小寫</p>
               </div>
@@ -280,7 +281,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
                 <Input
                   value={formData.admin_name}
                   onChange={(e) => handleFieldChange('admin_name', e.target.value)}
-                  placeholder="例：王大明"
+                  placeholder={WORKSPACES_LABELS.例_王大明}
                 />
               </div>
 
@@ -289,7 +290,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
                 <Input
                   value={formData.admin_employee_number}
                   onChange={(e) => handleFieldChange('admin_employee_number', e.target.value)}
-                  placeholder="例：E001"
+                  placeholder={WORKSPACES_LABELS.例_E001}
                   className="uppercase"
                 />
               </div>
@@ -301,7 +302,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
                 type="password"
                 value={formData.admin_password}
                 onChange={(e) => handleFieldChange('admin_password', e.target.value)}
-                placeholder="請設定密碼"
+                placeholder={WORKSPACES_LABELS.請設定密碼}
               />
             </div>
           </div>

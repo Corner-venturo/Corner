@@ -7,6 +7,7 @@ import {
   invalidatePaymentRequests,
 } from '@/data'
 import { ValidationError } from '@/core/errors/app-errors'
+import { PAYMENTS_LABELS } from '../constants/labels'
 // workspace_id is now auto-set by DB trigger
 
 class DisbursementOrderService extends BaseService<DisbursementOrder> {
@@ -62,18 +63,18 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
 
   protected validate(data: Partial<DisbursementOrder>): void {
     if (data.payment_request_ids && data.payment_request_ids.length === 0) {
-      throw new ValidationError('payment_request_ids', '出納單必須包含至少一個請款單')
+      throw new ValidationError('payment_request_ids', PAYMENTS_LABELS.出納單必須包含至少一個請款單)
     }
 
     if (data.amount !== undefined && data.amount < 0) {
-      throw new ValidationError('amount', '總金額不能為負數')
+      throw new ValidationError('amount', PAYMENTS_LABELS.總金額不能為負數)
     }
 
     if (data.disbursement_date) {
       const date = new Date(data.disbursement_date)
       const dayOfWeek = date.getDay()
       if (dayOfWeek !== 4) {
-        throw new ValidationError('disbursement_date', '出納日期必須為週四')
+        throw new ValidationError('disbursement_date', PAYMENTS_LABELS.出納日期必須為週四)
       }
     }
   }
@@ -176,7 +177,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
     }
 
     if (order.status !== 'pending') {
-      throw new Error('只能確認待處理的出納單')
+      throw new Error(PAYMENTS_LABELS.只能確認待處理的出納單)
     }
 
     const now = this.now()
@@ -206,7 +207,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
     }
 
     if (order.status !== 'pending') {
-      throw new Error('只能修改待處理的出納單')
+      throw new Error(PAYMENTS_LABELS.只能修改待處理的出納單)
     }
 
     // 從 Supabase 取得請款單並計算總金額
@@ -244,7 +245,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
     }
 
     if (order.status !== 'pending') {
-      throw new Error('只能修改待處理的出納單')
+      throw new Error(PAYMENTS_LABELS.只能修改待處理的出納單)
     }
 
     // 計算新的總金額

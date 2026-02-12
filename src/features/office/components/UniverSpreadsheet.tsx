@@ -9,6 +9,7 @@ import type { Univer, IWorkbookData } from '@univerjs/core'
 import type { FUniver } from '@univerjs/core/facade'
 import { UniverBackToListPlugin } from '../plugins/back-to-list-plugin'
 import { UniverFileOperationsPlugin, setFileOperationCallbacks, clearFileOperationCallbacks } from '../plugins/file-operations-plugin'
+import { OFFICE_LABELS } from '../constants/labels'
 
 // CSS
 import '@univerjs/presets/lib/styles/preset-sheets-core.css'
@@ -59,7 +60,7 @@ export function UniverSpreadsheet({
       const snapshot = workbook.save()
       return snapshot as IWorkbookData
     } catch (error) {
-      logger.error('取得 workbook 資料失敗:', error)
+      logger.error(OFFICE_LABELS.取得_workbook_資料失敗, error)
       return null
     }
   }, [])
@@ -94,7 +95,7 @@ export function UniverSpreadsheet({
         lastSavedDataRef.current = dataStr
         onSaveStatusChange?.('saved')
       } catch (error) {
-        logger.error('自動儲存失敗:', error)
+        logger.error(OFFICE_LABELS.自動儲存失敗, error)
         onSaveStatusChange?.('unsaved')
       }
     }, autoSaveDelay)
@@ -165,7 +166,7 @@ export function UniverSpreadsheet({
           lastSavedDataRef.current = JSON.stringify(initialData)
         } else {
           univerAPI.createWorkbook({
-            name: documentName || '未命名試算表',
+            name: documentName || OFFICE_LABELS.未命名試算表,
           })
         }
 
@@ -189,7 +190,7 @@ export function UniverSpreadsheet({
         }
 
       } catch (error) {
-        logger.error('Univer Spreadsheet 初始化失敗:', error)
+        logger.error(OFFICE_LABELS.Univer_Spreadsheet_初始化失敗, error)
       }
     }, 100)
 

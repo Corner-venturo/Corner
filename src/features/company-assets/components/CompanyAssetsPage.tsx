@@ -23,6 +23,7 @@ import { createCompanyAsset, updateCompanyAsset } from '@/data/entities/company-
 import { useAuthStore } from '@/stores'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import type { CompanyAsset, CompanyAssetType } from '@/types/company-asset.types'
+import { COMPANY_ASSETS_LABELS } from '../constants/labels'
 
 export const CompanyAssetsPage: React.FC = () => {
   const user = useAuthStore(state => state.user)
@@ -85,7 +86,7 @@ export const CompanyAssetsPage: React.FC = () => {
 
     if (!response.ok) {
       const errorData = await response.json()
-      throw new Error(errorData.error || '上傳失敗')
+      throw new Error(errorData.error || COMPANY_ASSETS_LABELS.上傳失敗)
     }
   }
 
@@ -97,18 +98,18 @@ export const CompanyAssetsPage: React.FC = () => {
 
     if (!response.ok) {
       const errorData = await response.json()
-      throw new Error(errorData.error || '刪除失敗')
+      throw new Error(errorData.error || COMPANY_ASSETS_LABELS.刪除失敗)
     }
   }
 
   const handleSubmit = useCallback(async () => {
     if (!formData.name.trim()) {
-      await alert('請輸入資料名稱', 'warning')
+      await alert(COMPANY_ASSETS_LABELS.請輸入資料名稱, 'warning')
       return
     }
 
     if (!isEditMode && !formData.file) {
-      await alert('請選擇檔案', 'warning')
+      await alert(COMPANY_ASSETS_LABELS.請選擇檔案, 'warning')
       return
     }
 
@@ -137,7 +138,7 @@ export const CompanyAssetsPage: React.FC = () => {
         }
 
         await updateCompanyAsset(editingAsset.id, updateData as any)
-        await alert('更新成功', 'success')
+        await alert(COMPANY_ASSETS_LABELS.更新成功, 'success')
       } else {
         // 新增模式
         const file = formData.file!
@@ -158,19 +159,19 @@ export const CompanyAssetsPage: React.FC = () => {
           mime_type: file.type,
           uploaded_by: user?.id || null,
           uploaded_by_name: userName,
-          description: formData.restricted ? '受限資源' : null,
+          description: formData.restricted ? COMPANY_ASSETS_LABELS.受限資源 : null,
           restricted: formData.restricted,
           workspace_id: user?.workspace_id,
           folder_id: targetFolderId,
         } as any)
-        await alert('新增成功', 'success')
+        await alert(COMPANY_ASSETS_LABELS.新增成功, 'success')
       }
 
       handleCloseDialog()
       setRefreshKey(k => k + 1) // 觸發重新載入
     } catch (error) {
-      logger.error('儲存失敗:', error)
-      await alert(`儲存失敗: ${error instanceof Error ? error.message : '未知錯誤'}`, 'error')
+      logger.error(COMPANY_ASSETS_LABELS.儲存失敗, error)
+      await alert(`儲存失敗: ${error instanceof Error ? error.message : COMPANY_ASSETS_LABELS.未知錯誤}`, 'error')
     } finally {
       setIsLoading(false)
     }
@@ -179,15 +180,15 @@ export const CompanyAssetsPage: React.FC = () => {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="公司資源管理"
+        title={COMPANY_ASSETS_LABELS.公司資源管理}
         icon={FolderArchive}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '資料庫管理', href: '/database' },
-          { label: '公司資源管理', href: '/database/company-assets' },
+          { label: COMPANY_ASSETS_LABELS.首頁, href: '/' },
+          { label: COMPANY_ASSETS_LABELS.資料庫管理, href: '/database' },
+          { label: COMPANY_ASSETS_LABELS.公司資源管理, href: '/database/company-assets' },
         ]}
         onAdd={() => handleAddFile(null)}
-        addLabel="上傳檔案"
+        addLabel={COMPANY_ASSETS_LABELS.上傳檔案}
       />
 
       <div className="flex-1 overflow-hidden">

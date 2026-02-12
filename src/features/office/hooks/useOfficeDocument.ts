@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
 import type { Database } from '@/lib/supabase/types'
+import { OFFICE_LABELS } from '../constants/labels'
 
 type OfficeDocument = Database['public']['Tables']['office_documents']['Row']
 type DocumentType = 'spreadsheet' | 'document' | 'slides'
@@ -46,7 +47,7 @@ export function useOfficeDocument(): UseOfficeDocumentReturn {
   // 取得我的文件（私人，tour_id IS NULL）
   const fetchDocuments = useCallback(async () => {
     if (!workspaceId) {
-      setError('無法取得工作區資訊')
+      setError(OFFICE_LABELS.無法取得工作區資訊)
       return
     }
 
@@ -64,7 +65,7 @@ export function useOfficeDocument(): UseOfficeDocumentReturn {
 
       setDocuments(data || [])
     } catch (err) {
-      const message = err instanceof Error ? err.message : '載入文件失敗'
+      const message = err instanceof Error ? err.message : OFFICE_LABELS.載入文件失敗
       setError(message)
       logger.error('fetchDocuments failed', { error: err })
     } finally {
@@ -113,7 +114,7 @@ export function useOfficeDocument(): UseOfficeDocumentReturn {
     options: CreateDocumentOptions
   ): Promise<OfficeDocument | null> => {
     if (!workspaceId) {
-      setError('無法取得工作區資訊')
+      setError(OFFICE_LABELS.無法取得工作區資訊)
       return null
     }
 
@@ -145,7 +146,7 @@ export function useOfficeDocument(): UseOfficeDocumentReturn {
 
       return newDoc
     } catch (err) {
-      const message = err instanceof Error ? err.message : '建立文件失敗'
+      const message = err instanceof Error ? err.message : OFFICE_LABELS.建立文件失敗
       setError(message)
       logger.error('createDocument failed', { name, type, error: err })
       return null
@@ -191,7 +192,7 @@ export function useOfficeDocument(): UseOfficeDocumentReturn {
 
       return true
     } catch (err) {
-      const message = err instanceof Error ? err.message : '儲存文件失敗'
+      const message = err instanceof Error ? err.message : OFFICE_LABELS.儲存文件失敗
       setError(message)
       logger.error('saveDocument failed', { id, error: err })
       return false
@@ -212,7 +213,7 @@ export function useOfficeDocument(): UseOfficeDocumentReturn {
     if (!original) {
       const fetched = await fetchDocument(originalId)
       if (!fetched) {
-        setError('找不到原始文件')
+        setError(OFFICE_LABELS.找不到原始文件)
         return null
       }
       return createDocument({
@@ -255,7 +256,7 @@ export function useOfficeDocument(): UseOfficeDocumentReturn {
 
       return true
     } catch (err) {
-      const message = err instanceof Error ? err.message : '存到旅遊團失敗'
+      const message = err instanceof Error ? err.message : OFFICE_LABELS.存到旅遊團失敗
       setError(message)
       logger.error('saveToTour failed', { id, tourId, error: err })
       return false
@@ -279,7 +280,7 @@ export function useOfficeDocument(): UseOfficeDocumentReturn {
 
       return true
     } catch (err) {
-      const message = err instanceof Error ? err.message : '刪除文件失敗'
+      const message = err instanceof Error ? err.message : OFFICE_LABELS.刪除文件失敗
       setError(message)
       logger.error('deleteDocument failed', { id, error: err })
       return false

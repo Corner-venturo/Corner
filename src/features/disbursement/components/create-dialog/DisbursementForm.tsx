@@ -14,13 +14,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { DISBURSEMENT_LABELS } from '../../constants/labels'
 
 // 狀態選項
 const STATUS_OPTIONS = [
-  { value: 'all', label: '全部狀態' },
-  { value: 'pending', label: '請款中' },
-  { value: 'approved', label: '已核准' },
-  { value: 'confirmed', label: '已確認' },
+  { value: 'all', label: DISBURSEMENT_LABELS.全部狀態 },
+  { value: 'pending', label: DISBURSEMENT_LABELS.請款中 },
+  { value: 'approved', label: DISBURSEMENT_LABELS.已核准 },
+  { value: 'confirmed', label: DISBURSEMENT_LABELS.已確認 },
 ]
 
 interface DisbursementFormProps {
@@ -47,14 +48,14 @@ export function DisbursementForm({
               value={disbursementDate}
               onChange={onDateChange}
               className="flex-1"
-              placeholder="選擇日期"
+              placeholder={DISBURSEMENT_LABELS.選擇日期}
             />
           </div>
         </div>
         <div className="space-y-1">
           <label className="text-sm text-morandi-muted">出納單號</label>
           <Input
-            value="（自動產生）"
+            value={DISBURSEMENT_LABELS.自動產生_2}
             disabled
             className="bg-morandi-background/50"
           />
@@ -66,7 +67,7 @@ export function DisbursementForm({
         <label className="text-sm text-morandi-muted">狀態</label>
         <Select value={statusFilter} onValueChange={onStatusChange}>
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="選擇狀態" />
+            <SelectValue placeholder={DISBURSEMENT_LABELS.選擇狀態} />
           </SelectTrigger>
           <SelectContent>
             {STATUS_OPTIONS.map(opt => (
