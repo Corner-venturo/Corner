@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/utils/logger'
 
 interface GetEmployeeRequest {
@@ -14,6 +15,13 @@ interface GetEmployeeRequest {
  */
 export async function POST(request: NextRequest) {
   try {
+    // Auth 檢查：需要有效的 Supabase session
+    const supabaseAuth = await createSupabaseServerClient()
+    const { data: { session } } = await supabaseAuth.auth.getSession()
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body: GetEmployeeRequest = await request.json()
     const { username, code } = body
 
