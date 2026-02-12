@@ -37,13 +37,14 @@ import {
   type LeaveRequest,
   type LeaveRequestStatus,
 } from '../../hooks/useLeaveRequests'
+import { LEAVE_PAGE_LABELS as L } from '../../constants/labels'
 
 // 狀態標籤
 const STATUS_LABELS: Record<LeaveRequestStatus, string> = {
-  pending: '待審核',
-  approved: '已核准',
-  rejected: '已駁回',
-  cancelled: '已取消',
+  pending: L.status_pending,
+  approved: L.status_approved,
+  rejected: L.status_rejected,
+  cancelled: L.status_cancelled,
 }
 
 const STATUS_COLORS: Record<LeaveRequestStatus, string> = {
@@ -92,7 +93,7 @@ export function LeaveManagementPage() {
   const typeColumns: Column<LeaveType>[] = [
     {
       key: 'code',
-      label: '代碼',
+      label: L.col_code,
       width: '100px',
       render: (_, row) => (
         <span className="font-mono text-morandi-gold">{row.code}</span>
@@ -100,7 +101,7 @@ export function LeaveManagementPage() {
     },
     {
       key: 'name',
-      label: '假別名稱',
+      label: L.col_type_name,
       width: '150px',
       render: (_, row) => (
         <span className="font-medium text-morandi-primary">{row.name}</span>
@@ -108,47 +109,47 @@ export function LeaveManagementPage() {
     },
     {
       key: 'days_per_year',
-      label: '年度配額',
+      label: L.col_days_per_year,
       width: '100px',
       render: (_, row) => (
         <span className="text-morandi-secondary">
-          {row.days_per_year !== null ? `${row.days_per_year} 天` : '無限制'}
+          {row.days_per_year !== null ? `${row.days_per_year} ${L.days_suffix}` : L.days_unlimited}
         </span>
       ),
     },
     {
       key: 'is_paid',
-      label: '給薪',
+      label: L.col_is_paid,
       width: '80px',
       render: (_, row) => (
         <span className={`px-2 py-0.5 rounded text-xs ${
           row.is_paid !== false ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
         }`}>
-          {row.is_paid !== false ? '是' : '否'}
+          {row.is_paid !== false ? L.yes : L.no}
         </span>
       ),
     },
     {
       key: 'requires_proof',
-      label: '需證明',
+      label: L.col_requires_proof,
       width: '80px',
       render: (_, row) => (
         <span className={`px-2 py-0.5 rounded text-xs ${
           row.requires_proof === true ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-500'
         }`}>
-          {row.requires_proof === true ? '是' : '否'}
+          {row.requires_proof === true ? L.yes : L.no}
         </span>
       ),
     },
     {
       key: 'is_active',
-      label: '狀態',
+      label: L.col_is_active,
       width: '80px',
       render: (_, row) => (
         <span className={`px-2 py-0.5 rounded text-xs ${
           row.is_active !== false ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
         }`}>
-          {row.is_active !== false ? '啟用' : '停用'}
+          {row.is_active !== false ? L.active : L.inactive}
         </span>
       ),
     },
@@ -161,7 +162,7 @@ export function LeaveManagementPage() {
           actions={[
             {
               icon: Edit2,
-              label: '編輯',
+              label: L.action_edit,
               onClick: () => {
                 setEditingType(row)
                 setShowTypeDialog(true)
@@ -169,7 +170,7 @@ export function LeaveManagementPage() {
             },
             {
               icon: Trash2,
-              label: '刪除',
+              label: L.action_delete,
               onClick: () => handleDeleteType(row),
               variant: 'danger',
             },
@@ -183,7 +184,7 @@ export function LeaveManagementPage() {
   const requestColumns: Column<LeaveRequest>[] = [
     {
       key: 'employee_name',
-      label: '員工',
+      label: L.col_employee,
       width: '120px',
       render: (_, row) => (
         <span className="font-medium text-morandi-primary">{row.employee_name}</span>
@@ -191,7 +192,7 @@ export function LeaveManagementPage() {
     },
     {
       key: 'leave_type_name',
-      label: '假別',
+      label: L.col_leave_type,
       width: '100px',
       render: (_, row) => (
         <span className="text-morandi-secondary">{row.leave_type_name}</span>
@@ -199,27 +200,27 @@ export function LeaveManagementPage() {
     },
     {
       key: 'start_date',
-      label: '開始日期',
+      label: L.col_start_date,
       width: '120px',
       render: (_, row) => <DateCell date={row.start_date} />,
     },
     {
       key: 'end_date',
-      label: '結束日期',
+      label: L.col_end_date,
       width: '120px',
       render: (_, row) => <DateCell date={row.end_date} />,
     },
     {
       key: 'days',
-      label: '天數',
+      label: L.col_days,
       width: '80px',
       render: (_, row) => (
-        <span className="font-mono text-morandi-primary">{row.days} 天</span>
+        <span className="font-mono text-morandi-primary">{row.days} {L.days_suffix}</span>
       ),
     },
     {
       key: 'status',
-      label: '狀態',
+      label: L.col_status,
       width: '100px',
       render: (_, row) => (
         <span className={`px-2 py-0.5 rounded text-xs ${STATUS_COLORS[row.status]}`}>
@@ -229,7 +230,7 @@ export function LeaveManagementPage() {
     },
     {
       key: 'created_at',
-      label: '申請時間',
+      label: L.col_applied_at,
       width: '120px',
       render: (_, row) => <DateCell date={row.created_at} />,
     },
@@ -247,7 +248,7 @@ export function LeaveManagementPage() {
               className="gap-1 bg-morandi-green hover:bg-morandi-green/90 text-white"
             >
               <Check size={14} />
-              核准
+              {L.btn_approve}
             </Button>
             <Button
               size="sm"
@@ -260,7 +261,7 @@ export function LeaveManagementPage() {
               className="gap-1 text-morandi-red border-morandi-red hover:bg-morandi-red hover:text-white"
             >
               <X size={14} />
-              駁回
+              {L.btn_reject}
             </Button>
           </div>
         )
@@ -270,38 +271,38 @@ export function LeaveManagementPage() {
 
   // 初始化預設假別
   const handleInitializeTypes = async () => {
-    const confirmed = await confirm('確定要初始化預設假別類型嗎？', {
-      title: '初始化假別',
+    const confirmed = await confirm(L.confirm_init, {
+      title: L.confirm_init_title,
       type: 'info',
     })
     if (!confirmed) return
 
     const success = await initializeDefaultTypes()
     if (success) {
-      await alert('已成功初始化預設假別類型', 'success')
+      await alert(L.toast_initialized, 'success')
     }
   }
 
   // 刪除假別類型
   const handleDeleteType = async (type: LeaveType) => {
-    const confirmed = await confirm(`確定要刪除「${type.name}」假別嗎？`, {
-      title: '刪除假別',
+    const confirmed = await confirm(L.confirm_delete_message(type.name), {
+      title: L.confirm_delete_title,
       type: 'warning',
     })
     if (!confirmed) return
 
     const success = await deleteLeaveType(type.id)
     if (success) {
-      await alert('假別已刪除', 'success')
+      await alert(L.toast_type_deleted, 'success')
     }
   }
 
   // 核准請假
   const handleApprove = async (request: LeaveRequest) => {
     const confirmed = await confirm(
-      `確定要核准「${request.employee_name}」的請假申請嗎？\n\n假別：${request.leave_type_name}\n期間：${request.start_date} ~ ${request.end_date}\n天數：${request.days} 天`,
+      L.confirm_approve_message(request.employee_name, request.leave_type_name, request.start_date, request.end_date, request.days),
       {
-        title: '核准請假',
+        title: L.confirm_approve_title,
         type: 'info',
       }
     )
@@ -309,7 +310,7 @@ export function LeaveManagementPage() {
 
     const success = await approveRequest(request.id)
     if (success) {
-      await alert('已核准請假申請', 'success')
+      await alert(L.toast_approved, 'success')
     }
   }
 
@@ -317,13 +318,13 @@ export function LeaveManagementPage() {
   const handleReject = async () => {
     if (!rejectingRequest) return
     if (!rejectReason.trim()) {
-      await alert('請填寫駁回原因', 'error')
+      await alert(L.error_reject_reason, 'error')
       return
     }
 
     const success = await rejectRequest(rejectingRequest.id, rejectReason)
     if (success) {
-      await alert('已駁回請假申請', 'success')
+      await alert(L.toast_rejected, 'success')
       setRejectDialogOpen(false)
       setRejectingRequest(null)
       setRejectReason('')
@@ -333,12 +334,12 @@ export function LeaveManagementPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="請假管理"
+        title={L.page_title}
         icon={Calendar}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '人資', href: '/hr' },
-          { label: '請假管理', href: '/hr/leave' },
+          { label: L.breadcrumb_home, href: '/' },
+          { label: L.breadcrumb_hr, href: '/hr' },
+          { label: L.breadcrumb_leave, href: '/hr/leave' },
         ]}
       />
 
@@ -351,7 +352,7 @@ export function LeaveManagementPage() {
             className={activeTab === 'requests' ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white' : ''}
           >
             <FileText size={16} className="mr-2" />
-            請假申請
+            {L.tab_requests}
           </Button>
           <Button
             variant={activeTab === 'types' ? 'default' : 'outline'}
@@ -359,7 +360,7 @@ export function LeaveManagementPage() {
             className={activeTab === 'types' ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white' : ''}
           >
             <Settings size={16} className="mr-2" />
-            假別設定
+            {L.tab_types}
           </Button>
         </div>
       </div>
@@ -372,20 +373,20 @@ export function LeaveManagementPage() {
               <div className="bg-morandi-gold/10 border border-morandi-gold/30 rounded-lg p-4 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-morandi-gold">
                   <AlertCircle size={16} />
-                  <span>尚未設定假別類型，建議初始化預設假別</span>
+                  <span>{L.init_hint}</span>
                 </div>
                 <Button
                   onClick={handleInitializeTypes}
                   className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
                 >
                   <Plus size={16} />
-                  初始化預設假別
+                  {L.btn_init}
                 </Button>
               </div>
             )}
 
             <div className="flex justify-between items-center">
-              <h3 className="font-medium text-morandi-primary">假別類型</h3>
+              <h3 className="font-medium text-morandi-primary">{L.type_section_title}</h3>
               <Button
                 onClick={() => {
                   setEditingType(null)
@@ -394,7 +395,7 @@ export function LeaveManagementPage() {
                 className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
                 <Plus size={16} />
-                新增假別
+                {L.dialog_title_add}
               </Button>
             </div>
 
@@ -417,7 +418,7 @@ export function LeaveManagementPage() {
         {requests.length === 0 && activeTab === 'requests' && !requestsLoading && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <FileText size={48} className="text-morandi-muted mb-4" />
-            <p className="text-morandi-secondary">尚無請假申請</p>
+            <p className="text-morandi-secondary">{L.empty_requests}</p>
           </div>
         )}
       </div>
@@ -449,17 +450,17 @@ export function LeaveManagementPage() {
       <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
         <DialogContent level={1} className={DIALOG_SIZES.sm}>
           <DialogHeader>
-            <DialogTitle>駁回請假申請</DialogTitle>
+            <DialogTitle>{L.reject_dialog_title}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <Label>駁回原因</Label>
+              <Label>{L.reject_label}</Label>
               <textarea
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 className="w-full mt-1 px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-morandi-gold resize-none"
                 rows={3}
-                placeholder="請輸入駁回原因..."
+                placeholder={L.reject_placeholder}
               />
             </div>
             <div className="flex justify-end gap-2">
@@ -468,14 +469,14 @@ export function LeaveManagementPage() {
                 onClick={() => setRejectDialogOpen(false)}
               >
                 <X size={16} className="mr-2" />
-                取消
+                {L.btn_cancel}
               </Button>
               <Button
                 onClick={handleReject}
                 className="bg-morandi-red hover:bg-morandi-red/90 text-white"
               >
                 <X size={16} className="mr-2" />
-                確認駁回
+                {L.btn_reject_confirm}
               </Button>
             </div>
           </div>
@@ -525,7 +526,7 @@ function LeaveTypeDialog({
 
   const handleSave = async () => {
     if (!name.trim() || !code.trim()) {
-      await alert('請填寫假別名稱和代碼', 'error')
+      await alert(L.error_required, 'error')
       return
     }
 
@@ -541,7 +542,7 @@ function LeaveTypeDialog({
     setSaving(false)
 
     if (success) {
-      await alert(editingType ? '假別已更新' : '假別已新增', 'success')
+      await alert(editingType ? L.toast_type_updated : L.toast_type_created, 'success')
     }
   }
 
@@ -549,37 +550,37 @@ function LeaveTypeDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent level={1} className={DIALOG_SIZES.md}>
         <DialogHeader>
-          <DialogTitle>{editingType ? '編輯假別' : '新增假別'}</DialogTitle>
+          <DialogTitle>{editingType ? L.dialog_title_edit : L.dialog_title_add}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label required>假別名稱</Label>
+              <Label required>{L.label_type_name}</Label>
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="如：特休"
+                placeholder={L.placeholder_type_name}
                 className="mt-1"
               />
             </div>
             <div>
-              <Label required>代碼</Label>
+              <Label required>{L.label_code}</Label>
               <Input
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
-                placeholder="如：ANNUAL"
+                placeholder={L.placeholder_code}
                 className="mt-1 font-mono"
               />
             </div>
           </div>
 
           <div>
-            <Label>年度配額（天）</Label>
+            <Label>{L.label_days_per_year}</Label>
             <Input
               type="number"
               value={daysPerYear}
               onChange={(e) => setDaysPerYear(e.target.value)}
-              placeholder="留空表示無限制"
+              placeholder={L.placeholder_days}
               className="mt-1"
               min={0}
               step={0.5}
@@ -594,7 +595,7 @@ function LeaveTypeDialog({
                 onChange={(e) => setIsPaid(e.target.checked)}
                 className="w-4 h-4 rounded border-border text-morandi-gold focus:ring-morandi-gold"
               />
-              <span className="text-sm text-morandi-primary">給薪假</span>
+              <span className="text-sm text-morandi-primary">{L.checkbox_paid}</span>
             </label>
 
             <label className="flex items-center gap-2 cursor-pointer">
@@ -604,7 +605,7 @@ function LeaveTypeDialog({
                 onChange={(e) => setRequiresProof(e.target.checked)}
                 className="w-4 h-4 rounded border-border text-morandi-gold focus:ring-morandi-gold"
               />
-              <span className="text-sm text-morandi-primary">需要證明文件</span>
+              <span className="text-sm text-morandi-primary">{L.checkbox_proof}</span>
             </label>
 
             <label className="flex items-center gap-2 cursor-pointer">
@@ -614,7 +615,7 @@ function LeaveTypeDialog({
                 onChange={(e) => setIsActive(e.target.checked)}
                 className="w-4 h-4 rounded border-border text-morandi-gold focus:ring-morandi-gold"
               />
-              <span className="text-sm text-morandi-primary">啟用</span>
+              <span className="text-sm text-morandi-primary">{L.checkbox_active}</span>
             </label>
           </div>
 
@@ -624,7 +625,7 @@ function LeaveTypeDialog({
               onClick={() => onOpenChange(false)}
             >
               <X size={16} className="mr-2" />
-              取消
+              {L.btn_cancel}
             </Button>
             <Button
               onClick={handleSave}
@@ -632,7 +633,7 @@ function LeaveTypeDialog({
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
               <Check size={16} className="mr-2" />
-              {editingType ? '更新' : '新增'}
+              {editingType ? L.btn_update : L.btn_add}
             </Button>
           </div>
         </div>

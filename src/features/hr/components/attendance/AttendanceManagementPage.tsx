@@ -36,6 +36,7 @@ import {
 } from '../../hooks/useAttendanceRecords'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
+import { ATTENDANCE_PAGE_LABELS as L } from '../../constants/labels'
 
 interface Employee {
   id: string
@@ -93,7 +94,7 @@ export function AttendanceManagementPage() {
       if (data) {
         setEmployees(data.map(e => ({
           id: e.id,
-          name: e.display_name || e.chinese_name || '未知',
+          name: e.display_name || e.chinese_name || L.unknown_employee,
         })))
       }
     }
@@ -117,13 +118,13 @@ export function AttendanceManagementPage() {
   const columns: Column<AttendanceRecord>[] = [
     {
       key: 'date',
-      label: '日期',
+      label: L.col_date,
       width: '120px',
       render: (_, row) => <DateCell date={row.date} />,
     },
     {
       key: 'employee_name',
-      label: '員工',
+      label: L.col_employee,
       width: '120px',
       render: (_, row) => (
         <span className="font-medium text-morandi-primary">{row.employee_name}</span>
@@ -131,7 +132,7 @@ export function AttendanceManagementPage() {
     },
     {
       key: 'clock_in',
-      label: '上班時間',
+      label: L.col_clock_in,
       width: '100px',
       render: (_, row) => (
         <span className="font-mono text-morandi-secondary">
@@ -141,7 +142,7 @@ export function AttendanceManagementPage() {
     },
     {
       key: 'clock_out',
-      label: '下班時間',
+      label: L.col_clock_out,
       width: '100px',
       render: (_, row) => (
         <span className="font-mono text-morandi-secondary">
@@ -151,7 +152,7 @@ export function AttendanceManagementPage() {
     },
     {
       key: 'work_hours',
-      label: '工時',
+      label: L.col_work_hours,
       width: '80px',
       render: (_, row) => (
         <span className="font-mono text-morandi-primary">
@@ -161,7 +162,7 @@ export function AttendanceManagementPage() {
     },
     {
       key: 'overtime_hours',
-      label: '加班',
+      label: L.col_overtime,
       width: '80px',
       render: (_, row) => (
         <span className={`font-mono ${row.overtime_hours && row.overtime_hours > 0 ? 'text-morandi-gold' : 'text-morandi-muted'}`}>
@@ -171,7 +172,7 @@ export function AttendanceManagementPage() {
     },
     {
       key: 'status',
-      label: '狀態',
+      label: L.col_status,
       width: '80px',
       render: (_, row) => row.status ? (
         <span className={`px-2 py-0.5 rounded text-xs ${ATTENDANCE_STATUS_COLORS[row.status]}`}>
@@ -183,7 +184,7 @@ export function AttendanceManagementPage() {
     },
     {
       key: 'notes',
-      label: '備註',
+      label: L.col_notes,
       width: '150px',
       render: (_, row) => (
         <span className="text-sm text-morandi-secondary truncate">
@@ -200,12 +201,12 @@ export function AttendanceManagementPage() {
           actions={[
             {
               icon: Edit2,
-              label: '編輯',
+              label: L.action_edit,
               onClick: () => handleEdit(row),
             },
             {
               icon: Trash2,
-              label: '刪除',
+              label: L.action_delete,
               onClick: () => handleDelete(row),
               variant: 'danger',
             },
@@ -242,9 +243,9 @@ export function AttendanceManagementPage() {
   // 刪除
   const handleDelete = async (record: AttendanceRecord) => {
     const confirmed = await confirm(
-      `確定要刪除 ${record.employee_name} 於 ${record.date} 的出勤紀錄嗎？`,
+      L.confirm_delete_message(record.employee_name, record.date),
       {
-        title: '刪除出勤紀錄',
+        title: L.confirm_delete_title,
         type: 'warning',
       }
     )
@@ -252,14 +253,14 @@ export function AttendanceManagementPage() {
 
     const success = await deleteRecord(record.id)
     if (success) {
-      await alert('出勤紀錄已刪除', 'success')
+      await alert(L.toast_deleted, 'success')
     }
   }
 
   // 儲存
   const handleSave = async () => {
     if (!formEmployeeId || !formDate) {
-      await alert('請選擇員工和日期', 'error')
+      await alert(L.error_required, 'error')
       return
     }
 
@@ -280,7 +281,7 @@ export function AttendanceManagementPage() {
     }
 
     if (success) {
-      await alert(editingRecord ? '出勤紀錄已更新' : '出勤紀錄已新增', 'success')
+      await alert(editingRecord ? L.toast_updated : L.toast_created, 'success')
       setShowDialog(false)
     }
   }
@@ -288,12 +289,12 @@ export function AttendanceManagementPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="出勤紀錄"
+        title={L.page_title}
         icon={Clock}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '人資', href: '/hr' },
-          { label: '出勤紀錄', href: '/hr/attendance' },
+          { label: L.breadcrumb_home, href: '/' },
+          { label: L.breadcrumb_hr, href: '/hr' },
+          { label: L.breadcrumb_attendance, href: '/hr/attendance' },
         ]}
         actions={
           <Button
@@ -301,7 +302,7 @@ export function AttendanceManagementPage() {
             className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
             <Plus size={16} />
-            新增紀錄
+            {L.btn_add}
           </Button>
         }
       />
@@ -314,13 +315,13 @@ export function AttendanceManagementPage() {
             <DatePicker
               value={startDate}
               onChange={setStartDate}
-              placeholder="開始日期"
+              placeholder={L.placeholder_start_date}
             />
-            <span className="text-morandi-secondary">至</span>
+            <span className="text-morandi-secondary">{L.range_separator}</span>
             <DatePicker
               value={endDate}
               onChange={setEndDate}
-              placeholder="結束日期"
+              placeholder={L.placeholder_end_date}
             />
           </div>
 
@@ -331,7 +332,7 @@ export function AttendanceManagementPage() {
               onChange={(e) => setSelectedEmployeeId(e.target.value)}
               className="px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-morandi-gold"
             >
-              <option value="">全部員工</option>
+              <option value="">{L.all_employees}</option>
               {employees.map(emp => (
                 <option key={emp.id} value={emp.id}>{emp.name}</option>
               ))}
@@ -344,27 +345,27 @@ export function AttendanceManagementPage() {
       <div className="p-4 bg-morandi-container/30 border-b border-border">
         <div className="grid grid-cols-6 gap-4">
           <div className="text-center">
-            <div className="text-sm text-morandi-secondary">總天數</div>
+            <div className="text-sm text-morandi-secondary">{L.summary_total_days}</div>
             <div className="text-xl font-bold text-morandi-primary">{summary.total_days}</div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-morandi-secondary">正常</div>
+            <div className="text-sm text-morandi-secondary">{L.summary_present}</div>
             <div className="text-xl font-bold text-green-600">{summary.present_days}</div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-morandi-secondary">遲到</div>
+            <div className="text-sm text-morandi-secondary">{L.summary_late}</div>
             <div className="text-xl font-bold text-yellow-600">{summary.late_days}</div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-morandi-secondary">缺勤</div>
+            <div className="text-sm text-morandi-secondary">{L.summary_absent}</div>
             <div className="text-xl font-bold text-red-600">{summary.absent_days}</div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-morandi-secondary">總工時</div>
+            <div className="text-sm text-morandi-secondary">{L.summary_total_hours}</div>
             <div className="text-xl font-bold text-morandi-primary">{summary.total_work_hours.toFixed(1)} h</div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-morandi-secondary">總加班</div>
+            <div className="text-sm text-morandi-secondary">{L.summary_total_overtime}</div>
             <div className="text-xl font-bold text-morandi-gold">{summary.total_overtime_hours.toFixed(1)} h</div>
           </div>
         </div>
@@ -381,7 +382,7 @@ export function AttendanceManagementPage() {
         {records.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <Clock size={48} className="text-morandi-muted mb-4" />
-            <p className="text-morandi-secondary">尚無出勤紀錄</p>
+            <p className="text-morandi-secondary">{L.empty_message}</p>
           </div>
         )}
       </div>
@@ -390,30 +391,30 @@ export function AttendanceManagementPage() {
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent level={1} className={DIALOG_SIZES.md}>
           <DialogHeader>
-            <DialogTitle>{editingRecord ? '編輯出勤紀錄' : '新增出勤紀錄'}</DialogTitle>
+            <DialogTitle>{editingRecord ? L.dialog_title_edit : L.dialog_title_add}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label required>員工</Label>
+                <Label required>{L.label_employee}</Label>
                 <select
                   value={formEmployeeId}
                   onChange={(e) => setFormEmployeeId(e.target.value)}
                   className="w-full mt-1 px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-morandi-gold"
                   disabled={!!editingRecord}
                 >
-                  <option value="">選擇員工</option>
+                  <option value="">{L.placeholder_employee}</option>
                   {employees.map(emp => (
                     <option key={emp.id} value={emp.id}>{emp.name}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <Label required>日期</Label>
+                <Label required>{L.label_date}</Label>
                 <DatePicker
                   value={formDate}
                   onChange={setFormDate}
-                  placeholder="選擇日期"
+                  placeholder={L.placeholder_date}
                   className="mt-1 w-full"
                   disabled={!!editingRecord}
                 />
@@ -422,7 +423,7 @@ export function AttendanceManagementPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>上班時間</Label>
+                <Label>{L.label_clock_in}</Label>
                 <Input
                   type="time"
                   value={formClockIn}
@@ -431,7 +432,7 @@ export function AttendanceManagementPage() {
                 />
               </div>
               <div>
-                <Label>下班時間</Label>
+                <Label>{L.label_clock_out}</Label>
                 <Input
                   type="time"
                   value={formClockOut}
@@ -442,7 +443,7 @@ export function AttendanceManagementPage() {
             </div>
 
             <div>
-              <Label>狀態</Label>
+              <Label>{L.label_status}</Label>
               <select
                 value={formStatus}
                 onChange={(e) => setFormStatus(e.target.value as AttendanceStatus)}
@@ -455,11 +456,11 @@ export function AttendanceManagementPage() {
             </div>
 
             <div>
-              <Label>備註</Label>
+              <Label>{L.label_notes}</Label>
               <Input
                 value={formNotes}
                 onChange={(e) => setFormNotes(e.target.value)}
-                placeholder="備註說明"
+                placeholder={L.placeholder_notes}
                 className="mt-1"
               />
             </div>
@@ -470,7 +471,7 @@ export function AttendanceManagementPage() {
                 onClick={() => setShowDialog(false)}
               >
                 <X size={16} className="mr-2" />
-                取消
+                {L.btn_cancel}
               </Button>
               <Button
                 onClick={handleSave}
@@ -478,7 +479,7 @@ export function AttendanceManagementPage() {
                 className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
                 <Check size={16} className="mr-2" />
-                {editingRecord ? '更新' : '新增'}
+                {editingRecord ? L.btn_update : L.btn_add}
               </Button>
             </div>
           </div>

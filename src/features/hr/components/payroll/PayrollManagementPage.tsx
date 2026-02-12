@@ -32,6 +32,7 @@ import {
   PAYROLL_PERIOD_STATUS_LABELS,
   PAYROLL_PERIOD_STATUS_COLORS,
 } from '../../hooks/usePayroll'
+import { PAYROLL_PAGE_LABELS as L } from '../../constants/labels'
 
 export function PayrollManagementPage() {
   const {
@@ -74,17 +75,17 @@ export function PayrollManagementPage() {
   const periodColumns: Column<PayrollPeriod>[] = [
     {
       key: 'period',
-      label: '期間',
+      label: L.col_period,
       width: '150px',
       render: (_, row) => (
         <span className="font-medium text-morandi-primary">
-          {row.year}年{row.month}月
+          {row.year}{L.year_suffix}{row.month}{L.month_suffix}
         </span>
       ),
     },
     {
       key: 'date_range',
-      label: '日期範圍',
+      label: L.col_date_range,
       width: '200px',
       render: (_, row) => (
         <span className="text-morandi-secondary">
@@ -94,7 +95,7 @@ export function PayrollManagementPage() {
     },
     {
       key: 'status',
-      label: '狀態',
+      label: L.col_status,
       width: '100px',
       render: (_, row) => (
         <span className={`px-2 py-0.5 rounded text-xs ${PAYROLL_PERIOD_STATUS_COLORS[row.status]}`}>
@@ -104,7 +105,7 @@ export function PayrollManagementPage() {
     },
     {
       key: 'confirmed_at',
-      label: '確認時間',
+      label: L.col_confirmed_at,
       width: '150px',
       render: (_, row) => (
         <span className="text-sm text-morandi-secondary">
@@ -125,7 +126,7 @@ export function PayrollManagementPage() {
             className="gap-1"
           >
             <Eye size={14} />
-            查看
+            {L.btn_view}
           </Button>
           {row.status === 'draft' && (
             <Button
@@ -135,7 +136,7 @@ export function PayrollManagementPage() {
               className="gap-1"
             >
               <Calculator size={14} />
-              計算
+              {L.btn_calculate}
             </Button>
           )}
           {row.status === 'draft' && (
@@ -145,7 +146,7 @@ export function PayrollManagementPage() {
               className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
               <Check size={14} />
-              確認
+              {L.btn_confirm}
             </Button>
           )}
           {row.status === 'confirmed' && (
@@ -155,7 +156,7 @@ export function PayrollManagementPage() {
               className="gap-1 bg-morandi-green hover:opacity-80 text-white"
             >
               <CreditCard size={14} />
-              發放
+              {L.btn_mark_paid}
             </Button>
           )}
         </div>
@@ -167,7 +168,7 @@ export function PayrollManagementPage() {
   const recordColumns: Column<PayrollRecord>[] = [
     {
       key: 'employee_name',
-      label: '員工',
+      label: L.col_employee,
       width: '120px',
       render: (_, row) => (
         <span className="font-medium text-morandi-primary">{row.employee_name}</span>
@@ -175,25 +176,25 @@ export function PayrollManagementPage() {
     },
     {
       key: 'base_salary',
-      label: '底薪',
+      label: L.col_base_salary,
       width: '100px',
       render: (_, row) => <CurrencyCell amount={row.base_salary} />,
     },
     {
       key: 'overtime_pay',
-      label: '加班費',
+      label: L.col_overtime_pay,
       width: '100px',
       render: (_, row) => <CurrencyCell amount={row.overtime_pay} />,
     },
     {
       key: 'bonus',
-      label: '獎金',
+      label: L.col_bonus,
       width: '100px',
       render: (_, row) => <CurrencyCell amount={row.bonus} />,
     },
     {
       key: 'deductions',
-      label: '扣款',
+      label: L.col_deductions_label,
       width: '100px',
       render: (_, row) => (
         <span className="text-morandi-red">
@@ -203,13 +204,13 @@ export function PayrollManagementPage() {
     },
     {
       key: 'gross_salary',
-      label: '應發',
+      label: L.col_gross,
       width: '120px',
       render: (_, row) => <CurrencyCell amount={row.gross_salary} />,
     },
     {
       key: 'net_salary',
-      label: '實發',
+      label: L.col_net,
       width: '120px',
       render: (_, row) => <CurrencyCell amount={row.net_salary} variant="income" />,
     },
@@ -222,7 +223,7 @@ export function PayrollManagementPage() {
           actions={[
             {
               icon: Printer,
-              label: '薪資單',
+              label: L.action_payslip,
               onClick: () => handlePrintPayslip(row),
             },
           ]}
@@ -235,7 +236,7 @@ export function PayrollManagementPage() {
   const handleCreate = async () => {
     const period = await createPeriod(formYear, formMonth)
     if (period) {
-      await alert('薪資期間已建立', 'success')
+      await alert(L.toast_period_created, 'success')
       setShowCreateDialog(false)
     }
   }
@@ -248,41 +249,41 @@ export function PayrollManagementPage() {
 
   const handleCalculate = async (period: PayrollPeriod) => {
     const confirmed = await confirm(
-      `確定要計算 ${period.year}年${period.month}月 的薪資嗎？此操作會覆蓋現有的薪資紀錄。`,
-      { title: '計算薪資', type: 'warning' }
+      L.confirm_calculate_message(period.year, period.month),
+      { title: L.confirm_calculate_title, type: 'warning' }
     )
     if (!confirmed) return
 
     const success = await calculatePayroll(period.id)
     if (success) {
-      await alert('薪資計算完成', 'success')
+      await alert(L.toast_calculated, 'success')
       await handleViewRecords(period)
     }
   }
 
   const handleConfirm = async (period: PayrollPeriod) => {
     const confirmed = await confirm(
-      `確定要確認 ${period.year}年${period.month}月 的薪資嗎？確認後將無法修改。`,
-      { title: '確認薪資', type: 'warning' }
+      L.confirm_confirm_message(period.year, period.month),
+      { title: L.confirm_confirm_title, type: 'warning' }
     )
     if (!confirmed) return
 
     const success = await confirmPeriod(period.id)
     if (success) {
-      await alert('薪資已確認', 'success')
+      await alert(L.toast_confirmed, 'success')
     }
   }
 
   const handleMarkPaid = async (period: PayrollPeriod) => {
     const confirmed = await confirm(
-      `確定要標記 ${period.year}年${period.month}月 的薪資為已發放嗎？`,
-      { title: '標記發放', type: 'info' }
+      L.confirm_paid_message(period.year, period.month),
+      { title: L.confirm_paid_title, type: 'info' }
     )
     if (!confirmed) return
 
     const success = await markAsPaid(period.id)
     if (success) {
-      await alert('已標記為發放', 'success')
+      await alert(L.toast_paid, 'success')
     }
   }
 
@@ -297,12 +298,12 @@ export function PayrollManagementPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="薪資管理"
+        title={L.page_title}
         icon={DollarSign}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '人資', href: '/hr' },
-          { label: '薪資管理', href: '/hr/payroll' },
+          { label: L.breadcrumb_home, href: '/' },
+          { label: L.breadcrumb_hr, href: '/hr' },
+          { label: L.breadcrumb_payroll, href: '/hr/payroll' },
         ]}
         actions={
           <Button
@@ -310,7 +311,7 @@ export function PayrollManagementPage() {
             className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
             <Plus size={16} />
-            建立期間
+            {L.btn_create}
           </Button>
         }
       />
@@ -326,7 +327,7 @@ export function PayrollManagementPage() {
               className="px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-morandi-gold"
             >
               {Array.from({ length: 5 }, (_, i) => currentYear - 2 + i).map(year => (
-                <option key={year} value={year}>{year} 年</option>
+                <option key={year} value={year}>{year} {L.year_suffix}</option>
               ))}
             </select>
           </div>
@@ -344,13 +345,13 @@ export function PayrollManagementPage() {
         {periods.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <DollarSign size={48} className="text-morandi-muted mb-4" />
-            <p className="text-morandi-secondary">尚無薪資期間</p>
+            <p className="text-morandi-secondary">{L.empty_message}</p>
             <Button
               onClick={() => setShowCreateDialog(true)}
               className="mt-4 gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
               <Plus size={16} />
-              建立期間
+              {L.btn_create}
             </Button>
           </div>
         )}
@@ -360,12 +361,12 @@ export function PayrollManagementPage() {
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <DialogContent level={1} className={DIALOG_SIZES.sm}>
           <DialogHeader>
-            <DialogTitle>建立薪資期間</DialogTitle>
+            <DialogTitle>{L.dialog_create_title}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label required>年度</Label>
+                <Label required>{L.label_year}</Label>
                 <select
                   value={formYear}
                   onChange={(e) => setFormYear(Number(e.target.value))}
@@ -377,14 +378,14 @@ export function PayrollManagementPage() {
                 </select>
               </div>
               <div>
-                <Label required>月份</Label>
+                <Label required>{L.label_month}</Label>
                 <select
                   value={formMonth}
                   onChange={(e) => setFormMonth(Number(e.target.value))}
                   className="w-full mt-1 px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-morandi-gold"
                 >
                   {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
-                    <option key={month} value={month}>{month} 月</option>
+                    <option key={month} value={month}>{month} {L.month_suffix}</option>
                   ))}
                 </select>
               </div>
@@ -396,7 +397,7 @@ export function PayrollManagementPage() {
                 onClick={() => setShowCreateDialog(false)}
               >
                 <X size={16} className="mr-2" />
-                取消
+                {L.btn_cancel}
               </Button>
               <Button
                 onClick={handleCreate}
@@ -404,7 +405,7 @@ export function PayrollManagementPage() {
                 className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
                 <Plus size={16} className="mr-2" />
-                建立
+                {L.btn_create}
               </Button>
             </div>
           </div>
@@ -416,39 +417,39 @@ export function PayrollManagementPage() {
         <DialogContent level={1} className={DIALOG_SIZES['2xl']}>
           <DialogHeader>
             <DialogTitle>
-              {selectedPeriod ? `${selectedPeriod.year}年${selectedPeriod.month}月 薪資明細` : '薪資明細'}
+              {selectedPeriod ? L.records_dialog_title(selectedPeriod.year, selectedPeriod.month) : L.records_dialog_title_default}
             </DialogTitle>
           </DialogHeader>
           <div className="py-4">
             {/* 統計區 */}
             <div className="grid grid-cols-5 gap-4 mb-4 p-4 bg-morandi-container/30 rounded-lg">
               <div className="text-center">
-                <div className="text-sm text-morandi-secondary">員工數</div>
+                <div className="text-sm text-morandi-secondary">{L.summary_employees}</div>
                 <div className="text-xl font-bold text-morandi-primary flex items-center justify-center gap-1">
                   <Users size={16} />
                   {summary.totalEmployees}
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-sm text-morandi-secondary">應發總額</div>
+                <div className="text-sm text-morandi-secondary">{L.summary_gross}</div>
                 <div className="text-xl font-bold text-morandi-primary">
                   {summary.totalGrossSalary.toLocaleString()}
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-sm text-morandi-secondary">實發總額</div>
+                <div className="text-sm text-morandi-secondary">{L.summary_net}</div>
                 <div className="text-xl font-bold text-morandi-green">
                   {summary.totalNetSalary.toLocaleString()}
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-sm text-morandi-secondary">加班費</div>
+                <div className="text-sm text-morandi-secondary">{L.summary_overtime}</div>
                 <div className="text-xl font-bold text-morandi-gold">
                   {summary.totalOvertimePay.toLocaleString()}
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-sm text-morandi-secondary">扣款</div>
+                <div className="text-sm text-morandi-secondary">{L.summary_deductions}</div>
                 <div className="text-xl font-bold text-morandi-red">
                   {summary.totalDeductions.toLocaleString()}
                 </div>
@@ -466,7 +467,7 @@ export function PayrollManagementPage() {
 
             {records.length === 0 && !loading && (
               <div className="text-center py-8 text-morandi-secondary">
-                尚無薪資紀錄，請先執行薪資計算
+                {L.empty_records}
               </div>
             )}
           </div>
@@ -477,7 +478,7 @@ export function PayrollManagementPage() {
       <Dialog open={showPayslipDialog} onOpenChange={setShowPayslipDialog}>
         <DialogContent level={1} className={DIALOG_SIZES.md}>
           <DialogHeader>
-            <DialogTitle>薪資單</DialogTitle>
+            <DialogTitle>{L.payslip_title}</DialogTitle>
           </DialogHeader>
           {selectedRecord && selectedPeriod && (
             <PayslipContent record={selectedRecord} period={selectedPeriod} />
@@ -501,7 +502,7 @@ function PayslipContent({ record, period }: { record: PayrollRecord; period: Pay
           <!DOCTYPE html>
           <html>
           <head>
-            <title>薪資單 - ${record.employee_name}</title>
+            <title>${L.payslip_print_title(record.employee_name)}</title>
             <style>
               body { font-family: 'Microsoft JhengHei', sans-serif; padding: 20px; }
               table { width: 100%; border-collapse: collapse; margin: 20px 0; }
@@ -527,66 +528,66 @@ function PayslipContent({ record, period }: { record: PayrollRecord; period: Pay
     <div className="py-4">
       <div ref={printRef}>
         <div className="text-center mb-4">
-          <h2 className="text-xl font-bold">薪資單</h2>
-          <p className="text-morandi-secondary">{period.year}年{period.month}月</p>
+          <h2 className="text-xl font-bold">{L.payslip_title}</h2>
+          <p className="text-morandi-secondary">{period.year}{L.year_suffix}{period.month}{L.month_suffix}</p>
         </div>
 
         <div className="mb-4 p-3 bg-morandi-container/30 rounded-lg">
-          <p><strong>員工姓名：</strong>{record.employee_name}</p>
-          <p><strong>薪資期間：</strong>{period.start_date} ~ {period.end_date}</p>
+          <p><strong>{L.payslip_employee_name}</strong>{record.employee_name}</p>
+          <p><strong>{L.payslip_period}</strong>{period.start_date} ~ {period.end_date}</p>
         </div>
 
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-morandi-container/40">
-              <th className="border border-border p-2 text-left">項目</th>
-              <th className="border border-border p-2 text-right w-32">金額</th>
+              <th className="border border-border p-2 text-left">{L.payslip_col_item}</th>
+              <th className="border border-border p-2 text-right w-32">{L.payslip_col_amount}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td className="border border-border p-2">底薪</td>
+              <td className="border border-border p-2">{L.payslip_base_salary}</td>
               <td className="border border-border p-2 text-right">{record.base_salary.toLocaleString()}</td>
             </tr>
             <tr>
-              <td className="border border-border p-2">加班費（{record.overtime_hours.toFixed(1)} 小時）</td>
+              <td className="border border-border p-2">{L.payslip_overtime(record.overtime_hours.toFixed(1))}</td>
               <td className="border border-border p-2 text-right">{record.overtime_pay.toLocaleString()}</td>
             </tr>
             <tr>
-              <td className="border border-border p-2">獎金</td>
+              <td className="border border-border p-2">{L.payslip_bonus}</td>
               <td className="border border-border p-2 text-right">{record.bonus.toLocaleString()}</td>
             </tr>
             <tr>
-              <td className="border border-border p-2">津貼</td>
+              <td className="border border-border p-2">{L.payslip_allowances}</td>
               <td className="border border-border p-2 text-right">{record.allowances.toLocaleString()}</td>
             </tr>
             <tr>
-              <td className="border border-border p-2">其他加項</td>
+              <td className="border border-border p-2">{L.payslip_other_additions}</td>
               <td className="border border-border p-2 text-right">{record.other_additions.toLocaleString()}</td>
             </tr>
             <tr className="bg-morandi-container/20">
-              <td className="border border-border p-2 font-medium">應發薪資</td>
+              <td className="border border-border p-2 font-medium">{L.payslip_gross}</td>
               <td className="border border-border p-2 text-right font-medium">{record.gross_salary.toLocaleString()}</td>
             </tr>
             <tr>
-              <td className="border border-border p-2 text-morandi-red">無薪假扣款（{record.unpaid_leave_days} 天）</td>
+              <td className="border border-border p-2 text-morandi-red">{L.payslip_unpaid_leave(record.unpaid_leave_days)}</td>
               <td className="border border-border p-2 text-right text-morandi-red">-{record.unpaid_leave_deduction.toLocaleString()}</td>
             </tr>
             <tr>
-              <td className="border border-border p-2 text-morandi-red">其他扣款</td>
+              <td className="border border-border p-2 text-morandi-red">{L.payslip_other_deductions}</td>
               <td className="border border-border p-2 text-right text-morandi-red">-{record.other_deductions.toLocaleString()}</td>
             </tr>
             <tr className="bg-morandi-gold/10">
-              <td className="border border-border p-2 font-bold text-lg">實發薪資</td>
+              <td className="border border-border p-2 font-bold text-lg">{L.payslip_net}</td>
               <td className="border border-border p-2 text-right font-bold text-lg text-morandi-green">{record.net_salary.toLocaleString()}</td>
             </tr>
           </tbody>
         </table>
 
         <div className="mt-4 text-sm text-morandi-secondary">
-          <p>出勤天數：{record.actual_work_days} / {record.work_days} 天</p>
-          <p>有薪假天數：{record.paid_leave_days} 天</p>
-          <p>無薪假天數：{record.unpaid_leave_days} 天</p>
+          <p>{L.payslip_work_days(record.actual_work_days, record.work_days)}</p>
+          <p>{L.payslip_paid_leave(record.paid_leave_days)}</p>
+          <p>{L.payslip_unpaid_leave_days(record.unpaid_leave_days)}</p>
         </div>
       </div>
 
@@ -596,9 +597,10 @@ function PayslipContent({ record, period }: { record: PayrollRecord; period: Pay
           className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
         >
           <Printer size={16} />
-          列印
+          {L.btn_print}
         </Button>
       </div>
     </div>
   )
 }
+
