@@ -13,6 +13,8 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { subDays } from 'date-fns'
 
+const CRON_SECRET = process.env.CRON_SECRET
+
 // Logan 的 ID
 const LOGAN_ID = '00000000-0000-0000-0000-000000000002'
 
@@ -24,6 +26,12 @@ interface SyncResult {
 }
 
 export async function GET(_request: NextRequest) {
+  // 驗證 cron secret
+  const authHeader = _request.headers.get('authorization')
+  if (CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     logger.info('開始執行 Logan 知識同步 Cron Job')
 

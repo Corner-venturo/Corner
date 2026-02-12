@@ -8,7 +8,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 
+const CRON_SECRET = process.env.CRON_SECRET
+
 export async function GET(request: NextRequest) {
+  // 驗證 cron secret
+  const authHeader = request.headers.get('authorization')
+  if (CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     logger.info('開始執行開票狀態檢查 Cron Job')
 
