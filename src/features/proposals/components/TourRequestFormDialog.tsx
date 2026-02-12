@@ -40,7 +40,7 @@ import { logger } from '@/lib/utils/logger'
 import type { Proposal, ProposalPackage } from '@/types/proposal.types'
 import type { Tour } from '@/stores/types'
 import { ADD_MANUAL_REQUEST_DIALOG_LABELS, PACKAGE_LIST_PANEL_LABELS, TOUR_REQUEST_FORM_DIALOG_LABELS } from '../constants/labels';
-import { formatDateTWPadded } from '@/lib/utils/format-date'
+import { formatDateTW } from '@/lib/utils/format-date'
 
 // 分類對應表（TourRequest category → supplier_type_code）
 const CATEGORY_TO_SUPPLIER_TYPE: Record<string, string> = {
@@ -250,7 +250,7 @@ export function TourRequestFormDialog({
 
   // 格式化日期
   const formatDate = (dateStr: string | null | undefined) => {
-    return formatDateTWPadded(dateStr)
+    return formatDateTW(dateStr)
   }
 
   // 沒有足夠資料時不渲染
