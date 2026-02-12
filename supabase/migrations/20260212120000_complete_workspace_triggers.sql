@@ -29,6 +29,7 @@ DECLARE
   ];
 BEGIN
   FOREACH tbl IN ARRAY tables LOOP
+    EXECUTE format('DROP TRIGGER IF EXISTS trigger_auto_set_workspace_id ON public.%I', tbl);
     EXECUTE format(
       'CREATE TRIGGER trigger_auto_set_workspace_id
         BEFORE INSERT ON public.%I

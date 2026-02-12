@@ -34,11 +34,12 @@ BEGIN
     EXECUTE format('DROP POLICY IF EXISTS "%s_delete" ON public.%I', tbl, tbl);
 
     -- SELECT: workspace 匹配或 super_admin
+    -- 使用 ::text 轉換確保 text/uuid 欄位都相容
     EXECUTE format(
       'CREATE POLICY "%s_select" ON public.%I FOR SELECT ' ||
       'USING (' ||
       '  is_super_admin() ' ||
-      '  OR workspace_id = get_current_user_workspace()' ||
+      '  OR workspace_id::text = get_current_user_workspace()::text' ||
       ')',
       tbl, tbl
     );
@@ -48,7 +49,7 @@ BEGIN
       'CREATE POLICY "%s_insert" ON public.%I FOR INSERT ' ||
       'WITH CHECK (' ||
       '  is_super_admin() ' ||
-      '  OR workspace_id = get_current_user_workspace()' ||
+      '  OR workspace_id::text = get_current_user_workspace()::text' ||
       ')',
       tbl, tbl
     );
@@ -58,7 +59,7 @@ BEGIN
       'CREATE POLICY "%s_update" ON public.%I FOR UPDATE ' ||
       'USING (' ||
       '  is_super_admin() ' ||
-      '  OR workspace_id = get_current_user_workspace()' ||
+      '  OR workspace_id::text = get_current_user_workspace()::text' ||
       ')',
       tbl, tbl
     );
@@ -68,7 +69,7 @@ BEGIN
       'CREATE POLICY "%s_delete" ON public.%I FOR DELETE ' ||
       'USING (' ||
       '  is_super_admin() ' ||
-      '  OR workspace_id = get_current_user_workspace()' ||
+      '  OR workspace_id::text = get_current_user_workspace()::text' ||
       ')',
       tbl, tbl
     );
