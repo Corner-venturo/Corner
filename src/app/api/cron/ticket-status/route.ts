@@ -24,7 +24,10 @@ export async function GET(request: NextRequest) {
     const baseUrl = request.nextUrl.origin
     const response = await fetch(`${baseUrl}/api/bot/ticket-status`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(process.env.BOT_API_SECRET && { 'authorization': process.env.BOT_API_SECRET }),
+      },
       body: JSON.stringify({
         notify_sales: true,
       }),
