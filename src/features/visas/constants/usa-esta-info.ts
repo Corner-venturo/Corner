@@ -249,6 +249,4 @@ export const US_STATES = [
   'Wyoming (WY)',
 ]
 
-export function formatCurrency(amount: number): string {
-  return `NT$${amount.toLocaleString()}`
-}
+export { formatCurrency } from '@/lib/utils/format-currency'

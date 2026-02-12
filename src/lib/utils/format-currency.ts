@@ -21,7 +21,8 @@ export function formatCurrency(
     CNY: '¥ ',
   }[currency]
 
-  return `${prefix}${Math.abs(amount).toLocaleString()}`
+  const sign = amount < 0 ? '-' : ''
+  return `${sign}${prefix}${Math.abs(amount).toLocaleString()}`
 }
 
 /**

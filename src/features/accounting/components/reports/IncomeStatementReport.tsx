@@ -12,10 +12,7 @@ import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { useAccountingReports, type IncomeStatementResult } from '../../hooks/useAccountingReports'
 import { formatDate } from '@/lib/utils/format-date'
-
-function formatCurrency(amount: number): string {
-  return `NT$ ${amount.toLocaleString()}`
-}
+import { formatCurrency } from '@/lib/utils/format-currency'
 
 function formatPercent(value: number): string {
   return `${value.toFixed(1)}%`

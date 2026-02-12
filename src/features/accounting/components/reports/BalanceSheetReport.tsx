@@ -12,10 +12,7 @@ import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { useAccountingReports, type BalanceSheetResult } from '../../hooks/useAccountingReports'
 import { formatDate } from '@/lib/utils/format-date'
-
-function formatCurrency(amount: number): string {
-  return `NT$ ${amount.toLocaleString()}`
-}
+import { formatCurrency } from '@/lib/utils/format-currency'
 
 export function BalanceSheetReport() {
   const { loading, error, fetchBalanceSheet } = useAccountingReports()

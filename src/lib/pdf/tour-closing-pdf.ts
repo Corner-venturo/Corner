@@ -21,6 +21,7 @@ interface JsPDFWithAutoTable extends jsPDF {
   }
 }
 import { formatDate } from '@/lib/utils'
+import { formatCurrency } from '@/lib/utils/format-currency'
 import { loadChineseFonts } from './pdf-fonts'
 
 // 簡化的訂單介面（只需要報表需要的欄位）
@@ -41,13 +42,6 @@ export interface TourClosingPDFData {
 interface CostSummary {
   category: string
   amount: number
-}
-
-/**
- * 格式化金額
- */
-function formatCurrency(amount: number): string {
-  return `NT$ ${amount.toLocaleString()}`
 }
 
 /**

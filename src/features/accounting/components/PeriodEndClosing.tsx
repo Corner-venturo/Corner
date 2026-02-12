@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { EnhancedTable, type Column } from '@/components/ui/enhanced-table'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { formatCurrency } from '@/lib/utils/format-currency'
 import {
   usePeriodClosing,
   type PeriodType,
@@ -48,9 +49,6 @@ const QUARTER_OPTIONS = [
   { value: 4, label: 'Q4（10-12月）' },
 ]
 
-function formatCurrency(amount: number): string {
-  return `NT$ ${amount.toLocaleString()}`
-}
 
 export function PeriodEndClosing() {
   const {

@@ -139,9 +139,7 @@ export const USA_ESTA_NOTES: string[] = [
   '＊正常 ESTA 代辦時程為 3-5 個工作天（不含例假日）',
 ]
 
-export function formatCurrency(amount: number): string {
-  return `NT$${amount.toLocaleString()}`
-}
+export { formatCurrency } from '@/lib/utils/format-currency'
 
 export function buildVisaInfoText(): string {
   const sections = [

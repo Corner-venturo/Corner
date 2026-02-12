@@ -6,6 +6,19 @@
 // 基礎型別
 // ============================================
 
+// Utility: make nullable fields optional for create/insert
+type NullableKeys<T> = {
+  [K in keyof T]: null extends T[K] ? K : never
+}[keyof T]
+
+type CreateInput<T> = Omit<T, 'id' | 'created_at' | 'updated_at' | '_needs_sync' | '_synced_at' | '_deleted' | 'code'>
+
+/** Makes nullable fields optional — matches Supabase Insert semantics */
+export type EntityCreateData<T> =
+  Partial<Pick<CreateInput<T>, NullableKeys<CreateInput<T>>>> &
+  Omit<CreateInput<T>, NullableKeys<CreateInput<T>>> &
+  { code?: string }
+
 export interface BaseEntity {
   id: string
   created_at?: string | null
@@ -168,7 +181,7 @@ export interface EntityHook<T extends BaseEntity> {
   /** Dictionary hook */
   useDictionary: () => DictionaryResult<T>
   /** 建立（code 可選，會自動生成）*/
-  create: (data: Omit<T, 'id' | 'created_at' | 'updated_at' | '_needs_sync' | '_synced_at' | '_deleted' | 'code'> & { code?: string }) => Promise<T>
+  create: (data: EntityCreateData<T>) => Promise<T>
   /** 更新 */
   update: (id: string, data: Partial<T>) => Promise<T>
   /** 刪除 */

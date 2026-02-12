@@ -12,11 +12,7 @@ import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { useAccountingReports, type CashFlowResult } from '../../hooks/useAccountingReports'
 import { formatDate } from '@/lib/utils/format-date'
-
-function formatCurrency(amount: number): string {
-  const prefix = amount >= 0 ? '' : '-'
-  return `${prefix}NT$ ${Math.abs(amount).toLocaleString()}`
-}
+import { formatCurrency } from '@/lib/utils/format-currency'
 
 export function CashFlowStatementReport() {
   const { loading, error, fetchCashFlowStatement } = useAccountingReports()
