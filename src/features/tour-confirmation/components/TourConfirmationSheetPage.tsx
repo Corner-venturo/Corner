@@ -50,6 +50,7 @@ import type {
   CreateConfirmationItem,
   ResourceType,
 } from '@/types/tour-confirmation-sheet.types'
+import { COST_SUMMARY_LABELS, TOUR_CONFIRMATION_SHEET_PAGE_LABELS } from '../constants/labels';
 
 // 新行的初始狀態
 const EMPTY_NEW_ITEM = {
@@ -73,11 +74,11 @@ interface TourConfirmationSheetPageProps {
 
 // 分類配置
 const CATEGORIES: { key: ConfirmationItemCategory; label: string }[] = [
-  { key: 'transport', label: '交通' },
-  { key: 'accommodation', label: '住宿' },
-  { key: 'meal', label: '餐食' },
-  { key: 'activity', label: '活動' },
-  { key: 'other', label: '其他' },
+  { key: 'transport', label: COST_SUMMARY_LABELS.交通 },
+  { key: 'accommodation', label: COST_SUMMARY_LABELS.住宿 },
+  { key: 'meal', label: COST_SUMMARY_LABELS.餐食 },
+  { key: 'activity', label: COST_SUMMARY_LABELS.活動 },
+  { key: 'other', label: COST_SUMMARY_LABELS.其他 },
 ]
 
 export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPageProps) {
@@ -164,7 +165,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
       localExpectedCostsRef.current[itemId] = { ...local, dirty: false }
     } catch (err) {
       logger.error('更新預計支出失敗:', err)
-      toast({ title: '更新失敗', variant: 'destructive' })
+      toast({ title: TOUR_CONFIRMATION_SHEET_PAGE_LABELS.更新失敗, variant: 'destructive' })
     }
   }
 
@@ -223,7 +224,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
 
     const twdSubtotal = (item.unit_price || 0) * (item.quantity || 1)
     if (twdSubtotal <= 0) {
-      toast({ title: '小計為 0，無法換算', variant: 'destructive' })
+      toast({ title: TOUR_CONFIRMATION_SHEET_PAGE_LABELS.小計為_0_無法換算, variant: 'destructive' })
       return
     }
 
@@ -254,7 +255,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
       })
     } catch (err) {
       logger.error('換算失敗:', err)
-      toast({ title: '換算失敗', variant: 'destructive' })
+      toast({ title: TOUR_CONFIRMATION_SHEET_PAGE_LABELS.換算失敗, variant: 'destructive' })
     }
   }
 
@@ -262,7 +263,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
   const handleSaveExchangeRate = async () => {
     const rate = parseFloat(exchangeRateInput)
     if (isNaN(rate) || rate <= 0) {
-      toast({ title: '請輸入有效的匯率', variant: 'destructive' })
+      toast({ title: TOUR_CONFIRMATION_SHEET_PAGE_LABELS.請輸入有效的匯率, variant: 'destructive' })
       return
     }
 
@@ -271,11 +272,11 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
         exchange_rate: rate,
         foreign_currency: destinationCurrency,
       })
-      toast({ title: '匯率設定成功', description: `1 ${destinationCurrency} = ${rate} TWD` })
+      toast({ title: TOUR_CONFIRMATION_SHEET_PAGE_LABELS.匯率設定成功, description: `1 ${destinationCurrency} = ${rate} TWD` })
     } catch (err) {
       logger.warn('無法儲存匯率到資料庫，使用本地狀態:', err)
       setLocalExchangeRate(rate)
-      toast({ title: '匯率已設定（本次有效）', description: `1 ${destinationCurrency} = ${rate} TWD` })
+      toast({ title: TOUR_CONFIRMATION_SHEET_PAGE_LABELS.匯率已設定_本次有效, description: `1 ${destinationCurrency} = ${rate} TWD` })
     }
 
     setExchangeRateDialog({ open: false, itemId: null })
@@ -287,7 +288,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
         const convertedAmount = Math.round(item.expected_cost / rate)
         toast({
           title: `換算結果`,
-          description: `${item.expected_cost.toLocaleString()} TWD = ${convertedAmount.toLocaleString()} ${destinationCurrency || '外幣'}`,
+          description: `${item.expected_cost.toLocaleString()} TWD = ${convertedAmount.toLocaleString()} ${destinationCurrency || TOUR_CONFIRMATION_SHEET_PAGE_LABELS.外幣}`,
         })
       }
     }
@@ -504,13 +505,13 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
       for (const day of itinerary.daily_itinerary) {
         const meals = day.meals
         const mealTypes = [
-          { key: 'breakfast', label: '早餐', value: meals?.breakfast },
-          { key: 'lunch', label: '午餐', value: meals?.lunch },
-          { key: 'dinner', label: '晚餐', value: meals?.dinner },
+          { key: 'breakfast', label: TOUR_CONFIRMATION_SHEET_PAGE_LABELS.早餐, value: meals?.breakfast },
+          { key: 'lunch', label: TOUR_CONFIRMATION_SHEET_PAGE_LABELS.午餐, value: meals?.lunch },
+          { key: 'dinner', label: TOUR_CONFIRMATION_SHEET_PAGE_LABELS.晚餐, value: meals?.dinner },
         ]
 
         for (const meal of mealTypes) {
-          if (meal.value && meal.value !== '敬請自理' && meal.value !== '機上') {
+          if (meal.value && meal.value !== TOUR_CONFIRMATION_SHEET_PAGE_LABELS.敬請自理 && meal.value !== TOUR_CONFIRMATION_SHEET_PAGE_LABELS.機上) {
             await addItem({
               sheet_id: sheet.id,
               category: 'meal',
@@ -550,7 +551,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     setSavingNew(true)
     try {
       for (const day of itinerary.daily_itinerary) {
-        if (day.accommodation && day.accommodation !== '溫暖的家') {
+        if (day.accommodation && day.accommodation !== TOUR_CONFIRMATION_SHEET_PAGE_LABELS.溫暖的家) {
           await addItem({
             sheet_id: sheet.id,
             category: 'accommodation',
@@ -700,13 +701,13 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
 
     setSavingNew(true)
     try {
-      let title = newItemData.title || '新項目'
+      let title = newItemData.title || TOUR_CONFIRMATION_SHEET_PAGE_LABELS.新項目
       const hasDateRange = newItemData.service_date_end && newItemData.service_date_end !== newItemData.service_date
       if (addingCategory === 'transport' && transportSubType === 'vehicle') {
         if (hasDateRange) {
-          title = title || '全程用車'
+          title = title || TOUR_CONFIRMATION_SHEET_PAGE_LABELS.全程用車
         } else {
-          title = title || '單日用車'
+          title = title || TOUR_CONFIRMATION_SHEET_PAGE_LABELS.單日用車
         }
       }
 
@@ -763,7 +764,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
 
   // 刪除項目
   const handleDelete = async (itemId: string) => {
-    if (confirm('確定要刪除此項目嗎？')) {
+    if (confirm(TOUR_CONFIRMATION_SHEET_PAGE_LABELS.確定要刪除此項目嗎)) {
       await deleteItem(itemId)
     }
   }
@@ -777,10 +778,10 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
 
     if (!hasLeader) {
       const proceed = window.confirm(
-        '⚠️ 尚未設定領隊\n\n' +
-        '如果此團需要領隊，請先在上方填寫領隊姓名。\n' +
-        '如果此團不需要領隊（如包車），可以繼續交接。\n\n' +
-        '確定要繼續交接嗎？'
+        TOUR_CONFIRMATION_SHEET_PAGE_LABELS.尚未設定領隊_n_n +
+        TOUR_CONFIRMATION_SHEET_PAGE_LABELS.如果此團需要領隊_請先在上方填寫領隊姓名_n +
+        TOUR_CONFIRMATION_SHEET_PAGE_LABELS.如果此團不需要領隊_如包車_可以繼續交接_n_n +
+        TOUR_CONFIRMATION_SHEET_PAGE_LABELS.確定要繼續交接嗎
       )
       if (!proceed) return
     }
@@ -804,11 +805,11 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
         logger.warn('同步到 Online 失敗:', syncResult.message)
       }
 
-      alert('交接完成！\n\n確認單狀態已更新。\n行程已同步到 Online App。')
+      alert(TOUR_CONFIRMATION_SHEET_PAGE_LABELS.交接完成_n_n確認單狀態已更新_n行程已同步到_Onlin)
       reload()
     } catch (error) {
       logger.error('交接失敗:', error)
-      alert('交接失敗，請稍後再試')
+      alert(TOUR_CONFIRMATION_SHEET_PAGE_LABELS.交接失敗_請稍後再試)
     } finally {
       setHandingOver(false)
     }
@@ -1054,7 +1055,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                                   onChange={(e) => handleNotesChange(item.id, e.target.value)}
                                   onBlur={() => handleNotesBlur(item.id)}
                                   className="flex-1 h-7 px-2 py-1 text-xs bg-transparent border border-transparent hover:border-border focus:border-morandi-gold focus:ring-1 focus:ring-morandi-gold/30 rounded outline-none"
-                                  placeholder="備註..."
+                                  placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.備註}
                                 />
                                 {destinationCurrency && (item.subtotal || (item.unit_price && item.quantity)) ? (
                                   <button
@@ -1125,7 +1126,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                                     disabled={savingNew}
                                     className="px-3 py-1 text-xs font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded disabled:opacity-50"
                                   >
-                                    {savingNew ? '新增中...' : '確認帶入'}
+                                    {savingNew ? '新增中...' : TOUR_CONFIRMATION_SHEET_PAGE_LABELS.確認帶入}
                                   </button>
                                   <button
                                     onClick={() => { setAddingCategory(null); setTransportSubType(null) }}
@@ -1139,26 +1140,26 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                                   <div className="flex items-center gap-2 text-sm">
                                     <span className="text-morandi-green font-medium w-10">去程</span>
                                     <input
-                                      placeholder="航空"
+                                      placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.航空}
                                       value={manualFlight.outbound.airline}
                                       onChange={(e) => setManualFlight(prev => ({ ...prev, outbound: { ...prev.outbound, airline: e.target.value } }))}
                                       className="w-20 px-2 py-1 border border-border rounded text-sm"
                                     />
                                     <input
-                                      placeholder="航班"
+                                      placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.航班}
                                       value={manualFlight.outbound.flightNumber}
                                       onChange={(e) => setManualFlight(prev => ({ ...prev, outbound: { ...prev.outbound, flightNumber: e.target.value } }))}
                                       className="w-20 px-2 py-1 border border-border rounded text-sm"
                                     />
                                     <input
-                                      placeholder="起飛"
+                                      placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.起飛}
                                       value={manualFlight.outbound.departureAirport}
                                       onChange={(e) => setManualFlight(prev => ({ ...prev, outbound: { ...prev.outbound, departureAirport: e.target.value } }))}
                                       className="w-16 px-2 py-1 border border-border rounded text-sm"
                                     />
                                     <span>→</span>
                                     <input
-                                      placeholder="抵達"
+                                      placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.抵達}
                                       value={manualFlight.outbound.arrivalAirport}
                                       onChange={(e) => setManualFlight(prev => ({ ...prev, outbound: { ...prev.outbound, arrivalAirport: e.target.value } }))}
                                       className="w-16 px-2 py-1 border border-border rounded text-sm"
@@ -1167,26 +1168,26 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                                   <div className="flex items-center gap-2 text-sm">
                                     <span className="text-morandi-gold font-medium w-10">回程</span>
                                     <input
-                                      placeholder="航空"
+                                      placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.航空}
                                       value={manualFlight.return.airline}
                                       onChange={(e) => setManualFlight(prev => ({ ...prev, return: { ...prev.return, airline: e.target.value } }))}
                                       className="w-20 px-2 py-1 border border-border rounded text-sm"
                                     />
                                     <input
-                                      placeholder="航班"
+                                      placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.航班}
                                       value={manualFlight.return.flightNumber}
                                       onChange={(e) => setManualFlight(prev => ({ ...prev, return: { ...prev.return, flightNumber: e.target.value } }))}
                                       className="w-20 px-2 py-1 border border-border rounded text-sm"
                                     />
                                     <input
-                                      placeholder="起飛"
+                                      placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.起飛}
                                       value={manualFlight.return.departureAirport}
                                       onChange={(e) => setManualFlight(prev => ({ ...prev, return: { ...prev.return, departureAirport: e.target.value } }))}
                                       className="w-16 px-2 py-1 border border-border rounded text-sm"
                                     />
                                     <span>→</span>
                                     <input
-                                      placeholder="抵達"
+                                      placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.抵達}
                                       value={manualFlight.return.arrivalAirport}
                                       onChange={(e) => setManualFlight(prev => ({ ...prev, return: { ...prev.return, arrivalAirport: e.target.value } }))}
                                       className="w-16 px-2 py-1 border border-border rounded text-sm"
@@ -1198,7 +1199,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                                       disabled={savingNew || (!manualFlight.outbound.airline && !manualFlight.return.airline)}
                                       className="px-3 py-1 text-xs font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded disabled:opacity-50"
                                     >
-                                      {savingNew ? '儲存中...' : '確認儲存'}
+                                      {savingNew ? '儲存中...' : TOUR_CONFIRMATION_SHEET_PAGE_LABELS.確認儲存}
                                     </button>
                                     <button
                                       onClick={() => { setManualFlightMode(false); setAddingCategory(null); setTransportSubType(null) }}
@@ -1235,14 +1236,14 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                                 <DatePicker
                                   value={newItemData.service_date}
                                   onChange={(date) => handleNewItemChange('service_date', date)}
-                                  placeholder="開始"
+                                  placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.開始}
                                   buttonClassName="h-8 text-xs border-0 shadow-none"
                                 />
                                 <span className="text-morandi-secondary text-xs">~</span>
                                 <DatePicker
                                   value={newItemData.service_date_end}
                                   onChange={(date) => handleNewItemChange('service_date_end', date)}
-                                  placeholder="結束(選填)"
+                                  placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.結束_選填}
                                   buttonClassName="h-8 text-xs border-0 shadow-none"
                                   clearable
                                 />
@@ -1252,7 +1253,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                               <input
                                 value={newItemData.supplier_name}
                                 onChange={(e) => handleNewItemChange('supplier_name', e.target.value)}
-                                placeholder="車行..."
+                                placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.車行}
                                 className="w-full h-full px-2 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
                               />
                             </td>
@@ -1304,7 +1305,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                               <input
                                 value={newItemData.notes}
                                 onChange={(e) => handleNewItemChange('notes', e.target.value)}
-                                placeholder="備註..."
+                                placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.備註}
                                 className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
                               />
                             </td>
@@ -1314,7 +1315,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                                   onClick={handleSaveNewItem}
                                   disabled={savingNew}
                                   className="p-1.5 text-white bg-morandi-green hover:bg-morandi-green/80 rounded disabled:opacity-50"
-                                  title="儲存"
+                                  title={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.儲存}
                                 >
                                   {savingNew ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                                 </button>
@@ -1322,7 +1323,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                                   onClick={handleCancelAdd}
                                   disabled={savingNew}
                                   className="p-1.5 text-white bg-morandi-red hover:bg-morandi-red/80 rounded disabled:opacity-50"
-                                  title="取消"
+                                  title={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.取消}
                                 >
                                   <X size={14} />
                                 </button>
@@ -1350,7 +1351,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                           <input
                             value={newItemData.supplier_name}
                             onChange={(e) => handleNewItemChange('supplier_name', e.target.value)}
-                            placeholder="輸入供應商..."
+                            placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.輸入供應商}
                             className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
                           />
                         </td>
@@ -1358,7 +1359,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                           <input
                             value={newItemData.title}
                             onChange={(e) => handleNewItemChange('title', e.target.value)}
-                            placeholder="輸入項目說明..."
+                            placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.輸入項目說明}
                             className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
                           />
                         </td>
@@ -1402,7 +1403,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                           <input
                             value={newItemData.notes}
                             onChange={(e) => handleNewItemChange('notes', e.target.value)}
-                            placeholder="輸入備註..."
+                            placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.輸入備註}
                             className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
                           />
                         </td>
@@ -1412,7 +1413,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                               onClick={handleSaveNewItem}
                               disabled={savingNew}
                               className="p-1.5 text-white bg-morandi-green hover:bg-morandi-green/80 rounded disabled:opacity-50"
-                              title="儲存"
+                              title={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.儲存}
                             >
                               {savingNew ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                             </button>
@@ -1420,7 +1421,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                               onClick={handleCancelAdd}
                               disabled={savingNew}
                               className="p-1.5 text-white bg-morandi-red hover:bg-morandi-red/80 rounded disabled:opacity-50"
-                              title="取消"
+                              title={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.取消}
                             >
                               <X size={14} />
                             </button>

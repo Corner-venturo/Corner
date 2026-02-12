@@ -10,6 +10,7 @@
 import { LucideIcon, Plus, Edit2, Trash2, FileOutput, Navigation } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { TourConfirmationItem, ConfirmationItemCategory } from '@/types/tour-confirmation-sheet.types'
+import { CONFIRMATION_SECTION_LABELS } from '../constants/labels';
 
 interface ColumnConfig {
   key: string
@@ -179,7 +180,7 @@ export function ConfirmationSection({
                             if (url) window.open(url, '_blank')
                           }}
                           className="h-7 w-7 p-0 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50"
-                          title="開啟 Google Maps 導航"
+                          title={CONFIRMATION_SECTION_LABELS.開啟_Google_Maps_導航}
                         >
                           <Navigation size={14} />
                         </Button>
@@ -190,7 +191,7 @@ export function ConfirmationSection({
                           size="sm"
                           onClick={() => onGenerateRequest(item)}
                           className="h-7 w-7 p-0 text-morandi-secondary hover:text-morandi-gold"
-                          title="產出需求單"
+                          title={CONFIRMATION_SECTION_LABELS.產出需求單}
                         >
                           <FileOutput size={14} />
                         </Button>
@@ -200,7 +201,7 @@ export function ConfirmationSection({
                         size="sm"
                         onClick={() => onEdit(item)}
                         className="h-7 w-7 p-0 text-morandi-secondary hover:text-morandi-primary"
-                        title="編輯"
+                        title={CONFIRMATION_SECTION_LABELS.編輯}
                       >
                         <Edit2 size={14} />
                       </Button>
@@ -209,7 +210,7 @@ export function ConfirmationSection({
                         size="sm"
                         onClick={() => onDelete(item.id)}
                         className="h-7 w-7 p-0 text-morandi-secondary hover:text-morandi-red"
-                        title="刪除"
+                        title={CONFIRMATION_SECTION_LABELS.刪除}
                       >
                         <Trash2 size={14} />
                       </Button>

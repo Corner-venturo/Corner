@@ -8,6 +8,7 @@
 
 import { Bus, Utensils, Hotel, Ticket, FileText, Calculator } from 'lucide-react'
 import type { CostSummary as CostSummaryType } from '@/types/tour-confirmation-sheet.types'
+import { COST_SUMMARY_LABELS } from '../constants/labels';
 
 interface CostSummaryCardProps {
   summary: CostSummaryType
@@ -23,11 +24,11 @@ export function CostSummaryCard({ summary }: CostSummaryCardProps) {
   }
 
   const categories = [
-    { key: 'transport', label: '交通', icon: Bus, color: 'text-blue-500' },
-    { key: 'meal', label: '餐食', icon: Utensils, color: 'text-orange-500' },
-    { key: 'accommodation', label: '住宿', icon: Hotel, color: 'text-purple-500' },
-    { key: 'activity', label: '活動', icon: Ticket, color: 'text-green-500' },
-    { key: 'other', label: '其他', icon: FileText, color: 'text-morandi-secondary' },
+    { key: 'transport', label: COST_SUMMARY_LABELS.交通, icon: Bus, color: 'text-blue-500' },
+    { key: 'meal', label: COST_SUMMARY_LABELS.餐食, icon: Utensils, color: 'text-orange-500' },
+    { key: 'accommodation', label: COST_SUMMARY_LABELS.住宿, icon: Hotel, color: 'text-purple-500' },
+    { key: 'activity', label: COST_SUMMARY_LABELS.活動, icon: Ticket, color: 'text-green-500' },
+    { key: 'other', label: COST_SUMMARY_LABELS.其他, icon: FileText, color: 'text-morandi-secondary' },
   ] as const
 
   const difference = summary.total.actual - summary.total.expected

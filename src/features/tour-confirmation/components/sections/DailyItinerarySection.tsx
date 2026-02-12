@@ -5,6 +5,7 @@
 import React, { useState } from 'react'
 import { Plus, Check } from 'lucide-react'
 import type { Itinerary, DailyItineraryDay } from '@/stores/types'
+import { DAILY_ITINERARY_SECTION_LABELS, TOUR_CONFIRMATION_SHEET_PAGE_LABELS } from '../../constants/labels';
 
 interface DailyItinerarySectionProps {
   itinerary: Itinerary
@@ -71,7 +72,7 @@ export function DailyItinerarySection({ itinerary }: DailyItinerarySectionProps)
                     <button
                       onClick={() => toggleDayNote(idx)}
                       className="flex items-center gap-1 text-xs text-morandi-gold hover:text-morandi-gold-hover"
-                      title={isExpanded ? '收起說明' : '新增說明'}
+                      title={isExpanded ? '收起說明' : DAILY_ITINERARY_SECTION_LABELS.新增說明}
                     >
                       <Plus size={14} className={`transition-transform ${isExpanded ? 'rotate-45' : ''}`} />
                       說明
@@ -81,7 +82,7 @@ export function DailyItinerarySection({ itinerary }: DailyItinerarySectionProps)
                     <div className="flex text-sm text-morandi-secondary">
                       <span className="w-[150px] flex items-center">
                         早：{day.meals?.breakfast || 'X'}
-                        {day.meals?.breakfast === '飯店早餐' && (
+                        {day.meals?.breakfast === DAILY_ITINERARY_SECTION_LABELS.飯店早餐 && (
                           <Check size={14} className="ml-1 text-morandi-green/40" />
                         )}
                       </span>
@@ -91,10 +92,10 @@ export function DailyItinerarySection({ itinerary }: DailyItinerarySectionProps)
                       <span className="w-[150px] flex items-center">
                         晚：{day.meals?.dinner || 'X'}
                       </span>
-                      {day.accommodation && day.accommodation !== '溫暖的家' && (
+                      {day.accommodation && day.accommodation !== TOUR_CONFIRMATION_SHEET_PAGE_LABELS.溫暖的家 && (
                         <span className="flex-1 flex items-center">
                           住：{day.accommodation}
-                          {(day.isSameAccommodation || day.accommodation.includes('同上')) && (
+                          {(day.isSameAccommodation || day.accommodation.includes(DAILY_ITINERARY_SECTION_LABELS.同上)) && (
                             <Check size={14} className="ml-1 text-morandi-green/40" />
                           )}
                         </span>
@@ -113,7 +114,7 @@ export function DailyItinerarySection({ itinerary }: DailyItinerarySectionProps)
                       <textarea
                         value={noteText}
                         onChange={(e) => updateDayNote(idx, e.target.value)}
-                        placeholder="輸入說明文字，例如：提醒客戶帶護照..."
+                        placeholder={DAILY_ITINERARY_SECTION_LABELS.輸入說明文字_例如_提醒客戶帶護照}
                         className="w-full px-2 py-1.5 text-sm border border-border rounded bg-card focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 resize-none"
                         rows={2}
                       />

@@ -6,6 +6,7 @@ import React from 'react'
 import type { Itinerary } from '@/stores/types'
 import type { Database } from '@/lib/supabase/types'
 import type { TourRoom, QuoteRoomItem } from '../../hooks/useTourSheetData'
+import { CONFIRMATION_HEADER_LABELS, DAILY_ITINERARY_SECTION_LABELS, HOTEL_CONFIRMATION_SECTION_LABELS, TOUR_CONFIRMATION_SHEET_PAGE_LABELS } from '../../constants/labels';
 
 type TourRequestRow = Database['public']['Tables']['tour_requests']['Row']
 
@@ -40,9 +41,9 @@ export function HotelConfirmationSection({
   itinerary.daily_itinerary.forEach((day, idx) => {
     // 最後一天通常不住宿
     if (idx === itinerary.daily_itinerary.length - 1) return
-    if (!day.accommodation || day.accommodation === '溫暖的家') return
+    if (!day.accommodation || day.accommodation === TOUR_CONFIRMATION_SHEET_PAGE_LABELS.溫暖的家) return
 
-    const isSame = day.isSameAccommodation || day.accommodation.includes('同上')
+    const isSame = day.isSameAccommodation || day.accommodation.includes(DAILY_ITINERARY_SECTION_LABELS.同上)
     // 提取實際飯店名稱（去掉「同上」前綴）
     let hotelName = day.accommodation
     if (isSame && day.accommodation.includes('(')) {
@@ -84,7 +85,7 @@ export function HotelConfirmationSection({
     // 統計各房型數量
     const roomCounts: Record<string, number> = {}
     rooms.forEach(r => {
-      const type = r.room_type || '未指定'
+      const type = r.room_type || HOTEL_CONFIRMATION_SECTION_LABELS.未指定
       roomCounts[type] = (roomCounts[type] || 0) + 1
     })
     return Object.entries(roomCounts)
@@ -97,9 +98,9 @@ export function HotelConfirmationSection({
     const req = accommodationRequests.find(r =>
       r.supplier_name?.includes(hotelName) || r.title?.includes(hotelName)
     )
-    if (!req) return { status: 'pending', label: '待確認', color: 'bg-morandi-gold/20 text-morandi-gold' }
-    if (req.status === 'confirmed') return { status: 'confirmed', label: '已確認', color: 'bg-morandi-green/20 text-morandi-green' }
-    if (req.status === 'replied') return { status: 'replied', label: '已回覆', color: 'bg-morandi-container text-morandi-primary' }
+    if (!req) return { status: 'pending', label: HOTEL_CONFIRMATION_SECTION_LABELS.待確認, color: 'bg-morandi-gold/20 text-morandi-gold' }
+    if (req.status === 'confirmed') return { status: 'confirmed', label: CONFIRMATION_HEADER_LABELS.已確認, color: 'bg-morandi-green/20 text-morandi-green' }
+    if (req.status === 'replied') return { status: 'replied', label: HOTEL_CONFIRMATION_SECTION_LABELS.已回覆, color: 'bg-morandi-container text-morandi-primary' }
     return { status: 'pending', label: '待確認', color: 'bg-morandi-gold/20 text-morandi-gold' }
   }
 

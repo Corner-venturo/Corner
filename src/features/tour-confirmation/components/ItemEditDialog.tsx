@@ -34,6 +34,7 @@ import type {
   CreateConfirmationItem,
   BookingStatus,
 } from '@/types/tour-confirmation-sheet.types'
+import { CONFIRMATION_HEADER_LABELS, COST_SUMMARY_LABELS, ITEM_EDIT_DIALOG_LABELS } from '../constants/labels';
 
 interface ItemEditDialogProps {
   open: boolean
@@ -45,19 +46,19 @@ interface ItemEditDialogProps {
 }
 
 const categoryLabels: Record<ConfirmationItemCategory, string> = {
-  transport: '交通',
-  meal: '餐食',
-  accommodation: '住宿',
-  activity: '活動',
-  other: '其他',
+  transport: COST_SUMMARY_LABELS.交通,
+  meal: COST_SUMMARY_LABELS.餐食,
+  accommodation: COST_SUMMARY_LABELS.住宿,
+  activity: COST_SUMMARY_LABELS.活動,
+  other: COST_SUMMARY_LABELS.其他,
 }
 
 const bookingStatusOptions: { value: BookingStatus; label: string }[] = [
-  { value: 'pending', label: '待處理' },
-  { value: 'requested', label: '已發需求' },
-  { value: 'confirmed', label: '已確認' },
-  { value: 'cancelled', label: '已取消' },
-  { value: 'pending_change', label: '待變更' },
+  { value: 'pending', label: ITEM_EDIT_DIALOG_LABELS.待處理 },
+  { value: 'requested', label: ITEM_EDIT_DIALOG_LABELS.已發需求 },
+  { value: 'confirmed', label: CONFIRMATION_HEADER_LABELS.已確認 },
+  { value: 'cancelled', label: ITEM_EDIT_DIALOG_LABELS.已取消 },
+  { value: 'pending_change', label: ITEM_EDIT_DIALOG_LABELS.待變更 },
 ]
 
 export function ItemEditDialog({
@@ -211,7 +212,7 @@ export function ItemEditDialog({
       <DialogContent level={1} className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {isEdit ? '編輯' : '新增'}{categoryLabels[category]}項目
+            {isEdit ? '編輯' : ITEM_EDIT_DIALOG_LABELS.新增}{categoryLabels[category]}項目
           </DialogTitle>
         </DialogHeader>
 
@@ -256,7 +257,7 @@ export function ItemEditDialog({
                 {category === 'transport' ? '接駁公司' :
                  category === 'meal' ? '餐廳名稱' :
                  category === 'accommodation' ? '飯店名稱' :
-                 category === 'activity' ? '場地名稱' : '供應商'} *
+                 category === 'activity' ? '場地名稱' : ITEM_EDIT_DIALOG_LABELS.供應商} *
               </Label>
               <Input
                 value={formData.supplier_name || ''}
@@ -267,7 +268,7 @@ export function ItemEditDialog({
             <div>
               <Label>
                 {category === 'transport' ? '接駁地點' :
-                 category === 'accommodation' ? '房型' : '項目名稱'} *
+                 category === 'accommodation' ? '房型' : ITEM_EDIT_DIALOG_LABELS.項目名稱} *
               </Label>
               <Input
                 value={formData.title || ''}
@@ -283,7 +284,7 @@ export function ItemEditDialog({
             <Textarea
               value={formData.description || ''}
               onChange={(e) => updateField('description', e.target.value)}
-              placeholder="詳細說明..."
+              placeholder={ITEM_EDIT_DIALOG_LABELS.詳細說明}
               className="mt-1"
               rows={2}
             />
@@ -356,7 +357,7 @@ export function ItemEditDialog({
                 value={formData.actual_cost ?? ''}
                 onChange={(e) => updateField('actual_cost', parseFloat(e.target.value) || null)}
                 className="mt-1"
-                placeholder="完成後填寫"
+                placeholder={ITEM_EDIT_DIALOG_LABELS.完成後填寫}
               />
             </div>
           </div>
@@ -369,7 +370,7 @@ export function ItemEditDialog({
                 value={formData.booking_reference || ''}
                 onChange={(e) => updateField('booking_reference', e.target.value)}
                 className="mt-1"
-                placeholder="預約確認碼"
+                placeholder={ITEM_EDIT_DIALOG_LABELS.預約確認碼}
               />
             </div>
             <div>
@@ -406,7 +407,7 @@ export function ItemEditDialog({
                     value={formData.leader_expense ?? ''}
                     onChange={(e) => updateField('leader_expense', parseFloat(e.target.value) || null)}
                     className="mt-1"
-                    placeholder="領隊支付金額"
+                    placeholder={ITEM_EDIT_DIALOG_LABELS.領隊支付金額}
                   />
                 </div>
                 <div>
@@ -415,7 +416,7 @@ export function ItemEditDialog({
                     value={formData.leader_expense_note || ''}
                     onChange={(e) => updateField('leader_expense_note', e.target.value)}
                     className="mt-1"
-                    placeholder="領隊備註"
+                    placeholder={ITEM_EDIT_DIALOG_LABELS.領隊備註}
                   />
                 </div>
               </div>
@@ -480,7 +481,7 @@ export function ItemEditDialog({
             <Textarea
               value={formData.notes || ''}
               onChange={(e) => updateField('notes', e.target.value)}
-              placeholder="內部備註..."
+              placeholder={ITEM_EDIT_DIALOG_LABELS.內部備註}
               className="mt-1"
               rows={2}
             />

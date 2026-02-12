@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { EXCHANGE_RATE_DIALOG_LABELS, TOUR_CONFIRMATION_SHEET_PAGE_LABELS } from '../../constants/labels';
 
 interface ExchangeRateDialogProps {
   open: boolean
@@ -39,7 +40,7 @@ export function ExchangeRateDialog({
         </DialogHeader>
         <div className="space-y-4 py-4">
           <p className="text-sm text-morandi-secondary">
-            設定 {destinationCurrency || '外幣'} 對台幣的匯率，用於換算預計支出
+            設定 {destinationCurrency || TOUR_CONFIRMATION_SHEET_PAGE_LABELS.外幣} 對台幣的匯率，用於換算預計支出
           </p>
           <div className="space-y-2">
             <Label htmlFor="exchange-rate">1 {destinationCurrency || '外幣'} = ? TWD</Label>
@@ -47,7 +48,7 @@ export function ExchangeRateDialog({
               id="exchange-rate"
               type="number"
               step="0.001"
-              placeholder="例如：0.22（日圓）或 0.9（泰銖）"
+              placeholder={EXCHANGE_RATE_DIALOG_LABELS.例如_0_22_日圓_或_0_9_泰銖}
               value={exchangeRateInput}
               onChange={(e) => onExchangeRateInputChange(e.target.value)}
             />

@@ -26,6 +26,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import type { Tour } from '@/stores/types'
 import type { TourConfirmationSheet } from '@/types/tour-confirmation-sheet.types'
+import { CONFIRMATION_HEADER_LABELS } from '../constants/labels';
 
 interface ConfirmationHeaderProps {
   sheet: TourConfirmationSheet | null
@@ -76,10 +77,10 @@ export function ConfirmationHeader({
 
   const getStatusLabel = (status: string) => {
     const statusMap: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }> = {
-      draft: { label: '草稿', variant: 'secondary' },
-      confirmed: { label: '已確認', variant: 'default' },
-      in_progress: { label: '執行中', variant: 'outline' },
-      completed: { label: '已完成', variant: 'default' },
+      draft: { label: CONFIRMATION_HEADER_LABELS.草稿, variant: 'secondary' },
+      confirmed: { label: CONFIRMATION_HEADER_LABELS.已確認, variant: 'default' },
+      in_progress: { label: CONFIRMATION_HEADER_LABELS.執行中, variant: 'outline' },
+      completed: { label: CONFIRMATION_HEADER_LABELS.已完成, variant: 'default' },
     }
     return statusMap[status] || { label: status, variant: 'secondary' }
   }
@@ -171,7 +172,7 @@ export function ConfirmationHeader({
                   onChange={(e) =>
                     setFormData({ ...formData, tour_leader_name: e.target.value })
                   }
-                  placeholder="領隊姓名"
+                  placeholder={CONFIRMATION_HEADER_LABELS.領隊姓名}
                   className="mt-1 h-8"
                 />
               </div>
@@ -182,7 +183,7 @@ export function ConfirmationHeader({
                   onChange={(e) =>
                     setFormData({ ...formData, sales_person: e.target.value })
                   }
-                  placeholder="業務姓名"
+                  placeholder={CONFIRMATION_HEADER_LABELS.業務姓名}
                   className="mt-1 h-8"
                 />
               </div>
@@ -193,7 +194,7 @@ export function ConfirmationHeader({
                   onChange={(e) =>
                     setFormData({ ...formData, assistant: e.target.value })
                   }
-                  placeholder="助理姓名"
+                  placeholder={CONFIRMATION_HEADER_LABELS.助理姓名}
                   className="mt-1 h-8"
                 />
               </div>
@@ -215,7 +216,7 @@ export function ConfirmationHeader({
                   onChange={(e) =>
                     setFormData({ ...formData, flight_info: e.target.value })
                   }
-                  placeholder="航班資訊"
+                  placeholder={CONFIRMATION_HEADER_LABELS.航班資訊}
                   className="mt-1 h-8"
                 />
               </div>
