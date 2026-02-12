@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 /**
  * Detailed Health Check API
@@ -10,6 +11,13 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin'
  * 注意：此 API 使用自定義狀態碼 (200/207/503)，不使用統一回應格式
  */
 export async function GET() {
+  // Auth 檢查：需要有效的 Supabase session
+  const supabaseAuth = await createSupabaseServerClient()
+  const { data: { session } } = await supabaseAuth.auth.getSession()
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const startTime = Date.now()
 
   const checks = {
@@ -30,9 +38,7 @@ export async function GET() {
     },
     version: {
       app: '5.8.0',
-      node: process.version,
     },
-    environment: process.env.NODE_ENV || 'development',
   }
 
   // 核心表列表
