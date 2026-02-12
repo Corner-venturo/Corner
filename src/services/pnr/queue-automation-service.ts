@@ -9,6 +9,7 @@
  */
 
 import { supabase } from '@/lib/supabase/client'
+import { getRequiredWorkspaceId } from '@/lib/workspace-context'
 import { logger } from '@/lib/utils/logger'
 import { formatDateChinese } from '@/lib/utils/format-date'
 import type { Database } from '@/lib/supabase/types'
@@ -115,7 +116,6 @@ export const QUEUE_RULES: QueueRule[] = [
  */
 export async function evaluatePnrForQueues(
   pnr: PNR,
-  workspaceId: string,
   options?: {
     createdBy?: string
     skipExisting?: boolean
@@ -136,7 +136,7 @@ export async function evaluatePnrForQueues(
     }
 
     // 建立 Queue 項目
-    const item = await createQueueItem(pnr.id, workspaceId, rule.type, {
+    const item = await createQueueItem(pnr.id, rule.type, {
       title: rule.title,
       description: rule.getDescription?.(pnr),
       priority: rule.priority,
@@ -160,7 +160,6 @@ export async function evaluatePnrForQueues(
  */
 export async function createQueueItem(
   pnrId: string,
-  workspaceId: string,
   queueType: QueueType,
   options?: {
     title?: string
@@ -176,7 +175,7 @@ export async function createQueueItem(
   try {
     const queueItem: PnrQueueItemInsert = {
       pnr_id: pnrId,
-      workspace_id: workspaceId,
+      workspace_id: getRequiredWorkspaceId(),
       queue_type: queueType,
       title: options?.title || getDefaultTitle(queueType),
       description: options?.description || null,
@@ -364,7 +363,6 @@ export async function getPnrQueueItems(
  * 取得 Workspace 的待處理項目
  */
 export async function getDueItems(
-  workspaceId: string,
   options?: {
     assignedTo?: string
     queueType?: QueueType
@@ -377,7 +375,6 @@ export async function getDueItems(
     let query = supabase
       .from('pnr_queue_items')
       .select('*')
-      .eq('workspace_id', workspaceId)
       .in('status', ['pending', 'in_progress'])
       .or(`due_date.is.null,due_date.lte.${now}`)
       .order('priority', { ascending: false })
@@ -413,7 +410,6 @@ export async function getDueItems(
  * 取得逾期項目
  */
 export async function getOverdueItems(
-  workspaceId: string,
   limit: number = 50
 ): Promise<PnrQueueItem[]> {
   try {
@@ -422,7 +418,6 @@ export async function getOverdueItems(
     const { data, error } = await supabase
       .from('pnr_queue_items')
       .select('*')
-      .eq('workspace_id', workspaceId)
       .in('status', ['pending', 'in_progress'])
       .not('due_date', 'is', null)
       .lt('due_date', now)
@@ -444,7 +439,7 @@ export async function getOverdueItems(
 /**
  * 計算 Queue 統計資訊
  */
-export async function getQueueStats(workspaceId: string): Promise<QueueStats> {
+export async function getQueueStats(): Promise<QueueStats> {
   const stats: QueueStats = {
     pendingTicket: 0,
     pendingConfirm: 0,
@@ -463,7 +458,6 @@ export async function getQueueStats(workspaceId: string): Promise<QueueStats> {
     const { data, error } = await supabase
       .from('pnr_queue_items')
       .select('queue_type, due_date')
-      .eq('workspace_id', workspaceId)
       .in('status', ['pending', 'in_progress'])
 
     if (error) {

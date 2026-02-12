@@ -9,6 +9,7 @@
  */
 
 import { supabase } from '@/lib/supabase/client'
+import { getRequiredWorkspaceId } from '@/lib/workspace-context'
 import { logger } from '@/lib/utils/logger'
 import type { Database } from '@/lib/supabase/types'
 import type { PNRSegment, BookingStatus, OperationalStatus } from '@/types/pnr.types'
@@ -222,7 +223,6 @@ function getBookingStatusChangeSeverity(
  */
 export async function recordStatusHistory(
   pnrId: string,
-  workspaceId: string,
   segment: PNRSegment,
   options?: {
     operationalStatus?: OperationalStatus
@@ -241,7 +241,7 @@ export async function recordStatusHistory(
 
     const historyRecord: PnrFlightStatusHistoryInsert = {
       pnr_id: pnrId,
-      workspace_id: workspaceId,
+      workspace_id: getRequiredWorkspaceId(),
       segment_id: null, // 可由呼叫者提供
       airline_code: segment.airline,
       flight_number: segment.flightNumber,
@@ -362,7 +362,6 @@ export async function getLatestFlightStatus(
  * 建立航班訂閱
  */
 export async function createFlightSubscription(
-  workspaceId: string,
   flight: FlightQuery,
   options?: {
     pnrId?: string
@@ -375,7 +374,7 @@ export async function createFlightSubscription(
     const { data, error } = await supabase
       .from('flight_status_subscriptions')
       .insert({
-        workspace_id: workspaceId,
+        workspace_id: getRequiredWorkspaceId(),
         pnr_id: options?.pnrId || null,
         segment_id: null,
         airline_code: flight.airlineCode,
@@ -461,7 +460,6 @@ export async function getPnrSubscriptions(
  */
 export async function processPnrStatusUpdate(
   pnrId: string,
-  workspaceId: string,
   oldSegments: PNRSegment[],
   newSegments: PNRSegment[]
 ): Promise<{
@@ -478,7 +476,7 @@ export async function processPnrStatusUpdate(
 
   // 2. 記錄每個航段的狀態歷史
   for (const segment of newSegments) {
-    const history = await recordStatusHistory(pnrId, workspaceId, segment, {
+    const history = await recordStatusHistory(pnrId, segment, {
       source: 'telegram'
     })
 

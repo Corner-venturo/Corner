@@ -6,6 +6,7 @@
  */
 
 import { supabase } from '@/lib/supabase/client'
+import { getRequiredWorkspaceId } from '@/lib/workspace-context'
 import { logger } from '@/lib/utils/logger'
 import { formatDateChinese } from '@/lib/utils/format-date'
 import type { Database } from '@/lib/supabase/types'
@@ -414,7 +415,6 @@ export function processQuery(pnr: PNR, queryText: string): QueryResponse {
  */
 export async function recordQuery(
   pnrId: string | null,
-  workspaceId: string,
   queryText: string,
   response: QueryResponse,
   userId?: string
@@ -422,7 +422,7 @@ export async function recordQuery(
   try {
     const queryRecord: PnrAiQueryInsert = {
       pnr_id: pnrId,
-      workspace_id: workspaceId,
+      workspace_id: getRequiredWorkspaceId(),
       query_text: queryText,
       query_context: pnrId ? { pnr_id: pnrId } : null,
       response_text: response.answer,

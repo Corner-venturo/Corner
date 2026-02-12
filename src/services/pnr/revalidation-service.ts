@@ -9,6 +9,7 @@
  */
 
 import { supabase } from '@/lib/supabase/client'
+import { getRequiredWorkspaceId } from '@/lib/workspace-context'
 import { logger } from '@/lib/utils/logger'
 import type { Database } from '@/lib/supabase/types'
 import type {
@@ -265,14 +266,13 @@ export function assessImpact(change: DetectedScheduleChange): ImpactAssessment {
  */
 export async function createScheduleChangeRecord(
   pnrId: string,
-  workspaceId: string,
   change: DetectedScheduleChange,
   segmentId?: string
 ): Promise<PnrScheduleChange | null> {
   try {
     const record: PnrScheduleChangeInsert = {
       pnr_id: pnrId,
-      workspace_id: workspaceId,
+      workspace_id: getRequiredWorkspaceId(),
       segment_id: segmentId || null,
       change_type: change.changeType,
       original_flight_number: change.originalFlightNumber,
@@ -413,14 +413,12 @@ export async function getScheduleChanges(
  * 取得待處理的航變記錄（全 workspace）
  */
 export async function getPendingScheduleChanges(
-  workspaceId: string,
   limit: number = 50
 ): Promise<PnrScheduleChange[]> {
   try {
     const { data, error } = await supabase
       .from('pnr_schedule_changes')
       .select('*')
-      .eq('workspace_id', workspaceId)
       .in('status', ['pending', 'contacted'])
       .order('detected_at', { ascending: true })
       .limit(limit)
@@ -446,7 +444,6 @@ export async function getPendingScheduleChanges(
  */
 export async function processPnrScheduleChanges(
   pnrId: string,
-  workspaceId: string,
   oldSegments: PNRSegment[],
   newSegments: PNRSegment[]
 ): Promise<{
@@ -469,7 +466,7 @@ export async function processPnrScheduleChanges(
 
   // 2. 建立航變記錄
   for (const change of result.changesDetected) {
-    const record = await createScheduleChangeRecord(pnrId, workspaceId, change)
+    const record = await createScheduleChangeRecord(pnrId, change)
     if (record) {
       result.recordsCreated++
     }

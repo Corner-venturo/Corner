@@ -9,6 +9,7 @@
  */
 
 import { supabase } from '@/lib/supabase/client'
+import { getRequiredWorkspaceId } from '@/lib/workspace-context'
 import { parseFareFromTelegram, type ParsedFareData } from '@/lib/pnr-parser'
 import { logger } from '@/lib/utils/logger'
 import type { Database } from '@/lib/supabase/types'
@@ -43,7 +44,6 @@ export interface FareAlertTrigger {
  */
 export async function recordFareHistory(
   pnrId: string,
-  workspaceId: string,
   fareData: ParsedFareData,
   source: 'telegram' | 'manual' | 'api' = 'telegram',
   recordedBy?: string
@@ -51,7 +51,7 @@ export async function recordFareHistory(
   try {
     const historyRecord: PnrFareHistoryInsert = {
       pnr_id: pnrId,
-      workspace_id: workspaceId,
+      workspace_id: getRequiredWorkspaceId(),
       fare_basis: fareData.fareBasis,
       currency: fareData.currency,
       base_fare: fareData.baseFare,
@@ -332,7 +332,6 @@ export async function checkFareAlerts(
  */
 export async function createFareAlert(
   pnrId: string,
-  workspaceId: string,
   alertType: 'price_increase' | 'price_decrease' | 'threshold',
   options?: {
     thresholdAmount?: number
@@ -349,7 +348,7 @@ export async function createFareAlert(
       .from('pnr_fare_alerts')
       .insert({
         pnr_id: pnrId,
-        workspace_id: workspaceId,
+        workspace_id: getRequiredWorkspaceId(),
         alert_type: alertType,
         threshold_amount: options?.thresholdAmount || null,
         threshold_percent: options?.thresholdPercent || null,
@@ -380,7 +379,6 @@ export async function createFareAlert(
  */
 export async function processPnrFareUpdate(
   pnrId: string,
-  workspaceId: string,
   rawPnr: string,
   userId?: string
 ): Promise<{
@@ -408,7 +406,6 @@ export async function processPnrFareUpdate(
   // 3. 記錄新票價
   const historyRecord = await recordFareHistory(
     pnrId,
-    workspaceId,
     fareData,
     'telegram',
     userId
@@ -445,7 +442,6 @@ export async function processPnrFareUpdate(
  */
 export async function recordManualFare(
   pnrId: string,
-  workspaceId: string,
   fare: {
     currency: string
     baseFare?: number
@@ -467,7 +463,7 @@ export async function recordManualFare(
     raw: `Manual entry: ${fare.currency} ${fare.totalFare}`
   }
 
-  return recordFareHistory(pnrId, workspaceId, fareData, 'manual', userId)
+  return recordFareHistory(pnrId, fareData, 'manual', userId)
 }
 
 export default {
