@@ -14,6 +14,7 @@
 import { motion } from 'framer-motion'
 import { Plane } from 'lucide-react'
 import type { FlightInfo } from '@/types/flight.types'
+import { formatDateShort } from '@/lib/utils/format-date'
 
 // Dreamscape 配色
 const DREAM = {
@@ -34,26 +35,6 @@ interface DreamscapeFlightSectionProps {
   viewMode: 'desktop' | 'mobile'
 }
 
-// 格式化日期為 DEC 24 格式
-function formatDateShort(dateStr: string | undefined | null): string {
-  if (!dateStr) return ''
-  try {
-    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
-    const mmddMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})$/)
-    if (mmddMatch) {
-      const month = parseInt(mmddMatch[1], 10) - 1
-      const day = parseInt(mmddMatch[2], 10)
-      if (month >= 0 && month < 12) return `${months[month]} ${day}`
-    }
-    const date = new Date(dateStr)
-    if (!isNaN(date.getTime())) {
-      return `${months[date.getMonth()]} ${date.getDate()}`
-    }
-    return ''
-  } catch {
-    return ''
-  }
-}
 
 // 單程航班節點
 function FlightNode({

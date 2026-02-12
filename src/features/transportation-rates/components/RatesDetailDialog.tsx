@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { EditableRatesTable } from '@/components/transportation/editable-rates-table/index'
 import { TransportationRate } from '@/types/transportation-rates.types'
 import {
+  type TransportationRate as TransportationRateEntity,
   updateTransportationRate,
   deleteTransportationRate,
   createTransportationRate,
@@ -46,7 +47,7 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
   // 更新單筆資料
   const handleUpdate = async (id: string, updates: Partial<TransportationRate>) => {
     try {
-      await updateTransportationRate(id, updates as any)
+      await updateTransportationRate(id, updates as Partial<TransportationRateEntity>)
       toast.success(TRANSPORTATION_RATES_LABELS.更新成功)
       onUpdate()
     } catch (error) {
@@ -91,7 +92,7 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
         unit: 'trip',
         is_active: true,
         display_order: 0,
-      } as any)
+      })
       toast.success(TRANSPORTATION_RATES_LABELS.新增成功)
       onUpdate()
     } catch (error) {

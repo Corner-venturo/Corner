@@ -274,7 +274,7 @@ export function AddManualRequestDialog({
         created_by_name: user.display_name || user.chinese_name || '',
       }
 
-      await createTourRequest(insertData as any)
+      await createTourRequest(insertData)
 
       toast({ title: ADD_MANUAL_REQUEST_DIALOG_LABELS.需求已新增 })
       resetForm()

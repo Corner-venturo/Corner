@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { isHtmlString, cleanTiptapHtml } from '@/lib/utils/rich-text'
-import { formatMonthShort } from '@/lib/utils/format-date'
+import { formatDateShort } from '@/lib/utils/format-date'
 import type { TourPageData } from '@/features/tours/types/tour-display.types'
 
 // 渲染可能包含 HTML 的文字
@@ -52,19 +52,6 @@ function extractDayNumber(title: string | undefined, dailyItinerary?: Array<{ da
     if (match) return parseInt(match[1], 10)
   }
   return 0
-}
-
-// 格式化日期為 DEC 24 格式
-function formatDateShort(dateStr: string | undefined): string {
-  if (!dateStr) return ''
-  try {
-    const date = new Date(dateStr)
-    const month = formatMonthShort(date)
-    const day = date.getDate()
-    return `${month} ${day}`
-  } catch {
-    return dateStr
-  }
 }
 
 // 分割標題（取得主標題和副標題）

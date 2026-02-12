@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { isHtmlString, cleanTiptapHtml } from '@/lib/utils/rich-text'
+import { formatDateShort } from '@/lib/utils/format-date'
 import { ART } from './utils/art-theme'
 import type { TourPageData } from '@/features/tours/types/tour-display.types'
 
@@ -58,22 +59,6 @@ function extractDayNumber(title: string | undefined, dailyItinerary?: Array<{ da
 
   // 最後 fallback: 返回 0（不顯示或顯示 --）
   return 0
-}
-
-// 格式化日期為 DEC 24 格式
-function formatDateShort(dateStr: string | undefined): string {
-  if (!dateStr) return ''
-  try {
-    const date = new Date(dateStr)
-    if (isNaN(date.getTime())) return ''
-    const month = date.getMonth()
-    const day = date.getDate()
-    if (isNaN(month) || isNaN(day)) return ''
-    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
-    return `${months[month]} ${day}`
-  } catch {
-    return ''
-  }
 }
 
 export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {

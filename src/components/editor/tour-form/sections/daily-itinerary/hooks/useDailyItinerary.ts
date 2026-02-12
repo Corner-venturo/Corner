@@ -294,7 +294,7 @@ export function useDailyItinerary({
         public_url: saveToLibraryDialog.publicUrl,
         category: 'activity',
         tags: [COMP_EDITOR_LABELS.景點, COMP_EDITOR_LABELS.活動],
-      } as any)
+      })
 
       toast.success(COMP_EDITOR_LABELS.已儲存到圖庫)
     } catch (error) {

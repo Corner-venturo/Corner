@@ -46,22 +46,6 @@ export function calculateDayLabels(itinerary: TourFormData['dailyItinerary']): s
   return labels
 }
 
-// 格式化日期為 DEC 24 格式（大寫月份）
-export function formatDateShort(dateStr: string | undefined): string {
-  if (!dateStr) return ''
-  try {
-    const date = new Date(dateStr)
-    if (isNaN(date.getTime())) return ''
-    const month = date.getMonth()
-    const day = date.getDate()
-    if (isNaN(month) || isNaN(day)) return ''
-    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
-    return `${months[month]} ${day}`
-  } catch {
-    return ''
-  }
-}
-
 // 根據出發日期和實際天數（非 index）計算該天的日期
 // actualDayNumber 是從 1 開始的實際天數，建議行程不增加天數
 export function calculateDayDate(departureDate: string | undefined, actualDayNumber: number): string {

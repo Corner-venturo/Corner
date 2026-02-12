@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { isHtmlString, cleanTiptapHtml } from '@/lib/utils/rich-text'
-import { formatMonthShort } from '@/lib/utils/format-date'
+import { formatDateShort } from '@/lib/utils/format-date'
 import type { TourPageData } from '@/features/tours/types/tour-display.types'
 
 // 渲染可能包含 HTML 的文字
@@ -68,19 +68,6 @@ function splitTitle(title: string | undefined): { main: string; sub: string } {
     return { main: dayMatch[1].trim(), sub: dayMatch[2].trim() }
   }
   return { main: title, sub: '' }
-}
-
-// 格式化日期
-function formatDateShort(dateStr: string | undefined): string {
-  if (!dateStr) return ''
-  try {
-    const date = new Date(dateStr.replace(/\//g, '-'))
-    const month = formatMonthShort(date)
-    const day = date.getDate()
-    return `${month} ${day}`
-  } catch {
-    return dateStr
-  }
 }
 
 export function TourHeroCollage({ data, viewMode }: TourHeroCollageProps) {

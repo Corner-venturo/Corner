@@ -7,12 +7,12 @@ import {
   LUXURY,
   DAY_COLORS,
   calculateDayLabels,
-  formatDateShort,
   calculateDayDate,
   isLastMainDay,
   ImageGalleryState,
   ActivityInfo,
 } from './utils/itineraryLuxuryUtils'
+import { formatDateShort } from '@/lib/utils/format-date'
 import { ImageGalleryModal } from './modals/ImageGalleryModal'
 import { ActivityDetailModal } from './modals/ActivityDetailModal'
 import type { TourPageData } from '@/features/tours/types/tour-display.types'

@@ -454,3 +454,34 @@ export function startOfDay(date: Date): Date {
   result.setHours(0, 0, 0, 0)
   return result
 }
+
+/**
+ * 格式化日期為簡短英文格式 (JAN 15)
+ * @param date - ISO 字串或 Date 物件
+ * @returns "JAN 15" 格式的日期字串
+ */
+export function formatDateShort(date: string | Date | null | undefined): string {
+  if (!date) return ''
+
+  try {
+    // Handle MM/DD format strings
+    if (typeof date === 'string') {
+      const mmddMatch = date.match(/^(\d{1,2})\/(\d{1,2})$/)
+      if (mmddMatch) {
+        const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+        const month = parseInt(mmddMatch[1], 10) - 1
+        const day = parseInt(mmddMatch[2], 10)
+        if (month >= 0 && month < 12) return `${months[month]} ${day}`
+      }
+    }
+
+    const d = typeof date === 'string' ? new Date(date.replace(/\//g, '-')) : date
+    if (isNaN(d.getTime())) return ''
+
+    const month = formatMonthShort(d)
+    const day = d.getDate()
+    return `${month} ${day}`
+  } catch {
+    return typeof date === 'string' ? date : ''
+  }
+}

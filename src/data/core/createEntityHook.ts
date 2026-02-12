@@ -33,6 +33,21 @@ import {
 } from './types'
 
 // ============================================
+// Utility: make nullable fields optional for insert
+// ============================================
+type NullableKeys<T> = {
+  [K in keyof T]: null extends T[K] ? K : never
+}[keyof T]
+
+type CreateInput<T> = Omit<T, 'id' | 'created_at' | 'updated_at' | '_needs_sync' | '_synced_at' | '_deleted' | 'code'>
+
+/** Makes nullable fields optional — matches Supabase Insert semantics */
+type EntityCreateData<T> =
+  Partial<Pick<CreateInput<T>, NullableKeys<CreateInput<T>>>> &
+  Omit<CreateInput<T>, NullableKeys<CreateInput<T>>> &
+  { code?: string }
+
+// ============================================
 // Workspace 隔離配置
 // ============================================
 
@@ -449,7 +464,7 @@ export function createEntityHook<T extends BaseEntity>(
   // create - 建立（支援 code 自動生成 + 樂觀更新）
   // ============================================
   async function create(
-    data: Omit<T, 'id' | 'created_at' | 'updated_at' | '_needs_sync' | '_synced_at' | '_deleted' | 'code'> & { code?: string }
+    data: EntityCreateData<T>
   ): Promise<T> {
     const now = new Date().toISOString()
 

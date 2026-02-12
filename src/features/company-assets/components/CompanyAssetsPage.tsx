@@ -137,7 +137,7 @@ export const CompanyAssetsPage: React.FC = () => {
           updateData.mime_type = formData.file.type
         }
 
-        await updateCompanyAsset(editingAsset.id, updateData as any)
+        await updateCompanyAsset(editingAsset.id, updateData)
         await alert(COMPANY_ASSETS_LABELS.更新成功, 'success')
       } else {
         // 新增模式
@@ -161,9 +161,9 @@ export const CompanyAssetsPage: React.FC = () => {
           uploaded_by_name: userName,
           description: formData.restricted ? COMPANY_ASSETS_LABELS.受限資源 : null,
           restricted: formData.restricted,
-          workspace_id: user?.workspace_id,
+          workspace_id: user?.workspace_id ?? null,
           folder_id: targetFolderId,
-        } as any)
+        })
         await alert(COMPANY_ASSETS_LABELS.新增成功, 'success')
       }
 
