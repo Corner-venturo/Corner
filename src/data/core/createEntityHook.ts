@@ -613,6 +613,38 @@ export function createEntityHook<T extends BaseEntity>(
   }
 
   // ============================================
+  // batchRemove - 批量刪除
+  // ============================================
+  async function batchRemove(ids: string[]): Promise<boolean> {
+    if (ids.length === 0) return true
+
+    // 樂觀更新
+    globalMutate(
+      cacheKeyList,
+      (currentItems: T[] | undefined) =>
+        (currentItems || []).filter(item => !ids.includes(item.id)),
+      false
+    )
+
+    try {
+      // @ts-expect-error - Dynamic table factory
+      const { error } = await supabase.from(tableName).delete().in('id', ids)
+
+      if (error) {
+        logger.error(`[${tableName}] BatchRemove error:`, error.message)
+        await invalidate()
+        throw error
+      }
+
+      await invalidate()
+      return true
+    } catch (err) {
+      await invalidate()
+      throw err
+    }
+  }
+
+  // ============================================
   // invalidate - 使快取失效
   // ============================================
   async function invalidate(): Promise<void> {
@@ -638,6 +670,7 @@ export function createEntityHook<T extends BaseEntity>(
     create,
     update,
     delete: remove,
+    batchRemove,
     invalidate,
   }
 }

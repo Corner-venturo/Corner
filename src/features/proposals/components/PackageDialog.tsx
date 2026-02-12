@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui/date-picker'
 import { CountryAirportSelector } from '@/components/selectors/CountryAirportSelector'
 import type { Proposal, ProposalPackage, CreatePackageData } from '@/types/proposal.types'
+import { PROPOSAL_LABELS } from '../constants'
 
 interface CountryOption {
   id: string
@@ -150,23 +151,23 @@ export function PackageDialog({
     <FormDialog
       open={open}
       onOpenChange={onOpenChange}
-      title={mode === 'create' ? '新增團體套件' : '編輯團體套件'}
+      title={mode === 'create' ? PROPOSAL_LABELS.packageDialog.createTitle : PROPOSAL_LABELS.packageDialog.editTitle}
       onSubmit={handleSubmit}
-      submitLabel={mode === 'create' ? '建立' : '儲存'}
+      submitLabel={mode === 'create' ? PROPOSAL_LABELS.packageDialog.createSubmit : PROPOSAL_LABELS.packageDialog.editSubmit}
       loading={submitting}
       maxWidth="md"
     >
       <div className="space-y-4">
         <div>
           <label className="text-sm font-medium text-morandi-primary mb-2 block">
-            版本名稱 <span className="text-morandi-red">*</span>
+            {PROPOSAL_LABELS.packageDialog.versionNameLabel} <span className="text-morandi-red">{PROPOSAL_LABELS.required}</span>
           </label>
           <Input
             value={formData.version_name}
             onChange={e =>
               setFormData(prev => ({ ...prev, version_name: e.target.value }))
             }
-            placeholder="例如：方案A - 經濟版"
+            placeholder={PROPOSAL_LABELS.packageDialog.versionNamePlaceholder}
           />
         </div>
 

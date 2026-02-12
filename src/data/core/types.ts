@@ -173,6 +173,8 @@ export interface EntityHook<T extends BaseEntity> {
   update: (id: string, data: Partial<T>) => Promise<T>
   /** 刪除 */
   delete: (id: string) => Promise<boolean>
+  /** 批量刪除 */
+  batchRemove: (ids: string[]) => Promise<boolean>
   /** 使快取失效 */
   invalidate: () => Promise<void>
 }

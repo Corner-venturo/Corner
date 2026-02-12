@@ -318,7 +318,7 @@ export function PackageListPanel({
           .insert({
             id: crypto.randomUUID(),
             name: proposal.title || pkg.version_name,
-            customer_name: proposal.customer_name || '待填寫',
+            customer_name: proposal.customer_name || PROPOSAL_LABELS.packageList.customerPlaceholder,
             quote_type: 'standard',
             status: 'draft',
             destination: destinationDisplay,
@@ -338,7 +338,7 @@ export function PackageListPanel({
 
         if (quoteError) {
           logger.error('建立報價單失敗:', quoteError.message)
-          await alert('建立報價單失敗', 'error')
+          await alert(PROPOSAL_LABELS.packageList.createQuoteFailed, 'error')
           return
         }
 
@@ -354,7 +354,7 @@ export function PackageListPanel({
         }
       } catch (error) {
         logger.error('建立報價單時發生錯誤:', error)
-        await alert('建立報價單失敗', 'error')
+        await alert(PROPOSAL_LABELS.packageList.createQuoteFailed, 'error')
       }
     },
     [router, proposal, user, onPackagesChange]
@@ -548,30 +548,30 @@ export function PackageListPanel({
                           <button
                             onClick={() => handleDuplicatePackage(pkg)}
                             className="p-1 text-morandi-secondary hover:text-morandi-primary"
-                            title="複製"
+                            title={PROPOSAL_LABELS.packageList.copyTitle}
                           >
                             <Copy size={14} />
                           </button>
                           <button
                             onClick={() => openEditDialog(pkg)}
                             className="p-1 text-morandi-secondary hover:text-morandi-primary"
-                            title="編輯"
+                            title={PROPOSAL_LABELS.packageList.editTitle}
                           >
                             <Edit2 size={14} />
                           </button>
                           <button
                             onClick={() => handleDeletePackage(pkg)}
                             className="p-1 text-morandi-red/60 hover:text-morandi-red"
-                            title="刪除"
+                            title={PROPOSAL_LABELS.packageList.deleteTitle}
                           >
                             <Trash2 size={14} />
                           </button>
                           <button
                             onClick={() => handleConvertToTour(pkg)}
                             className="ml-1 px-2 py-1 text-xs bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded"
-                            title="轉開團"
+                            title={PROPOSAL_LABELS.packageList.convertToTour}
                           >
-                            轉開團
+                            {PROPOSAL_LABELS.packageList.convertToTour}
                           </button>
                         </>
                       )}
