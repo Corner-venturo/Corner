@@ -122,7 +122,7 @@ export function useTourChannelOperations({ actions }: UseTourChannelOperationsPa
           employee_id: auth.user!.id,
           role: 'owner',
           status: 'active',
-        } as Record<string, unknown>)
+        } as any)
         logger.log('✅ [建立頻道] 創建者已加入為擁有者')
       } catch (memberErr) {
         logger.warn('⚠️ [建立頻道] 加入成員異常:', memberErr)

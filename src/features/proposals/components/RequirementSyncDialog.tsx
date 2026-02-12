@@ -26,6 +26,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { logger } from '@/lib/utils/logger'
 import type { ProposalPackage, Proposal } from '@/types/proposal.types'
 import type { Tour } from '@/stores/types'
+import { PROPOSAL_LABELS } from '../constants'
 
 interface RequirementSyncDialogProps {
   isOpen: boolean
@@ -83,7 +84,7 @@ export function RequirementSyncDialog({
         },
         () => {
           logger.log('報價單已更新')
-          toast({ title: '報價單已更新', description: '需求總覽將自動刷新' })
+          toast({ title: PROPOSAL_LABELS.requirementSync.quoteUpdated, description: PROPOSAL_LABELS.requirementSync.quoteUpdatedDesc })
         }
       )
       .subscribe()
@@ -137,7 +138,7 @@ export function RequirementSyncDialog({
             <DialogHeader className="flex flex-row items-center justify-between">
               <DialogTitle className="flex items-center gap-2">
                 <ClipboardList size={18} className="text-morandi-gold" />
-                需求確認單
+                {PROPOSAL_LABELS.requirementSync.title}
                 {mode === 'tour' && (
                   <span className="text-xs font-normal text-morandi-secondary ml-1">
                     ({source.code})
@@ -159,7 +160,7 @@ export function RequirementSyncDialog({
             <div className="flex justify-end pt-4 border-t border-border">
               <Button variant="outline" onClick={onClose} className="gap-2">
                 <X size={16} />
-                關閉
+                {PROPOSAL_LABELS.requirementSync.close}
               </Button>
             </div>
           </DialogContent>

@@ -24,6 +24,7 @@ import { invalidateItineraries } from '@/data'
 import { formatDateTW } from '@/lib/utils/format-date'
 import { supabase } from '@/lib/supabase/client'
 import type { Itinerary, ItineraryVersionRecord } from '@/stores/types'
+import { PROPOSAL_LABELS } from '../constants'
 
 interface BrochurePreviewDialogProps {
   isOpen: boolean
@@ -62,10 +63,10 @@ export function BrochurePreviewDialog({
   // 取得當前版本名稱
   const getCurrentVersionName = () => {
     if (selectedVersionIndex === -1) {
-      return '主版本'
+      return PROPOSAL_LABELS.brochurePreview.mainVersion
     }
     const record = versionRecords[selectedVersionIndex]
-    return record?.note || `版本 ${record?.version || selectedVersionIndex + 1}`
+    return record?.note || PROPOSAL_LABELS.brochurePreview.versionLabel(record?.version || selectedVersionIndex + 1)
   }
 
   useEffect(() => {
@@ -100,7 +101,7 @@ export function BrochurePreviewDialog({
     if (!printWindow || !itinerary) return
 
     const dailyItinerary = currentDailyItinerary
-    const companyName = user?.workspace_code || '旅行社'
+    const companyName = user?.workspace_code || PROPOSAL_LABELS.brochurePreview.defaultCompany
 
     const printContent = `
       <!DOCTYPE html>
@@ -182,14 +183,14 @@ export function BrochurePreviewDialog({
     printWindow.print()
   }
 
-  const companyName = user?.workspace_code || '旅行社'
+  const companyName = user?.workspace_code || PROPOSAL_LABELS.brochurePreview.defaultCompany
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
       <DialogContent level={2} className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0 flex flex-row items-center justify-between">
           <DialogTitle className="flex items-center gap-2">
-            <span>簡易行程表</span>
+            <span>{PROPOSAL_LABELS.brochurePreview.title}</span>
             {itinerary && (
               <span className="text-sm text-morandi-secondary font-normal">
                 - {itinerary.title}
@@ -212,7 +213,7 @@ export function BrochurePreviewDialog({
                     onClick={() => setSelectedVersionIndex(-1)}
                     className={selectedVersionIndex === -1 ? 'bg-morandi-gold/10' : ''}
                   >
-                    主版本
+                    {PROPOSAL_LABELS.brochurePreview.mainVersion}
                   </DropdownMenuItem>
                   {versionRecords.map((record, idx) => (
                     <DropdownMenuItem
@@ -233,7 +234,7 @@ export function BrochurePreviewDialog({
               className="h-7 text-[11px] bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1"
             >
               <Printer size={12} />
-              列印
+              {PROPOSAL_LABELS.brochurePreview.print}
             </Button>
           </div>
         </DialogHeader>
@@ -245,7 +246,7 @@ export function BrochurePreviewDialog({
             </div>
           ) : !itinerary ? (
             <div className="h-64 flex items-center justify-center text-morandi-secondary">
-              找不到行程表
+              {PROPOSAL_LABELS.brochurePreview.notFound}
             </div>
           ) : (
             <div className="p-6">
@@ -271,16 +272,16 @@ export function BrochurePreviewDialog({
                 {/* 基本資訊 */}
                 <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
                   <div className="flex gap-2">
-                    <span className="text-morandi-secondary">目的地：</span>
+                    <span className="text-morandi-secondary">{PROPOSAL_LABELS.brochurePreview.destinationLabel}</span>
                     <span className="font-medium">{itinerary.city || itinerary.country || '-'}</span>
                   </div>
                   <div className="flex gap-2">
-                    <span className="text-morandi-secondary">出發日期：</span>
+                    <span className="text-morandi-secondary">{PROPOSAL_LABELS.brochurePreview.departDateLabel}</span>
                     <span className="font-medium">{itinerary.departure_date || '-'}</span>
                   </div>
                   <div className="flex gap-2">
-                    <span className="text-morandi-secondary">行程天數：</span>
-                    <span className="font-medium">{currentDailyItinerary.length} 天</span>
+                    <span className="text-morandi-secondary">{PROPOSAL_LABELS.brochurePreview.daysLabel}</span>
+                    <span className="font-medium">{PROPOSAL_LABELS.brochurePreview.daysUnit(currentDailyItinerary.length)}</span>
                   </div>
                 </div>
               </div>
@@ -289,12 +290,12 @@ export function BrochurePreviewDialog({
               <table className="w-full border-collapse text-sm">
                 <thead>
                   <tr className="bg-morandi-gold text-white">
-                    <th className="border border-morandi-gold/50 px-3 py-2 text-left w-20">日期</th>
-                    <th className="border border-morandi-gold/50 px-3 py-2 text-left">行程內容</th>
-                    <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">早餐</th>
-                    <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">午餐</th>
-                    <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">晚餐</th>
-                    <th className="border border-morandi-gold/50 px-3 py-2 text-left w-32">住宿</th>
+                    <th className="border border-morandi-gold/50 px-3 py-2 text-left w-20">{PROPOSAL_LABELS.brochurePreview.dateCol}</th>
+                    <th className="border border-morandi-gold/50 px-3 py-2 text-left">{PROPOSAL_LABELS.brochurePreview.contentCol}</th>
+                    <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">{PROPOSAL_LABELS.brochurePreview.breakfastCol}</th>
+                    <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">{PROPOSAL_LABELS.brochurePreview.lunchCol}</th>
+                    <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">{PROPOSAL_LABELS.brochurePreview.dinnerCol}</th>
+                    <th className="border border-morandi-gold/50 px-3 py-2 text-left w-32">{PROPOSAL_LABELS.brochurePreview.hotelCol}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -329,7 +330,7 @@ export function BrochurePreviewDialog({
 
               {/* 頁尾 */}
               <div className="mt-6 pt-4 border-t border-morandi-container text-xs text-morandi-secondary text-center">
-                <p>本行程表由 {companyName} 提供</p>
+                <p>{PROPOSAL_LABELS.brochurePreview.footer(companyName)}</p>
               </div>
             </div>
           )}

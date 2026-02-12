@@ -28,7 +28,7 @@ export const channelMemberEntity = createEntityHook<ChannelMember>('channel_memb
     select: 'id,channel_id,employee_id,role,status',
   },
   detail: { select: '*' },
-  cache: CACHE_PRESETS.short,
+  cache: CACHE_PRESETS.high,
 })
 
 export const useChannelMembers = channelMemberEntity.useList

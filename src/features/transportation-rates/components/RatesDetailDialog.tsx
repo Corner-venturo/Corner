@@ -45,7 +45,7 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
   // 更新單筆資料
   const handleUpdate = async (id: string, updates: Partial<TransportationRate>) => {
     try {
-      await updateTransportationRate(id, updates as Record<string, unknown>)
+      await updateTransportationRate(id, updates as any)
       toast.success('更新成功')
       onUpdate()
     } catch (error) {
@@ -90,7 +90,7 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
         unit: 'trip',
         is_active: true,
         display_order: 0,
-      } as Record<string, unknown>)
+      } as any)
       toast.success('新增成功')
       onUpdate()
     } catch (error) {

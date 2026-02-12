@@ -185,7 +185,7 @@ export function PackageDialog({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              出發日期
+              {PROPOSAL_LABELS.packageDialog.departDateLabel}
             </label>
             <DatePicker
               value={formData.start_date}
@@ -204,13 +204,13 @@ export function PackageDialog({
                   return { ...prev, start_date: startDate, end_date: endDate }
                 })
               }}
-              placeholder="選擇日期"
+              placeholder={PROPOSAL_LABELS.packageDialog.datePlaceholder}
             />
           </div>
 
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              回程日期
+              {PROPOSAL_LABELS.packageDialog.returnDateLabel}
             </label>
             <DatePicker
               value={formData.end_date}
@@ -223,7 +223,7 @@ export function PackageDialog({
                   setFormData(prev => ({ ...prev, end_date: endDate }))
                 }
               }}
-              placeholder="選擇日期"
+              placeholder={PROPOSAL_LABELS.packageDialog.datePlaceholder}
               minDate={formData.start_date ? new Date(formData.start_date) : undefined}
             />
           </div>
@@ -231,7 +231,7 @@ export function PackageDialog({
 
         <div>
           <label className="text-sm font-medium text-morandi-primary mb-2 block">
-            預計人數
+            {PROPOSAL_LABELS.packageDialog.groupSizeLabel}
           </label>
           <Input
             type="number"
@@ -243,18 +243,18 @@ export function PackageDialog({
                 group_size: e.target.value ? parseInt(e.target.value, 10) : null,
               }))
             }
-            placeholder="人數"
+            placeholder={PROPOSAL_LABELS.packageDialog.groupSizePlaceholder}
           />
         </div>
 
         <div>
           <label className="text-sm font-medium text-morandi-primary mb-2 block">
-            備註
+            {PROPOSAL_LABELS.packageDialog.notesLabel}
           </label>
           <Textarea
             value={formData.notes}
             onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-            placeholder="套件相關備註..."
+            placeholder={PROPOSAL_LABELS.packageDialog.notesPlaceholder}
             rows={3}
           />
         </div>

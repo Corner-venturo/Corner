@@ -40,15 +40,16 @@ import { addManualRequestSchema } from '@/lib/validations/schemas'
 import { RestaurantSelector, type CombinedRestaurant } from '@/components/editor/RestaurantSelector'
 import { HotelSelector } from '@/components/editor/hotel-selector'
 import { AttractionSelector } from '@/components/editor/attraction-selector'
+import { PROPOSAL_LABELS } from '../constants'
 
 // 需求類別（統一使用 accommodation/meal）
 const CATEGORIES = [
-  { key: 'transport', label: '交通（派車）' },
-  { key: 'guide', label: '領隊' },
-  { key: 'accommodation', label: '住宿' },
-  { key: 'meal', label: '餐食' },
-  { key: 'activity', label: '門票/活動' },
-  { key: 'other', label: '其他' },
+  { key: 'transport', label: PROPOSAL_LABELS.categories.transport },
+  { key: 'guide', label: PROPOSAL_LABELS.categories.guide },
+  { key: 'accommodation', label: PROPOSAL_LABELS.categories.accommodation },
+  { key: 'meal', label: PROPOSAL_LABELS.categories.meal },
+  { key: 'activity', label: PROPOSAL_LABELS.categories.activity },
+  { key: 'other', label: PROPOSAL_LABELS.categories.other },
 ]
 
 interface AddManualRequestDialogProps {
@@ -217,7 +218,7 @@ export function AddManualRequestDialog({
   // 儲存需求
   const handleSave = useCallback(async () => {
     if (!user?.workspace_id) {
-      toast({ title: '請先登入', variant: 'destructive' })
+      toast({ title: PROPOSAL_LABELS.addRequestDialog.pleaseLogin, variant: 'destructive' })
       return
     }
 
@@ -272,7 +273,7 @@ export function AddManualRequestDialog({
         created_by_name: user.display_name || user.chinese_name || '',
       }
 
-      await createTourRequest(insertData as Record<string, unknown>)
+      await createTourRequest(insertData as any)
 
       toast({ title: '需求已新增' })
       resetForm()

@@ -293,7 +293,7 @@ export function useDailyItinerary({
         public_url: saveToLibraryDialog.publicUrl,
         category: 'activity',
         tags: ['景點', '活動'],
-      } as Record<string, unknown>)
+      } as any)
 
       toast.success('已儲存到圖庫')
     } catch (error) {

@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import { Search, Plus, Loader2, Building2 } from 'lucide-react'
 import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { logger } from '@/lib/utils/logger'
+import { PROPOSAL_LABELS } from '../constants'
 
 // 供應商資料（完整欄位）
 export interface Supplier {
@@ -42,7 +43,7 @@ export function SupplierSearchInput({
   onChange,
   onSupplierSelect,
   category,
-  placeholder = '輸入供應商名稱',
+  placeholder = PROPOSAL_LABELS.supplierSearch.placeholder,
   className = '',
 }: SupplierSearchInputProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -164,7 +165,7 @@ export function SupplierSearchInput({
           {suppliers.length === 0 && !loading ? (
             <div className="p-3 text-center">
               <p className="text-sm text-morandi-secondary mb-2">
-                找不到「{searchTerm}」
+                {PROPOSAL_LABELS.supplierSearch.notFound(searchTerm)}
               </p>
               <Button
                 variant="outline"
@@ -177,7 +178,7 @@ export function SupplierSearchInput({
                 }}
               >
                 <Plus size={12} />
-                使用「{searchTerm}」
+                {PROPOSAL_LABELS.supplierSearch.useAs(searchTerm)}
               </Button>
             </div>
           ) : (
@@ -194,7 +195,7 @@ export function SupplierSearchInput({
                       {supplier.name}
                     </div>
                     <div className="text-xs text-morandi-secondary flex gap-2">
-                      {supplier.contact_person && <span>聯絡人: {supplier.contact_person}</span>}
+                      {supplier.contact_person && <span>{PROPOSAL_LABELS.supplierSearch.contactLabel}{supplier.contact_person}</span>}
                       {supplier.phone && <span>{supplier.phone}</span>}
                     </div>
                   </div>

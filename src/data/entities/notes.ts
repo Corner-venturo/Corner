@@ -28,7 +28,7 @@ export const noteEntity = createEntityHook<Note>('notes', {
     select: 'id,tab_id,tab_name,tab_order',
   },
   detail: { select: '*' },
-  cache: CACHE_PRESETS.short,
+  cache: CACHE_PRESETS.high,
 })
 
 export const useNotes = noteEntity.useList

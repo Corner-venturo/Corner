@@ -170,7 +170,7 @@ export function useEmployeeForm(onSubmit: () => void) {
                 employee_id: newEmployee.id,
                 role: 'member',
                 status: 'active',
-              } as Record<string, unknown>)
+              } as any)
             ))
             logger.log(`✅ 已將新員工加入 ${channels.length} 個公開頻道`)
           }

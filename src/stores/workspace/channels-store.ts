@@ -189,7 +189,7 @@ export const useChannelsStore = () => {
             employee_id: newChannel.created_by,
             role: 'owner',
             status: 'active',
-          } as Record<string, unknown>)
+          } as any)
         } catch (error) {
           logger.warn('[ChannelsStore] 加入頻道擁有者失敗:', error)
         }

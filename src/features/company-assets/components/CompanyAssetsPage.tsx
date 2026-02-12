@@ -136,7 +136,7 @@ export const CompanyAssetsPage: React.FC = () => {
           updateData.mime_type = formData.file.type
         }
 
-        await updateCompanyAsset(editingAsset.id, updateData as Record<string, unknown>)
+        await updateCompanyAsset(editingAsset.id, updateData as any)
         await alert('更新成功', 'success')
       } else {
         // 新增模式
@@ -162,7 +162,7 @@ export const CompanyAssetsPage: React.FC = () => {
           restricted: formData.restricted,
           workspace_id: user?.workspace_id,
           folder_id: targetFolderId,
-        } as Record<string, unknown>)
+        } as any)
         await alert('新增成功', 'success')
       }
 

@@ -85,7 +85,7 @@ export const tourRequestEntity = createEntityHook<TourRequest>('tour_requests', 
     select: 'id,code,title,category,status,priority,tour_id,tour_code,service_date',
   },
   detail: { select: '*' },
-  cache: CACHE_PRESETS.short,
+  cache: CACHE_PRESETS.high,
 })
 
 export const useTourRequests = tourRequestEntity.useList
