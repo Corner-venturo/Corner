@@ -142,7 +142,7 @@ export function ProposalDialog({
         aria-describedby={undefined}
       >
         <DialogHeader>
-          <DialogTitle>{mode === 'create' ? '新增提案' : '編輯提案'}</DialogTitle>
+          <DialogTitle>{mode === 'create' ? PROPOSAL_LABELS.proposalDialog.createTitle : PROPOSAL_LABELS.proposalDialog.editTitle}</DialogTitle>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto">
@@ -151,24 +151,24 @@ export function ProposalDialog({
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                  提案名稱
+                  {PROPOSAL_LABELS.proposalDialog.proposalNameLabel}
                 </label>
                 <Input
                   value={title}
                   onChange={e => setTitle(e.target.value)}
-                  placeholder="例如：2026 泰北清邁家族旅遊"
+                  placeholder={PROPOSAL_LABELS.proposalDialog.proposalNamePlaceholder}
                   autoFocus
                 />
               </div>
 
               <div>
                 <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                  預計出發日期（選填）
+                  {PROPOSAL_LABELS.proposalDialog.expectedDateLabel}
                 </label>
                 <DatePicker
                   value={expectedStartDate}
                   onChange={date => setExpectedStartDate(date || '')}
-                  placeholder="選擇日期"
+                  placeholder={PROPOSAL_LABELS.proposalDialog.datePlaceholder}
                 />
               </div>
             </div>
@@ -177,12 +177,12 @@ export function ProposalDialog({
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                  版本名稱 <span className="text-morandi-red">*</span>
+                  {PROPOSAL_LABELS.proposalDialog.versionNameLabel} <span className="text-morandi-red">{PROPOSAL_LABELS.required}</span>
                 </label>
                 <Input
                   value={versionName}
                   onChange={e => setVersionName(e.target.value)}
-                  placeholder="例如：方案A - 經濟版"
+                  placeholder={PROPOSAL_LABELS.proposalDialog.versionNamePlaceholder}
                   autoFocus
                 />
               </div>

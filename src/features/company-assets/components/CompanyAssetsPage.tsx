@@ -19,6 +19,7 @@ import {
 import { CompanyAssetsTree } from './CompanyAssetsTree'
 import { CompanyAssetsDialog } from './CompanyAssetsDialog'
 import { supabase } from '@/lib/supabase/client'
+import { createCompanyAsset, updateCompanyAsset } from '@/data/entities/company-assets'
 import { useAuthStore } from '@/stores'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import type { CompanyAsset, CompanyAssetType } from '@/types/company-asset.types'
@@ -135,12 +136,7 @@ export const CompanyAssetsPage: React.FC = () => {
           updateData.mime_type = formData.file.type
         }
 
-        const { error } = await supabase
-          .from('company_assets')
-          .update(updateData)
-          .eq('id', editingAsset.id)
-
-        if (error) throw error
+        await updateCompanyAsset(editingAsset.id, updateData as Record<string, unknown>)
         await alert('更新成功', 'success')
       } else {
         // 新增模式
@@ -154,7 +150,7 @@ export const CompanyAssetsPage: React.FC = () => {
         const userName =
           user?.display_name || user?.chinese_name || user?.personal_info?.email || 'Unknown'
 
-        const { error: dbError } = await supabase.from('company_assets').insert({
+        await createCompanyAsset({
           name: formData.name,
           asset_type: formData.asset_type,
           file_path: filePath,
@@ -166,9 +162,7 @@ export const CompanyAssetsPage: React.FC = () => {
           restricted: formData.restricted,
           workspace_id: user?.workspace_id,
           folder_id: targetFolderId,
-        })
-
-        if (dbError) throw dbError
+        } as Record<string, unknown>)
         await alert('新增成功', 'success')
       }
 
