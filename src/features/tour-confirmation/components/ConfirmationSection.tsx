@@ -11,6 +11,7 @@ import { LucideIcon, Plus, Edit2, Trash2, FileOutput, Navigation } from 'lucide-
 import { Button } from '@/components/ui/button'
 import type { TourConfirmationItem, ConfirmationItemCategory } from '@/types/tour-confirmation-sheet.types'
 import { CONFIRMATION_SECTION_LABELS } from '../constants/labels';
+import { formatDateCompactPadded } from '@/lib/utils/format-date'
 
 interface ColumnConfig {
   key: string
@@ -54,11 +55,7 @@ export function ConfirmationSection({
   }
 
   const formatDate = (dateStr: string | null | undefined) => {
-    if (!dateStr) return '-'
-    return new Date(dateStr).toLocaleDateString('zh-TW', {
-      month: '2-digit',
-      day: '2-digit',
-    })
+    return formatDateCompactPadded(dateStr) || '-'
   }
 
   const getCellValue = (item: TourConfirmationItem, col: ColumnConfig) => {

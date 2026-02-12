@@ -27,6 +27,7 @@ import { Badge } from '@/components/ui/badge'
 import type { Tour } from '@/stores/types'
 import type { TourConfirmationSheet } from '@/types/tour-confirmation-sheet.types'
 import { CONFIRMATION_HEADER_LABELS } from '../constants/labels';
+import { formatDateTWPadded } from '@/lib/utils/format-date'
 
 interface ConfirmationHeaderProps {
   sheet: TourConfirmationSheet | null
@@ -67,12 +68,7 @@ export function ConfirmationHeader({
   }
 
   const formatDate = (dateStr: string | null | undefined) => {
-    if (!dateStr) return '-'
-    return new Date(dateStr).toLocaleDateString('zh-TW', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    })
+    return formatDateTWPadded(dateStr) || '-'
   }
 
   const getStatusLabel = (status: string) => {
