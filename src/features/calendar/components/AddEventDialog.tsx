@@ -5,6 +5,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { AddEventDialogState, NewEventForm } from '../types'
+import { CALENDAR_LABELS } from '../constants/labels'
 
 interface AddEventDialogProps {
   dialog: AddEventDialogState
@@ -83,7 +84,7 @@ export function AddEventDialog({
       <DialogContent level={1} className="max-w-[600px] p-0 rounded-2xl border-[#E8E4E0] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] overflow-hidden [&>button:last-child]:hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-6 pb-2">
-          <h2 className="text-2xl font-bold tracking-tight text-[#333333]">新增行事曆事項</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-[#333333]">{CALENDAR_LABELS.ADD_DIALOG_TITLE}</h2>
           <button
             onClick={onClose}
             className="text-[#333333]/40 hover:text-[#333333] transition-colors"
@@ -105,31 +106,31 @@ export function AddEventDialog({
           {/* 日期欄位 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-[#333333]/80">開始日期</label>
+              <label className="block text-sm font-semibold text-[#333333]/80">{CALENDAR_LABELS.START_DATE}</label>
               <DatePicker
                 value={dialog.selectedDate}
                 onChange={(date) => onDialogChange({ ...dialog, selectedDate: date })}
-                placeholder="選擇日期"
+                placeholder={CALENDAR_LABELS.PLACEHOLDER_SELECT_DATE}
               />
             </div>
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-[#333333]/80">結束日期 (選填)</label>
+              <label className="block text-sm font-semibold text-[#333333]/80">{CALENDAR_LABELS.END_DATE_OPTIONAL}</label>
               <DatePicker
                 value={newEvent.end_date}
                 onChange={(date) => onNewEventChange({ ...newEvent, end_date: date })}
-                placeholder="選擇日期"
+                placeholder={CALENDAR_LABELS.PLACEHOLDER_SELECT_DATE}
               />
             </div>
           </div>
 
           {/* 標題 */}
           <div className="space-y-2">
-            <label className="block text-sm font-semibold text-[#333333]/80">標題</label>
+            <label className="block text-sm font-semibold text-[#333333]/80">{CALENDAR_LABELS.TITLE_LABEL}</label>
             <input
               type="text"
               value={newEvent.title}
               onChange={e => onNewEventChange({ ...newEvent, title: e.target.value })}
-              placeholder="輸入事項標題"
+              placeholder={CALENDAR_LABELS.PLACEHOLDER_ENTER_TITLE}
               className={inputClassName}
             />
           </div>
@@ -137,7 +138,7 @@ export function AddEventDialog({
           {/* 類型與時間 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-[#333333]/80">事件類型</label>
+              <label className="block text-sm font-semibold text-[#333333]/80">{CALENDAR_LABELS.EVENT_TYPE}</label>
               <Select
                 value={newEvent.visibility}
                 onValueChange={(value: 'personal' | 'company') =>
@@ -148,17 +149,17 @@ export function AddEventDialog({
                 }
               >
                 <SelectTrigger className={inputClassName}>
-                  <SelectValue placeholder="選擇事件類型" />
+                  <SelectValue placeholder={CALENDAR_LABELS.PLACEHOLDER_SELECT_EVENT_TYPE} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="personal">個人行事曆</SelectItem>
-                  <SelectItem value="company">公司行事曆</SelectItem>
+                  <SelectItem value="personal">{CALENDAR_LABELS.PERSONAL_CALENDAR}</SelectItem>
+                  <SelectItem value="company">{CALENDAR_LABELS.COMPANY_CALENDAR}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-[#333333]/80">開始時間 (選填)</label>
+              <label className="block text-sm font-semibold text-[#333333]/80">{CALENDAR_LABELS.START_TIME_OPTIONAL}</label>
               <input
                 type="text"
                 value={newEvent.start_time}
@@ -171,7 +172,7 @@ export function AddEventDialog({
                     end_time: end || newEvent.end_time
                   })
                 }}
-                placeholder="如 0800-1400 或 14:30"
+                placeholder={CALENDAR_LABELS.PLACEHOLDER_TIME_RANGE}
                 className={inputClassName}
               />
             </div>
@@ -179,11 +180,11 @@ export function AddEventDialog({
 
           {/* 說明 */}
           <div className="space-y-2">
-            <label className="block text-sm font-semibold text-[#333333]/80">說明 (選填)</label>
+            <label className="block text-sm font-semibold text-[#333333]/80">{CALENDAR_LABELS.DESCRIPTION_OPTIONAL}</label>
             <textarea
               value={newEvent.description}
               onChange={e => onNewEventChange({ ...newEvent, description: e.target.value })}
-              placeholder="輸入說明"
+              placeholder={CALENDAR_LABELS.PLACEHOLDER_ENTER_DESCRIPTION}
               rows={3}
               className={`${inputClassName} resize-none`}
             />
@@ -197,7 +198,7 @@ export function AddEventDialog({
             onClick={onClose}
             className="px-6 py-2.5 rounded-lg border border-[#E8E4E0] text-[#333333] bg-card hover:bg-[#F9F8F6] transition-colors text-sm font-medium"
           >
-            取消
+            {CALENDAR_LABELS.CANCEL}
           </button>
           <button
             type="submit"
@@ -205,7 +206,7 @@ export function AddEventDialog({
             onClick={() => newEvent.title.trim() && onSubmit()}
             className="px-6 py-2.5 rounded-lg bg-[#B8A99A] hover:bg-[#9E8C7A] text-white shadow-md hover:shadow-lg transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            新增 (Enter)
+            {CALENDAR_LABELS.ADD_ENTER}
           </button>
         </div>
       </DialogContent>

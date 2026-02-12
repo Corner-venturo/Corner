@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { formatYearMonth } from '@/lib/utils/format-date'
+import { CALENDAR_LABELS } from '../constants/labels'
 
 interface BirthdayPerson {
   id: string
@@ -120,7 +121,7 @@ export function BirthdayListDialog({ open, onClose, initialMonth }: BirthdayList
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Cake size={20} className="text-morandi-gold" />
-            生日名單
+            {CALENDAR_LABELS.BIRTHDAY_LIST}
           </DialogTitle>
         </DialogHeader>
 
@@ -145,7 +146,7 @@ export function BirthdayListDialog({ open, onClose, initialMonth }: BirthdayList
               onClick={handleToday}
               className="h-6 px-2 text-xs"
             >
-              本月
+              {CALENDAR_LABELS.THIS_MONTH}
             </Button>
           </div>
 
@@ -163,11 +164,11 @@ export function BirthdayListDialog({ open, onClose, initialMonth }: BirthdayList
         <div className="max-h-[400px] overflow-y-auto">
           {loading ? (
             <div className="py-8 text-center text-morandi-secondary">
-              載入中...
+              {CALENDAR_LABELS.LOADING}
             </div>
           ) : birthdays.length === 0 ? (
             <div className="py-8 text-center text-morandi-secondary">
-              這個月沒有生日
+              {CALENDAR_LABELS.NO_BIRTHDAY_THIS_MONTH}
             </div>
           ) : (
             <div className="divide-y divide-border">
@@ -205,7 +206,7 @@ export function BirthdayListDialog({ open, onClose, initialMonth }: BirthdayList
         {/* 統計 */}
         {!loading && birthdays.length > 0 && (
           <div className="pt-2 border-t border-border text-sm text-morandi-secondary text-center">
-            本月共 {birthdays.length} 位客戶生日
+            {CALENDAR_LABELS.MONTHLY_BIRTHDAY_COUNT_PREFIX}{birthdays.length}{CALENDAR_LABELS.MONTHLY_BIRTHDAY_COUNT_SUFFIX}
           </div>
         )}
       </DialogContent>

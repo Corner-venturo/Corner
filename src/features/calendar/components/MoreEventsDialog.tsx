@@ -3,6 +3,7 @@
 import { MapPin, Cake, Briefcase, CheckSquare, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { MoreEventsDialogState, FullCalendarEvent } from '../types'
+import { CALENDAR_LABELS } from '../constants/labels'
 
 interface MoreEventsDialogProps {
   dialog: MoreEventsDialogState
@@ -23,7 +24,7 @@ export function MoreEventsDialog({
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle>
-              {dialog.date} 的所有事件 ({dialog.events.length})
+              {dialog.date}{CALENDAR_LABELS.ALL_EVENTS_SUFFIX} ({dialog.events.length})
             </DialogTitle>
             <button onClick={onClose} className="text-morandi-secondary hover:text-morandi-primary">
               <X size={20} />
@@ -66,11 +67,11 @@ export function MoreEventsDialog({
                       {event.extendedProps.location && <span>{event.extendedProps.location}</span>}
                       {(event.extendedProps.max_participants ?? 0) > 0 && (
                         <span>
-                          {event.extendedProps.participants ?? 0}/{event.extendedProps.max_participants}人
+                          {event.extendedProps.participants ?? 0}/{event.extendedProps.max_participants}{CALENDAR_LABELS.PERSON_UNIT}
                         </span>
                       )}
                       {duration > 0 && (
-                        <span className="text-morandi-gold font-medium">{duration}天</span>
+                        <span className="text-morandi-gold font-medium">{duration}{CALENDAR_LABELS.DAY_UNIT}</span>
                       )}
                     </div>
                     {event.extendedProps.description && (

@@ -4,6 +4,7 @@ import { getTodayString } from '@/lib/utils/format-date'
 
 import { useState } from 'react'
 import { Plus, Building2, Calendar, CalendarDays, CalendarClock, Cake } from 'lucide-react'
+import { CALENDAR_LABELS } from '@/features/calendar/constants/labels'
 import { CalendarSettingsDialog } from '@/components/calendar/calendar-settings-dialog'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
@@ -80,10 +81,10 @@ export default function CalendarPage() {
     <>
       <div className="h-full flex flex-col">
         <ResponsiveHeader
-          title="行事曆"
+          title={CALENDAR_LABELS.PAGE_TITLE}
           breadcrumb={[
-            { label: '首頁', href: '/' },
-            { label: '行事曆', href: '/calendar' },
+            { label: CALENDAR_LABELS.BREADCRUMB_HOME, href: '/' },
+            { label: CALENDAR_LABELS.BREADCRUMB_CALENDAR, href: '/calendar' },
           ]}
           actions={
             <div className="flex items-center gap-3">
@@ -116,7 +117,7 @@ export default function CalendarPage() {
                 onClick={handleToday}
                 className="h-9 border-morandi-gold/30 bg-card text-morandi-gold hover:bg-morandi-gold hover:border-morandi-gold hover:text-white transition-all shadow-sm font-medium rounded-lg"
               >
-                今天
+                {CALENDAR_LABELS.TODAY}
               </Button>
 
               {/* 視圖切換按鈕 */}
@@ -133,7 +134,7 @@ export default function CalendarPage() {
                       ? 'bg-morandi-gold/10 text-morandi-gold'
                       : 'hover:bg-morandi-container/50'
                   }`}
-                  title="月視圖"
+                  title={CALENDAR_LABELS.MONTH_VIEW}
                 >
                   <Calendar size={16} />
                 </Button>
@@ -149,7 +150,7 @@ export default function CalendarPage() {
                       ? 'bg-morandi-gold/10 text-morandi-gold'
                       : 'hover:bg-morandi-container/50'
                   }`}
-                  title="週視圖"
+                  title={CALENDAR_LABELS.WEEK_VIEW}
                 >
                   <CalendarDays size={16} />
                 </Button>
@@ -165,7 +166,7 @@ export default function CalendarPage() {
                       ? 'bg-morandi-gold/10 text-morandi-gold'
                       : 'hover:bg-morandi-container/50'
                   }`}
-                  title="日視圖"
+                  title={CALENDAR_LABELS.DAY_VIEW}
                 >
                   <CalendarClock size={16} />
                 </Button>
@@ -179,10 +180,10 @@ export default function CalendarPage() {
                 >
                   <SelectTrigger className="h-9 w-[140px] shadow-sm">
                     <Building2 size={14} className="mr-1.5 text-morandi-blue" />
-                    <SelectValue placeholder="全部分公司" />
+                    <SelectValue placeholder={CALENDAR_LABELS.ALL_WORKSPACES} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">全部分公司</SelectItem>
+                    <SelectItem value="all">{CALENDAR_LABELS.ALL_WORKSPACES}</SelectItem>
                     {workspaces.map((ws: { id: string; name: string }) => (
                       <SelectItem key={ws.id} value={ws.id}>
                         {ws.name}
@@ -198,10 +199,10 @@ export default function CalendarPage() {
                 size="sm"
                 onClick={() => setBirthdayDialogOpen(true)}
                 className="h-9 px-3 gap-1.5 border-border hover:bg-morandi-container/50 hover:border-morandi-gold/50 transition-all rounded-lg text-morandi-secondary hover:text-morandi-gold"
-                title="查看生日名單"
+                title={CALENDAR_LABELS.VIEW_BIRTHDAY_LIST}
               >
                 <Cake size={16} />
-                <span className="text-xs">生日</span>
+                <span className="text-xs">{CALENDAR_LABELS.BIRTHDAY}</span>
               </Button>
 
               <CalendarSettingsDialog />
@@ -215,7 +216,7 @@ export default function CalendarPage() {
                 className="h-9 bg-morandi-gold hover:bg-morandi-gold-hover text-white shadow-sm hover:shadow-md transition-all font-medium rounded-lg"
               >
                 <Plus size={16} className="mr-1.5" />
-                新增事項
+                {CALENDAR_LABELS.ADD_EVENT}
               </Button>
             </div>
           }

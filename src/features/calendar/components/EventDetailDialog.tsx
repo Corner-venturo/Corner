@@ -8,6 +8,7 @@ import { ConfirmDialog } from '@/components/dialog/confirm-dialog'
 import { useConfirmDialog } from '@/hooks/useConfirmDialog'
 import { useAuthStore } from '@/stores/auth-store'
 import { formatDateChineseWithWeekday } from '@/lib/utils/format-date'
+import { CALENDAR_LABELS } from '../constants/labels'
 
 interface EventDetailDialogProps {
   open: boolean
@@ -50,7 +51,7 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
       <Dialog open={open} onOpenChange={open => !open && onClose()}>
         <DialogContent level={1} className="max-w-md">
           <DialogHeader>
-            <DialogTitle>事件詳情</DialogTitle>
+            <DialogTitle>{CALENDAR_LABELS.EVENT_DETAIL_TITLE}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -97,7 +98,7 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
                       </div>
                       {!isSameDay && actualEnd && (
                         <div className="flex items-center gap-2 text-sm">
-                          <span className="text-morandi-secondary ml-6">至</span>
+                          <span className="text-morandi-secondary ml-6">{CALENDAR_LABELS.TO}</span>
                           <span className="text-morandi-primary">
                             {formatDateChineseWithWeekday(actualEnd)}
                           </span>
@@ -147,7 +148,7 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
             {/* 建立者（僅公司事項） */}
             {event.extendedProps?.type === 'company' && event.extendedProps?.creator_name && (
               <div className="flex items-center gap-2 text-sm">
-                <span className="text-morandi-secondary">建立者：</span>
+                <span className="text-morandi-secondary">{CALENDAR_LABELS.CREATED_BY}</span>
                 <span className="text-morandi-primary font-medium">
                   {event.extendedProps.creator_name}
                 </span>
@@ -157,7 +158,7 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
             {/* 說明 */}
             {event.extendedProps?.description && (
               <div className="p-3 bg-morandi-container/10 rounded-lg">
-                <p className="text-sm text-morandi-secondary mb-1">說明</p>
+                <p className="text-sm text-morandi-secondary mb-1">{CALENDAR_LABELS.DESCRIPTION}</p>
                 <p className="text-sm text-morandi-primary">{event.extendedProps.description}</p>
               </div>
             )}
@@ -171,11 +172,11 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
                     onClick={async () => {
                       const confirmed = await confirm({
                         type: 'danger',
-                        title: '刪除事件',
-                        message: '確定要刪除這個事件嗎？',
-                        details: ['此操作無法復原'],
-                        confirmLabel: '確認刪除',
-                        cancelLabel: '取消',
+                        title: CALENDAR_LABELS.DELETE_EVENT_TITLE,
+                        message: CALENDAR_LABELS.DELETE_EVENT_MESSAGE,
+                        details: [CALENDAR_LABELS.DELETE_EVENT_DETAIL],
+                        confirmLabel: CALENDAR_LABELS.CONFIRM_DELETE,
+                        cancelLabel: CALENDAR_LABELS.CANCEL,
                       })
                       if (confirmed) {
                         onDelete(event.id)
@@ -184,20 +185,20 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
                     className="gap-1 text-morandi-red hover:bg-morandi-red hover:text-white"
                   >
                     <Trash2 size={16} />
-                    刪除
+                    {CALENDAR_LABELS.DELETE}
                   </Button>
                   <Button
                     variant="outline"
                     onClick={() => onEdit(event)}
                     className="text-morandi-gold hover:bg-morandi-gold hover:text-white"
                   >
-                    編輯
+                    {CALENDAR_LABELS.EDIT}
                   </Button>
                 </>
               )}
               <Button variant="outline" onClick={onClose} className="gap-2">
                 <X size={16} />
-                關閉
+                {CALENDAR_LABELS.CLOSE}
               </Button>
             </div>
           </div>
