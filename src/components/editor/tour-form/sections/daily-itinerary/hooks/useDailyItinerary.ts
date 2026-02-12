@@ -6,6 +6,7 @@ import { AttractionWithCity, MealSelectorState } from '../types'
 import { LuxuryHotel } from '@/components/editor/HotelSelector'
 import { Restaurant, MichelinRestaurant } from '@/components/editor/RestaurantSelector'
 import { supabase } from '@/lib/supabase/client'
+import { createImageLibraryItem } from '@/data/entities/image-library'
 import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
 import { toast } from 'sonner'
@@ -285,30 +286,16 @@ export function useDailyItinerary({
 
     setIsSavingToLibrary(true)
     try {
-      const { error: checkError } = await supabase
-        .from('image_library')
-        .select('id')
-        .limit(1)
-
-      if (checkError) {
-        toast.error('圖庫功能暫時無法使用')
-        return
-      }
-
-      const { error } = await supabase.from('image_library').insert({
+      await createImageLibraryItem({
         workspace_id: workspaceId,
         name: libraryImageName || '未命名圖片',
         file_path: saveToLibraryDialog.filePath,
         public_url: saveToLibraryDialog.publicUrl,
         category: 'activity',
         tags: ['景點', '活動'],
-      })
+      } as Record<string, unknown>)
 
-      if (error) {
-        toast.error(`儲存失敗: ${error.message}`)
-      } else {
-        toast.success('已儲存到圖庫')
-      }
+      toast.success('已儲存到圖庫')
     } catch (error) {
       toast.error(`儲存過程發生錯誤`)
     } finally {

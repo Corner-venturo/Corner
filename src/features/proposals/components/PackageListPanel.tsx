@@ -422,7 +422,7 @@ export function PackageListPanel({
                   {/* 人數 */}
                   <td className="px-4 py-3">
                     <span className="text-sm text-morandi-primary">
-                      {pkg.group_size ? `${pkg.group_size}人` : '-'}
+                      {pkg.group_size ? PROPOSAL_LABELS.packageList.personUnit(pkg.group_size) : '-'}
                     </span>
                   </td>
 
@@ -443,7 +443,7 @@ export function PackageListPanel({
                             ? 'text-morandi-green hover:bg-morandi-green/10'
                             : 'text-morandi-secondary hover:bg-morandi-container/80'
                         }`}
-                        title="行程表"
+                        title={PROPOSAL_LABELS.packageList.itineraryTitle}
                       >
                         <FileText size={16} />
                       </button>
@@ -454,7 +454,7 @@ export function PackageListPanel({
                             setSelectedPackage(pkg)
                             setBrochureDialogOpen(true)
                           } else {
-                            void alert('請先建立行程表', 'info')
+                            void alert(PROPOSAL_LABELS.packageList.pleaseCreateItinerary, 'info')
                           }
                         }}
                         className={`p-1.5 rounded transition-colors ${
@@ -462,7 +462,7 @@ export function PackageListPanel({
                             ? 'text-morandi-green hover:bg-morandi-green/10'
                             : 'text-morandi-muted cursor-not-allowed'
                         }`}
-                        title="簡易行程預覽"
+                        title={PROPOSAL_LABELS.packageList.brochurePreviewTitle}
                         disabled={!pkg.itinerary_id}
                       >
                         <Book size={16} />
@@ -473,7 +473,7 @@ export function PackageListPanel({
                           if (pkg.itinerary_id) {
                             router.push(`/itinerary/new?itinerary_id=${pkg.itinerary_id}`)
                           } else {
-                            void alert('請先建立行程表', 'info')
+                            void alert(PROPOSAL_LABELS.packageList.pleaseCreateItinerary, 'info')
                           }
                         }}
                         className={`p-1.5 rounded transition-colors ${
@@ -481,7 +481,7 @@ export function PackageListPanel({
                             ? 'text-morandi-green hover:bg-morandi-green/10'
                             : 'text-morandi-muted cursor-not-allowed'
                         }`}
-                        title="網頁行程"
+                        title={PROPOSAL_LABELS.packageList.webItineraryTitle}
                         disabled={!pkg.itinerary_id}
                       >
                         <Globe size={16} />
@@ -494,7 +494,7 @@ export function PackageListPanel({
                             ? 'text-morandi-gold hover:bg-morandi-gold/10'
                             : 'text-morandi-secondary hover:bg-morandi-container/80'
                         }`}
-                        title={pkg.quote_id ? '查看報價單' : '建立報價單'}
+                        title={pkg.quote_id ? PROPOSAL_LABELS.packageList.viewQuote : PROPOSAL_LABELS.packageList.createQuote}
                       >
                         <DollarSign size={16} />
                       </button>
@@ -505,7 +505,7 @@ export function PackageListPanel({
                             setSelectedPackage(pkg)
                             setRequirementDialogOpen(true)
                           } else {
-                            void alert('請先建立報價單', 'info')
+                            void alert(PROPOSAL_LABELS.packageList.pleaseCreateQuote, 'info')
                           }
                         }}
                         className={`p-1.5 rounded transition-colors ${
@@ -513,7 +513,7 @@ export function PackageListPanel({
                             ? 'text-morandi-green hover:bg-morandi-green/10'
                             : 'text-morandi-muted cursor-not-allowed'
                         }`}
-                        title="需求確認單"
+                        title={PROPOSAL_LABELS.packageList.requirementTitle}
                         disabled={!pkg.quote_id}
                       >
                         <ClipboardList size={16} />
@@ -524,7 +524,7 @@ export function PackageListPanel({
                           if (pkg.itinerary_id) {
                             router.push(`/brochure?itinerary_id=${pkg.itinerary_id}`)
                           } else {
-                            void alert('請先建立行程表', 'info')
+                            void alert(PROPOSAL_LABELS.packageList.pleaseCreateItinerary, 'info')
                           }
                         }}
                         className={`p-1.5 rounded transition-colors ${
@@ -532,7 +532,7 @@ export function PackageListPanel({
                             ? 'text-morandi-primary hover:bg-morandi-container/80'
                             : 'text-morandi-muted cursor-not-allowed'
                         }`}
-                        title="手冊設計"
+                        title={PROPOSAL_LABELS.packageList.brochureDesignTitle}
                         disabled={!pkg.itinerary_id}
                       >
                         <BookMarked size={16} />
