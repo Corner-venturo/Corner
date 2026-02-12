@@ -10,6 +10,7 @@ import { CurrencyCell } from '@/components/table-cells'
 import { useVendorCosts, createVendorCost, updateVendorCost, updateVisa } from '@/data'
 import { logger } from '@/lib/utils/logger'
 import type { Visa } from '@/stores/types'
+import { SUBMIT_DIALOG_LABELS as L } from '../constants/labels'
 
 interface SubmitVisaDialogProps {
   open: boolean
@@ -139,10 +140,10 @@ export function SubmitVisaDialog({
     <FormDialog
       open={open}
       onOpenChange={open => !open && onClose()}
-      title="送件"
+      title={L.title}
       onSubmit={handleSubmit}
       onCancel={onClose}
-      submitLabel="確認送件"
+      submitLabel={L.submit_label}
       submitDisabled={!vendor}
       loading={isSubmitting}
       maxWidth="lg"
@@ -151,20 +152,20 @@ export function SubmitVisaDialog({
         {/* 送件日期與代辦商 */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium text-morandi-primary">送件日期</label>
+            <label className="text-sm font-medium text-morandi-primary">{L.label_date}</label>
             <DatePicker
               value={submitDate}
               onChange={(date) => setSubmitDate(date)}
               className="mt-1"
-              placeholder="選擇日期"
+              placeholder={L.placeholder_date}
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-morandi-primary">代辦商</label>
+            <label className="text-sm font-medium text-morandi-primary">{L.label_vendor}</label>
             <Input
               value={vendor}
               onChange={e => setVendor(e.target.value)}
-              placeholder="輸入或選擇代辦商"
+              placeholder={L.placeholder_vendor}
               className="mt-1"
               list="vendor-list-submit"
             />
@@ -179,7 +180,7 @@ export function SubmitVisaDialog({
         {/* 成本填寫 */}
         <div className="border-t border-border pt-4">
           <label className="text-sm font-medium text-morandi-primary mb-2 block">
-            成本設定（共 {selectedVisas.length} 筆）
+            {L.cost_section(selectedVisas.length)}
           </label>
 
           <div className="space-y-3 max-h-[40vh] overflow-y-auto">
@@ -198,12 +199,12 @@ export function SubmitVisaDialog({
                     </span>
                     {historyCost && (
                       <span className="text-xs text-morandi-green flex items-center gap-1">
-                        歷史成本: <CurrencyCell amount={historyCost.cost} className="text-xs text-morandi-green" />
+                        {L.history_cost} <CurrencyCell amount={historyCost.cost} className="text-xs text-morandi-green" />
                       </span>
                     )}
                     {vendor && !historyCost && (
                       <span className="text-xs text-morandi-gold">
-                        新的成本記錄
+                        {L.new_cost_record}
                       </span>
                     )}
                   </div>
@@ -219,7 +220,7 @@ export function SubmitVisaDialog({
                           value={costs[visa.id] ?? 0}
                           onChange={e => updateCost(visa.id, Number(e.target.value))}
                           className="w-28"
-                          placeholder="成本"
+                          placeholder={L.placeholder_cost}
                         />
                       </div>
                     ))}
@@ -232,7 +233,7 @@ export function SubmitVisaDialog({
 
         {/* 總計 */}
         <div className="border-t border-border pt-3 flex justify-between items-center">
-          <span className="text-sm text-morandi-secondary">總成本</span>
+          <span className="text-sm text-morandi-secondary">{L.total_cost}</span>
           <CurrencyCell amount={Object.values(costs).reduce((sum, c) => sum + c, 0)} className="text-lg font-semibold text-morandi-primary" />
         </div>
       </div>

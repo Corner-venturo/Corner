@@ -15,6 +15,7 @@ import type { Visa } from '@/stores/types'
 import { useBatchPickup } from '../hooks/useBatchPickup'
 import { PickupList } from './PickupList'
 import { PickupSummary } from './PickupSummary'
+import { BATCH_PICKUP_DIALOG_LABELS as L } from '../constants/labels'
 
 interface BatchPickupDialogProps {
   open: boolean
@@ -66,17 +67,17 @@ export function BatchPickupDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileImage className="h-5 w-5 text-morandi-gold" />
-            批次下件
+            {L.title}
             {step === 'matching' && (
               <span className="text-sm font-normal text-morandi-secondary ml-2">
-                - 配對結果
+                {L.subtitle_matching}
               </span>
             )}
           </DialogTitle>
           <DialogDescription>
             {step === 'upload'
-              ? '上傳護照照片，系統將自動辨識並配對待取件的簽證'
-              : '確認配對結果，未配對的項目可手動選擇對應的簽證'
+              ? L.desc_upload
+              : L.desc_matching
             }
           </DialogDescription>
         </DialogHeader>
@@ -100,9 +101,9 @@ export function BatchPickupDialog({
                 <div className="flex flex-col items-center justify-center py-4">
                   <Upload className="w-10 h-10 mb-3 text-morandi-secondary" />
                   <p className="text-sm text-morandi-primary">
-                    <span className="font-semibold">點擊上傳</span> 或拖曳護照照片
+                    <span className="font-semibold">{L.upload_hint}</span> {L.upload_drag}
                   </p>
-                  <p className="text-xs text-morandi-secondary mt-1">支援 JPG, PNG（可多選）</p>
+                  <p className="text-xs text-morandi-secondary mt-1">{L.upload_formats}</p>
                 </div>
                 <input
                   ref={fileInputRef}
@@ -120,7 +121,7 @@ export function BatchPickupDialog({
               {files.length > 0 && (
                 <div className="space-y-2">
                   <div className="text-sm text-morandi-secondary">
-                    已選擇 {files.length} 個檔案：
+                    {L.files_selected(files.length)}
                   </div>
                   <div className="max-h-40 overflow-y-auto space-y-2">
                     {files.map((file, index) => (
@@ -155,7 +156,7 @@ export function BatchPickupDialog({
               {/* 待取件簽證提示 */}
               <div className="bg-status-info-bg border border-status-info/30 rounded-lg p-3">
                 <p className="text-sm text-morandi-primary">
-                  目前有 <span className="font-semibold">{pendingVisas.length}</span> 筆待取件簽證
+                  {L.pending_visas(pendingVisas.length)}
                 </p>
               </div>
             </div>
@@ -184,7 +185,7 @@ export function BatchPickupDialog({
             <>
               <Button variant="outline" className="gap-1" onClick={handleClose} disabled={isProcessing}>
                 <X size={16} />
-                取消
+                {L.btn_cancel}
               </Button>
               <Button
                 onClick={handleStartOCR}
@@ -194,10 +195,10 @@ export function BatchPickupDialog({
                 {isProcessing ? (
                   <>
                     <Loader2 size={16} className="mr-2 animate-spin" />
-                    辨識中...
+                    {L.btn_processing}
                   </>
                 ) : (
-                  `開始辨識 (${files.length})`
+                  L.btn_start_ocr(files.length)
                 )}
               </Button>
             </>
@@ -208,7 +209,7 @@ export function BatchPickupDialog({
                 onClick={() => setStep('upload')}
                 disabled={isProcessing}
               >
-                返回上傳
+                {L.btn_back}
               </Button>
               <Button
                 onClick={handleConfirmPickup}
@@ -218,10 +219,10 @@ export function BatchPickupDialog({
                 {isProcessing ? (
                   <>
                     <Loader2 size={16} className="mr-2 animate-spin" />
-                    處理中...
+                    {L.btn_confirming}
                   </>
                 ) : (
-                  `確認下件 (${confirmableCount})`
+                  L.btn_confirm_pickup(confirmableCount)
                 )}
               </Button>
             </>

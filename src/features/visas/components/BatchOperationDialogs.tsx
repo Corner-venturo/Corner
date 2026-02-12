@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import { DatePicker } from '@/components/ui/date-picker'
 import { X, Check } from 'lucide-react'
+import { BATCH_OPERATION_LABELS as L } from '../constants/labels'
 
 interface BatchPickupDialogProps {
   open: boolean
@@ -32,33 +33,33 @@ export function BatchPickupDialog({
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onCancel()}>
       <DialogContent level={1} className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>批次取件</DialogTitle>
+          <DialogTitle>{L.pickup_title}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <p className="text-sm text-morandi-secondary">
-            已選擇 <span className="font-semibold text-morandi-primary">{selectedCount}</span> 筆簽證
+            {L.selected_prefix} <span className="font-semibold text-morandi-primary">{selectedCount}</span> {L.selected_suffix}
           </p>
           <div>
-            <label className="text-sm font-medium text-morandi-primary">取件日期</label>
+            <label className="text-sm font-medium text-morandi-primary">{L.pickup_date}</label>
             <DatePicker
               value={pickupDate}
               onChange={onPickupDateChange}
               className="mt-1"
-              placeholder="選擇日期"
+              placeholder={L.placeholder_date}
             />
           </div>
         </div>
         <div className="flex justify-end gap-2">
           <Button variant="outline" className="gap-1" onClick={onCancel}>
             <X size={16} />
-            取消
+            {L.btn_cancel}
           </Button>
           <Button
             onClick={onConfirm}
             className="bg-morandi-green hover:bg-morandi-green/90 gap-1"
           >
             <Check size={16} />
-            確認取件
+            {L.btn_confirm_pickup}
           </Button>
         </div>
       </DialogContent>
@@ -87,33 +88,33 @@ export function BatchRejectDialog({
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onCancel()}>
       <DialogContent level={1} className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>批次退件</DialogTitle>
+          <DialogTitle>{L.reject_title}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <p className="text-sm text-morandi-secondary">
-            已選擇 <span className="font-semibold text-morandi-primary">{selectedCount}</span> 筆簽證
+            {L.selected_prefix} <span className="font-semibold text-morandi-primary">{selectedCount}</span> {L.selected_suffix}
           </p>
           <div>
-            <label className="text-sm font-medium text-morandi-primary">退件日期</label>
+            <label className="text-sm font-medium text-morandi-primary">{L.reject_date}</label>
             <DatePicker
               value={rejectDate}
               onChange={onRejectDateChange}
               className="mt-1"
-              placeholder="選擇日期"
+              placeholder={L.placeholder_date}
             />
           </div>
         </div>
         <div className="flex justify-end gap-2">
           <Button variant="outline" className="gap-1" onClick={onCancel}>
             <X size={16} />
-            取消
+            {L.btn_cancel}
           </Button>
           <Button
             onClick={onConfirm}
             className="bg-morandi-red hover:bg-morandi-red/90 gap-1"
           >
             <Check size={16} />
-            確認退件
+            {L.btn_confirm_reject}
           </Button>
         </div>
       </DialogContent>

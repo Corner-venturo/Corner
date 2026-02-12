@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox'
 import type { VisaApplicant } from '../hooks/useVisasDialog'
 import type { Visa } from '@/stores/types'
+import { ADD_VISA_DIALOG_LABELS as L } from '../constants/labels'
 
 interface ContactInfo {
   tour_id: string
@@ -141,7 +142,7 @@ export function AddVisaDialog({
     if (contact_info.tour_id) {
       options.push({
         value: '__create_new__',
-        label: '+ 新增訂單',
+        label: L.new_order,
       })
     }
     return options
@@ -178,10 +179,10 @@ export function AddVisaDialog({
     <FormDialog
       open={open}
       onOpenChange={open => !open && onClose()}
-      title={isEditMode ? '編輯簽證' : '新增簽證'}
+      title={isEditMode ? L.title_edit : L.title_add}
       onSubmit={handleSubmit}
       onCancel={onClose}
-      submitLabel={isEditMode ? '儲存' : '批次新增簽證'}
+      submitLabel={isEditMode ? L.submit_edit : L.submit_add}
       submitDisabled={!canSubmit}
       loading={isSubmitting}
       maxWidth="6xl"
@@ -192,14 +193,14 @@ export function AddVisaDialog({
         {!isEditMode && (
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">選擇團號</label>
+              <label className="text-sm font-medium text-morandi-primary">{L.label_tour}</label>
               <Combobox
                 value={contact_info.tour_id}
                 onChange={value => {
                   setContactInfo((prev) => ({ ...prev, tour_id: value, order_id: '' }))
                 }}
                 options={tourOptions}
-                placeholder="請輸入或選擇團號（例如：0810）"
+                placeholder={L.placeholder_tour}
                 className="mt-1"
                 showSearchIcon
                 showClearButton
@@ -207,14 +208,14 @@ export function AddVisaDialog({
             </div>
             <div>
               <label className="text-sm font-medium text-morandi-primary">
-                選擇訂單{' '}
-                <span className="text-xs text-morandi-secondary">(選填，未選擇將自動建立)</span>
+                {L.label_order}{' '}
+                <span className="text-xs text-morandi-secondary">{L.order_optional}</span>
               </label>
               <Combobox
                 value={contact_info.order_id}
                 onChange={value => setContactInfo((prev) => ({ ...prev, order_id: value }))}
                 options={orderOptions}
-                placeholder={contact_info.tour_id ? '請選擇訂單或留空自動建立' : '請先選擇團號'}
+                placeholder={contact_info.tour_id ? L.placeholder_order_ready : L.placeholder_order_disabled}
                 className="mt-1"
                 disabled={!contact_info.tour_id}
                 showSearchIcon
@@ -226,25 +227,25 @@ export function AddVisaDialog({
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium text-morandi-primary">聯絡人</label>
+            <label className="text-sm font-medium text-morandi-primary">{L.label_contact}</label>
             <Input
               value={contact_info.contact_person}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setContactInfo((prev) => ({ ...prev, contact_person: e.target.value }))
               }
               className="mt-1"
-              placeholder="請輸入聯絡人"
+              placeholder={L.placeholder_contact}
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-morandi-primary">聯絡電話</label>
+            <label className="text-sm font-medium text-morandi-primary">{L.label_phone}</label>
             <Input
               value={contact_info.contact_phone}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setContactInfo((prev) => ({ ...prev, contact_phone: e.target.value }))
               }
               className="mt-1"
-              placeholder="請輸入聯絡電話"
+              placeholder={L.placeholder_phone}
             />
           </div>
         </div>
@@ -257,15 +258,15 @@ export function AddVisaDialog({
       <table className="w-full border-collapse border border-border">
         <thead>
           <tr className="text-xs text-morandi-secondary font-medium bg-morandi-container/30">
-            <th className="text-left py-2 px-3 border border-border">申請人</th>
-            <th className="text-left py-2 px-3 border border-border">簽證類型</th>
-            <th className="text-center py-2 px-3 border border-border">急件</th>
-            <th className="text-left py-2 px-3 border border-border">收件日期</th>
-            <th className="text-left py-2 px-3 border border-border">回件日期</th>
-            <th className="text-center py-2 px-3 border border-border">辦理費用</th>
-            <th className="text-center py-2 px-3 border border-border">急件費用</th>
-            <th className="text-center py-2 px-3 border border-border">應收費用</th>
-            {!isEditMode && <th className="text-center py-2 px-3 border border-border">追加辦理</th>}
+            <th className="text-left py-2 px-3 border border-border">{L.th_applicant}</th>
+            <th className="text-left py-2 px-3 border border-border">{L.th_visa_type}</th>
+            <th className="text-center py-2 px-3 border border-border">{L.th_urgent}</th>
+            <th className="text-left py-2 px-3 border border-border">{L.th_received_date}</th>
+            <th className="text-left py-2 px-3 border border-border">{L.th_return_date}</th>
+            <th className="text-center py-2 px-3 border border-border">{L.th_fee}</th>
+            <th className="text-center py-2 px-3 border border-border">{L.th_urgent_fee}</th>
+            <th className="text-center py-2 px-3 border border-border">{L.th_total_fee}</th>
+            {!isEditMode && <th className="text-center py-2 px-3 border border-border">{L.th_add_more}</th>}
             {!isEditMode && <th className="border border-border w-10"></th>}
           </tr>
         </thead>
@@ -301,7 +302,7 @@ export function AddVisaDialog({
                       type="text"
                       value={applicant.name}
                       onChange={(e) => updateApplicant(applicant.id, 'name', e.target.value)}
-                      placeholder="申請人"
+                      placeholder={L.placeholder_applicant}
                       className="w-full bg-transparent outline-none text-sm"
                     />
                   )}
@@ -314,20 +315,20 @@ export function AddVisaDialog({
                     onValueChange={(value) => updateApplicant(applicant.id, 'country', value)}
                   >
                     <SelectTrigger className="h-auto p-0 border-0 shadow-none bg-transparent text-sm">
-                      <SelectValue placeholder="類型" />
+                      <SelectValue placeholder={L.placeholder_type} />
                     </SelectTrigger>
                     <SelectContent>
-                      <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary">護照</div>
-                      <SelectItem value="護照 成人">護照 成人</SelectItem>
-                      <SelectItem value="護照 兒童">護照 兒童</SelectItem>
-                      <SelectItem value="護照 成人 遺失件">護照 成人 遺失件</SelectItem>
-                      <SelectItem value="護照 兒童 遺失件">護照 兒童 遺失件</SelectItem>
-                      <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary border-t mt-1">台胞證</div>
-                      <SelectItem value="台胞證">台胞證</SelectItem>
-                      <SelectItem value="台胞證 遺失件">台胞證 遺失件</SelectItem>
-                      <SelectItem value="台胞證 首辦">台胞證 首辦</SelectItem>
-                      <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary border-t mt-1">美國簽證</div>
-                      <SelectItem value="美國 ESTA">美國 ESTA</SelectItem>
+                      <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary">{L.group_passport}</div>
+                      <SelectItem value={L.type_passport_adult}>{L.type_passport_adult}</SelectItem>
+                      <SelectItem value={L.type_passport_child}>{L.type_passport_child}</SelectItem>
+                      <SelectItem value={L.type_passport_adult_lost}>{L.type_passport_adult_lost}</SelectItem>
+                      <SelectItem value={L.type_passport_child_lost}>{L.type_passport_child_lost}</SelectItem>
+                      <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary border-t mt-1">{L.group_taiwan}</div>
+                      <SelectItem value={L.type_taiwan}>{L.type_taiwan}</SelectItem>
+                      <SelectItem value={L.type_taiwan_lost}>{L.type_taiwan_lost}</SelectItem>
+                      <SelectItem value={L.type_taiwan_first}>{L.type_taiwan_first}</SelectItem>
+                      <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary border-t mt-1">{L.group_usa}</div>
+                      <SelectItem value={L.type_usa_esta}>{L.type_usa_esta}</SelectItem>
                     </SelectContent>
                   </Select>
                 </td>
@@ -345,7 +346,7 @@ export function AddVisaDialog({
                   <DatePicker
                     value={applicant.received_date}
                     onChange={(date) => updateApplicant(applicant.id, 'received_date', date)}
-                    placeholder="收件日期"
+                    placeholder={L.placeholder_received}
                     buttonClassName="h-auto p-0 border-0 shadow-none bg-transparent"
                   />
                 </td>
@@ -355,7 +356,7 @@ export function AddVisaDialog({
                   <DatePicker
                     value={applicant.expected_issue_date}
                     onChange={(date) => updateApplicant(applicant.id, 'expected_issue_date', date)}
-                    placeholder="回件日期"
+                    placeholder={L.placeholder_return}
                     buttonClassName="h-auto p-0 border-0 shadow-none bg-transparent"
                   />
                 </td>
@@ -387,7 +388,7 @@ export function AddVisaDialog({
                       <span
                         onClick={() => addApplicantForSame(applicant.id, applicant.name)}
                         className="text-morandi-green cursor-pointer hover:text-morandi-green/70 text-lg"
-                        title="追加同一人的其他簽證"
+                        title={L.tooltip_add_same}
                       >
                         +
                       </span>
@@ -401,7 +402,7 @@ export function AddVisaDialog({
                     <span
                       onClick={() => removeApplicant(applicant.id)}
                       className="text-morandi-secondary cursor-pointer hover:text-morandi-red text-sm"
-                      title="刪除"
+                      title={L.tooltip_delete}
                     >
                       x
                     </span>
@@ -420,7 +421,7 @@ export function AddVisaDialog({
             onClick={addApplicant}
             className="text-morandi-gold cursor-pointer hover:text-morandi-gold-hover text-sm"
           >
-            + 新增辦理人
+            {L.btn_add_applicant}
           </span>
         </div>
       )}

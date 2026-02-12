@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { updateVisa } from '@/data'
 import type { Visa } from '@/stores/types'
+import { RETURN_DIALOG_LABELS as L } from '../constants/labels'
 
 interface ReturnDocumentsDialogProps {
   open: boolean
@@ -45,8 +46,8 @@ export function ReturnDocumentsDialog({
         const existingNote = visa.notes || ''
         const newNote = returnNote
           ? existingNote
-            ? `${existingNote}\n[證件歸還] ${returnNote}`
-            : `[證件歸還] ${returnNote}`
+            ? `${existingNote}\n${L.note_prefix} ${returnNote}`
+            : `${L.note_prefix} ${returnNote}`
           : existingNote
 
         await updateVisa(visa.id, {
@@ -67,10 +68,10 @@ export function ReturnDocumentsDialog({
     <FormDialog
       open={open}
       onOpenChange={open => !open && onClose()}
-      title="證件歸還"
+      title={L.title}
       onSubmit={handleSubmit}
       onCancel={onClose}
-      submitLabel="確認歸還"
+      submitLabel={L.submit_label}
       submitDisabled={!returnDate}
       loading={isSubmitting}
       maxWidth="sm"
@@ -78,32 +79,32 @@ export function ReturnDocumentsDialog({
       <div className="space-y-4">
         <div>
           <label className="text-sm font-medium text-morandi-primary">
-            歸還時間
+            {L.return_date}
           </label>
           <DatePicker
             value={returnDate}
             onChange={(date) => setReturnDate(date)}
             className="mt-1"
-            placeholder="選擇日期"
+            placeholder={L.placeholder_date}
           />
         </div>
 
         <div>
           <label className="text-sm font-medium text-morandi-primary">
-            備註 <span className="text-xs text-morandi-secondary">(選填)</span>
+            {L.notes_label} <span className="text-xs text-morandi-secondary">{L.notes_optional}</span>
           </label>
           <Input
             value={returnNote}
             onChange={e => setReturnNote(e.target.value)}
             className="mt-1"
-            placeholder="例如：寄送、自取..."
+            placeholder={L.notes_placeholder}
           />
         </div>
 
         {/* 選中的簽證清單 */}
         <div className="border-t border-border pt-3">
           <label className="text-xs text-morandi-primary mb-2 block">
-            共 {selectedVisas.length} 筆簽證
+            {L.visa_count(selectedVisas.length)}
           </label>
           <div className="max-h-[150px] overflow-y-auto space-y-1">
             {selectedVisas.map(visa => (

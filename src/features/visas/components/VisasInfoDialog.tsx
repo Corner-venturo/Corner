@@ -20,6 +20,7 @@ import {
   type DeliveryOption,
   type RequirementSection,
 } from '../constants/visa-info'
+import { VISA_INFO_DIALOG_LABELS as L } from '../constants/labels'
 
 interface VisasInfoDialogProps {
   open: boolean
@@ -103,9 +104,9 @@ export function VisasInfoDialog({ open, onClose }: VisasInfoDialogProps) {
     <div className="space-y-6">
       <div className="rounded-lg border border-border overflow-hidden">
         <div className="grid grid-cols-[1.5fr_1fr_1fr] bg-morandi-container text-xs font-medium uppercase tracking-wide text-morandi-secondary">
-          <div className="px-4 py-3">取貨方式／身份</div>
-          <div className="px-4 py-3">成人</div>
-          <div className="px-4 py-3">兒童（未滿14歲）</div>
+          <div className="px-4 py-3">{L.col_method}</div>
+          <div className="px-4 py-3">{L.col_adult}</div>
+          <div className="px-4 py-3">{L.col_child}</div>
         </div>
         {options.map(option => (
           <div
@@ -168,7 +169,7 @@ export function VisasInfoDialog({ open, onClose }: VisasInfoDialogProps) {
     <Dialog open={open} onOpenChange={open => !open && onClose()}>
       <DialogContent level={1} className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <DialogTitle>簽證資訊總覽</DialogTitle>
+          <DialogTitle>{L.title}</DialogTitle>
           <div className="flex flex-wrap items-center gap-2">
             <Button
               variant="outline"
@@ -177,7 +178,7 @@ export function VisasInfoDialog({ open, onClose }: VisasInfoDialogProps) {
               className="flex items-center gap-2"
             >
               <Copy size={16} />
-              複製已選擇項目 ({selectedSections.size})
+              {L.btn_copy} ({selectedSections.size})
             </Button>
           </div>
         </DialogHeader>
@@ -189,17 +190,17 @@ export function VisasInfoDialog({ open, onClose }: VisasInfoDialogProps) {
             )}
           >
             {copyStatus === 'success'
-              ? `已複製 ${selectedSections.size} 個項目`
+              ? L.copy_success(selectedSections.size)
               : selectedSections.size === 0
-                ? '請先勾選要複製的項目'
-                : '複製失敗，請重試'}
+                ? L.copy_empty
+                : L.copy_failed}
           </p>
         )}
         <Tabs defaultValue="passport" className="mt-4">
           <TabsList className="grid h-12 grid-cols-3 rounded-lg bg-morandi-container text-sm text-morandi-secondary">
-            <TabsTrigger value="passport">護照</TabsTrigger>
-            <TabsTrigger value="taiwan">台胞證</TabsTrigger>
-            <TabsTrigger value="usa-esta">美國 ESTA</TabsTrigger>
+            <TabsTrigger value="passport">{L.tab_passport}</TabsTrigger>
+            <TabsTrigger value="taiwan">{L.tab_taiwan}</TabsTrigger>
+            <TabsTrigger value="usa-esta">{L.tab_usa_esta}</TabsTrigger>
           </TabsList>
           <TabsContent value="passport" className="mt-4">
             {renderVisaInfoContent(

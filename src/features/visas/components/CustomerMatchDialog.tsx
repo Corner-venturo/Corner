@@ -16,6 +16,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DateCell } from '@/components/table-cells'
+import { CUSTOMER_MATCH_LABELS as CL, ADD_CUSTOMER_FORM_LABELS as FL } from '../constants/labels'
 
 interface CustomerMatch {
   name: string
@@ -54,7 +55,7 @@ export function CustomerMatchDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <UserPlus className="h-5 w-5 text-morandi-gold" />
-            旅客資料比對
+            {CL.title}
             {totalCount > 1 && (
               <span className="text-sm font-normal text-morandi-secondary">
                 ({currentIndex + 1} / {totalCount})
@@ -63,8 +64,8 @@ export function CustomerMatchDialog({
           </DialogTitle>
           <DialogDescription>
             {currentPerson?.matchedCustomers.length ?? 0 > 0
-              ? `找到 ${currentPerson?.matchedCustomers.length} 位同名「${currentPerson?.name}」的客戶，請確認是否為同一人`
-              : `「${currentPerson?.name}」為新客戶，是否要新增到 CRM？`
+              ? CL.found_match(currentPerson?.matchedCustomers.length ?? 0, currentPerson?.name ?? '')
+              : CL.new_customer(currentPerson?.name ?? '')
             }
           </DialogDescription>
         </DialogHeader>
@@ -94,12 +95,12 @@ export function CustomerMatchDialog({
                           {customer.national_id && <span>{customer.national_id}</span>}
                         </div>
                         {!customer.phone && !customer.birth_date && !customer.national_id && (
-                          <div className="text-sm text-morandi-secondary/60">尚無詳細資料</div>
+                          <div className="text-sm text-morandi-secondary/60">{CL.no_detail}</div>
                         )}
                       </div>
                     </div>
                     <Button size="sm" variant="outline" className="text-morandi-gold border-morandi-gold/50">
-                      是此人
+                      {CL.btn_is_this}
                     </Button>
                   </div>
                 </div>
@@ -116,13 +117,13 @@ export function CustomerMatchDialog({
                       <UserPlus className="h-5 w-5 text-morandi-green" />
                     </div>
                     <div>
-                      <div className="font-medium text-morandi-primary">都不是，新增為新客戶</div>
-                      <div className="text-sm text-morandi-secondary">建立「{currentPerson?.name}」的新資料</div>
+                      <div className="font-medium text-morandi-primary">{CL.not_any}</div>
+                      <div className="text-sm text-morandi-secondary">{CL.create_new(currentPerson?.name ?? '')}</div>
                     </div>
                   </div>
                   <Button size="sm" variant="outline" className="text-morandi-green border-morandi-green/50 gap-1">
                     <Plus size={16} />
-                    新增
+                    {CL.btn_add}
                   </Button>
                 </div>
               </div>
@@ -137,7 +138,7 @@ export function CustomerMatchDialog({
                 {currentPerson?.name}
               </div>
               <div className="text-sm text-morandi-secondary mb-4">
-                此為新客戶，尚無資料
+                {CL.new_customer_label}
               </div>
             </div>
           )}
@@ -150,7 +151,7 @@ export function CustomerMatchDialog({
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
             >
               <Plus size={16} />
-              新增到 CRM
+              {CL.btn_add_to_crm}
             </Button>
           )}
         </DialogFooter>
@@ -200,10 +201,10 @@ export function AddCustomerFormDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <UserPlus className="h-5 w-5 text-morandi-gold" />
-            新增旅客資料
+            {FL.title}
           </DialogTitle>
           <DialogDescription>
-            填寫「{customerName}」的資料（所有欄位皆為選填）
+            {FL.desc(customerName)}
           </DialogDescription>
         </DialogHeader>
 
@@ -213,7 +214,7 @@ export function AddCustomerFormDialog({
             {/* 基本資料 */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs">姓名</Label>
+                <Label className="text-xs">{FL.label_name}</Label>
                 <Input
                   value={formData.name}
                   onChange={(e) => onUpdateField('name', e.target.value)}
@@ -221,11 +222,11 @@ export function AddCustomerFormDialog({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">電話</Label>
+                <Label className="text-xs">{FL.label_phone}</Label>
                 <Input
                   value={formData.phone}
                   onChange={(e) => onUpdateField('phone', e.target.value)}
-                  placeholder="選填"
+                  placeholder={FL.placeholder_optional}
                   className="h-9"
                 />
               </div>
@@ -233,21 +234,21 @@ export function AddCustomerFormDialog({
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs">Email</Label>
+                <Label className="text-xs">{FL.label_email}</Label>
                 <Input
                   type="email"
                   value={formData.email}
                   onChange={(e) => onUpdateField('email', e.target.value)}
-                  placeholder="選填"
+                  placeholder={FL.placeholder_optional}
                   className="h-9"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">身分證字號</Label>
+                <Label className="text-xs">{FL.label_national_id}</Label>
                 <Input
                   value={formData.national_id}
                   onChange={(e) => onUpdateField('national_id', e.target.value)}
-                  placeholder="選填"
+                  placeholder={FL.placeholder_optional}
                   className="h-9"
                 />
               </div>
@@ -255,19 +256,19 @@ export function AddCustomerFormDialog({
 
             {/* 護照資訊 */}
             <div className="border-t border-border pt-3">
-              <p className="text-xs text-morandi-secondary mb-2">護照資訊</p>
+              <p className="text-xs text-morandi-secondary mb-2">{FL.section_passport}</p>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs">護照號碼</Label>
+                  <Label className="text-xs">{FL.label_passport_number}</Label>
                   <Input
                     value={formData.passport_number}
                     onChange={(e) => onUpdateField('passport_number', e.target.value)}
-                    placeholder="選填"
+                    placeholder={FL.placeholder_optional}
                     className="h-9"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">護照拼音</Label>
+                  <Label className="text-xs">{FL.label_passport_name}</Label>
                   <Input
                     value={formData.passport_name}
                     onChange={(e) => onUpdateField('passport_name', e.target.value.toUpperCase())}
@@ -278,21 +279,21 @@ export function AddCustomerFormDialog({
               </div>
               <div className="grid grid-cols-2 gap-3 mt-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs">護照效期</Label>
+                  <Label className="text-xs">{FL.label_passport_expiry}</Label>
                   <DatePicker
                     value={formData.passport_expiry}
                     onChange={(date) => onUpdateField('passport_expiry', date)}
                     className="h-9"
-                    placeholder="選擇日期"
+                    placeholder={FL.placeholder_date}
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">出生日期</Label>
+                  <Label className="text-xs">{FL.label_birth_date}</Label>
                   <DatePicker
                     value={formData.birth_date}
                     onChange={(date) => onUpdateField('birth_date', date)}
                     className="h-9"
-                    placeholder="選擇日期"
+                    placeholder={FL.placeholder_date}
                   />
                 </div>
               </div>
@@ -301,26 +302,26 @@ export function AddCustomerFormDialog({
             {/* 其他資料 */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs">性別</Label>
+                <Label className="text-xs">{FL.label_gender}</Label>
                 <Select
                   value={formData.gender}
                   onValueChange={(value) => onUpdateField('gender', value)}
                 >
                   <SelectTrigger className="w-full h-9">
-                    <SelectValue placeholder="選填" />
+                    <SelectValue placeholder={FL.placeholder_optional} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="male">男</SelectItem>
-                    <SelectItem value="female">女</SelectItem>
+                    <SelectItem value="male">{FL.gender_male}</SelectItem>
+                    <SelectItem value="female">{FL.gender_female}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">備註</Label>
+                <Label className="text-xs">{FL.label_notes}</Label>
                 <Input
                   value={formData.notes}
                   onChange={(e) => onUpdateField('notes', e.target.value)}
-                  placeholder="選填"
+                  placeholder={FL.placeholder_optional}
                   className="h-9"
                 />
               </div>
@@ -329,7 +330,7 @@ export function AddCustomerFormDialog({
 
           {/* 右側：護照圖片上傳 */}
           <div className="space-y-3">
-            <Label className="text-xs">護照掃描檔</Label>
+            <Label className="text-xs">{FL.label_passport_scan}</Label>
             <div
               className={`relative border-2 border-dashed rounded-lg transition-colors ${
                 formData.passport_image_url
@@ -354,7 +355,7 @@ export function AddCustomerFormDialog({
                 <>
                   <img
                     src={formData.passport_image_url}
-                    alt="護照掃描檔"
+                    alt={FL.alt_passport_scan}
                     className="w-full h-full object-contain rounded-lg"
                     style={{ maxHeight: '280px' }}
                   />
@@ -362,7 +363,7 @@ export function AddCustomerFormDialog({
                     type="button"
                     onClick={() => onUpdateField('passport_image_url', '')}
                     className="absolute top-2 right-2 w-7 h-7 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
-                    title="移除圖片"
+                    title={FL.tooltip_remove_image}
                   >
                     <X size={14} />
                   </button>
@@ -374,8 +375,8 @@ export function AddCustomerFormDialog({
                   ) : (
                     <>
                       <Upload size={32} className="text-morandi-secondary/50 mb-2" />
-                      <span className="text-sm text-morandi-secondary">點擊或拖曳上傳護照掃描檔</span>
-                      <span className="text-xs text-morandi-secondary/60 mt-1">支援 JPG、PNG 格式</span>
+                      <span className="text-sm text-morandi-secondary">{FL.upload_hint}</span>
+                      <span className="text-xs text-morandi-secondary/60 mt-1">{FL.upload_formats}</span>
                     </>
                   )}
                   <input
@@ -395,7 +396,7 @@ export function AddCustomerFormDialog({
               )}
             </div>
             <p className="text-xs text-morandi-secondary/60">
-              上傳護照掃描檔後，未來可直接調用，不需重新掃描
+              {FL.upload_note}
             </p>
           </div>
         </div>
@@ -407,14 +408,14 @@ export function AddCustomerFormDialog({
             className="gap-2"
           >
             <X size={16} />
-            取消
+            {FL.btn_cancel}
           </Button>
           <Button
             onClick={onSave}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
             <Save size={16} />
-            儲存
+            {FL.btn_save}
           </Button>
         </DialogFooter>
       </DialogContent>

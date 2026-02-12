@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Check, AlertTriangle, FileImage } from 'lucide-react'
 import type { Visa } from '@/stores/types'
 import type { MatchedItem } from '../hooks/useBatchPickup'
+import { PICKUP_LIST_LABELS as L } from '../constants/labels'
 
 interface PickupListProps {
   matchedItems: MatchedItem[]
@@ -38,7 +39,7 @@ export function PickupList({
               {item.ocrResult.imageBase64 ? (
                 <img
                   src={item.ocrResult.imageBase64}
-                  alt="護照"
+                  alt={L.alt_passport}
                   className="w-full h-24 object-cover rounded border"
                 />
               ) : (
@@ -58,12 +59,12 @@ export function PickupList({
                   {/* OCR 辨識結果 */}
                   <div className="mb-3">
                     <div className="text-sm font-medium text-morandi-primary">
-                      {item.ocrResult.customer.name || '(無法辨識姓名)'}
+                      {item.ocrResult.customer.name || L.no_name}
                     </div>
                     <div className="text-xs text-morandi-secondary">
                       {item.ocrResult.customer.passport_name}
                       {item.ocrResult.customer.passport_number && (
-                        <span className="ml-2">護照: {item.ocrResult.customer.passport_number}</span>
+                        <span className="ml-2">{L.passport_label} {item.ocrResult.customer.passport_number}</span>
                       )}
                     </div>
                   </div>
@@ -73,12 +74,12 @@ export function PickupList({
                     {item.matchedVisa ? (
                       <span className="flex items-center gap-1 text-xs text-status-success">
                         <Check size={14} />
-                        自動配對成功
+                        {L.auto_matched}
                       </span>
                     ) : (
                       <span className="flex items-center gap-1 text-xs text-status-warning">
                         <AlertTriangle size={14} />
-                        請手動選擇
+                        {L.manual_select}
                       </span>
                     )}
                   </div>
@@ -89,7 +90,7 @@ export function PickupList({
                     onValueChange={value => onManualSelect(index, value || null)}
                   >
                     <SelectTrigger className="w-full h-9">
-                      <SelectValue placeholder="-- 選擇簽證 --" />
+                      <SelectValue placeholder={L.placeholder_select} />
                     </SelectTrigger>
                     <SelectContent>
                       {pendingVisas.map(visa => {
@@ -102,7 +103,7 @@ export function PickupList({
                           >
                             {visa.applicant_name} - {visa.country}
                             {visa.order_number && ` (${visa.order_number})`}
-                            {isSelected && ' (已選)'}
+                            {isSelected && ` ${L.already_selected}`}
                           </SelectItem>
                         )
                       })}
@@ -119,7 +120,7 @@ export function PickupList({
                         className="rounded border-border"
                       />
                       <span className="text-xs text-morandi-secondary">
-                        同時更新顧客護照資訊
+                        {L.update_customer}
                       </span>
                     </label>
                   )}
@@ -127,7 +128,7 @@ export function PickupList({
               ) : (
                 <div className="text-sm text-status-danger">
                   <AlertTriangle size={16} className="inline mr-1" />
-                  辨識失敗：{item.ocrResult.error || '無法解析護照資訊'}
+                  {L.ocr_failed_prefix}{item.ocrResult.error || L.ocr_failed_default}
                 </div>
               )}
             </div>
