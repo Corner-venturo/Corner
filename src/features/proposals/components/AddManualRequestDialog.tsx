@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { X, Save, Loader2, Search } from 'lucide-react'
-import { supabase } from '@/lib/supabase/client'
+import { createTourRequest } from '@/data/entities/tour-requests'
 import { useAuthStore } from '@/stores'
 import { useToast } from '@/components/ui/use-toast'
 import { logger } from '@/lib/utils/logger'
@@ -272,9 +272,7 @@ export function AddManualRequestDialog({
         created_by_name: user.display_name || user.chinese_name || '',
       }
 
-      const { error } = await supabase.from('tour_requests').insert(insertData)
-
-      if (error) throw error
+      await createTourRequest(insertData as Record<string, unknown>)
 
       toast({ title: '需求已新增' })
       resetForm()

@@ -159,8 +159,8 @@ export function PackageListPanel({
   const handleDeletePackage = useCallback(
     async (pkg: ProposalPackage) => {
       const confirmed = await confirm(
-        `確定要刪除套件「${pkg.version_name}」嗎？`,
-        { type: 'warning', title: '刪除套件' }
+        PROPOSAL_LABELS.packageList.deleteConfirm(pkg.version_name),
+        { type: 'warning', title: PROPOSAL_LABELS.packageList.deleteDialogTitle }
       )
 
       if (confirmed) {
@@ -168,7 +168,7 @@ export function PackageListPanel({
           await deletePackage(pkg.id)
           onPackagesChange()
         } catch (error) {
-          await alert('刪除套件失敗', 'error')
+          await alert(PROPOSAL_LABELS.packageList.deletePackageFailed, 'error')
         }
       }
     },
@@ -370,18 +370,18 @@ export function PackageListPanel({
       <div className="flex-1 border border-border rounded-lg overflow-hidden min-h-[260px]">
         {packages.length === 0 ? (
           <div className="h-full flex items-center justify-center text-morandi-secondary text-center">
-            尚無版本
+            {PROPOSAL_LABELS.packageList.noVersions}
           </div>
         ) : (
           <div className="h-full flex flex-col">
           <table className="w-full">
             <thead>
               <tr className="bg-morandi-container/40 border-b border-border/60">
-                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">版本</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">目的地</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">日期</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">人數</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">操作</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">{PROPOSAL_LABELS.packageList.versionCol}</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">{PROPOSAL_LABELS.packageList.destinationCol}</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">{PROPOSAL_LABELS.packageList.dateCol}</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">{PROPOSAL_LABELS.packageList.groupSizeCol}</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">{PROPOSAL_LABELS.packageList.operationsCol}</th>
                 <th className="px-4 py-2 text-right text-xs font-medium text-morandi-secondary"></th>
               </tr>
             </thead>
