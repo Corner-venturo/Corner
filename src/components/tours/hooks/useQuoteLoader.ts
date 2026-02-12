@@ -15,6 +15,7 @@ import type {
   TourDepartureOther,
 } from '@/types/tour-departure.types'
 import type { Database } from '@/lib/supabase/types'
+import { COMP_TOURS_LABELS } from '../constants/labels'
 
 type QuoteItemRow = Database['public']['Tables']['quote_items']['Row']
 
@@ -56,7 +57,7 @@ export function useQuoteLoader(
         .order('created_at', { ascending: false })
 
       if (error) {
-        logger.error('載入報價單失敗:', error)
+        logger.error(COMP_TOURS_LABELS.載入報價單失敗_2, error)
         return
       }
 
@@ -78,7 +79,7 @@ export function useQuoteLoader(
         }
       }
     } catch (error) {
-      logger.error('查找報價單失敗:', error)
+      logger.error(COMP_TOURS_LABELS.查找報價單失敗, error)
     } finally {
       setLoadingQuotes(false)
     }
@@ -98,7 +99,7 @@ export function useQuoteLoader(
 
     const quoteId = selectedQuoteId || linkedQuotes[0]?.id || tour.quote_id
     if (!quoteId) {
-      toast.error('此團沒有關聯的報價單')
+      toast.error(COMP_TOURS_LABELS.此團沒有關聯的報價單)
       return
     }
 
@@ -107,13 +108,13 @@ export function useQuoteLoader(
 
   const loadFromQuoteById = async (quoteId: string) => {
     if (!quoteId) {
-      toast.error('此團沒有關聯的報價單')
+      toast.error(COMP_TOURS_LABELS.此團沒有關聯的報價單)
       return
     }
 
     setLoading(true)
     try {
-      logger.info('開始載入報價單資料, quoteId:', quoteId)
+      logger.info(COMP_TOURS_LABELS.開始載入報價單資料_quoteId, quoteId)
 
       const { data: quote, error: quoteError } = await supabase
         .from('quotes')
@@ -122,11 +123,11 @@ export function useQuoteLoader(
         .single()
 
       if (quoteError) {
-        logger.error('載入報價單失敗:', quoteError)
+        logger.error(COMP_TOURS_LABELS.載入報價單失敗_2, quoteError)
         throw quoteError
       }
 
-      logger.info('報價單載入成功:', quote?.id, quote?.name)
+      logger.info(COMP_TOURS_LABELS.報價單載入成功, quote?.id, quote?.name)
 
       const { data: quoteItems, error: itemsError } = await supabase
         .from('quote_items')
@@ -135,11 +136,11 @@ export function useQuoteLoader(
         .order('display_order', { ascending: true })
 
       if (itemsError) {
-        logger.error('載入報價項目失敗:', itemsError)
+        logger.error(COMP_TOURS_LABELS.載入報價項目失敗, itemsError)
         throw itemsError
       }
 
-      logger.info('報價項目載入成功, 數量:', quoteItems?.length || 0)
+      logger.info(COMP_TOURS_LABELS.報價項目載入成功_數量, quoteItems?.length || 0)
 
       const mealItems: TourDepartureMeal[] = []
       const accomItems: TourDepartureAccommodation[] = []
@@ -152,7 +153,7 @@ export function useQuoteLoader(
         const category = item.category?.toLowerCase() || ''
         const itemType = item.item_type?.toLowerCase() || ''
 
-        if (itemType === 'meals' || category.includes('餐') || category.includes('meal')) {
+        if (itemType === 'meals' || category.includes(COMP_TOURS_LABELS.餐) || category.includes('meal')) {
           mealItems.push({
             id: `meal-${index}`,
             departure_data_id: data?.id || '',
@@ -165,7 +166,7 @@ export function useQuoteLoader(
             notes: item.notes,
             display_order: index,
           })
-        } else if (itemType === 'accommodation' || category.includes('住宿') || category.includes('飯店') || category.includes('hotel')) {
+        } else if (itemType === 'accommodation' || category.includes(COMP_TOURS_LABELS.住宿) || category.includes(COMP_TOURS_LABELS.飯店) || category.includes('hotel')) {
           accomItems.push({
             id: `accom-${index}`,
             departure_data_id: data?.id || '',
@@ -178,7 +179,7 @@ export function useQuoteLoader(
             notes: item.notes,
             display_order: index,
           })
-        } else if (itemType === 'tickets' || itemType === 'activity' || category.includes('活動') || category.includes('門票') || category.includes('ticket')) {
+        } else if (itemType === 'tickets' || itemType === 'activity' || category.includes(COMP_TOURS_LABELS.活動) || category.includes(COMP_TOURS_LABELS.門票) || category.includes('ticket')) {
           activityItems.push({
             id: `activity-${index}`,
             departure_data_id: data?.id || '',
@@ -221,7 +222,7 @@ export function useQuoteLoader(
           const baseDate = tour.departure_date || getTodayString()
           const desc = item.description?.toLowerCase() || ''
 
-          if (desc.includes('餐') || desc.includes('meal')) {
+          if (desc.includes(COMP_TOURS_LABELS.餐) || desc.includes('meal')) {
             mealItems.push({
               id: `quick-meal-${index}`,
               departure_data_id: data?.id || '',
@@ -234,7 +235,7 @@ export function useQuoteLoader(
               notes: item.notes || '',
               display_order: mealItems.length,
             })
-          } else if (desc.includes('住') || desc.includes('hotel') || desc.includes('飯店')) {
+          } else if (desc.includes(COMP_TOURS_LABELS.住) || desc.includes('hotel') || desc.includes(COMP_TOURS_LABELS.飯店)) {
             accomItems.push({
               id: `quick-accom-${index}`,
               departure_data_id: data?.id || '',
@@ -247,7 +248,7 @@ export function useQuoteLoader(
               notes: item.notes || '',
               display_order: accomItems.length,
             })
-          } else if (desc.includes('門票') || desc.includes('活動') || desc.includes('ticket')) {
+          } else if (desc.includes(COMP_TOURS_LABELS.門票) || desc.includes(COMP_TOURS_LABELS.活動) || desc.includes('ticket')) {
             activityItems.push({
               id: `quick-activity-${index}`,
               departure_data_id: data?.id || '',
@@ -287,7 +288,7 @@ export function useQuoteLoader(
         sales_person: quote?.handler_name || prev?.sales_person || '',
       }))
 
-      toast.success('已從報價單帶入資料')
+      toast.success(COMP_TOURS_LABELS.已從報價單帶入資料)
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : JSON.stringify(error)
       const errorDetails = error && typeof error === 'object' ? {
@@ -296,8 +297,8 @@ export function useQuoteLoader(
         details: (error as { details?: string }).details,
         hint: (error as { hint?: string }).hint,
       } : error
-      logger.error('從報價單載入失敗:', errorDetails, '| quoteId:', quoteId)
-      toast.error(`載入失敗: ${errorMessage || '未知錯誤'}`)
+      logger.error(COMP_TOURS_LABELS.從報價單載入失敗, errorDetails, '| quoteId:', quoteId)
+      toast.error(`載入失敗: ${errorMessage || COMP_TOURS_LABELS.未知錯誤}`)
     } finally {
       setLoading(false)
     }

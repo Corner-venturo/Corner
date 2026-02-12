@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Search, Loader2, List } from 'lucide-react'
 import type { FlightSegment } from './FlightSearchDialog'
+import { COMP_EDITOR_LABELS } from '../../../constants/labels'
 
 interface FlightSegmentCardProps {
   title: string
@@ -129,7 +130,7 @@ export function FlightSegmentCard({
             value={flightData.airline || ''}
             onChange={e => onFieldChange('airline', e.target.value)}
             className="text-xs h-8"
-            placeholder="長榮航空"
+            placeholder={COMP_EDITOR_LABELS.長榮航空}
           />
         </div>
         <div>

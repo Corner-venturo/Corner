@@ -46,6 +46,7 @@ import { toast } from 'sonner'
 import type { OrderMember } from '@/components/orders/order-member.types'
 import type { PNR, PNRSegment } from '@/types/pnr.types'
 import type { Json } from '@/lib/supabase/types'
+import { COMP_TOURS_LABELS } from './constants/labels'
 
 // 航班擴充欄位編輯狀態
 interface SegmentEditData {
@@ -177,9 +178,9 @@ export function TourPnrToolDialog({
     const now = new Date()
     const diffDays = Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
 
-    if (diffDays < 0) return { text: '已過期', color: 'text-red-600 bg-red-50', urgent: true }
-    if (diffDays === 0) return { text: '今日到期', color: 'text-red-600 bg-red-50', urgent: true }
-    if (diffDays === 1) return { text: '明日到期', color: 'text-orange-600 bg-orange-50', urgent: true }
+    if (diffDays < 0) return { text: COMP_TOURS_LABELS.已過期, color: 'text-red-600 bg-red-50', urgent: true }
+    if (diffDays === 0) return { text: COMP_TOURS_LABELS.今日到期, color: 'text-red-600 bg-red-50', urgent: true }
+    if (diffDays === 1) return { text: COMP_TOURS_LABELS.明日到期, color: 'text-orange-600 bg-orange-50', urgent: true }
     if (diffDays <= 3) return { text: `${diffDays} 天內`, color: 'text-yellow-600 bg-yellow-50', urgent: true }
     return { text: `${diffDays} 天後`, color: 'text-green-600 bg-green-50', urgent: false }
   }, [parsedPNR?.ticketingDeadline])
@@ -187,7 +188,7 @@ export function TourPnrToolDialog({
   // 解析 PNR
   const handleParse = useCallback(() => {
     if (!rawPNR.trim()) {
-      setError('請貼上 PNR 電報內容')
+      setError(COMP_TOURS_LABELS.請貼上_PNR_電報內容)
       setParsedPNR(null)
       setPassengerMatches([])
       setSegmentEdits({})
@@ -253,7 +254,7 @@ export function TourPnrToolDialog({
         setError(result.validation.errors[0])
       }
     } catch (err) {
-      setError('解析失敗：' + (err instanceof Error ? err.message : '未知錯誤'))
+      setError(COMP_TOURS_LABELS.解析失敗 + (err instanceof Error ? err.message : COMP_TOURS_LABELS.未知錯誤))
       setParsedPNR(null)
       setPassengerMatches([])
     }
@@ -268,7 +269,7 @@ export function TourPnrToolDialog({
       setParsedPNR(null)
       setPassengerMatches([])
     } catch {
-      setError('無法存取剪貼簿')
+      setError(COMP_TOURS_LABELS.無法存取剪貼簿)
     }
   }, [])
 
@@ -340,7 +341,7 @@ export function TourPnrToolDialog({
       const names = conflicts.map(m => m.memberName || m.pnrName).join('、')
       const confirmed = await confirm(
         `以下團員的 PNR 將被覆蓋：\n${names}\n\n確定要繼續嗎？`,
-        { title: 'PNR 覆蓋確認', type: 'warning' }
+        { title: COMP_TOURS_LABELS.PNR_覆蓋確認, type: 'warning' }
       )
       if (!confirmed) return
     }
@@ -473,7 +474,7 @@ export function TourPnrToolDialog({
       onSuccess?.()
       onClose()
     } catch (err) {
-      toast.error('儲存失敗：' + (err instanceof Error ? err.message : '未知錯誤'))
+      toast.error(COMP_TOURS_LABELS.儲存失敗_3 + (err instanceof Error ? err.message : COMP_TOURS_LABELS.未知錯誤))
     } finally {
       setIsSaving(false)
     }
@@ -590,7 +591,7 @@ export function TourPnrToolDialog({
               <Textarea
                 value={rawPNR}
                 onChange={(e) => setRawPNR(e.target.value)}
-                placeholder="貼上 Amadeus PNR 電報..."
+                placeholder={COMP_TOURS_LABELS.貼上_Amadeus_PNR_電報}
                 className="min-h-[100px] font-mono text-xs"
               />
             </div>
@@ -726,14 +727,14 @@ export function TourPnrToolDialog({
                       // 判斷問題狀態
                       const isProblematicStatus = ['HX', 'XX', 'UC', 'UN', 'NO'].includes(seg.status)
                       const statusLabel = {
-                        HK: '已確認',
-                        TK: '已開票',
-                        RR: '已確認',
-                        HX: '已取消',
-                        XX: '已取消',
-                        UC: '待確認',
-                        UN: '無法處理',
-                        NO: '無動作',
+                        HK: COMP_TOURS_LABELS.已確認,
+                        TK: COMP_TOURS_LABELS.已開票,
+                        RR: COMP_TOURS_LABELS.已確認,
+                        HX: COMP_TOURS_LABELS.已取消,
+                        XX: COMP_TOURS_LABELS.已取消,
+                        UC: COMP_TOURS_LABELS.待確認,
+                        UN: COMP_TOURS_LABELS.無法處理,
+                        NO: COMP_TOURS_LABELS.無動作,
                       }[seg.status] || seg.status
 
                       const editData = segmentEdits[i] || {
@@ -815,7 +816,7 @@ export function TourPnrToolDialog({
                               <Input
                                 value={editData.meal}
                                 onChange={(e) => handleSegmentEdit(i, 'meal', e.target.value)}
-                                placeholder="午餐"
+                                placeholder={COMP_TOURS_LABELS.午餐}
                                 className="w-16 h-6 text-xs px-2"
                               />
                             </div>
@@ -824,7 +825,7 @@ export function TourPnrToolDialog({
                               <Input
                                 value={editData.duration}
                                 onChange={(e) => handleSegmentEdit(i, 'duration', e.target.value)}
-                                placeholder="1小時30分"
+                                placeholder={COMP_TOURS_LABELS._1小時30分}
                                 className="w-20 h-6 text-xs px-2"
                               />
                             </div>
@@ -941,7 +942,7 @@ export function TourPnrToolDialog({
                               type="number"
                               value={match.ticketPrice || ''}
                               onChange={(e) => handlePriceChange(i, e.target.value)}
-                              placeholder="票價"
+                              placeholder={COMP_TOURS_LABELS.票價}
                               className="w-24 h-7 text-sm"
                             />
                           </td>

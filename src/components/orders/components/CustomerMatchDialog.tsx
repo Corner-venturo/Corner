@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Search, User, X } from 'lucide-react'
 import type { Customer } from '@/types/customer.types'
 import type { MatchType } from '../hooks/useCustomerMatch'
+import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 interface CustomerMatchDialogProps {
   isOpen: boolean
@@ -27,7 +28,7 @@ export function CustomerMatchDialog({
   onClose,
   onSelect,
 }: CustomerMatchDialogProps) {
-  const matchTypeLabel = matchType === 'name' ? '姓名' : '身分證號'
+  const matchTypeLabel = matchType === 'name' ? COMP_ORDERS_LABELS.姓名 : COMP_ORDERS_LABELS.身分證號
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -104,7 +105,7 @@ export function CustomerMatchDialog({
                       {customer.gender && (
                         <div>
                           <span className="text-xs text-morandi-muted">性別：</span>
-                          {customer.gender === 'M' ? '男' : customer.gender === 'F' ? '女' : customer.gender}
+                          {customer.gender === 'M' ? COMP_ORDERS_LABELS.男 : customer.gender === 'F' ? COMP_ORDERS_LABELS.女 : customer.gender}
                         </div>
                       )}
                     </div>

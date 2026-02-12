@@ -4,6 +4,7 @@ import React from 'react'
 import { Utensils } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DailyItinerary } from '../../types'
+import { COMP_EDITOR_LABELS } from '../../../constants/labels'
 
 interface MealsSectionProps {
   day: DailyItinerary
@@ -51,7 +52,7 @@ export function MealsSection({
               })
             }
             className="w-full px-2 py-1 border rounded text-sm"
-            placeholder="飯店內早餐"
+            placeholder={COMP_EDITOR_LABELS.飯店內早餐}
           />
         </div>
 
@@ -76,7 +77,7 @@ export function MealsSection({
               updateDailyItinerary(dayIndex, 'meals', { ...day.meals, lunch: e.target.value })
             }
             className="w-full px-2 py-1 border rounded text-sm"
-            placeholder="博多拉麵 (¥1000)"
+            placeholder={COMP_EDITOR_LABELS.博多拉麵_1000}
           />
         </div>
 
@@ -101,7 +102,7 @@ export function MealsSection({
               updateDailyItinerary(dayIndex, 'meals', { ...day.meals, dinner: e.target.value })
             }
             className="w-full px-2 py-1 border rounded text-sm"
-            placeholder="長腳蟹自助餐"
+            placeholder={COMP_EDITOR_LABELS.長腳蟹自助餐}
           />
         </div>
       </div>

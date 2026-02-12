@@ -4,6 +4,7 @@ import React from 'react'
 import { Input } from '@/components/ui/input'
 import { EmployeeFormData } from './types'
 import { type UserRole, ROLES } from '@/lib/rbac-config'
+import { COMP_HR_LABELS } from '../constants/labels'
 
 interface PasswordAndRoleFieldsProps {
   formData: EmployeeFormData
@@ -37,7 +38,7 @@ export function PasswordAndRoleFields({ formData, setFormData }: PasswordAndRole
           type="text"
           value={formData.defaultPassword}
           onChange={e => setFormData({ ...formData, defaultPassword: e.target.value })}
-          placeholder="請設定預設密碼"
+          placeholder={COMP_HR_LABELS.請設定預設密碼}
           required
         />
         <p className="text-xs text-morandi-muted mt-1">

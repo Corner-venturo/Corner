@@ -19,6 +19,7 @@ import { confirm } from '@/lib/ui/alert-dialog'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
 import type { OrderMember } from '@/components/orders/order-member.types'
+import { COMP_TOURS_LABELS } from '../constants/labels'
 
 type MemberBasic = Pick<OrderMember, 'id' | 'chinese_name' | 'passport_name'>
 
@@ -64,9 +65,9 @@ interface TourTableTabProps {
 }
 
 const MEAL_TYPE_LABELS: Record<string, string> = {
-  breakfast: '早餐',
-  lunch: '午餐',
-  dinner: '晚餐',
+  breakfast: COMP_TOURS_LABELS.早餐,
+  lunch: COMP_TOURS_LABELS.午餐,
+  dinner: COMP_TOURS_LABELS.晚餐,
 }
 
 // 預設桌次人數選項
@@ -94,13 +95,13 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
 
     if (effectiveSchedule.length > 0) {
       effectiveSchedule.forEach(day => {
-        if (day.meals?.breakfast && day.meals.breakfast !== '飯店內' && day.meals.breakfast !== '機上') {
+        if (day.meals?.breakfast && day.meals.breakfast !== COMP_TOURS_LABELS.飯店內 && day.meals.breakfast !== COMP_TOURS_LABELS.機上) {
           meals.push({ day_number: day.day, meal_type: 'breakfast', restaurant_name: day.meals.breakfast })
         }
-        if (day.meals?.lunch && day.meals.lunch !== '敬請自理' && day.meals.lunch !== '機上') {
+        if (day.meals?.lunch && day.meals.lunch !== COMP_TOURS_LABELS.敬請自理 && day.meals.lunch !== COMP_TOURS_LABELS.機上) {
           meals.push({ day_number: day.day, meal_type: 'lunch', restaurant_name: day.meals.lunch })
         }
-        if (day.meals?.dinner && day.meals.dinner !== '敬請自理' && day.meals.dinner !== '機上') {
+        if (day.meals?.dinner && day.meals.dinner !== COMP_TOURS_LABELS.敬請自理 && day.meals.dinner !== COMP_TOURS_LABELS.機上) {
           meals.push({ day_number: day.day, meal_type: 'dinner', restaurant_name: day.meals.dinner })
         }
       })
@@ -186,7 +187,7 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
       const enabledIds = new Set((settings || []).filter(s => s.enabled).map(s => s.id))
       setExpandedMeals(enabledIds)
     } catch (error) {
-      logger.error('載入分桌資料失敗:', error)
+      logger.error(COMP_TOURS_LABELS.載入分桌資料失敗, error)
     } finally {
       setLoading(false)
     }
@@ -212,10 +213,10 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
         }
       }
       await loadData()
-      toast.success('已從行程表同步餐食資料')
+      toast.success(COMP_TOURS_LABELS.已從行程表同步餐食資料)
     } catch (error) {
-      logger.error('同步餐食失敗:', error)
-      toast.error('同步餐食失敗')
+      logger.error(COMP_TOURS_LABELS.同步餐食失敗_2, error)
+      toast.error(COMP_TOURS_LABELS.同步餐食失敗)
     }
   }
 
@@ -237,8 +238,8 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
         setExpandedMeals(prev => new Set([...prev, settingId]))
       }
     } catch (error) {
-      logger.error('更新餐食設定失敗:', error)
-      toast.error('更新失敗')
+      logger.error(COMP_TOURS_LABELS.更新餐食設定失敗, error)
+      toast.error(COMP_TOURS_LABELS.更新失敗)
     }
   }
 
@@ -265,15 +266,15 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
       setShowAddTable(false)
       loadData()
     } catch (error) {
-      logger.error('新增桌次失敗:', error)
-      toast.error('新增桌次失敗')
+      logger.error(COMP_TOURS_LABELS.新增桌次失敗_2, error)
+      toast.error(COMP_TOURS_LABELS.新增桌次失敗)
     }
   }
 
   // 刪除桌次
   const handleDeleteTable = async (tableId: string) => {
-    const confirmed = await confirm('確定要刪除這桌嗎？', {
-      title: '刪除桌次',
+    const confirmed = await confirm(COMP_TOURS_LABELS.確定要刪除這桌嗎, {
+      title: COMP_TOURS_LABELS.刪除桌次,
       type: 'warning',
     })
     if (!confirmed) return
@@ -286,11 +287,11 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
 
       if (error) throw error
 
-      toast.success('已刪除桌次')
+      toast.success(COMP_TOURS_LABELS.已刪除桌次)
       loadData()
     } catch (error) {
-      logger.error('刪除桌次失敗:', error)
-      toast.error('刪除桌次失敗')
+      logger.error(COMP_TOURS_LABELS.刪除桌次失敗_2, error)
+      toast.error(COMP_TOURS_LABELS.刪除桌次失敗)
     }
   }
 
@@ -336,7 +337,7 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
         <div className="text-sm text-morandi-secondary">
           {enabledCount > 0
             ? `已啟用 ${enabledCount} 餐分桌，共 ${totalTables} 桌`
-            : '請勾選需要分桌的餐食'
+            : COMP_TOURS_LABELS.請勾選需要分桌的餐食
           }
         </div>
         {mealsFromSchedule.length > 0 && mealSettings.length === 0 && (

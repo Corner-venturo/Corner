@@ -9,6 +9,7 @@ import { useTourEdit } from './hooks/useTourEdit'
 import { BasicInfoSection } from './edit-dialog/BasicInfoSection'
 import { FlightInfoSection } from './edit-dialog/FlightInfoSection'
 import { ItinerarySyncDialog } from './ItinerarySyncDialog'
+import { COMP_TOURS_LABELS } from './constants/labels'
 
 interface TourEditDialogProps {
   isOpen: boolean
@@ -130,7 +131,7 @@ export function TourEditDialog({ isOpen, onClose, tour, onSuccess }: TourEditDia
               disabled={submitting || !formData.name.trim() || !formData.departure_date || !formData.return_date}
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
-              {submitting ? '儲存中...' : '儲存變更'}
+              {submitting ? COMP_TOURS_LABELS.儲存中 : COMP_TOURS_LABELS.儲存變更}
             </Button>
           </div>
         </DialogContent>

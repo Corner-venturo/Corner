@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import type { Message } from '@/stores/workspace/types'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 interface ThreadPanelProps {
   parentMessage: Message
@@ -109,7 +110,7 @@ export function ThreadPanel({
             value={messageText}
             onChange={(e) => onMessageChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="回覆討論串..."
+            placeholder={COMP_WORKSPACE_LABELS.回覆討論串_2}
             className="min-h-[60px] max-h-[120px] pr-10 resize-none"
             rows={2}
           />
@@ -177,7 +178,7 @@ function MessageItem({ message, isParent, currentUserId }: MessageItemProps) {
             'font-medium text-sm',
             isOwn ? 'text-morandi-gold' : 'text-morandi-primary'
           )}>
-            {message.author?.display_name || '未知用戶'}
+            {message.author?.display_name || COMP_WORKSPACE_LABELS.未知用戶}
           </span>
           <span className="text-xs text-morandi-secondary">
             {formatDistanceToNow(new Date(message.created_at), {

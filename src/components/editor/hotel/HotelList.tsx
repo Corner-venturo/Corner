@@ -4,6 +4,7 @@ import React from 'react'
 import { Loader2 } from 'lucide-react'
 import { HotelCard } from './HotelCard'
 import type { LuxuryHotel } from '../HotelSelector'
+import { COMP_EDITOR_LABELS } from '../constants/labels'
 
 interface HotelListProps {
   hotels: LuxuryHotel[]
@@ -34,7 +35,7 @@ export function HotelList({
   if (hotels.length === 0) {
     return (
       <div className="h-full flex items-center justify-center text-morandi-secondary">
-        {!selectedCountryId ? '請先選擇國家' : searchQuery ? '找不到符合的飯店' : '沒有可選擇的飯店'}
+        {!selectedCountryId ? COMP_EDITOR_LABELS.請先選擇國家 : searchQuery ? COMP_EDITOR_LABELS.找不到符合的飯店 : COMP_EDITOR_LABELS.沒有可選擇的飯店}
       </div>
     )
   }

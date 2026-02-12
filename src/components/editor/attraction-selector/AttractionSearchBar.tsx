@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Search, PenLine, Plus } from 'lucide-react'
 import type { Country as FullCountry, City as FullCity } from '@/stores/region-store'
+import { COMP_EDITOR_LABELS } from '../constants/labels'
 
 // 此元件只需要 id 和 name
 type City = Pick<FullCity, 'id' | 'name'>
@@ -49,7 +50,7 @@ export function AttractionSearchBar({
         {/* 國家選擇 */}
         <Select value={selectedCountryId || '__all__'} onValueChange={onCountryChange}>
           <SelectTrigger className="h-9 px-3 border-morandi-container rounded-lg text-sm bg-card min-w-[120px]">
-            <SelectValue placeholder="全部國家" />
+            <SelectValue placeholder={COMP_EDITOR_LABELS.全部國家} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__all__">全部國家</SelectItem>
@@ -65,7 +66,7 @@ export function AttractionSearchBar({
         {selectedCountryId && cities.length > 0 && (
           <Select value={selectedCityId || '__all__'} onValueChange={onCityChange}>
             <SelectTrigger className="h-9 px-3 border-morandi-container rounded-lg text-sm bg-card min-w-[120px]">
-              <SelectValue placeholder="全部城市" />
+              <SelectValue placeholder={COMP_EDITOR_LABELS.全部城市} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="__all__">全部城市</SelectItem>
@@ -100,7 +101,7 @@ export function AttractionSearchBar({
         <Input
           value={searchQuery}
           onChange={e => onSearchChange(e.target.value)}
-          placeholder="搜尋景點名稱..."
+          placeholder={COMP_EDITOR_LABELS.搜尋景點名稱}
           className="pl-9 h-9 rounded-lg border-morandi-container"
         />
       </div>
@@ -111,7 +112,7 @@ export function AttractionSearchBar({
           <Input
             value={manualAttractionName}
             onChange={e => onManualAttractionChange(e.target.value)}
-            placeholder="輸入景點名稱..."
+            placeholder={COMP_EDITOR_LABELS.輸入景點名稱}
             className="flex-1 h-8 rounded-md text-sm"
             onKeyDown={e => {
               if (e.key === 'Enter') {

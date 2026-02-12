@@ -25,6 +25,7 @@ import { Activity, DailyItinerary } from '../../types'
 import { SortableActivityItem } from './SortableActivityItem'
 import { SortableActivityGridItem } from './SortableActivityGridItem'
 import { logger } from '@/lib/utils/logger'
+import { COMP_EDITOR_LABELS } from '../../../constants/labels'
 
 interface ActivitiesSectionProps {
   day: DailyItinerary
@@ -103,8 +104,8 @@ export function ActivitiesSection({
         toast.success(`已將「${activity.title}」存到景點資料庫`)
       }
     } catch (error) {
-      logger.error('儲存景點失敗:', error)
-      toast.error('儲存失敗，請稍後再試')
+      logger.error(COMP_EDITOR_LABELS.儲存景點失敗, error)
+      toast.error(COMP_EDITOR_LABELS.儲存失敗_請稍後再試)
     }
   }
 
@@ -143,7 +144,7 @@ export function ActivitiesSection({
                   ? 'bg-card shadow-sm text-morandi-primary'
                   : 'text-morandi-secondary hover:text-morandi-primary'
               }`}
-              title="列表模式"
+              title={COMP_EDITOR_LABELS.列表模式}
             >
               <List size={14} />
             </button>
@@ -155,13 +156,13 @@ export function ActivitiesSection({
                   ? 'bg-card shadow-sm text-morandi-primary'
                   : 'text-morandi-secondary hover:text-morandi-primary'
               }`}
-              title="網格預覽（快速排序）"
+              title={COMP_EDITOR_LABELS.網格預覽_快速排序}
             >
               <LayoutGrid size={14} />
             </button>
           </div>
           <span className="text-xs text-morandi-secondary">
-            {viewMode === 'grid' ? '（拖曳調整順序）' : '（拖曳 ⋮⋮ 可調整順序）'}
+            {viewMode === 'grid' ? COMP_EDITOR_LABELS.拖曳調整順序 : COMP_EDITOR_LABELS.拖曳_可調整順序}
           </span>
         </div>
         <div className="flex gap-2">

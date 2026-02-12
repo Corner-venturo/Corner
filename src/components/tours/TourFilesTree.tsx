@@ -15,6 +15,7 @@ import { logger } from '@/lib/utils/logger'
 import { toast } from 'sonner'
 import { TreeView, type TreeItem } from '@/components/files'
 import { useRouter } from 'next/navigation'
+import { COMP_TOURS_LABELS } from './constants/labels'
 
 interface TourFilesTreeProps {
   tourId: string
@@ -28,18 +29,18 @@ type FileCategory = 'quote' | 'itinerary' | 'confirmation' | 'request' | 'passpo
 
 // 預設的團資料夾結構
 const DEFAULT_FOLDERS = [
-  { id: 'quote', name: '團體報價單', icon: '📋', dbType: 'quote' as const },
-  { id: 'quick_quote', name: '快速報價', icon: '💰', dbType: 'quick_quote' as const },
-  { id: 'itinerary', name: '行程表', icon: '🗺️', dbType: 'itinerary' as const },
-  { id: 'confirmation', name: '確認單', icon: '✅', dbType: 'confirmation' as const },
+  { id: 'quote', name: COMP_TOURS_LABELS.團體報價單, icon: '📋', dbType: 'quote' as const },
+  { id: 'quick_quote', name: COMP_TOURS_LABELS.快速報價, icon: '💰', dbType: 'quick_quote' as const },
+  { id: 'itinerary', name: COMP_TOURS_LABELS.行程表, icon: '🗺️', dbType: 'itinerary' as const },
+  { id: 'confirmation', name: COMP_TOURS_LABELS.確認單, icon: '✅', dbType: 'confirmation' as const },
   // TODO: contract 暫時移除，等 contracts 表建立後再啟用
-  { id: 'request', name: '需求單', icon: '📨', dbType: 'request' as const },
-  { id: 'passport', name: '護照', icon: '🛂', category: 'passport' as FileCategory },
-  { id: 'visa', name: '簽證', icon: '📄', category: 'visa' as FileCategory },
-  { id: 'ticket', name: '機票', icon: '✈️', category: 'ticket' as FileCategory },
-  { id: 'voucher', name: '住宿憑證', icon: '🏨', category: 'voucher' as FileCategory },
-  { id: 'insurance', name: '保險', icon: '🛡️', category: 'insurance' as FileCategory },
-  { id: 'other', name: '其他', icon: '📁', category: 'other' as FileCategory },
+  { id: 'request', name: COMP_TOURS_LABELS.需求單, icon: '📨', dbType: 'request' as const },
+  { id: 'passport', name: COMP_TOURS_LABELS.護照, icon: '🛂', category: 'passport' as FileCategory },
+  { id: 'visa', name: COMP_TOURS_LABELS.簽證, icon: '📄', category: 'visa' as FileCategory },
+  { id: 'ticket', name: COMP_TOURS_LABELS.機票, icon: '✈️', category: 'ticket' as FileCategory },
+  { id: 'voucher', name: COMP_TOURS_LABELS.住宿憑證, icon: '🏨', category: 'voucher' as FileCategory },
+  { id: 'insurance', name: COMP_TOURS_LABELS.保險, icon: '🛡️', category: 'insurance' as FileCategory },
+  { id: 'other', name: COMP_TOURS_LABELS.其他, icon: '📁', category: 'other' as FileCategory },
 ]
 
 export function TourFilesTree({ tourId, tourCode, quoteId, itineraryId }: TourFilesTreeProps) {
@@ -113,8 +114,8 @@ export function TourFilesTree({ tourId, tourCode, quoteId, itineraryId }: TourFi
 
       setItems(folderItems)
     } catch (err) {
-      logger.error('載入資料夾失敗', err)
-      toast.error('載入失敗')
+      logger.error(COMP_TOURS_LABELS.載入資料夾失敗, err)
+      toast.error(COMP_TOURS_LABELS.載入失敗)
     } finally {
       setLoading(false)
     }
@@ -139,7 +140,7 @@ export function TourFilesTree({ tourId, tourCode, quoteId, itineraryId }: TourFi
           for (const q of data) {
             children.push({
               id: q.id,
-              name: q.name || q.code || '未命名報價單',
+              name: q.name || q.code || COMP_TOURS_LABELS.未命名報價單,
               type: 'file',
               icon: '📋',
               data: { dbType: 'quote', dbId: q.id },
@@ -157,7 +158,7 @@ export function TourFilesTree({ tourId, tourCode, quoteId, itineraryId }: TourFi
           for (const q of data) {
             children.push({
               id: q.id,
-              name: q.name || q.code || '未命名快速報價',
+              name: q.name || q.code || COMP_TOURS_LABELS.未命名快速報價,
               type: 'file',
               icon: '💰',
               data: { dbType: 'quick_quote', dbId: q.id },
@@ -175,7 +176,7 @@ export function TourFilesTree({ tourId, tourCode, quoteId, itineraryId }: TourFi
           for (const i of data) {
             children.push({
               id: i.id,
-              name: i.title || i.code || '未命名行程表',
+              name: i.title || i.code || COMP_TOURS_LABELS.未命名行程表,
               type: 'file',
               icon: '🗺️',
               data: { dbType: 'itinerary', dbId: i.id },
@@ -210,7 +211,7 @@ export function TourFilesTree({ tourId, tourCode, quoteId, itineraryId }: TourFi
           for (const r of data) {
             children.push({
               id: r.id,
-              name: `${r.request_type || '需求'} - ${r.supplier_name || r.code}`,
+              name: `${r.request_type || COMP_TOURS_LABELS.需求} - ${r.supplier_name || r.code}`,
               type: 'file',
               icon: '📨',
               data: { dbType: 'request', dbId: r.id },
@@ -236,7 +237,7 @@ export function TourFilesTree({ tourId, tourCode, quoteId, itineraryId }: TourFi
         }
       }
     } catch (err) {
-      logger.error('載入子項目失敗', err)
+      logger.error(COMP_TOURS_LABELS.載入子項目失敗, err)
     }
 
     return children
@@ -262,12 +263,12 @@ export function TourFilesTree({ tourId, tourCode, quoteId, itineraryId }: TourFi
           router.push(`/tours/${tourCode}/confirmation`)
           break
         case 'request':
-          toast.info('需求單功能開發中')
+          toast.info(COMP_TOURS_LABELS.需求單功能開發中)
           break
       }
     } else if (item.data?.fileId) {
       // 實體檔案 - 下載或預覽
-      toast.info('檔案預覽功能開發中')
+      toast.info(COMP_TOURS_LABELS.檔案預覽功能開發中)
     }
   }, [router, tourCode])
 

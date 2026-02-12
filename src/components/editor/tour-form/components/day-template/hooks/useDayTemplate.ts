@@ -5,6 +5,7 @@ import { DailyItinerary, Activity, DayDisplayStyle } from '../../../types'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
+import { COMP_EDITOR_LABELS } from '../../../../constants/labels'
 
 interface UseDayTemplateProps {
   dayData: DailyItinerary
@@ -48,7 +49,7 @@ export function useDayTemplate({ dayData, style }: UseDayTemplateProps) {
   // 處理圖片上傳
   const handleImageUpload = async (file: File, target: { type: 'activity' | 'day'; index?: number }) => {
     if (!file.type.startsWith('image/')) {
-      toast.error('請選擇圖片檔案')
+      toast.error(COMP_EDITOR_LABELS.請選擇圖片檔案)
       return
     }
 
@@ -74,10 +75,10 @@ export function useDayTemplate({ dayData, style }: UseDayTemplateProps) {
         updateActivity(target.index, 'image', urlData.publicUrl)
       }
 
-      toast.success('圖片上傳成功')
+      toast.success(COMP_EDITOR_LABELS.圖片上傳成功)
     } catch (error) {
-      logger.error('上傳失敗:', error)
-      toast.error('圖片上傳失敗')
+      logger.error(COMP_EDITOR_LABELS.上傳失敗, error)
+      toast.error(COMP_EDITOR_LABELS.圖片上傳失敗)
     } finally {
       setUploading(null)
       setUploadTarget(null)

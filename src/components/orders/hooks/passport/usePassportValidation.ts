@@ -13,6 +13,7 @@ import { supabase } from '@/lib/supabase/client'
 import { createCustomer, invalidateCustomers } from '@/data'
 import { logger } from '@/lib/utils/logger'
 import { syncPassportImageToMembers } from '@/lib/utils/sync-passport-image'
+import { COMP_ORDERS_LABELS } from '../../constants/labels'
 
 interface CustomerData {
   name?: string
@@ -91,7 +92,7 @@ export function usePassportValidation(): UsePassportValidationReturn {
         })
 
       if (uploadError) {
-        logger.error('上傳護照照片失敗:', uploadError, { fileName, workspaceId, orderId, index })
+        logger.error(COMP_ORDERS_LABELS.上傳護照照片失敗, uploadError, { fileName, workspaceId, orderId, index })
         return null
       }
 
@@ -105,7 +106,7 @@ export function usePassportValidation(): UsePassportValidationReturn {
       }
       return publicUrl
     } catch (error) {
-      logger.error('上傳護照照片異常:', error)
+      logger.error(COMP_ORDERS_LABELS.上傳護照照片異常, error)
       return null
     }
   }, [])
@@ -140,8 +141,8 @@ export function usePassportValidation(): UsePassportValidationReturn {
         passport_expiry: customerData.passport_expiry || null,
         birth_date: birthDate,
         id_number: idNumber,
-        gender: customerData.sex === '男' ? 'M' : customerData.sex === '女' ? 'F' : null,
-        identity: '大人',
+        gender: customerData.sex === COMP_ORDERS_LABELS.男 ? 'M' : customerData.sex === COMP_ORDERS_LABELS.女 ? 'F' : null,
+        identity: COMP_ORDERS_LABELS.大人,
         member_type: 'adult',
         passport_image_url: passportImageUrl,
       }
@@ -216,7 +217,7 @@ export function usePassportValidation(): UsePassportValidationReturn {
             passport_image_url: passportImageUrl || null,
             national_id: idNumber || null,
             birth_date: birthDate || null,
-            gender: customerData.sex === '男' ? 'M' : customerData.sex === '女' ? 'F' : null,
+            gender: customerData.sex === COMP_ORDERS_LABELS.男 ? 'M' : customerData.sex === COMP_ORDERS_LABELS.女 ? 'F' : null,
             phone: '',
             member_type: 'potential', // 護照建立的客戶預設為潛在客戶
             is_vip: false,
@@ -243,10 +244,10 @@ export function usePassportValidation(): UsePassportValidationReturn {
         newCustomer,
       }
     } catch (error) {
-      logger.error('建立成員失敗:', error)
+      logger.error(COMP_ORDERS_LABELS.建立成員失敗, error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : '未知錯誤',
+        error: error instanceof Error ? error.message : COMP_ORDERS_LABELS.未知錯誤,
       }
     }
   }, [uploadPassportImage])
@@ -278,7 +279,7 @@ export function usePassportValidation(): UsePassportValidationReturn {
         passport_expiry: customerData.passport_expiry || null,
         birth_date: birthDate,
         id_number: idNumber,
-        gender: customerData.sex === '男' ? 'M' : customerData.sex === '女' ? 'F' : null,
+        gender: customerData.sex === COMP_ORDERS_LABELS.男 ? 'M' : customerData.sex === COMP_ORDERS_LABELS.女 ? 'F' : null,
         passport_image_url: passportImageUrl,
       }
 
@@ -308,10 +309,10 @@ export function usePassportValidation(): UsePassportValidationReturn {
         memberId,
       }
     } catch (error) {
-      logger.error('更新成員失敗:', error)
+      logger.error(COMP_ORDERS_LABELS.更新成員失敗, error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : '未知錯誤',
+        error: error instanceof Error ? error.message : COMP_ORDERS_LABELS.未知錯誤,
       }
     }
   }, [uploadPassportImage])

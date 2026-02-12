@@ -3,6 +3,7 @@
 import React from 'react'
 import { Building2 } from 'lucide-react'
 import { EditableText } from './EditableText'
+import { COMP_EDITOR_LABELS } from '../../../constants/labels'
 
 interface AccommodationSectionProps {
   accommodation?: string
@@ -32,7 +33,7 @@ export function AccommodationSection({
           setEditingField={setEditingField}
           onChange={onUpdateAccommodation}
           className="text-sm text-morandi-primary"
-          placeholder="住宿飯店"
+          placeholder={COMP_EDITOR_LABELS.住宿飯店}
         />
       </div>
     )
@@ -49,7 +50,7 @@ export function AccommodationSection({
           setEditingField={setEditingField}
           onChange={onUpdateAccommodation}
           className="text-morandi-primary"
-          placeholder="住宿"
+          placeholder={COMP_EDITOR_LABELS.住宿}
         />
       </div>
     )
@@ -66,7 +67,7 @@ export function AccommodationSection({
         setEditingField={setEditingField}
         onChange={onUpdateAccommodation}
         className="inline text-morandi-primary"
-        placeholder="住宿"
+        placeholder={COMP_EDITOR_LABELS.住宿}
       />
     </div>
   )

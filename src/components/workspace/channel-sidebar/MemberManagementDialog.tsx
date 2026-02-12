@@ -11,6 +11,7 @@ import {
 import { X, Trash2 } from 'lucide-react'
 import type { ChannelMember } from '@/services/workspace-members'
 import type { Channel, ChannelGroup } from '@/stores/workspace-store'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 interface MemberManagementDialogProps {
   memberToRemove: ChannelMember | null
@@ -42,7 +43,7 @@ export function MemberManagementDialog({
         </DialogHeader>
         <p className="text-sm text-morandi-secondary">
           確定要將「
-          {memberToRemove?.profile?.displayName || memberToRemove?.profile?.englishName || '此成員'}
+          {memberToRemove?.profile?.displayName || memberToRemove?.profile?.englishName || COMP_WORKSPACE_LABELS.此成員}
           」移出頻道嗎？
         </p>
         <DialogFooter className="mt-4">
@@ -52,7 +53,7 @@ export function MemberManagementDialog({
           </Button>
           <Button variant="destructive" onClick={onRemove} disabled={isRemovingMember} className="gap-2">
             <Trash2 size={16} />
-            {isRemovingMember ? '移除中...' : '移除'}
+            {isRemovingMember ? COMP_WORKSPACE_LABELS.移除中 : COMP_WORKSPACE_LABELS.移除}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -106,7 +107,7 @@ export function ChannelDeleteDialog({
             onClick={onDelete}
             disabled={isDeletingChannel}
           >
-            {isDeletingChannel ? '刪除中...' : '刪除'}
+            {isDeletingChannel ? COMP_WORKSPACE_LABELS.刪除中 : COMP_WORKSPACE_LABELS.刪除}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -175,7 +176,7 @@ export function GroupDeleteDialog({
             onClick={handleDelete}
             disabled={isDeletingGroup}
           >
-            {isDeletingGroup ? '刪除中...' : '刪除'}
+            {isDeletingGroup ? COMP_WORKSPACE_LABELS.刪除中 : COMP_WORKSPACE_LABELS.刪除}
           </Button>
         </DialogFooter>
       </DialogContent>

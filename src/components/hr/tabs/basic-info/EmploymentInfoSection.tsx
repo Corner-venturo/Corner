@@ -6,6 +6,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { DateCell } from '@/components/table-cells'
 import { Employee } from '@/stores/types'
 import { BasicInfoFormData } from './types'
+import { COMP_HR_LABELS } from '../../constants/labels'
 
 interface EmploymentInfoSectionProps {
   employee: Employee
@@ -36,10 +37,10 @@ export function EmploymentInfoSection({
                   job_info: { ...formData.job_info, position: e.target.value },
                 })
               }
-              placeholder="輸入職位..."
+              placeholder={COMP_HR_LABELS.輸入職位}
             />
           ) : (
-            <p className="text-morandi-primary py-2">{employee.job_info?.position || '未設定'}</p>
+            <p className="text-morandi-primary py-2">{employee.job_info?.position || COMP_HR_LABELS.未設定}</p>
           )}
         </div>
 
@@ -54,7 +55,7 @@ export function EmploymentInfoSection({
                   job_info: { ...formData.job_info, hire_date: date },
                 })
               }
-              placeholder="選擇日期"
+              placeholder={COMP_HR_LABELS.選擇日期}
             />
           ) : (
             <div className="py-2">

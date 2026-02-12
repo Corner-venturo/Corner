@@ -32,6 +32,7 @@ import { ImagePositionEditor } from '@/components/ui/image-position-editor'
 import { calculateDayLabels } from './daily-itinerary'
 import { DayList } from './daily-itinerary/DayList'
 import { useDailyItinerary } from './daily-itinerary/hooks/useDailyItinerary'
+import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
 interface DailyItinerarySectionProps {
   data: TourFormData
@@ -256,7 +257,7 @@ export function DailyItinerarySection({
               <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-morandi-container">
                 <img
                   src={saveToLibraryDialog.publicUrl}
-                  alt="預覽"
+                  alt={COMP_EDITOR_LABELS.預覽}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -268,7 +269,7 @@ export function DailyItinerarySection({
               <Input
                 value={libraryImageName}
                 onChange={(e) => setLibraryImageName(e.target.value)}
-                placeholder="輸入圖片名稱..."
+                placeholder={COMP_EDITOR_LABELS.輸入圖片名稱}
               />
             </div>
           </div>
@@ -296,7 +297,7 @@ export function DailyItinerarySection({
                   儲存中...
                 </>
               ) : (
-                '儲存到圖庫'
+                COMP_EDITOR_LABELS.儲存到圖庫
               )}
             </Button>
           </DialogFooter>
@@ -318,7 +319,7 @@ export function DailyItinerarySection({
               updateActivity(activityPositionEditor.dayIndex, activityPositionEditor.actIndex, 'imagePosition', JSON.stringify(settings))
             }}
             aspectRatio={16 / 9}
-            title="調整景點圖片"
+            title={COMP_EDITOR_LABELS.調整景點圖片}
           />
         )
       })()}

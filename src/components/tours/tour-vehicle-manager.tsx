@@ -21,6 +21,7 @@ import type { TourVehicleStatus } from '@/types/room-vehicle.types'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
 import type { OrderMember } from '@/components/orders/order-member.types'
+import { COMP_TOURS_LABELS } from './constants/labels'
 
 // 此元件只需要 OrderMember 的部分欄位
 type MemberBasic = Pick<OrderMember, 'id' | 'chinese_name' | 'passport_name'>
@@ -64,7 +65,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
       if (error) throw error
       setVehicles((data || []) as TourVehicleStatus[])
     } catch (error) {
-      logger.error('載入車輛失敗:', error)
+      logger.error(COMP_TOURS_LABELS.載入車輛失敗, error)
     } finally {
       setLoading(false)
     }
@@ -72,7 +73,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
 
   const handleAddVehicle = async () => {
     if (!newVehicle.vehicle_name.trim()) {
-      toast.error('請輸入車輛名稱')
+      toast.error(COMP_TOURS_LABELS.請輸入車輛名稱)
       return
     }
 
@@ -91,7 +92,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
 
       if (error) throw error
 
-      toast.success('車輛已新增')
+      toast.success(COMP_TOURS_LABELS.車輛已新增)
       setShowAddVehicle(false)
       setNewVehicle({
         vehicle_name: '',
@@ -103,14 +104,14 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
       })
       loadVehicles()
     } catch (error) {
-      logger.error('新增車輛失敗:', error)
-      toast.error('新增車輛失敗')
+      logger.error(COMP_TOURS_LABELS.新增車輛失敗_2, error)
+      toast.error(COMP_TOURS_LABELS.新增車輛失敗)
     }
   }
 
   const handleDeleteVehicle = async (vehicleId: string) => {
-    const confirmed = await confirm('確定要刪除這輛車嗎？', {
-      title: '刪除車輛',
+    const confirmed = await confirm(COMP_TOURS_LABELS.確定要刪除這輛車嗎, {
+      title: COMP_TOURS_LABELS.刪除車輛,
       type: 'warning',
     })
     if (!confirmed) return
@@ -123,11 +124,11 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
 
       if (error) throw error
 
-      toast.success('車輛已刪除')
+      toast.success(COMP_TOURS_LABELS.車輛已刪除)
       loadVehicles()
     } catch (error) {
-      logger.error('刪除車輛失敗:', error)
-      toast.error('刪除車輛失敗')
+      logger.error(COMP_TOURS_LABELS.刪除車輛失敗_2, error)
+      toast.error(COMP_TOURS_LABELS.刪除車輛失敗)
     }
   }
 
@@ -275,7 +276,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
               <Input
                 value={newVehicle.vehicle_name}
                 onChange={e => setNewVehicle({ ...newVehicle, vehicle_name: e.target.value })}
-                placeholder="例如：1號車、A車"
+                placeholder={COMP_TOURS_LABELS.例如_1號車_A車}
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -318,7 +319,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
                 <Input
                   value={newVehicle.driver_name}
                   onChange={e => setNewVehicle({ ...newVehicle, driver_name: e.target.value })}
-                  placeholder="選填"
+                  placeholder={COMP_TOURS_LABELS.選填}
                 />
               </div>
               <div className="space-y-1.5">
@@ -326,7 +327,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
                 <Input
                   value={newVehicle.driver_phone}
                   onChange={e => setNewVehicle({ ...newVehicle, driver_phone: e.target.value })}
-                  placeholder="選填"
+                  placeholder={COMP_TOURS_LABELS.選填}
                 />
               </div>
             </div>
@@ -335,7 +336,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
               <Input
                 value={newVehicle.license_plate}
                 onChange={e => setNewVehicle({ ...newVehicle, license_plate: e.target.value })}
-                placeholder="選填"
+                placeholder={COMP_TOURS_LABELS.選填}
               />
             </div>
             <div className="flex justify-end gap-2 pt-3 border-t border-border">

@@ -3,6 +3,7 @@
 import { forwardRef } from 'react'
 import { Receipt, DollarSign, Wallet, CheckSquare, Paperclip, Luggage, Plane, ListTodo, Ticket, Calendar, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 export interface QuickAction {
   id: string
@@ -78,63 +79,63 @@ export const createQuickActions = (handlers: {
   {
     id: 'share-order',
     icon: Receipt,
-    label: '分享待收款',
+    label: COMP_WORKSPACE_LABELS.分享待收款,
     color: 'text-morandi-primary',
     action: handlers.onShareOrders,
   },
   {
     id: 'share-quote',
     icon: Receipt,
-    label: '分享報價單',
+    label: COMP_WORKSPACE_LABELS.分享報價單,
     color: 'text-morandi-primary',
     action: handlers.onShareQuote,
   },
   {
     id: 'new-payment',
     icon: DollarSign,
-    label: '新增請款單',
+    label: COMP_WORKSPACE_LABELS.新增請款單,
     color: 'text-morandi-gold',
     action: handlers.onNewPayment,
   },
   {
     id: 'new-receipt',
     icon: DollarSign,
-    label: '新增收款單',
+    label: COMP_WORKSPACE_LABELS.新增收款單,
     color: 'text-morandi-gold',
     action: handlers.onNewReceipt,
   },
   {
     id: 'share-advance',
     icon: Wallet,
-    label: '分享代墊清單',
+    label: COMP_WORKSPACE_LABELS.分享代墊清單,
     color: 'text-morandi-secondary',
     action: handlers.onShareAdvance,
   },
   {
     id: 'new-task',
     icon: CheckSquare,
-    label: '新增任務',
+    label: COMP_WORKSPACE_LABELS.新增任務,
     color: 'text-morandi-gold',
     action: handlers.onNewTask,
   },
   {
     id: 'upload-file',
     icon: Paperclip,
-    label: '上傳檔案',
+    label: COMP_WORKSPACE_LABELS.上傳檔案,
     color: 'text-morandi-secondary',
     action: handlers.onUploadFile,
   },
   ...(handlers.onTicketStatus ? [{
     id: 'ticket-status',
     icon: Plane,
-    label: '開票狀態',
+    label: COMP_WORKSPACE_LABELS.開票狀態,
     color: 'text-morandi-gold',
     action: handlers.onTicketStatus,
   }] : []),
   ...(handlers.onBaggageInfo ? [{
     id: 'baggage-info',
     icon: Luggage,
-    label: '行李資訊',
+    label: COMP_WORKSPACE_LABELS.行李資訊,
     color: 'text-morandi-secondary',
     action: handlers.onBaggageInfo,
   }] : []),
@@ -151,14 +152,14 @@ export const createBotQuickActions = (handlers: {
   {
     id: 'check-ticket-status',
     icon: Ticket,
-    label: '確認機票狀況',
+    label: COMP_WORKSPACE_LABELS.確認機票狀況,
     color: 'text-morandi-gold',
     action: handlers.onCheckTicketStatus,
   },
   {
     id: 'tour-review',
     icon: Calendar,
-    label: '復盤',
+    label: COMP_WORKSPACE_LABELS.復盤,
     color: 'text-morandi-primary',
     action: handlers.onTourReview,
   },

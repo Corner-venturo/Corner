@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CurrencyCell } from '@/components/table-cells'
+import { COMP_TOURS_LABELS } from './constants/labels'
 
 interface TourOverviewProps {
   tour: Tour
@@ -48,13 +49,13 @@ export const TourOverview = React.memo(function TourOverview({
   }> = order
     ? [
         {
-          title: '訂單金額',
+          title: COMP_TOURS_LABELS.訂單金額,
           amount: order.total_amount ?? 0,
           icon: DollarSign,
           color: 'text-morandi-gold',
         },
         {
-          title: '付款狀態',
+          title: COMP_TOURS_LABELS.付款狀態,
           value: order.payment_status || '-',
           icon: order.payment_status === 'paid' ? CheckCircle : AlertCircle,
           color:
@@ -65,25 +66,25 @@ export const TourOverview = React.memo(function TourOverview({
                 : 'text-morandi-red',
         },
         {
-          title: '已付金額',
+          title: COMP_TOURS_LABELS.已付金額,
           amount: order.paid_amount ?? 0,
           icon: TrendingUp,
           color: 'text-morandi-green',
         },
         {
-          title: '未付金額',
+          title: COMP_TOURS_LABELS.未付金額,
           amount: order.remaining_amount ?? 0,
           icon: TrendingUp,
           color: 'text-morandi-red',
         },
         {
-          title: '訂單人數',
+          title: COMP_TOURS_LABELS.訂單人數,
           value: `${order.member_count ?? 0} 人`,
           icon: Users,
           color: 'text-morandi-gold',
         },
         {
-          title: '聯絡人',
+          title: COMP_TOURS_LABELS.聯絡人,
           value: order.contact_person || '-',
           icon: Users,
           color: 'text-morandi-primary',
@@ -91,37 +92,37 @@ export const TourOverview = React.memo(function TourOverview({
       ]
     : [
         {
-          title: '報價單價格',
+          title: COMP_TOURS_LABELS.報價單價格,
           amount: tour.price ?? 0,
           icon: DollarSign,
           color: 'text-morandi-gold',
         },
         {
-          title: '合約狀態',
-          value: tour.contract_status || '未簽約',
+          title: COMP_TOURS_LABELS.合約狀態,
+          value: tour.contract_status || COMP_TOURS_LABELS.未簽約,
           icon: tour.contract_status === 'signed' ? CheckCircle : AlertCircle,
           color: tour.contract_status === 'signed' ? 'text-morandi-green' : 'text-morandi-red',
         },
         {
-          title: '總收入',
+          title: COMP_TOURS_LABELS.總收入,
           amount: tour.total_revenue ?? 0,
           icon: TrendingUp,
           color: 'text-morandi-green',
         },
         {
-          title: '總支出',
+          title: COMP_TOURS_LABELS.總支出,
           amount: tour.total_cost ?? 0,
           icon: TrendingUp,
           color: 'text-morandi-red',
         },
         {
-          title: '淨利潤',
+          title: COMP_TOURS_LABELS.淨利潤,
           amount: tour.profit ?? 0,
           icon: TrendingUp,
           color: (tour.profit ?? 0) >= 0 ? 'text-morandi-green' : 'text-morandi-red',
         },
         {
-          title: '總訂單數',
+          title: COMP_TOURS_LABELS.總訂單數,
           value: `${orders.filter(o => o.tour_id === tour.id).length} 筆`,
           icon: FileText,
           color: 'text-morandi-gold',

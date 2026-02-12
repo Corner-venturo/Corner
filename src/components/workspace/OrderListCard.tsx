@@ -7,6 +7,7 @@ import { CurrencyCell } from '@/components/table-cells'
 
 // 使用統一的型別定義
 import type { SharedOrderList } from '@/stores/workspace/types'
+import { COMP_WORKSPACE_LABELS } from './constants/labels'
 
 interface OrderListCardProps {
   orderList: SharedOrderList
@@ -18,7 +19,7 @@ interface OrderListCardProps {
 
 export function OrderListCard({
   orderList,
-  userName = '會計',
+  userName = COMP_WORKSPACE_LABELS.會計,
   onCreateReceipt,
   userRole = 'member',
 }: OrderListCardProps) {
@@ -33,19 +34,19 @@ export function OrderListCard({
 
     if (isFullyUnpaid) {
       return {
-        text: '❌❌ 未請款/未收款',
+        text: COMP_WORKSPACE_LABELS.未請款_未收款,
         color: 'text-status-danger',
         bgColor: 'bg-status-danger-bg',
       }
     } else if (isLowRate) {
       return {
-        text: '✅❌ 已請款/未收款',
+        text: COMP_WORKSPACE_LABELS.已請款_未收款,
         color: 'text-status-warning',
         bgColor: 'bg-status-warning-bg',
       }
     } else {
       return {
-        text: '部分收款',
+        text: COMP_WORKSPACE_LABELS.部分收款,
         color: 'text-status-warning',
         bgColor: 'bg-status-warning-bg',
       }
@@ -80,7 +81,7 @@ export function OrderListCard({
                   📋 待處理訂單 ({orderList.orders.length}筆 / <CurrencyCell amount={totalGap} className="inline" />)
                 </div>
                 <div className="text-xs text-morandi-secondary mt-1">
-                  {isExpanded ? '點擊收合詳情' : '點擊展開詳情'}
+                  {isExpanded ? COMP_WORKSPACE_LABELS.點擊收合詳情 : COMP_WORKSPACE_LABELS.點擊展開詳情}
                 </div>
               </div>
             </div>

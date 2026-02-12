@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Plus, Trash2, Users, GripVertical, Download } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { TierPricing } from '@/stores/types/quote.types'
+import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
 interface PriceTiersSectionProps {
   data: TourFormData
@@ -34,9 +35,9 @@ const parsePrice = (value: string): string => {
 const convertFromQuoteTierPricings = (tierPricings: TierPricing[]): PriceTier[] => {
   return tierPricings.map((tier) => ({
     label: `${tier.participant_count}人成團`,
-    sublabel: '每人',
+    sublabel: COMP_EDITOR_LABELS.每人,
     price: formatPrice(String(tier.selling_prices?.adult || 0)),
-    priceNote: '起',
+    priceNote: COMP_EDITOR_LABELS.起,
     addon: '',
   }))
 }
@@ -44,25 +45,25 @@ const convertFromQuoteTierPricings = (tierPricings: TierPricing[]): PriceTier[] 
 // 預設價格方案
 const getDefaultPriceTiers = (): PriceTier[] => [
   {
-    label: '4人包團',
-    sublabel: '每人',
+    label: COMP_EDITOR_LABELS._4人包團,
+    sublabel: COMP_EDITOR_LABELS.每人,
     price: '',
-    priceNote: '起',
-    addon: '加購1日包車 / 每人+NT$900',
+    priceNote: COMP_EDITOR_LABELS.起,
+    addon: COMP_EDITOR_LABELS.加購1日包車_每人_NT_900,
   },
   {
-    label: '6人包團',
-    sublabel: '每人',
+    label: COMP_EDITOR_LABELS._6人包團,
+    sublabel: COMP_EDITOR_LABELS.每人,
     price: '',
-    priceNote: '起',
-    addon: '加購1日包車 / 每人+NT$800',
+    priceNote: COMP_EDITOR_LABELS.起,
+    addon: COMP_EDITOR_LABELS.加購1日包車_每人_NT_800,
   },
   {
-    label: '8人包團',
-    sublabel: '每人',
+    label: COMP_EDITOR_LABELS._8人包團,
+    sublabel: COMP_EDITOR_LABELS.每人,
     price: '',
-    priceNote: '起',
-    addon: '加購1日包車 / 每人+NT$600',
+    priceNote: COMP_EDITOR_LABELS.起,
+    addon: COMP_EDITOR_LABELS.加購1日包車_每人_NT_600,
   },
 ]
 
@@ -89,9 +90,9 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
       ...priceTiers,
       {
         label: `${priceTiers.length + 4}人包團`,
-        sublabel: '每人',
+        sublabel: COMP_EDITOR_LABELS.每人,
         price: '',
-        priceNote: '起',
+        priceNote: COMP_EDITOR_LABELS.起,
         addon: '',
       },
     ]
@@ -192,13 +193,13 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
                     <Input
                       value={tier.label}
                       onChange={(e) => updatePriceTier(index, { label: e.target.value })}
-                      placeholder="如：4人包團"
+                      placeholder={COMP_EDITOR_LABELS.如_4人包團}
                       className="flex-1"
                     />
                     <Input
                       value={tier.sublabel || ''}
                       onChange={(e) => updatePriceTier(index, { sublabel: e.target.value })}
-                      placeholder="每人"
+                      placeholder={COMP_EDITOR_LABELS.每人}
                       className="w-20"
                     />
                   </div>
@@ -229,7 +230,7 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
                     <Input
                       value={tier.priceNote || ''}
                       onChange={(e) => updatePriceTier(index, { priceNote: e.target.value })}
-                      placeholder="起"
+                      placeholder={COMP_EDITOR_LABELS.起}
                       className="w-16"
                     />
                   </div>
@@ -241,7 +242,7 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
                   <Input
                     value={tier.addon || ''}
                     onChange={(e) => updatePriceTier(index, { addon: e.target.value })}
-                    placeholder="如：加購1日包車 / 每人+NT$900"
+                    placeholder={COMP_EDITOR_LABELS.如_加購1日包車_每人_NT_900}
                     className="mt-1"
                   />
                 </div>

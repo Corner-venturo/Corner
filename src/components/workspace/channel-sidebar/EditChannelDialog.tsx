@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Save, X } from 'lucide-react'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 interface EditChannelDialogProps {
   isOpen: boolean
@@ -46,7 +47,7 @@ export function EditChannelDialog({
               value={channelName}
               onChange={e => onChannelNameChange(e.target.value)}
               className="w-full px-3 py-2 border border-morandi-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
-              placeholder="輸入頻道名稱"
+              placeholder={COMP_WORKSPACE_LABELS.輸入頻道名稱}
             />
           </div>
           <div>
@@ -57,7 +58,7 @@ export function EditChannelDialog({
               value={channelDescription}
               onChange={e => onChannelDescriptionChange(e.target.value)}
               className="w-full px-3 py-2 border border-morandi-gold/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
-              placeholder="輸入頻道描述"
+              placeholder={COMP_WORKSPACE_LABELS.輸入頻道描述}
               rows={3}
             />
           </div>

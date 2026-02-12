@@ -2,31 +2,32 @@
 
 import { Menu } from 'lucide-react'
 import { usePathname } from 'next/navigation'
+import { COMP_LAYOUT_LABELS } from './constants/labels'
 
 // 頁面標題映射
 const PAGE_TITLES: Record<string, string> = {
-  '/': '首頁',
-  '/calendar': '行事曆',
-  '/workspace': '工作空間',
-  '/todos': '待辦事項',
-  '/itinerary': '行程管理',
-  '/tours': '旅遊團',
-  '/orders': '訂單',
-  '/quotes': '報價單',
-  '/contracts': '合約',
-  '/customers': '客戶',
-  '/finance': '財務系統',
-  '/finance/payments': '請款管理',
-  '/finance/cashier': '出納管理',
-  '/finance/vouchers': '會計傳票',
-  '/finance/travel-invoices': '代轉發票',
-  '/settings': '設定',
-  '/destinations': '地區管理',
-  '/attractions': '景點管理',
-  '/suppliers': '供應商',
-  '/visas': '簽證管理',
-  '/confirmations': '確認單',
-  '/image-library': '圖庫',
+  '/': COMP_LAYOUT_LABELS.首頁,
+  '/calendar': COMP_LAYOUT_LABELS.行事曆,
+  '/workspace': COMP_LAYOUT_LABELS.工作空間,
+  '/todos': COMP_LAYOUT_LABELS.待辦事項,
+  '/itinerary': COMP_LAYOUT_LABELS.行程管理,
+  '/tours': COMP_LAYOUT_LABELS.旅遊團,
+  '/orders': COMP_LAYOUT_LABELS.訂單,
+  '/quotes': COMP_LAYOUT_LABELS.報價單,
+  '/contracts': COMP_LAYOUT_LABELS.合約,
+  '/customers': COMP_LAYOUT_LABELS.客戶,
+  '/finance': COMP_LAYOUT_LABELS.財務系統,
+  '/finance/payments': COMP_LAYOUT_LABELS.請款管理,
+  '/finance/cashier': COMP_LAYOUT_LABELS.出納管理,
+  '/finance/vouchers': COMP_LAYOUT_LABELS.會計傳票,
+  '/finance/travel-invoices': COMP_LAYOUT_LABELS.代轉發票,
+  '/settings': COMP_LAYOUT_LABELS.設定,
+  '/destinations': COMP_LAYOUT_LABELS.地區管理,
+  '/attractions': COMP_LAYOUT_LABELS.景點管理,
+  '/suppliers': COMP_LAYOUT_LABELS.供應商,
+  '/visas': COMP_LAYOUT_LABELS.簽證管理,
+  '/confirmations': COMP_LAYOUT_LABELS.確認單,
+  '/image-library': COMP_LAYOUT_LABELS.圖庫,
 }
 
 interface MobileHeaderProps {
@@ -55,7 +56,7 @@ export function MobileHeader({ onMenuClick }: MobileHeaderProps) {
       <button
         onClick={onMenuClick}
         className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-muted active:bg-morandi-container transition-colors -ml-2"
-        aria-label="開啟選單"
+        aria-label={COMP_LAYOUT_LABELS.開啟選單}
       >
         <Menu className="w-6 h-6 text-morandi-primary" />
       </button>

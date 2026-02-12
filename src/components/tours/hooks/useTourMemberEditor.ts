@@ -7,6 +7,7 @@ import { useOrdersSlim, useMembersSlim, createMember, updateMember, deleteMember
 import { getGenderFromIdNumber, calculateAge } from '@/lib/utils'
 import { supabase } from '@/lib/supabase/client'
 import { confirm } from '@/lib/ui/alert-dialog'
+import { COMP_TOURS_LABELS } from '../constants/labels'
 
 export interface EditingMember {
   id?: string
@@ -97,11 +98,11 @@ export function useTourMemberEditor(
 
   const getRoomTypeLabel = (roomType: string): string => {
     const labels: Record<string, string> = {
-      single: '單人房',
-      double: '雙人房',
-      triple: '三人房',
-      quad: '四人房',
-      suite: '套房',
+      single: COMP_TOURS_LABELS.單人房,
+      double: COMP_TOURS_LABELS.雙人房,
+      triple: COMP_TOURS_LABELS.三人房,
+      quad: COMP_TOURS_LABELS.四人房,
+      suite: COMP_TOURS_LABELS.套房,
     }
     return labels[roomType] || roomType
   }
@@ -163,7 +164,7 @@ export function useTourMemberEditor(
 
       setRoomAssignments(assignmentMap)
     } catch (err) {
-      logger.error('載入房間分配失敗:', err)
+      logger.error(COMP_TOURS_LABELS.載入房間分配失敗, err)
     }
   }, [tour.id])
 
@@ -245,9 +246,9 @@ export function useTourMemberEditor(
       member.birthday = value
       member.age = calculateAge(value, tour.departure_date, tour.return_date)
     } else if (field === 'gender') {
-      if (value === '男' || value.toLowerCase() === 'm' || value === '1') {
+      if (value === COMP_TOURS_LABELS.男 || value.toLowerCase() === 'm' || value === '1') {
         member.gender = 'M'
-      } else if (value === '女' || value.toLowerCase() === 'f' || value === '2') {
+      } else if (value === COMP_TOURS_LABELS.女 || value.toLowerCase() === 'f' || value === '2') {
         member.gender = 'F'
       } else {
         member.gender = ''
@@ -318,10 +319,10 @@ export function useTourMemberEditor(
 
   const deleteRow = async (index: number) => {
     const member = tableMembers[index]
-    const memberName = member.name || member.nameEn || '此成員'
+    const memberName = member.name || member.nameEn || COMP_TOURS_LABELS.此成員
 
-    const confirmed = await confirm('確定要刪除「' + memberName + '」嗎？', {
-      title: '刪除成員',
+    const confirmed = await confirm(COMP_TOURS_LABELS.確定要刪除 + memberName + COMP_TOURS_LABELS.嗎, {
+      title: COMP_TOURS_LABELS.刪除成員,
       type: 'warning',
     })
     if (!confirmed) return

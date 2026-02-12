@@ -14,6 +14,7 @@ import dynamic from 'next/dynamic'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Tour } from '@/stores/types'
+import { COMP_TOURS_LABELS } from './constants/labels'
 
 // Loading placeholder
 const TabLoading = () => (
@@ -93,17 +94,17 @@ const TourWebpageTab = dynamic(
 // ============================================================================
 
 export const TOUR_TABS = [
-  { value: 'orders', label: '訂單' },
-  { value: 'members', label: '團員' },
-  { value: 'itinerary', label: '行程' },
-  { value: 'quote', label: '報價' },
-  { value: 'requirements', label: '需求' },
-  { value: 'confirmation', label: '確認' },
-  { value: 'checkin', label: '報到' },
-  { value: 'webpage', label: '網頁' },
-  { value: 'designs', label: '設計' },
-  { value: 'files', label: '檔案' },
-  { value: 'overview', label: '總覽' },
+  { value: 'orders', label: COMP_TOURS_LABELS.訂單 },
+  { value: 'members', label: COMP_TOURS_LABELS.團員 },
+  { value: 'itinerary', label: COMP_TOURS_LABELS.行程 },
+  { value: 'quote', label: COMP_TOURS_LABELS.報價 },
+  { value: 'requirements', label: COMP_TOURS_LABELS.需求 },
+  { value: 'confirmation', label: COMP_TOURS_LABELS.確認 },
+  { value: 'checkin', label: COMP_TOURS_LABELS.報到 },
+  { value: 'webpage', label: COMP_TOURS_LABELS.網頁 },
+  { value: 'designs', label: COMP_TOURS_LABELS.設計 },
+  { value: 'files', label: COMP_TOURS_LABELS.檔案 },
+  { value: 'overview', label: COMP_TOURS_LABELS.總覽 },
 ] as const
 
 export type TourTabValue = typeof TOUR_TABS[number]['value']

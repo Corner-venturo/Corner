@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 import { parseLocalDate } from '@/lib/utils/format-date'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 // 類型定義
 interface MemberStatus {
@@ -92,13 +93,13 @@ function TourCard({ tour }: { tour: TourData }) {
   const getStatusLabel = (status: MemberStatus['status']) => {
     switch (status) {
       case 'ticketed':
-        return '已開票'
+        return COMP_WORKSPACE_LABELS.已開票
       case 'needs_ticketing':
-        return '待開票'
+        return COMP_WORKSPACE_LABELS.待開票
       case 'no_record':
-        return '無紀錄'
+        return COMP_WORKSPACE_LABELS.無紀錄
       case 'self_arranged':
-        return '自理'
+        return COMP_WORKSPACE_LABELS.自理
     }
   }
 
@@ -199,7 +200,7 @@ function TourCard({ tour }: { tour: TourData }) {
                     key={m.id}
                     className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-amber-50 text-amber-700 rounded border border-amber-200"
                   >
-                    {m.name || '未知'}
+                    {m.name || COMP_WORKSPACE_LABELS.未知}
                     {m.pnr && <span className="text-amber-500">({m.pnr})</span>}
                   </span>
                 ))}
@@ -220,7 +221,7 @@ function TourCard({ tour }: { tour: TourData }) {
                     key={m.id}
                     className="inline-flex items-center px-2 py-0.5 text-xs bg-red-50 text-morandi-red rounded border border-red-200"
                   >
-                    {m.name || '未知'}
+                    {m.name || COMP_WORKSPACE_LABELS.未知}
                   </span>
                 ))}
               </div>
@@ -240,7 +241,7 @@ function TourCard({ tour }: { tour: TourData }) {
                     key={m.id}
                     className="inline-flex items-center px-2 py-0.5 text-xs bg-green-50 text-green-700 rounded border border-green-200"
                   >
-                    {m.name || '未知'}
+                    {m.name || COMP_WORKSPACE_LABELS.未知}
                   </span>
                 ))}
               </div>
@@ -260,7 +261,7 @@ function TourCard({ tour }: { tour: TourData }) {
                     key={m.id}
                     className="inline-flex items-center px-2 py-0.5 text-xs bg-morandi-container text-morandi-secondary rounded border border-border/60"
                   >
-                    {m.name || '未知'}
+                    {m.name || COMP_WORKSPACE_LABELS.未知}
                   </span>
                 ))}
               </div>

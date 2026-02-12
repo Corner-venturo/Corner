@@ -13,6 +13,7 @@ import type { Channel } from '@/stores/workspace'
 import { logger } from '@/lib/utils/logger'
 import { useEmployeesSlim } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 // 系統機器人 ID
 const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
@@ -102,18 +103,18 @@ export function MessageInput({
     if (channel.type === 'direct') {
       // 檢查是否是機器人
       if (dmTargetId === SYSTEM_BOT_ID) {
-        return 'VENTURO 機器人'
+        return COMP_WORKSPACE_LABELS.VENTURO_機器人
       }
 
       // 用 dmTargetId 查詢員工名稱
       if (dmTargetId) {
         const emp = employees.find(e => e.id === dmTargetId)
         if (emp) {
-          return emp.chinese_name || emp.display_name || '同事'
+          return emp.chinese_name || emp.display_name || COMP_WORKSPACE_LABELS.同事
         }
       }
 
-      return '私訊'
+      return COMP_WORKSPACE_LABELS.私訊
     }
     return channelName
   }, [channel.type, dmTargetId, employees, channelName])
@@ -180,9 +181,9 @@ export function MessageInput({
           try {
             // 下載圖片並轉換為 File
             const response = await fetch(imageUrl, { mode: 'cors' })
-            if (!response.ok) throw new Error('下載失敗')
+            if (!response.ok) throw new Error(COMP_WORKSPACE_LABELS.下載失敗)
             const blob = await response.blob()
-            if (!blob.type.startsWith('image/')) throw new Error('不是圖片')
+            if (!blob.type.startsWith('image/')) throw new Error(COMP_WORKSPACE_LABELS.不是圖片)
             const fileName = imageUrl.split('/').pop()?.split('?')[0] || 'image.jpg'
             const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' })
 
@@ -192,7 +193,7 @@ export function MessageInput({
               return
             }
           } catch {
-            void alert('此網站不允許下載圖片，請改用右鍵另存圖片後上傳', 'warning')
+            void alert(COMP_WORKSPACE_LABELS.此網站不允許下載圖片_請改用右鍵另存圖片後上傳, 'warning')
             return
           }
         }
@@ -211,9 +212,9 @@ export function MessageInput({
       if (isImageUrl) {
         try {
           const response = await fetch(url, { mode: 'cors' })
-          if (!response.ok) throw new Error('下載失敗')
+          if (!response.ok) throw new Error(COMP_WORKSPACE_LABELS.下載失敗)
           const blob = await response.blob()
-          if (!blob.type.startsWith('image/')) throw new Error('不是圖片')
+          if (!blob.type.startsWith('image/')) throw new Error(COMP_WORKSPACE_LABELS.不是圖片)
           const fileName = url.split('/').pop()?.split('?')[0] || 'image.jpg'
           const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' })
 
@@ -223,8 +224,8 @@ export function MessageInput({
             return
           }
         } catch (err) {
-          logger.log('無法下載圖片（可能是 CORS 限制）:', url)
-          void alert('此網站不允許下載圖片，請改用右鍵另存圖片後上傳', 'warning')
+          logger.log(COMP_WORKSPACE_LABELS.無法下載圖片_可能是_CORS_限制, url)
+          void alert(COMP_WORKSPACE_LABELS.此網站不允許下載圖片_請改用右鍵另存圖片後上傳, 'warning')
           return
         }
       }
@@ -443,7 +444,7 @@ export function MessageInput({
                 }
               }
             }}
-            placeholder={isDisabled ? "只有管理員才能在此頻道發言" : `傳送訊息給 ${displayChannelName}...`}
+            placeholder={isDisabled ? COMP_WORKSPACE_LABELS.只有管理員才能在此頻道發言 : `傳送訊息給 ${displayChannelName}...`}
             className="w-full min-h-[40px] max-h-[120px] px-3 py-2 pr-10 bg-card border border-morandi-container rounded-md resize-none text-sm focus:outline-none focus:border-morandi-gold transition-colors disabled:bg-muted disabled:cursor-not-allowed"
             rows={1}
             style={{

@@ -15,6 +15,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { CurrencyCell } from '@/components/table-cells'
+import { COMP_WORKSPACE_LABELS } from './constants/labels'
 
 interface AdvanceRow {
   name: string
@@ -86,7 +87,7 @@ export function ShareAdvanceDialog({
     )
 
     if (validRows.length === 0) {
-      void alert('請至少填寫一筆完整的代墊項目', 'warning')
+      void alert(COMP_WORKSPACE_LABELS.請至少填寫一筆完整的代墊項目, 'warning')
       return
     }
 
@@ -102,7 +103,7 @@ export function ShareAdvanceDialog({
       onSuccess()
       onClose()
     } catch (error) {
-      void alert('分享失敗，請稍後再試', 'error')
+      void alert(COMP_WORKSPACE_LABELS.分享失敗_請稍後再試, 'error')
     }
   }
 
@@ -141,7 +142,7 @@ export function ShareAdvanceDialog({
                       type="text"
                       value={row.name}
                       onChange={e => updateRow(index, 'name', e.target.value)}
-                      placeholder="品項名稱"
+                      placeholder={COMP_WORKSPACE_LABELS.品項名稱}
                       className="input-morandi !py-1.5 text-sm w-full"
                     />
                   </td>
@@ -150,7 +151,7 @@ export function ShareAdvanceDialog({
                       type="text"
                       value={row.description}
                       onChange={e => updateRow(index, 'description', e.target.value)}
-                      placeholder="說明"
+                      placeholder={COMP_WORKSPACE_LABELS.說明}
                       className="input-morandi !py-1.5 text-sm w-full"
                     />
                   </td>
@@ -171,8 +172,8 @@ export function ShareAdvanceDialog({
                       }))}
                       value={row.advance_person}
                       onChange={value => updateRow(index, 'advance_person', value)}
-                      placeholder="選擇代墊人..."
-                      emptyMessage="找不到員工"
+                      placeholder={COMP_WORKSPACE_LABELS.選擇代墊人}
+                      emptyMessage={COMP_WORKSPACE_LABELS.找不到員工}
                       showSearchIcon={true}
                       showClearButton={true}
                       className="!py-1.5 text-sm"

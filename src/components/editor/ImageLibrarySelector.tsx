@@ -11,6 +11,7 @@ import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
+import { COMP_EDITOR_LABELS } from './constants/labels'
 
 interface ImageLibraryItem {
   id: string
@@ -72,8 +73,8 @@ export function ImageLibrarySelector({
         .limit(50)
 
       if (error) {
-        logger.error('載入圖庫失敗:', error)
-        toast.error('載入圖庫失敗')
+        logger.error(COMP_EDITOR_LABELS.載入圖庫失敗_2, error)
+        toast.error(COMP_EDITOR_LABELS.載入圖庫失敗)
         return
       }
 
@@ -83,8 +84,8 @@ export function ImageLibrarySelector({
         tags: item.tags ?? []
       })))
     } catch (error) {
-      logger.error('載入圖庫錯誤:', error)
-      toast.error('載入圖庫發生錯誤')
+      logger.error(COMP_EDITOR_LABELS.載入圖庫錯誤, error)
+      toast.error(COMP_EDITOR_LABELS.載入圖庫發生錯誤)
     } finally {
       setLoading(false)
     }
@@ -93,7 +94,7 @@ export function ImageLibrarySelector({
   const handleSelectImage = (imageUrl: string) => {
     onSelect(imageUrl)
     onClose()
-    toast.success('已選擇圖片')
+    toast.success(COMP_EDITOR_LABELS.已選擇圖片)
   }
 
   return (
@@ -110,7 +111,7 @@ export function ImageLibrarySelector({
         <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-secondary" />
           <Input
-            placeholder="搜尋圖片名稱或標籤..."
+            placeholder={COMP_EDITOR_LABELS.搜尋圖片名稱或標籤}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -127,7 +128,7 @@ export function ImageLibrarySelector({
             <div className="flex flex-col items-center justify-center h-32 text-morandi-secondary">
               <ImageIcon size={32} className="mb-2 opacity-50" />
               <p className="text-sm">
-                {images.length === 0 ? '圖庫中還沒有圖片' : '沒有符合搜尋條件的圖片'}
+                {images.length === 0 ? COMP_EDITOR_LABELS.圖庫中還沒有圖片 : COMP_EDITOR_LABELS.沒有符合搜尋條件的圖片}
               </p>
             </div>
           ) : (

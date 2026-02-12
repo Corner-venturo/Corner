@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Plus, Trash2, AlertCircle, FileX, GripVertical } from 'lucide-react'
+import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
 interface NoticesPolicySectionProps {
   data: TourFormData
@@ -15,19 +16,19 @@ interface NoticesPolicySectionProps {
 
 // 預設提醒事項
 const getDefaultNotices = (): string[] => [
-  '本行程之最低出團人數為4人(含)以上。',
-  '行程內容僅供出發前參考,最終行程、航班時刻及住宿安排,請以行前說明會提供之資料為準。',
-  '各日行程將依當地交通與實際狀況彈性調整,如景點順序、住宿安排與參觀時間,均由專業領隊現場妥善規劃,敬請旅客理解與配合。',
-  '團費已包含機場稅、燃油附加費及領隊/導遊服務費;惟不包含其他個別性小費(如司機、行李員、飯店服務人員之服務小費)。',
-  '因應國際油價波動,航空公司可能調整燃油附加費,相關費用將依實際票務成本調整計算。',
-  '住宿以雙人房為主(兩張單人床或一張大床)。如需求三人房,將視飯店實際情況安排加床(多為折疊床或沙發床),空間較為有限。若需單人房,請於報名時提出並補足房差費用。',
-  '航空公司座位安排(非廉價航空):多提供班機起飛前48小時內的網路與手機報到免費選位服務,惟額外加長座位(如出口座位)不包含於免費選位範圍內。',
+  COMP_EDITOR_LABELS.本行程之最低出團人數為4人_含_以上,
+  COMP_EDITOR_LABELS.行程內容僅供出發前參考_最終行程_航班時刻及住宿安排_請以行前說明會提供之資料為準,
+  COMP_EDITOR_LABELS.各日行程將依當地交通與實際狀況彈性調整_如景點順序_住宿安排與參觀時間_均由專業領隊現場妥善規劃_敬請旅客理解與配合,
+  COMP_EDITOR_LABELS.團費已包含機場稅_燃油附加費及領隊_導遊服務費_惟不包含其他個別性小費_如司機_行李員_飯店服務人員之服務小費,
+  COMP_EDITOR_LABELS.因應國際油價波動_航空公司可能調整燃油附加費_相關費用將依實際票務成本調整計算,
+  COMP_EDITOR_LABELS.住宿以雙人房為主_兩張單人床或一張大床_如需求三人房_將視飯店實際情況安排加床_多為折疊床或沙發床_空間較為有限_若需單人房_請於報名時提出並補足房差費用,
+  COMP_EDITOR_LABELS.航空公司座位安排_非廉價航空_多提供班機起飛前48小時內的網路與手機報到免費選位服務_惟額外加長座位_如出口座位_不包含於免費選位範圍內,
 ]
 
 // 預設取消政策
 const getDefaultCancellationPolicy = (): string[] => [
-  '旅客繳交訂金後,即視為《國外旅遊定型化契約》正式生效。旅行社將依各合作單位(如飯店、餐廳、行程體驗業者)之規定,陸續預付旅程相關費用。若旅客因個人因素取消行程,將依契約條款辦理,或視實際已支出金額酌收相關費用後,退還剩餘款項。',
-  '由於本行程多數項目須事前預約安排,若旅客於旅途中臨時於國外提出無法參與之通知,將視同自動放棄,相關費用恕無法退還,敬請理解與配合。',
+  COMP_EDITOR_LABELS.旅客繳交訂金後_即視為_國外旅遊定型化契約_正式生效_旅行社將依各合作單位_如飯店_餐廳_行程體驗業者_之規定_陸續預付旅程相關費用_若旅客因個人因素取消行程_將依契約條款辦理_或視實際已支出金額酌收相關費用後_退還剩餘款項,
+  COMP_EDITOR_LABELS.由於本行程多數項目須事前預約安排_若旅客於旅途中臨時於國外提出無法參與之通知_將視同自動放棄_相關費用恕無法退還_敬請理解與配合,
 ]
 
 export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionProps) {
@@ -114,7 +115,7 @@ export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionPro
                   <Textarea
                     value={notice}
                     onChange={(e) => updateNotice(index, e.target.value)}
-                    placeholder="輸入提醒事項..."
+                    placeholder={COMP_EDITOR_LABELS.輸入提醒事項}
                     className="mt-1 min-h-[60px]"
                   />
                 </div>
@@ -185,7 +186,7 @@ export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionPro
                   <Textarea
                     value={policy}
                     onChange={(e) => updateCancellationPolicy(index, e.target.value)}
-                    placeholder="輸入取消政策..."
+                    placeholder={COMP_EDITOR_LABELS.輸入取消政策}
                     className="mt-1 min-h-[80px]"
                   />
                 </div>

@@ -16,6 +16,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { CurrencyCell } from '@/components/table-cells'
+import { COMP_WORKSPACE_LABELS } from './constants/labels'
 
 interface ShareOrdersDialogProps {
   channelId: string
@@ -107,7 +108,7 @@ export function ShareOrdersDialog({ channelId, open, onClose, onSuccess }: Share
 
   const handleShare = async () => {
     if (selectedOrders.size === 0) {
-      void alert('請至少選擇一筆訂單', 'warning')
+      void alert(COMP_WORKSPACE_LABELS.請至少選擇一筆訂單, 'warning')
       return
     }
 
@@ -123,7 +124,7 @@ export function ShareOrdersDialog({ channelId, open, onClose, onSuccess }: Share
       onSuccess()
       onClose()
     } catch (error) {
-      void alert('分享訂單失敗，請稍後再試', 'error')
+      void alert(COMP_WORKSPACE_LABELS.分享訂單失敗_請稍後再試, 'error')
     }
   }
 
@@ -148,7 +149,7 @@ export function ShareOrdersDialog({ channelId, open, onClose, onSuccess }: Share
               type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              placeholder="搜尋訂單號、客戶名稱..."
+              placeholder={COMP_WORKSPACE_LABELS.搜尋訂單號_客戶名稱}
               className="input-morandi pl-10"
             />
           </div>
@@ -158,7 +159,7 @@ export function ShareOrdersDialog({ channelId, open, onClose, onSuccess }: Share
         <div className="flex-1 overflow-y-auto">
           {filteredOrders.length === 0 ? (
             <div className="text-center py-8 text-morandi-secondary">
-              {searchQuery ? '沒有符合搜尋條件的訂單' : '目前沒有待收款訂單'}
+              {searchQuery ? COMP_WORKSPACE_LABELS.沒有符合搜尋條件的訂單 : COMP_WORKSPACE_LABELS.目前沒有待收款訂單}
             </div>
           ) : (
             <table className="w-full">

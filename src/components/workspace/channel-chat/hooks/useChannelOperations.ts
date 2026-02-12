@@ -3,6 +3,7 @@ import type { Channel } from '@/stores/workspace-store'
 import { CHANNEL_SWITCH_DELAY, ALERT_MESSAGES } from '../constants'
 import { UI_DELAYS } from '@/lib/constants/timeouts'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { COMP_WORKSPACE_LABELS } from '../../constants/labels'
 
 /**
  * 管理頻道切換、刪除、更新等操作
@@ -56,9 +57,9 @@ export function useChannelOperations(
     }
 
     const confirmed = await confirm(
-      `${ALERT_MESSAGES.DELETE_CHANNEL_CONFIRM.replace('頻道', `#${selectedChannel.name} 頻道`)}`,
+      `${ALERT_MESSAGES.DELETE_CHANNEL_CONFIRM.replace(COMP_WORKSPACE_LABELS.頻道, `#${selectedChannel.name} 頻道`)}`,
       {
-        title: '刪除頻道',
+        title: COMP_WORKSPACE_LABELS.刪除頻道,
         type: 'warning',
       }
     )

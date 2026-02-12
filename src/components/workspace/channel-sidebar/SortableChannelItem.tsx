@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import type { SortableChannelItemProps } from './types'
 import { DELETE_TOUR_CHANNEL_PASSWORD } from '@/lib/constants/workspace-settings'
 import { prompt, alert } from '@/lib/ui/alert-dialog'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 export function SortableChannelItem({
   channel,
@@ -73,7 +74,7 @@ export function SortableChannelItem({
               onJoinChannel(channel.id)
             }}
             className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-morandi-gold/20 text-morandi-gold transition-opacity"
-            title="加入頻道"
+            title={COMP_WORKSPACE_LABELS.加入頻道}
           >
             <UserPlus size={12} />
           </button>
@@ -90,7 +91,7 @@ export function SortableChannelItem({
                   onLeaveChannel(channel.id)
                 }}
                 className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-status-warning-bg text-status-warning hover:text-status-warning transition-opacity"
-                title="離開頻道"
+                title={COMP_WORKSPACE_LABELS.離開頻道}
               >
                 <LogOut size={12} />
               </button>
@@ -103,7 +104,7 @@ export function SortableChannelItem({
                   onEdit(channel.id)
                 }}
                 className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-morandi-gold/20 text-morandi-secondary transition-opacity"
-                title="編輯頻道"
+                title={COMP_WORKSPACE_LABELS.編輯頻道}
               >
                 <Edit2 size={12} />
               </button>
@@ -117,7 +118,7 @@ export function SortableChannelItem({
                     onUnarchive(channel.id)
                   }}
                   className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-morandi-green/20 text-morandi-green transition-opacity"
-                  title="解除封存"
+                  title={COMP_WORKSPACE_LABELS.解除封存}
                 >
                   <ArchiveRestore size={12} />
                 </button>
@@ -130,7 +131,7 @@ export function SortableChannelItem({
                     onArchive(channel.id)
                   }}
                   className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-status-warning-bg text-status-warning transition-opacity"
-                  title="封存頻道"
+                  title={COMP_WORKSPACE_LABELS.封存頻道}
                 >
                   <Archive size={12} />
                 </button>
@@ -146,7 +147,7 @@ export function SortableChannelItem({
                 'p-0.5 rounded hover:bg-morandi-gold/20 transition-colors',
                 channel.is_favorite ? 'text-morandi-gold' : 'text-morandi-secondary opacity-0 group-hover:opacity-100'
               )}
-              title={channel.is_favorite ? '取消釘選' : '釘選頻道'}
+              title={channel.is_favorite ? COMP_WORKSPACE_LABELS.取消釘選 : COMP_WORKSPACE_LABELS.釘選頻道}
             >
               <Star size={12} fill={channel.is_favorite ? 'currentColor' : 'none'} />
             </button>
@@ -159,9 +160,9 @@ export function SortableChannelItem({
                   // 如果是旅遊團頻道，需要輸入密碼
                   if (isTourChannel) {
                     const password = await prompt(`即將刪除：${channel.name}\n此操作無法復原，請輸入密碼確認`, {
-                      title: '刪除旅遊團頻道',
+                      title: COMP_WORKSPACE_LABELS.刪除旅遊團頻道,
                       inputType: 'password',
-                      placeholder: '請輸入密碼',
+                      placeholder: COMP_WORKSPACE_LABELS.請輸入密碼,
                     })
 
                     // 使用者取消
@@ -171,7 +172,7 @@ export function SortableChannelItem({
 
                     // 驗證密碼
                     if (password !== DELETE_TOUR_CHANNEL_PASSWORD) {
-                      await alert('密碼錯誤', 'error')
+                      await alert(COMP_WORKSPACE_LABELS.密碼錯誤, 'error')
                       return
                     }
                   }
@@ -179,7 +180,7 @@ export function SortableChannelItem({
                   onDelete(channel.id)
                 }}
                 className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-status-danger-bg text-status-danger hover:text-status-danger transition-opacity"
-                title={isTourChannel ? '刪除頻道（需要密碼）' : '刪除頻道'}
+                title={isTourChannel ? COMP_WORKSPACE_LABELS.刪除頻道_需要密碼 : COMP_WORKSPACE_LABELS.刪除頻道}
               >
                 <Trash2 size={12} />
               </button>

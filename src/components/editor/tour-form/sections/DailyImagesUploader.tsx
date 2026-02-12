@@ -15,6 +15,7 @@ import { ImageGrid } from './daily-images/ImageGrid'
 import { ImageUploadZone } from './daily-images/ImageUploadZone'
 import { ImagePreviewModal, ImagePositionEditor } from './daily-images/ImagePreviewDialog'
 import { useImageUpload } from './daily-images/hooks/useImageUpload'
+import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
 interface DailyImagesUploaderProps {
   dayIndex: number
@@ -72,13 +73,13 @@ export function DailyImagesUploader({
         const imageUrl = imgMatch[1]
         // 跳過 data: URL 和 blob: URL
         if (!imageUrl.startsWith('data:') && !imageUrl.startsWith('blob:')) {
-          toast.info('正在下載並上傳圖片...')
+          toast.info(COMP_EDITOR_LABELS.正在下載並上傳圖片)
           const uploadedUrl = await uploadImageFromUrl(imageUrl)
           if (uploadedUrl) {
             onImagesChange([...images, createDailyImage(uploadedUrl)])
-            toast.success('圖片已上傳')
+            toast.success(COMP_EDITOR_LABELS.圖片已上傳)
           } else {
-            toast.error('圖片上傳失敗')
+            toast.error(COMP_EDITOR_LABELS.圖片上傳失敗)
           }
           return
         }
@@ -100,13 +101,13 @@ export function DailyImagesUploader({
                          lowerUrl.includes('googleusercontent')
 
       if (isImageUrl) {
-        toast.info('正在下載並上傳圖片...')
+        toast.info(COMP_EDITOR_LABELS.正在下載並上傳圖片)
         const uploadedUrl = await uploadImageFromUrl(url)
         if (uploadedUrl) {
           onImagesChange([...images, createDailyImage(uploadedUrl)])
-          toast.success('圖片已上傳')
+          toast.success(COMP_EDITOR_LABELS.圖片已上傳)
         } else {
-          toast.error('圖片上傳失敗')
+          toast.error(COMP_EDITOR_LABELS.圖片上傳失敗)
         }
         return
       }
@@ -126,18 +127,18 @@ export function DailyImagesUploader({
 
     // 4. 嘗試任何 URL（可能是圖片）
     if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
-      toast.info('正在嘗試下載並上傳...')
+      toast.info(COMP_EDITOR_LABELS.正在嘗試下載並上傳)
       const uploadedUrl = await uploadImageFromUrl(url)
       if (uploadedUrl) {
         onImagesChange([...images, createDailyImage(uploadedUrl)])
-        toast.success('圖片已上傳')
+        toast.success(COMP_EDITOR_LABELS.圖片已上傳)
       } else {
-        toast.error('無法下載或上傳圖片')
+        toast.error(COMP_EDITOR_LABELS.無法下載或上傳圖片)
       }
       return
     }
 
-    toast.error('無法識別拖曳的內容，請嘗試直接上傳檔案')
+    toast.error(COMP_EDITOR_LABELS.無法識別拖曳的內容_請嘗試直接上傳檔案)
   }
 
   // 刪除圖片

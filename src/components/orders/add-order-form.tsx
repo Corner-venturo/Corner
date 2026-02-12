@@ -8,6 +8,7 @@ import { useToursListSlim } from '@/hooks/useListSlim'
 import { useEmployeesSlim } from '@/data'
 import type { Employee } from '@/stores/types'
 import type { SyncableEntity } from '@/types'
+import { COMP_ORDERS_LABELS } from './constants/labels'
 
 // 型別守衛：檢查 Employee 是否包含同步欄位
 type EmployeeWithSync = Employee & Partial<SyncableEntity>
@@ -120,8 +121,8 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
             }))}
             value={formData.tour_id || ''}
             onChange={value => updateFormData?.({ ...formData, tour_id: value })}
-            placeholder="搜尋或選擇旅遊團..."
-            emptyMessage="找不到旅遊團"
+            placeholder={COMP_ORDERS_LABELS.搜尋或選擇旅遊團}
+            emptyMessage={COMP_ORDERS_LABELS.找不到旅遊團}
             className="mt-1"
             disablePortal={true}
           />
@@ -134,7 +135,7 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
         <Input
           value={formData.contact_person || ''}
           onChange={e => updateFormData?.({ ...formData, contact_person: e.target.value })}
-          placeholder="輸入聯絡人姓名"
+          placeholder={COMP_ORDERS_LABELS.輸入聯絡人姓名}
           className="mt-1"
           required={!isEmbedded}
         />
@@ -157,8 +158,8 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
             }))}
             value={formData.sales_person || ''}
             onChange={value => updateFormData?.({ ...formData, sales_person: value })}
-            placeholder="選擇業務人員..."
-            emptyMessage="找不到業務人員"
+            placeholder={COMP_ORDERS_LABELS.選擇業務人員}
+            emptyMessage={COMP_ORDERS_LABELS.找不到業務人員}
             showSearchIcon={true}
             showClearButton={true}
             className="mt-1"
@@ -174,8 +175,8 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
             }))}
             value={formData.assistant || ''}
             onChange={value => updateFormData?.({ ...formData, assistant: value })}
-            placeholder="選擇助理..."
-            emptyMessage="找不到助理"
+            placeholder={COMP_ORDERS_LABELS.選擇助理}
+            emptyMessage={COMP_ORDERS_LABELS.找不到助理}
             showSearchIcon={true}
             showClearButton={true}
             className="mt-1"

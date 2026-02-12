@@ -5,6 +5,7 @@ import { Plus } from 'lucide-react'
 import { DailyItinerary, Activity } from '../../../types'
 import { UploadableImage } from '../UploadableImage'
 import { EditableText } from '../EditableText'
+import { COMP_EDITOR_LABELS } from '../../../../constants/labels'
 
 interface SingleImageTemplateProps {
   editingDay: DailyItinerary
@@ -57,7 +58,7 @@ export function SingleImageTemplate({
             setEditingField={setEditingField}
             onChange={v => updateField('title', v)}
             className="text-2xl font-bold text-white"
-            placeholder="行程標題"
+            placeholder={COMP_EDITOR_LABELS.行程標題}
             inputClassName="bg-card/20 text-white placeholder:text-white/50"
           />
         </div>
@@ -72,7 +73,7 @@ export function SingleImageTemplate({
           setEditingField={setEditingField}
           onChange={v => updateField('description', v)}
           className="text-morandi-secondary mb-4"
-          placeholder="行程描述..."
+          placeholder={COMP_EDITOR_LABELS.行程描述}
           multiline
         />
 
@@ -103,7 +104,7 @@ export function SingleImageTemplate({
                   setEditingField={setEditingField}
                   onChange={v => updateActivity(i, 'title', v)}
                   className="font-medium text-foreground text-sm"
-                  placeholder="景點名稱"
+                  placeholder={COMP_EDITOR_LABELS.景點名稱}
                 />
               </div>
             </div>
@@ -121,7 +122,7 @@ export function SingleImageTemplate({
               setEditingField={setEditingField}
               onChange={v => updateField('meals', { ...editingDay.meals, lunch: v })}
               className="inline text-morandi-primary"
-              placeholder="午餐"
+              placeholder={COMP_EDITOR_LABELS.午餐}
             />
           </div>
           <div className="flex-1">
@@ -133,7 +134,7 @@ export function SingleImageTemplate({
               setEditingField={setEditingField}
               onChange={v => updateField('accommodation', v)}
               className="inline text-morandi-primary"
-              placeholder="住宿"
+              placeholder={COMP_EDITOR_LABELS.住宿}
             />
           </div>
         </div>

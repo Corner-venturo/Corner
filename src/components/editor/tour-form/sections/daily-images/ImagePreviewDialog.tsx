@@ -12,6 +12,7 @@ import {
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
 import { DailyImage } from '../../types'
+import { COMP_EDITOR_LABELS } from '../../../constants/labels'
 
 // 工具函數：取得圖片 URL
 function getImageUrl(image: string | DailyImage): string {
@@ -186,13 +187,13 @@ export function ImagePositionEditor({
 
   // 快速預設位置
   const presetPositions = [
-    { label: '置中', value: 'center' },
-    { label: '上方', value: 'center top' },
-    { label: '下方', value: 'center bottom' },
-    { label: '左上', value: 'left top' },
-    { label: '右上', value: 'right top' },
-    { label: '左下', value: 'left bottom' },
-    { label: '右下', value: 'right bottom' },
+    { label: COMP_EDITOR_LABELS.置中, value: 'center' },
+    { label: COMP_EDITOR_LABELS.上方, value: 'center top' },
+    { label: COMP_EDITOR_LABELS.下方, value: 'center bottom' },
+    { label: COMP_EDITOR_LABELS.左上, value: 'left top' },
+    { label: COMP_EDITOR_LABELS.右上, value: 'right top' },
+    { label: COMP_EDITOR_LABELS.左下, value: 'left bottom' },
+    { label: COMP_EDITOR_LABELS.右下, value: 'right bottom' },
   ]
 
   return (
@@ -213,7 +214,7 @@ export function ImagePositionEditor({
         >
           <img
             src={imageUrl}
-            alt="調整位置"
+            alt={COMP_EDITOR_LABELS.調整位置}
             className="w-full h-full object-cover"
             style={{ objectPosition: position }}
             draggable={false}

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Copy, Download, Printer, QrCode, Calendar, MapPin } from 'lucide-react'
 import { toast } from 'sonner'
 import { formatDateMonthDayChinese } from '@/lib/utils/format-date'
+import { COMP_TOURS_LABELS } from '../constants/labels'
 
 interface CheckinQRCodeProps {
   tour: Tour
@@ -25,9 +26,9 @@ export function CheckinQRCode({ tour }: CheckinQRCodeProps) {
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(checkinUrl)
-      toast.success('連結已複製')
+      toast.success(COMP_TOURS_LABELS.連結已複製)
     } catch {
-      toast.error('複製失敗')
+      toast.error(COMP_TOURS_LABELS.複製失敗)
     }
   }
 
@@ -55,7 +56,7 @@ export function CheckinQRCode({ tour }: CheckinQRCodeProps) {
       link.download = `${tour.code}-checkin-qrcode.png`
       link.href = canvas.toDataURL('image/png')
       link.click()
-      toast.success('QR Code 已下載')
+      toast.success(COMP_TOURS_LABELS.QR_Code_已下載)
     }
 
     img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)))
@@ -65,7 +66,7 @@ export function CheckinQRCode({ tour }: CheckinQRCodeProps) {
   const handlePrint = () => {
     const printWindow = window.open('', '_blank')
     if (!printWindow) {
-      toast.error('無法開啟列印視窗')
+      toast.error(COMP_TOURS_LABELS.無法開啟列印視窗)
       return
     }
 

@@ -7,6 +7,7 @@ import { ImageIcon, RefreshCw } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
+import { COMP_EDITOR_LABELS } from './constants/labels'
 
 interface RelatedImage {
   id: string
@@ -60,7 +61,7 @@ export function RelatedImagesPreviewer({
         .limit(1)
 
       if (checkError) {
-        logger.error('圖庫表格不存在:', checkError)
+        logger.error(COMP_EDITOR_LABELS.圖庫表格不存在, checkError)
         setRelatedImages([])
         return
       }
@@ -81,7 +82,7 @@ export function RelatedImagesPreviewer({
         .limit(6)
 
       if (error) {
-        logger.error('載入相關圖片失敗:', error)
+        logger.error(COMP_EDITOR_LABELS.載入相關圖片失敗, error)
         
         // 如果 OR 查詢失敗，回退到簡單搜尋
         const { data: fallbackData, error: fallbackError } = await supabase
@@ -94,7 +95,7 @@ export function RelatedImagesPreviewer({
           .limit(6)
 
         if (fallbackError) {
-          logger.error('回退搜尋也失敗:', fallbackError)
+          logger.error(COMP_EDITOR_LABELS.回退搜尋也失敗, fallbackError)
           setRelatedImages([])
           return
         }
@@ -114,7 +115,7 @@ export function RelatedImagesPreviewer({
 
       setRelatedImages(filteredImages)
     } catch (error) {
-      logger.error('載入相關圖片錯誤:', error)
+      logger.error(COMP_EDITOR_LABELS.載入相關圖片錯誤, error)
       setRelatedImages([])
     } finally {
       setLoading(false)
@@ -171,7 +172,7 @@ export function RelatedImagesPreviewer({
             <button
               onClick={handleRefresh}
               className="w-6 h-6 flex-shrink-0 rounded border border-morandi-container hover:border-morandi-gold bg-morandi-background-cream hover:bg-morandi-gold/10 flex items-center justify-center transition-all"
-              title="重新載入相關圖片"
+              title={COMP_EDITOR_LABELS.重新載入相關圖片}
             >
               <RefreshCw size={10} className="text-morandi-secondary" />
             </button>

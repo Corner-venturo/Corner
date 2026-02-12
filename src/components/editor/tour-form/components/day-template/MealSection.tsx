@@ -3,6 +3,7 @@
 import React from 'react'
 import { Utensils } from 'lucide-react'
 import { EditableText } from './EditableText'
+import { COMP_EDITOR_LABELS } from '../../../constants/labels'
 
 interface MealData {
   breakfast?: string
@@ -40,7 +41,7 @@ export function MealSection({
               setEditingField={setEditingField}
               onChange={v => onUpdateMeals({ ...meals, breakfast: v })}
               className="inline text-morandi-primary"
-              placeholder="飯店內"
+              placeholder={COMP_EDITOR_LABELS.飯店內}
             />
           </span>
           <span>
@@ -51,7 +52,7 @@ export function MealSection({
               setEditingField={setEditingField}
               onChange={v => onUpdateMeals({ ...meals, lunch: v })}
               className="inline text-morandi-primary"
-              placeholder="午餐"
+              placeholder={COMP_EDITOR_LABELS.午餐}
             />
           </span>
           <span>
@@ -62,7 +63,7 @@ export function MealSection({
               setEditingField={setEditingField}
               onChange={v => onUpdateMeals({ ...meals, dinner: v })}
               className="inline text-morandi-primary"
-              placeholder="晚餐"
+              placeholder={COMP_EDITOR_LABELS.晚餐}
             />
           </span>
         </div>
@@ -82,7 +83,7 @@ export function MealSection({
             setEditingField={setEditingField}
             onChange={v => onUpdateMeals({ ...meals, lunch: v })}
             className="text-morandi-primary"
-            placeholder="午餐"
+            placeholder={COMP_EDITOR_LABELS.午餐}
           />
         </div>
       </div>
@@ -101,7 +102,7 @@ export function MealSection({
           setEditingField={setEditingField}
           onChange={v => onUpdateMeals({ ...meals, lunch: v })}
           className="inline text-morandi-primary"
-          placeholder="午餐"
+          placeholder={COMP_EDITOR_LABELS.午餐}
         />
       </div>
     </div>

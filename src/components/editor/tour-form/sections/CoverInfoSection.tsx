@@ -18,6 +18,7 @@ import { TourHeroCollage } from '@/features/tours/components/sections/TourHeroCo
 import { useCoverInfo } from './cover/hooks/useCoverInfo'
 import { AirportImageLibrary } from './cover/AirportImageLibrary'
 import { CoverInfoForm } from './cover/CoverInfoForm'
+import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
 interface CoverInfoSectionProps {
   data: TourFormData
@@ -93,13 +94,13 @@ export function CoverInfoSection({
   const getHeroData = () => ({
     coverImage: data.coverImage,
     tagline: data.tagline || 'Corner Travel',
-    title: data.title || '行程標題',
-    subtitle: data.subtitle || '副標題',
-    description: data.description || '此處顯示行程描述',
+    title: data.title || COMP_EDITOR_LABELS.行程標題,
+    subtitle: data.subtitle || COMP_EDITOR_LABELS.副標題,
+    description: data.description || COMP_EDITOR_LABELS.此處顯示行程描述,
     departureDate: data.departureDate || '2025/01/01',
     tourCode: data.tourCode || 'CODE',
     price: data.price || '',
-    priceNote: data.priceNote === '__hidden__' ? '' : (data.priceNote || '/人'),
+    priceNote: data.priceNote === '__hidden__' ? '' : (data.priceNote || COMP_EDITOR_LABELS.人),
     country: selectedCountry || '',
     city: data.city || '',
     dailyItinerary: data.dailyItinerary,
@@ -145,7 +146,7 @@ export function CoverInfoSection({
         <div className="text-left flex-1">
           <h2 className="text-base font-bold text-morandi-primary">封面設定</h2>
           <p className="text-xs text-morandi-secondary">
-            風格：{currentStyleOption?.label || '經典全屏'}
+            風格：{currentStyleOption?.label || COMP_EDITOR_LABELS.經典全屏}
             {airportCode && ` · ${airportCode}`}
           </p>
         </div>
@@ -209,7 +210,7 @@ export function CoverInfoSection({
 
           {/* 右側：實時預覽 */}
           <PreviewPanel
-            styleLabel={currentStyleOption?.label || '經典全屏'}
+            styleLabel={currentStyleOption?.label || COMP_EDITOR_LABELS.經典全屏}
             styleColor={currentStyleColor}
           >
             {renderHeroPreview}

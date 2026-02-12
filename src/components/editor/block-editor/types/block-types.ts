@@ -27,6 +27,7 @@ import type {
   HeroStatCard,
   TourCountry,
 } from '@/components/editor/tour-form/types'
+import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
 // ============================================================
 // 區塊類型定義
@@ -270,9 +271,9 @@ export interface BlockConfig {
 export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
   COVER: {
     type: 'COVER',
-    label: '封面',
+    label: COMP_EDITOR_LABELS.封面,
     icon: 'Image',
-    description: '行程封面與基本資訊',
+    description: COMP_EDITOR_LABELS.行程封面與基本資訊,
     defaultData: {
       tagline: '',
       title: '',
@@ -291,9 +292,9 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
   },
   FLIGHT: {
     type: 'FLIGHT',
-    label: '航班資訊',
+    label: COMP_EDITOR_LABELS.航班資訊,
     icon: 'Plane',
-    description: '往返航班資訊',
+    description: COMP_EDITOR_LABELS.往返航班資訊,
     defaultData: {
       outboundFlight: {
         airline: '',
@@ -320,9 +321,9 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
   },
   FEATURES: {
     type: 'FEATURES',
-    label: '行程特色',
+    label: COMP_EDITOR_LABELS.行程特色,
     icon: 'Star',
-    description: '行程亮點與特色',
+    description: COMP_EDITOR_LABELS.行程亮點與特色,
     defaultData: {
       features: [],
       featuresStyle: 'original',
@@ -334,9 +335,9 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
   },
   FOCUS_CARDS: {
     type: 'FOCUS_CARDS',
-    label: '精選景點',
+    label: COMP_EDITOR_LABELS.精選景點,
     icon: 'MapPin',
-    description: '精選景點照片牆',
+    description: COMP_EDITOR_LABELS.精選景點照片牆,
     defaultData: {
       focusCards: [],
     },
@@ -347,9 +348,9 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
   },
   LEADER_MEETING: {
     type: 'LEADER_MEETING',
-    label: '領隊與集合',
+    label: COMP_EDITOR_LABELS.領隊與集合,
     icon: 'Users',
-    description: '領隊資訊與集合地點',
+    description: COMP_EDITOR_LABELS.領隊資訊與集合地點,
     defaultData: {
       leader: { name: '', domesticPhone: '', overseasPhone: '' },
       meetingPoints: [{ time: '', location: '' }],
@@ -361,9 +362,9 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
   },
   HOTELS: {
     type: 'HOTELS',
-    label: '飯店資訊',
+    label: COMP_EDITOR_LABELS.飯店資訊,
     icon: 'Building',
-    description: '住宿飯店介紹',
+    description: COMP_EDITOR_LABELS.住宿飯店介紹,
     defaultData: {
       hotels: [],
     },
@@ -374,9 +375,9 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
   },
   DAILY_ITINERARY: {
     type: 'DAILY_ITINERARY',
-    label: '每日行程',
+    label: COMP_EDITOR_LABELS.每日行程,
     icon: 'Calendar',
-    description: '每日行程安排',
+    description: COMP_EDITOR_LABELS.每日行程安排,
     defaultData: {
       itinerarySubtitle: '',
       dailyItinerary: [],
@@ -389,9 +390,9 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
   },
   PRICING: {
     type: 'PRICING',
-    label: '團費明細',
+    label: COMP_EDITOR_LABELS.團費明細,
     icon: 'DollarSign',
-    description: '費用包含與不含',
+    description: COMP_EDITOR_LABELS.費用包含與不含,
     defaultData: {
       pricingDetails: {
         included_items: [],
@@ -406,9 +407,9 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
   },
   PRICE_TIERS: {
     type: 'PRICE_TIERS',
-    label: '價格方案',
+    label: COMP_EDITOR_LABELS.價格方案,
     icon: 'Tag',
-    description: '多人數價格方案',
+    description: COMP_EDITOR_LABELS.多人數價格方案,
     defaultData: {
       priceTiers: [],
     },
@@ -419,9 +420,9 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
   },
   FAQS: {
     type: 'FAQS',
-    label: '常見問題',
+    label: COMP_EDITOR_LABELS.常見問題,
     icon: 'HelpCircle',
-    description: 'FAQ 問答',
+    description: COMP_EDITOR_LABELS.FAQ_問答,
     defaultData: {
       faqs: [],
     },
@@ -432,9 +433,9 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
   },
   NOTICES: {
     type: 'NOTICES',
-    label: '提醒事項',
+    label: COMP_EDITOR_LABELS.提醒事項,
     icon: 'AlertCircle',
-    description: '行前注意事項',
+    description: COMP_EDITOR_LABELS.行前注意事項,
     defaultData: {
       notices: [],
     },
@@ -445,9 +446,9 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
   },
   CANCELLATION: {
     type: 'CANCELLATION',
-    label: '取消政策',
+    label: COMP_EDITOR_LABELS.取消政策,
     icon: 'XCircle',
-    description: '退費與取消規定',
+    description: COMP_EDITOR_LABELS.退費與取消規定,
     defaultData: {
       cancellationPolicy: [],
     },

@@ -25,6 +25,7 @@ import {
   Settings,
   Check,
 } from 'lucide-react'
+import { COMP_LAYOUT_LABELS } from './constants/labels'
 
 // 可用的導航項目配置
 export interface NavItem {
@@ -51,19 +52,19 @@ const ICON_MAP = {
 
 // 預設導航項目（所有可選的功能）
 export const DEFAULT_NAV_ITEMS: NavItem[] = [
-  { id: 'home', icon: 'Home', label: '首頁', href: '/' },
+  { id: 'home', icon: 'Home', label: COMP_LAYOUT_LABELS.首頁, href: '/' },
   {
     id: 'calendar',
     icon: 'Calendar',
-    label: '行事曆',
+    label: COMP_LAYOUT_LABELS.行事曆,
     href: '/calendar',
     requiredPermission: 'calendar',
   },
-  { id: 'tours', icon: 'MapPin', label: '旅遊團', href: '/tours', requiredPermission: 'tours' },
+  { id: 'tours', icon: 'MapPin', label: COMP_LAYOUT_LABELS.旅遊團, href: '/tours', requiredPermission: 'tours' },
   {
     id: 'orders',
     icon: 'ShoppingCart',
-    label: '訂單',
+    label: COMP_LAYOUT_LABELS.訂單,
     href: '/orders',
     requiredPermission: 'orders',
   },
@@ -78,21 +79,21 @@ export const DEFAULT_NAV_ITEMS: NavItem[] = [
   {
     id: 'finance',
     icon: 'CreditCard',
-    label: '財務',
+    label: COMP_LAYOUT_LABELS.財務,
     href: '/finance',
     requiredPermission: 'payments',
   },
   {
     id: 'customers',
     icon: 'Users',
-    label: '顧客',
+    label: COMP_LAYOUT_LABELS.顧客,
     href: '/customers',
     requiredPermission: 'customers',
   },
   {
     id: 'database',
     icon: 'Database',
-    label: '資料',
+    label: COMP_LAYOUT_LABELS.資料,
     href: '/database',
     requiredPermission: 'database',
   },

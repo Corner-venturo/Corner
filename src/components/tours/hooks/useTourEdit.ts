@@ -12,6 +12,7 @@ import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
 import { logger } from '@/lib/utils/logger'
 import { differenceInDays, addDays, format, parseISO } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
+import { COMP_TOURS_LABELS } from '../constants/labels'
 
 // ================================
 // Types
@@ -133,7 +134,7 @@ export function useTourEdit(params: UseTourEditParams) {
         description: tour.description || '',
         outboundFlight: tourOutbound || { ...emptyFlightInfo },
         returnFlight: tourReturn || { ...emptyFlightInfo, departureAirport: '', arrivalAirport: 'TPE' },
-        isSpecial: tour.status === '特殊團',
+        isSpecial: tour.status === COMP_TOURS_LABELS.特殊團,
         enable_checkin: tour.enable_checkin || false,
       })
       return
@@ -204,7 +205,7 @@ export function useTourEdit(params: UseTourEditParams) {
       description: tour.description || '',
       outboundFlight: tourOutbound || { ...emptyFlightInfo },
       returnFlight: tourReturn || { ...emptyFlightInfo, departureAirport: '', arrivalAirport: 'TPE' },
-      isSpecial: tour.status === '特殊團',
+      isSpecial: tour.status === COMP_TOURS_LABELS.特殊團,
       enable_checkin: tour.enable_checkin || false,
     })
   }, [isOpen, tour, activeCountries, getCitiesByCountry])
@@ -243,7 +244,7 @@ export function useTourEdit(params: UseTourEditParams) {
   const handleSearchOutbound = useCallback(async () => {
     const flightNumber = formData.outboundFlight.flightNumber
     if (!flightNumber) {
-      toast.error('請先輸入航班號碼')
+      toast.error(COMP_TOURS_LABELS.請先輸入航班號碼)
       return
     }
 
@@ -277,11 +278,11 @@ export function useTourEdit(params: UseTourEditParams) {
         if (result.warning) {
           toast.warning(result.warning, { duration: 5000 })
         } else {
-          toast.success('航班資料已更新')
+          toast.success(COMP_TOURS_LABELS.航班資料已更新)
         }
       }
     } catch {
-      toast.error('查詢航班時發生錯誤')
+      toast.error(COMP_TOURS_LABELS.查詢航班時發生錯誤)
     } finally {
       setLoadingOutbound(false)
     }
@@ -291,7 +292,7 @@ export function useTourEdit(params: UseTourEditParams) {
   const handleSearchReturn = useCallback(async () => {
     const flightNumber = formData.returnFlight.flightNumber
     if (!flightNumber) {
-      toast.error('請先輸入航班號碼')
+      toast.error(COMP_TOURS_LABELS.請先輸入航班號碼)
       return
     }
 
@@ -325,11 +326,11 @@ export function useTourEdit(params: UseTourEditParams) {
         if (result.warning) {
           toast.warning(result.warning, { duration: 5000 })
         } else {
-          toast.success('航班資料已更新')
+          toast.success(COMP_TOURS_LABELS.航班資料已更新)
         }
       }
     } catch {
-      toast.error('查詢航班時發生錯誤')
+      toast.error(COMP_TOURS_LABELS.查詢航班時發生錯誤)
     } finally {
       setLoadingReturn(false)
     }
@@ -380,7 +381,7 @@ export function useTourEdit(params: UseTourEditParams) {
   const handleSubmit = useCallback(async () => {
     if (!tour) return
     if (!formData.name.trim() || !formData.departure_date || !formData.return_date) {
-      toast.error('請填寫必要欄位')
+      toast.error(COMP_TOURS_LABELS.請填寫必要欄位)
       return
     }
 
@@ -421,7 +422,7 @@ export function useTourEdit(params: UseTourEditParams) {
         description: formData.description.trim(),
         outbound_flight: cleanFlightInfo(formData.outboundFlight),
         return_flight: cleanFlightInfo(formData.returnFlight),
-        status: formData.isSpecial ? '特殊團' : tour.status,
+        status: formData.isSpecial ? COMP_TOURS_LABELS.特殊團 : tour.status,
         enable_checkin: formData.enable_checkin,
         updated_at: new Date().toISOString(),
       }
@@ -435,7 +436,7 @@ export function useTourEdit(params: UseTourEditParams) {
 
       if (error) throw error
 
-      toast.success('旅遊團資料已更新')
+      toast.success(COMP_TOURS_LABELS.旅遊團資料已更新)
 
       // Reload data
       mutate(`tour-${tour.id}`)
@@ -468,8 +469,8 @@ export function useTourEdit(params: UseTourEditParams) {
       onSuccess?.(updatedTour)
       onClose()
     } catch (error) {
-      logger.error('更新旅遊團失敗:', error)
-      toast.error('更新失敗，請稍後再試')
+      logger.error(COMP_TOURS_LABELS.更新旅遊團失敗, error)
+      toast.error(COMP_TOURS_LABELS.更新失敗_請稍後再試)
     } finally {
       setSubmitting(false)
     }
@@ -478,7 +479,7 @@ export function useTourEdit(params: UseTourEditParams) {
   // Generate date label for itinerary day
   const generateDateLabel = useCallback((departureDate: string, dayIndex: number): string => {
     const date = addDays(parseISO(departureDate), dayIndex)
-    const weekdays = ['日', '一', '二', '三', '四', '五', '六']
+    const weekdays = [COMP_TOURS_LABELS.日, COMP_TOURS_LABELS.一, COMP_TOURS_LABELS.二, COMP_TOURS_LABELS.三, COMP_TOURS_LABELS.四, COMP_TOURS_LABELS.五, COMP_TOURS_LABELS.六]
     const weekday = weekdays[date.getDay()]
     return `${format(date, 'M/d', { locale: zhTW })} (${weekday})`
   }, [])
@@ -532,15 +533,15 @@ export function useTourEdit(params: UseTourEditParams) {
           const newDay: DailyItineraryDay = {
             dayLabel: `Day ${newDayIndex + 1}`,
             date: generateDateLabel(formData.departure_date, newDayIndex),
-            title: '自由活動',
+            title: COMP_TOURS_LABELS.自由活動,
             highlight: '',
             description: '',
             activities: [],
             recommendations: [],
             meals: {
-              breakfast: '飯店早餐',
-              lunch: '敬請自理',
-              dinner: '敬請自理',
+              breakfast: COMP_TOURS_LABELS.飯店早餐,
+              lunch: COMP_TOURS_LABELS.敬請自理,
+              dinner: COMP_TOURS_LABELS.敬請自理,
             },
             accommodation: lastDay?.accommodation || '',
             images: [],
@@ -566,17 +567,17 @@ export function useTourEdit(params: UseTourEditParams) {
         .eq('id', itinerary.id)
 
       if (error) {
-        logger.error('同步行程表失敗:', error)
-        toast.error('同步行程表失敗')
+        logger.error(COMP_TOURS_LABELS.同步行程表失敗_2, error)
+        toast.error(COMP_TOURS_LABELS.同步行程表失敗)
       } else {
-        toast.success('行程表已同步更新')
+        toast.success(COMP_TOURS_LABELS.行程表已同步更新)
         // Invalidate itinerary cache
         mutate(`itinerary-${itinerary.id}`)
         mutate('itineraries')
       }
     } catch (error) {
-      logger.error('同步行程表失敗:', error)
-      toast.error('同步行程表失敗')
+      logger.error(COMP_TOURS_LABELS.同步行程表失敗_2, error)
+      toast.error(COMP_TOURS_LABELS.同步行程表失敗)
     }
 
     closeSyncDialog()

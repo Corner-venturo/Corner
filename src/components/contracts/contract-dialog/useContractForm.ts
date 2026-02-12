@@ -7,6 +7,7 @@ import { alert, alertSuccess, alertError } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import type { OrderMember } from '@/components/orders/order-member.types'
+import { COMP_CONTRACTS_LABELS } from '../constants/labels'
 
 interface UseContractFormProps {
   tour: Tour
@@ -65,7 +66,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
       if (error) throw error
       setOrderMembers(data || [])
     } catch (error) {
-      logger.error('載入訂單成員失敗:', error)
+      logger.error(COMP_CONTRACTS_LABELS.載入訂單成員失敗, error)
     } finally {
       setMembersLoading(false)
     }
@@ -273,9 +274,9 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
             // 根據航空公司判斷航廈
             if (!gatherLocation && itinerary.outbound_flight?.airline) {
               const airline = itinerary.outbound_flight.airline.toUpperCase()
-              const terminal2Airlines = ['中華航空', 'CI', 'CHINA AIRLINES', '華航', '長榮航空', 'BR', 'EVA', '星宇航空', 'JX', 'STARLUX', '台灣虎航', 'IT', 'TIGERAIR', '樂桃航空', 'MM', 'PEACH', '捷星航空', 'GK', 'JETSTAR', '酷航', 'TR', 'SCOOT', '亞洲航空', 'AK', 'D7', 'AIRASIA']
+              const terminal2Airlines = [COMP_CONTRACTS_LABELS.中華航空, 'CI', 'CHINA AIRLINES', COMP_CONTRACTS_LABELS.華航, COMP_CONTRACTS_LABELS.長榮航空, 'BR', 'EVA', COMP_CONTRACTS_LABELS.星宇航空, 'JX', 'STARLUX', COMP_CONTRACTS_LABELS.台灣虎航, 'IT', 'TIGERAIR', COMP_CONTRACTS_LABELS.樂桃航空, 'MM', 'PEACH', COMP_CONTRACTS_LABELS.捷星航空, 'GK', 'JETSTAR', COMP_CONTRACTS_LABELS.酷航, 'TR', 'SCOOT', COMP_CONTRACTS_LABELS.亞洲航空, 'AK', 'D7', 'AIRASIA']
               const isTerminal2 = terminal2Airlines.some(t => airline.includes(t.toUpperCase()))
-              gatherLocation = isTerminal2 ? '桃園國際機場第二航廈' : ''
+              gatherLocation = isTerminal2 ? COMP_CONTRACTS_LABELS.桃園國際機場第二航廈 : ''
             }
           } else if (tour.departure_date) {
             // 沒有行程表，只帶入出發日期
@@ -344,7 +345,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
     const hasExistingContract = !!tour.contract_template
 
     if (!hasExistingContract && !selectedTemplate) {
-      void alert('請選擇合約範本', 'warning')
+      void alert(COMP_CONTRACTS_LABELS.請選擇合約範本, 'warning')
       return false
     }
 
@@ -382,17 +383,17 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
           .in('id', idsToUpdate)
 
         if (memberError) {
-          logger.error('更新成員合約狀態失敗:', memberError)
+          logger.error(COMP_CONTRACTS_LABELS.更新成員合約狀態失敗, memberError)
         }
 
         // 重新載入成員資料
         void loadOrderMembers()
       }
 
-      void alertSuccess(hasExistingContract ? '合約更新成功!' : '合約建立成功!')
+      void alertSuccess(hasExistingContract ? COMP_CONTRACTS_LABELS.合約更新成功 : COMP_CONTRACTS_LABELS.合約建立成功)
       return true
     } catch (error) {
-      void alertError('儲存合約失敗，請稍後再試')
+      void alertError(COMP_CONTRACTS_LABELS.儲存合約失敗_請稍後再試)
       return false
     } finally {
       setSaving(false)
@@ -401,7 +402,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
 
   const handlePrint = async () => {
     if (!contractData || Object.keys(contractData).length === 0) {
-      void alert('請先填寫合約資料', 'warning')
+      void alert(COMP_CONTRACTS_LABELS.請先填寫合約資料, 'warning')
       return
     }
 
@@ -427,7 +428,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
       const templateFile = templateMap[selectedTemplate as string] || 'international.html'
       const response = await fetch(`/contract-templates/${templateFile}`)
       if (!response.ok) {
-        throw new Error('無法載入合約範本')
+        throw new Error(COMP_CONTRACTS_LABELS.無法載入合約範本)
       }
 
       let template = await response.text()
@@ -448,7 +449,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
       // 開啟新視窗並列印
       const printWindow = window.open('', '_blank')
       if (!printWindow) {
-        void alert('請允許彈出視窗以進行列印', 'warning')
+        void alert(COMP_CONTRACTS_LABELS.請允許彈出視窗以進行列印, 'warning')
         return
       }
 
@@ -464,7 +465,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
         }
       }
     } catch (error) {
-      void alertError('列印合約時發生錯誤，請稍後再試')
+      void alertError(COMP_CONTRACTS_LABELS.列印合約時發生錯誤_請稍後再試)
     } finally {
       setSaving(false)
     }

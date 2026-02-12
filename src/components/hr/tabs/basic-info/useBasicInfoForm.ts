@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Employee } from '@/stores/types'
 import { useUserStore, userStoreHelpers } from '@/stores/user-store'
 import { BasicInfoFormData, PasswordData } from './types'
+import { COMP_HR_LABELS } from '../../constants/labels'
 
 export function useBasicInfoForm(employee: Employee, setIsEditing: (editing: boolean) => void) {
   const { update: updateUser } = useUserStore()
@@ -56,7 +57,7 @@ export function useBasicInfoForm(employee: Employee, setIsEditing: (editing: boo
       await updateUser(employee.id, updates)
       setIsEditing(false)
     } catch (error) {
-      alert('儲存失敗：' + (error as Error).message)
+      alert(COMP_HR_LABELS.儲存失敗 + (error as Error).message)
     }
   }
 
@@ -93,12 +94,12 @@ export function useBasicInfoForm(employee: Employee, setIsEditing: (editing: boo
 
   const handlePasswordUpdate = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert('新密碼與確認密碼不符！')
+      alert(COMP_HR_LABELS.新密碼與確認密碼不符)
       return
     }
 
     if (passwordData.newPassword.length < 8) {
-      alert('密碼長度至少需要8個字元！')
+      alert(COMP_HR_LABELS.密碼長度至少需要8個字元)
       return
     }
 
@@ -118,7 +119,7 @@ export function useBasicInfoForm(employee: Employee, setIsEditing: (editing: boo
       const result = await response.json()
 
       if (!result.success) {
-        alert('密碼更新失敗：' + result.error)
+        alert(COMP_HR_LABELS.密碼更新失敗 + result.error)
         return
       }
 
@@ -126,7 +127,7 @@ export function useBasicInfoForm(employee: Employee, setIsEditing: (editing: boo
       setPasswordData({ newPassword: '', confirmPassword: '' })
       setShowPasswordSection(false)
     } catch (error) {
-      alert('密碼更新失敗，請稍後再試')
+      alert(COMP_HR_LABELS.密碼更新失敗_請稍後再試)
     } finally {
       setPasswordUpdateLoading(false)
     }

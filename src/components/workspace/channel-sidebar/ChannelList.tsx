@@ -20,6 +20,7 @@ import { ChannelListSection, GroupedChannelList } from './ChannelListSection'
 import { getWorkspaceMembers } from '@/lib/actions/user-actions'
 import { BotSection } from './BotSection'
 import { ColleaguesSection } from './ColleaguesSection'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 interface ChannelListProps {
   announcementChannels: Channel[]
@@ -170,7 +171,7 @@ export function ChannelList({
               checkIsMember={checkIsMember}
               isExpanded={expandedSections.favorites !== false}
               onToggleExpanded={() => onToggleExpanded('favorites', !expandedSections.favorites)}
-              title="我的最愛"
+              title={COMP_WORKSPACE_LABELS.我的最愛}
               icon="star"
             />
           )}
@@ -217,7 +218,7 @@ export function ChannelList({
               checkIsMember={checkIsMember}
               isExpanded={expandedSections.ungrouped !== false}
               onToggleExpanded={() => onToggleExpanded('ungrouped', !expandedSections.ungrouped)}
-              title="頻道"
+              title={COMP_WORKSPACE_LABELS.頻道}
               icon="hash"
               showAddButton
               onAddClick={() => {}}
@@ -249,7 +250,7 @@ export function ChannelList({
               checkIsMember={checkIsMember}
               isExpanded={true}
               onToggleExpanded={() => {}}
-              title="可加入的頻道"
+              title={COMP_WORKSPACE_LABELS.可加入的頻道}
               icon="userPlus"
             />
           )}

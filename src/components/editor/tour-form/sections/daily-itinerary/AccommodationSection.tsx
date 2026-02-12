@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DailyItinerary, TourFormData } from '../../types'
+import { COMP_EDITOR_LABELS } from '../../../constants/labels'
 
 interface AccommodationSectionProps {
   day: DailyItinerary
@@ -120,7 +121,7 @@ export function AccommodationSection({
             onChange={e => updateDailyItinerary(dayIndex, 'accommodation', e.target.value)}
             disabled={isLocked}
             className="h-8 text-sm"
-            placeholder="飯店名稱"
+            placeholder={COMP_EDITOR_LABELS.飯店名稱}
           />
         </div>
         <div className="w-24">

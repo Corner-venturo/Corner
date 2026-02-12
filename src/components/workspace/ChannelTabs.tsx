@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { prompt, confirm } from '@/lib/ui/alert-dialog'
 import { CanvasEditor } from './CanvasEditor'
 import { Channel } from '@/stores/workspace-store'
+import { COMP_WORKSPACE_LABELS } from './constants/labels'
 
 interface Canvas {
   id: string
@@ -46,9 +47,9 @@ export function ChannelTabs({ channel, children, headerActions }: ChannelTabsPro
 
   // 新增畫布
   const handleAddCanvas = async () => {
-    const name = await prompt('請輸入畫布名稱', {
-      title: '新增畫布',
-      placeholder: '輸入名稱...',
+    const name = await prompt(COMP_WORKSPACE_LABELS.請輸入畫布名稱, {
+      title: COMP_WORKSPACE_LABELS.新增畫布,
+      placeholder: COMP_WORKSPACE_LABELS.輸入名稱,
     })
     if (!name || !name.trim()) return
 
@@ -69,7 +70,7 @@ export function ChannelTabs({ channel, children, headerActions }: ChannelTabsPro
     if (!canvas) return
 
     const confirmed = await confirm(`確定要刪除畫布「${canvas.name}」嗎？`, {
-      title: '刪除畫布',
+      title: COMP_WORKSPACE_LABELS.刪除畫布,
       type: 'warning',
     })
     if (!confirmed) return
@@ -128,7 +129,7 @@ export function ChannelTabs({ channel, children, headerActions }: ChannelTabsPro
                 <button
                   onClick={e => handleDeleteCanvas(canvas.id, e)}
                   className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-status-danger-bg rounded transition-opacity"
-                  title="刪除畫布"
+                  title={COMP_WORKSPACE_LABELS.刪除畫布}
                 >
                   <Trash2 size={12} className="text-status-danger" />
                 </button>
@@ -142,7 +143,7 @@ export function ChannelTabs({ channel, children, headerActions }: ChannelTabsPro
             <button
               onClick={handleAddCanvas}
               className="flex items-center justify-center w-8 h-8 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/10 rounded transition-colors"
-              title="新增畫布"
+              title={COMP_WORKSPACE_LABELS.新增畫布}
             >
               <Plus size={18} />
             </button>

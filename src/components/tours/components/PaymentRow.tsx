@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { TrendingUp, TrendingDown, CreditCard, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
+import { COMP_TOURS_LABELS } from '../constants/labels'
 
 interface ReceiptPayment extends Payment {
   method?: string
@@ -20,9 +21,9 @@ interface PaymentRowProps {
 
 // 狀態標籤映射（英文 -> 中文）
 const STATUS_LABELS: Record<string, string> = {
-  confirmed: '已確認',
-  pending: '待確認',
-  completed: '已完成',
+  confirmed: COMP_TOURS_LABELS.已確認,
+  pending: COMP_TOURS_LABELS.待確認,
+  completed: COMP_TOURS_LABELS.已完成,
 }
 
 const getStatusLabel = (status: string) => STATUS_LABELS[status] || status
@@ -53,10 +54,10 @@ const getMethodBadge = (method: string) => {
 
 const getMethodDisplayName = (method: string) => {
   const names: Record<string, string> = {
-    bank_transfer: '銀行轉帳',
-    credit_card: '信用卡',
-    cash: '現金',
-    check: '支票',
+    bank_transfer: COMP_TOURS_LABELS.銀行轉帳,
+    credit_card: COMP_TOURS_LABELS.信用卡,
+    cash: COMP_TOURS_LABELS.現金,
+    check: COMP_TOURS_LABELS.支票,
   }
   return names[method] || method
 }
@@ -81,7 +82,7 @@ export const PaymentRow = React.memo(function PaymentRow({
         <div className="flex items-center space-x-2">
           {getPaymentTypeIcon(payment.type)}
           <span className="text-morandi-primary">
-            {payment.type === 'receipt' ? '收款' : payment.type === 'request' ? '請款' : '出納'}
+            {payment.type === 'receipt' ? COMP_TOURS_LABELS.收款 : payment.type === 'request' ? COMP_TOURS_LABELS.請款 : COMP_TOURS_LABELS.出納}
           </span>
         </div>
       </td>
@@ -123,7 +124,7 @@ export const PaymentRow = React.memo(function PaymentRow({
           size="sm"
           onClick={() => onOpenInvoice(payment.order_id)}
           className="h-8 px-2 text-xs text-primary hover:bg-primary/10"
-          title="開立代轉發票"
+          title={COMP_TOURS_LABELS.開立代轉發票}
         >
           <FileText size={14} className="mr-1" />
           開代轉

@@ -3,6 +3,7 @@
 import React from 'react'
 import { ImageIcon, Crown, Star } from 'lucide-react'
 import type { LuxuryHotel } from '../HotelSelector'
+import { COMP_EDITOR_LABELS } from '../constants/labels'
 
 interface HotelCardProps {
   hotel: LuxuryHotel
@@ -21,9 +22,9 @@ const getPriceDisplay = (priceRange: string | null) => {
 // 轉換飯店等級顯示
 const getHotelClassLabel = (hotelClass: string | null) => {
   switch (hotelClass) {
-    case 'ultra-luxury': return '頂級奢華'
-    case 'luxury': return '奢華'
-    case 'boutique': return '精品'
+    case 'ultra-luxury': return COMP_EDITOR_LABELS.頂級奢華
+    case 'luxury': return COMP_EDITOR_LABELS.奢華
+    case 'boutique': return COMP_EDITOR_LABELS.精品
     default: return hotelClass
   }
 }

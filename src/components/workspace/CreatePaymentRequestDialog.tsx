@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/dialog'
 import { CurrencyCell } from '@/components/table-cells'
 import { createPaymentRequestSchema } from '@/lib/validations/schemas'
+import { COMP_WORKSPACE_LABELS } from './constants/labels'
 
 interface CreatePaymentRequestDialogProps {
   items: AdvanceItem | AdvanceItem[] // 單項或批次
@@ -44,7 +45,7 @@ export function CreatePaymentRequestDialog({
   const isBatch = Array.isArray(items)
 
   const [selectedTourId, setSelectedTourId] = useState('')
-  const [category, setCategory] = useState('其他')
+  const [category, setCategory] = useState(COMP_WORKSPACE_LABELS.其他)
   const [supplier, setSupplier] = useState('')
   const [requestDate, setRequestDate] = useState('')
 
@@ -86,7 +87,7 @@ export function CreatePaymentRequestDialog({
         code: '',
         request_number: '',
         tour_id: selectedTourId,
-        request_type: category || '員工代墊',
+        request_type: category || COMP_WORKSPACE_LABELS.員工代墊,
         request_date: requestDate,
         amount: totalAmount,
         supplier_name: supplier,
@@ -109,8 +110,8 @@ export function CreatePaymentRequestDialog({
       onSuccess()
       onOpenChange(false)
     } catch (error) {
-      logger.error('建立請款單失敗：', error)
-      void alert('建立失敗，請稍後再試', 'error')
+      logger.error(COMP_WORKSPACE_LABELS.建立請款單失敗, error)
+      void alert(COMP_WORKSPACE_LABELS.建立失敗_請稍後再試, 'error')
     }
   }
 
@@ -119,7 +120,7 @@ export function CreatePaymentRequestDialog({
       <DialogContent level={1} className="max-w-[600px]">
         <DialogHeader>
           <DialogTitle>
-            {isBatch ? `批次請款 (${itemsArray.length} 筆)` : '建立請款單'}
+            {isBatch ? `批次請款 (${itemsArray.length} 筆)` : COMP_WORKSPACE_LABELS.建立請款單}
           </DialogTitle>
         </DialogHeader>
 
@@ -156,8 +157,8 @@ export function CreatePaymentRequestDialog({
                 value: tour.id,
                 label: `${tour.code} - ${tour.name}`,
               }))}
-              placeholder="搜尋或選擇旅遊團..."
-              emptyMessage="找不到旅遊團"
+              placeholder={COMP_WORKSPACE_LABELS.搜尋或選擇旅遊團}
+              emptyMessage={COMP_WORKSPACE_LABELS.找不到旅遊團}
             />
           </div>
 

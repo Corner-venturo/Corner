@@ -7,6 +7,7 @@ import { TourFormData } from '../../types'
 import { searchFlightAction, type FlightData } from '@/features/dashboard/actions/flight-actions'
 import { alert } from '@/lib/ui/alert-dialog'
 import { parseDate } from './utils'
+import { COMP_EDITOR_LABELS } from '../../../constants/labels'
 
 // 航段資訊類型
 export interface FlightSegment {
@@ -62,7 +63,7 @@ export function useFlightSearch({
     const dateStr = data.outboundFlight?.departureDate // 格式 MM/DD
 
     if (!flightNumber) {
-      void alert('請先輸入航班號碼', 'warning')
+      void alert(COMP_EDITOR_LABELS.請先輸入航班號碼, 'warning')
       return
     }
 
@@ -119,7 +120,7 @@ export function useFlightSearch({
         }
       }
     } catch {
-      void alert('查詢航班時發生錯誤', 'error')
+      void alert(COMP_EDITOR_LABELS.查詢航班時發生錯誤, 'error')
     } finally {
       setLoadingOutbound(false)
     }
@@ -153,7 +154,7 @@ export function useFlightSearch({
     const dateStr = data.returnFlight?.departureDate // 格式 MM/DD
 
     if (!flightNumber) {
-      void alert('請先輸入航班號碼', 'warning')
+      void alert(COMP_EDITOR_LABELS.請先輸入航班號碼, 'warning')
       return
     }
 
@@ -213,7 +214,7 @@ export function useFlightSearch({
         }
       }
     } catch {
-      void alert('查詢航班時發生錯誤', 'error')
+      void alert(COMP_EDITOR_LABELS.查詢航班時發生錯誤, 'error')
     } finally {
       setLoadingReturn(false)
     }

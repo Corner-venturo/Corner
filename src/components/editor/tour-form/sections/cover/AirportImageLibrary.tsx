@@ -14,6 +14,7 @@ import { useAuthStore } from '@/stores'
 import { logger } from '@/lib/utils/logger'
 import type { AirportImage } from '@/stores/types'
 import type { ImagePositionSettings } from '@/components/ui/image-position-editor'
+import { COMP_EDITOR_LABELS } from '../../../constants/labels'
 
 interface AirportImageLibraryProps {
   airportCode: string
@@ -80,7 +81,7 @@ export function AirportImageLibrary({
       setShowAddDialog(false)
       onImageUpload(newImageUrl)
     } catch (error) {
-      logger.error('儲存圖片失敗:', error)
+      logger.error(COMP_EDITOR_LABELS.儲存圖片失敗, error)
     } finally {
       setIsUploading(false)
     }
@@ -91,7 +92,7 @@ export function AirportImageLibrary({
     try {
       await deleteImage(imageId)
     } catch (error) {
-      logger.error('刪除圖片失敗:', error)
+      logger.error(COMP_EDITOR_LABELS.刪除圖片失敗, error)
     }
   }, [deleteImage])
 
@@ -111,7 +112,7 @@ export function AirportImageLibrary({
           filePrefix="itinerary"
           previewHeight="112px"
           aspectRatio={16 / 9}
-          placeholder="或直接上傳圖片"
+          placeholder={COMP_EDITOR_LABELS.或直接上傳圖片}
         />
       </div>
     )
@@ -156,7 +157,7 @@ export function AirportImageLibrary({
             >
               <img
                 src={image.image_url}
-                alt={image.label || '封面圖片'}
+                alt={image.label || COMP_EDITOR_LABELS.封面圖片}
                 className="w-full h-full object-cover"
               />
 
@@ -208,7 +209,7 @@ export function AirportImageLibrary({
             filePrefix="itinerary"
             previewHeight="70px"
             aspectRatio={16 / 9}
-            placeholder="本地圖片"
+            placeholder={COMP_EDITOR_LABELS.本地圖片}
           />
         </div>
 
@@ -266,7 +267,7 @@ export function AirportImageLibrary({
               filePrefix={`airport/${airportCode}`}
               previewHeight="120px"
               aspectRatio={16 / 9}
-              placeholder="上傳圖片"
+              placeholder={COMP_EDITOR_LABELS.上傳圖片}
             />
 
             <div>
@@ -276,7 +277,7 @@ export function AirportImageLibrary({
               <Input
                 value={newImageLabel}
                 onChange={(e) => setNewImageLabel(e.target.value)}
-                placeholder="如：春季、夏季、寺廟..."
+                placeholder={COMP_EDITOR_LABELS.如_春季_夏季_寺廟}
                 className="h-9"
               />
             </div>
@@ -300,7 +301,7 @@ export function AirportImageLibrary({
                 disabled={!newImageUrl || isUploading}
                 className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
-                {isUploading ? <Loader2 size={14} className="animate-spin" /> : '加入圖片庫'}
+                {isUploading ? <Loader2 size={14} className="animate-spin" /> : COMP_EDITOR_LABELS.加入圖片庫}
               </Button>
             </div>
           </div>

@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase/client'
 import { useCustomersSlim, updateCustomer, createCustomer } from '@/data'
 import { alert } from '@/lib/ui/alert-dialog'
 import type { OrderMember } from '@/components/orders/order-member.types'
+import { COMP_ORDERS_LABELS } from '../constants/labels'
 // 2025-06-27: 移除 useImageEditor 依賴 (改用統一的 ImageEditor 元件)
 
 interface UseMemberEditDialogParams {
@@ -96,7 +97,7 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
           .eq('id', editingMember.customer_id)
 
         if (customerError) {
-          logger.error('更新顧客失敗:', customerError)
+          logger.error(COMP_ORDERS_LABELS.更新顧客失敗, customerError)
         }
       } else if (editFormData.chinese_name || editFormData.passport_number || editFormData.id_number) {
         // 2b. 沒有關聯顧客但有填寫資料，嘗試比對或建立新顧客
@@ -194,10 +195,10 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
       // 4. 關閉彈窗
       setIsEditDialogOpen(false)
       setEditingMember(null)
-      void alert(editMode === 'verify' ? '驗證完成！' : '儲存成功！', 'success')
+      void alert(editMode === 'verify' ? COMP_ORDERS_LABELS.驗證完成 : COMP_ORDERS_LABELS.儲存成功, 'success')
     } catch (error) {
-      logger.error('儲存失敗:', error)
-      void alert('儲存失敗：' + (error instanceof Error ? error.message : '未知錯誤'), 'error')
+      logger.error(COMP_ORDERS_LABELS.儲存失敗_2, error)
+      void alert(COMP_ORDERS_LABELS.儲存失敗_3 + (error instanceof Error ? error.message : COMP_ORDERS_LABELS.未知錯誤), 'error')
     } finally {
       setIsSaving(false)
     }

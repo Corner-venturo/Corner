@@ -11,6 +11,7 @@ import Placeholder from '@tiptap/extension-placeholder'
 import { useEditorState } from '../shared/useCanvasState'
 import { CANVAS_LIMITS, IMAGE_QUALITY, UPLOAD_DELAYS, EDITOR_CLASSES } from '../shared/constants'
 import { prompt } from '@/lib/ui/alert-dialog'
+import { COMP_WORKSPACE_LABELS } from '../../constants/labels'
 
 export function useCanvasEditor(storageKey: string) {
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -35,7 +36,7 @@ export function useCanvasEditor(storageKey: string) {
         },
       }),
       Placeholder.configure({
-        placeholder: '開始編寫內容...',
+        placeholder: COMP_WORKSPACE_LABELS.開始編寫內容,
       }),
     ],
     content: '',
@@ -109,7 +110,7 @@ export function useCanvasEditor(storageKey: string) {
 
           const ctx = canvas.getContext('2d')
           if (!ctx) {
-            reject(new Error('無法取得 canvas context'))
+            reject(new Error(COMP_WORKSPACE_LABELS.無法取得_canvas_context))
             return
           }
 
@@ -120,7 +121,7 @@ export function useCanvasEditor(storageKey: string) {
           canvas.toBlob(
             blob => {
               if (!blob) {
-                reject(new Error('圖片壓縮失敗'))
+                reject(new Error(COMP_WORKSPACE_LABELS.圖片壓縮失敗))
                 return
               }
 
@@ -149,12 +150,12 @@ export function useCanvasEditor(storageKey: string) {
   const processImageFile = useCallback(
     async (file: File) => {
       if (!file.type.startsWith('image/')) {
-        alert('請選擇圖片檔案')
+        alert(COMP_WORKSPACE_LABELS.請選擇圖片檔案)
         return
       }
 
       if (file.size > CANVAS_LIMITS.MAX_IMAGE_SIZE) {
-        alert('圖片大小不能超過 20MB')
+        alert(COMP_WORKSPACE_LABELS.圖片大小不能超過_20MB)
         return
       }
 
@@ -184,7 +185,7 @@ export function useCanvasEditor(storageKey: string) {
           resetUploadProgress()
         }, UPLOAD_DELAYS.HIDE_PROGRESS)
       } catch (error) {
-        alert('圖片處理失敗，請重試')
+        alert(COMP_WORKSPACE_LABELS.圖片處理失敗_請重試)
         resetUploadProgress()
       }
     },
@@ -231,7 +232,7 @@ export function useCanvasEditor(storageKey: string) {
       const imageFiles = files.filter(file => file.type.startsWith('image/'))
 
       if (imageFiles.length === 0) {
-        alert('請拖曳圖片檔案')
+        alert(COMP_WORKSPACE_LABELS.請拖曳圖片檔案)
         return
       }
 
@@ -252,8 +253,8 @@ export function useCanvasEditor(storageKey: string) {
   )
 
   const setLink = useCallback(async () => {
-    const url = await prompt('輸入網址', {
-      title: '插入連結',
+    const url = await prompt(COMP_WORKSPACE_LABELS.輸入網址, {
+      title: COMP_WORKSPACE_LABELS.插入連結,
       placeholder: 'https://...',
     })
     if (url) {
@@ -262,8 +263,8 @@ export function useCanvasEditor(storageKey: string) {
   }, [editor])
 
   const addImage = useCallback(async () => {
-    const url = await prompt('輸入圖片網址', {
-      title: '插入圖片',
+    const url = await prompt(COMP_WORKSPACE_LABELS.輸入圖片網址, {
+      title: COMP_WORKSPACE_LABELS.插入圖片,
       placeholder: 'https://...',
     })
     if (url) {

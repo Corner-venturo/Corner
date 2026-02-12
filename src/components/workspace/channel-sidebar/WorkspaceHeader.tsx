@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 interface WorkspaceHeaderProps {
   workspaceName: string
@@ -70,7 +71,7 @@ export function WorkspaceHeader({
     <div className="h-[56px] px-6 border-b border-border bg-gradient-to-r from-morandi-gold/5 to-transparent flex items-center">
       <div className="flex items-center justify-between w-full">
         <h2 className="font-semibold text-morandi-primary truncate flex-1 min-w-0">
-          {workspaceIcon} {workspaceName || '工作空間'}
+          {workspaceIcon} {workspaceName || COMP_WORKSPACE_LABELS.工作空間}
         </h2>
         <div className="flex items-center gap-1">
           {/* 搜尋按鈕/輸入框 */}
@@ -81,7 +82,7 @@ export function WorkspaceHeader({
                 <input
                   ref={searchInputRef}
                   type="text"
-                  placeholder="搜尋..."
+                  placeholder={COMP_WORKSPACE_LABELS.搜尋}
                   value={searchQuery}
                   onChange={e => onSearchChange(e.target.value)}
                   className="w-24 h-7 px-2 text-xs border-none focus:outline-none focus:ring-0"
@@ -104,7 +105,7 @@ export function WorkspaceHeader({
               <button
                 onClick={handleSearchToggle}
                 className="btn-icon-morandi !w-7 !h-7"
-                title="搜尋頻道"
+                title={COMP_WORKSPACE_LABELS.搜尋頻道}
               >
                 <Search size={14} />
               </button>
@@ -115,7 +116,7 @@ export function WorkspaceHeader({
               onClick={onRefresh}
               disabled={isRefreshing}
               className="btn-icon-morandi !w-7 !h-7"
-              title="重新整理頻道列表"
+              title={COMP_WORKSPACE_LABELS.重新整理頻道列表}
             >
               <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
             </button>

@@ -1,3 +1,4 @@
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 /**
  * 新增群組 Dialog
  */
@@ -25,7 +26,7 @@ export function CreateGroupDialog({
         <h3 className="font-semibold mb-3 text-morandi-primary">新增群組</h3>
         <input
           type="text"
-          placeholder="群組名稱"
+          placeholder={COMP_WORKSPACE_LABELS.群組名稱}
           value={groupName}
           onChange={e => onGroupNameChange(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && onCreate()}

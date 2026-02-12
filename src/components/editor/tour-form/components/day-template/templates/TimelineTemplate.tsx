@@ -5,6 +5,7 @@ import { Plus, Utensils, Building2 } from 'lucide-react'
 import { DailyItinerary, Activity } from '../../../types'
 import { UploadableImage } from '../UploadableImage'
 import { EditableText } from '../EditableText'
+import { COMP_EDITOR_LABELS } from '../../../../constants/labels'
 
 interface TimelineTemplateProps {
   editingDay: DailyItinerary
@@ -46,7 +47,7 @@ export function TimelineTemplate({
               setEditingField={setEditingField}
               onChange={v => updateField('title', v)}
               className="text-xl font-bold text-white"
-              placeholder="行程標題"
+              placeholder={COMP_EDITOR_LABELS.行程標題}
               inputClassName="bg-card/20 text-white placeholder:text-white/50"
             />
           </div>
@@ -83,7 +84,7 @@ export function TimelineTemplate({
                     setEditingField={setEditingField}
                     onChange={v => updateActivity(i, 'title', v)}
                     className="font-bold text-foreground"
-                    placeholder="景點名稱"
+                    placeholder={COMP_EDITOR_LABELS.景點名稱}
                   />
                   <EditableText
                     value={act.description}
@@ -92,7 +93,7 @@ export function TimelineTemplate({
                     setEditingField={setEditingField}
                     onChange={v => updateActivity(i, 'description', v)}
                     className="text-sm text-morandi-secondary mt-1"
-                    placeholder="景點描述..."
+                    placeholder={COMP_EDITOR_LABELS.景點描述_2}
                     multiline
                   />
                 </div>
@@ -127,7 +128,7 @@ export function TimelineTemplate({
               setEditingField={setEditingField}
               onChange={v => updateField('meals', { ...editingDay.meals, lunch: v })}
               className="text-sm text-morandi-primary"
-              placeholder="午餐安排"
+              placeholder={COMP_EDITOR_LABELS.午餐安排}
             />
           </div>
           <div>
@@ -141,7 +142,7 @@ export function TimelineTemplate({
               setEditingField={setEditingField}
               onChange={v => updateField('meals', { ...editingDay.meals, dinner: v })}
               className="text-sm text-morandi-primary"
-              placeholder="晚餐安排"
+              placeholder={COMP_EDITOR_LABELS.晚餐安排}
             />
           </div>
           <div>
@@ -155,7 +156,7 @@ export function TimelineTemplate({
               setEditingField={setEditingField}
               onChange={v => updateField('accommodation', v)}
               className="text-sm text-morandi-primary"
-              placeholder="住宿飯店"
+              placeholder={COMP_EDITOR_LABELS.住宿飯店}
             />
           </div>
         </div>

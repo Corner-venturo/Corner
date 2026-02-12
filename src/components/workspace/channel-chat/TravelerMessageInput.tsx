@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { QuickMessages } from './QuickMessages'
 import { cn } from '@/lib/utils'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 interface TravelerMessageInputProps {
   onSend: (message: string) => Promise<{ success: boolean; error?: string }>
@@ -16,7 +17,7 @@ interface TravelerMessageInputProps {
 export function TravelerMessageInput({
   onSend,
   disabled,
-  placeholder = '輸入訊息給旅伴...',
+  placeholder = COMP_WORKSPACE_LABELS.輸入訊息給旅伴,
 }: TravelerMessageInputProps) {
   const [message, setMessage] = useState('')
   const [isSending, setIsSending] = useState(false)

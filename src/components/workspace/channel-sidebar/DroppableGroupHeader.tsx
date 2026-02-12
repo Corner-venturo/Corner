@@ -4,6 +4,7 @@ import { ChevronDown, ChevronRight, Trash2 } from 'lucide-react'
 import { useDroppable } from '@dnd-kit/core'
 import { cn } from '@/lib/utils'
 import type { DroppableGroupHeaderProps } from './types'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 export function DroppableGroupHeader({
   groupId,
@@ -36,7 +37,7 @@ export function DroppableGroupHeader({
             onDelete(groupId)
           }}
           className="opacity-0 group-hover/header:opacity-100 p-1 rounded hover:bg-status-danger-bg text-status-danger hover:text-status-danger transition-opacity"
-          title="刪除群組"
+          title={COMP_WORKSPACE_LABELS.刪除群組}
         >
           <Trash2 size={12} />
         </button>

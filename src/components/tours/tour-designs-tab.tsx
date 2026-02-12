@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase/client'
 import { Globe, FileText, Loader2, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { COMP_TOURS_LABELS } from './constants/labels'
 
 interface DesignItem {
   id: string
@@ -42,9 +43,9 @@ export function TourDesignsTab({ tourId, proposalId }: TourDesignsTabProps) {
         directDesigns.forEach(d => {
           allDesigns.push({
             id: d.id,
-            title: d.title || '未命名行程',
+            title: d.title || COMP_TOURS_LABELS.未命名行程,
             type: 'itinerary',
-            status: d.status || '草稿',
+            status: d.status || COMP_TOURS_LABELS.草稿,
             updatedAt: d.updated_at,
             isSelected: true,
           })
@@ -73,9 +74,9 @@ export function TourDesignsTab({ tourId, proposalId }: TourDesignsTabProps) {
                 if (itinerary) {
                   allDesigns.push({
                     id: itinerary.id,
-                    title: itinerary.title || '未命名行程',
+                    title: itinerary.title || COMP_TOURS_LABELS.未命名行程,
                     type: 'itinerary',
-                    status: itinerary.status || '草稿',
+                    status: itinerary.status || COMP_TOURS_LABELS.草稿,
                     updatedAt: itinerary.updated_at,
                     isSelected: pkg.is_selected || false,
                     packageName: pkg.version_name || undefined,
@@ -167,7 +168,7 @@ export function TourDesignsTab({ tourId, proposalId }: TourDesignsTabProps) {
                   )}
                 </div>
                 <div className="text-sm text-morandi-secondary">
-                  {design.type === 'itinerary' ? '網頁行程' : '手冊'} · {design.status}
+                  {design.type === 'itinerary' ? COMP_TOURS_LABELS.網頁行程 : COMP_TOURS_LABELS.手冊} · {design.status}
                 </div>
               </div>
             </div>

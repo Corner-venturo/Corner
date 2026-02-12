@@ -2,6 +2,7 @@ import React from 'react'
 import { TourFormData, TourCountry } from '../types'
 import { X } from 'lucide-react'
 import { Combobox, ComboboxOption } from '@/components/ui/combobox'
+import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
 interface CountriesSectionProps {
   data: TourFormData
@@ -177,7 +178,7 @@ export function CountriesSection({
                   }
                 }}
                 options={countryOptions}
-                placeholder="搜尋或選擇國家..."
+                placeholder={COMP_EDITOR_LABELS.搜尋或選擇國家}
                 showSearchIcon
                 showClearButton
               />
@@ -196,7 +197,7 @@ export function CountriesSection({
                   }
                 }}
                 options={primaryCityOptions}
-                placeholder="搜尋或選擇城市..."
+                placeholder={COMP_EDITOR_LABELS.搜尋或選擇城市}
                 showSearchIcon
                 showClearButton
                 disabled={!primaryCountry.country_id}
@@ -237,7 +238,7 @@ export function CountriesSection({
                     value={country.country_id}
                     onChange={value => updateCountry(actualIndex, 'country_id', value)}
                     options={countryOptions}
-                    placeholder="搜尋或選擇國家..."
+                    placeholder={COMP_EDITOR_LABELS.搜尋或選擇國家}
                     showSearchIcon
                     showClearButton
                   />
@@ -251,7 +252,7 @@ export function CountriesSection({
                     value={country.main_city_id || ''}
                     onChange={value => updateCountry(actualIndex, 'main_city_id', value)}
                     options={cityOptionsMap[country.country_id] || []}
-                    placeholder="搜尋或選擇城市..."
+                    placeholder={COMP_EDITOR_LABELS.搜尋或選擇城市}
                     showSearchIcon
                     showClearButton
                     disabled={!country.country_id}

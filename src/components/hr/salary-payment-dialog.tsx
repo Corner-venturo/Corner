@@ -15,6 +15,7 @@ import { X } from 'lucide-react'
 import { CurrencyCell } from '@/components/table-cells'
 import { useAuthStore } from '@/stores/auth-store'
 import { format } from 'date-fns'
+import { COMP_HR_LABELS } from './constants/labels'
 
 interface SalaryPaymentDialogProps {
   open: boolean
@@ -161,13 +162,13 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
                   <DatePicker
                     value={requestDate}
                     onChange={date => setRequestDate(date)}
-                    placeholder="選擇日期"
+                    placeholder={COMP_HR_LABELS.選擇日期}
                     className="bg-morandi-gold/10 border-morandi-container/30"
                   />
                 ) : (
                   <Select value={requestDate} onValueChange={setRequestDate}>
                     <SelectTrigger className="border-morandi-container/30">
-                      <SelectValue placeholder="選擇請款日期（週四）" />
+                      <SelectValue placeholder={COMP_HR_LABELS.選擇請款日期_週四} />
                     </SelectTrigger>
                     <SelectContent>
                       {upcomingThursdays.map(date => (
@@ -185,7 +186,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
                 <Input
                   value={note}
                   onChange={e => setNote(e.target.value)}
-                  placeholder="輸入備註..."
+                  placeholder={COMP_HR_LABELS.輸入備註}
                   className="mt-1"
                 />
               </div>

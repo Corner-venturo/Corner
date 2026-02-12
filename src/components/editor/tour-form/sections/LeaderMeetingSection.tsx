@@ -4,6 +4,7 @@ import { Plus, X, Upload, User, Loader2, Search } from 'lucide-react'
 import { uploadFileToStorage } from '@/services/storage'
 import { supabase } from '@/lib/supabase/client'
 import type { TourLeader } from '@/types/tour-leader.types'
+import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
 interface LeaderMeetingSectionProps {
   data: TourFormData
@@ -220,14 +221,14 @@ export function LeaderMeetingSection({
                 <div className="relative">
                   <img
                     src={data.leader.photo}
-                    alt="領隊頭像"
+                    alt={COMP_EDITOR_LABELS.領隊頭像}
                     className="w-20 h-20 rounded-full object-cover border-2 border-morandi-container"
                   />
                   <button
                     type="button"
                     onClick={handleRemovePhoto}
                     className="absolute -top-1 -right-1 p-1 bg-morandi-red text-white rounded-full hover:bg-morandi-red/80 transition-colors"
-                    title="移除頭像"
+                    title={COMP_EDITOR_LABELS.移除頭像}
                   >
                     <X size={12} />
                   </button>
@@ -275,7 +276,7 @@ export function LeaderMeetingSection({
                   onChange={e => handleNameChange(e.target.value)}
                   onFocus={() => searchQuery && searchResults.length > 0 && setShowDropdown(true)}
                   className="w-full px-3 py-2 pr-10 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
-                  placeholder="輸入名稱搜尋領隊..."
+                  placeholder={COMP_EDITOR_LABELS.輸入名稱搜尋領隊}
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
                   {isSearching ? (
@@ -378,7 +379,7 @@ export function LeaderMeetingSection({
               type="button"
               onClick={() => removeMeetingPoint(index)}
               className="absolute top-2 right-2 p-1 text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
-              title="移除此集合地點"
+              title={COMP_EDITOR_LABELS.移除此集合地點}
             >
               <X size={16} />
             </button>
@@ -405,7 +406,7 @@ export function LeaderMeetingSection({
                   value={point.location}
                   onChange={e => updateMeetingPoint(index, 'location', e.target.value)}
                   className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
-                  placeholder="桃園機場華航第二航廈 7號櫃台"
+                  placeholder={COMP_EDITOR_LABELS.桃園機場華航第二航廈_7號櫃台}
                 />
               </div>
             </div>

@@ -4,6 +4,7 @@ import React from 'react'
 import { Input } from '@/components/ui/input'
 import { SimpleDateInput } from '@/components/ui/simple-date-input'
 import { Combobox } from '@/components/ui/combobox'
+import { COMP_TOURS_LABELS } from '../constants/labels'
 
 interface BasicInfoSectionProps {
   formData: {
@@ -56,10 +57,10 @@ export function BasicInfoSection({
                 value: country.code,
                 label: country.name,
               })),
-              { value: '__custom__', label: '+ 其他目的地' },
+              { value: '__custom__', label: COMP_TOURS_LABELS.其他目的地 },
             ]}
-            placeholder="選擇國家..."
-            emptyMessage="找不到符合的國家"
+            placeholder={COMP_TOURS_LABELS.選擇國家}
+            emptyMessage={COMP_TOURS_LABELS.找不到符合的國家}
             className="mt-1"
           />
         </div>
@@ -70,7 +71,7 @@ export function BasicInfoSection({
             <Input
               value={formData.customLocation || ''}
               onChange={e => onFieldChange('customLocation', e.target.value)}
-              placeholder="輸入城市名稱"
+              placeholder={COMP_TOURS_LABELS.輸入城市名稱}
               className="mt-1"
             />
           ) : (
@@ -82,8 +83,8 @@ export function BasicInfoSection({
                 label: city.code ? `${city.name} (${city.code})` : city.name,
                 disabled: !city.code,
               }))}
-              placeholder="選擇城市..."
-              emptyMessage="找不到符合的城市"
+              placeholder={COMP_TOURS_LABELS.選擇城市}
+              emptyMessage={COMP_TOURS_LABELS.找不到符合的城市}
               disabled={!formData.countryCode || formData.countryCode === '__custom__'}
               className="mt-1"
             />

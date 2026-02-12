@@ -11,6 +11,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
 import { toast } from 'sonner'
 import { alert } from '@/lib/ui/alert-dialog'
+import { COMP_EDITOR_LABELS } from '../../../../constants/labels'
 
 type CombinedRestaurant = (Restaurant | MichelinRestaurant) & {
   source: 'restaurant' | 'michelin'
@@ -128,7 +129,7 @@ export function useDailyItinerary({
             imageUrl = libraryImages[0].public_url
           }
         } catch (error) {
-          logger.error('搜尋圖庫圖片失敗:', error)
+          logger.error(COMP_EDITOR_LABELS.搜尋圖庫圖片失敗, error)
         }
       }
 
@@ -178,7 +179,7 @@ export function useDailyItinerary({
     file: File
   ) => {
     if (!file.type.startsWith('image/')) {
-      void alert('請選擇圖片檔案', 'warning')
+      void alert(COMP_EDITOR_LABELS.請選擇圖片檔案, 'warning')
       return
     }
 
@@ -194,7 +195,7 @@ export function useDailyItinerary({
         .upload(filePath, file)
 
       if (uploadError) {
-        logger.error('上傳失敗:', uploadError)
+        logger.error(COMP_EDITOR_LABELS.上傳失敗, uploadError)
         void alert(`圖片上傳失敗: ${uploadError.message}`, 'error')
         return
       }
@@ -206,7 +207,7 @@ export function useDailyItinerary({
       updateActivity(dayIndex, actIndex, 'image', urlData.publicUrl)
 
       const currentActivity = data.dailyItinerary?.[dayIndex]?.activities?.[actIndex]
-      const activityTitle = currentActivity?.title || '景點圖片'
+      const activityTitle = currentActivity?.title || COMP_EDITOR_LABELS.景點圖片
       setSaveToLibraryDialog({
         isOpen: true,
         filePath,
@@ -215,8 +216,8 @@ export function useDailyItinerary({
       })
       setLibraryImageName(activityTitle)
     } catch (error) {
-      logger.error('意外錯誤:', error)
-      void alert('上傳過程發生錯誤', 'error')
+      logger.error(COMP_EDITOR_LABELS.意外錯誤, error)
+      void alert(COMP_EDITOR_LABELS.上傳過程發生錯誤, 'error')
     } finally {
       setUploadingActivityImage(null)
     }
@@ -234,7 +235,7 @@ export function useDailyItinerary({
       // 下載圖片
       const response = await fetch(imageUrl)
       if (!response.ok) {
-        throw new Error('無法下載圖片')
+        throw new Error(COMP_EDITOR_LABELS.無法下載圖片)
       }
 
       const blob = await response.blob()
@@ -248,7 +249,7 @@ export function useDailyItinerary({
         .upload(filePath, blob)
 
       if (uploadError) {
-        logger.error('上傳失敗:', uploadError)
+        logger.error(COMP_EDITOR_LABELS.上傳失敗, uploadError)
         toast.error(`圖片上傳失敗: ${uploadError.message}`)
         return
       }
@@ -260,7 +261,7 @@ export function useDailyItinerary({
       updateActivity(dayIndex, actIndex, 'image', urlData.publicUrl)
 
       const currentActivity = data.dailyItinerary?.[dayIndex]?.activities?.[actIndex]
-      const activityTitle = currentActivity?.title || '景點圖片'
+      const activityTitle = currentActivity?.title || COMP_EDITOR_LABELS.景點圖片
       setSaveToLibraryDialog({
         isOpen: true,
         filePath,
@@ -268,10 +269,10 @@ export function useDailyItinerary({
         activityTitle,
       })
       setLibraryImageName(activityTitle)
-      toast.success('圖片已儲存')
+      toast.success(COMP_EDITOR_LABELS.圖片已儲存)
     } catch (error) {
-      logger.error('外部圖片上傳失敗:', error)
-      toast.error('圖片下載或上傳失敗')
+      logger.error(COMP_EDITOR_LABELS.外部圖片上傳失敗, error)
+      toast.error(COMP_EDITOR_LABELS.圖片下載或上傳失敗)
     } finally {
       setUploadingActivityImage(null)
     }
@@ -280,7 +281,7 @@ export function useDailyItinerary({
   // 儲存到圖庫
   const handleSaveToLibrary = async () => {
     if (!saveToLibraryDialog || !workspaceId) {
-      toast.error('缺少必要資料，無法儲存')
+      toast.error(COMP_EDITOR_LABELS.缺少必要資料_無法儲存)
       return
     }
 
@@ -288,14 +289,14 @@ export function useDailyItinerary({
     try {
       await createImageLibraryItem({
         workspace_id: workspaceId,
-        name: libraryImageName || '未命名圖片',
+        name: libraryImageName || COMP_EDITOR_LABELS.未命名圖片,
         file_path: saveToLibraryDialog.filePath,
         public_url: saveToLibraryDialog.publicUrl,
         category: 'activity',
-        tags: ['景點', '活動'],
+        tags: [COMP_EDITOR_LABELS.景點, COMP_EDITOR_LABELS.活動],
       } as any)
 
-      toast.success('已儲存到圖庫')
+      toast.success(COMP_EDITOR_LABELS.已儲存到圖庫)
     } catch (error) {
       toast.error(`儲存過程發生錯誤`)
     } finally {

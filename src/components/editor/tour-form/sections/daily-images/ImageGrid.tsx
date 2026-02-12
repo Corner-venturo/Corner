@@ -20,6 +20,7 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { DailyImage } from '../../types'
+import { COMP_EDITOR_LABELS } from '../../../constants/labels'
 
 // 工具函數：取得圖片 URL
 function getImageUrl(image: string | DailyImage): string {
@@ -94,7 +95,7 @@ function SortableImageItem({
         type="button"
         onClick={onEdit}
         className="absolute bottom-1 right-8 p-1 bg-black/50 hover:bg-morandi-gold rounded text-white opacity-0 group-hover:opacity-100 transition-all"
-        title="調整顯示位置"
+        title={COMP_EDITOR_LABELS.調整顯示位置}
       >
         <Move size={14} />
       </button>
@@ -111,7 +112,7 @@ function SortableImageItem({
         type="button"
         onClick={onPreview}
         className="absolute bottom-1 right-1 p-1 bg-black/50 hover:bg-morandi-gold rounded text-white opacity-0 group-hover:opacity-100 transition-all"
-        title="預覽大圖"
+        title={COMP_EDITOR_LABELS.預覽大圖}
       >
         <ZoomIn size={14} />
       </button>

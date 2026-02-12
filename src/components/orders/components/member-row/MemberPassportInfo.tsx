@@ -11,6 +11,7 @@ import { formatPassportExpiryWithStatus } from '@/lib/utils/passport-expiry'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 import type { OrderMember } from '../../order-member.types'
 import type { ColumnVisibility } from '../../OrderMembersExpandable'
+import { COMP_ORDERS_LABELS } from '../../constants/labels'
 
 interface MemberPassportInfoProps {
   member: OrderMember
@@ -111,9 +112,9 @@ export function MemberPassportInfo({
                   return `${d.getMonth() + 1}/${d.getDate()}`
                 }
                 // 詳細說明
-                const detailLabel = expiryInfo.statusLabel === '效期不足'
+                const detailLabel = expiryInfo.statusLabel === COMP_ORDERS_LABELS.效期不足
                   ? `護照需有效至 ${getRequiredDate()}`
-                  : '護照已過期'
+                  : COMP_ORDERS_LABELS.護照已過期
                 return (
                   <Tooltip>
                     <TooltipTrigger>

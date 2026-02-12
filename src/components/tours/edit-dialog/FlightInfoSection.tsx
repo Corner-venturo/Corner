@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Search, Loader2, Plane } from 'lucide-react'
 import { FlightInfo } from '@/stores/types'
+import { COMP_TOURS_LABELS } from '../constants/labels'
 
 interface FlightInfoSectionProps {
   outboundFlight: FlightInfo
@@ -67,7 +68,7 @@ export function FlightInfoSection({
             <Input
               value={outboundFlight.airline}
               onChange={e => onUpdateFlight('outboundFlight', 'airline', e.target.value)}
-              placeholder="長榮航空"
+              placeholder={COMP_TOURS_LABELS.長榮航空}
               className="text-xs h-8"
             />
           </div>
@@ -154,7 +155,7 @@ export function FlightInfoSection({
             <Input
               value={returnFlight.airline}
               onChange={e => onUpdateFlight('returnFlight', 'airline', e.target.value)}
-              placeholder="長榮航空"
+              placeholder={COMP_TOURS_LABELS.長榮航空}
               className="text-xs h-8"
             />
           </div>

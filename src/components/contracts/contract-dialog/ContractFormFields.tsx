@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { ContractData } from './types'
 import { Users, ChevronDown, Check } from 'lucide-react'
+import { COMP_CONTRACTS_LABELS } from '../constants/labels'
 
 interface MemberOption {
   id: string
@@ -77,10 +78,10 @@ export function ContractFormFields({
 
   // 取得顯示文字
   const getButtonLabel = () => {
-    if (selectedMemberIds.length === 0) return '選擇成員'
+    if (selectedMemberIds.length === 0) return COMP_CONTRACTS_LABELS.選擇成員
     if (selectedMemberIds.length === 1) {
       const member = members.find(m => m.id === selectedMemberIds[0])
-      return member?.name || '1 人'
+      return member?.name || COMP_CONTRACTS_LABELS._1_人
     }
     return `${selectedMemberIds.length} 人`
   }
@@ -113,7 +114,7 @@ export function ContractFormFields({
                       onClick={toggleAll}
                       className="text-xs text-morandi-gold hover:underline"
                     >
-                      {selectedMemberIds.length === members.length ? '取消全選' : '全選'}
+                      {selectedMemberIds.length === members.length ? COMP_CONTRACTS_LABELS.取消全選 : COMP_CONTRACTS_LABELS.全選}
                     </button>
                   </div>
 
@@ -270,7 +271,7 @@ export function ContractFormFields({
               type="text"
               value={contractData.gatherLocation || ''}
               onChange={e => onFieldChange('gatherLocation', e.target.value)}
-              placeholder="集合地點（例如：桃園國際機場第一航廈）"
+              placeholder={COMP_CONTRACTS_LABELS.集合地點_例如_桃園國際機場第一航廈}
             />
           </div>
         </div>
@@ -310,7 +311,7 @@ export function ContractFormFields({
             type="text"
             value={contractData.companyExtension || ''}
             onChange={e => onFieldChange('companyExtension', e.target.value)}
-            placeholder="分機號碼"
+            placeholder={COMP_CONTRACTS_LABELS.分機號碼}
           />
         </div>
       </div>

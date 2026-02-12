@@ -23,6 +23,7 @@ import type { ProcessedFile } from '../order-member.types'
 import { usePassportFiles } from './passport/usePassportFiles'
 import { usePassportOcr } from './passport/usePassportOcr'
 import { usePassportValidation } from './passport/usePassportValidation'
+import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 interface UsePassportUploadParams {
   orderId: string | undefined
@@ -65,7 +66,7 @@ export function usePassportUpload({
     if (fileModule.processedFiles.length === 0) return
     if (isUploading) return
     if (!orderId) {
-      void alert('需要訂單 ID 才能批次上傳', 'error')
+      void alert(COMP_ORDERS_LABELS.需要訂單_ID_才能批次上傳, 'error')
       return
     }
 
@@ -183,8 +184,8 @@ export function usePassportUpload({
       fileModule.clearFiles()
       await onSuccess()
     } catch (error) {
-      logger.error('批次上傳失敗:', error)
-      void alert('批次上傳失敗：' + (error instanceof Error ? error.message : '未知錯誤'), 'error')
+      logger.error(COMP_ORDERS_LABELS.批次上傳失敗, error)
+      void alert(COMP_ORDERS_LABELS.批次上傳失敗_2 + (error instanceof Error ? error.message : COMP_ORDERS_LABELS.未知錯誤), 'error')
     } finally {
       setIsUploading(false)
     }

@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, Trash2, GripVertical } from 'lucide-react'
 import type { FeaturesBlockData } from '../types'
 import type { Feature, FeaturesStyleType } from '@/components/editor/tour-form/types'
+import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
 interface FeaturesBlockEditorProps {
   data: FeaturesBlockData
@@ -48,7 +49,7 @@ export function FeaturesBlockEditor({ data, onChange }: FeaturesBlockEditorProps
           onValueChange={(value) => onChange({ featuresStyle: value as FeaturesStyleType })}
         >
           <SelectTrigger className="h-8 text-sm w-40">
-            <SelectValue placeholder="選擇風格" />
+            <SelectValue placeholder={COMP_EDITOR_LABELS.選擇風格} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="original">經典莫蘭迪</SelectItem>
@@ -80,13 +81,13 @@ export function FeaturesBlockEditor({ data, onChange }: FeaturesBlockEditorProps
               <Input
                 value={feature.title || ''}
                 onChange={e => updateFeature(index, 'title', e.target.value)}
-                placeholder="特色標題"
+                placeholder={COMP_EDITOR_LABELS.特色標題}
                 className="h-8 text-sm"
               />
               <Input
                 value={feature.description || ''}
                 onChange={e => updateFeature(index, 'description', e.target.value)}
-                placeholder="特色描述"
+                placeholder={COMP_EDITOR_LABELS.特色描述}
                 className="h-8 text-sm"
               />
             </div>

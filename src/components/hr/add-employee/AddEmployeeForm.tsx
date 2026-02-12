@@ -21,6 +21,7 @@ import { AddEmployeeFormProps } from './types'
 import { getAvailableWorkspaces, isSuperAdmin as checkIsSuperAdmin, getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
 import { useWorkspaceStoreData } from '@/stores/workspace/workspace-store'
 import { hasFullFeatures } from '@/lib/feature-restrictions'
+import { COMP_HR_LABELS } from '../constants/labels'
 
 export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
   const {
@@ -79,7 +80,7 @@ export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
               onValueChange={value => setFormData({ ...formData, workspace_id: value })}
             >
               <SelectTrigger className="bg-card">
-                <SelectValue placeholder="請選擇辦公室" />
+                <SelectValue placeholder={COMP_HR_LABELS.請選擇辦公室} />
               </SelectTrigger>
               <SelectContent>
                 {availableWorkspaces.map((workspace) => (

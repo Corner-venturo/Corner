@@ -14,6 +14,7 @@ import { TravelerMessageList } from './channel-chat/TravelerMessageList'
 import { QuickMessages } from './channel-chat/QuickMessages'
 import { TravelerMessageInput } from './channel-chat/TravelerMessageInput'
 import { cn } from '@/lib/utils'
+import { COMP_WORKSPACE_LABELS } from './constants/labels'
 
 export function ChannelChat() {
   const {
@@ -168,8 +169,8 @@ export function ChannelChat() {
                     disabled={!travelerMode.selectedConversationId}
                     placeholder={
                       travelerMode.activeConversationType === 'tour_announcement'
-                        ? '發送公告給所有旅客...'
-                        : '回覆客服訊息...'
+                        ? COMP_WORKSPACE_LABELS.發送公告給所有旅客
+                        : COMP_WORKSPACE_LABELS.回覆客服訊息
                     }
                   />
                 )}

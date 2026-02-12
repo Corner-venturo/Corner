@@ -12,6 +12,7 @@ import { MealsSection } from './MealsSection'
 import { AccommodationSection } from './AccommodationSection'
 import { RecommendationsSection } from './RecommendationsSection'
 import { DayCardProps } from './types'
+import { COMP_EDITOR_LABELS } from '../../../constants/labels'
 
 export function DayCard({
   day,
@@ -70,7 +71,7 @@ export function DayCard({
               type="button"
               onClick={onToggleCollapse}
               className="p-1 rounded transition-colors text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50"
-              title={isCollapsed ? '展開' : '摺疊'}
+              title={isCollapsed ? COMP_EDITOR_LABELS.展開 : COMP_EDITOR_LABELS.摺疊}
             >
               <ChevronRight
                 size={18}
@@ -93,7 +94,7 @@ export function DayCard({
                     ? 'text-morandi-container cursor-not-allowed'
                     : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50'
                 }`}
-                title="上移"
+                title={COMP_EDITOR_LABELS.上移}
               >
                 <ChevronUp size={16} />
               </button>
@@ -106,7 +107,7 @@ export function DayCard({
                     ? 'text-morandi-container cursor-not-allowed'
                     : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50'
                 }`}
-                title="下移"
+                title={COMP_EDITOR_LABELS.下移}
               >
                 <ChevronDown size={16} />
               </button>
@@ -123,7 +124,7 @@ export function DayCard({
             </span>
           )}
           <span className="text-sm text-morandi-primary truncate max-w-[300px]">
-            {day.title || '尚未設定行程標題'}
+            {day.title || COMP_EDITOR_LABELS.尚未設定行程標題}
           </span>
           {/* 摺疊時顯示的統計 */}
           {isCollapsed && (
@@ -218,7 +219,7 @@ export function DayCard({
               }}
               className="w-full px-3 py-2 border rounded-lg resize-none overflow-hidden min-h-[42px]"
               rows={1}
-              placeholder="✨ 特別安排：由布院 · 金麟湖 ～ 日本 OL 人氣 NO.1 散策地"
+              placeholder={COMP_EDITOR_LABELS.特別安排_由布院_金麟湖_日本_OL_人氣_NO_1_散策地}
             />
           </div>
 
@@ -238,7 +239,7 @@ export function DayCard({
                 value={day.locationLabel || ''}
                 onChange={e => updateDailyItinerary(dayIndex, 'locationLabel', e.target.value)}
                 className="w-full px-3 py-2 border rounded-lg"
-                placeholder="如：京都、大阪、由布院（顯示在 Luxury 模板的每日卡片上）"
+                placeholder={COMP_EDITOR_LABELS.如_京都_大阪_由布院_顯示在_Luxury_模板的每日卡片上}
               />
             </div>
           )}
@@ -269,7 +270,7 @@ export function DayCard({
               onChange={e => updateDailyItinerary(dayIndex, 'description', e.target.value)}
               className="w-full px-3 py-2 border rounded-lg"
               rows={3}
-              placeholder="集合於台灣桃園國際機場..."
+              placeholder={COMP_EDITOR_LABELS.集合於台灣桃園國際機場}
             />
           </div>
 

@@ -10,6 +10,7 @@ import { SortableActivityItemProps } from './types'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { UnsplashSearch } from '@/components/ui/image-uploader/UnsplashSearch'
 import { PexelsPicker } from '@/features/designer/components/PexelsPicker'
+import { COMP_EDITOR_LABELS } from '../../../constants/labels'
 
 export function SortableActivityItem({
   activity,
@@ -113,18 +114,18 @@ export function SortableActivityItem({
             <>
               <img
                 src={activity.image}
-                alt={activity.title || '活動圖片'}
+                alt={activity.title || COMP_EDITOR_LABELS.活動圖片}
                 className="w-full h-full object-cover cursor-pointer"
                 style={getImagePositionStyle(activity.imagePosition)}
                 onClick={() => onOpenPositionEditor(dayIndex, actIndex)}
-                title="點擊調整顯示位置"
+                title={COMP_EDITOR_LABELS.點擊調整顯示位置}
               />
               {/* 位置調整按鈕 */}
               <button
                 type="button"
                 onClick={() => onOpenPositionEditor(dayIndex, actIndex)}
                 className="absolute bottom-1 left-1 w-5 h-5 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
-                title="調整顯示位置"
+                title={COMP_EDITOR_LABELS.調整顯示位置}
               >
                 <Crop size={10} />
               </button>
@@ -133,7 +134,7 @@ export function SortableActivityItem({
                 type="button"
                 onClick={() => updateActivity(dayIndex, actIndex, 'image', '')}
                 className="absolute top-1 right-1 w-5 h-5 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
-                title="移除圖片"
+                title={COMP_EDITOR_LABELS.移除圖片}
               >
                 <X size={12} />
               </button>
@@ -174,7 +175,7 @@ export function SortableActivityItem({
             value={activity.title}
             onChange={e => updateActivity(dayIndex, actIndex, 'title', e.target.value)}
             className="w-full px-3 py-2 border rounded-lg text-sm"
-            placeholder="景點名稱"
+            placeholder={COMP_EDITOR_LABELS.景點名稱}
           />
           <textarea
             value={activity.description}
@@ -183,7 +184,7 @@ export function SortableActivityItem({
             }
             className="w-full px-3 py-2 border rounded-lg text-sm resize-none"
             rows={2}
-            placeholder="描述（選填）"
+            placeholder={COMP_EDITOR_LABELS.描述_選填}
           />
 
           {/* 時間軸展開區塊 */}
@@ -305,7 +306,7 @@ export function SortableActivityItem({
               onClick={handleSaveToDb}
               disabled={isSaving}
               className="flex items-center gap-1 px-2 py-1 text-xs text-morandi-blue hover:text-morandi-blue/80 hover:bg-morandi-blue/10 rounded transition-colors disabled:opacity-50"
-              title="將此景點儲存到景點資料庫"
+              title={COMP_EDITOR_LABELS.將此景點儲存到景點資料庫}
             >
               {isSaving ? (
                 <Loader2 size={12} className="animate-spin" />

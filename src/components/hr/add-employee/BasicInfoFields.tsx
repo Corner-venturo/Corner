@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { userStoreHelpers } from '@/stores/user-store'
 import { EmployeeFormData } from './types'
+import { COMP_HR_LABELS } from '../constants/labels'
 
 interface BasicInfoFieldsProps {
   formData: EmployeeFormData
@@ -30,7 +31,7 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
           <Input
             value={formData.chinese_name}
             onChange={e => setFormData({ ...formData, chinese_name: e.target.value })}
-            placeholder="例：王小明"
+            placeholder={COMP_HR_LABELS.例_王小明}
           />
         </div>
       </div>
@@ -43,7 +44,7 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
           <Input
             value={formData.english_name}
             onChange={e => setFormData({ ...formData, english_name: e.target.value })}
-            placeholder="例：John"
+            placeholder={COMP_HR_LABELS.例_John}
             required
           />
         </div>
@@ -85,7 +86,7 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
               personal_info: { ...formData.personal_info, birthday: date },
             })
           }
-          placeholder="選擇日期"
+          placeholder={COMP_HR_LABELS.選擇日期}
         />
       </div>
     </div>

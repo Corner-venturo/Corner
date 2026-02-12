@@ -10,6 +10,7 @@ import { updateOrder } from '@/data'
 import type { Order, Employee } from '@/stores/types'
 import type { SyncableEntity } from '@/types'
 import { logger } from '@/lib/utils/logger'
+import { COMP_ORDERS_LABELS } from './constants/labels'
 
 // 型別守衛：檢查 Employee 是否包含同步欄位
 type EmployeeWithSync = Employee & Partial<SyncableEntity>
@@ -102,8 +103,8 @@ export function OrderEditDialog({
       })
       onOpenChange(false)
     } catch (error) {
-      logger.error('[OrderEditDialog] 更新訂單失敗:', error)
-      alert(error instanceof Error ? error.message : '更新訂單失敗，請稍後再試')
+      logger.error(COMP_ORDERS_LABELS.OrderEditDialog_更新訂單失敗, error)
+      alert(error instanceof Error ? error.message : COMP_ORDERS_LABELS.更新訂單失敗_請稍後再試)
     } finally {
       setIsSubmitting(false)
     }
@@ -132,7 +133,7 @@ export function OrderEditDialog({
             <Input
               value={formData.contact_person}
               onChange={e => setFormData(prev => ({ ...prev, contact_person: e.target.value }))}
-              placeholder="輸入聯絡人姓名"
+              placeholder={COMP_ORDERS_LABELS.輸入聯絡人姓名}
               className="mt-1"
               required
             />
@@ -154,8 +155,8 @@ export function OrderEditDialog({
                 }))}
                 value={formData.sales_person}
                 onChange={value => setFormData(prev => ({ ...prev, sales_person: value }))}
-                placeholder="選擇業務人員..."
-                emptyMessage="找不到業務人員"
+                placeholder={COMP_ORDERS_LABELS.選擇業務人員}
+                emptyMessage={COMP_ORDERS_LABELS.找不到業務人員}
                 showSearchIcon={true}
                 showClearButton={true}
                 className="mt-1"
@@ -171,8 +172,8 @@ export function OrderEditDialog({
                 }))}
                 value={formData.assistant}
                 onChange={value => setFormData(prev => ({ ...prev, assistant: value }))}
-                placeholder="選擇助理..."
-                emptyMessage="找不到助理"
+                placeholder={COMP_ORDERS_LABELS.選擇助理}
+                emptyMessage={COMP_ORDERS_LABELS.找不到助理}
                 showSearchIcon={true}
                 showClearButton={true}
                 className="mt-1"
@@ -196,7 +197,7 @@ export function OrderEditDialog({
               disabled={!formData.contact_person || isSubmitting}
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
-              {isSubmitting ? '儲存中...' : '儲存'}
+              {isSubmitting ? COMP_ORDERS_LABELS.儲存中 : COMP_ORDERS_LABELS.儲存}
             </Button>
           </div>
         </form>

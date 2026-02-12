@@ -27,6 +27,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { useTours, updateTour, useQuotes } from '@/data'
 import { generateUUID } from '@/lib/utils/uuid'
 import { alert } from '@/lib/ui/alert-dialog'
+import { COMP_CONTRACTS_LABELS } from './constants/labels'
 
 interface EnvelopeDialogProps {
   isOpen: boolean
@@ -44,8 +45,8 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
   // 寄件人資訊
   const [senderName, setSenderName] = useState('')
   const [senderPhone, setSenderPhone] = useState('')
-  const senderAddress = '台北市大同區重慶北路一段67號8樓之2'
-  const senderCompany = '角落旅行社'
+  const senderAddress = COMP_CONTRACTS_LABELS.台北市大同區重慶北路一段67號8樓之2
+  const senderCompany = COMP_CONTRACTS_LABELS.角落旅行社
 
   useEffect(() => {
     if (isOpen && user) {
@@ -79,12 +80,12 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
 
   const handlePrint = async () => {
     if (!recipient || !recipientAddress || !recipientPhone) {
-      void alert('請填寫完整的收件人資訊', 'warning')
+      void alert(COMP_CONTRACTS_LABELS.請填寫完整的收件人資訊, 'warning')
       return
     }
 
     if (!senderName || !senderPhone) {
-      void alert('請填寫完整的寄件人資訊(姓名和電話)', 'warning')
+      void alert(COMP_CONTRACTS_LABELS.請填寫完整的寄件人資訊_姓名和電話, 'warning')
       return
     }
 
@@ -124,7 +125,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
     // 產生列印內容
     const printWindow = window.open('', '_blank')
     if (!printWindow) {
-      void alert('請允許彈出視窗以進行列印', 'warning')
+      void alert(COMP_CONTRACTS_LABELS.請允許彈出視窗以進行列印, 'warning')
       return
     }
 
@@ -150,7 +151,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
               width: 297mm;
               height: 210mm;
               padding: 15mm;
-              font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+              font-family: "Microsoft JhengHei", COMP_CONTRACTS_LABELS.微軟正黑體, sans-serif;
               background: white;
             }
 
@@ -305,7 +306,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                   type="text"
                   value={recipient}
                   onChange={e => setRecipient(e.target.value)}
-                  placeholder="請輸入收件人姓名"
+                  placeholder={COMP_CONTRACTS_LABELS.請輸入收件人姓名}
                 />
               </div>
               <div>
@@ -314,7 +315,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                   type="text"
                   value={recipientAddress}
                   onChange={e => setRecipientAddress(e.target.value)}
-                  placeholder="請輸入收件地址"
+                  placeholder={COMP_CONTRACTS_LABELS.請輸入收件地址}
                 />
               </div>
               <div>
@@ -323,7 +324,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                   type="text"
                   value={recipientPhone}
                   onChange={e => setRecipientPhone(e.target.value)}
-                  placeholder="請輸入收件人電話"
+                  placeholder={COMP_CONTRACTS_LABELS.請輸入收件人電話}
                 />
               </div>
             </div>
@@ -351,7 +352,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                     type="text"
                     value={senderName}
                     onChange={e => setSenderName(e.target.value)}
-                    placeholder="請輸入員工姓名（可修改）"
+                    placeholder={COMP_CONTRACTS_LABELS.請輸入員工姓名_可修改}
                   />
                 </div>
               </div>
@@ -372,7 +373,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                   type="text"
                   value={senderPhone}
                   onChange={e => setSenderPhone(e.target.value)}
-                  placeholder="請輸入聯絡電話（可修改）"
+                  placeholder={COMP_CONTRACTS_LABELS.請輸入聯絡電話_可修改}
                 />
               </div>
             </div>

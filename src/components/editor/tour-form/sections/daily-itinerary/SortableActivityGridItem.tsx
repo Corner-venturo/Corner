@@ -5,6 +5,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, ImageIcon } from 'lucide-react'
 import { SortableActivityGridItemProps } from './types'
+import { COMP_EDITOR_LABELS } from '../../../constants/labels'
 
 export function SortableActivityGridItem({
   activity,
@@ -38,7 +39,7 @@ export function SortableActivityGridItem({
       {activity.image ? (
         <img
           src={activity.image}
-          alt={activity.title || '活動圖片'}
+          alt={activity.title || COMP_EDITOR_LABELS.活動圖片}
           className="w-full h-full object-cover"
         />
       ) : (
@@ -53,7 +54,7 @@ export function SortableActivityGridItem({
       {/* 標題 */}
       <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5 bg-gradient-to-t from-black/70 to-transparent">
         <p className="text-white text-xs font-medium truncate">
-          {activity.title || '未命名景點'}
+          {activity.title || COMP_EDITOR_LABELS.未命名景點}
         </p>
       </div>
       {/* 拖曳提示 */}

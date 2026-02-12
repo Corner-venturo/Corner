@@ -4,6 +4,7 @@ import { TourFormData, HotelInfo } from '../types'
 import { Plus, X, Upload, Image as ImageIcon, GripVertical, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { alert } from '@/lib/ui/alert-dialog'
+import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
 interface HotelSectionProps {
   data: TourFormData
@@ -56,12 +57,12 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
   // 上傳圖片（單張）
   const handleImageUpload = async (hotelIndex: number, imageIndex: number, file: File) => {
     if (!file.type.startsWith('image/')) {
-      void alert('請選擇圖片檔案', 'warning')
+      void alert(COMP_EDITOR_LABELS.請選擇圖片檔案, 'warning')
       return
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      void alert('圖片大小不可超過 5MB', 'warning')
+      void alert(COMP_EDITOR_LABELS.圖片大小不可超過_5MB, 'warning')
       return
     }
 
@@ -77,8 +78,8 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
         .upload(filePath, file)
 
       if (uploadError) {
-        logger.error('上傳失敗:', uploadError)
-        void alert('圖片上傳失敗', 'error')
+        logger.error(COMP_EDITOR_LABELS.上傳失敗, uploadError)
+        void alert(COMP_EDITOR_LABELS.圖片上傳失敗, 'error')
         return
       }
 
@@ -97,8 +98,8 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
 
       updateHotel(hotelIndex, 'images', currentImages)
     } catch (error) {
-      logger.error('上傳錯誤:', error)
-      void alert('上傳過程發生錯誤', 'error')
+      logger.error(COMP_EDITOR_LABELS.上傳錯誤, error)
+      void alert(COMP_EDITOR_LABELS.上傳過程發生錯誤, 'error')
     } finally {
       setUploadingImage(null)
     }
@@ -111,7 +112,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
     const remainingSlots = 4 - currentImages.length
 
     if (remainingSlots <= 0) {
-      void alert('已達到最大圖片數量（4 張）', 'warning')
+      void alert(COMP_EDITOR_LABELS.已達到最大圖片數量_4_張, 'warning')
       return
     }
 
@@ -120,7 +121,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
       .slice(0, remainingSlots)
 
     if (imageFiles.length === 0) {
-      void alert('請選擇圖片檔案', 'warning')
+      void alert(COMP_EDITOR_LABELS.請選擇圖片檔案, 'warning')
       return
     }
 
@@ -161,8 +162,8 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
         void alert(`${successfulUrls.length} 張圖片上傳成功，${imageFiles.length - successfulUrls.length} 張失敗`, 'warning')
       }
     } catch (error) {
-      logger.error('批量上傳錯誤:', error)
-      void alert('上傳過程發生錯誤', 'error')
+      logger.error(COMP_EDITOR_LABELS.批量上傳錯誤, error)
+      void alert(COMP_EDITOR_LABELS.上傳過程發生錯誤, 'error')
     } finally {
       setUploadingImage(null)
     }
@@ -273,7 +274,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
                 type="button"
                 onClick={() => removeHotel(hotelIndex)}
                 className="absolute top-3 right-3 p-1 text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
-                title="移除此飯店"
+                title={COMP_EDITOR_LABELS.移除此飯店}
               >
                 <X size={16} />
               </button>
@@ -291,7 +292,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
                       value={hotel.name}
                       onChange={e => updateHotel(hotelIndex, 'name', e.target.value)}
                       className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
-                      placeholder="例如: 福岡海鷹希爾頓酒店"
+                      placeholder={COMP_EDITOR_LABELS.例如_福岡海鷹希爾頓酒店}
                     />
                   </div>
 
@@ -303,7 +304,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
                       value={hotel.description}
                       onChange={e => updateHotel(hotelIndex, 'description', e.target.value)}
                       className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold min-h-[80px]"
-                      placeholder="介紹飯店特色、位置、設施等..."
+                      placeholder={COMP_EDITOR_LABELS.介紹飯店特色_位置_設施等}
                     />
                   </div>
 
@@ -332,7 +333,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
                         >
                           <img
                             src={imageUrl}
-                            alt={`${hotel.name || '飯店'} 圖片 ${imageIndex + 1}`}
+                            alt={`${hotel.name || COMP_EDITOR_LABELS.飯店} 圖片 ${imageIndex + 1}`}
                             className="w-full h-full object-cover"
                           />
                           {/* 拖曳把手 */}

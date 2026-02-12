@@ -11,6 +11,7 @@ import type {
   TourDepartureActivity,
   TourDepartureOther,
 } from '@/types/tour-departure.types'
+import { COMP_TOURS_LABELS } from '../constants/labels'
 
 export function useTourDepartureData(tourId: string, open: boolean) {
   const [loading, setLoading] = useState(false)
@@ -78,8 +79,8 @@ export function useTourDepartureData(tourId: string, open: boolean) {
         } as TourDepartureData)
       }
     } catch (error) {
-      logger.error('載入出團資料失敗:', error)
-      toast.error('載入失敗')
+      logger.error(COMP_TOURS_LABELS.載入出團資料失敗, error)
+      toast.error(COMP_TOURS_LABELS.載入失敗)
     } finally {
       setLoading(false)
     }
@@ -114,11 +115,11 @@ export function useTourDepartureData(tourId: string, open: boolean) {
         if (error) throw error
       }
 
-      toast.success('儲存成功')
+      toast.success(COMP_TOURS_LABELS.儲存成功)
       return true
     } catch (error) {
-      logger.error('儲存失敗:', error)
-      toast.error('儲存失敗')
+      logger.error(COMP_TOURS_LABELS.儲存失敗_2, error)
+      toast.error(COMP_TOURS_LABELS.儲存失敗)
       return false
     } finally {
       setSaving(false)

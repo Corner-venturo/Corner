@@ -15,6 +15,7 @@ import { Tour } from '@/types/tour.types'
 import { ContractData } from '@/lib/contract-utils'
 import DOMPurify from 'dompurify'
 import { alert } from '@/lib/ui/alert-dialog'
+import { COMP_CONTRACTS_LABELS } from './constants/labels'
 
 interface ContractViewDialogProps {
   isOpen: boolean
@@ -60,7 +61,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
         const response = await fetch(`/contract-templates/${templateFile}`)
 
         if (!response.ok) {
-          throw new Error('無法載入合約範本')
+          throw new Error(COMP_CONTRACTS_LABELS.無法載入合約範本)
         }
 
         let template = await response.text()
@@ -97,8 +98,8 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
 
         setContractHtml(sanitizedHtml)
       } catch (error) {
-        logger.error('載入合約失敗:', error)
-        setContractHtml('<p class="text-status-danger">載入合約範本失敗，請稍後再試</p>')
+        logger.error(COMP_CONTRACTS_LABELS.載入合約失敗, error)
+        setContractHtml(COMP_CONTRACTS_LABELS.p_class_text_status_danger_載入合約範本失敗_請稍後再試_p)
       } finally {
         setLoading(false)
       }
@@ -109,7 +110,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
 
   const handlePrint = async () => {
     if (!contractHtml) {
-      void alert('無合約資料可列印', 'warning')
+      void alert(COMP_CONTRACTS_LABELS.無合約資料可列印, 'warning')
       return
     }
 
@@ -119,7 +120,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
       // 開啟新視窗並列印
       const printWindow = window.open('', '_blank')
       if (!printWindow) {
-        void alert('請允許彈出視窗以進行列印', 'warning')
+        void alert(COMP_CONTRACTS_LABELS.請允許彈出視窗以進行列印, 'warning')
         return
       }
 
@@ -135,8 +136,8 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
         }
       }
     } catch (error) {
-      logger.error('列印錯誤:', error)
-      void alert('列印合約時發生錯誤，請稍後再試', 'error')
+      logger.error(COMP_CONTRACTS_LABELS.列印錯誤, error)
+      void alert(COMP_CONTRACTS_LABELS.列印合約時發生錯誤_請稍後再試, 'error')
     } finally {
       setPrinting(false)
     }
@@ -189,7 +190,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
             className="bg-morandi-gold hover:bg-morandi-gold-hover gap-2"
           >
             <Printer size={16} />
-            {printing ? '列印中...' : '列印完整合約'}
+            {printing ? COMP_CONTRACTS_LABELS.列印中 : COMP_CONTRACTS_LABELS.列印完整合約}
           </Button>
         </DialogFooter>
       </DialogContent>

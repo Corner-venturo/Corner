@@ -10,6 +10,7 @@ import { downloadFile } from '@/lib/files'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { TicketStatusCard, type TourData, type TourStats } from './TicketStatusCard'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 // 將文字中的網址轉換成可點擊的連結
 function renderMessageContent(content: string) {
@@ -48,19 +49,19 @@ interface MessageItemProps {
 // 使用 memo 避免不必要的重新渲染
 export const MessageItem = memo(function MessageItem({ message, currentUserId, onReaction, onDelete, onReply, replyCount = 0 }: MessageItemProps) {
   const handleDownloadAttachment = async (attachment: MessageAttachment) => {
-    const fileName = attachment.fileName || attachment.name || '未命名檔案'
+    const fileName = attachment.fileName || attachment.name || COMP_WORKSPACE_LABELS.未命名檔案
     const targetUrl = resolveAttachmentUrl(attachment)
 
     if (!targetUrl) {
-      void alert('找不到檔案下載連結', 'error')
+      void alert(COMP_WORKSPACE_LABELS.找不到檔案下載連結, 'error')
       return
     }
 
     try {
       await downloadFile(targetUrl, fileName)
     } catch (error) {
-      logger.error('[MessageItem] 下載檔案失敗:', error)
-      void alert('下載失敗，請稍後再試', 'error')
+      logger.error(COMP_WORKSPACE_LABELS.MessageItem_下載檔案失敗, error)
+      void alert(COMP_WORKSPACE_LABELS.下載失敗_請稍後再試, 'error')
     }
   }
 
@@ -76,7 +77,7 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, o
         {/* 訊息標題 */}
         <div className="flex items-baseline gap-2 mb-0.5">
           <span className="font-semibold text-morandi-primary text-[15px]">
-            {message.author?.display_name || '未知用戶'}
+            {message.author?.display_name || COMP_WORKSPACE_LABELS.未知用戶}
           </span>
           <span className="text-[11px] text-morandi-secondary/80 font-normal">
             {formatMessageTime(message.created_at)}
@@ -108,7 +109,7 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, o
                 attachment.fileType ||
                 attachment.type ||
                 'application/octet-stream'
-              const fileName = attachment.fileName || attachment.name || '未命名檔案'
+              const fileName = attachment.fileName || attachment.name || COMP_WORKSPACE_LABELS.未命名檔案
               const fileSize =
                 typeof attachment.fileSize === 'number'
                   ? attachment.fileSize
@@ -142,7 +143,7 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, o
                       <button
                         onClick={() => handleDownloadAttachment(attachment)}
                         className="opacity-0 group-hover/attachment:opacity-100 transition-opacity p-1 hover:bg-morandi-gold/10 rounded"
-                        title="下載圖片"
+                        title={COMP_WORKSPACE_LABELS.下載圖片}
                       >
                         <Download size={12} className="text-morandi-gold" />
                       </button>
@@ -167,7 +168,7 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, o
                   <button
                     onClick={() => handleDownloadAttachment(attachment)}
                     className="opacity-0 group-hover/attachment:opacity-100 transition-opacity p-1 hover:bg-morandi-gold/10 rounded"
-                    title="下載檔案"
+                    title={COMP_WORKSPACE_LABELS.下載檔案}
                   >
                     <Download size={14} className="text-morandi-gold" />
                   </button>
@@ -228,7 +229,7 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, o
             <button
               onClick={() => onReply(message)}
               className="w-6 h-6 flex items-center justify-center text-xs hover:bg-morandi-gold/10 rounded border border-morandi-container hover:border-morandi-gold/40 transition-all hover:scale-110"
-              title="回覆討論串"
+              title={COMP_WORKSPACE_LABELS.回覆討論串}
             >
               <MessageSquare size={12} className="text-morandi-gold" />
             </button>
@@ -237,8 +238,8 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, o
           {currentUserId === message.author_id && (
             <button
               onClick={async () => {
-                const confirmed = await confirm('確定要刪除這則訊息嗎？', {
-                  title: '刪除訊息',
+                const confirmed = await confirm(COMP_WORKSPACE_LABELS.確定要刪除這則訊息嗎, {
+                  title: COMP_WORKSPACE_LABELS.刪除訊息,
                   type: 'warning',
                 })
                 if (confirmed) {
@@ -246,7 +247,7 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, o
                 }
               }}
               className="w-6 h-6 flex items-center justify-center text-xs hover:bg-morandi-red/10 rounded border border-morandi-container hover:border-morandi-red/40 transition-all hover:scale-110"
-              title="刪除訊息"
+              title={COMP_WORKSPACE_LABELS.刪除訊息}
             >
               <Trash2 size={12} className="text-morandi-red" />
             </button>

@@ -1,14 +1,15 @@
 import React from 'react'
 import { Feature } from '../../types'
 import { Loader2, X, Plus, GripVertical } from 'lucide-react'
+import { COMP_EDITOR_LABELS } from '../../../constants/labels'
 
 const TAG_COLOR_OPTIONS = [
-  { value: '#2C5F4D', label: '深綠', preview: 'bg-[#2C5F4D]' },
-  { value: '#C69C6D', label: '金色', preview: 'bg-[#C69C6D]' },
-  { value: '#8F4F4F', label: '酒紅', preview: 'bg-[#8F4F4F]' },
-  { value: '#636E72', label: '灰色', preview: 'bg-[#636E72]' },
-  { value: '#2D3436', label: '深灰', preview: 'bg-[#2D3436]' },
-  { value: '#0984e3', label: '藍色', preview: 'bg-[#0984e3]' },
+  { value: '#2C5F4D', label: COMP_EDITOR_LABELS.深綠, preview: 'bg-[#2C5F4D]' },
+  { value: '#C69C6D', label: COMP_EDITOR_LABELS.金色, preview: 'bg-[#C69C6D]' },
+  { value: '#8F4F4F', label: COMP_EDITOR_LABELS.酒紅, preview: 'bg-[#8F4F4F]' },
+  { value: '#636E72', label: COMP_EDITOR_LABELS.灰色, preview: 'bg-[#636E72]' },
+  { value: '#2D3436', label: COMP_EDITOR_LABELS.深灰, preview: 'bg-[#2D3436]' },
+  { value: '#0984e3', label: COMP_EDITOR_LABELS.藍色, preview: 'bg-[#0984e3]' },
 ]
 
 interface FeatureItemProps {
@@ -80,7 +81,7 @@ export function FeatureItem({
             onDragStart={() => onFeatureDragStart(index)}
             onDragEnd={onFeatureDragEnd}
             className="cursor-move text-morandi-secondary hover:text-morandi-primary transition-colors p-1 -m-1 rounded hover:bg-morandi-container/50"
-            title="拖曳排序"
+            title={COMP_EDITOR_LABELS.拖曳排序}
           >
             <GripVertical size={18} />
           </div>
@@ -103,7 +104,7 @@ export function FeatureItem({
             value={feature.tag || ''}
             onChange={e => onUpdateFeature(index, 'tag', e.target.value)}
             className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
-            placeholder="如：Gastronomy、Discovery"
+            placeholder={COMP_EDITOR_LABELS.如_Gastronomy_Discovery}
           />
         </div>
         <div>
@@ -135,7 +136,7 @@ export function FeatureItem({
           value={feature.title}
           onChange={e => onUpdateFeature(index, 'title', e.target.value)}
           className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
-          placeholder="溫泉飯店體驗"
+          placeholder={COMP_EDITOR_LABELS.溫泉飯店體驗}
         />
       </div>
 
@@ -147,7 +148,7 @@ export function FeatureItem({
           value={feature.description}
           onChange={e => onUpdateFeature(index, 'description', e.target.value)}
           className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
-          placeholder="保證入住阿蘇溫泉飯店，享受日式溫泉文化"
+          placeholder={COMP_EDITOR_LABELS.保證入住阿蘇溫泉飯店_享受日式溫泉文化}
         />
       </div>
 
@@ -199,7 +200,7 @@ export function FeatureItem({
                         onRemoveImage(index, imgIndex)
                       }}
                       className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/50 hover:bg-status-danger rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                      title="移除圖片"
+                      title={COMP_EDITOR_LABELS.移除圖片}
                     >
                       <X size={10} />
                     </button>
@@ -262,11 +263,11 @@ export function FeatureItem({
 
         {/* 圖片數量提示 */}
         <p className="text-xs text-morandi-secondary/60 mt-2">
-          {images.length === 0 && '尚未上傳圖片'}
-          {images.length === 1 && '1 張圖片會滿版顯示'}
-          {images.length === 2 && '2 張圖片會左右並排'}
-          {images.length === 3 && '3 張圖片會 1 大 + 2 小'}
-          {images.length === 4 && '4 張圖片會 2x2 網格'}
+          {images.length === 0 && COMP_EDITOR_LABELS.尚未上傳圖片}
+          {images.length === 1 && COMP_EDITOR_LABELS._1_張圖片會滿版顯示}
+          {images.length === 2 && COMP_EDITOR_LABELS._2_張圖片會左右並排}
+          {images.length === 3 && COMP_EDITOR_LABELS._3_張圖片會_1_大_2_小}
+          {images.length === 4 && COMP_EDITOR_LABELS._4_張圖片會_2x2_網格}
         </p>
       </div>
     </div>

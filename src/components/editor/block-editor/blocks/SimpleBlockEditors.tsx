@@ -20,6 +20,7 @@ import type {
   NoticesBlockData,
   CancellationBlockData,
 } from '../types'
+import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
 // ============================================================
 // 精選景點區塊編輯器
@@ -56,13 +57,13 @@ export function FocusCardsBlockEditor({ data, onChange }: FocusCardsBlockEditorP
             <Input
               value={card.title || ''}
               onChange={e => updateCard(index, 'title', e.target.value)}
-              placeholder="景點名稱"
+              placeholder={COMP_EDITOR_LABELS.景點名稱}
               className="h-8 text-sm"
             />
             <Input
               value={card.src || ''}
               onChange={e => updateCard(index, 'src', e.target.value)}
-              placeholder="圖片 URL"
+              placeholder={COMP_EDITOR_LABELS.圖片_URL}
               className="h-8 text-sm"
             />
           </div>
@@ -121,19 +122,19 @@ export function LeaderMeetingBlockEditor({ data, onChange }: LeaderMeetingBlockE
           <Input
             value={leader.name || ''}
             onChange={e => updateLeader('name', e.target.value)}
-            placeholder="領隊姓名"
+            placeholder={COMP_EDITOR_LABELS.領隊姓名}
             className="h-8 text-sm"
           />
           <Input
             value={leader.domesticPhone || ''}
             onChange={e => updateLeader('domesticPhone', e.target.value)}
-            placeholder="國內電話"
+            placeholder={COMP_EDITOR_LABELS.國內電話}
             className="h-8 text-sm"
           />
           <Input
             value={leader.overseasPhone || ''}
             onChange={e => updateLeader('overseasPhone', e.target.value)}
-            placeholder="海外電話"
+            placeholder={COMP_EDITOR_LABELS.海外電話}
             className="h-8 text-sm"
           />
         </div>
@@ -147,13 +148,13 @@ export function LeaderMeetingBlockEditor({ data, onChange }: LeaderMeetingBlockE
               <Input
                 value={point.time || ''}
                 onChange={e => updatePoint(index, 'time', e.target.value)}
-                placeholder="時間"
+                placeholder={COMP_EDITOR_LABELS.時間}
                 className="h-8 text-sm w-24"
               />
               <Input
                 value={point.location || ''}
                 onChange={e => updatePoint(index, 'location', e.target.value)}
-                placeholder="地點"
+                placeholder={COMP_EDITOR_LABELS.地點}
                 className="h-8 text-sm flex-1"
               />
               <Button variant="ghost" size="icon" className="h-8 w-8 text-status-danger" onClick={() => removePoint(index)}>
@@ -228,13 +229,13 @@ export function PriceTiersBlockEditor({ data, onChange }: PriceTiersBlockEditorP
           <Input
             value={tier.label || ''}
             onChange={e => updateTier(index, 'label', e.target.value)}
-            placeholder="方案名稱"
+            placeholder={COMP_EDITOR_LABELS.方案名稱}
             className="h-8 text-sm flex-1"
           />
           <Input
             value={tier.price || ''}
             onChange={e => updateTier(index, 'price', e.target.value)}
-            placeholder="價格"
+            placeholder={COMP_EDITOR_LABELS.價格}
             className="h-8 text-sm w-28"
           />
           <Button variant="ghost" size="icon" className="h-8 w-8 text-status-danger" onClick={() => removeTier(index)}>
@@ -285,7 +286,7 @@ export function FAQsBlockEditor({ data, onChange }: FAQsBlockEditorProps) {
             <Input
               value={faq.question || ''}
               onChange={e => updateFaq(index, 'question', e.target.value)}
-              placeholder="問題"
+              placeholder={COMP_EDITOR_LABELS.問題}
               className="h-8 text-sm flex-1"
             />
             <Button variant="ghost" size="icon" className="h-8 w-8 text-status-danger" onClick={() => removeFaq(index)}>
@@ -295,7 +296,7 @@ export function FAQsBlockEditor({ data, onChange }: FAQsBlockEditorProps) {
           <Textarea
             value={faq.answer || ''}
             onChange={e => updateFaq(index, 'answer', e.target.value)}
-            placeholder="答案"
+            placeholder={COMP_EDITOR_LABELS.答案}
             className="text-sm min-h-[60px]"
           />
         </div>
@@ -342,7 +343,7 @@ export function NoticesBlockEditor({ data, onChange }: NoticesBlockEditorProps) 
           <Input
             value={notice || ''}
             onChange={e => updateNotice(index, e.target.value)}
-            placeholder="提醒事項"
+            placeholder={COMP_EDITOR_LABELS.提醒事項}
             className="h-8 text-sm flex-1"
           />
           <Button variant="ghost" size="icon" className="h-8 w-8 text-status-danger" onClick={() => removeNotice(index)}>
@@ -392,7 +393,7 @@ export function CancellationBlockEditor({ data, onChange }: CancellationBlockEdi
           <Input
             value={policy || ''}
             onChange={e => updatePolicy(index, e.target.value)}
-            placeholder="取消政策"
+            placeholder={COMP_EDITOR_LABELS.取消政策}
             className="h-8 text-sm flex-1"
           />
           <Button variant="ghost" size="icon" className="h-8 w-8 text-status-danger" onClick={() => removePolicy(index)}>

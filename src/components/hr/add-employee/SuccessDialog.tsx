@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dialog'
 import { Copy, Check } from 'lucide-react'
 import { CreatedEmployeeInfo } from './types'
+import { COMP_HR_LABELS } from '../constants/labels'
 
 interface SuccessDialogProps {
   open: boolean
@@ -58,7 +59,7 @@ export function SuccessDialog({
                   <button
                     onClick={() => onCopy(createdEmployee?.employee_number || '', 'number')}
                     className="ml-3 p-2 hover:bg-muted rounded-md transition-colors"
-                    title="複製員工編號"
+                    title={COMP_HR_LABELS.複製員工編號}
                   >
                     {copiedField === 'number' ? (
                       <Check size={20} className="text-morandi-gold" />
@@ -81,7 +82,7 @@ export function SuccessDialog({
                   <button
                     onClick={() => onCopy(createdEmployee?.password || '', 'password')}
                     className="ml-3 p-2 hover:bg-muted rounded-md transition-colors"
-                    title="複製密碼"
+                    title={COMP_HR_LABELS.複製密碼}
                   >
                     {copiedField === 'password' ? (
                       <Check size={20} className="text-morandi-gold" />

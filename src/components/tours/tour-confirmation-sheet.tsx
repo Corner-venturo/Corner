@@ -33,6 +33,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { useToast } from '@/components/ui/use-toast'
 import { QuickRequestFromItemDialog } from '@/features/finance/requests/components/QuickRequestFromItemDialog'
 import { useRequirementsData, type QuoteItem, type CategoryKey, CATEGORIES } from '@/components/requirements/hooks/useRequirementsData'
+import { COMP_TOURS_LABELS } from './constants/labels'
 
 interface TourConfirmationSheetProps {
   tourId: string
@@ -136,20 +137,20 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'hotel':
-      case '住宿':
+      case COMP_TOURS_LABELS.住宿:
       case 'accommodation':
         return <Hotel size={14} className="text-blue-600" />
       case 'transportation':
-      case '交通':
+      case COMP_TOURS_LABELS.交通:
       case 'transport':
         return <Bus size={14} className="text-green-600" />
       case 'activity':
       case 'ticket':
-      case '門票':
+      case COMP_TOURS_LABELS.門票:
         return <Ticket size={14} className="text-purple-600" />
       case 'restaurant':
       case 'meal':
-      case '餐食':
+      case COMP_TOURS_LABELS.餐食:
         return <UtensilsCrossed size={14} className="text-orange-600" />
       default:
         return <Package size={14} className="text-morandi-secondary" />
@@ -164,7 +165,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
       id: request.id,
       category: request.category,
       title: request.title,
-      supplierName: request.supplier_name || '未知供應商',
+      supplierName: request.supplier_name || COMP_TOURS_LABELS.未知供應商,
       supplierId: request.supplier_id || '',
       estimatedCost: request.estimated_cost || 0,
       tourId: tourId,
@@ -206,7 +207,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
           tour_id: tourId,
           tour_code: tour.code,
           tour_name: tour.name,
-          title: `${supplierName} - ${category === 'accommodation' ? '住宿預訂' : '餐食預訂'}`,
+          title: `${supplierName} - ${category === 'accommodation' ? COMP_TOURS_LABELS.住宿預訂 : COMP_TOURS_LABELS.餐食預訂}`,
           category: category,  // 直接使用 accommodation/meal
           supplier_name: supplierName,
           service_date: serviceDate,
@@ -227,13 +228,13 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
       await refreshRequests()
 
       toast({
-        title: '需求單已建立',
+        title: COMP_TOURS_LABELS.需求單已建立,
         description: `${supplierName} 的需求單已建立為草稿`,
       })
     } catch (error) {
       toast({
-        title: '建立失敗',
-        description: '無法建立需求單，請稍後再試',
+        title: COMP_TOURS_LABELS.建立失敗,
+        description: COMP_TOURS_LABELS.無法建立需求單_請稍後再試,
         variant: 'destructive',
       })
     } finally {
@@ -439,16 +440,16 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                           ${request.status === 'draft' ? 'bg-morandi-container text-morandi-secondary' : ''}
                           ${request.status === 'processing' ? 'bg-morandi-gold/20 text-morandi-gold' : ''}
                         `}>
-                          {request.status === 'confirmed' ? '已確認' :
-                           request.status === 'draft' ? '草稿' :
-                           request.status === 'processing' ? '處理中' : request.status}
+                          {request.status === 'confirmed' ? COMP_TOURS_LABELS.已確認 :
+                           request.status === 'draft' ? COMP_TOURS_LABELS.草稿 :
+                           request.status === 'processing' ? COMP_TOURS_LABELS.處理中 : request.status}
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-3 text-xs text-morandi-secondary mt-1">
                       <span className="flex items-center gap-1">
                         <Building2 size={12} />
-                        {request.supplier_name || '未知供應商'}
+                        {request.supplier_name || COMP_TOURS_LABELS.未知供應商}
                       </span>
                       {request.service_date && (
                         <span className="flex items-center gap-1">
@@ -494,7 +495,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
           onSuccess={() => {
             refreshRequests()
             toast({
-              title: '請款單已建立',
+              title: COMP_TOURS_LABELS.請款單已建立,
               description: `${quickRequestItem.supplierName} 的請款單已建立`,
             })
           }}

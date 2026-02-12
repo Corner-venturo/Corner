@@ -5,6 +5,7 @@ import type { Channel, ChannelGroup } from '@/stores/workspace/types'
 import { useChannelStore } from '@/stores/workspace/channel-store'
 import { useChannelMemberStore } from '@/stores/workspace/channel-member-store'
 import { alert } from '@/lib/ui/alert-dialog'
+import { COMP_WORKSPACE_LABELS } from '../../constants/labels'
 
 /** Channel creation data */
 interface CreateChannelData {
@@ -151,7 +152,7 @@ export function createChannelHandlers(params: ChannelHandlersParams) {
       }
     } catch (error) {
       logger.error('Failed to create channel:', error)
-      void alert('建立頻道失敗', 'error')
+      void alert(COMP_WORKSPACE_LABELS.建立頻道失敗, 'error')
     }
   }
 

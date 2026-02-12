@@ -5,6 +5,7 @@ import { Plus } from 'lucide-react'
 import { DailyItinerary, Activity } from '../../../types'
 import { UploadableImage } from '../UploadableImage'
 import { EditableText } from '../EditableText'
+import { COMP_EDITOR_LABELS } from '../../../../constants/labels'
 
 interface CardGridTemplateProps {
   editingDay: DailyItinerary
@@ -48,7 +49,7 @@ export function CardGridTemplate({
               setEditingField={setEditingField}
               onChange={v => updateField('title', v)}
               className="text-xl font-bold text-foreground"
-              placeholder="行程標題"
+              placeholder={COMP_EDITOR_LABELS.行程標題}
             />
             <EditableText
               value={editingDay.description || ''}
@@ -57,7 +58,7 @@ export function CardGridTemplate({
               setEditingField={setEditingField}
               onChange={v => updateField('description', v)}
               className="text-sm text-morandi-secondary mt-1"
-              placeholder="簡短描述..."
+              placeholder={COMP_EDITOR_LABELS.簡短描述}
             />
           </div>
         </div>
@@ -85,7 +86,7 @@ export function CardGridTemplate({
                   setEditingField={setEditingField}
                   onChange={v => updateActivity(i, 'title', v)}
                   className="font-medium text-foreground text-sm"
-                  placeholder="景點名稱"
+                  placeholder={COMP_EDITOR_LABELS.景點名稱}
                 />
                 <EditableText
                   value={act.description}
@@ -94,7 +95,7 @@ export function CardGridTemplate({
                   setEditingField={setEditingField}
                   onChange={v => updateActivity(i, 'description', v)}
                   className="text-xs text-morandi-secondary mt-1"
-                  placeholder="景點描述"
+                  placeholder={COMP_EDITOR_LABELS.景點描述}
                 />
               </div>
             </div>
@@ -124,7 +125,7 @@ export function CardGridTemplate({
                 setEditingField={setEditingField}
                 onChange={v => updateField('meals', { ...editingDay.meals, breakfast: v })}
                 className="inline text-morandi-primary"
-                placeholder="飯店內"
+                placeholder={COMP_EDITOR_LABELS.飯店內}
               />
             </span>
             <span>
@@ -135,7 +136,7 @@ export function CardGridTemplate({
                 setEditingField={setEditingField}
                 onChange={v => updateField('meals', { ...editingDay.meals, lunch: v })}
                 className="inline text-morandi-primary"
-                placeholder="午餐"
+                placeholder={COMP_EDITOR_LABELS.午餐}
               />
             </span>
             <span>
@@ -146,7 +147,7 @@ export function CardGridTemplate({
                 setEditingField={setEditingField}
                 onChange={v => updateField('meals', { ...editingDay.meals, dinner: v })}
                 className="inline text-morandi-primary"
-                placeholder="晚餐"
+                placeholder={COMP_EDITOR_LABELS.晚餐}
               />
             </span>
           </div>
@@ -160,7 +161,7 @@ export function CardGridTemplate({
             setEditingField={setEditingField}
             onChange={v => updateField('accommodation', v)}
             className="text-sm text-morandi-primary"
-            placeholder="住宿飯店"
+            placeholder={COMP_EDITOR_LABELS.住宿飯店}
           />
         </div>
       </div>

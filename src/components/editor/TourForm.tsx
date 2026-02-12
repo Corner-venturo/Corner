@@ -19,6 +19,7 @@ import { NoticesPolicySection } from './tour-form/sections/NoticesPolicySection'
 import { Image, Plane, Star, MapPin, Users, Building2, DollarSign, HelpCircle, AlertCircle, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { TierPricing } from '@/stores/types/quote.types'
+import { COMP_EDITOR_LABELS } from './constants/labels'
 
 interface TourFormProps {
   data: TourFormData
@@ -29,15 +30,15 @@ interface TourFormProps {
 
 // 導覽項目配置
 const navItems = [
-  { id: 'section-cover', label: '封面', icon: Image },
-  { id: 'section-flight', label: '航班', icon: Plane },
-  { id: 'section-features', label: '特色', icon: Star },
-  { id: 'section-itinerary', label: '行程', icon: MapPin, hasDayNav: true },
-  { id: 'section-leader', label: '領隊', icon: Users },
-  { id: 'section-hotel', label: '飯店', icon: Building2 },
-  { id: 'section-pricing', label: '團費', icon: DollarSign },
-  { id: 'section-faq', label: '問答', icon: HelpCircle },
-  { id: 'section-notices', label: '須知', icon: AlertCircle },
+  { id: 'section-cover', label: COMP_EDITOR_LABELS.封面, icon: Image },
+  { id: 'section-flight', label: COMP_EDITOR_LABELS.航班, icon: Plane },
+  { id: 'section-features', label: COMP_EDITOR_LABELS.特色, icon: Star },
+  { id: 'section-itinerary', label: COMP_EDITOR_LABELS.行程, icon: MapPin, hasDayNav: true },
+  { id: 'section-leader', label: COMP_EDITOR_LABELS.領隊, icon: Users },
+  { id: 'section-hotel', label: COMP_EDITOR_LABELS.飯店, icon: Building2 },
+  { id: 'section-pricing', label: COMP_EDITOR_LABELS.團費, icon: DollarSign },
+  { id: 'section-faq', label: COMP_EDITOR_LABELS.問答, icon: HelpCircle },
+  { id: 'section-notices', label: COMP_EDITOR_LABELS.須知, icon: AlertCircle },
 ]
 
 // 計算 dayLabel 的函數 - 處理建議方案編號
@@ -318,7 +319,7 @@ export function TourForm({ data, onChange, quoteTierPricings, hasLinkedQuote }: 
               <div className="text-left flex-1">
                 <h2 className="text-base font-bold text-morandi-primary">特色行程</h2>
                 <p className="text-xs text-morandi-secondary">
-                  {data.showFeatures !== false ? '已啟用' : '未啟用'}
+                  {data.showFeatures !== false ? COMP_EDITOR_LABELS.已啟用 : COMP_EDITOR_LABELS.未啟用}
                 </p>
               </div>
               <input

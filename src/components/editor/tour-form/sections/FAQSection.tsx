@@ -8,6 +8,7 @@ import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Plus, Trash2, HelpCircle, GripVertical, MessageCircleQuestion } from 'lucide-react'
+import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
 interface FAQSectionProps {
   data: TourFormData
@@ -17,20 +18,20 @@ interface FAQSectionProps {
 // 預設常見問題
 const getDefaultFAQs = (): FAQ[] => [
   {
-    question: '行程可以客製化嗎？',
-    answer: '可以的！我們提供彈性的行程調整服務，可依您的需求增減景點、調整住宿等級或延長天數，歡迎與我們聯繫討論。',
+    question: COMP_EDITOR_LABELS.行程可以客製化嗎,
+    answer: COMP_EDITOR_LABELS.可以的_我們提供彈性的行程調整服務_可依您的需求增減景點_調整住宿等級或延長天數_歡迎與我們聯繫討論,
   },
   {
-    question: '需要準備什麼證件？',
-    answer: '請準備有效期限超過六個月的護照。部分國家可能需要簽證，我們會在行前說明會提供詳細資訊。',
+    question: COMP_EDITOR_LABELS.需要準備什麼證件,
+    answer: COMP_EDITOR_LABELS.請準備有效期限超過六個月的護照_部分國家可能需要簽證_我們會在行前說明會提供詳細資訊,
   },
   {
-    question: '團費包含小費嗎？',
-    answer: '團費不含導遊、司機小費。建議每人每日小費約 NT$200-300，實際金額可依服務品質自行調整。',
+    question: COMP_EDITOR_LABELS.團費包含小費嗎,
+    answer: COMP_EDITOR_LABELS.團費不含導遊_司機小費_建議每人每日小費約_NT_200_300_實際金額可依服務品質自行調整,
   },
   {
-    question: '可以刷卡付款嗎？',
-    answer: '可以！我們接受信用卡付款（VISA、MasterCard、JCB），也可選擇銀行轉帳或現金付款。',
+    question: COMP_EDITOR_LABELS.可以刷卡付款嗎,
+    answer: COMP_EDITOR_LABELS.可以_我們接受信用卡付款_VISA_MasterCard_JCB_也可選擇銀行轉帳或現金付款,
   },
 ]
 
@@ -130,7 +131,7 @@ export function FAQSection({ data, onChange }: FAQSectionProps) {
                   <Input
                     value={faq.question}
                     onChange={(e) => updateFAQ(index, { question: e.target.value })}
-                    placeholder="輸入常見問題，如：行程可以客製化嗎？"
+                    placeholder={COMP_EDITOR_LABELS.輸入常見問題_如_行程可以客製化嗎}
                     className="mt-1"
                   />
                 </div>
@@ -141,7 +142,7 @@ export function FAQSection({ data, onChange }: FAQSectionProps) {
                   <Textarea
                     value={faq.answer}
                     onChange={(e) => updateFAQ(index, { answer: e.target.value })}
-                    placeholder="輸入問題的答案..."
+                    placeholder={COMP_EDITOR_LABELS.輸入問題的答案}
                     className="mt-1 min-h-[80px] resize-none"
                     rows={3}
                   />

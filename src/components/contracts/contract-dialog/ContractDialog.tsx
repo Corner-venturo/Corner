@@ -17,20 +17,21 @@ import { ContractDialogProps } from './types'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useContractForm } from './useContractForm'
 import { ContractFormFields } from './ContractFormFields'
+import { COMP_CONTRACTS_LABELS } from '../constants/labels'
 
 const CONTRACT_TEMPLATES = [
-  { value: 'domestic' as ContractTemplate, label: '國內旅遊定型化契約' },
-  { value: 'international' as ContractTemplate, label: '國外旅遊定型化契約' },
+  { value: 'domestic' as ContractTemplate, label: COMP_CONTRACTS_LABELS.國內旅遊定型化契約 },
+  { value: 'international' as ContractTemplate, label: COMP_CONTRACTS_LABELS.國外旅遊定型化契約 },
   {
     value: 'individual_international' as ContractTemplate,
-    label: '國外個別旅遊定型化契約',
+    label: COMP_CONTRACTS_LABELS.國外個別旅遊定型化契約,
   },
 ]
 
 const CONTRACT_TEMPLATE_LABELS: Record<ContractTemplate, string> = {
-  domestic: '國內旅遊定型化契約',
-  international: '國外旅遊定型化契約',
-  individual_international: '國外個別旅遊定型化契約',
+  domestic: COMP_CONTRACTS_LABELS.國內旅遊定型化契約,
+  international: COMP_CONTRACTS_LABELS.國外旅遊定型化契約,
+  individual_international: COMP_CONTRACTS_LABELS.國外個別旅遊定型化契約,
 }
 
 export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogProps) {
@@ -235,7 +236,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                   <Plus size={16} />
                   {hasContract && membersWithoutContract.length > 0
                     ? `新增旅客 (${membersWithoutContract.length} 人未加入)`
-                    : '新增'}
+                    : COMP_CONTRACTS_LABELS.新增}
                 </button>
               </div>
             </div>
@@ -273,7 +274,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                   onClick={toggleSelectAll}
                   className="text-xs text-morandi-gold hover:underline"
                 >
-                  {selectedMemberIds.length === membersWithoutContract.length ? '取消全選' : '全選'}
+                  {selectedMemberIds.length === membersWithoutContract.length ? COMP_CONTRACTS_LABELS.取消全選 : COMP_CONTRACTS_LABELS.全選}
                 </button>
               </div>
 
@@ -294,7 +295,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                         <div className="space-y-1">
                           {members.map(member => {
                             const memberData = member as unknown as { chinese_name?: string; passport_name?: string; id_number?: string }
-                            const displayName = memberData.chinese_name || memberData.passport_name || '未命名'
+                            const displayName = memberData.chinese_name || memberData.passport_name || COMP_CONTRACTS_LABELS.未命名
                             const isSelected = selectedMemberIds.includes(member.id)
 
                             return (
@@ -365,7 +366,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                   <ArrowLeft className="w-4 h-4" />
                 </button>
                 <FileSignature size={20} />
-                {hasContract ? '編輯合約' : '建立合約'}
+                {hasContract ? COMP_CONTRACTS_LABELS.編輯合約 : COMP_CONTRACTS_LABELS.建立合約}
                 {selectedMemberIds.length > 0 && (
                   <span className="text-sm font-normal text-morandi-secondary">
                     ({selectedMemberIds.length} 位旅客)
@@ -411,7 +412,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                     </label>
                     <Select value={selectedOrderId} onValueChange={setSelectedOrderId}>
                       <SelectTrigger>
-                        <SelectValue placeholder="選擇訂單" />
+                        <SelectValue placeholder={COMP_CONTRACTS_LABELS.選擇訂單} />
                       </SelectTrigger>
                       <SelectContent>
                         {tourOrders.map(order => (
@@ -457,7 +458,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                     id: m.id,
                     name: (m as unknown as { chinese_name?: string; passport_name?: string }).chinese_name ||
                           (m as unknown as { chinese_name?: string; passport_name?: string }).passport_name ||
-                          '未命名',
+                          COMP_CONTRACTS_LABELS.未命名,
                     idNumber: (m as unknown as { id_number?: string }).id_number || undefined,
                     phone: (m as unknown as { phone?: string }).phone || undefined,
                   }))}
@@ -480,7 +481,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                   <textarea
                     value={contractNotes}
                     onChange={e => setContractNotes(e.target.value)}
-                    placeholder="請輸入備註..."
+                    placeholder={COMP_CONTRACTS_LABELS.請輸入備註}
                     className="w-full h-20 p-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 resize-none text-sm"
                   />
                 </div>
@@ -503,7 +504,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                     <DatePicker
                       value={archivedDate}
                       onChange={date => setArchivedDate(date)}
-                      placeholder="選擇日期"
+                      placeholder={COMP_CONTRACTS_LABELS.選擇日期}
                       className="w-full"
                     />
                   </div>
@@ -518,7 +519,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
               </Button>
               <Button onClick={onSave} disabled={saving || (!hasContract && !selectedTemplate)} className="gap-2">
                 <Save size={16} />
-                {saving ? '儲存中...' : hasContract ? '儲存' : '建立合約'}
+                {saving ? COMP_CONTRACTS_LABELS.儲存中 : hasContract ? COMP_CONTRACTS_LABELS.儲存 : COMP_CONTRACTS_LABELS.建立合約}
               </Button>
               <Button
                 onClick={handlePrint}

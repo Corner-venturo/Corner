@@ -22,6 +22,7 @@ import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import type { OrderMember } from '../order-member.types'
+import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 type EditMode = 'edit' | 'verify'
 
@@ -63,7 +64,7 @@ async function compressImage(file: File): Promise<File> {
         canvas.height = height
         const ctx = canvas.getContext('2d')
         if (!ctx) {
-          reject(new Error('無法取得 canvas context'))
+          reject(new Error(COMP_ORDERS_LABELS.無法取得_canvas_context))
           return
         }
         ctx.drawImage(img, 0, 0, width, height)
@@ -72,7 +73,7 @@ async function compressImage(file: File): Promise<File> {
             if (blob) {
               resolve(new File([blob], file.name, { type: 'image/jpeg' }))
             } else {
-              reject(new Error('壓縮失敗'))
+              reject(new Error(COMP_ORDERS_LABELS.壓縮失敗))
             }
           },
           'image/jpeg',
@@ -117,7 +118,7 @@ export function MemberEditDialog({
   // 從顧客主檔同步資料
   const handleSyncFromCustomer = useCallback(async () => {
     if (!editingMember?.customer_id) {
-      toast.error('此成員尚未關聯顧客')
+      toast.error(COMP_ORDERS_LABELS.此成員尚未關聯顧客)
       return
     }
 
@@ -130,7 +131,7 @@ export function MemberEditDialog({
         .single()
 
       if (error || !customer) {
-        toast.error('找不到關聯的顧客資料')
+        toast.error(COMP_ORDERS_LABELS.找不到關聯的顧客資料)
         return
       }
 
@@ -153,9 +154,9 @@ export function MemberEditDialog({
         })
       }
 
-      toast.success('已從顧客主檔同步資料')
+      toast.success(COMP_ORDERS_LABELS.已從顧客主檔同步資料)
     } catch {
-      toast.error('同步失敗')
+      toast.error(COMP_ORDERS_LABELS.同步失敗)
     } finally {
       setIsSyncing(false)
     }
@@ -186,7 +187,7 @@ export function MemberEditDialog({
         passport_image_url: urlData.publicUrl,
       })
 
-      toast.success('護照照片已上傳')
+      toast.success(COMP_ORDERS_LABELS.護照照片已上傳)
 
       // 自動進行 OCR
       if (onRecognize) {
@@ -197,8 +198,8 @@ export function MemberEditDialog({
         }
       }
     } catch (error) {
-      logger.error('上傳護照照片失敗:', error)
-      toast.error('上傳失敗，請稍後再試')
+      logger.error(COMP_ORDERS_LABELS.上傳護照照片失敗, error)
+      toast.error(COMP_ORDERS_LABELS.上傳失敗_請稍後再試)
     }
   }, [editingMember, onMemberChange, onRecognize])
 
@@ -278,7 +279,7 @@ export function MemberEditDialog({
                 : 'bg-morandi-gold hover:bg-morandi-gold-hover text-white px-8 font-medium'
               }
             >
-              {isSaving ? '儲存中...' : editMode === 'verify' ? '確認驗證' : '儲存變更'}
+              {isSaving ? COMP_ORDERS_LABELS.儲存中 : editMode === 'verify' ? COMP_ORDERS_LABELS.確認驗證 : COMP_ORDERS_LABELS.儲存變更}
             </Button>
           </div>
         </div>

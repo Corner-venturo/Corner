@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { BOT_CHANNEL_NAME, LAST_CHANNEL_STORAGE_KEY } from '../constants'
+import { COMP_WORKSPACE_LABELS } from '../../constants/labels'
 
 /**
  * 管理頻道相關的副作用
@@ -127,7 +128,7 @@ export function useChannelEffects(
           filter: `channel_id=eq.${selectedChannel.id}`,
         },
         (payload) => {
-          logger.log('[Workspace] Realtime 訊息更新:', payload.eventType)
+          logger.log(COMP_WORKSPACE_LABELS.Workspace_Realtime_訊息更新, payload.eventType)
           // 重新載入訊息
           loadMessages(selectedChannel.id)
         }

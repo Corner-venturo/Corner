@@ -36,11 +36,11 @@ function TicketStatusDialog({
   const [error, setError] = useState<string | null>(null)
 
   const handleSendQuery = useCallback(async (days: number) => {
-    logger.log('🎫 開始查詢機票狀態, channelId:', channelId, 'days:', days)
+    logger.log(COMP_WORKSPACE_LABELS.開始查詢機票狀態_channelId, channelId, 'days:', days)
 
     if (!channelId) {
-      logger.error('❌ channelId 為空')
-      setError('無法取得頻道資訊')
+      logger.error(COMP_WORKSPACE_LABELS.channelId_為空)
+      setError(COMP_WORKSPACE_LABELS.無法取得頻道資訊)
       return
     }
 
@@ -49,7 +49,7 @@ function TicketStatusDialog({
     setError(null)
 
     try {
-      logger.log('📡 發送 API 請求...')
+      logger.log(COMP_WORKSPACE_LABELS.發送_API_請求)
       const response = await fetch('/api/bot/ticket-status', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -59,15 +59,15 @@ function TicketStatusDialog({
           notify_sales: false, // 不發送給業務，只發到當前頻道
         }),
       })
-      logger.log('📥 API 回應狀態:', response.status)
+      logger.log(COMP_WORKSPACE_LABELS.API_回應狀態, response.status)
       const data = await response.json()
-      logger.log('📦 API 回應資料:', data)
+      logger.log(COMP_WORKSPACE_LABELS.API_回應資料, data)
 
       if (data.success) {
-        logger.log('✅ 查詢成功，關閉 Dialog')
+        logger.log(COMP_WORKSPACE_LABELS.查詢成功_關閉_Dialog)
         // 如果沒有需要通知的內容，顯示提示訊息
-        if (data.message === '無需發送通知' || data.data?.sent === false) {
-          setError('✅ 未來 ' + days + ' 天內沒有需要關注的開票狀況')
+        if (data.message === COMP_WORKSPACE_LABELS.無需發送通知 || data.data?.sent === false) {
+          setError(COMP_WORKSPACE_LABELS.未來 + days + COMP_WORKSPACE_LABELS.天內沒有需要關注的開票狀況)
           setLoading(false)
           setSelectedDays(null)
           return
@@ -75,12 +75,12 @@ function TicketStatusDialog({
         // 成功發送，關閉 Dialog
         onClose()
       } else {
-        logger.error('❌ API 回傳失敗:', data.message)
-        setError(data.message || '查詢失敗')
+        logger.error(COMP_WORKSPACE_LABELS.API_回傳失敗, data.message)
+        setError(data.message || COMP_WORKSPACE_LABELS.查詢失敗)
       }
     } catch (err) {
-      logger.error('❌ 查詢機票狀態失敗:', err)
-      setError('查詢失敗，請稍後再試')
+      logger.error(COMP_WORKSPACE_LABELS.查詢機票狀態失敗, err)
+      setError(COMP_WORKSPACE_LABELS.查詢失敗_請稍後再試)
     } finally {
       setLoading(false)
       setSelectedDays(null)
@@ -94,9 +94,9 @@ function TicketStatusDialog({
   }, [onClose])
 
   const periodOptions = [
-    { days: 30, label: '1 個月' },
-    { days: 90, label: '3 個月' },
-    { days: 180, label: '6 個月' },
+    { days: 30, label: COMP_WORKSPACE_LABELS._1_個月 },
+    { days: 90, label: COMP_WORKSPACE_LABELS._3_個月 },
+    { days: 180, label: COMP_WORKSPACE_LABELS._6_個月 },
   ]
 
   return (
@@ -153,6 +153,7 @@ function TicketStatusDialog({
 }
 import type { Channel } from '@/stores/workspace/types'
 import type { AdvanceItem } from '@/stores/workspace/types'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 interface User {
   id: string

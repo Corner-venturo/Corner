@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { FileText } from 'lucide-react'
 import { Quote } from '@/types/quote.types'
 import { CostCategory } from '@/features/quotes/types'
+import { COMP_EDITOR_LABELS } from './constants/labels'
 
 interface CreateItineraryFromQuoteButtonProps {
   quote: Quote & { categories?: CostCategory[] }
@@ -41,7 +42,7 @@ export const CreateItineraryFromQuoteButton: React.FC<CreateItineraryFromQuoteBu
       // 如果格式不符，嘗試從 description 取得
       return {
         day: 1,
-        type: '午餐',
+        type: COMP_EDITOR_LABELS.午餐,
         name: item.name || item.description || '',
         note: item.notes || '',
       }

@@ -8,6 +8,7 @@
 import React from 'react'
 import { AlertTriangle, Pencil, Trash2 } from 'lucide-react'
 import type { OrderMember } from '../../order-member.types'
+import { COMP_ORDERS_LABELS } from '../../constants/labels'
 
 interface MemberActionsProps {
   member: OrderMember
@@ -28,7 +29,7 @@ export function MemberActions({
           <button
             onClick={(e) => { e.stopPropagation(); onEdit(member, 'verify') }}
             className="text-status-warning hover:text-morandi-gold hover:bg-morandi-gold/10 transition-colors p-1 rounded"
-            title="待驗證 - 點擊驗證"
+            title={COMP_ORDERS_LABELS.待驗證_點擊驗證}
           >
             <AlertTriangle size={14} />
           </button>
@@ -37,7 +38,7 @@ export function MemberActions({
         <button
           onClick={(e) => { e.stopPropagation(); onEdit(member, 'edit') }}
           className="text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10 transition-colors p-1 rounded"
-          title="編輯成員"
+          title={COMP_ORDERS_LABELS.編輯成員}
         >
           <Pencil size={14} />
         </button>
@@ -45,7 +46,7 @@ export function MemberActions({
         <button
           onClick={(e) => { e.stopPropagation(); onDelete(member.id) }}
           className="text-morandi-secondary hover:text-morandi-red hover:bg-morandi-red/10 transition-colors p-1 rounded"
-          title="刪除成員"
+          title={COMP_ORDERS_LABELS.刪除成員}
         >
           <Trash2 size={14} />
         </button>

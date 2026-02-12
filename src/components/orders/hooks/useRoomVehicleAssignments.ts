@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { toast } from 'sonner'
+import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 interface UseRoomVehicleAssignmentsParams {
   tourId: string
@@ -128,7 +129,7 @@ export function useRoomVehicleAssignments({
         // 按飯店分組修復
         const byHotel: Record<string, typeof roomsToFix> = {}
         roomsToFix.forEach(r => {
-          const hotel = r.hotel_name || '未指定'
+          const hotel = r.hotel_name || COMP_ORDERS_LABELS.未指定
           if (!byHotel[hotel]) byHotel[hotel] = []
           byHotel[hotel].push(r)
         })
@@ -267,7 +268,7 @@ export function useRoomVehicleAssignments({
         // 建立飯店欄位資訊
         const hotelColsMap = new Map<string, HotelColumn>()
         rooms.forEach(room => {
-          const hotelName = room.hotel_name || '未指定'
+          const hotelName = room.hotel_name || COMP_ORDERS_LABELS.未指定
           if (!hotelColsMap.has(hotelName)) {
             hotelColsMap.set(hotelName, {
               id: hotelName,
@@ -373,7 +374,7 @@ export function useRoomVehicleAssignments({
               roomNumber: roomNumbers[room.id] || 1,
               capacity: room.capacity,
               assignedCount: assigned,
-              label: `${room.room_type}${roomNumbers[room.id] || 1}${remaining > 0 ? ` (剩${remaining}床)` : ' (滿)'}`,
+              label: `${room.room_type}${roomNumbers[room.id] || 1}${remaining > 0 ? ` (剩${remaining}床)` : COMP_ORDERS_LABELS.滿}`,
             }
           })
         })
@@ -393,7 +394,7 @@ export function useRoomVehicleAssignments({
           const memberData = a.order_members as { id: string; chinese_name: string | null; passport_name: string | null; birth_date: string | null } | null
           if (!memberData) return
 
-          const memberName = memberData.chinese_name || memberData.passport_name || '未命名'
+          const memberName = memberData.chinese_name || memberData.passport_name || COMP_ORDERS_LABELS.未命名
           const isChild = isChildNotOccupyingBed(memberData.birth_date, departureDate)
 
           if (!membersByHotelRoom[room.hotel_name]) {
@@ -427,7 +428,7 @@ export function useRoomVehicleAssignments({
         }
       }
     } catch (error) {
-      logger.error('載入分房資訊失敗:', error)
+      logger.error(COMP_ORDERS_LABELS.載入分房資訊失敗, error)
     }
   }
 
@@ -452,7 +453,7 @@ export function useRoomVehicleAssignments({
         assignments.forEach(a => {
           const vehicle = vehicles.find(v => v.id === a.vehicle_id)
           if (vehicle) {
-            map[a.order_member_id] = vehicle.vehicle_name || vehicle.vehicle_type || '已分車'
+            map[a.order_member_id] = vehicle.vehicle_name || vehicle.vehicle_type || COMP_ORDERS_LABELS.已分車
           }
         })
         setVehicleAssignments(map)
@@ -462,7 +463,7 @@ export function useRoomVehicleAssignments({
         }
       }
     } catch (error) {
-      logger.error('載入分車資訊失敗:', error)
+      logger.error(COMP_ORDERS_LABELS.載入分車資訊失敗, error)
     }
   }
 
@@ -504,15 +505,15 @@ export function useRoomVehicleAssignments({
             if (isChild) {
               // 幼童可以加入已滿房間，但顯示提示
               const age = calculateAge(memberBirthDate, departureDate)
-              const ageText = age !== null && age < 2 ? '嬰兒' : `${age}歲幼童`
+              const ageText = age !== null && age < 2 ? COMP_ORDERS_LABELS.嬰兒 : `${age}歲幼童`
               toast.info(`${ageText}不佔床，已加入已滿房間`, { duration: 3000 })
             } else if (!memberBirthDate) {
               // 沒有出生日期資料，顯示錯誤
-              toast.error('此房間已滿，無法分配（如為幼童請先填寫出生日期）')
+              toast.error(COMP_ORDERS_LABELS.此房間已滿_無法分配_如為幼童請先填寫出生日期)
               return
             } else {
               // 非幼童不能加入已滿房間
-              toast.error('此房間已滿，無法分配')
+              toast.error(COMP_ORDERS_LABELS.此房間已滿_無法分配)
               return
             }
           }
@@ -593,7 +594,7 @@ export function useRoomVehicleAssignments({
       // 重新載入分房資料
       await loadRoomAssignments()
     } catch (error) {
-      logger.error('分配房間失敗:', error)
+      logger.error(COMP_ORDERS_LABELS.分配房間失敗, error)
     }
   }
 
@@ -623,7 +624,7 @@ export function useRoomVehicleAssignments({
       // 重新載入分房資料
       await loadRoomAssignments()
     } catch (error) {
-      logger.error('移除成員房間分配失敗:', error)
+      logger.error(COMP_ORDERS_LABELS.移除成員房間分配失敗, error)
     }
   }
 
@@ -729,7 +730,7 @@ export function useRoomVehicleAssignments({
       // 重新載入分房資料
       await loadRoomAssignments()
     } catch (error) {
-      logger.error('重新排列房間順序失敗:', error)
+      logger.error(COMP_ORDERS_LABELS.重新排列房間順序失敗, error)
       // 出錯時也要重新載入，確保 UI 狀態正確
       await loadRoomAssignments()
     }

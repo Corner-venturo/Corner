@@ -10,6 +10,7 @@ import { useChannelStore } from '@/stores/workspace/channel-store'
 import type { Channel } from '@/stores/workspace/types'
 import { getWorkspaceMembers, getOrCreateDmChannel } from '@/lib/actions'
 import { alert, confirm } from '@/lib/ui/alert-dialog'
+import { COMP_WORKSPACE_LABELS } from '../../constants/labels'
 
 /**
  * 頻道側邊欄狀態管理 Hook
@@ -76,7 +77,7 @@ export function useChannelSidebarState() {
       return dmChannel as Channel | null
     } catch (error) {
       logger.error('Failed to create or get DM channel:', error)
-      void alert('開啟私訊失敗', 'error')
+      void alert(COMP_WORKSPACE_LABELS.開啟私訊失敗, 'error')
       return null
     } finally {
       setIsCreatingDm(false)
@@ -117,7 +118,7 @@ export function useChannelSidebarState() {
     if (!channel) return
 
     const confirmed = await confirm(`確定要離開 #${channel.name} 頻道嗎？`, {
-      title: '離開頻道',
+      title: COMP_WORKSPACE_LABELS.離開頻道,
       type: 'warning',
     })
     if (!confirmed) return
@@ -160,7 +161,7 @@ export function useChannelSidebarState() {
     if (!channel) return
 
     const confirmed = await confirm(`確定要封存 #${channel.name} 頻道嗎？\n封存後頻道將移至「封存」區域。`, {
-      title: '封存頻道',
+      title: COMP_WORKSPACE_LABELS.封存頻道,
       type: 'warning',
     })
     if (!confirmed) return
@@ -175,7 +176,7 @@ export function useChannelSidebarState() {
       logger.log(`頻道 ${channelId} 已封存`)
     } catch (error) {
       logger.error('Failed to archive channel:', error)
-      void alert('封存頻道失敗', 'error')
+      void alert(COMP_WORKSPACE_LABELS.封存頻道失敗, 'error')
     }
   }
 
@@ -193,7 +194,7 @@ export function useChannelSidebarState() {
       logger.log(`頻道 ${channelId} 已解除封存`)
     } catch (error) {
       logger.error('Failed to unarchive channel:', error)
-      void alert('解除封存失敗', 'error')
+      void alert(COMP_WORKSPACE_LABELS.解除封存失敗, 'error')
     }
   }
 

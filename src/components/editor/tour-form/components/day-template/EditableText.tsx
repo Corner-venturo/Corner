@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { COMP_EDITOR_LABELS } from '../../../constants/labels'
 
 interface EditableTextProps {
   value: string
@@ -21,7 +22,7 @@ export function EditableText({
   setEditingField,
   onChange,
   className = '',
-  placeholder = '點擊編輯...',
+  placeholder = COMP_EDITOR_LABELS.點擊編輯_2,
   multiline = false,
   inputClassName = '',
 }: EditableTextProps) {
@@ -64,7 +65,7 @@ export function EditableText({
     <div
       onClick={() => setEditingField(fieldKey)}
       className={`cursor-pointer hover:bg-[#2C5F4D]/10 rounded px-1 py-0.5 transition-all border border-transparent hover:border-[#2C5F4D]/30 ${className}`}
-      title="點擊編輯"
+      title={COMP_EDITOR_LABELS.點擊編輯}
     >
       {value || <span className="text-morandi-muted italic">{placeholder}</span>}
     </div>

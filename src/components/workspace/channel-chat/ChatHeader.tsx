@@ -10,6 +10,7 @@ import { useQuotes } from '@/data'
 import { cn } from '@/lib/utils'
 import type { ChatMode, TravelerConversationType } from './useTravelerMode'
 import { stripHtml } from '@/lib/utils/string-utils'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 interface ChatHeaderProps {
   showMemberSidebar: boolean
@@ -128,7 +129,7 @@ export function ChatHeader({
           size="icon"
           className="w-8 h-8 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10"
           onClick={() => router.push(`/tours?highlight=${tourId}`)}
-          title="前往旅遊團詳情"
+          title={COMP_WORKSPACE_LABELS.前往旅遊團詳情}
         >
           <MapPin size={16} />
         </Button>
@@ -142,7 +143,7 @@ export function ChatHeader({
               variant="ghost"
               size="icon"
               className="w-8 h-8 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10 relative"
-              title="關聯報價單"
+              title={COMP_WORKSPACE_LABELS.關聯報價單}
             >
               <CircleDollarSign size={16} />
               {linkedQuotes.length > 0 && (
@@ -173,7 +174,7 @@ export function ChatHeader({
                       <div className="flex items-center gap-2">
                         <span className="font-mono text-xs text-morandi-gold">{quote.code}</span>
                         <span className="text-sm text-morandi-text truncate">
-                          {stripHtml(quote.name) || stripHtml(quote.destination) || '未命名'}
+                          {stripHtml(quote.name) || stripHtml(quote.destination) || COMP_WORKSPACE_LABELS.未命名}
                         </span>
                       </div>
                       {quote.total_cost && (

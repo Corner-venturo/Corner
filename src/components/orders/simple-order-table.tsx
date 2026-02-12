@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 import { Order, Tour } from '@/stores/types'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { OrderMembersExpandable } from '@/components/orders/OrderMembersExpandable'
+import { COMP_ORDERS_LABELS } from './constants/labels'
 
 interface SimpleOrderTableProps {
   orders: Order[]
@@ -46,7 +47,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
     const confirmMessage = `確定要刪除訂單「${order.order_number}」嗎？\n\n此操作會影響：\n- 團員名單將被移除\n- 收款記錄將被刪除\n- 旅遊團人數統計將更新\n\n此操作無法復原！`
 
     const confirmed = await confirm(confirmMessage, {
-      title: '刪除訂單',
+      title: COMP_ORDERS_LABELS.刪除訂單,
       type: 'warning',
     })
     if (!confirmed) {
@@ -56,7 +57,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
     try {
       await deleteOrder(order.id)
     } catch (err) {
-      await alert('刪除失敗，請稍後再試', 'error')
+      await alert(COMP_ORDERS_LABELS.刪除失敗_請稍後再試, 'error')
     }
   }
 
@@ -157,7 +158,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                         'h-8 w-8 p-0 text-morandi-secondary hover:text-morandi-blue hover:bg-morandi-blue/10',
                         expandedOrderId === order.id && 'text-morandi-blue bg-morandi-blue/10'
                       )}
-                      title="查看成員"
+                      title={COMP_ORDERS_LABELS.查看成員}
                     >
                       <User size={16} />
                     </Button>
@@ -177,7 +178,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                         }
                       }}
                       className="h-8 w-8 p-0 text-morandi-secondary hover:text-morandi-green hover:bg-morandi-green/10 font-bold text-base"
-                      title="快速收款"
+                      title={COMP_ORDERS_LABELS.快速收款}
                     >
                       $
                     </Button>
@@ -192,7 +193,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                           onQuickInvoice(order)
                         }}
                         className="h-8 w-8 p-0 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10"
-                        title="開發票"
+                        title={COMP_ORDERS_LABELS.開發票}
                       >
                         <FileText size={14} />
                       </Button>
@@ -213,7 +214,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                         }
                       }}
                       className="h-8 w-8 p-0 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10"
-                      title="快速請款"
+                      title={COMP_ORDERS_LABELS.快速請款}
                     >
                       ¥
                     </Button>
@@ -228,7 +229,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                           onEdit(order)
                         }}
                         className="h-8 w-8 p-0 text-morandi-secondary hover:text-morandi-blue hover:bg-morandi-blue/10"
-                        title="編輯訂單"
+                        title={COMP_ORDERS_LABELS.編輯訂單}
                       >
                         <Pencil size={14} />
                       </Button>
@@ -240,7 +241,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                       variant="ghost"
                       onClick={e => handleDeleteOrder(order, e)}
                       className="h-8 w-8 p-0 text-morandi-secondary hover:text-morandi-red hover:bg-morandi-red/10"
-                      title="刪除訂單"
+                      title={COMP_ORDERS_LABELS.刪除訂單}
                     >
                       <Trash2 size={14} />
                     </Button>

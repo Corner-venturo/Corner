@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Plus, Trash2, Building } from 'lucide-react'
 import type { HotelsBlockData } from '../types'
 import type { HotelInfo } from '@/components/editor/tour-form/types'
+import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
 interface HotelsBlockEditorProps {
   data: HotelsBlockData
@@ -47,13 +48,13 @@ export function HotelsBlockEditor({ data, onChange }: HotelsBlockEditorProps) {
             <Input
               value={hotel.name || ''}
               onChange={e => updateHotel(index, 'name', e.target.value)}
-              placeholder="飯店名稱"
+              placeholder={COMP_EDITOR_LABELS.飯店名稱}
               className="h-8 text-sm"
             />
             <Input
               value={hotel.description || ''}
               onChange={e => updateHotel(index, 'description', e.target.value)}
-              placeholder="飯店描述"
+              placeholder={COMP_EDITOR_LABELS.飯店描述}
               className="h-8 text-sm"
             />
           </div>

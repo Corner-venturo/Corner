@@ -18,6 +18,7 @@ import { Plus, X, Check } from 'lucide-react'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { updateTour } from '@/data'
 import { CurrencyCell } from '@/components/table-cells'
+import { COMP_TOURS_LABELS } from './constants/labels'
 
 interface Employee {
   id: string
@@ -80,7 +81,7 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
         .single()
 
       if (!workspace) {
-        logger.error('找不到工作空間')
+        logger.error(COMP_TOURS_LABELS.找不到工作空間)
         return
       }
 
@@ -101,7 +102,7 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
         )
       }
     } catch (error) {
-      logger.error('載入員工失敗:', error)
+      logger.error(COMP_TOURS_LABELS.載入員工失敗, error)
     }
   }
 
@@ -154,8 +155,8 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
       setTax(taxAmount)
       setNetProfit(net)
     } catch (error) {
-      logger.error('計算團體財務失敗:', error)
-      toast.error('計算失敗')
+      logger.error(COMP_TOURS_LABELS.計算團體財務失敗, error)
+      toast.error(COMP_TOURS_LABELS.計算失敗)
     } finally {
       setCalculating(false)
     }
@@ -188,17 +189,17 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
     const opTotal = opRecipients.reduce((sum, r) => sum + r.percentage, 0)
 
     if (salesRecipients.some(r => !r.employeeId)) {
-      toast.error('請選擇所有業務人員')
+      toast.error(COMP_TOURS_LABELS.請選擇所有業務人員)
       return
     }
 
     if (opRecipients.some(r => !r.employeeId)) {
-      toast.error('請選擇所有 OP 人員')
+      toast.error(COMP_TOURS_LABELS.請選擇所有_OP_人員)
       return
     }
 
     const confirmed = await confirm(`確定要結團嗎？結團後將無法修改。\n\n業務業績：${salesTotal}%\nOP 獎金：${opTotal}%`, {
-      title: '結團確認',
+      title: COMP_TOURS_LABELS.結團確認,
       type: 'warning',
     })
     if (!confirmed) {
@@ -239,7 +240,7 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
           const amount = Math.round(netProfit * (recipient.percentage / 100))
           bonusPayments.push({
             order_id: orderId,
-            supplier_name: '業務業績',
+            supplier_name: COMP_TOURS_LABELS.業務業績,
             supplier_type: 'bonus',
             amount,
             note: `業務業績 ${recipient.percentage}%`,
@@ -257,7 +258,7 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
           const amount = Math.round(netProfit * (recipient.percentage / 100))
           bonusPayments.push({
             order_id: orderId,
-            supplier_name: 'OP 獎金',
+            supplier_name: COMP_TOURS_LABELS.OP_獎金,
             supplier_type: 'bonus',
             amount,
             note: `OP 獎金 ${recipient.percentage}%`,
@@ -277,16 +278,16 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
 
       // 4. 更新團體狀態為已結團
       await updateTour(tour.id, {
-        status: '結案',
+        status: COMP_TOURS_LABELS.結案,
         closing_date: getTodayString(),
       } as Parameters<typeof updateTour>[1])
 
-      toast.success('結團成功！')
+      toast.success(COMP_TOURS_LABELS.結團成功)
       onSuccess()
       onOpenChange(false)
     } catch (error) {
-      logger.error('結團失敗:', error)
-      toast.error('結團失敗')
+      logger.error(COMP_TOURS_LABELS.結團失敗_2, error)
+      toast.error(COMP_TOURS_LABELS.結團失敗)
     } finally {
       setLoading(false)
     }
@@ -352,7 +353,7 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
                       }}
                     >
                       <SelectTrigger className="flex-1">
-                        <SelectValue placeholder="選擇業務" />
+                        <SelectValue placeholder={COMP_TOURS_LABELS.選擇業務} />
                       </SelectTrigger>
                       <SelectContent>
                         {employees.map(emp => (
@@ -407,7 +408,7 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
                       }}
                     >
                       <SelectTrigger className="flex-1">
-                        <SelectValue placeholder="選擇 OP" />
+                        <SelectValue placeholder={COMP_TOURS_LABELS.選擇_OP} />
                       </SelectTrigger>
                       <SelectContent>
                         {employees.map(emp => (
@@ -449,7 +450,7 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
               </Button>
               <Button className="gap-2" onClick={handleCloseTour} disabled={loading}>
                 <Check size={16} />
-                {loading ? '處理中...' : '確認結團'}
+                {loading ? COMP_TOURS_LABELS.處理中_2 : COMP_TOURS_LABELS.確認結團}
               </Button>
             </div>
           </div>

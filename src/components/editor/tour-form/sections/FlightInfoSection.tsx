@@ -16,6 +16,7 @@ import { FlightStyleSelector } from './flight/FlightStyleSelector'
 import { useFlightData } from './flight/hooks/useFlightData'
 import { useFlightSearch } from './flight/FlightSearchDialog'
 import { parseDate, formatDateFull } from './flight/utils'
+import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
 interface FlightInfoSectionProps {
   data: TourFormData
@@ -85,8 +86,8 @@ export function FlightInfoSection({
   // 取得目前選擇的風格資訊
   const currentStyle = flightStyleOptions.find(s => s.value === (data.flightStyle || 'original')) || {
     value: 'original' as FlightStyleType,
-    label: '經典金色',
-    description: '莫蘭迪金色風格',
+    label: COMP_EDITOR_LABELS.經典金色,
+    description: COMP_EDITOR_LABELS.莫蘭迪金色風格,
     color: getTemplateColor('original'),
     previewImage: undefined,
   }
@@ -249,7 +250,7 @@ export function FlightInfoSection({
 
                 {/* 去程航班 */}
                 <FlightSegmentCard
-                  title="去程航班"
+                  title={COMP_EDITOR_LABELS.去程航班}
                   flightData={data.outboundFlight || {}}
                   onFieldChange={(field, value) => updateFlightField('outboundFlight', field, value)}
                   onSearch={handleSearchOutbound}
@@ -262,7 +263,7 @@ export function FlightInfoSection({
 
                 {/* 回程航班 */}
                 <FlightSegmentCard
-                  title="回程航班"
+                  title={COMP_EDITOR_LABELS.回程航班}
                   flightData={data.returnFlight || {}}
                   onFieldChange={(field, value) => updateFlightField('returnFlight', field, value)}
                   onSearch={handleSearchReturn}

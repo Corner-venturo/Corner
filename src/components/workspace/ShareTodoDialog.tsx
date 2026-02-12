@@ -20,6 +20,7 @@ import { DateCell } from '@/components/table-cells'
 import { formatDateTW } from '@/lib/utils/format-date'
 import type { Todo } from '@/stores/types'
 import { alert } from '@/lib/ui/alert-dialog'
+import { COMP_WORKSPACE_LABELS } from './constants/labels'
 
 interface ShareTodoDialogProps {
   channelId: string
@@ -68,7 +69,7 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
         `📋 **共享代辦事項**\n\n` +
         `**標題：** ${selectedTodo.title}\n` +
         `**優先級：** ${'⭐'.repeat(selectedTodo.priority)}\n` +
-        `**截止日期：** ${selectedTodo.deadline ? formatDateTW(new Date(selectedTodo.deadline)) : '無'}\n` +
+        `**截止日期：** ${selectedTodo.deadline ? formatDateTW(new Date(selectedTodo.deadline)) : COMP_WORKSPACE_LABELS.無}\n` +
         `**狀態：** ${getStatusLabel(selectedTodo.status)}\n` +
         (assigneeInfo ? `**指派給：** ${assigneeInfo.display_name}\n` : '') +
         `\n👉 [查看詳細](#/todos/${selectedTodo.id})`
@@ -81,7 +82,7 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
 
       onSuccess()
     } catch (error) {
-      void alert('分享失敗，請稍後再試', 'error')
+      void alert(COMP_WORKSPACE_LABELS.分享失敗_請稍後再試, 'error')
     } finally {
       setIsSubmitting(false)
     }
@@ -89,10 +90,10 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
 
   const getStatusLabel = (status: Todo['status']) => {
     const labels = {
-      pending: '待處理',
-      in_progress: '進行中',
-      completed: '已完成',
-      cancelled: '已取消',
+      pending: COMP_WORKSPACE_LABELS.待處理,
+      in_progress: COMP_WORKSPACE_LABELS.進行中,
+      completed: COMP_WORKSPACE_LABELS.已完成,
+      cancelled: COMP_WORKSPACE_LABELS.已取消,
     }
     return labels[status]
   }
@@ -116,7 +117,7 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-morandi-secondary" />
             <Input
-              placeholder="搜尋代辦事項..."
+              placeholder={COMP_WORKSPACE_LABELS.搜尋代辦事項}
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -131,7 +132,7 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
             <div className="border border-morandi-gold/20 rounded-lg max-h-64 overflow-y-auto">
               {pendingTodos.length === 0 ? (
                 <div className="p-4 text-center text-morandi-secondary text-sm">
-                  {searchQuery ? '沒有符合的代辦事項' : '沒有待處理的代辦事項'}
+                  {searchQuery ? COMP_WORKSPACE_LABELS.沒有符合的代辦事項 : COMP_WORKSPACE_LABELS.沒有待處理的代辦事項}
                 </div>
               ) : (
                 <div className="divide-y divide-morandi-gold/10">
@@ -168,7 +169,7 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
                               <span className="text-xs text-morandi-secondary">
                                 👤{' '}
                                 {employees.find(e => e.id === todo.assignee)?.display_name ||
-                                  '未知'}
+                                  COMP_WORKSPACE_LABELS.未知}
                               </span>
                             )}
                           </div>

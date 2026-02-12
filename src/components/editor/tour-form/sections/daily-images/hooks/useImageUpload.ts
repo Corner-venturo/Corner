@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import { DailyImage } from '../../../types'
+import { COMP_EDITOR_LABELS } from '../../../../constants/labels'
 
 // 工具函數：建立 DailyImage 物件
 function createDailyImage(url: string, position?: string): DailyImage {
@@ -42,7 +43,7 @@ export function useImageUpload(dayIndex: number) {
           .upload(filePath, file)
 
         if (uploadError) {
-          logger.error('[DailyImagesUploader] 上傳失敗:', uploadError)
+          logger.error(COMP_EDITOR_LABELS.DailyImagesUploader_上傳失敗, uploadError)
           toast.error(`圖片上傳失敗: ${uploadError.message}`)
           continue
         }
@@ -58,8 +59,8 @@ export function useImageUpload(dayIndex: number) {
 
       return newImages
     } catch (error) {
-      logger.error('[DailyImagesUploader] 意外錯誤:', error)
-      toast.error(`上傳過程發生錯誤: ${error instanceof Error ? error.message : '未知錯誤'}`)
+      logger.error(COMP_EDITOR_LABELS.DailyImagesUploader_意外錯誤, error)
+      toast.error(`上傳過程發生錯誤: ${error instanceof Error ? error.message : COMP_EDITOR_LABELS.未知錯誤}`)
       return []
     } finally {
       setIsUploading(false)
@@ -78,13 +79,13 @@ export function useImageUpload(dayIndex: number) {
       try {
         response = await fetch(imageUrl, { mode: 'cors' })
       } catch (fetchError) {
-        logger.error('CORS 錯誤，無法下載此圖片:', imageUrl)
-        toast.error('此網站不允許下載圖片，請改用右鍵另存圖片後上傳')
+        logger.error(COMP_EDITOR_LABELS.CORS_錯誤_無法下載此圖片, imageUrl)
+        toast.error(COMP_EDITOR_LABELS.此網站不允許下載圖片_請改用右鍵另存圖片後上傳)
         return null
       }
 
       if (!response.ok) {
-        toast.error('無法下載圖片，請改用右鍵另存圖片後上傳')
+        toast.error(COMP_EDITOR_LABELS.無法下載圖片_請改用右鍵另存圖片後上傳)
         return null
       }
 
@@ -93,7 +94,7 @@ export function useImageUpload(dayIndex: number) {
 
       // 檢查是否為有效圖片
       if (!blob.type.startsWith('image/') && blob.size === 0) {
-        toast.error('下載的內容不是有效圖片')
+        toast.error(COMP_EDITOR_LABELS.下載的內容不是有效圖片)
         return null
       }
 
@@ -121,8 +122,8 @@ export function useImageUpload(dayIndex: number) {
         .upload(filePath, blob, { contentType })
 
       if (uploadError) {
-        logger.error('Supabase 上傳失敗:', uploadError)
-        toast.error('上傳到伺服器失敗')
+        logger.error(COMP_EDITOR_LABELS.Supabase_上傳失敗, uploadError)
+        toast.error(COMP_EDITOR_LABELS.上傳到伺服器失敗)
         return null
       }
 
@@ -135,8 +136,8 @@ export function useImageUpload(dayIndex: number) {
       setUploadProgress(100)
       return data.publicUrl
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : '未知錯誤'
-      logger.error('上傳圖片失敗:', errorMessage)
+      const errorMessage = error instanceof Error ? error.message : COMP_EDITOR_LABELS.未知錯誤
+      logger.error(COMP_EDITOR_LABELS.上傳圖片失敗, errorMessage)
       toast.error(`上傳失敗: ${errorMessage}`)
       return null
     } finally {

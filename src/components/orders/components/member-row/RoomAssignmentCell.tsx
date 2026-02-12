@@ -12,6 +12,7 @@ import { X, Plus, Bed } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import type { RoomOption, RoomMemberInfo } from '../../hooks/useRoomVehicleAssignments'
+import { COMP_ORDERS_LABELS } from '../../constants/labels'
 
 interface RoomAssignmentCellProps {
   memberId: string
@@ -20,7 +21,7 @@ interface RoomAssignmentCellProps {
   hotelId: string
   hotelName: string
   currentRoomId: string
-  currentRoomLabel: string  // 目前顯示的房間標籤（如 "雙床1"）
+  currentRoomLabel: string  // 目前顯示的房間標籤（如 COMP_ORDERS_LABELS.雙床1）
   roomOptions: RoomOption[]
   roomMembers: RoomMemberInfo[]  // 同房成員列表
   rowSpan?: number
@@ -89,7 +90,7 @@ export function RoomAssignmentCell({
             const isFull = opt.assignedCount >= opt.capacity
             return (
               <option key={opt.id} value={opt.id}>
-                {opt.label}{isFull ? ' (6歲↓可加)' : ''}
+                {opt.label}{isFull ? COMP_ORDERS_LABELS._6歲_可加 : ''}
               </option>
             )
           })}
@@ -152,7 +153,7 @@ export function RoomAssignmentCell({
                   type="button"
                   onClick={() => handleRemoveMember(member.id)}
                   className="p-1 rounded hover:bg-morandi-red/10 text-morandi-muted hover:text-morandi-red transition-colors"
-                  title="移除此成員"
+                  title={COMP_ORDERS_LABELS.移除此成員}
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -206,7 +207,7 @@ export function RoomAssignmentCell({
                 const isFull = opt.assignedCount >= opt.capacity && opt.id !== currentRoomId
                 return (
                   <option key={opt.id} value={opt.id}>
-                    {opt.label}{isFull ? ' (6歲↓可加)' : ''}
+                    {opt.label}{isFull ? COMP_ORDERS_LABELS._6歲_可加 : ''}
                   </option>
                 )
               })}

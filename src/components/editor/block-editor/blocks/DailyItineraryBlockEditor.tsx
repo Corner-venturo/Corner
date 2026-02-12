@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import type { DailyItineraryBlockData } from '../types'
 import type { DailyItinerary, ItineraryStyleType } from '@/components/editor/tour-form/types'
+import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
 interface DailyItineraryBlockEditorProps {
   data: DailyItineraryBlockData
@@ -81,7 +82,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
           <Input
             value={data.itinerarySubtitle || ''}
             onChange={e => onChange({ itinerarySubtitle: e.target.value })}
-            placeholder="深度探索之旅"
+            placeholder={COMP_EDITOR_LABELS.深度探索之旅}
             className="h-8 text-sm"
           />
         </div>
@@ -93,7 +94,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
             onValueChange={(value) => onChange({ itineraryStyle: value as ItineraryStyleType })}
           >
             <SelectTrigger className="h-8 text-sm">
-              <SelectValue placeholder="選擇" />
+              <SelectValue placeholder={COMP_EDITOR_LABELS.選擇} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="original">經典時間軸</SelectItem>
@@ -173,7 +174,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                       <Input
                         value={day.title || ''}
                         onChange={e => updateDay(index, 'title', e.target.value)}
-                        placeholder="福岡市區探索"
+                        placeholder={COMP_EDITOR_LABELS.福岡市區探索}
                         className="h-8 text-sm"
                       />
                     </div>
@@ -187,7 +188,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                     <Input
                       value={day.highlight || ''}
                       onChange={e => updateDay(index, 'highlight', e.target.value)}
-                      placeholder="博多運河城 · 天神地下街"
+                      placeholder={COMP_EDITOR_LABELS.博多運河城_天神地下街}
                       className="h-8 text-sm"
                     />
                   </div>
@@ -201,7 +202,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                       <Input
                         value={day.meals?.breakfast || ''}
                         onChange={e => updateDay(index, 'meals', { ...day.meals, breakfast: e.target.value })}
-                        placeholder="飯店早餐"
+                        placeholder={COMP_EDITOR_LABELS.飯店早餐}
                         className="h-8 text-sm"
                       />
                     </div>
@@ -210,7 +211,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                       <Input
                         value={day.meals?.lunch || ''}
                         onChange={e => updateDay(index, 'meals', { ...day.meals, lunch: e.target.value })}
-                        placeholder="自理"
+                        placeholder={COMP_EDITOR_LABELS.自理}
                         className="h-8 text-sm"
                       />
                     </div>
@@ -219,7 +220,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                       <Input
                         value={day.meals?.dinner || ''}
                         onChange={e => updateDay(index, 'meals', { ...day.meals, dinner: e.target.value })}
-                        placeholder="自理"
+                        placeholder={COMP_EDITOR_LABELS.自理}
                         className="h-8 text-sm"
                       />
                     </div>
@@ -233,7 +234,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                     <Input
                       value={day.accommodation || ''}
                       onChange={e => updateDay(index, 'accommodation', e.target.value)}
-                      placeholder="博多都飯店"
+                      placeholder={COMP_EDITOR_LABELS.博多都飯店}
                       className="h-8 text-sm"
                     />
                   </div>
@@ -242,7 +243,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                     活動數量：{day.activities?.length || 0} 個
                     {day.activities && day.activities.length > 0 && (
                       <span className="ml-2">
-                        ({day.activities.map(a => a.title).filter(Boolean).join('、') || '無標題'})
+                        ({day.activities.map(a => a.title).filter(Boolean).join('、') || COMP_EDITOR_LABELS.無標題})
                       </span>
                     )}
                   </div>

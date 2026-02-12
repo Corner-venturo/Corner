@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { FileText, Plus, Trash2, X } from 'lucide-react'
 import { TravelInvoiceItem, BuyerInfo } from '@/stores/travel-invoice-store'
 import { CurrencyCell } from '@/components/table-cells'
+import { COMP_TOURS_LABELS } from '../constants/labels'
 
 interface InvoiceDialogProps {
   open: boolean
@@ -75,7 +76,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
               <DatePicker
                 value={invoiceDate}
                 onChange={(date) => onInvoiceDateChange(date)}
-                placeholder="選擇日期"
+                placeholder={COMP_TOURS_LABELS.選擇日期}
               />
             </div>
             <div>
@@ -98,7 +99,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
                 }}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="- 不關聯訂單 -" />
+                  <SelectValue placeholder={COMP_TOURS_LABELS.不關聯訂單} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="__none__">- 不關聯訂單 -</SelectItem>
@@ -146,7 +147,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
                 <Input
                   value={invoiceBuyer.buyerName}
                   onChange={e => onInvoiceBuyerChange({ ...invoiceBuyer, buyerName: e.target.value })}
-                  placeholder="請輸入買受人名稱"
+                  placeholder={COMP_TOURS_LABELS.請輸入買受人名稱}
                 />
               </div>
               <div>
@@ -154,7 +155,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
                 <Input
                   value={invoiceBuyer.buyerUBN || ''}
                   onChange={e => onInvoiceBuyerChange({ ...invoiceBuyer, buyerUBN: e.target.value })}
-                  placeholder="8 碼數字"
+                  placeholder={COMP_TOURS_LABELS._8_碼數字}
                 />
               </div>
               <div>
@@ -163,7 +164,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
                   type="email"
                   value={invoiceBuyer.buyerEmail || ''}
                   onChange={e => onInvoiceBuyerChange({ ...invoiceBuyer, buyerEmail: e.target.value })}
-                  placeholder="用於寄送電子收據"
+                  placeholder={COMP_TOURS_LABELS.用於寄送電子收據}
                 />
               </div>
               <div>
@@ -195,7 +196,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
                     <Input
                       value={item.item_name}
                       onChange={e => onUpdateInvoiceItem(index, 'item_name', e.target.value)}
-                      placeholder="商品名稱"
+                      placeholder={COMP_TOURS_LABELS.商品名稱}
                       className="h-8"
                     />
                   </div>
@@ -260,7 +261,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
                 <Input
                   value={invoiceRemark}
                   onChange={e => onInvoiceRemarkChange(e.target.value.slice(0, 50))}
-                  placeholder="請輸入備註（限 50 字）"
+                  placeholder={COMP_TOURS_LABELS.請輸入備註_限_50_字}
                   maxLength={50}
                   className="flex-1"
                 />
@@ -309,7 +310,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
               disabled={isInvoiceLoading}
               className="min-w-[100px]"
             >
-              {isInvoiceLoading ? '開立中...' : '開立發票'}
+              {isInvoiceLoading ? COMP_TOURS_LABELS.開立中 : COMP_TOURS_LABELS.開立發票}
             </Button>
           </div>
         </div>

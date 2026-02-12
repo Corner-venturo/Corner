@@ -3,6 +3,7 @@
 import React from 'react'
 import { Button } from '@/components/ui/button'
 import { DailyItinerary } from '../../types'
+import { COMP_EDITOR_LABELS } from '../../../constants/labels'
 
 interface RecommendationsSectionProps {
   day: DailyItinerary
@@ -38,7 +39,7 @@ export function RecommendationsSection({
             value={rec}
             onChange={e => updateRecommendation(dayIndex, recIndex, e.target.value)}
             className="flex-1 px-2 py-1 border rounded text-sm bg-card"
-            placeholder="天神商圈購物"
+            placeholder={COMP_EDITOR_LABELS.天神商圈購物}
           />
           <button
             onClick={() => removeRecommendation(dayIndex, recIndex)}

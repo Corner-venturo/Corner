@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Lock, Eye, EyeOff } from 'lucide-react'
 import { Employee } from '@/stores/types'
 import { PasswordData } from './types'
+import { COMP_HR_LABELS } from '../../constants/labels'
 
 interface PasswordManagementSectionProps {
   employee: Employee
@@ -43,7 +44,7 @@ export function PasswordManagementSection({
           onClick={() => setShowPasswordSection(!showPasswordSection)}
           className="text-sm"
         >
-          {showPasswordSection ? '取消' : '修改密碼'}
+          {showPasswordSection ? COMP_HR_LABELS.取消 : COMP_HR_LABELS.修改密碼}
         </Button>
       </div>
 
@@ -67,7 +68,7 @@ export function PasswordManagementSection({
                     newPassword: e.target.value,
                   })
                 }
-                placeholder="至少8個字元"
+                placeholder={COMP_HR_LABELS.至少8個字元}
                 className="pr-10"
               />
               <button
@@ -93,7 +94,7 @@ export function PasswordManagementSection({
                   confirmPassword: e.target.value,
                 })
               }
-              placeholder="再次輸入新密碼"
+              placeholder={COMP_HR_LABELS.再次輸入新密碼}
             />
           </div>
 
@@ -119,7 +120,7 @@ export function PasswordManagementSection({
               }
               className="bg-morandi-gold hover:bg-morandi-gold-hover"
             >
-              {passwordUpdateLoading ? '更新中...' : '更新密碼'}
+              {passwordUpdateLoading ? COMP_HR_LABELS.更新中 : COMP_HR_LABELS.更新密碼}
             </Button>
             <Button
               size="sm"

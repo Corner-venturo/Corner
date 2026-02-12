@@ -13,6 +13,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { AlertTriangle, Plus, Minus, Calendar } from 'lucide-react'
 import type { ItinerarySyncInfo } from './hooks/useTourEdit'
 import type { DailyItineraryDay } from '@/stores/types'
+import { COMP_TOURS_LABELS } from './constants/labels'
 
 interface ItinerarySyncDialogProps {
   open: boolean
@@ -108,7 +109,7 @@ export function ItinerarySyncDialog({
           <div className="bg-muted/50 rounded-lg p-4 space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">行程表名稱</span>
-              <span className="font-medium">{syncInfo.itinerary.title || syncInfo.itinerary.name || '未命名行程'}</span>
+              <span className="font-medium">{syncInfo.itinerary.title || syncInfo.itinerary.name || COMP_TOURS_LABELS.未命名行程}</span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">目前天數</span>
@@ -166,7 +167,7 @@ export function ItinerarySyncDialog({
                         <span className="text-muted-foreground text-sm">{day.date}</span>
                       </div>
                       <p className="text-sm text-muted-foreground mt-1 truncate">
-                        {day.title || '未設定標題'}
+                        {day.title || COMP_TOURS_LABELS.未設定標題}
                       </p>
                     </div>
                   </label>
@@ -203,7 +204,7 @@ export function ItinerarySyncDialog({
             disabled={!isSelectionValid}
             className={syncInfo.action === 'decrease' ? 'bg-amber-600 hover:bg-amber-700' : ''}
           >
-            {syncInfo.action === 'decrease' ? '確認移除' : '確認新增'}
+            {syncInfo.action === 'decrease' ? COMP_TOURS_LABELS.確認移除 : COMP_TOURS_LABELS.確認新增}
           </Button>
         </div>
       </DialogContent>

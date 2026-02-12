@@ -15,6 +15,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { alert } from '@/lib/ui/alert-dialog'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 interface MemberSidebarProps {
   isOpen: boolean
@@ -116,7 +117,7 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
       setSearchQuery('')
       setShowAddMemberDialog(false)
     } catch (error) {
-      void alert('新增成員失敗，請稍後再試', 'error')
+      void alert(COMP_WORKSPACE_LABELS.新增成員失敗_請稍後再試, 'error')
     } finally {
       setIsAdding(false)
     }
@@ -139,7 +140,7 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
             <button
               onClick={() => setShowAddMemberDialog(true)}
               className="p-1.5 rounded-md hover:bg-morandi-gold/10 text-morandi-gold transition-colors"
-              title="新增成員"
+              title={COMP_WORKSPACE_LABELS.新增成員}
             >
               <UserPlus size={16} />
             </button>
@@ -151,14 +152,14 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
             <span className="ml-2 text-morandi-gold">
               · 你的角色：
               {currentUserRole === 'owner'
-                ? '擁有者'
+                ? COMP_WORKSPACE_LABELS.擁有者
                 : currentUserRole === 'admin'
-                  ? '管理員'
+                  ? COMP_WORKSPACE_LABELS.管理員
                   : currentUserRole === 'manager'
-                    ? '經理'
+                    ? COMP_WORKSPACE_LABELS.經理
                     : currentUserRole === 'member'
-                      ? '成員'
-                      : '訪客'}
+                      ? COMP_WORKSPACE_LABELS.成員
+                      : COMP_WORKSPACE_LABELS.訪客}
             </span>
           )}
         </p>
@@ -181,9 +182,9 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-morandi-primary truncate">
-                    {member.profile?.displayName || member.profile?.englishName || '未知成員'}
+                    {member.profile?.displayName || member.profile?.englishName || COMP_WORKSPACE_LABELS.未知成員}
                   </p>
-                  <p className="text-xs text-morandi-secondary truncate">{member.role || '成員'}</p>
+                  <p className="text-xs text-morandi-secondary truncate">{member.role || COMP_WORKSPACE_LABELS.成員}</p>
                 </div>
               </div>
             ))}
@@ -202,7 +203,7 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
           <div className="border-b border-border pb-4">
             <input
               type="text"
-              placeholder="搜尋員工姓名或編號..."
+              placeholder={COMP_WORKSPACE_LABELS.搜尋員工姓名或編號}
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-morandi-gold/20 text-sm"
@@ -270,7 +271,7 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
                 className="bg-morandi-gold hover:bg-morandi-gold-hover gap-2"
               >
                 <Check size={16} />
-                {isAdding ? '新增中...' : `新增 (${selectedEmployees.length})`}
+                {isAdding ? COMP_WORKSPACE_LABELS.新增中 : `新增 (${selectedEmployees.length})`}
               </Button>
             </div>
           </DialogFooter>

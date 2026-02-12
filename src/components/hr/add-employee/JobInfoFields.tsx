@@ -4,6 +4,7 @@ import React from 'react'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { EmployeeFormData } from './types'
+import { COMP_HR_LABELS } from '../constants/labels'
 
 interface JobInfoFieldsProps {
   formData: EmployeeFormData
@@ -26,7 +27,7 @@ export function JobInfoFields({ formData, setFormData }: JobInfoFieldsProps) {
                 job_info: { ...formData.job_info, hire_date: date },
               })
             }
-            placeholder="選擇日期"
+            placeholder={COMP_HR_LABELS.選擇日期}
           />
         </div>
         <div>

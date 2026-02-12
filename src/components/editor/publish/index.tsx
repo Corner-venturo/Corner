@@ -19,6 +19,7 @@ import { updateItinerary } from '@/data'
 import { usePublish } from './hooks/usePublish'
 import { PublishDialog } from './PublishDialog'
 import { PublishPreview } from './PublishPreview'
+import { COMP_EDITOR_LABELS } from '../constants/labels'
 
 interface PublishButtonData extends Partial<TourFormData> {
   id?: string
@@ -83,7 +84,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
     const versionName = versionToDelete?.note || `版本 ${versionToDelete?.version || index + 1}`
 
     const confirmed = await confirm(`確定要刪除「${versionName}」嗎？`, {
-      title: '刪除版本',
+      title: COMP_EDITOR_LABELS.刪除版本,
       type: 'warning',
     })
     if (!confirmed) return
@@ -98,8 +99,8 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
         onVersionChange(currentVersionIndex - 1, versionRecords[currentVersionIndex - 1])
       }
     } catch (error) {
-      logger.error('刪除版本失敗:', error)
-      await alert('刪除版本失敗：' + (error instanceof Error ? error.message : '未知錯誤'), 'error')
+      logger.error(COMP_EDITOR_LABELS.刪除版本失敗, error)
+      await alert(COMP_EDITOR_LABELS.刪除版本失敗_2 + (error instanceof Error ? error.message : COMP_EDITOR_LABELS.未知錯誤), 'error')
     }
   }
 
@@ -114,7 +115,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
           className="bg-morandi-gold hover:bg-morandi-gold-hover text-white h-8 px-3"
         >
           <Save size={14} className="mr-1.5" />
-          {saving ? '儲存中...' : '存檔'}
+          {saving ? COMP_EDITOR_LABELS.儲存中 : COMP_EDITOR_LABELS.存檔}
         </Button>
 
         {/* 2. 另存按鈕 */}
@@ -145,7 +146,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
               <DropdownMenuItem
                 className="flex items-center gap-2 py-2 cursor-pointer"
                 onClick={() => {
-                  setNewFileName(`${stripHtml(data.title) || '行程表'} 副本`)
+                  setNewFileName(`${stripHtml(data.title) || COMP_EDITOR_LABELS.行程表} 副本`)
                   setShowSaveAsNewDialog(true)
                 }}
               >
@@ -209,7 +210,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
                             handleDeleteVersion(index)
                           }}
                           className="p-1 hover:bg-status-danger-bg rounded transition-colors"
-                          title="刪除版本"
+                          title={COMP_EDITOR_LABELS.刪除版本}
                         >
                           <Trash2 size={14} className="text-status-danger" />
                         </button>
@@ -243,7 +244,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
           setShowSaveDialog(false)
         }}
         saving={saving}
-        placeholder={stripHtml(data.title) || '行程表'}
+        placeholder={stripHtml(data.title) || COMP_EDITOR_LABELS.行程表}
         versionCount={versionRecords.length}
       />
 
@@ -259,7 +260,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
           setShowSaveAsNewDialog(false)
         }}
         saving={saving}
-        placeholder={`${stripHtml(data.title) || '行程表'} 副本`}
+        placeholder={`${stripHtml(data.title) || COMP_EDITOR_LABELS.行程表} 副本`}
       />
     </>
   )

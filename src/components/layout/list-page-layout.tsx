@@ -5,6 +5,7 @@ import { ResponsiveHeader } from './responsive-header'
 import { EnhancedTable, TableColumn, RowData } from '../ui/enhanced-table'
 import { useDataFiltering } from '@/hooks'
 import type { LucideIcon } from 'lucide-react'
+import { COMP_LAYOUT_LABELS } from './constants/labels'
 
 /**
  * 麵包屑項目
@@ -137,13 +138,13 @@ export function ListPageLayout<T extends Record<string, any>>({
   renderExpanded,
   bordered = true,
   searchable = true,
-  searchPlaceholder = '搜尋...',
+  searchPlaceholder = COMP_LAYOUT_LABELS.搜尋_2,
   searchFields = [],
   statusTabs,
   statusField,
   defaultStatusTab = 'all',
   onAdd,
-  addLabel = '新增',
+  addLabel = COMP_LAYOUT_LABELS.新增,
   addDisabled = false,
   headerActions,
   beforeTable,

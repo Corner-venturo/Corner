@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Combobox } from '@/components/ui/combobox'
 import { Check, X } from 'lucide-react'
+import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 interface TourOrder {
   id: string
@@ -40,7 +41,7 @@ export function OrderSelectDialog({
   // 將 orders 轉換為 Combobox 選項格式
   const orderOptions = orders.map((order) => ({
     value: order.id,
-    label: order.order_number || '未命名訂單',
+    label: order.order_number || COMP_ORDERS_LABELS.未命名訂單,
     data: order,
   }))
 
@@ -86,8 +87,8 @@ export function OrderSelectDialog({
             options={orderOptions}
             value={selectedOrderId}
             onChange={setSelectedOrderId}
-            placeholder="搜尋或選擇訂單..."
-            emptyMessage="找不到符合的訂單"
+            placeholder={COMP_ORDERS_LABELS.搜尋或選擇訂單}
+            emptyMessage={COMP_ORDERS_LABELS.找不到符合的訂單}
             showSearchIcon
             showClearButton
           />

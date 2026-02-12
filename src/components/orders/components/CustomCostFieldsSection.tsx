@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import type { CustomCostField } from '../order-member.types'
+import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 interface CustomCostFieldsSectionProps {
   fields: CustomCostField[]
@@ -84,7 +85,7 @@ export function CustomCostFieldsSection({
 
           <div className="space-y-4 py-4">
             <Input
-              placeholder="輸入欄位名稱（例如：簽證費、小費）"
+              placeholder={COMP_ORDERS_LABELS.輸入欄位名稱_例如_簽證費_小費}
               value={newFieldName}
               onChange={(e) => setNewFieldName(e.target.value)}
               onKeyDown={(e) => {

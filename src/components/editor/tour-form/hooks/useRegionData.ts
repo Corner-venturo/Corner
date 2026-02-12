@@ -2,6 +2,7 @@ import React from 'react'
 import { useCountries, useCities } from '@/data'
 import { logger } from '@/lib/utils/logger'
 import { CityOption } from '../types'
+import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
 /**
  * 🎯 軍事級別的地區資料管理 Hook
@@ -34,7 +35,7 @@ export function useRegionData(data: { country?: string }) {
   React.useEffect(() => {
     if (countries.length > 0 && !hasFetchedRef.current) {
       hasFetchedRef.current = true
-      logger.log('[useRegionData] 國家和城市資料已載入（SWR）')
+      logger.log(COMP_EDITOR_LABELS.useRegionData_國家和城市資料已載入_SWR)
     }
   }, [countries.length])
 
@@ -111,7 +112,7 @@ export function useRegionData(data: { country?: string }) {
   // 根據選中的國家代碼取得城市列表
   const availableCities = React.useMemo<CityOption[]>(() => {
     if (!selectedCountryCode) {
-      logger.log('[useRegionData] selectedCountryCode 為空，返回空城市列表')
+      logger.log(COMP_EDITOR_LABELS.useRegionData_selectedCountryCode_為空_返回空城市列表)
       return []
     }
 
@@ -141,7 +142,7 @@ export function useRegionData(data: { country?: string }) {
   // 📊 Debug 資訊（開發環境）
   React.useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      logger.log('[useRegionData] 狀態更新:', {
+      logger.log(COMP_EDITOR_LABELS.useRegionData_狀態更新, {
         'data.country': data.country,
         selectedCountry,
         selectedCountryCode,

@@ -12,6 +12,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { FilePlus, Files, X } from 'lucide-react'
+import { COMP_EDITOR_LABELS } from '../constants/labels'
 
 interface PublishDialogProps {
   type: 'version' | 'file'
@@ -44,17 +45,17 @@ export function PublishDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {isVersion ? <FilePlus size={18} /> : <Files size={18} />}
-            {isVersion ? '另存新版本' : '另存新檔'}
+            {isVersion ? COMP_EDITOR_LABELS.另存新版本 : COMP_EDITOR_LABELS.另存新檔}
           </DialogTitle>
           <DialogDescription>
             {isVersion
-              ? '為這個版本取一個名稱，方便之後辨識。'
-              : '將創建一個全新的行程表，有獨立的分享連結。'}
+              ? COMP_EDITOR_LABELS.為這個版本取一個名稱_方便之後辨識
+              : COMP_EDITOR_LABELS.將創建一個全新的行程表_有獨立的分享連結}
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
           <Label htmlFor={isVersion ? 'version-note' : 'new-file-name'} className="text-sm font-medium">
-            {isVersion ? '版本名稱' : '新檔案名稱'}
+            {isVersion ? COMP_EDITOR_LABELS.版本名稱 : COMP_EDITOR_LABELS.新檔案名稱}
           </Label>
           <Input
             id={isVersion ? 'version-note' : 'new-file-name'}
@@ -74,7 +75,7 @@ export function PublishDialog({
             disabled={saving}
             className="bg-morandi-gold hover:bg-morandi-gold-hover"
           >
-            {saving ? '儲存中...' : '確認另存'}
+            {saving ? COMP_EDITOR_LABELS.儲存中 : COMP_EDITOR_LABELS.確認另存}
           </Button>
         </DialogFooter>
       </DialogContent>

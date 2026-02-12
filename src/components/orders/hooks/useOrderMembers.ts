@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { confirm } from '@/lib/ui/alert-dialog'
 import type { OrderMember, CustomCostField } from '../order-member.types'
+import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 interface UseOrderMembersParams {
   orderId?: string
@@ -69,7 +70,7 @@ export function useOrderMembers({
       setDepartureDate(data?.departure_date || null)
       setReturnDate(data?.return_date || null)
     } catch (error) {
-      logger.error('載入出發日期失敗:', error)
+      logger.error(COMP_ORDERS_LABELS.載入出發日期失敗, error)
     }
   }, [tourId])
 
@@ -94,13 +95,13 @@ export function useOrderMembers({
         assignments.forEach(a => {
           const room = rooms.find(r => r.id === a.room_id)
           if (room) {
-            map[a.order_member_id] = room.room_number || room.room_type || '已分房'
+            map[a.order_member_id] = room.room_number || room.room_type || COMP_ORDERS_LABELS.已分房
           }
         })
         setRoomAssignments(map)
       }
     } catch (error) {
-      logger.error('載入分房資訊失敗:', error)
+      logger.error(COMP_ORDERS_LABELS.載入分房資訊失敗, error)
     }
   }, [tourId])
 
@@ -125,13 +126,13 @@ export function useOrderMembers({
         assignments.forEach(a => {
           const vehicle = vehicles.find(v => v.id === a.vehicle_id)
           if (vehicle) {
-            map[a.order_member_id] = vehicle.vehicle_name || vehicle.vehicle_type || '已分車'
+            map[a.order_member_id] = vehicle.vehicle_name || vehicle.vehicle_type || COMP_ORDERS_LABELS.已分車
           }
         })
         setVehicleAssignments(map)
       }
     } catch (error) {
-      logger.error('載入分車資訊失敗:', error)
+      logger.error(COMP_ORDERS_LABELS.載入分車資訊失敗, error)
     }
   }, [tourId])
 
@@ -217,7 +218,7 @@ export function useOrderMembers({
 
       setMembers(membersData)
     } catch (error) {
-      logger.error('載入成員失敗:', error)
+      logger.error(COMP_ORDERS_LABELS.載入成員失敗, error)
     } finally {
       setLoading(false)
     }
@@ -232,7 +233,7 @@ export function useOrderMembers({
         order_id: orderId,
         workspace_id: workspaceId,
         member_type: 'adult' as const,
-        identity: '大人',
+        identity: COMP_ORDERS_LABELS.大人,
       }))
 
       const { data, error } = await supabase
@@ -246,16 +247,16 @@ export function useOrderMembers({
         setMembers(prev => [...prev, ...data])
       }
     } catch (error) {
-      logger.error('新增成員失敗:', error)
+      logger.error(COMP_ORDERS_LABELS.新增成員失敗, error)
       throw error
     }
   }, [orderId, workspaceId])
 
   // 刪除成員
   const deleteMember = useCallback(async (memberId: string): Promise<boolean> => {
-    const confirmed = await confirm('確定要刪除此成員嗎？', {
-      confirmText: '刪除',
-      cancelText: '取消',
+    const confirmed = await confirm(COMP_ORDERS_LABELS.確定要刪除此成員嗎, {
+      confirmText: COMP_ORDERS_LABELS.刪除,
+      cancelText: COMP_ORDERS_LABELS.取消,
     })
 
     if (!confirmed) return false
@@ -271,7 +272,7 @@ export function useOrderMembers({
       setMembers(prev => prev.filter(m => m.id !== memberId))
       return true
     } catch (error) {
-      logger.error('刪除成員失敗:', error)
+      logger.error(COMP_ORDERS_LABELS.刪除成員失敗, error)
       return false
     }
   }, [])
@@ -294,7 +295,7 @@ export function useOrderMembers({
         m.id === memberId ? { ...m, [field]: value } : m
       ))
     } catch (error) {
-      logger.error('更新成員失敗:', error)
+      logger.error(COMP_ORDERS_LABELS.更新成員失敗, error)
     }
   }, [])
 
@@ -315,7 +316,7 @@ export function useOrderMembers({
         m.id === memberId ? { ...m, ...data } : m
       ))
     } catch (error) {
-      logger.error('更新成員失敗:', error)
+      logger.error(COMP_ORDERS_LABELS.更新成員失敗, error)
       throw error
     }
   }, [])

@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 import { useWorkspaceStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
 import { useEmployeesSlim } from '@/data'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 // 系統機器人的固定 ID
 export const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
@@ -79,7 +80,7 @@ export function ColleaguesSection({
   // 取得工作空間名稱
   const getWorkspaceName = (workspaceId: string) => {
     const ws = workspaces.find(w => w.id === workspaceId)
-    return ws?.name || '其他'
+    return ws?.name || COMP_WORKSPACE_LABELS.其他
   }
 
   // 切換辦公室展開

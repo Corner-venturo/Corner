@@ -18,6 +18,7 @@ import type { Tour } from '@/stores/types'
 import { createQuote } from '@/data'
 import { DEFAULT_CATEGORIES } from '@/features/quotes/constants'
 import { QuoteDetailEmbed } from '@/features/quotes/components/QuoteDetailEmbed'
+import { COMP_TOURS_LABELS } from './constants/labels'
 
 interface TourQuoteTabProps {
   tour: Tour
@@ -53,7 +54,7 @@ export function TourQuoteTab({ tour }: TourQuoteTabProps) {
         if (error) throw error
         setQuoteId(data?.id || null)
       } catch (err) {
-        logger.error('載入報價單失敗', err)
+        logger.error(COMP_TOURS_LABELS.載入報價單失敗, err)
       } finally {
         setLoading(false)
       }
@@ -84,11 +85,11 @@ export function TourQuoteTab({ tour }: TourQuoteTabProps) {
 
       if (newQuote?.id) {
         setQuoteId(newQuote.id)
-        toast.success('報價單已建立')
+        toast.success(COMP_TOURS_LABELS.報價單已建立)
       }
     } catch (error) {
-      logger.error('建立報價單失敗:', error)
-      toast.error('建立報價單失敗')
+      logger.error(COMP_TOURS_LABELS.建立報價單失敗_2, error)
+      toast.error(COMP_TOURS_LABELS.建立報價單失敗)
     } finally {
       setCreating(false)
     }

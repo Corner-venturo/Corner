@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
 import { alert } from '@/lib/ui/alert-dialog'
+import { COMP_EDITOR_LABELS } from '../../../../constants/labels'
 
 interface UploadingState {
   featureIndex: number
@@ -30,7 +31,7 @@ export function useFeatures() {
     currentImages: string[]
   ) => {
     if (!file.type.startsWith('image/')) {
-      void alert('請選擇圖片檔案', 'warning')
+      void alert(COMP_EDITOR_LABELS.請選擇圖片檔案, 'warning')
       return
     }
 
@@ -46,8 +47,8 @@ export function useFeatures() {
         .upload(filePath, file)
 
       if (uploadError) {
-        logger.error('上傳失敗:', uploadError)
-        void alert('圖片上傳失敗', 'error')
+        logger.error(COMP_EDITOR_LABELS.上傳失敗, uploadError)
+        void alert(COMP_EDITOR_LABELS.圖片上傳失敗, 'error')
         return
       }
 
@@ -64,8 +65,8 @@ export function useFeatures() {
 
       updateFeature(featureIndex, 'images', newImages)
     } catch (error) {
-      logger.error('上傳錯誤:', error)
-      void alert('上傳過程發生錯誤', 'error')
+      logger.error(COMP_EDITOR_LABELS.上傳錯誤, error)
+      void alert(COMP_EDITOR_LABELS.上傳過程發生錯誤, 'error')
     } finally {
       setUploadingImage(null)
     }
@@ -81,7 +82,7 @@ export function useFeatures() {
     const remainingSlots = 4 - currentImages.length
 
     if (remainingSlots <= 0) {
-      void alert('已達到最大圖片數量（4 張）', 'warning')
+      void alert(COMP_EDITOR_LABELS.已達到最大圖片數量_4_張, 'warning')
       return
     }
 
@@ -90,7 +91,7 @@ export function useFeatures() {
       .slice(0, remainingSlots)
 
     if (imageFiles.length === 0) {
-      void alert('請選擇圖片檔案', 'warning')
+      void alert(COMP_EDITOR_LABELS.請選擇圖片檔案, 'warning')
       return
     }
 
@@ -131,8 +132,8 @@ export function useFeatures() {
         void alert(`${successfulUrls.length} 張圖片上傳成功，${imageFiles.length - successfulUrls.length} 張失敗`, 'warning')
       }
     } catch (error) {
-      logger.error('批量上傳錯誤:', error)
-      void alert('上傳過程發生錯誤', 'error')
+      logger.error(COMP_EDITOR_LABELS.批量上傳錯誤, error)
+      void alert(COMP_EDITOR_LABELS.上傳過程發生錯誤, 'error')
     } finally {
       setUploadingImage(null)
     }

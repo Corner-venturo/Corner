@@ -5,6 +5,7 @@ import { Receipt, Check, Trash2 } from 'lucide-react'
 import { AdvanceList } from '@/stores/workspace-store'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { CurrencyCell } from '@/components/table-cells'
+import { COMP_WORKSPACE_LABELS } from './constants/labels'
 
 interface AdvanceListCardProps {
   advanceList: AdvanceList
@@ -17,7 +18,7 @@ interface AdvanceListCardProps {
 
 export function AdvanceListCard({
   advanceList,
-  userName = '使用者',
+  userName = COMP_WORKSPACE_LABELS.使用者,
   onCreatePayment,
   onDelete,
   userRole = 'member',
@@ -47,8 +48,8 @@ export function AdvanceListCard({
   }
 
   const handleDelete = async () => {
-    const confirmed = await confirm('確定要刪除這個代墊清單嗎？（已建立的請款單不會被刪除）', {
-      title: '刪除代墊清單',
+    const confirmed = await confirm(COMP_WORKSPACE_LABELS.確定要刪除這個代墊清單嗎_已建立的請款單不會被刪除, {
+      title: COMP_WORKSPACE_LABELS.刪除代墊清單,
       type: 'warning',
     })
     if (confirmed) {
@@ -75,7 +76,7 @@ export function AdvanceListCard({
             <button
               onClick={handleDelete}
               className="p-1 hover:bg-status-danger-bg hover:text-status-danger rounded transition-colors opacity-0 group-hover:opacity-100"
-              title="刪除代墊清單"
+              title={COMP_WORKSPACE_LABELS.刪除代墊清單}
             >
               <Trash2 size={14} />
             </button>

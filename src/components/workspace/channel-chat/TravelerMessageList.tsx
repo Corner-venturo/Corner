@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import { Loader2, AlertCircle, Users, Megaphone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { TravelerConversationType } from './useTravelerMode'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 interface TravelerMessage {
   id: string
@@ -59,7 +60,7 @@ export function TravelerMessageList({
     const employee = employees.find(e => e.id === senderId)
     if (employee) {
       return {
-        name: employee.display_name || employee.name || '員工',
+        name: employee.display_name || employee.name || COMP_WORKSPACE_LABELS.員工,
         isEmployee: true,
         avatar: employee.avatar_url,
       }
@@ -69,13 +70,13 @@ export function TravelerMessageList({
     const traveler = travelers.find(t => t.id === senderId)
     if (traveler) {
       return {
-        name: traveler.name || traveler.display_name || '旅客',
+        name: traveler.name || traveler.display_name || COMP_WORKSPACE_LABELS.旅客,
         isEmployee: false,
         avatar: traveler.avatar_url,
       }
     }
 
-    return { name: '未知用戶', isEmployee: false }
+    return { name: COMP_WORKSPACE_LABELS.未知用戶, isEmployee: false }
   }
 
   // 格式化時間
@@ -102,7 +103,7 @@ export function TravelerMessageList({
           )}
         </div>
         <h3 className="text-lg font-medium text-white mb-2">
-          {conversationType === 'tour_announcement' ? '團公告' : '客服對話'}尚未開啟
+          {conversationType === 'tour_announcement' ? COMP_WORKSPACE_LABELS.團公告 : COMP_WORKSPACE_LABELS.客服對話}尚未開啟
         </h3>
         <p className="text-sm text-violet-300 text-center mb-4">
           開啟後，旅客將可以在 APP 中看到此對話
@@ -157,7 +158,7 @@ export function TravelerMessageList({
               {showDateSeparator && (
                 <div className="flex items-center justify-center my-4">
                   <div className="bg-[#2d2640] text-violet-300 text-xs px-3 py-1 rounded-full border border-violet-500/30">
-                    {format(new Date(message.created_at), 'yyyy年MM月dd日 (EEEE)', { locale: zhTW })}
+                    {format(new Date(message.created_at), COMP_WORKSPACE_LABELS.yyyy年MM月dd日_EEEE, { locale: zhTW })}
                   </div>
                 </div>
               )}
@@ -219,7 +220,7 @@ export function TravelerMessageList({
                   {/* 時間 */}
                   <span className="text-[10px] text-violet-500 mt-1">
                     {formatTime(message.created_at)}
-                    {message.edited_at && ' (已編輯)'}
+                    {message.edited_at && COMP_WORKSPACE_LABELS.已編輯}
                   </span>
                 </div>
               </div>

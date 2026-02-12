@@ -3,6 +3,7 @@
 import { Switch } from '@/components/ui/switch'
 import { Users, UserCheck, UserX } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { COMP_TOURS_LABELS } from '../constants/labels'
 
 interface CheckinStats {
   total: number
@@ -35,7 +36,7 @@ export function CheckinSettings({ enableCheckin, onToggle, stats }: CheckinSetti
             <div>
               <p className="font-medium text-morandi-primary">啟用報到功能</p>
               <p className="text-xs text-morandi-secondary">
-                {enableCheckin ? '旅客可掃描 QR Code 報到' : '報到功能已關閉'}
+                {enableCheckin ? COMP_TOURS_LABELS.旅客可掃描_QR_Code_報到 : COMP_TOURS_LABELS.報到功能已關閉}
               </p>
             </div>
           </div>

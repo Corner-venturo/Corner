@@ -9,6 +9,7 @@ import { Check, AlertCircle, Info } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ROLES, type UserRole, getAllRoles, getRoleConfig } from '@/lib/rbac-config'
 import { alert } from '@/lib/ui/alert-dialog'
+import { COMP_HR_LABELS } from '../constants/labels'
 
 interface PermissionsTabProps {
   employee: Employee
@@ -90,7 +91,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
         setShowSavedMessage(true)
         setTimeout(() => setShowSavedMessage(false), UI_DELAYS.SUCCESS_MESSAGE)
       } catch (error) {
-        void alert('儲存失敗，請稍後再試', 'error')
+        void alert(COMP_HR_LABELS.儲存失敗_請稍後再試, 'error')
       } finally {
         setIsSaving(false)
       }
@@ -126,7 +127,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
         setShowSavedMessage(true)
         setTimeout(() => setShowSavedMessage(false), UI_DELAYS.SUCCESS_MESSAGE)
       } catch (error) {
-        void alert('儲存失敗，請稍後再試', 'error')
+        void alert(COMP_HR_LABELS.儲存失敗_請稍後再試, 'error')
       } finally {
         setIsSaving(false)
       }
@@ -241,7 +242,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
                         role.color
                       )}
                     >
-                      {role.canCrossWorkspace ? '跨空間' : role.canManageWorkspace ? '管理員' : '一般'}
+                      {role.canCrossWorkspace ? COMP_HR_LABELS.跨空間 : role.canManageWorkspace ? COMP_HR_LABELS.管理員 : COMP_HR_LABELS.一般}
                     </span>
                   </div>
                   <p className="text-sm text-morandi-secondary">{role.description}</p>

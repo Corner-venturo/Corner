@@ -4,6 +4,7 @@ import React from 'react'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Search, Star } from 'lucide-react'
+import { COMP_EDITOR_LABELS } from '../constants/labels'
 
 interface LocationData {
   id: string
@@ -12,11 +13,11 @@ interface LocationData {
 
 // 餐廳分類
 const RESTAURANT_CATEGORIES = [
-  { value: 'fine-dining', label: '高級餐廳' },
-  { value: 'casual', label: '休閒餐廳' },
-  { value: 'local', label: '在地美食' },
-  { value: 'buffet', label: '自助餐' },
-  { value: 'izakaya', label: '居酒屋' },
+  { value: 'fine-dining', label: COMP_EDITOR_LABELS.高級餐廳 },
+  { value: 'casual', label: COMP_EDITOR_LABELS.休閒餐廳 },
+  { value: 'local', label: COMP_EDITOR_LABELS.在地美食 },
+  { value: 'buffet', label: COMP_EDITOR_LABELS.自助餐 },
+  { value: 'izakaya', label: COMP_EDITOR_LABELS.居酒屋 },
 ]
 
 interface RestaurantSearchInputProps {
@@ -68,7 +69,7 @@ export function RestaurantSearchInput({
       {/* 國家選擇 */}
       <Select value={selectedCountryId || '__all__'} onValueChange={onCountryChange}>
         <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-card min-w-[120px] focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500">
-          <SelectValue placeholder="全部國家" />
+          <SelectValue placeholder={COMP_EDITOR_LABELS.全部國家} />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="__all__">全部國家</SelectItem>
@@ -84,7 +85,7 @@ export function RestaurantSearchInput({
       {selectedCountryId && regions.length > 0 && (
         <Select value={selectedRegionId || '__all__'} onValueChange={onRegionChange}>
           <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-card min-w-[120px] focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500">
-            <SelectValue placeholder="全部區域" />
+            <SelectValue placeholder={COMP_EDITOR_LABELS.全部區域} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__all__">全部區域</SelectItem>
@@ -101,7 +102,7 @@ export function RestaurantSearchInput({
       {selectedCountryId && cities.length > 0 && (
         <Select value={selectedCityId || '__all__'} onValueChange={onCityChange}>
           <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-card min-w-[120px] focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500">
-            <SelectValue placeholder="全部城市" />
+            <SelectValue placeholder={COMP_EDITOR_LABELS.全部城市} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__all__">全部城市</SelectItem>
@@ -118,7 +119,7 @@ export function RestaurantSearchInput({
       {!showMichelinOnly && (
         <Select value={selectedCategory || '__all__'} onValueChange={onCategoryChange}>
           <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-card min-w-[120px] focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500">
-            <SelectValue placeholder="全部分類" />
+            <SelectValue placeholder={COMP_EDITOR_LABELS.全部分類} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__all__">全部分類</SelectItem>
@@ -155,7 +156,7 @@ export function RestaurantSearchInput({
         <Input
           value={searchQuery}
           onChange={e => onSearchChange(e.target.value)}
-          placeholder="搜尋餐廳..."
+          placeholder={COMP_EDITOR_LABELS.搜尋餐廳}
           className="pl-10 h-11 rounded-xl border-morandi-container focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500"
         />
       </div>

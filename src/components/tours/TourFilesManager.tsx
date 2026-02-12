@@ -18,6 +18,7 @@ import { toast } from 'sonner'
 import { FinderView, type FinderItem } from '@/components/files'
 import { useRouter } from 'next/navigation'
 import type { Folder, VenturoFile } from '@/types/file-system.types'
+import { COMP_TOURS_LABELS } from './constants/labels'
 
 interface TourFilesManagerProps {
   tourId: string
@@ -41,19 +42,19 @@ interface TourFolder {
 
 // 預設的團資料夾結構
 const DEFAULT_TOUR_FOLDERS: TourFolder[] = [
-  { name: '團體報價單', category: 'quote', icon: '📋', dbType: 'quote' },
-  { name: '快速報價', category: 'quick_quote', icon: '💰', dbType: 'quick_quote' },
-  { name: '行程表', category: 'itinerary', icon: '🗺️', dbType: 'itinerary' },
-  { name: '確認單', category: 'confirmation', icon: '✅', dbType: 'confirmation' },
+  { name: COMP_TOURS_LABELS.團體報價單, category: 'quote', icon: '📋', dbType: 'quote' },
+  { name: COMP_TOURS_LABELS.快速報價, category: 'quick_quote', icon: '💰', dbType: 'quick_quote' },
+  { name: COMP_TOURS_LABELS.行程表, category: 'itinerary', icon: '🗺️', dbType: 'itinerary' },
+  { name: COMP_TOURS_LABELS.確認單, category: 'confirmation', icon: '✅', dbType: 'confirmation' },
   // TODO: 合約功能暫未實作，contracts 表尚未建立
   // { name: '合約', category: 'contract', icon: '📝', dbType: 'contract' },
-  { name: '需求單', category: 'request', icon: '📨', dbType: 'request' },
-  { name: '護照', category: 'passport', icon: '🛂' },
-  { name: '簽證', category: 'visa', icon: '📄' },
-  { name: '機票', category: 'ticket', icon: '✈️' },
-  { name: '住宿憑證', category: 'voucher', icon: '🏨' },
-  { name: '保險', category: 'insurance', icon: '🛡️' },
-  { name: '其他', category: 'other', icon: '📁' },
+  { name: COMP_TOURS_LABELS.需求單, category: 'request', icon: '📨', dbType: 'request' },
+  { name: COMP_TOURS_LABELS.護照, category: 'passport', icon: '🛂' },
+  { name: COMP_TOURS_LABELS.簽證, category: 'visa', icon: '📄' },
+  { name: COMP_TOURS_LABELS.機票, category: 'ticket', icon: '✈️' },
+  { name: COMP_TOURS_LABELS.住宿憑證, category: 'voucher', icon: '🏨' },
+  { name: COMP_TOURS_LABELS.保險, category: 'insurance', icon: '🛡️' },
+  { name: COMP_TOURS_LABELS.其他, category: 'other', icon: '📁' },
 ]
 
 export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: TourFilesManagerProps) {
@@ -241,8 +242,8 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
 
       setItems(newItems)
     } catch (err) {
-      logger.error('載入資料夾失敗', err)
-      toast.error('載入失敗')
+      logger.error(COMP_TOURS_LABELS.載入資料夾失敗, err)
+      toast.error(COMP_TOURS_LABELS.載入失敗)
     } finally {
       setLoading(false)
     }
@@ -269,7 +270,7 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
           for (const q of data) {
             items.push({
               id: q.id,
-              name: q.name || q.code || '未命名報價單',
+              name: q.name || q.code || COMP_TOURS_LABELS.未命名報價單,
               type: 'file',
               icon: '📋',
               parentId: folderId,
@@ -295,7 +296,7 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
           for (const q of data) {
             items.push({
               id: q.id,
-              name: q.name || q.code || '未命名快速報價',
+              name: q.name || q.code || COMP_TOURS_LABELS.未命名快速報價,
               type: 'file',
               icon: '💰',
               parentId: folderId,
@@ -320,7 +321,7 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
           for (const i of data) {
             items.push({
               id: i.id,
-              name: i.title || i.code || '未命名行程表',
+              name: i.title || i.code || COMP_TOURS_LABELS.未命名行程表,
               type: 'file',
               icon: '🗺️',
               parentId: folderId,
@@ -368,7 +369,7 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
           for (const r of data) {
             items.push({
               id: r.id,
-              name: `${r.category || '需求'} - ${r.supplier_name || '未指定'}`,
+              name: `${r.category || COMP_TOURS_LABELS.需求} - ${r.supplier_name || COMP_TOURS_LABELS.未指定}`,
               type: 'file',
               icon: '📨',
               parentId: folderId,
@@ -427,7 +428,7 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
           router.push(`/tours/${tourId}/confirmation`)
           break
         case 'request':
-          toast.info('需求單功能開發中')
+          toast.info(COMP_TOURS_LABELS.需求單功能開發中)
           break
       }
     } else if (item.type === 'file') {
@@ -455,8 +456,8 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
         }
       }
     } catch (err) {
-      logger.error('下載失敗', err)
-      toast.error('下載失敗')
+      logger.error(COMP_TOURS_LABELS.下載失敗, err)
+      toast.error(COMP_TOURS_LABELS.下載失敗)
     }
   }, [])
 
@@ -476,8 +477,8 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
       toast.success(`已移動 ${fileIds.length} 個項目`)
       await loadFolderContent(currentFolderId)
     } catch (err) {
-      logger.error('移動失敗', err)
-      toast.error('移動失敗')
+      logger.error(COMP_TOURS_LABELS.移動失敗, err)
+      toast.error(COMP_TOURS_LABELS.移動失敗)
     }
   }, [currentFolderId, loadFolderContent])
 
@@ -499,12 +500,12 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
         }
       }
 
-      toast.success('已刪除')
+      toast.success(COMP_TOURS_LABELS.已刪除)
       setSelectedIds(new Set())
       await loadFolderContent(currentFolderId)
     } catch (err) {
-      logger.error('刪除失敗', err)
-      toast.error('刪除失敗')
+      logger.error(COMP_TOURS_LABELS.刪除失敗, err)
+      toast.error(COMP_TOURS_LABELS.刪除失敗)
     }
   }, [currentFolderId, items, loadFolderContent])
 
@@ -527,11 +528,11 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
         sort_order: items.filter(i => i.type === 'folder').length,
       })
 
-      toast.success('已建立資料夾')
+      toast.success(COMP_TOURS_LABELS.已建立資料夾)
       await loadFolderContent(currentFolderId)
     } catch (err) {
-      logger.error('建立資料夾失敗', err)
-      toast.error('建立失敗')
+      logger.error(COMP_TOURS_LABELS.建立資料夾失敗, err)
+      toast.error(COMP_TOURS_LABELS.建立失敗)
     }
   }, [workspaceId, tourId, tourCode, currentPath.length, items, currentFolderId, loadFolderContent])
 
@@ -577,8 +578,8 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
       toast.success(`已上傳 ${files.length} 個檔案`)
       await loadFolderContent(currentFolderId)
     } catch (err) {
-      logger.error('上傳失敗', err)
-      toast.error('上傳失敗')
+      logger.error(COMP_TOURS_LABELS.上傳失敗, err)
+      toast.error(COMP_TOURS_LABELS.上傳失敗)
     }
   }, [workspaceId, tourId, currentFolderId, loadFolderContent])
 
@@ -593,15 +594,15 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
       } else if (item.type === 'file' && !item.dbType) {
         await supabase.from('files').update({ original_filename: newName }).eq('id', itemId)
       } else {
-        toast.error('此項目無法重新命名')
+        toast.error(COMP_TOURS_LABELS.此項目無法重新命名)
         return
       }
 
-      toast.success('已重新命名')
+      toast.success(COMP_TOURS_LABELS.已重新命名)
       await loadFolderContent(currentFolderId)
     } catch (err) {
-      logger.error('重新命名失敗', err)
-      toast.error('重新命名失敗')
+      logger.error(COMP_TOURS_LABELS.重新命名失敗, err)
+      toast.error(COMP_TOURS_LABELS.重新命名失敗)
     }
   }, [items, currentFolderId, loadFolderContent])
 
@@ -620,12 +621,12 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
     if (!folderConfig?.dbType) return undefined // 檔案資料夾用上傳
     
     const actions: Record<string, { label: string; path: string }> = {
-      quote: { label: '前往報價單', path: `/quotes` },
-      quick_quote: { label: '新增快速報價', path: `/quotes/quick?tour_id=${tourId}` },
-      itinerary: { label: '新增行程表', path: `/itinerary/block-editor?tour_id=${tourId}` },
-      confirmation: { label: '建立確認單', path: `/tours/${tourCode}/confirmation` },
+      quote: { label: COMP_TOURS_LABELS.前往報價單, path: `/quotes` },
+      quick_quote: { label: COMP_TOURS_LABELS.新增快速報價, path: `/quotes/quick?tour_id=${tourId}` },
+      itinerary: { label: COMP_TOURS_LABELS.新增行程表, path: `/itinerary/block-editor?tour_id=${tourId}` },
+      confirmation: { label: COMP_TOURS_LABELS.建立確認單, path: `/tours/${tourCode}/confirmation` },
       // TODO: contract action 暫時移除
-      request: { label: '新增需求單', path: `/tours/${tourCode}?tab=requirements` },
+      request: { label: COMP_TOURS_LABELS.新增需求單, path: `/tours/${tourCode}?tab=requirements` },
     }
     
     const action = actions[folderConfig.dbType]

@@ -18,6 +18,7 @@ import { X, Check, Calendar } from 'lucide-react'
 import { Tour } from '@/stores/types'
 import { format } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
+import { COMP_CONTRACTS_LABELS } from './constants/labels'
 
 interface SelectTourDialogProps {
   isOpen: boolean
@@ -95,8 +96,8 @@ export const SelectTourDialog: React.FC<SelectTourDialogProps> = ({
               value={selectedTourId}
               onChange={setSelectedTourId}
               options={tourOptions}
-              placeholder="搜尋團號或團名..."
-              emptyMessage="找不到符合的團體"
+              placeholder={COMP_CONTRACTS_LABELS.搜尋團號或團名}
+              emptyMessage={COMP_CONTRACTS_LABELS.找不到符合的團體}
               showSearchIcon
               showClearButton
               renderOption={renderTourOption}

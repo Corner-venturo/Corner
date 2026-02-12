@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import type { Message, AdvanceList, SharedOrderList, Channel } from '@/stores/workspace'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 interface MessageListTheme {
   colors: {
@@ -176,13 +177,13 @@ export function ChatMessages({
       if (imageUrl) {
         try {
           const response = await fetch(imageUrl, { mode: 'cors' })
-          if (!response.ok) throw new Error('無法下載圖片')
+          if (!response.ok) throw new Error(COMP_WORKSPACE_LABELS.無法下載圖片)
 
           const blob = await response.blob()
 
           // 檢查是否為有效圖片
           if (!blob.type.startsWith('image/') && blob.size === 0) {
-            throw new Error('下載的內容不是有效圖片')
+            throw new Error(COMP_WORKSPACE_LABELS.下載的內容不是有效圖片)
           }
 
           const urlParts = imageUrl.split('/')
@@ -201,8 +202,8 @@ export function ChatMessages({
             errors.push(validation.error)
           }
         } catch (err) {
-          logger.log('無法下載圖片（可能是 CORS 限制）:', imageUrl)
-          errors.push('此網站不允許下載圖片，請改用右鍵另存圖片後上傳')
+          logger.log(COMP_WORKSPACE_LABELS.無法下載圖片_可能是_CORS_限制, imageUrl)
+          errors.push(COMP_WORKSPACE_LABELS.此網站不允許下載圖片_請改用右鍵另存圖片後上傳)
         }
       }
     }

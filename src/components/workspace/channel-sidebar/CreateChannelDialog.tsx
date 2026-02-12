@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import { useWorkspaceStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
 import { useEmployeesSlim } from '@/data'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 interface CreateChannelDialogProps {
   isOpen: boolean
@@ -92,7 +93,7 @@ export function CreateChannelDialog({
             <label className="block text-sm font-medium text-morandi-primary mb-1">頻道名稱</label>
             <input
               type="text"
-              placeholder="例如：專案討論"
+              placeholder={COMP_WORKSPACE_LABELS.例如_專案討論}
               value={channelName}
               onChange={e => onChannelNameChange(e.target.value)}
               autoFocus
@@ -105,7 +106,7 @@ export function CreateChannelDialog({
               頻道描述（選填）
             </label>
             <textarea
-              placeholder="說明這個頻道的用途"
+              placeholder={COMP_WORKSPACE_LABELS.說明這個頻道的用途}
               value={channelDescription}
               onChange={e => onChannelDescriptionChange(e.target.value)}
               className="input-morandi resize-none"
@@ -147,7 +148,7 @@ export function CreateChannelDialog({
               </button>
             </div>
             <p className="text-xs text-morandi-secondary mt-1">
-              {channelType === 'public' ? '所有成員都可以看到並加入' : '只有被邀請的成員可以看到'}
+              {channelType === 'public' ? COMP_WORKSPACE_LABELS.所有成員都可以看到並加入 : COMP_WORKSPACE_LABELS.只有被邀請的成員可以看到}
             </p>
           </div>
 
@@ -195,8 +196,8 @@ export function CreateChannelDialog({
               </div>
               <p className="text-xs text-morandi-secondary mt-1">
                 {channelScope === 'workspace'
-                  ? '只能邀請同分公司的成員'
-                  : '可以邀請所有分公司的成員'}
+                  ? COMP_WORKSPACE_LABELS.只能邀請同分公司的成員
+                  : COMP_WORKSPACE_LABELS.可以邀請所有分公司的成員}
               </p>
             </div>
           )}
@@ -270,7 +271,7 @@ export function CreateChannelDialog({
             onClick={onCreate}
             disabled={!channelName.trim() || selectedMembers.length === 0 || isCreating}
           >
-            {isCreating ? '建立中...' : '建立'}
+            {isCreating ? COMP_WORKSPACE_LABELS.建立中 : COMP_WORKSPACE_LABELS.建立}
           </button>
         </div>
       </div>

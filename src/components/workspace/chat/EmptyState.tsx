@@ -3,6 +3,7 @@
 import { Hash, Bot, MessageCircle } from 'lucide-react'
 import { useEmployeesSlim } from '@/data'
 import { useMemo } from 'react'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 // 系統機器人 ID
 const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
@@ -27,7 +28,7 @@ export function EmptyState({ channelName, channelType, currentUserId }: EmptySta
         return {
           isDm: true,
           isBot: true,
-          name: 'VENTURO 機器人',
+          name: COMP_WORKSPACE_LABELS.VENTURO_機器人,
           icon: Bot,
         }
       }
@@ -41,7 +42,7 @@ export function EmptyState({ channelName, channelType, currentUserId }: EmptySta
         return {
           isDm: true,
           isBot: false,
-          name: employee.chinese_name || employee.display_name || '同事',
+          name: employee.chinese_name || employee.display_name || COMP_WORKSPACE_LABELS.同事,
           icon: MessageCircle,
         }
       }
@@ -49,7 +50,7 @@ export function EmptyState({ channelName, channelType, currentUserId }: EmptySta
       return {
         isDm: true,
         isBot: false,
-        name: '私訊',
+        name: COMP_WORKSPACE_LABELS.私訊,
         icon: MessageCircle,
       }
     }
@@ -74,8 +75,8 @@ export function EmptyState({ channelName, channelType, currentUserId }: EmptySta
       </h3>
       <p className="text-morandi-secondary">
         {displayInfo.isBot
-          ? 'VENTURO 機器人會在這裡通知你重要的系統訊息'
-          : '這裡還沒有任何訊息。開始對話吧！'}
+          ? COMP_WORKSPACE_LABELS.VENTURO_機器人會在這裡通知你重要的系統訊息
+          : COMP_WORKSPACE_LABELS.這裡還沒有任何訊息_開始對話吧}
       </p>
     </div>
   )

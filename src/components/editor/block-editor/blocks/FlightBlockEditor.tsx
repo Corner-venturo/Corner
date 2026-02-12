@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plane, ArrowRight } from 'lucide-react'
 import type { FlightBlockData } from '../types'
 import type { FlightInfo, FlightStyleType } from '@/components/editor/tour-form/types'
+import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
 interface FlightBlockEditorProps {
   data: FlightBlockData
@@ -50,7 +51,7 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
             <Input
               value={flight.airline || ''}
               onChange={e => updateFlight(type, 'airline', e.target.value)}
-              placeholder="長榮航空"
+              placeholder={COMP_EDITOR_LABELS.長榮航空}
               className="h-8 text-sm"
             />
           </div>
@@ -80,7 +81,7 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
             <Input
               value={flight.departureAirport || ''}
               onChange={e => updateFlight(type, 'departureAirport', e.target.value)}
-              placeholder="桃園"
+              placeholder={COMP_EDITOR_LABELS.桃園}
               className="h-8 text-sm"
             />
           </div>
@@ -99,7 +100,7 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
             <Input
               value={flight.arrivalAirport || ''}
               onChange={e => updateFlight(type, 'arrivalAirport', e.target.value)}
-              placeholder="福岡"
+              placeholder={COMP_EDITOR_LABELS.福岡}
               className="h-8 text-sm"
             />
           </div>
@@ -127,7 +128,7 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
           onValueChange={(value) => onChange({ flightStyle: value as FlightStyleType })}
         >
           <SelectTrigger className="h-8 text-sm w-48">
-            <SelectValue placeholder="選擇風格" />
+            <SelectValue placeholder={COMP_EDITOR_LABELS.選擇風格} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="original">經典莫蘭迪</SelectItem>
@@ -143,12 +144,12 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
       </div>
 
       {/* 去程航班 */}
-      {renderFlightInputs('outboundFlight', '去程航班')}
+      {renderFlightInputs('outboundFlight', COMP_EDITOR_LABELS.去程航班)}
 
       <div className="border-t border-border/50" />
 
       {/* 回程航班 */}
-      {renderFlightInputs('returnFlight', '回程航班')}
+      {renderFlightInputs('returnFlight', COMP_EDITOR_LABELS.回程航班)}
     </div>
   )
 }

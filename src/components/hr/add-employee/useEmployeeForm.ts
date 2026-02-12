@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useUserStore, userStoreHelpers } from '@/stores/user-store'
 import { EmployeeFormData, CreatedEmployeeInfo } from './types'
 import { getCurrentWorkspaceId, isSuperAdmin } from '@/lib/workspace-helpers'
+import { COMP_HR_LABELS } from '../constants/labels'
 
 export function useEmployeeForm(onSubmit: () => void) {
   const { create: addUser } = useUserStore()
@@ -47,7 +48,7 @@ export function useEmployeeForm(onSubmit: () => void) {
     e.preventDefault()
 
     if (!formData.english_name.trim() || !formData.display_name.trim()) {
-      alert('請填寫姓名')
+      alert(COMP_HR_LABELS.請填寫姓名)
       return
     }
 
@@ -61,7 +62,7 @@ export function useEmployeeForm(onSubmit: () => void) {
         : currentWorkspaceId
 
       if (!targetWorkspaceId) {
-        alert('無法取得 workspace，請重新登入')
+        alert(COMP_HR_LABELS.無法取得_workspace_請重新登入)
         return
       }
 
@@ -91,13 +92,13 @@ export function useEmployeeForm(onSubmit: () => void) {
         if (authResponse.ok) {
           const authResult = await authResponse.json()
           authUserId = authResult.data?.user?.id || null
-          logger.log('✅ Auth 帳號已建立:', employee_number, 'ID:', authUserId)
+          logger.log(COMP_HR_LABELS.Auth_帳號已建立, employee_number, 'ID:', authUserId)
         } else {
           const error = await authResponse.json()
-          logger.warn('⚠️ 建立 Auth 帳號失敗:', error)
+          logger.warn(COMP_HR_LABELS.建立_Auth_帳號失敗, error)
         }
       } catch (authError) {
-        logger.warn('⚠️ 建立 Auth 帳號失敗:', authError)
+        logger.warn(COMP_HR_LABELS.建立_Auth_帳號失敗, authError)
       }
 
       // 建立員工資料
@@ -134,7 +135,7 @@ export function useEmployeeForm(onSubmit: () => void) {
             {
               effective_date: formData.job_info.hire_date,
               base_salary: formData.salary_info.base_salary,
-              reason: '入職起薪',
+              reason: COMP_HR_LABELS.入職起薪,
             },
           ],
         },
@@ -175,7 +176,7 @@ export function useEmployeeForm(onSubmit: () => void) {
             logger.log(`✅ 已將新員工加入 ${channels.length} 個公開頻道`)
           }
         } catch (channelError) {
-          logger.error('⚠️ 加入頻道失敗（不影響員工建立）:', channelError)
+          logger.error(COMP_HR_LABELS.加入頻道失敗_不影響員工建立, channelError)
         }
       }
 
@@ -186,7 +187,7 @@ export function useEmployeeForm(onSubmit: () => void) {
       })
       setShowSuccessDialog(true)
     } catch (error) {
-      alert('創建員工失敗，請稍後再試')
+      alert(COMP_HR_LABELS.創建員工失敗_請稍後再試)
     }
   }
 

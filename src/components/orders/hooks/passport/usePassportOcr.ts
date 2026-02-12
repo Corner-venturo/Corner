@@ -11,6 +11,7 @@ import { useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import type { ProcessedFile } from '../../order-member.types'
+import { COMP_ORDERS_LABELS } from '../../constants/labels'
 
 interface OcrCustomerData {
   name?: string
@@ -77,12 +78,12 @@ export function usePassportOcr(): UsePassportOcrReturn {
       try {
         errorText = await response.text()
       } catch (e) {
-        errorText = '無法讀取回應內容'
+        errorText = COMP_ORDERS_LABELS.無法讀取回應內容
       }
       const statusCode = response.status
       const statusMessage = response.statusText
       logger.error(`OCR API 回應錯誤: status=${statusCode}, statusText=${statusMessage}, body=${errorText.slice(0, 500)}`)
-      throw new Error(`OCR 辨識失敗 (${statusCode}): ${errorText.slice(0, 100) || statusMessage || '未知錯誤'}`)
+      throw new Error(`OCR 辨識失敗 (${statusCode}): ${errorText.slice(0, 100) || statusMessage || COMP_ORDERS_LABELS.未知錯誤}`)
     }
 
     const json = await response.json()
@@ -94,7 +95,7 @@ export function usePassportOcr(): UsePassportOcrReturn {
 
     // 如果 API 返回錯誤
     if (!json.success) {
-      throw new Error(json.error || 'OCR 辨識失敗')
+      throw new Error(json.error || COMP_ORDERS_LABELS.OCR_辨識失敗)
     }
 
     // 向後相容：如果直接返回資料格式
@@ -135,7 +136,7 @@ export function usePassportOcr(): UsePassportOcrReturn {
       const matched = findMatchedMember('passport_number', passportNumber)
       return {
         isDuplicate: true,
-        reason: '護照號碼重複',
+        reason: COMP_ORDERS_LABELS.護照號碼重複,
         matchType: 'exact',
         matchedMember: matched
       }
@@ -146,7 +147,7 @@ export function usePassportOcr(): UsePassportOcrReturn {
       const matched = findMatchedMember('id_number', idNumber)
       return {
         isDuplicate: true,
-        reason: '身分證號重複',
+        reason: COMP_ORDERS_LABELS.身分證號重複,
         matchType: 'exact',
         matchedMember: matched
       }
@@ -159,7 +160,7 @@ export function usePassportOcr(): UsePassportOcrReturn {
       )
       return {
         isDuplicate: true,
-        reason: '姓名+生日重複',
+        reason: COMP_ORDERS_LABELS.姓名_生日重複,
         matchType: 'exact',
         matchedMember: matched
       }
@@ -173,7 +174,7 @@ export function usePassportOcr(): UsePassportOcrReturn {
       if (nameOnlyMatch) {
         return {
           isDuplicate: false,  // 不算重複，但需要使用者確認
-          reason: '發現同名成員（無生日資料）',
+          reason: COMP_ORDERS_LABELS.發現同名成員_無生日資料,
           matchType: 'name_only',
           matchedMember: nameOnlyMatch
         }

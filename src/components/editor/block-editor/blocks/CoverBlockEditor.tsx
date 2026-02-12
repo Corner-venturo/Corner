@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import type { CoverBlockData } from '../types'
 import type { CoverStyleType } from '@/components/editor/tour-form/types'
 import type { ImagePositionSettings } from '@/components/ui/image-position-editor'
+import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
 interface CoverBlockEditorProps {
   data: CoverBlockData
@@ -46,7 +47,7 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
           <RichTextInput
             value={data.title || ''}
             onChange={value => updateField('title', value)}
-            placeholder="漫遊福岡"
+            placeholder={COMP_EDITOR_LABELS.漫遊福岡}
           />
         </div>
 
@@ -55,7 +56,7 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
           <RichTextInput
             value={data.subtitle || ''}
             onChange={value => updateField('subtitle', value)}
-            placeholder="半自由行"
+            placeholder={COMP_EDITOR_LABELS.半自由行}
           />
         </div>
 
@@ -64,7 +65,7 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
           <RichTextInput
             value={data.description || ''}
             onChange={value => updateField('description', value)}
-            placeholder="行程特色描述..."
+            placeholder={COMP_EDITOR_LABELS.行程特色描述}
             singleLine={false}
           />
         </div>
@@ -100,7 +101,7 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
             type="text"
             value={data.country || ''}
             onChange={e => updateField('country', e.target.value)}
-            placeholder="日本"
+            placeholder={COMP_EDITOR_LABELS.日本}
             className="h-8 text-sm"
           />
         </div>
@@ -111,7 +112,7 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
             type="text"
             value={data.city || ''}
             onChange={e => updateField('city', e.target.value)}
-            placeholder="福岡"
+            placeholder={COMP_EDITOR_LABELS.福岡}
             className="h-8 text-sm"
           />
         </div>
@@ -133,16 +134,16 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
         <div>
           <label className="block text-xs font-medium text-morandi-primary mb-1">單位</label>
           <Select
-            value={data.priceNote || '/人'}
+            value={data.priceNote || COMP_EDITOR_LABELS.人}
             onValueChange={(value) => updateField('priceNote', value)}
           >
             <SelectTrigger className="h-8 text-sm">
-              <SelectValue placeholder="選擇單位" />
+              <SelectValue placeholder={COMP_EDITOR_LABELS.選擇單位} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="/人">/人</SelectItem>
-              <SelectItem value="起">起</SelectItem>
-              <SelectItem value="/人起">/人起</SelectItem>
+              <SelectItem value={COMP_EDITOR_LABELS.人}>/人</SelectItem>
+              <SelectItem value={COMP_EDITOR_LABELS.起}>起</SelectItem>
+              <SelectItem value={COMP_EDITOR_LABELS.人起}>/人起</SelectItem>
               <SelectItem value="__hidden__">(不顯示)</SelectItem>
             </SelectContent>
           </Select>
@@ -157,7 +158,7 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
           onValueChange={(value) => updateField('coverStyle', value as CoverStyleType)}
         >
           <SelectTrigger className="h-8 text-sm">
-            <SelectValue placeholder="選擇風格" />
+            <SelectValue placeholder={COMP_EDITOR_LABELS.選擇風格} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="original">經典全屏</SelectItem>
@@ -183,7 +184,7 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
           filePrefix="itinerary"
           previewHeight="80px"
           aspectRatio={16 / 9}
-          placeholder="拖曳圖片到此處，或點擊上傳"
+          placeholder={COMP_EDITOR_LABELS.拖曳圖片到此處_或點擊上傳}
         />
       </div>
     </div>

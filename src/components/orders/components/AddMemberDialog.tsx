@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { PassportUploadZone } from './PassportUploadZone'
 import type { ProcessedFile } from '../order-member.types'
+import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 interface AddMemberDialogProps {
   isOpen: boolean
@@ -75,7 +76,7 @@ export function AddMemberDialog({
                   onCountChange(val === '' ? '' : parseInt(val, 10))
                 }}
                 className="w-24"
-                placeholder="人數"
+                placeholder={COMP_ORDERS_LABELS.人數}
               />
               <span className="text-sm text-morandi-muted">人</span>
               <Button

@@ -5,6 +5,7 @@ import { Plus } from 'lucide-react'
 import { Activity } from '../../types'
 import { UploadableImage } from './UploadableImage'
 import { EditableText } from './EditableText'
+import { COMP_EDITOR_LABELS } from '../../../constants/labels'
 
 interface ActivityListProps {
   activities: Activity[]
@@ -57,7 +58,7 @@ export function ActivityList({
                   setEditingField={setEditingField}
                   onChange={v => updateActivity(i, 'title', v)}
                   className="font-bold text-foreground"
-                  placeholder="景點名稱"
+                  placeholder={COMP_EDITOR_LABELS.景點名稱}
                 />
                 <EditableText
                   value={act.description}
@@ -66,7 +67,7 @@ export function ActivityList({
                   setEditingField={setEditingField}
                   onChange={v => updateActivity(i, 'description', v)}
                   className="text-sm text-morandi-secondary mt-1"
-                  placeholder="景點描述..."
+                  placeholder={COMP_EDITOR_LABELS.景點描述_2}
                   multiline
                 />
               </div>
@@ -118,7 +119,7 @@ export function ActivityList({
                 setEditingField={setEditingField}
                 onChange={v => updateActivity(i, 'title', v)}
                 className="font-medium text-foreground text-sm"
-                placeholder="景點名稱"
+                placeholder={COMP_EDITOR_LABELS.景點名稱}
               />
             </div>
           </div>
@@ -149,7 +150,7 @@ export function ActivityList({
               setEditingField={setEditingField}
               onChange={v => updateActivity(i, 'title', v)}
               className="font-medium text-foreground text-sm"
-              placeholder="景點名稱"
+              placeholder={COMP_EDITOR_LABELS.景點名稱}
             />
             <EditableText
               value={act.description}
@@ -158,7 +159,7 @@ export function ActivityList({
               setEditingField={setEditingField}
               onChange={v => updateActivity(i, 'description', v)}
               className="text-xs text-morandi-secondary mt-1"
-              placeholder="景點描述"
+              placeholder={COMP_EDITOR_LABELS.景點描述}
             />
           </div>
         </div>

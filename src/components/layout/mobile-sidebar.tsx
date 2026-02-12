@@ -36,6 +36,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { isMenuItemHidden } from '@/lib/constants/menu-items'
 import { isFeatureAvailable, RestrictedFeature } from '@/lib/feature-restrictions'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { COMP_LAYOUT_LABELS } from './constants/labels'
 
 interface MenuItem {
   href: string
@@ -48,56 +49,56 @@ interface MenuItem {
 
 // 主選單項目
 const menuItems: MenuItem[] = [
-  { href: '/', label: '首頁', icon: Home },
-  { href: '/calendar', label: '行事曆', icon: Calendar, requiredPermission: 'calendar' },
-  { href: '/workspace', label: '工作空間', icon: Building2, requiredPermission: 'workspace' },
+  { href: '/', label: COMP_LAYOUT_LABELS.首頁, icon: Home },
+  { href: '/calendar', label: COMP_LAYOUT_LABELS.行事曆, icon: Calendar, requiredPermission: 'calendar' },
+  { href: '/workspace', label: COMP_LAYOUT_LABELS.工作空間, icon: Building2, requiredPermission: 'workspace' },
   // 旅伴通訊已整合到工作頻道中，此路由暫時隱藏
   // { href: '/traveler-chat', label: '旅伴通訊', icon: MessageCircle, requiredPermission: 'workspace' },
-  { href: '/todos', label: '待辦事項', icon: CheckSquare, requiredPermission: 'todos' },
+  { href: '/todos', label: COMP_LAYOUT_LABELS.待辦事項, icon: CheckSquare, requiredPermission: 'todos' },
   // 行程管理已整合到旅遊團中，從團的視角操作
   // { href: '/itinerary', label: '行程管理', icon: Flag, requiredPermission: 'itinerary' },
-  { href: '/tours', label: '旅遊團', icon: MapPin, requiredPermission: 'tours' },
-  { href: '/orders', label: '訂單', icon: ShoppingCart, requiredPermission: 'orders' },
+  { href: '/tours', label: COMP_LAYOUT_LABELS.旅遊團, icon: MapPin, requiredPermission: 'tours' },
+  { href: '/orders', label: COMP_LAYOUT_LABELS.訂單, icon: ShoppingCart, requiredPermission: 'orders' },
   // 報價單已整合到旅遊團中，從團的視角操作
   // { href: '/quotes', label: '報價單', icon: Calculator, requiredPermission: 'quotes' },
   {
     href: '/finance',
-    label: '財務系統',
+    label: COMP_LAYOUT_LABELS.財務系統,
     icon: CreditCard,
     children: [
-      { href: '/finance/payments', label: '收款管理', icon: CreditCard, requiredPermission: 'payments' },
-      { href: '/finance/requests', label: '請款管理', icon: TrendingDown, requiredPermission: 'requests' },
-      { href: '/finance/treasury', label: '出納管理', icon: Wallet, requiredPermission: 'disbursement' },
-      { href: '/erp-accounting/vouchers', label: '會計傳票', icon: FileText, requiredPermission: 'vouchers' },
-      { href: '/finance/travel-invoice', label: '代轉發票', icon: FileText, requiredPermission: 'travel_invoice', restrictedFeature: 'travel_invoices' },
-      { href: '/finance/reports', label: '報表管理', icon: BarChart3, requiredPermission: 'reports' },
+      { href: '/finance/payments', label: COMP_LAYOUT_LABELS.收款管理, icon: CreditCard, requiredPermission: 'payments' },
+      { href: '/finance/requests', label: COMP_LAYOUT_LABELS.請款管理, icon: TrendingDown, requiredPermission: 'requests' },
+      { href: '/finance/treasury', label: COMP_LAYOUT_LABELS.出納管理, icon: Wallet, requiredPermission: 'disbursement' },
+      { href: '/erp-accounting/vouchers', label: COMP_LAYOUT_LABELS.會計傳票, icon: FileText, requiredPermission: 'vouchers' },
+      { href: '/finance/travel-invoice', label: COMP_LAYOUT_LABELS.代轉發票, icon: FileText, requiredPermission: 'travel_invoice', restrictedFeature: 'travel_invoices' },
+      { href: '/finance/reports', label: COMP_LAYOUT_LABELS.報表管理, icon: BarChart3, requiredPermission: 'reports' },
     ],
   },
-  { href: '/visas', label: '簽證管理', icon: FileCheck, requiredPermission: 'visas' },
-  { href: '/contracts', label: '合約管理', icon: FileSignature, requiredPermission: 'contracts' },
-  { href: '/confirmations', label: '確認單管理', icon: CircleDot, requiredPermission: 'confirmations' },
+  { href: '/visas', label: COMP_LAYOUT_LABELS.簽證管理, icon: FileCheck, requiredPermission: 'visas' },
+  { href: '/contracts', label: COMP_LAYOUT_LABELS.合約管理, icon: FileSignature, requiredPermission: 'contracts' },
+  { href: '/confirmations', label: COMP_LAYOUT_LABELS.確認單管理, icon: CircleDot, requiredPermission: 'confirmations' },
   {
     href: '/database',
-    label: '資料管理',
+    label: COMP_LAYOUT_LABELS.資料管理,
     icon: Database,
     requiredPermission: 'database',
     children: [
-      { href: '/customers', label: '顧客管理', icon: Users, requiredPermission: 'customers' },
-      { href: '/database/attractions', label: '旅遊資料庫', icon: MapPin, requiredPermission: 'database' },
-      { href: '/database/transportation-rates', label: '車資管理', icon: Bus, requiredPermission: 'database' },
-      { href: '/database/suppliers', label: '供應商管理', icon: Building2, requiredPermission: 'database' },
-      { href: '/database/tour-leaders', label: '領隊資料', icon: Users, requiredPermission: 'database' },
-      { href: '/database/company-assets', label: '公司資源管理', icon: ImageIcon, requiredPermission: 'database' },
+      { href: '/customers', label: COMP_LAYOUT_LABELS.顧客管理, icon: Users, requiredPermission: 'customers' },
+      { href: '/database/attractions', label: COMP_LAYOUT_LABELS.旅遊資料庫, icon: MapPin, requiredPermission: 'database' },
+      { href: '/database/transportation-rates', label: COMP_LAYOUT_LABELS.車資管理, icon: Bus, requiredPermission: 'database' },
+      { href: '/database/suppliers', label: COMP_LAYOUT_LABELS.供應商管理, icon: Building2, requiredPermission: 'database' },
+      { href: '/database/tour-leaders', label: COMP_LAYOUT_LABELS.領隊資料, icon: Users, requiredPermission: 'database' },
+      { href: '/database/company-assets', label: COMP_LAYOUT_LABELS.公司資源管理, icon: ImageIcon, requiredPermission: 'database' },
     ],
   },
-  { href: '/hr', label: '人資管理', icon: UserCog, requiredPermission: 'hr' },
-  { href: '/esims', label: '網卡管理', icon: Wifi, requiredPermission: 'hr', restrictedFeature: 'esim' },
+  { href: '/hr', label: COMP_LAYOUT_LABELS.人資管理, icon: UserCog, requiredPermission: 'hr' },
+  { href: '/esims', label: COMP_LAYOUT_LABELS.網卡管理, icon: Wifi, requiredPermission: 'hr', restrictedFeature: 'esim' },
 ]
 
 // 個人工具
 const personalToolItems: MenuItem[] = [
-  { href: '/accounting', label: '記帳管理', icon: Wallet, requiredPermission: 'accounting' },
-  { href: '/timebox', label: '箱型時間', icon: Clock, requiredPermission: 'timebox' },
+  { href: '/accounting', label: COMP_LAYOUT_LABELS.記帳管理, icon: Wallet, requiredPermission: 'accounting' },
+  { href: '/timebox', label: COMP_LAYOUT_LABELS.箱型時間, icon: Clock, requiredPermission: 'timebox' },
 ]
 
 interface MobileSidebarProps {

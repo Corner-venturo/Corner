@@ -29,6 +29,7 @@ import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
 import { findBestMatch, normalizeName, splitPassportName, calculateSimilarity } from './pnr-name-matcher'
+import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 interface TourMember {
   id: string
@@ -174,7 +175,7 @@ export function PnrMatchDialog({
 
       return suggestions
     } catch (error) {
-      logger.error('搜尋客戶失敗:', error)
+      logger.error(COMP_ORDERS_LABELS.搜尋客戶失敗, error)
       return {}
     }
   }, [])
@@ -182,7 +183,7 @@ export function PnrMatchDialog({
   // 解析 PNR 並進行配對
   const handleParse = useCallback(async () => {
     if (!rawPnr.trim()) {
-      toast.error('請先貼上 PNR 電報')
+      toast.error(COMP_ORDERS_LABELS.請先貼上_PNR_電報)
       return
     }
 
@@ -241,7 +242,7 @@ export function PnrMatchDialog({
     if (parsed.fareData && parsed.sourceFormat === 'ticket_order_detail') {
       toast.success(`已解析機票金額：${parsed.fareData.totalFare.toLocaleString()} 元/人`)
     } else if (parsed.sourceFormat === 'ticket_order_detail' && !parsed.fareData) {
-      toast.warning('機票訂單明細格式但未能解析金額，請檢查格式')
+      toast.warning(COMP_ORDERS_LABELS.機票訂單明細格式但未能解析金額_請檢查格式)
     }
   }, [rawPnr, members, searchCustomersForPassengers])
 
@@ -348,7 +349,7 @@ export function PnrMatchDialog({
     const selectedCustomers = finalResults.filter(r => r.selectedCustomerId && !r.matchedMember)
 
     if (matchedMembers.length === 0 && selectedCustomers.length === 0) {
-      toast.error('沒有可儲存的配對')
+      toast.error(COMP_ORDERS_LABELS.沒有可儲存的配對)
       return
     }
 
@@ -362,7 +363,7 @@ export function PnrMatchDialog({
           return
         }
       } else if (!orderId) {
-        toast.error('無法建立新成員：缺少訂單資訊')
+        toast.error(COMP_ORDERS_LABELS.無法建立新成員_缺少訂單資訊)
         return
       }
     }
@@ -480,7 +481,7 @@ export function PnrMatchDialog({
             flight_cost: perPersonFare,
             ticketing_deadline: parsedPnr.ticketingDeadline?.toISOString() || null,
             member_type: 'adult',
-            identity: '大人',
+            identity: COMP_ORDERS_LABELS.大人,
           }
 
           const { error } = await supabase
@@ -488,7 +489,7 @@ export function PnrMatchDialog({
             .insert(newMember)
 
           if (error) {
-            logger.error('建立成員失敗:', error)
+            logger.error(COMP_ORDERS_LABELS.建立成員失敗, error)
           } else {
             createdCount++
           }
@@ -552,7 +553,7 @@ export function PnrMatchDialog({
           }
         } catch (pnrError) {
           // PNR 保存失敗不阻止其他操作
-          logger.error('保存 PNR 記錄失敗:', pnrError)
+          logger.error(COMP_ORDERS_LABELS.保存_PNR_記錄失敗, pnrError)
         }
       }
 
@@ -566,8 +567,8 @@ export function PnrMatchDialog({
       onSuccess?.()
       handleClose()
     } catch (error) {
-      logger.error('儲存失敗:', error)
-      toast.error('儲存失敗')
+      logger.error(COMP_ORDERS_LABELS.儲存失敗_2, error)
+      toast.error(COMP_ORDERS_LABELS.儲存失敗)
     } finally {
       setIsSaving(false)
     }
@@ -636,11 +637,11 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
             <div className="flex gap-2">
               <Button onClick={handleParse} disabled={!rawPnr.trim() || isSearchingCustomers}>
                 <RefreshCw size={16} className={cn("mr-1", isSearchingCustomers && "animate-spin")} />
-                {isSearchingCustomers ? '搜尋客戶中...' : '解析並配對'}
+                {isSearchingCustomers ? COMP_ORDERS_LABELS.搜尋客戶中 : COMP_ORDERS_LABELS.解析並配對}
               </Button>
               {parsedPnr && (
                 <span className="text-sm text-morandi-secondary self-center">
-                  訂位代號: <strong>{parsedPnr.recordLocator || '未識別'}</strong>
+                  訂位代號: <strong>{parsedPnr.recordLocator || COMP_ORDERS_LABELS.未識別}</strong>
                 </span>
               )}
             </div>
@@ -685,7 +686,7 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
                 <div className="p-2 bg-blue-50 rounded-lg text-xs text-blue-700">
                   <Users size={12} className="inline mr-1" />
                   系統已從客戶資料庫找到相似護照拼音的客戶，您可以在「建議客戶」欄選擇後自動建立成員。
-                  {isTourMode && ' 請同時選擇每位旅客所屬的訂單。'}
+                  {isTourMode && COMP_ORDERS_LABELS.請同時選擇每位旅客所屬的訂單}
                 </div>
               )}
               {stats.withSuggestions > 0 && !orderId && !isTourMode && (
@@ -706,7 +707,7 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
                     <option value="">-- 請選擇 --</option>
                     {orders.map((o) => (
                       <option key={o.id} value={o.id}>
-                        {o.order_number} - {o.contact_person || '無聯絡人'}
+                        {o.order_number} - {o.contact_person || COMP_ORDERS_LABELS.無聯絡人}
                       </option>
                     ))}
                   </select>
@@ -821,7 +822,7 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
                               <option value="">-- 選擇訂單 --</option>
                               {orders.map((o) => (
                                 <option key={o.id} value={o.id}>
-                                  {o.order_number} - {o.contact_person || '無聯絡人'}
+                                  {o.order_number} - {o.contact_person || COMP_ORDERS_LABELS.無聯絡人}
                                 </option>
                               ))}
                             </select>
@@ -885,7 +886,7 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
             className="bg-morandi-gold hover:bg-morandi-gold-hover"
           >
             <Save size={16} className="mr-1" />
-            {isSaving ? '儲存中...' : `儲存配對 (${savableCount} 人)`}
+            {isSaving ? COMP_ORDERS_LABELS.儲存中 : `儲存配對 (${savableCount} 人)`}
           </Button>
         </DialogFooter>
       </DialogContent>

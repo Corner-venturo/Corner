@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 import { toHalfWidth } from '@/lib/utils/text'
 import { RichTextInput } from '@/components/ui/rich-text-input'
 import { CalendarIcon, Loader2 } from 'lucide-react'
+import { COMP_EDITOR_LABELS } from '../../../constants/labels'
 
 interface CoverInfoFormProps {
   data: TourFormData
@@ -64,7 +65,7 @@ export function CoverInfoForm({
             onValueChange={(value) => onCoverStyleChange(value as CoverStyleType)}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="選擇主題風格" />
+              <SelectValue placeholder={COMP_EDITOR_LABELS.選擇主題風格} />
             </SelectTrigger>
             <SelectContent>
               {coverStyleOptions.map((option) => (
@@ -87,7 +88,7 @@ export function CoverInfoForm({
           <RichTextInput
             value={data.tagline || ''}
             onChange={value => updateField('tagline', value)}
-            placeholder="Venturo Travel 2025 秋季精選"
+            placeholder={COMP_EDITOR_LABELS.Venturo_Travel_2025_秋季精選}
           />
         </div>
 
@@ -97,7 +98,7 @@ export function CoverInfoForm({
             <RichTextInput
               value={data.title || ''}
               onChange={value => updateField('title', value)}
-              placeholder="漫遊福岡"
+              placeholder={COMP_EDITOR_LABELS.漫遊福岡}
             />
           </div>
           <div>
@@ -105,7 +106,7 @@ export function CoverInfoForm({
             <RichTextInput
               value={data.subtitle || ''}
               onChange={value => updateField('subtitle', value)}
-              placeholder={data.coverStyle === 'art' ? 'Odyssey' : '半自由行'}
+              placeholder={data.coverStyle === 'art' ? 'Odyssey' : COMP_EDITOR_LABELS.半自由行}
             />
             {data.coverStyle === 'art' && !data.subtitle && (
               <p className="text-xs text-morandi-secondary mt-1">
@@ -120,7 +121,7 @@ export function CoverInfoForm({
           <RichTextInput
             value={data.description || ''}
             onChange={value => updateField('description', value)}
-            placeholder="2日市區自由活動 · 保證入住溫泉飯店 · 柳川遊船 · 阿蘇火山"
+            placeholder={COMP_EDITOR_LABELS._2日市區自由活動_保證入住溫泉飯店_柳川遊船_阿蘇火山}
             singleLine={false}
           />
         </div>
@@ -141,7 +142,7 @@ export function CoverInfoForm({
                 })
               }}
               options={allDestinations.map(dest => ({ value: dest.name, label: dest.name }))}
-              placeholder="搜尋或選擇國家..."
+              placeholder={COMP_EDITOR_LABELS.搜尋或選擇國家}
               showSearchIcon
               showClearButton
             />
@@ -152,7 +153,7 @@ export function CoverInfoForm({
               value={data.city || ''}
               onChange={value => updateCity(value)}
               options={availableCities.map(city => ({ value: city.code, label: city.name }))}
-              placeholder="搜尋或選擇城市..."
+              placeholder={COMP_EDITOR_LABELS.搜尋或選擇城市}
               showSearchIcon
               showClearButton
               disabled={!selectedCountry}
@@ -173,7 +174,7 @@ export function CoverInfoForm({
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {data.departureDate || '選擇日期'}
+                  {data.departureDate || COMP_EDITOR_LABELS.選擇日期}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -221,14 +222,14 @@ export function CoverInfoForm({
           </div>
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-1">單位</label>
-            <Select value={data.priceNote || '/人'} onValueChange={(value) => updateField('priceNote', value)}>
+            <Select value={data.priceNote || COMP_EDITOR_LABELS.人} onValueChange={(value) => updateField('priceNote', value)}>
               <SelectTrigger className="h-9">
-                <SelectValue placeholder="選擇單位" />
+                <SelectValue placeholder={COMP_EDITOR_LABELS.選擇單位} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="/人">/人</SelectItem>
-                <SelectItem value="起">起</SelectItem>
-                <SelectItem value="/人起">/人起</SelectItem>
+                <SelectItem value={COMP_EDITOR_LABELS.人}>/人</SelectItem>
+                <SelectItem value={COMP_EDITOR_LABELS.起}>起</SelectItem>
+                <SelectItem value={COMP_EDITOR_LABELS.人起}>/人起</SelectItem>
                 <SelectItem value="__hidden__">(不顯示)</SelectItem>
               </SelectContent>
             </Select>

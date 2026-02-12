@@ -7,14 +7,15 @@ import {
   MapPin,
 } from 'lucide-react'
 import { IconOption } from './types'
+import { COMP_EDITOR_LABELS } from '../constants/labels'
 
 export const iconOptions: IconOption[] = [
-  { value: 'IconBuilding', label: '建築/飯店', component: Building2 },
-  { value: 'IconToolsKitchen2', label: '餐食', component: UtensilsCrossed },
-  { value: 'IconSparkles', label: '特色', component: Sparkles },
-  { value: 'IconCalendar', label: '行程', component: Calendar },
-  { value: 'IconPlane', label: '航班', component: Plane },
-  { value: 'IconMapPin', label: '景點', component: MapPin },
+  { value: 'IconBuilding', label: COMP_EDITOR_LABELS.建築_飯店, component: Building2 },
+  { value: 'IconToolsKitchen2', label: COMP_EDITOR_LABELS.餐食, component: UtensilsCrossed },
+  { value: 'IconSparkles', label: COMP_EDITOR_LABELS.特色, component: Sparkles },
+  { value: 'IconCalendar', label: COMP_EDITOR_LABELS.行程, component: Calendar },
+  { value: 'IconPlane', label: COMP_EDITOR_LABELS.航班, component: Plane },
+  { value: 'IconMapPin', label: COMP_EDITOR_LABELS.景點, component: MapPin },
 ]
 
 // 時差對照表（相對於台灣 UTC+8）

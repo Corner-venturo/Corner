@@ -11,6 +11,7 @@ const AddRequestDialog = dynamic(() => import('@/features/finance/requests/compo
 import { InvoiceDialog } from '@/components/finance/invoice-dialog'
 import type { Order as OrderType } from '@/types/order.types'
 import { logger } from '@/lib/utils/logger'
+import { COMP_TOURS_LABELS } from './constants/labels'
 
 interface TourOrdersProps {
   tour: Tour
@@ -48,7 +49,7 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
         if (error) throw error
         setOrders((data || []) as Order[])
       } catch (err) {
-        logger.error('載入訂單失敗:', err)
+        logger.error(COMP_TOURS_LABELS.載入訂單失敗, err)
       } finally {
         setLoading(false)
       }

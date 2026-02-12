@@ -21,6 +21,7 @@ import type { TourRoomStatus } from '@/types/room-vehicle.types'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
 import type { OrderMember } from '@/components/orders/order-member.types'
+import { COMP_TOURS_LABELS } from '../constants/labels'
 
 type MemberBasic = Pick<OrderMember, 'id' | 'chinese_name' | 'passport_name'>
 
@@ -76,7 +77,7 @@ export function TourRoomTab({ tourId, tour, members, tourNights }: TourRoomTabPr
       if (error) throw error
       setRooms((data || []) as TourRoomStatus[])
     } catch (error) {
-      logger.error('載入房間失敗:', error)
+      logger.error(COMP_TOURS_LABELS.載入房間失敗, error)
     } finally {
       setLoading(false)
     }
@@ -98,19 +99,19 @@ export function TourRoomTab({ tourId, tour, members, tourNights }: TourRoomTabPr
 
       if (error) throw error
 
-      toast.success('房間已新增')
+      toast.success(COMP_TOURS_LABELS.房間已新增)
       setShowAddRoom(false)
       setNewRoom({ room_type: 'twin', capacity: 2, hotel_name: '' })
       loadRooms()
     } catch (error) {
-      logger.error('新增房間失敗:', error)
-      toast.error('新增房間失敗')
+      logger.error(COMP_TOURS_LABELS.新增房間失敗_2, error)
+      toast.error(COMP_TOURS_LABELS.新增房間失敗)
     }
   }
 
   const handleDeleteRoom = async (roomId: string) => {
-    const confirmed = await confirm('確定要刪除這個房間嗎？', {
-      title: '刪除房間',
+    const confirmed = await confirm(COMP_TOURS_LABELS.確定要刪除這個房間嗎, {
+      title: COMP_TOURS_LABELS.刪除房間,
       type: 'warning',
     })
     if (!confirmed) return
@@ -123,11 +124,11 @@ export function TourRoomTab({ tourId, tour, members, tourNights }: TourRoomTabPr
 
       if (error) throw error
 
-      toast.success('房間已刪除')
+      toast.success(COMP_TOURS_LABELS.房間已刪除)
       loadRooms()
     } catch (error) {
-      logger.error('刪除房間失敗:', error)
-      toast.error('刪除房間失敗')
+      logger.error(COMP_TOURS_LABELS.刪除房間失敗_2, error)
+      toast.error(COMP_TOURS_LABELS.刪除房間失敗)
     }
   }
 
@@ -275,7 +276,7 @@ export function TourRoomTab({ tourId, tour, members, tourNights }: TourRoomTabPr
               <Input
                 value={newRoom.hotel_name}
                 onChange={e => setNewRoom({ ...newRoom, hotel_name: e.target.value })}
-                placeholder="例如：清邁香格里拉"
+                placeholder={COMP_TOURS_LABELS.例如_清邁香格里拉}
               />
             </div>
             <div className="flex justify-end gap-2 pt-3 border-t border-border">

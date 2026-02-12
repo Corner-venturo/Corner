@@ -9,6 +9,7 @@ import { useMemo, useState, useEffect } from 'react'
 import { Bot, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useEmployeesSlim } from '@/data'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 // VENTURO 機器人 ID（同時也是 Logan AI）
 export const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
@@ -86,7 +87,7 @@ export function BotSection({
           )}
         </div>
         <span className="flex-1 text-left truncate font-medium">
-          {bot.chinese_name || bot.display_name || 'VENTURO 機器人'}
+          {bot.chinese_name || bot.display_name || COMP_WORKSPACE_LABELS.VENTURO_機器人}
         </span>
         {aiAvailable && (
           <span className="text-[10px] text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded">

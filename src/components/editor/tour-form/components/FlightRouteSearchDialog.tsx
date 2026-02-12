@@ -20,6 +20,7 @@ import { Search, Loader2, Plane, Clock, MapPin } from 'lucide-react'
 import { searchAirportDeparturesAction, AirportFlightItem } from '@/features/dashboard/actions/flight-actions'
 import { alert } from '@/lib/ui/alert-dialog'
 import { cn } from '@/lib/utils'
+import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
 interface FlightRouteSearchDialogProps {
   open: boolean
@@ -86,7 +87,7 @@ export function FlightRouteSearchDialog({
   // 執行搜尋
   const handleSearch = useCallback(async () => {
     if (!origin) {
-      void alert('請輸入出發機場代碼', 'warning')
+      void alert(COMP_EDITOR_LABELS.請輸入出發機場代碼, 'warning')
       return
     }
 
@@ -108,7 +109,7 @@ export function FlightRouteSearchDialog({
 
       setFlights(result.data || [])
     } catch {
-      void alert('查詢時發生錯誤', 'error')
+      void alert(COMP_EDITOR_LABELS.查詢時發生錯誤, 'error')
       setFlights([])
     } finally {
       setLoading(false)
@@ -180,7 +181,7 @@ export function FlightRouteSearchDialog({
                 <DatePicker
                   value={searchDate}
                   onChange={date => setSearchDate(date)}
-                  placeholder="選擇日期"
+                  placeholder={COMP_EDITOR_LABELS.選擇日期}
                   className="text-sm h-9"
                 />
               </div>
@@ -295,11 +296,11 @@ export function FlightRouteSearchDialog({
                         )}
                         <span className={cn(
                           'px-1.5 py-0.5 rounded text-[10px]',
-                          flight.status === '預計' || flight.status === '準時'
+                          flight.status === COMP_EDITOR_LABELS.預計 || flight.status === COMP_EDITOR_LABELS.準時
                             ? 'bg-status-success-bg text-status-success'
-                            : flight.status === '延誤'
+                            : flight.status === COMP_EDITOR_LABELS.延誤
                             ? 'bg-status-warning-bg text-status-warning'
-                            : flight.status === '已取消'
+                            : flight.status === COMP_EDITOR_LABELS.已取消
                             ? 'bg-status-danger-bg text-status-danger'
                             : 'bg-morandi-container text-morandi-primary'
                         )}>

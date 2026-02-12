@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { useWorkspaceChat } from '@/stores/workspace-store'
 import { logger } from '@/lib/utils/logger'
+import { COMP_WORKSPACE_LABELS } from '../../constants/labels'
 
 // VENTURO 機器人 ID（同時也是 Logan AI）
 const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
@@ -43,13 +44,13 @@ export function useBotResponse() {
       })
 
       if (!response.ok) {
-        return { success: false, message: '', error: '無法連接到 Logan AI' }
+        return { success: false, message: '', error: COMP_WORKSPACE_LABELS.無法連接到_Logan_AI }
       }
 
       return await response.json()
     } catch (error) {
       logger.error('Logan API call failed:', error)
-      return { success: false, message: '', error: 'AI 服務暫時無法使用' }
+      return { success: false, message: '', error: COMP_WORKSPACE_LABELS.AI_服務暫時無法使用 }
     }
   }, [])
 
@@ -64,7 +65,7 @@ export function useBotResponse() {
         content,
         author: {
           id: SYSTEM_BOT_ID,
-          display_name: 'VENTURO 機器人',
+          display_name: COMP_WORKSPACE_LABELS.VENTURO_機器人,
           avatar: undefined,
         },
         attachments: undefined,

@@ -3,6 +3,7 @@ import { Search, PenLine, Plus } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
+import { COMP_EDITOR_LABELS } from '../constants/labels'
 
 interface HotelSearchBarProps {
   // Filters
@@ -61,7 +62,7 @@ export function HotelSearchBar({
         {/* 國家選擇 */}
         <Select value={selectedCountryId || '__all__'} onValueChange={onCountryChange}>
           <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-card min-w-[120px] focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold">
-            <SelectValue placeholder="全部國家" />
+            <SelectValue placeholder={COMP_EDITOR_LABELS.全部國家} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__all__">全部國家</SelectItem>
@@ -77,7 +78,7 @@ export function HotelSearchBar({
         {selectedCountryId && regions.length > 0 && (
           <Select value={selectedRegionId || '__all__'} onValueChange={onRegionChange}>
             <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-card min-w-[120px] focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold">
-              <SelectValue placeholder="全部區域" />
+              <SelectValue placeholder={COMP_EDITOR_LABELS.全部區域} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="__all__">全部區域</SelectItem>
@@ -94,7 +95,7 @@ export function HotelSearchBar({
         {selectedCountryId && cities.length > 0 && (
           <Select value={selectedCityId || '__all__'} onValueChange={onCityChange}>
             <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-card min-w-[120px] focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold">
-              <SelectValue placeholder="全部城市" />
+              <SelectValue placeholder={COMP_EDITOR_LABELS.全部城市} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="__all__">全部城市</SelectItem>
@@ -110,7 +111,7 @@ export function HotelSearchBar({
         {/* 品牌選擇 */}
         <Select value={selectedBrand || '__all__'} onValueChange={onBrandChange}>
           <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-card min-w-[140px] focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold">
-            <SelectValue placeholder="全部品牌" />
+            <SelectValue placeholder={COMP_EDITOR_LABELS.全部品牌} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__all__">全部品牌</SelectItem>
@@ -131,7 +132,7 @@ export function HotelSearchBar({
           <Input
             value={searchQuery}
             onChange={e => onSearchChange(e.target.value)}
-            placeholder="搜尋飯店..."
+            placeholder={COMP_EDITOR_LABELS.搜尋飯店}
             className="pl-10 h-11 rounded-xl border-morandi-container focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold"
           />
         </div>
@@ -154,7 +155,7 @@ export function HotelSearchBar({
           <Input
             value={manualHotelName}
             onChange={e => onManualInputChange(e.target.value)}
-            placeholder="輸入飯店名稱..."
+            placeholder={COMP_EDITOR_LABELS.輸入飯店名稱}
             className="flex-1 h-10 rounded-lg border-morandi-gold/30 focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold"
             onKeyDown={e => {
               if (e.key === 'Enter') {

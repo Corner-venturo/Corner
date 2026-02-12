@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useBreadcrumb, type BreadcrumbItem } from '@/hooks/useBreadcrumb'
 import { ChevronRight } from 'lucide-react'
+import { COMP_LAYOUT_LABELS } from './constants/labels'
 
 interface ResponsiveHeaderProps {
   title: string
@@ -167,7 +168,7 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
               <button
                 onClick={() => setIsSearchOpen(true)}
                 className="p-2 text-morandi-secondary hover:text-morandi-primary transition-colors"
-                title="搜尋"
+                title={COMP_LAYOUT_LABELS.搜尋}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -184,7 +185,7 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
                   type="text"
                   value={props.searchTerm || ''}
                   onChange={e => props.onSearchChange?.(e.target.value)}
-                  placeholder={props.searchPlaceholder || '搜尋...'}
+                  placeholder={props.searchPlaceholder || COMP_LAYOUT_LABELS.搜尋_2}
                   className="w-48 px-3 py-1 text-sm border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-morandi-primary"
                   autoFocus
                   onBlur={() => {
@@ -199,7 +200,7 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
                     setIsSearchOpen(false)
                   }}
                   className="p-1 text-morandi-secondary hover:text-morandi-primary transition-colors"
-                  title="清除搜尋"
+                  title={COMP_LAYOUT_LABELS.清除搜尋}
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -226,7 +227,7 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">全部{props.filterLabel || '篩選'}</SelectItem>
+                <SelectItem value="all">全部{props.filterLabel || COMP_LAYOUT_LABELS.篩選}</SelectItem>
                 {props.filterOptions.map(option => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
@@ -296,7 +297,7 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              {props.addLabel || '新增'}
+              {props.addLabel || COMP_LAYOUT_LABELS.新增}
             </button>
           )}
         </div>

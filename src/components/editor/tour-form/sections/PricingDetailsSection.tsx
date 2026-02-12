@@ -25,6 +25,7 @@ import {
   AlertTriangle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
 interface PricingDetailsSectionProps {
   data: TourFormData
@@ -47,27 +48,27 @@ const getDefaultPricingDetails = (): PricingDetails => ({
   show_pricing_details: false,
   insurance_amount: '500',
   included_items: [
-    { text: '行程表所列之交通費用', included: true },
-    { text: '行程表所列之住宿費用', included: true },
-    { text: '行程表所列之餐食費用', included: true },
-    { text: '行程表所列之門票費用', included: true },
-    { text: '專業導遊服務', included: true },
-    { text: '旅遊責任險 500 萬元', included: true },
+    { text: COMP_EDITOR_LABELS.行程表所列之交通費用, included: true },
+    { text: COMP_EDITOR_LABELS.行程表所列之住宿費用, included: true },
+    { text: COMP_EDITOR_LABELS.行程表所列之餐食費用, included: true },
+    { text: COMP_EDITOR_LABELS.行程表所列之門票費用, included: true },
+    { text: COMP_EDITOR_LABELS.專業導遊服務, included: true },
+    { text: COMP_EDITOR_LABELS.旅遊責任險_500_萬元, included: true },
   ],
   excluded_items: [
-    { text: '個人護照及簽證費用', included: false },
-    { text: '行程外之自費行程', included: false },
-    { text: '個人消費及小費', included: false },
-    { text: '行李超重費用', included: false },
-    { text: '單人房差價', included: false },
+    { text: COMP_EDITOR_LABELS.個人護照及簽證費用, included: false },
+    { text: COMP_EDITOR_LABELS.行程外之自費行程, included: false },
+    { text: COMP_EDITOR_LABELS.個人消費及小費, included: false },
+    { text: COMP_EDITOR_LABELS.行李超重費用, included: false },
+    { text: COMP_EDITOR_LABELS.單人房差價, included: false },
   ],
   notes: [
     `本報價單有效期限至 ${getValidityDate()}，逾期請重新報價。`,
-    '最終價格以確認訂單時之匯率及費用為準。',
-    '如遇旺季或特殊節日，價格可能會有調整。',
-    '出發前 30 天內取消，需支付團費 30% 作為取消費。',
-    '出發前 14 天內取消，需支付團費 50% 作為取消費。',
-    '出發前 7 天內取消，需支付團費 100% 作為取消費。',
+    COMP_EDITOR_LABELS.最終價格以確認訂單時之匯率及費用為準,
+    COMP_EDITOR_LABELS.如遇旺季或特殊節日_價格可能會有調整,
+    COMP_EDITOR_LABELS.出發前_30_天內取消_需支付團費_30_作為取消費,
+    COMP_EDITOR_LABELS.出發前_14_天內取消_需支付團費_50_作為取消費,
+    COMP_EDITOR_LABELS.出發前_7_天內取消_需支付團費_100_作為取消費,
   ],
 })
 
@@ -146,7 +147,7 @@ export function PricingDetailsSection({
     updatePricingDetails({ insurance_amount: amount })
     // 更新包含項目中的保險文字
     const insuranceIndex = pricingDetails.included_items.findIndex(
-      item => item.text.includes('旅遊責任險')
+      item => item.text.includes(COMP_EDITOR_LABELS.旅遊責任險)
     )
     if (insuranceIndex !== -1) {
       const newItems = [...pricingDetails.included_items]
@@ -208,7 +209,7 @@ export function PricingDetailsSection({
                 onValueChange={handleInsuranceChange}
               >
                 <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="選擇保險金額" />
+                  <SelectValue placeholder={COMP_EDITOR_LABELS.選擇保險金額} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="250">250 萬元</SelectItem>
@@ -221,7 +222,7 @@ export function PricingDetailsSection({
                 <div className="flex items-center gap-2">
                   <Input
                     type="text"
-                    placeholder="輸入金額"
+                    placeholder={COMP_EDITOR_LABELS.輸入金額}
                     className="w-24"
                     onChange={(e) => {
                       const customAmount = e.target.value
@@ -270,7 +271,7 @@ export function PricingDetailsSection({
                   <Input
                     value={item.text}
                     onChange={(e) => updateIncludedItem(index, { text: e.target.value })}
-                    placeholder="輸入項目內容"
+                    placeholder={COMP_EDITOR_LABELS.輸入項目內容}
                     className="flex-1"
                   />
                   <Button
@@ -323,7 +324,7 @@ export function PricingDetailsSection({
                   <Input
                     value={item.text}
                     onChange={(e) => updateExcludedItem(index, { text: e.target.value })}
-                    placeholder="輸入項目內容"
+                    placeholder={COMP_EDITOR_LABELS.輸入項目內容}
                     className="flex-1"
                   />
                   <Button
@@ -367,7 +368,7 @@ export function PricingDetailsSection({
                   <Textarea
                     value={note}
                     onChange={(e) => updateNote(index, e.target.value)}
-                    placeholder="輸入注意事項"
+                    placeholder={COMP_EDITOR_LABELS.輸入注意事項}
                     className="flex-1 min-h-[60px] resize-none"
                     rows={2}
                   />

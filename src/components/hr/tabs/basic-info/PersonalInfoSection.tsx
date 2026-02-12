@@ -7,6 +7,7 @@ import { Calendar } from 'lucide-react'
 import { DateCell } from '@/components/table-cells'
 import { Employee } from '@/stores/types'
 import { BasicInfoFormData } from './types'
+import { COMP_HR_LABELS } from '../../constants/labels'
 
 interface PersonalInfoSectionProps {
   employee: Employee
@@ -102,7 +103,7 @@ export function PersonalInfoSection({
                   personal_info: { ...formData.personal_info, birthday: date },
                 })
               }
-              placeholder="選擇日期"
+              placeholder={COMP_HR_LABELS.選擇日期}
             />
           ) : (
             <div className="py-2">

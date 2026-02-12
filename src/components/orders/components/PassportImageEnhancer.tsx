@@ -14,6 +14,7 @@ import { RotateCcw, Sparkles, Check } from 'lucide-react'
 import { useImageAdjustments } from '@/features/designer/hooks/useImageAdjustments'
 import { DEFAULT_IMAGE_ADJUSTMENTS } from '@/features/designer/components/types'
 import type { ImageAdjustments } from '@/features/designer/components/types'
+import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 interface PassportImageEnhancerProps {
   open: boolean
@@ -57,7 +58,7 @@ export function PassportImageEnhancer({
       const result = await applyAdjustments(imageSrc, newAdjustments)
       setPreviewSrc(result)
     } catch (error) {
-      logger.error('圖片處理失敗:', error)
+      logger.error(COMP_ORDERS_LABELS.圖片處理失敗, error)
     } finally {
       setIsProcessing(false)
     }
@@ -92,7 +93,7 @@ export function PassportImageEnhancer({
             <div className="relative aspect-[3/2] bg-morandi-container rounded-lg overflow-hidden">
               <img
                 src={previewSrc}
-                alt="護照預覽"
+                alt={COMP_ORDERS_LABELS.護照預覽}
                 className="w-full h-full object-contain"
               />
               {isProcessing && (

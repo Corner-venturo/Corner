@@ -20,6 +20,7 @@ import { SalaryTab } from './tabs/salary-tab'
 import { PermissionsTabNew } from './tabs/permissions-tab-new'
 import { SYSTEM_PERMISSIONS } from '@/stores/types'
 import { getRoleConfig, type UserRole } from '@/lib/rbac-config'
+import { COMP_HR_LABELS } from './constants/labels'
 
 interface EmployeeExpandedViewProps {
   employee_id: string
@@ -42,9 +43,9 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
   }
 
   const tabs = [
-    { key: 'basic' as const, label: '基本資料', icon: User },
-    { key: 'salary' as const, label: '薪資', icon: DollarSign },
-    { key: 'permissions' as const, label: '權限', icon: Shield },
+    { key: 'basic' as const, label: COMP_HR_LABELS.基本資料, icon: User },
+    { key: 'salary' as const, label: COMP_HR_LABELS.薪資, icon: DollarSign },
+    { key: 'permissions' as const, label: COMP_HR_LABELS.權限, icon: Shield },
   ]
 
   const renderTabStats = () => {
@@ -67,7 +68,7 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
       case 'permissions':
         const userRole = employee.roles?.[0]
         const roleConfig = userRole ? getRoleConfig(userRole as UserRole) : null
-        const roleLabel = roleConfig?.label || '未設定'
+        const roleLabel = roleConfig?.label || COMP_HR_LABELS.未設定
         const permissionCount = roleConfig?.permissions.includes('*')
           ? SYSTEM_PERMISSIONS.length
           : (employee.permissions?.length || 0)
@@ -98,7 +99,7 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
 
       setIsEditing(false)
     } catch (error) {
-      void alert('儲存失敗，請稍後再試', 'error')
+      void alert(COMP_HR_LABELS.儲存失敗_請稍後再試, 'error')
     }
   }
 
@@ -148,7 +149,7 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
             </div>
             <div>
               <DialogTitle className="text-xl font-bold text-morandi-primary">
-                {employee.display_name || employee.chinese_name || '未命名員工'}
+                {employee.display_name || employee.chinese_name || COMP_HR_LABELS.未命名員工}
               </DialogTitle>
               <p className="text-morandi-secondary">{employee.employee_number}</p>
             </div>

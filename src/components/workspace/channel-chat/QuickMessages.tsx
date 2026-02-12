@@ -19,6 +19,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Zap, Clock, UtensilsCrossed, Bus, AlertTriangle, Send, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
 interface QuickMessage {
   id: string
@@ -37,38 +38,38 @@ const QUICK_MESSAGES: QuickMessage[] = [
   {
     id: 'meeting',
     icon: <Clock size={16} />,
-    label: '集合通知',
+    label: COMP_WORKSPACE_LABELS.集合通知,
     template: '📍 集合通知\n\n時間：{{time}}\n地點：{{location}}\n\n請準時集合！',
     variables: [
-      { key: 'time', label: '集合時間', placeholder: '例如：08:30', required: true },
-      { key: 'location', label: '集合地點', placeholder: '例如：飯店大廳', required: true },
+      { key: 'time', label: COMP_WORKSPACE_LABELS.集合時間, placeholder: COMP_WORKSPACE_LABELS.例如_08_30, required: true },
+      { key: 'location', label: COMP_WORKSPACE_LABELS.集合地點, placeholder: COMP_WORKSPACE_LABELS.例如_飯店大廳, required: true },
     ],
   },
   {
     id: 'meal',
     icon: <UtensilsCrossed size={16} />,
-    label: '用餐通知',
+    label: COMP_WORKSPACE_LABELS.用餐通知,
     template: '🍽️ 用餐通知\n\n{{message}}\n\n請移動至餐廳用餐',
     variables: [
-      { key: 'message', label: '餐廳/說明', placeholder: '例如：一樓中餐廳', required: false },
+      { key: 'message', label: COMP_WORKSPACE_LABELS.餐廳_說明, placeholder: COMP_WORKSPACE_LABELS.例如_一樓中餐廳, required: false },
     ],
   },
   {
     id: 'bus',
     icon: <Bus size={16} />,
-    label: '上車通知',
+    label: COMP_WORKSPACE_LABELS.上車通知,
     template: '🚌 上車通知\n\n{{message}}\n\n請回到車上，即將出發！',
     variables: [
-      { key: 'message', label: '說明', placeholder: '例如：請在 5 分鐘內上車', required: false },
+      { key: 'message', label: COMP_WORKSPACE_LABELS.說明, placeholder: COMP_WORKSPACE_LABELS.例如_請在_5_分鐘內上車, required: false },
     ],
   },
   {
     id: 'urgent',
     icon: <AlertTriangle size={16} />,
-    label: '緊急通知',
+    label: COMP_WORKSPACE_LABELS.緊急通知,
     template: '⚠️ 緊急通知\n\n{{message}}\n\n請注意查看！',
     variables: [
-      { key: 'message', label: '緊急訊息', placeholder: '請輸入緊急通知內容', required: true },
+      { key: 'message', label: COMP_WORKSPACE_LABELS.緊急訊息, placeholder: COMP_WORKSPACE_LABELS.請輸入緊急通知內容, required: true },
     ],
   },
 ]
@@ -218,7 +219,7 @@ export function QuickMessages({ onSend, disabled }: QuickMessagesProps) {
                 value={previewContent}
                 onChange={(e) => setPreviewContent(e.target.value)}
                 className="mt-1 min-h-[120px] border-violet-500/30 focus:border-violet-400 focus:ring-violet-400 bg-[#2d2640] text-violet-100 placeholder:text-violet-400/60"
-                placeholder="編輯訊息內容..."
+                placeholder={COMP_WORKSPACE_LABELS.編輯訊息內容}
               />
             </div>
           </div>

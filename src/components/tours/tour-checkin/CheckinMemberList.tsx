@@ -25,6 +25,7 @@ import {
   Clock,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { COMP_TOURS_LABELS } from '../constants/labels'
 
 type FilterType = 'all' | 'checked_in' | 'not_checked_in'
 
@@ -164,7 +165,7 @@ export function CheckinMemberList({
         <div className="relative flex-1 max-w-xs">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-muted" />
           <Input
-            placeholder="搜尋團員..."
+            placeholder={COMP_TOURS_LABELS.搜尋團員}
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             className="pl-9 h-9"
@@ -180,7 +181,7 @@ export function CheckinMemberList({
           </div>
         ) : filteredMembers.length === 0 ? (
           <div className="text-center py-12 text-morandi-secondary">
-            {searchQuery ? '找不到符合的團員' : '目前沒有團員'}
+            {searchQuery ? COMP_TOURS_LABELS.找不到符合的團員 : COMP_TOURS_LABELS.目前沒有團員}
           </div>
         ) : (
           filteredMembers.map(member => (
@@ -209,7 +210,7 @@ export function CheckinMemberList({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-morandi-primary truncate">
-                    {member.chinese_name || member.passport_name || '未知'}
+                    {member.chinese_name || member.passport_name || COMP_TOURS_LABELS.未知}
                   </span>
                   {member.checked_in && (
                     <span className="text-xs bg-morandi-green/20 text-morandi-green px-2 py-0.5 rounded">

@@ -16,6 +16,7 @@ import { Upload, X, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { ProcessedFile } from '../order-member.types'
 import { PassportImageEnhancer } from './PassportImageEnhancer'
+import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 interface PassportUploadZoneProps {
   processedFiles: ProcessedFile[]
@@ -110,7 +111,7 @@ export function PassportUploadZone({
         />
         <Upload size={24} className="text-morandi-muted mb-2" />
         <span className="text-sm text-morandi-muted">
-          {isProcessing ? '處理中...' : '拖放或點擊選擇護照照片/PDF'}
+          {isProcessing ? COMP_ORDERS_LABELS.處理中 : COMP_ORDERS_LABELS.拖放或點擊選擇護照照片_PDF}
         </span>
         <span className="text-xs text-morandi-muted mt-1">
           支援 JPG、PNG、PDF 格式
@@ -161,7 +162,7 @@ export function PassportUploadZone({
                   alt={pf.originalName}
                   className="w-full h-16 object-cover rounded border border-morandi-border cursor-pointer hover:border-morandi-gold transition-colors"
                   onClick={() => !pf.isPdf && handleOpenEnhancer(index)}
-                  title={pf.isPdf ? 'PDF 不支援增強' : '點擊進行圖片增強'}
+                  title={pf.isPdf ? COMP_ORDERS_LABELS.PDF_不支援增強 : COMP_ORDERS_LABELS.點擊進行圖片增強}
                 />
                 {/* 刪除按鈕 */}
                 <button
@@ -175,7 +176,7 @@ export function PassportUploadZone({
                   <button
                     onClick={(e) => { e.stopPropagation(); handleOpenEnhancer(index) }}
                     className="absolute -top-1 -left-1 w-5 h-5 bg-morandi-gold text-white rounded-full flex items-center justify-center shadow-sm hover:bg-morandi-gold-hover transition-colors"
-                    title="圖片增強（銳利化）"
+                    title={COMP_ORDERS_LABELS.圖片增強_銳利化}
                   >
                     <Sparkles size={10} />
                   </button>

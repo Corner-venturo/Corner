@@ -4,6 +4,7 @@ import React from 'react'
 import { Button } from '@/components/ui/button'
 import { ImageIcon, Map, Sparkles } from 'lucide-react'
 import { Attraction } from '@/features/attractions/types'
+import { COMP_EDITOR_LABELS } from '../constants/labels'
 
 interface AttractionWithCity extends Attraction {
   city_name?: string
@@ -106,7 +107,7 @@ export function AttractionCard({
           size="sm"
           onClick={() => onViewOnMap(attraction)}
           className={`h-8 px-2 rounded-lg ${selectedMapAttractionId === attraction.id ? 'bg-status-info-bg text-status-info' : ''}`}
-          title="查看附近景點"
+          title={COMP_EDITOR_LABELS.查看附近景點}
         >
           <Map size={16} />
         </Button>
