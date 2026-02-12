@@ -213,7 +213,7 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
       },
       {
         key: 'status',
-        label: '狀態',
+        label: PROPOSAL_LABELS.table.statusCol,
         sortable: true,
         width: '80px',
         render: (_, proposal) => (
@@ -239,7 +239,7 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
       }> = [
         {
           icon: Edit2,
-          label: '編輯',
+          label: PROPOSAL_LABELS.table.editAction,
           onClick: () => openEditDialog(proposal),
         },
       ]
@@ -248,7 +248,7 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
       if (proposal.status !== 'converted' && proposal.status !== 'archived') {
         actions.push({
           icon: Archive,
-          label: '封存',
+          label: PROPOSAL_LABELS.table.archiveAction,
           onClick: () => openArchiveDialog(proposal),
         })
       }
@@ -257,7 +257,7 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
       if (proposal.status === 'draft' || proposal.status === 'negotiating') {
         actions.push({
           icon: Trash2,
-          label: '刪除',
+          label: PROPOSAL_LABELS.table.deleteAction,
           onClick: () => handleDeleteProposal(proposal),
           variant: 'danger',
         })
@@ -277,7 +277,7 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
         actions={(proposal) => renderActions(proposal)}
         actionsWidth="50%"
         bordered
-        emptyMessage="尚無提案資料"
+        emptyMessage={PROPOSAL_LABELS.table.emptyMessage}
       />
 
       {/* 提案詳細對話框 */}

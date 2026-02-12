@@ -9,7 +9,11 @@ import React, { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { EditableRatesTable } from '@/components/transportation/editable-rates-table/index'
 import { TransportationRate } from '@/types/transportation-rates.types'
-import { supabase } from '@/lib/supabase/client'
+import {
+  updateTransportationRate,
+  deleteTransportationRate,
+  createTransportationRate,
+} from '@/data/entities/transportation-rates'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
 import { confirm } from '@/lib/ui/alert-dialog'
@@ -40,18 +44,14 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
 
   // 更新單筆資料
   const handleUpdate = async (id: string, updates: Partial<TransportationRate>) => {
-    // @ts-expect-error - transportation_rates table not in generated Supabase types
-    const result = await supabase.from('transportation_rates').update(updates).eq('id', id)
-    const error = result.error
-
-    if (error) {
+    try {
+      await updateTransportationRate(id, updates as Record<string, unknown>)
+      toast.success('更新成功')
+      onUpdate()
+    } catch (error) {
       logger.error('Error updating rate:', error)
       toast.error('更新失敗')
-      return
     }
-
-    toast.success('更新成功')
-    onUpdate()
   }
 
   // 刪除資料
@@ -62,17 +62,14 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
     })
     if (!confirmed) return
 
-    const result = await supabase.from('transportation_rates').delete().eq('id', id)
-    const error = result.error
-
-    if (error) {
+    try {
+      await deleteTransportationRate(id)
+      toast.success('刪除成功')
+      onUpdate()
+    } catch (error) {
       logger.error('Error deleting rate:', error)
       toast.error('刪除失敗')
-      return
     }
-
-    toast.success('刪除成功')
-    onUpdate()
   }
 
   // 新增資料
@@ -83,26 +80,23 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
     }
     const dataWithCategory = data as CreateRateData
 
-    const result = await supabase.from('transportation_rates').insert({
-      country_id: data.country_id || null,
-      country_name: countryName,
-      vehicle_type: data.vehicle_type || dataWithCategory?.category || '',
-      price: dataWithCategory?.price_twd || 0,
-      currency: 'TWD',
-      unit: 'trip',
-      is_active: true,
-      display_order: 0,
-    })
-    const error = result.error
-
-    if (error) {
+    try {
+      await createTransportationRate({
+        country_id: data.country_id || null,
+        country_name: countryName,
+        vehicle_type: data.vehicle_type || dataWithCategory?.category || '',
+        price: dataWithCategory?.price_twd || 0,
+        currency: 'TWD',
+        unit: 'trip',
+        is_active: true,
+        display_order: 0,
+      } as Record<string, unknown>)
+      toast.success('新增成功')
+      onUpdate()
+    } catch (error) {
       logger.error('Error creating rate:', error)
       toast.error('新增失敗')
-      return
     }
-
-    toast.success('新增成功')
-    onUpdate()
   }
 
   return (

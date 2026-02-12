@@ -15,6 +15,7 @@ import type {
 } from '@/types/proposal.types'
 import { createProposalSchema } from '@/lib/validations/schemas'
 import { alert } from '@/lib/ui/alert-dialog'
+import { PROPOSAL_LABELS } from '../constants'
 
 // 擴展的提案資料（包含第一個版本）
 export interface CreateProposalWithPackageData extends CreateProposalData {
