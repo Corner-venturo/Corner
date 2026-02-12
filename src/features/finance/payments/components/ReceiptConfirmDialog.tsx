@@ -17,6 +17,7 @@ import { RECEIPT_TYPE_OPTIONS } from '../types'
 import { useAuthStore } from '@/stores'
 import { deleteReceipt } from '@/data'
 import type { Receipt } from '@/types/receipt.types'
+import { ADD_RECEIPT_DIALOG_LABELS, RECEIPT_CONFIRM_DIALOG_LABELS } from '../../constants/labels';
 
 interface ReceiptConfirmDialogProps {
   open: boolean
@@ -51,7 +52,7 @@ export function ReceiptConfirmDialog({
 
   const receiptTypeLabel = RECEIPT_TYPE_OPTIONS.find(
     opt => opt.value === receipt.receipt_type
-  )?.label || '未知'
+  )?.label || RECEIPT_CONFIRM_DIALOG_LABELS.未知
 
   const isConfirmed = receipt.status === '1'
 
@@ -61,15 +62,15 @@ export function ReceiptConfirmDialog({
     try {
       await onConfirm(receipt.id, receipt.receipt_amount || 0, false)
       toast({
-        title: '確認成功',
-        description: '收款金額已確認',
+        title: RECEIPT_CONFIRM_DIALOG_LABELS.確認成功,
+        description: RECEIPT_CONFIRM_DIALOG_LABELS.收款金額已確認,
       })
       onSuccess?.()
       onOpenChange(false)
     } catch (error) {
       toast({
-        title: '確認失敗',
-        description: error instanceof Error ? error.message : '請稍後再試',
+        title: RECEIPT_CONFIRM_DIALOG_LABELS.確認失敗,
+        description: error instanceof Error ? error.message : ADD_RECEIPT_DIALOG_LABELS.請稍後再試,
         variant: 'destructive',
       })
     } finally {
@@ -82,7 +83,7 @@ export function ReceiptConfirmDialog({
     const amount = parseFloat(abnormalAmount)
     if (isNaN(amount) || amount < 0) {
       toast({
-        title: '請輸入有效金額',
+        title: RECEIPT_CONFIRM_DIALOG_LABELS.請輸入有效金額,
         variant: 'destructive',
       })
       return
@@ -93,7 +94,7 @@ export function ReceiptConfirmDialog({
       await onConfirm(receipt.id, amount, true)
       toast({
         title: '確認成功',
-        description: '已記錄實際收款金額，並通知建立者',
+        description: RECEIPT_CONFIRM_DIALOG_LABELS.已記錄實際收款金額_並通知建立者,
       })
       onSuccess?.()
       onOpenChange(false)
@@ -120,7 +121,7 @@ export function ReceiptConfirmDialog({
   const handleDelete = async () => {
     const confirmed = await confirm(
       `確定要刪除收款單 ${receipt.receipt_number} 嗎？此操作無法復原。`,
-      { title: '刪除收款單', type: 'error' }
+      { title: ADD_RECEIPT_DIALOG_LABELS.刪除收款單, type: 'error' }
     )
 
     if (!confirmed) return
@@ -129,14 +130,14 @@ export function ReceiptConfirmDialog({
     try {
       await deleteReceipt(receipt.id)
       toast({
-        title: '刪除成功',
+        title: ADD_RECEIPT_DIALOG_LABELS.刪除成功,
         description: `收款單 ${receipt.receipt_number} 已刪除`,
       })
       onSuccess?.()
       onOpenChange(false)
     } catch (error) {
       toast({
-        title: '刪除失敗',
+        title: ADD_RECEIPT_DIALOG_LABELS.刪除失敗,
         description: error instanceof Error ? error.message : '請稍後再試',
         variant: 'destructive',
       })
@@ -171,7 +172,7 @@ export function ReceiptConfirmDialog({
               'font-medium',
               isConfirmed ? 'text-morandi-green' : 'text-morandi-gold'
             )}>
-              {isConfirmed ? '已確認' : '待確認'}
+              {isConfirmed ? '已確認' : RECEIPT_CONFIRM_DIALOG_LABELS.待確認}
             </span>
           </div>
         </div>
@@ -220,7 +221,7 @@ export function ReceiptConfirmDialog({
                         onClick={handleConfirmCorrect}
                         disabled={isConfirming}
                         className="h-8 w-8 p-0 text-morandi-green hover:bg-morandi-green/10"
-                        title="金額正確"
+                        title={RECEIPT_CONFIRM_DIALOG_LABELS.金額正確}
                       >
                         <Check size={18} />
                       </Button>
@@ -230,7 +231,7 @@ export function ReceiptConfirmDialog({
                         onClick={() => setShowAbnormalInput(true)}
                         disabled={isConfirming}
                         className="h-8 w-8 p-0 text-morandi-red hover:bg-morandi-red/10"
-                        title="金額異常"
+                        title={RECEIPT_CONFIRM_DIALOG_LABELS.金額異常}
                       >
                         <X size={18} />
                       </Button>
@@ -267,7 +268,7 @@ export function ReceiptConfirmDialog({
                   type="number"
                   value={abnormalAmount}
                   onChange={e => setAbnormalAmount(e.target.value)}
-                  placeholder="輸入實際金額"
+                  placeholder={RECEIPT_CONFIRM_DIALOG_LABELS.輸入實際金額}
                   className="max-w-[200px]"
                   autoFocus
                 />
@@ -311,7 +312,7 @@ export function ReceiptConfirmDialog({
                 className="gap-2 text-morandi-red border-morandi-red hover:bg-morandi-red hover:text-white"
               >
                 <Trash2 size={16} />
-                {isDeleting ? '刪除中...' : '刪除'}
+                {isDeleting ? '刪除中...' : ADD_RECEIPT_DIALOG_LABELS.刪除}
               </Button>
             )}
           </div>

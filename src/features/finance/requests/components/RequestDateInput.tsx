@@ -6,6 +6,7 @@ import { useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { cn } from '@/lib/utils'
+import { PAYMENT_ITEM_ROW_LABELS, REQUEST_DATE_INPUT_LABELS } from '../../constants/labels';
 
 interface RequestDateInputProps {
   value: string
@@ -31,7 +32,7 @@ function getNextThursday(): string {
   return formatDate(nextThursday)
 }
 
-export function RequestDateInput({ value, onChange, label = '請款日期' }: RequestDateInputProps) {
+export function RequestDateInput({ value, onChange, label = REQUEST_DATE_INPUT_LABELS.請款日期 }: RequestDateInputProps) {
   // 打開時自動帶入下一個週四
   useEffect(() => {
     if (!value) {
@@ -57,7 +58,7 @@ export function RequestDateInput({ value, onChange, label = '請款日期' }: Re
           'mt-1',
           isSpecialBilling && 'bg-morandi-gold/10 border-morandi-gold/20'
         )}
-        placeholder="選擇日期"
+        placeholder={PAYMENT_ITEM_ROW_LABELS.選擇日期}
       />
       {value && (
         <p
@@ -66,7 +67,7 @@ export function RequestDateInput({ value, onChange, label = '請款日期' }: Re
             isSpecialBilling ? 'text-morandi-gold' : 'text-morandi-secondary'
           )}
         >
-          {isSpecialBilling ? '特殊出帳：非週四請款' : '一般請款：週四出帳'}
+          {isSpecialBilling ? '特殊出帳：非週四請款' : REQUEST_DATE_INPUT_LABELS.一般請款_週四出帳}
         </p>
       )}
     </div>

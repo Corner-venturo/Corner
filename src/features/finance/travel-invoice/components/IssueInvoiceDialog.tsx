@@ -14,6 +14,7 @@ import { useAuthStore } from '@/stores'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
+import { BATCH_INVOICE_DIALOG_LABELS, ISSUE_INVOICE_DIALOG_LABELS } from '../../constants/labels';
 
 interface IssueInvoiceDialogProps {
   open: boolean
@@ -54,7 +55,7 @@ export function IssueInvoiceDialog({
   const [buyerName, setBuyerName] = useState(contactPerson || '')
   const [buyerUBN, setBuyerUBN] = useState('')
   const [buyerEmail, setBuyerEmail] = useState('')
-  const [itemName, setItemName] = useState('旅遊服務費')
+  const [itemName, setItemName] = useState(ISSUE_INVOICE_DIALOG_LABELS.旅遊服務費)
 
   // 載入訂單發票資訊
   useEffect(() => {
@@ -91,12 +92,12 @@ export function IssueInvoiceDialog({
 
   const handleIssue = async () => {
     if (!buyerName) {
-      toast.error('請輸入買受人名稱')
+      toast.error(BATCH_INVOICE_DIALOG_LABELS.請輸入買受人名稱)
       return
     }
 
     if (amount <= 0) {
-      toast.error('發票金額必須大於 0')
+      toast.error(ISSUE_INVOICE_DIALOG_LABELS.發票金額必須大於_0)
       return
     }
 
@@ -116,7 +117,7 @@ export function IssueInvoiceDialog({
         {
           item_name: itemName || '旅遊服務費',
           item_count: 1,
-          item_unit: '式',
+          item_unit: ISSUE_INVOICE_DIALOG_LABELS.式,
           item_price: amount,
           itemAmt: amount,
         },
@@ -134,7 +135,7 @@ export function IssueInvoiceDialog({
         workspace_id: workspaceId,
       })
 
-      toast.success('發票開立成功')
+      toast.success(ISSUE_INVOICE_DIALOG_LABELS.發票開立成功)
       onOpenChange(false)
       onSuccess?.()
 
@@ -144,7 +145,7 @@ export function IssueInvoiceDialog({
       setBuyerEmail('')
       setAmount(0)
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : '開立失敗')
+      toast.error(error instanceof Error ? error.message : ISSUE_INVOICE_DIALOG_LABELS.開立失敗)
     }
   }
 
@@ -211,7 +212,7 @@ export function IssueInvoiceDialog({
                 type="number"
                 value={amount}
                 onChange={e => setAmount(Number(e.target.value))}
-                placeholder="輸入發票金額"
+                placeholder={ISSUE_INVOICE_DIALOG_LABELS.輸入發票金額}
                 max={summary?.invoiceable_amount}
               />
               {summary && amount > summary.invoiceable_amount && (
@@ -224,7 +225,7 @@ export function IssueInvoiceDialog({
               <Input
                 value={itemName}
                 onChange={e => setItemName(e.target.value)}
-                placeholder="旅遊服務費"
+                placeholder={ISSUE_INVOICE_DIALOG_LABELS.旅遊服務費}
               />
             </div>
 
@@ -234,7 +235,7 @@ export function IssueInvoiceDialog({
                 <Input
                   value={buyerName}
                   onChange={e => setBuyerName(e.target.value)}
-                  placeholder="請輸入買受人名稱"
+                  placeholder={BATCH_INVOICE_DIALOG_LABELS.請輸入買受人名稱}
                 />
               </div>
               <div>
@@ -242,7 +243,7 @@ export function IssueInvoiceDialog({
                 <Input
                   value={buyerUBN}
                   onChange={e => setBuyerUBN(e.target.value)}
-                  placeholder="8 碼數字"
+                  placeholder={BATCH_INVOICE_DIALOG_LABELS.n_8_碼數字}
                   maxLength={8}
                 />
               </div>
@@ -254,7 +255,7 @@ export function IssueInvoiceDialog({
                 type="email"
                 value={buyerEmail}
                 onChange={e => setBuyerEmail(e.target.value)}
-                placeholder="發票通知信箱"
+                placeholder={BATCH_INVOICE_DIALOG_LABELS.發票通知信箱}
               />
             </div>
 
@@ -276,7 +277,7 @@ export function IssueInvoiceDialog({
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
             <Check size={16} />
-            {isLoading ? '開立中...' : '開立發票'}
+            {isLoading ? '開立中...' : ISSUE_INVOICE_DIALOG_LABELS.開立發票}
           </Button>
         </DialogFooter>
       </DialogContent>

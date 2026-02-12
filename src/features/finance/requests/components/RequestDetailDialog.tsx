@@ -22,6 +22,7 @@ import { logger } from '@/lib/utils/logger'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
+import { ADD_REQUEST_DIALOG_LABELS, REQUEST_DETAIL_DIALOG_LABELS } from '../../constants/labels';
 
 interface RequestDetailDialogProps {
   request: PaymentRequest | null
@@ -42,7 +43,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
   const [editingItemId, setEditingItemId] = useState<string | null>(null)
   const [isAddingItem, setIsAddingItem] = useState(false)
   const [newItem, setNewItem] = useState({
-    category: '其他' as PaymentRequestItem['category'],
+    category: ADD_REQUEST_DIALOG_LABELS.其他 as PaymentRequestItem['category'],
     supplier_id: '',
     supplier_name: '',
     description: '',
@@ -132,17 +133,17 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
   // 付款對象選項（給 Combobox 使用）
   const supplierOptions = suppliers.map(s => ({
     value: s.id,
-    label: s.name || '未命名',
+    label: s.name || REQUEST_DETAIL_DIALOG_LABELS.未命名,
   }))
 
   // 刪除請款單
   const handleDelete = async () => {
     const deleteMessage = isBatch
       ? `確定要刪除此請款單（${currentRequest.code}）嗎？此操作無法復原。\n\n注意：只會刪除當前選中的請款單，同批次的其他請款單不受影響。`
-      : '確定要刪除此請款單嗎？此操作無法復原。'
+      : REQUEST_DETAIL_DIALOG_LABELS.確定要刪除此請款單嗎_此操作無法復原
 
     const confirmed = await confirm(deleteMessage, {
-      title: '刪除請款單',
+      title: REQUEST_DETAIL_DIALOG_LABELS.刪除請款單,
       type: 'warning',
     })
     if (!confirmed) {
@@ -151,7 +152,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
 
     try {
       await deletePaymentRequestApi(currentRequest.id)
-      await alert('請款單已刪除', 'success')
+      await alert(REQUEST_DETAIL_DIALOG_LABELS.請款單已刪除, 'success')
 
       // 如果是批次且還有其他請款單，切換到下一個
       if (isBatch && batchRequests.length > 1) {
@@ -163,14 +164,14 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
       }
     } catch (error) {
       logger.error('刪除請款單失敗:', error)
-      await alert('刪除請款單失敗', 'error')
+      await alert(REQUEST_DETAIL_DIALOG_LABELS.刪除請款單失敗, 'error')
     }
   }
 
   // 新增項目
   const handleAddItem = async () => {
     if (!newItem.description || newItem.unit_price <= 0) {
-      await alert('請填寫說明和單價', 'warning')
+      await alert(REQUEST_DETAIL_DIALOG_LABELS.請填寫說明和單價, 'warning')
       return
     }
 
@@ -199,7 +200,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
       })
     } catch (error) {
       logger.error('新增項目失敗:', error)
-      await alert('新增項目失敗', 'error')
+      await alert(REQUEST_DETAIL_DIALOG_LABELS.新增項目失敗, 'error')
     }
   }
 
@@ -230,14 +231,14 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
       setEditingItemId(null)
     } catch (error) {
       logger.error('更新項目失敗:', error)
-      await alert('更新項目失敗', 'error')
+      await alert(REQUEST_DETAIL_DIALOG_LABELS.更新項目失敗, 'error')
     }
   }
 
   // 刪除項目
   const handleDeleteItem = async (itemId: string) => {
-    const confirmed = await confirm('確定要刪除此項目嗎？', {
-      title: '刪除項目',
+    const confirmed = await confirm(REQUEST_DETAIL_DIALOG_LABELS.確定要刪除此項目嗎, {
+      title: REQUEST_DETAIL_DIALOG_LABELS.刪除項目,
       type: 'warning',
     })
     if (!confirmed) return
@@ -247,7 +248,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
       await refreshRequestItems()
     } catch (error) {
       logger.error('刪除項目失敗:', error)
-      await alert('刪除項目失敗', 'error')
+      await alert(REQUEST_DETAIL_DIALOG_LABELS.刪除項目失敗, 'error')
     }
   }
 
@@ -261,7 +262,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
   const handleOpenChange = async (newOpen: boolean) => {
     if (!newOpen && isEditing) {
       // 正在編輯中，提示用戶
-      await alert('請先儲存或取消目前的編輯', 'warning')
+      await alert(REQUEST_DETAIL_DIALOG_LABELS.請先儲存或取消目前的編輯, 'warning')
       return
     }
     onOpenChange(newOpen)
@@ -283,7 +284,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                 )}
               </DialogTitle>
               <p className="text-sm text-morandi-muted mt-1">
-                {currentRequest.tour_code ? `團號：${currentRequest.tour_code}` : '無關聯團號'}
+                {currentRequest.tour_code ? `團號：${currentRequest.tour_code}` : REQUEST_DETAIL_DIALOG_LABELS.無關聯團號}
                 {currentRequest.order_number && ` | 訂單：${currentRequest.order_number}`}
               </p>
             </div>
@@ -327,11 +328,11 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
         <div className="space-y-6 mt-4">
           {/* 基本資訊 */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-morandi-background/50 rounded-lg">
-            <InfoItem label="請款單號" value={currentRequest.code} />
-            <InfoItem label="團號" value={currentRequest.tour_code || '-'} />
-            <InfoItem label="團名" value={currentRequest.tour_name || tour?.name || '-'} />
-            <InfoItem label="訂單編號" value={currentRequest.order_number || '-'} />
-            <InfoItem label="請款人" value={currentRequest.created_by_name || '-'} />
+            <InfoItem label={REQUEST_DETAIL_DIALOG_LABELS.請款單號} value={currentRequest.code} />
+            <InfoItem label={REQUEST_DETAIL_DIALOG_LABELS.團號} value={currentRequest.tour_code || '-'} />
+            <InfoItem label={REQUEST_DETAIL_DIALOG_LABELS.團名} value={currentRequest.tour_name || tour?.name || '-'} />
+            <InfoItem label={REQUEST_DETAIL_DIALOG_LABELS.訂單編號} value={currentRequest.order_number || '-'} />
+            <InfoItem label={REQUEST_DETAIL_DIALOG_LABELS.請款人} value={currentRequest.created_by_name || '-'} />
             <div>
               <p className="text-xs text-morandi-muted mb-1">請款日期</p>
               <DateCell date={currentRequest.created_at} showIcon={false} />
@@ -400,7 +401,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                         options={supplierOptions}
                         value={newItem.supplier_id}
                         onChange={(value) => setNewItem({ ...newItem, supplier_id: value })}
-                        placeholder="選擇付款對象..."
+                        placeholder={REQUEST_DETAIL_DIALOG_LABELS.選擇付款對象}
                         className="[&_input]:h-8 [&_input]:text-xs [&_input]:bg-transparent"
                       />
                     </div>
@@ -408,7 +409,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                       <Input
                         value={newItem.description}
                         onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                        placeholder="說明"
+                        placeholder={REQUEST_DETAIL_DIALOG_LABELS.說明}
                         className="h-8 text-xs border-0 shadow-none bg-transparent"
                       />
                     </div>
@@ -482,7 +483,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                               options={supplierOptions}
                               value={editItem.supplier_id || ''}
                               onChange={(value) => setEditItem({ ...editItem, supplier_id: value })}
-                              placeholder="選擇付款對象..."
+                              placeholder={REQUEST_DETAIL_DIALOG_LABELS.選擇付款對象}
                               className="[&_input]:h-8 [&_input]:text-xs [&_input]:bg-transparent"
                             />
                           </div>

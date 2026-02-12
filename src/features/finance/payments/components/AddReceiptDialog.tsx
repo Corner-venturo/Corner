@@ -27,6 +27,7 @@ import { useReceiptMutations, type LinkPayResult } from '../hooks/useReceiptMuta
 import { PaymentItemRow } from './PaymentItemRow'
 import { Input } from '@/components/ui/input'
 import type { Receipt } from '@/stores'
+import { ADD_RECEIPT_DIALOG_LABELS } from '../../constants/labels';
 
 interface AddReceiptDialogProps {
   open: boolean
@@ -212,7 +213,7 @@ export function AddReceiptDialog({
     const errors = validateForm()
     if (errors.length > 0) {
       toast({
-        title: '表單驗證失敗',
+        title: ADD_RECEIPT_DIALOG_LABELS.表單驗證失敗,
         description: errors[0],
         variant: 'destructive',
       })
@@ -228,7 +229,7 @@ export function AddReceiptDialog({
       const user = authStore.user
 
       if (!user?.workspace_id) {
-        throw new Error('無法取得 workspace ID')
+        throw new Error(ADD_RECEIPT_DIALOG_LABELS.無法取得_workspace_ID)
       }
 
       // 編輯模式：更新收款單
@@ -248,7 +249,7 @@ export function AddReceiptDialog({
         })
 
         toast({
-          title: '收款單更新成功',
+          title: ADD_RECEIPT_DIALOG_LABELS.收款單更新成功,
           description: `已更新收款單 ${editingReceipt.receipt_number}（${result.itemCount} 個項目）`,
         })
         resetForm()
@@ -286,7 +287,7 @@ export function AddReceiptDialog({
       if (result.linkPayResults.length > 0) {
         setLinkPayResults(result.linkPayResults)
         toast({
-          title: '收款單建立成功',
+          title: ADD_RECEIPT_DIALOG_LABELS.收款單建立成功,
           description: `已新增 ${result.itemCount} 項收款，其中 ${result.linkPayResults.length} 項 LinkPay 已產生連結`,
         })
         resetForm()
@@ -305,7 +306,7 @@ export function AddReceiptDialog({
       logger.error('❌ Create Receipt Error:', error)
 
       // 解析錯誤訊息
-      let errorMessage = '發生未知錯誤，請檢查必填欄位是否完整'
+      let errorMessage = ADD_RECEIPT_DIALOG_LABELS.發生未知錯誤_請檢查必填欄位是否完整
       if (error instanceof Error) {
         errorMessage = error.message
       } else if (typeof error === 'object' && error !== null) {
@@ -324,7 +325,7 @@ export function AddReceiptDialog({
       }
 
       toast({
-        title: '❌ 建立失敗',
+        title: ADD_RECEIPT_DIALOG_LABELS.建立失敗,
         description: errorMessage,
         variant: 'destructive',
       })
@@ -345,7 +346,7 @@ export function AddReceiptDialog({
 
     const confirmed = await confirm(
       `確定要刪除收款單 ${editingReceipt.receipt_number} 嗎？此操作無法復原。`,
-      { type: 'warning', title: '刪除收款單' }
+      { type: 'warning', title: ADD_RECEIPT_DIALOG_LABELS.刪除收款單 }
     )
 
     if (!confirmed) return
@@ -354,7 +355,7 @@ export function AddReceiptDialog({
     try {
       await onDelete(editingReceipt.id)
       toast({
-        title: '刪除成功',
+        title: ADD_RECEIPT_DIALOG_LABELS.刪除成功,
         description: `收款單 ${editingReceipt.receipt_number} 已刪除`,
       })
       resetForm()
@@ -363,8 +364,8 @@ export function AddReceiptDialog({
     } catch (error) {
       logger.error('刪除收款單失敗:', error)
       toast({
-        title: '刪除失敗',
-        description: '請稍後再試',
+        title: ADD_RECEIPT_DIALOG_LABELS.刪除失敗,
+        description: ADD_RECEIPT_DIALOG_LABELS.請稍後再試,
         variant: 'destructive',
       })
     } finally {
@@ -377,7 +378,7 @@ export function AddReceiptDialog({
       <DialogContent level={2} className="max-w-[95vw] w-[95vw] h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            {isEditMode ? '編輯收款單' : '新增收款單'}
+            {isEditMode ? '編輯收款單' : ADD_RECEIPT_DIALOG_LABELS.新增收款單}
             {isConfirmed && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-morandi-green/20 text-morandi-green text-xs font-medium">
                 <Lock size={12} />
@@ -390,7 +391,7 @@ export function AddReceiptDialog({
               ? `${editingReceipt?.receipt_number} - 已確認的收款單無法編輯或刪除`
               : isEditMode
                 ? `編輯 ${editingReceipt?.receipt_number}`
-                : '收款單號將自動產生'}
+                : ADD_RECEIPT_DIALOG_LABELS.收款單號將自動產生}
           </p>
         </DialogHeader>
 
@@ -412,8 +413,8 @@ export function AddReceiptDialog({
                   order_id: '',
                 }))
               }}
-              placeholder="請選擇團體..."
-              emptyMessage="找不到團體"
+              placeholder={ADD_RECEIPT_DIALOG_LABELS.請選擇團體}
+              emptyMessage={ADD_RECEIPT_DIALOG_LABELS.找不到團體}
               className="mt-1 bg-card"
             />
           </div>
@@ -430,17 +431,17 @@ export function AddReceiptDialog({
                 <SelectValue
                   placeholder={
                     !formData.tour_id
-                      ? '請先選擇團體'
+                      ? ADD_RECEIPT_DIALOG_LABELS.請先選擇團體
                       : filteredOrders.length === 0
-                        ? '此團體沒有訂單'
-                        : '請選擇訂單...'
+                        ? ADD_RECEIPT_DIALOG_LABELS.此團體沒有訂單
+                        : ADD_RECEIPT_DIALOG_LABELS.請選擇訂單
                   }
                 />
               </SelectTrigger>
               <SelectContent>
                 {filteredOrders.map(order => (
                   <SelectItem key={order.id} value={order.id}>
-                    {order.order_number} - {order.contact_person || '無聯絡人'}
+                    {order.order_number} - {order.contact_person || ADD_RECEIPT_DIALOG_LABELS.無聯絡人}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -607,7 +608,7 @@ export function AddReceiptDialog({
                 className="gap-2 text-morandi-red border-morandi-red hover:bg-morandi-red hover:text-white"
               >
                 <Trash2 size={16} />
-                {isDeleting ? '刪除中...' : '刪除'}
+                {isDeleting ? '刪除中...' : ADD_RECEIPT_DIALOG_LABELS.刪除}
               </Button>
             )}
           </div>
@@ -616,7 +617,7 @@ export function AddReceiptDialog({
           <div className="flex space-x-2">
             <Button variant="outline" onClick={handleCancel} className="gap-2">
               <X size={16} />
-              {linkPayResults.length > 0 ? '關閉' : isConfirmed ? '關閉' : '取消'}
+              {linkPayResults.length > 0 ? '關閉' : isConfirmed ? '關閉' : ADD_RECEIPT_DIALOG_LABELS.取消}
             </Button>
             {linkPayResults.length === 0 && !isConfirmed && (
               <Button
@@ -632,10 +633,10 @@ export function AddReceiptDialog({
                 <Save size={16} />
                 {isSubmitting
                   ? isEditMode
-                    ? '更新中...'
-                    : '建立中...'
+                    ? ADD_RECEIPT_DIALOG_LABELS.更新中
+                    : ADD_RECEIPT_DIALOG_LABELS.建立中
                   : isEditMode
-                    ? '更新收款單'
+                    ? ADD_RECEIPT_DIALOG_LABELS.更新收款單
                     : `新增收款單 (共 ${paymentItems.length} 項)`}
               </Button>
             )}

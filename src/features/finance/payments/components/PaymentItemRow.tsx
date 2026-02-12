@@ -19,6 +19,7 @@ import {
 import { cn } from '@/lib/utils'
 import type { PaymentItem, ReceiptType } from '../types'
 import { RECEIPT_TYPES, RECEIPT_TYPE_OPTIONS, BANK_ACCOUNTS } from '../types'
+import { ADD_RECEIPT_DIALOG_LABELS, BATCH_RECEIPT_DIALOG_LABELS, PAYMENT_ITEM_ROW_LABELS } from '../../constants/labels';
 
 interface PaymentItemRowProps {
   item: PaymentItem
@@ -51,14 +52,14 @@ export function PaymentItemRow({
   const [copied, setCopied] = useState(false)
 
   const receiptTypeLabel =
-    RECEIPT_TYPE_OPTIONS.find(opt => opt.value === item.receipt_type)?.label || '現金'
+    RECEIPT_TYPE_OPTIONS.find(opt => opt.value === item.receipt_type)?.label || BATCH_RECEIPT_DIALOG_LABELS.現金
 
   // 產生 LinkPay 連結
   const handleGenerateLink = async () => {
     if (!item.email || !item.amount || !item.pay_dateline) {
       toast({
-        title: '請填寫必要欄位',
-        description: 'Email、金額、付款截止日為必填',
+        title: PAYMENT_ITEM_ROW_LABELS.請填寫必要欄位,
+        description: PAYMENT_ITEM_ROW_LABELS.Email_金額_付款截止日為必填,
         variant: 'destructive',
       })
       return
@@ -86,16 +87,16 @@ export function PaymentItemRow({
       if (data.success && data.data?.payment_link) {
         setGeneratedLink(data.data.payment_link)
         toast({
-          title: '連結產生成功',
-          description: '可複製連結發送給客戶',
+          title: PAYMENT_ITEM_ROW_LABELS.連結產生成功,
+          description: PAYMENT_ITEM_ROW_LABELS.可複製連結發送給客戶,
         })
       } else {
-        throw new Error(data.error || '產生連結失敗')
+        throw new Error(data.error || PAYMENT_ITEM_ROW_LABELS.產生連結失敗)
       }
     } catch (error) {
       toast({
         title: '產生連結失敗',
-        description: error instanceof Error ? error.message : '請稍後再試',
+        description: error instanceof Error ? error.message : ADD_RECEIPT_DIALOG_LABELS.請稍後再試,
         variant: 'destructive',
       })
     } finally {
@@ -168,7 +169,7 @@ export function PaymentItemRow({
           <DatePicker
             value={item.transaction_date}
             onChange={(date) => onUpdate(item.id, { transaction_date: date })}
-            placeholder="選擇日期"
+            placeholder={PAYMENT_ITEM_ROW_LABELS.選擇日期}
             buttonClassName="h-auto p-0 border-0 shadow-none bg-transparent"
           />
         </td>
@@ -187,15 +188,15 @@ export function PaymentItemRow({
             }}
             placeholder={
               item.receipt_type === RECEIPT_TYPES.LINK_PAY
-                ? '收款對象(五字內)'
+                ? PAYMENT_ITEM_ROW_LABELS.收款對象_五字內
                 : item.receipt_type === RECEIPT_TYPES.BANK_TRANSFER
-                  ? '帳號後五碼'
+                  ? PAYMENT_ITEM_ROW_LABELS.帳號後五碼
                   : item.receipt_type === RECEIPT_TYPES.CREDIT_CARD
-                    ? '調閱編號'
+                    ? PAYMENT_ITEM_ROW_LABELS.調閱編號
                     : item.receipt_type === RECEIPT_TYPES.CHECK
-                      ? '到期日'
+                      ? PAYMENT_ITEM_ROW_LABELS.到期日
                       : item.receipt_type === RECEIPT_TYPES.CASH
-                        ? '收款人'
+                        ? PAYMENT_ITEM_ROW_LABELS.收款人
                         : ''
             }
             maxLength={item.receipt_type === RECEIPT_TYPES.LINK_PAY || item.receipt_type === RECEIPT_TYPES.BANK_TRANSFER ? 5 : undefined}
@@ -209,7 +210,7 @@ export function PaymentItemRow({
             type="text"
             value={item.notes || ''}
             onChange={e => onUpdate(item.id, { notes: e.target.value })}
-            placeholder="備註（選填）"
+            placeholder={PAYMENT_ITEM_ROW_LABELS.備註_選填}
             className="input-no-focus w-full bg-transparent text-sm"
           />
         </td>
@@ -231,7 +232,7 @@ export function PaymentItemRow({
             <span
               onClick={() => onRemove(item.id)}
               className="text-morandi-secondary cursor-pointer hover:text-morandi-red text-sm"
-              title="刪除"
+              title={ADD_RECEIPT_DIALOG_LABELS.刪除}
             >
               ✕
             </span>
@@ -265,7 +266,7 @@ export function PaymentItemRow({
             <DatePicker
               value={item.pay_dateline || ''}
               onChange={(date) => onUpdate(item.id, { pay_dateline: date })}
-              placeholder="選擇日期"
+              placeholder={PAYMENT_ITEM_ROW_LABELS.選擇日期}
               buttonClassName="h-auto p-0 border-0 shadow-none bg-transparent"
             />
           </td>
@@ -274,7 +275,7 @@ export function PaymentItemRow({
               type="text"
               value={item.payment_name || ''}
               onChange={e => onUpdate(item.id, { payment_name: e.target.value })}
-              placeholder="例如：峇里島五日遊 - 尾款"
+              placeholder={PAYMENT_ITEM_ROW_LABELS.例如_峇里島五日遊_尾款}
               className="input-no-focus w-full bg-transparent text-sm"
             />
           </td>
@@ -319,7 +320,7 @@ export function PaymentItemRow({
               onClick={handleCopyLink}
               className="text-morandi-gold cursor-pointer hover:text-morandi-gold-hover text-sm mr-3"
             >
-              {copied ? '✓ 已複製' : '複製'}
+              {copied ? '✓ 已複製' : PAYMENT_ITEM_ROW_LABELS.複製}
             </span>
             <span
               onClick={() => window.open(generatedLink, '_blank')}

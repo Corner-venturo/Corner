@@ -26,6 +26,7 @@ import { useAuthStore } from '@/stores'
 import { generateReceiptNumber } from '@/lib/utils/receipt-number-generator'
 import { logger } from '@/lib/utils/logger'
 import { PaymentMethod } from '@/stores/types'
+import { ADD_RECEIPT_DIALOG_LABELS, BATCH_RECEIPT_DIALOG_LABELS } from '../../constants/labels';
 
 // 擴展 OrderAllocation 加入備註
 interface OrderAllocationWithNote {
@@ -50,10 +51,10 @@ interface BatchReceiptDialogProps {
 
 // 收款方式選項
 const paymentMethods = [
-  { value: 'cash', label: '現金' },
-  { value: 'transfer', label: '匯款' },
-  { value: 'card', label: '刷卡' },
-  { value: 'check', label: '支票' },
+  { value: 'cash', label: BATCH_RECEIPT_DIALOG_LABELS.現金 },
+  { value: 'transfer', label: BATCH_RECEIPT_DIALOG_LABELS.匯款 },
+  { value: 'card', label: BATCH_RECEIPT_DIALOG_LABELS.刷卡 },
+  { value: 'check', label: BATCH_RECEIPT_DIALOG_LABELS.支票 },
 ]
 
 export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogProps) {
@@ -169,22 +170,22 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
     const validAllocations = orderAllocations.filter(a => a.order_id && a.allocated_amount > 0)
 
     if (validAllocations.length === 0) {
-      void alert('請至少選擇一個訂單並輸入金額', 'warning')
+      void alert(BATCH_RECEIPT_DIALOG_LABELS.請至少選擇一個訂單並輸入金額, 'warning')
       return
     }
 
     if (totalAmount === 0) {
-      void alert('收款金額不能為 0', 'warning')
+      void alert(BATCH_RECEIPT_DIALOG_LABELS.收款金額不能為_0, 'warning')
       return
     }
 
     if (unallocatedAmount !== 0) {
-      void alert(`還有 NT$ ${Math.abs(unallocatedAmount).toLocaleString('zh-TW')} ${unallocatedAmount > 0 ? '未分配' : '超出'}，請確認分配金額`, 'warning')
+      void alert(`還有 NT$ ${Math.abs(unallocatedAmount).toLocaleString('zh-TW')} ${unallocatedAmount > 0 ? '未分配' : BATCH_RECEIPT_DIALOG_LABELS.超出}，請確認分配金額`, 'warning')
       return
     }
 
     if (!user?.workspace_id) {
-      void alert('無法取得 workspace ID', 'error')
+      void alert(ADD_RECEIPT_DIALOG_LABELS.無法取得_workspace_ID, 'error')
       return
     }
 
@@ -259,7 +260,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
       resetForm()
     } catch (error) {
       logger.error('批量收款建立失敗:', error)
-      void alert('建立失敗，請稍後再試', 'error')
+      void alert(BATCH_RECEIPT_DIALOG_LABELS.建立失敗_請稍後再試, 'error')
     }
   }
 
@@ -348,11 +349,11 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
                               .filter(o => !selectedOrderIds.has(o.id) || o.id === allocation.order_id)
                               .map(order => ({
                                 value: order.id,
-                                label: `${order.code} - ${order.contact_person || '無聯絡人'} (${order.tour_name})`
+                                label: `${order.code} - ${order.contact_person || ADD_RECEIPT_DIALOG_LABELS.無聯絡人} (${order.tour_name})`
                               }))}
                             value={allocation.order_id}
                             onChange={value => selectOrder(index, value)}
-                            placeholder="搜尋訂單..."
+                            placeholder={BATCH_RECEIPT_DIALOG_LABELS.搜尋訂單}
                           />
                         </td>
                         <td className="py-2 px-3 border-b border-r border-border text-sm text-morandi-secondary">
@@ -378,7 +379,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
                           <span
                             onClick={() => removeOrderAllocation(index)}
                             className="text-morandi-secondary cursor-pointer hover:text-morandi-red text-sm"
-                            title="刪除"
+                            title={ADD_RECEIPT_DIALOG_LABELS.刪除}
                           >
                             ✕
                           </span>
@@ -410,7 +411,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
               )}>
                 <div className="flex items-center gap-2">
                   <AlertCircle className="h-4 w-4 shrink-0" />
-                  <span>{unallocatedAmount > 0 ? '還有金額未分配' : '分配金額超過總金額'}</span>
+                  <span>{unallocatedAmount > 0 ? '還有金額未分配' : BATCH_RECEIPT_DIALOG_LABELS.分配金額超過總金額}</span>
                 </div>
                 <div className="font-medium">
                   未分配：<CurrencyCell amount={Math.abs(unallocatedAmount)} className="inline" />

@@ -12,6 +12,7 @@ import { Combobox } from '@/components/ui/combobox'
 import { Trash2, Plus } from 'lucide-react'
 import { RequestItem, categoryOptions } from '../types'
 import { CurrencyCell } from '@/components/table-cells'
+import { REQUEST_DETAIL_DIALOG_LABELS, REQUEST_ITEM_LIST_LABELS } from '../../constants/labels';
 
 interface SupplierOption {
   id: string
@@ -44,7 +45,7 @@ export function EditableRequestItemList({
 
   const supplierOptions = suppliers.map(s => ({
     value: s.id,
-    label: s.name || '未命名',
+    label: s.name || REQUEST_DETAIL_DIALOG_LABELS.未命名,
   }))
 
   // 無 focus 樣式的 input class（使用 globals.css 的 input-no-focus）
@@ -112,7 +113,7 @@ export function EditableRequestItemList({
                     supplierName: supplier?.name || '',
                   })
                 }}
-                placeholder="選擇供應商..."
+                placeholder={REQUEST_ITEM_LIST_LABELS.選擇供應商}
                 className="input-no-focus [&_input]:h-9 [&_input]:px-1 [&_input]:bg-transparent"
               />
             </div>
@@ -166,7 +167,7 @@ export function EditableRequestItemList({
                   size="icon"
                   onClick={addNewEmptyItem}
                   className="h-8 w-8 text-morandi-gold hover:bg-morandi-gold/10"
-                  title="新增項目"
+                  title={REQUEST_ITEM_LIST_LABELS.新增項目}
                 >
                   <Plus size={16} />
                 </Button>
@@ -176,7 +177,7 @@ export function EditableRequestItemList({
                   size="icon"
                   onClick={() => removeItem(item.id)}
                   className="h-8 w-8 text-morandi-secondary hover:text-morandi-red hover:bg-morandi-red/10"
-                  title="刪除項目"
+                  title={REQUEST_DETAIL_DIALOG_LABELS.刪除項目}
                 >
                   <Trash2 size={16} />
                 </Button>

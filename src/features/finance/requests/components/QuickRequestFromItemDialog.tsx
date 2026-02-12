@@ -18,6 +18,7 @@ import { PaymentItemCategory } from '@/stores/types'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import { cn } from '@/lib/utils'
+import { ADD_REQUEST_DIALOG_LABELS, QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS } from '../../constants/labels';
 
 // 類別對應的圖標和顏色
 const CATEGORY_CONFIG: Record<string, { icon: string; color: string }> = {
@@ -34,7 +35,7 @@ const CATEGORY_CONFIG: Record<string, { icon: string; color: string }> = {
 }
 
 function getCategoryConfig(category: string) {
-  return CATEGORY_CONFIG[category] || CATEGORY_CONFIG['其他']
+  return CATEGORY_CONFIG[category] || CATEGORY_CONFIG[ADD_REQUEST_DIALOG_LABELS.其他]
 }
 
 interface QuickRequestFromItemDialogProps {
@@ -85,7 +86,7 @@ export function QuickRequestFromItemDialog({
   const handleSubmit = async () => {
     const numAmount = parseFloat(amount.replace(/,/g, ''))
     if (!numAmount || numAmount <= 0) {
-      toast.error('請輸入有效的金額')
+      toast.error(QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS.請輸入有效的金額)
       return
     }
 
@@ -119,12 +120,12 @@ export function QuickRequestFromItemDialog({
         user?.display_name || user?.chinese_name || ''
       )
 
-      toast.success('請款單建立成功')
+      toast.success(QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS.請款單建立成功)
       onOpenChange(false)
       onSuccess?.()
     } catch (error) {
       logger.error('建立請款單失敗:', error)
-      toast.error('建立請款單失敗')
+      toast.error(QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS.建立請款單失敗)
     } finally {
       setIsSubmitting(false)
     }
@@ -221,7 +222,7 @@ export function QuickRequestFromItemDialog({
             <Input
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="輸入備註（可選）"
+              placeholder={ADD_REQUEST_DIALOG_LABELS.輸入備註_可選}
               className="mt-1"
             />
           </div>
@@ -243,7 +244,7 @@ export function QuickRequestFromItemDialog({
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
             <Check size={16} />
-            {isSubmitting ? '建立中...' : '確認請款'}
+            {isSubmitting ? '建立中...' : QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS.確認請款}
           </Button>
         </DialogFooter>
       </DialogContent>

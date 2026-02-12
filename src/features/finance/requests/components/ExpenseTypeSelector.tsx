@@ -5,6 +5,7 @@ import {
   CompanyExpenseType,
   EXPENSE_TYPE_CONFIG,
 } from '@/stores/types/finance.types'
+import { EXPENSE_TYPE_SELECTOR_LABELS } from '../../constants/labels';
 
 interface ExpenseTypeSelectorProps {
   value: CompanyExpenseType | ''
@@ -36,7 +37,7 @@ export function ExpenseTypeSelector({
         options={expenseTypeOptions}
         value={value}
         onChange={v => onChange(v as CompanyExpenseType | '')}
-        placeholder="選擇費用類型..."
+        placeholder={EXPENSE_TYPE_SELECTOR_LABELS.選擇費用類型}
         disabled={disabled}
         className="mt-1"
       />

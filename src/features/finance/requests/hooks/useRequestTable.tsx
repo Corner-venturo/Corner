@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { statusLabels, statusColors } from '../types' // Assuming statusLabels and statusColors are now correctly typed
+import { REQUEST_DATE_INPUT_LABELS, REQUEST_DETAIL_DIALOG_LABELS, USE_REQUEST_TABLE_LABELS } from '../../constants/labels';
 
 export function useRequestTable(payment_requests: PaymentRequest[]) {
   // Table columns configuration
@@ -12,7 +13,7 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
     () => [
       {
         key: 'code',
-        label: '請款單號',
+        label: REQUEST_DETAIL_DIALOG_LABELS.請款單號,
         sortable: true,
         render: (value: unknown, row: PaymentRequest) => {
           // 優先顯示 code，fallback 到 request_number
@@ -26,7 +27,7 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
       },
       {
         key: 'tour_name',
-        label: '團名',
+        label: REQUEST_DETAIL_DIALOG_LABELS.團名,
         sortable: true,
         render: (value: unknown, row: PaymentRequest) => {
           // 顯示團名，fallback 到團號
@@ -40,7 +41,7 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
       },
       {
         key: 'order_number',
-        label: '訂單編號',
+        label: REQUEST_DETAIL_DIALOG_LABELS.訂單編號,
         sortable: true,
         render: (value: unknown, row: PaymentRequest) => {
           const displayValue = value as string
@@ -53,7 +54,7 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
       },
       {
         key: 'request_date',
-        label: '請款日期',
+        label: REQUEST_DATE_INPUT_LABELS.請款日期,
         sortable: true,
         render: (value: unknown, row: PaymentRequest) => (
           <div className="text-sm">
@@ -70,7 +71,7 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
       },
       {
         key: 'amount',
-        label: '金額',
+        label: USE_REQUEST_TABLE_LABELS.金額,
         sortable: true,
         render: (value: unknown) => (
           <CurrencyCell amount={value as number} className="font-semibold text-morandi-gold" />
@@ -78,7 +79,7 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
       },
       {
         key: 'status',
-        label: '狀態',
+        label: USE_REQUEST_TABLE_LABELS.狀態,
         sortable: true,
         render: (value: unknown) => {
           const statusBadge = getStatusBadge(value as PaymentRequest['status'])

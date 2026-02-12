@@ -13,6 +13,7 @@ import { useTravelInvoiceStore } from '@/stores/travel-invoice-store'
 import { useAuthStore } from '@/stores'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { BATCH_INVOICE_DIALOG_LABELS } from '../../constants/labels';
 
 interface BatchInvoiceDialogProps {
   open: boolean
@@ -54,12 +55,12 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
 
   const handleBatchIssue = async () => {
     if (!buyerName) {
-      toast.error('請輸入買受人名稱')
+      toast.error(BATCH_INVOICE_DIALOG_LABELS.請輸入買受人名稱)
       return
     }
 
     if (selectedOrderIds.length === 0) {
-      toast.error('請選擇至少一筆訂單')
+      toast.error(BATCH_INVOICE_DIALOG_LABELS.請選擇至少一筆訂單)
       return
     }
 
@@ -88,7 +89,7 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
       setBuyerUBN('')
       setBuyerEmail('')
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : '批次開立失敗')
+      toast.error(error instanceof Error ? error.message : BATCH_INVOICE_DIALOG_LABELS.批次開立失敗)
     }
   }
 
@@ -112,7 +113,7 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
                   options={tours}
                   value={selectedTourId}
                   onChange={setSelectedTourId}
-                  placeholder="選擇團別..."
+                  placeholder={BATCH_INVOICE_DIALOG_LABELS.選擇團別}
                 />
               </div>
             </div>
@@ -212,7 +213,7 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
                     <Input
                       value={buyerName}
                       onChange={e => setBuyerName(e.target.value)}
-                      placeholder="買受人名稱"
+                      placeholder={BATCH_INVOICE_DIALOG_LABELS.買受人名稱}
                       className="h-8"
                     />
                   </div>
@@ -221,7 +222,7 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
                     <Input
                       value={buyerUBN}
                       onChange={e => setBuyerUBN(e.target.value)}
-                      placeholder="8 碼數字"
+                      placeholder={BATCH_INVOICE_DIALOG_LABELS.n_8_碼數字}
                       maxLength={8}
                       className="h-8"
                     />
@@ -234,7 +235,7 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
                       type="email"
                       value={buyerEmail}
                       onChange={e => setBuyerEmail(e.target.value)}
-                      placeholder="發票通知信箱"
+                      placeholder={BATCH_INVOICE_DIALOG_LABELS.發票通知信箱}
                       className="h-8"
                     />
                   </div>
