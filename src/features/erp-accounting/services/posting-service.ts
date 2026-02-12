@@ -704,6 +704,10 @@ export async function reverseVoucher(
     return { success: false, error: '找不到原傳票' }
   }
 
+  if (originalVoucher.status === 'reversed') {
+    return { success: false, error: '此傳票已經沖銷過' }
+  }
+
   if (originalVoucher.status !== 'posted') {
     return { success: false, error: '只有已過帳的傳票可以反沖' }
   }
