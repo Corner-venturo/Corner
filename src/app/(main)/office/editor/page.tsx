@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useState, useEffect, useCallback, Suspense } from 'react'
+import useSWR from 'swr'
 import { logger } from '@/lib/utils/logger'
 import { useAuthStore } from '@/stores/auth-store'
 import { cn } from '@/lib/utils'
@@ -154,28 +155,26 @@ function EditorContent() {
     saveAsDocument,
   } = useOfficeDocument()
 
-  const [documentData, setDocumentData] = useState<IWorkbookData | null>(null)
+  const { data: fetchedDoc, isLoading: isDocLoading } = useSWR(
+    docId ? `office-doc-${docId}` : null,
+    () => fetchDocument(docId!)
+  )
+
+  const documentData = (fetchedDoc?.data as unknown as IWorkbookData) ?? null
   const [currentDocId, setCurrentDocId] = useState<string | null>(docId)
   const [currentDocName, setCurrentDocName] = useState(docName)
-  const [isLoading, setIsLoading] = useState(!!docId)
+  const isLoading = !!docId && isDocLoading
   const [saveAsDialogOpen, setSaveAsDialogOpen] = useState(false)
   const [pendingSaveAsData, setPendingSaveAsData] = useState<IWorkbookData | null>(null)
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle')
 
-  // 載入現有文件
+  // 從 SWR 資料同步 docId 和 docName
   useEffect(() => {
-    if (docId) {
-      setIsLoading(true)
-      fetchDocument(docId).then((doc) => {
-        if (doc) {
-          setDocumentData(doc.data as unknown as IWorkbookData)
-          setCurrentDocName(doc.name)
-          setCurrentDocId(doc.id)
-        }
-        setIsLoading(false)
-      })
+    if (fetchedDoc) {
+      setCurrentDocName(fetchedDoc.name)
+      setCurrentDocId(fetchedDoc.id)
     }
-  }, [docId, fetchDocument])
+  }, [fetchedDoc])
 
   // 儲存（自動儲存用，不顯示 alert）
   const handleSave = useCallback(async (data: IWorkbookData): Promise<void> => {

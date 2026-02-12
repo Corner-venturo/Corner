@@ -271,6 +271,30 @@ export function useTourDetailsPaginated(tourId: string | null) {
   const updateStatus = async (newStatus: Tour['status']) => {
     if (!tourId) return null
 
+    // 狀態轉換驗證
+    const VALID_TOUR_TRANSITIONS: Record<string, string[]> = {
+      'draft': ['published', 'cancelled'],
+      'proposed': ['draft', 'cancelled'],
+      '提案': ['draft', 'cancelled'],
+      'published': ['departed', 'cancelled', 'draft'],
+      'departed': ['completed'],
+      'completed': ['archived'],
+      'cancelled': ['draft'],
+      'archived': [],
+    }
+
+    const { data: current, error: fetchError } = await supabase
+      .from('tours')
+      .select('status')
+      .eq('id', tourId)
+      .single()
+
+    if (fetchError || !current) throw new Error('無法取得目前狀態')
+
+    if (!VALID_TOUR_TRANSITIONS[current.status]?.includes(newStatus)) {
+      throw new Error(`無法從「${current.status}」轉為「${newStatus}」`)
+    }
+
     const { data, error: updateError } = await supabase
       .from('tours')
       .update({ status: newStatus, updated_at: new Date().toISOString() })

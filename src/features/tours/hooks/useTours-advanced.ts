@@ -141,6 +141,17 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
 
   // 刪除
   const deleteTour = async (id: string): Promise<boolean> => {
+    // 檢查是否有已付款訂單
+    const { data: paidOrders } = await supabase
+      .from('orders')
+      .select('id, payment_status')
+      .eq('tour_id', id)
+      .neq('payment_status', 'unpaid')
+
+    if (paidOrders && paidOrders.length > 0) {
+      throw new Error(`此團有 ${paidOrders.length} 筆已付款訂單，無法刪除`)
+    }
+
     // 樂觀更新：使用 functional update 避免 stale closure 問題
     mutate(
       TOURS_KEY,
@@ -213,6 +224,30 @@ export function useTourDetails(tour_id: string) {
 
   const updateTourStatus = async (newStatus: Tour['status']) => {
     if (!tour_id) return null
+
+    // 狀態轉換驗證
+    const VALID_TOUR_TRANSITIONS: Record<string, string[]> = {
+      'draft': ['published', 'cancelled'],
+      'proposed': ['draft', 'cancelled'],
+      '提案': ['draft', 'cancelled'],
+      'published': ['departed', 'cancelled', 'draft'],
+      'departed': ['completed'],
+      'completed': ['archived'],
+      'cancelled': ['draft'],
+      'archived': [],
+    }
+
+    const { data: current, error: fetchError } = await supabase
+      .from('tours')
+      .select('status')
+      .eq('id', tour_id)
+      .single()
+
+    if (fetchError || !current) throw new Error('無法取得目前狀態')
+
+    if (!VALID_TOUR_TRANSITIONS[current.status]?.includes(newStatus)) {
+      throw new Error(`無法從「${current.status}」轉為「${newStatus}」`)
+    }
 
     const now = new Date().toISOString()
     const { data, error } = await supabase

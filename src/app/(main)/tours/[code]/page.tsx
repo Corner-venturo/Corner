@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import useSWR from 'swr'
 import { useParams, useRouter } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
@@ -11,6 +12,17 @@ import { useTourDetails } from '@/features/tours/hooks/useTours-advanced'
 import { useWorkspaceChannels } from '@/stores/workspace-store'
 import { TOUR_TABS, TourTabContent } from '@/components/tours/TourTabs'
 
+const fetchTourIdByCode = async (code: string): Promise<string | null> => {
+  const { data, error } = await supabase
+    .from('tours')
+    .select('id')
+    .eq('code', code)
+    .single()
+
+  if (error || !data) return null
+  return data.id
+}
+
 export default function TourDetailPage() {
   const params = useParams()
   const router = useRouter()
@@ -19,34 +31,13 @@ export default function TourDetailPage() {
 
   const { channels, currentWorkspace } = useWorkspaceChannels()
 
-  // 狀態
-  const [tourId, setTourId] = useState<string | null>(null)
-  const [loadingTourId, setLoadingTourId] = useState(true)
+  // 用 SWR 查詢 tour_id
+  const { data: tourId, isLoading: loadingTourId } = useSWR(
+    code ? `tour-id-${code}` : null,
+    () => fetchTourIdByCode(code)
+  )
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'members')
   const [forceShowPnr, setForceShowPnr] = useState(false)
-
-  // 用 code 查詢 tour_id
-  useEffect(() => {
-    async function fetchTourId() {
-      setLoadingTourId(true)
-      const { data, error } = await supabase
-        .from('tours')
-        .select('id')
-        .eq('code', code)
-        .single()
-
-      if (error || !data) {
-        setTourId(null)
-      } else {
-        setTourId(data.id)
-      }
-      setLoadingTourId(false)
-    }
-
-    if (code) {
-      fetchTourId()
-    }
-  }, [code])
 
   // 載入團詳情
   const { tour, loading, actions } = useTourDetails(tourId || '')

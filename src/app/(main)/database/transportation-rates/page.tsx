@@ -1,7 +1,7 @@
 'use client'
 
-import { logger } from '@/lib/utils/logger'
-import { useState, useEffect } from 'react'
+import { useState, useCallback } from 'react'
+import useSWR from 'swr'
 import { Bus, Plus } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -14,40 +14,32 @@ import { TransportationRate } from '@/types/transportation-rates.types'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
 
+const fetchRates = async (): Promise<TransportationRate[]> => {
+  const { data, error } = await supabase
+    .from('transportation_rates')
+    .select('*')
+    .order('category')
+    .order('supplier')
+    .order('route')
+
+  if (error) {
+    toast.error('載入車資資料失敗')
+    throw error
+  }
+
+  return data ?? []
+}
+
 export default function TransportationRatesPage() {
   const { user } = useAuthStore()
-  const [rates, setRates] = useState<TransportationRate[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data: rates = [], isLoading: loading, mutate } = useSWR('transportation_rates', fetchRates)
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false)
   const [isAddingNewCountry, setIsAddingNewCountry] = useState(false)
   const [newCountryName, setNewCountryName] = useState('')
 
-  // 載入車資資料
-  const fetchRates = async () => {
-    setLoading(true)
-    const { data, error } = await supabase
-      .from('transportation_rates')
-      .select('*')
-      .order('category')
-      .order('supplier')
-      .order('route')
-
-    if (error) {
-      logger.error('Error fetching rates:', error)
-      toast.error('載入車資資料失敗')
-      setLoading(false)
-      return
-    }
-
-    if (data) setRates(data)
-    setLoading(false)
-  }
-
-  useEffect(() => {
-    fetchRates()
-  }, [])
+  const handleRefresh = useCallback(() => { void mutate() }, [mutate])
 
   // 打開國家詳細表格
   const handleOpenCountry = (countryName: string, editMode: boolean) => {
@@ -150,7 +142,7 @@ export default function TransportationRatesPage() {
           onClose={() => setIsDialogOpen(false)}
           countryName={selectedCountry}
           rates={rates.filter(rate => rate.country_name === selectedCountry)}
-          onUpdate={fetchRates}
+          onUpdate={handleRefresh}
           isEditMode={isEditMode}
         />
       )}
