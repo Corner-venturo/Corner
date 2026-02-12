@@ -18,6 +18,7 @@ import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
 import { generateUUID } from '@/lib/utils/uuid'
 import type { Database } from '@/lib/supabase/types'
 import { logger } from '@/lib/utils/logger'
+import { deleteTour as deleteTourEntity } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { formatDate } from '@/lib/utils/format-date'
 
@@ -181,9 +182,7 @@ export function useToursPaginated(params: UseToursPaginatedParams): UseToursPagi
   // Delete tour
   const deleteTour = async (id: string): Promise<boolean> => {
     try {
-      const { error: deleteError } = await supabase.from('tours').delete().eq('id', id)
-      if (deleteError) throw deleteError
-
+      await deleteTourEntity(id)
       await invalidateAllPaginatedQueries()
       return true
     } catch (err) {

@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button'
 import { logger } from '@/lib/utils/logger'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores'
-import { useTours, useItineraries, useQuotes, createItinerary, updateItinerary, useCountries, useCities } from '@/data'
+import { useTours, useItineraries, useQuotes, createItinerary, updateItinerary, useCountries, useCities, createTourLeader } from '@/data'
 import { syncHotelsFromItineraryToQuote } from '@/features/quotes/services/quoteItinerarySync'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { formatDateTW, formatDateCompactPadded } from '@/lib/utils/format-date'
@@ -308,14 +308,14 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
             )
 
             if (shouldSave) {
-              await supabase.from('tour_leaders').insert({
+              await createTourLeader({
                 name: leader.name.trim(),
                 english_name: leader.englishName || null,
                 photo: leader.photo || null,
                 domestic_phone: leader.domesticPhone || null,
                 overseas_phone: leader.overseasPhone || null,
                 status: 'active',
-              })
+              } as Parameters<typeof createTourLeader>[0])
             }
           }
         }

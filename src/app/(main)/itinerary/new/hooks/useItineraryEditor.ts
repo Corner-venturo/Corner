@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuthStore } from '@/stores'
-import { createItinerary, updateItinerary } from '@/data'
+import { createItinerary, updateItinerary, createTourLeader } from '@/data'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import { syncHotelsFromItineraryToQuote } from '@/features/quotes/services/quoteItinerarySync'
@@ -180,14 +180,14 @@ export function useItineraryEditor() {
             )
 
             if (shouldSave) {
-              await supabase.from('tour_leaders').insert({
+              await createTourLeader({
                 name: leader.name.trim(),
                 english_name: leader.englishName || null,
                 photo: leader.photo || null,
                 domestic_phone: leader.domesticPhone || null,
                 overseas_phone: leader.overseasPhone || null,
                 status: 'active',
-              })
+              } as Parameters<typeof createTourLeader>[0])
               logger.log('[ItineraryEditor] 領隊已新增到資料庫:', leader.name)
             }
           }

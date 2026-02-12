@@ -19,6 +19,7 @@ import { alert, confirm } from '@/lib/ui/alert-dialog'
 import { toast } from 'sonner'
 import type { OrderMember } from '../order-member.types'
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
+import { deleteMember } from '@/data'
 
 // 快取已同步的顧客 ID，避免重複同步
 const syncedCustomerIds = new Set<string>()
@@ -329,9 +330,7 @@ export function useOrderMembersData({
     if (!confirmed) return
 
     try {
-      const { error } = await supabase.from('order_members').delete().eq('id', memberId)
-
-      if (error) throw error
+      await deleteMember(memberId)
       setMembers(members.filter(m => m.id !== memberId))
     } catch (error) {
       logger.error('刪除成員失敗:', error)

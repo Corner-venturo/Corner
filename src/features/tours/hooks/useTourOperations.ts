@@ -8,7 +8,7 @@ import { logger } from '@/lib/utils/logger'
 import { NewTourData } from '../types'
 import { OrderFormData } from '@/components/orders/add-order-form'
 import type { CreateInput, UpdateInput } from '@/stores/core/types'
-import { useCountries, useCities, updateCountry, updateCity } from '@/data'
+import { useCountries, useCities, updateCountry, updateCity, updateQuote } from '@/data'
 import { supabase } from '@/lib/supabase/client'
 
 interface TourActions {
@@ -202,12 +202,10 @@ export function useTourOperations(params: UseTourOperationsParams) {
         // If created from quote, update quote's tourId
         if (fromQuoteId) {
           // 🔧 優化：直接用 supabase update
-          const { error: quoteError } = await supabase
-            .from('quotes')
-            .update({ tour_id: createdTour.id, updated_at: new Date().toISOString() })
-            .eq('id', fromQuoteId)
-          if (quoteError) {
-            logger.warn('更新報價單失敗:', quoteError.message)
+          try {
+            await updateQuote(fromQuoteId, { tour_id: createdTour.id } as Parameters<typeof updateQuote>[1])
+          } catch (quoteError) {
+            logger.warn('更新報價單失敗:', quoteError instanceof Error ? quoteError.message : quoteError)
           }
           onQuoteLinked?.(fromQuoteId, createdTour.id)
         }

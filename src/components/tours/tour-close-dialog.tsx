@@ -16,6 +16,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { toast } from 'sonner'
 import { Plus, X, Check } from 'lucide-react'
 import { confirm } from '@/lib/ui/alert-dialog'
+import { updateTour } from '@/data'
 import { CurrencyCell } from '@/components/table-cells'
 
 interface Employee {
@@ -275,15 +276,10 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
       }
 
       // 4. 更新團體狀態為已結團
-      const { error: updateError } = await supabase
-        .from('tours')
-        .update({
-          status: '結案',
-          closing_date: getTodayString()
-        })
-        .eq('id', tour.id)
-
-      if (updateError) throw updateError
+      await updateTour(tour.id, {
+        status: '結案',
+        closing_date: getTodayString(),
+      } as Parameters<typeof updateTour>[1])
 
       toast.success('結團成功！')
       onSuccess()

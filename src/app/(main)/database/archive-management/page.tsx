@@ -11,6 +11,7 @@ import { confirm } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'
 import { formatDate } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
+import { deleteTour as deleteTourEntity } from '@/data'
 
 interface ArchivedTour {
   id: string
@@ -180,12 +181,7 @@ export default function ArchiveManagementPage() {
       // 先刪除空訂單（沒有團員的）
       await supabase.from('orders').delete().eq('tour_id', tour.id)
 
-      const { error } = await supabase
-        .from('tours')
-        .delete()
-        .eq('id', tour.id)
-
-      if (error) throw error
+      await deleteTourEntity(tour.id)
       toast.success(`已永久刪除旅遊團 ${tour.code}`)
       loadArchivedData()
     } catch (error) {
