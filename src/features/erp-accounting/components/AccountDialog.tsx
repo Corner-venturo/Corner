@@ -22,6 +22,7 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { X, Save } from 'lucide-react'
 import type { Account, AccountType, AccountFormData } from '@/types/accounting.types'
+import { ACCOUNT_DIALOG_LABELS as L, ACCOUNTS_PAGE_LABELS } from '../constants/labels'
 
 interface AccountDialogProps {
   open: boolean
@@ -31,11 +32,11 @@ interface AccountDialogProps {
 }
 
 const accountTypes: { value: AccountType; label: string }[] = [
-  { value: 'asset', label: '資產' },
-  { value: 'liability', label: '負債' },
-  { value: 'revenue', label: '收入' },
-  { value: 'expense', label: '費用' },
-  { value: 'cost', label: '成本' },
+  { value: 'asset', label: ACCOUNTS_PAGE_LABELS.type_asset },
+  { value: 'liability', label: ACCOUNTS_PAGE_LABELS.type_liability },
+  { value: 'revenue', label: ACCOUNTS_PAGE_LABELS.type_revenue },
+  { value: 'expense', label: ACCOUNTS_PAGE_LABELS.type_expense },
+  { value: 'cost', label: ACCOUNTS_PAGE_LABELS.type_cost },
 ]
 
 export function AccountDialog({
@@ -91,21 +92,21 @@ export function AccountDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent level={1}>
         <DialogHeader>
-          <DialogTitle>{account ? '編輯科目' : '新增科目'}</DialogTitle>
+          <DialogTitle>{account ? L.title_edit : L.title_add}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>科目代碼 *</Label>
+              <Label>{L.label_code} *</Label>
               <Input
                 value={formData.code}
                 onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                placeholder="如：1100"
+                placeholder={L.placeholder_code}
               />
             </div>
             <div className="space-y-2">
-              <Label>科目類型 *</Label>
+              <Label>{L.label_type} *</Label>
               <Select
                 value={formData.account_type}
                 onValueChange={(value: AccountType) => setFormData({ ...formData, account_type: value })}
@@ -125,26 +126,26 @@ export function AccountDialog({
           </div>
 
           <div className="space-y-2">
-            <Label>科目名稱 *</Label>
+            <Label>{L.label_name} *</Label>
             <Input
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="如：銀行存款"
+              placeholder={L.placeholder_name}
             />
           </div>
 
           <div className="space-y-2">
-            <Label>說明</Label>
+            <Label>{L.label_description}</Label>
             <Textarea
               value={formData.description || ''}
               onChange={(e) => setFormData({ ...formData, description: e.target.value || null })}
-              placeholder="科目說明..."
+              placeholder={L.placeholder_description}
               rows={2}
             />
           </div>
 
           <div className="flex items-center justify-between">
-            <Label>啟用狀態</Label>
+            <Label>{L.label_active}</Label>
             <Switch
               checked={formData.is_active}
               onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
@@ -155,7 +156,7 @@ export function AccountDialog({
         <DialogFooter>
           <Button variant="outline" className="gap-1" onClick={() => onOpenChange(false)}>
             <X size={16} />
-            取消
+            {L.btn_cancel}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -163,7 +164,7 @@ export function AccountDialog({
             className="gap-1"
           >
             <Save size={16} />
-            {isSubmitting ? '儲存中...' : '儲存'}
+            {isSubmitting ? L.btn_saving : L.btn_save}
           </Button>
         </DialogFooter>
       </DialogContent>

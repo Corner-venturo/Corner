@@ -22,6 +22,7 @@ import {
 import { useAccounts } from '../hooks'
 import { X, Save } from 'lucide-react'
 import type { BankAccount } from '@/types/accounting.types'
+import { BANK_ACCOUNT_DIALOG_LABELS as L } from '../constants/labels'
 
 interface BankAccountDialogProps {
   open: boolean
@@ -100,49 +101,49 @@ export function BankAccountDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent level={1}>
         <DialogHeader>
-          <DialogTitle>{account ? '編輯銀行帳戶' : '新增銀行帳戶'}</DialogTitle>
+          <DialogTitle>{account ? L.title_edit : L.title_add}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>帳戶名稱 *</Label>
+            <Label>{L.label_name} *</Label>
             <Input
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="如：合庫西門分行"
+              placeholder={L.placeholder_name}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>銀行名稱</Label>
+              <Label>{L.label_bank}</Label>
               <Input
                 value={formData.bank_name}
                 onChange={(e) => setFormData({ ...formData, bank_name: e.target.value })}
-                placeholder="如：合作金庫"
+                placeholder={L.placeholder_bank}
               />
             </div>
             <div className="space-y-2">
-              <Label>銀行帳號</Label>
+              <Label>{L.label_account_number}</Label>
               <Input
                 value={formData.account_number}
                 onChange={(e) => setFormData({ ...formData, account_number: e.target.value })}
-                placeholder="如：0026800123456"
+                placeholder={L.placeholder_account_number}
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label>對應會計科目</Label>
+            <Label>{L.label_linked_account}</Label>
             <Select
               value={formData.account_id || '__none__'}
               onValueChange={(value) => setFormData({ ...formData, account_id: value === '__none__' ? null : value })}
             >
               <SelectTrigger>
-                <SelectValue placeholder="選擇科目" />
+                <SelectValue placeholder={L.placeholder_linked_account} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="__none__">不指定</SelectItem>
+                <SelectItem value="__none__">{L.linked_account_none}</SelectItem>
                 {bankAccountOptions.map((acc) => (
                   <SelectItem key={acc.id} value={acc.id}>
                     {acc.code} {acc.name}
@@ -151,12 +152,12 @@ export function BankAccountDialog({
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              選擇此銀行帳戶對應的會計科目，用於自動過帳
+              {L.linked_account_hint}
             </p>
           </div>
 
           <div className="flex items-center justify-between">
-            <Label>啟用狀態</Label>
+            <Label>{L.label_active}</Label>
             <Switch
               checked={formData.is_active}
               onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
@@ -167,7 +168,7 @@ export function BankAccountDialog({
         <DialogFooter>
           <Button variant="outline" className="gap-1" onClick={() => onOpenChange(false)}>
             <X size={16} />
-            取消
+            {L.btn_cancel}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -175,7 +176,7 @@ export function BankAccountDialog({
             className="gap-1"
           >
             <Save size={16} />
-            {isSubmitting ? '儲存中...' : '儲存'}
+            {isSubmitting ? L.btn_saving : L.btn_save}
           </Button>
         </DialogFooter>
       </DialogContent>

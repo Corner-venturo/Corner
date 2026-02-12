@@ -12,14 +12,15 @@ import { AccountDialog } from './AccountDialog'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { toast } from 'sonner'
 import type { Account, AccountType } from '@/types/accounting.types'
+import { ACCOUNTS_PAGE_LABELS as L, ACCOUNT_DIALOG_LABELS } from '../constants/labels'
 
 const typeConfig: Record<AccountType, { label: string; color: string }> = {
-  asset: { label: '資產', color: 'bg-status-info-bg text-status-info' },
-  liability: { label: '負債', color: 'bg-status-danger-bg text-status-danger' },
-  equity: { label: '權益', color: 'bg-teal-50 text-teal-600' },
-  revenue: { label: '收入', color: 'bg-status-success-bg text-status-success' },
-  expense: { label: '費用', color: 'bg-status-warning-bg text-status-warning' },
-  cost: { label: '成本', color: 'bg-purple-50 text-purple-600' },
+  asset: { label: L.type_asset, color: 'bg-status-info-bg text-status-info' },
+  liability: { label: L.type_liability, color: 'bg-status-danger-bg text-status-danger' },
+  equity: { label: L.type_equity, color: 'bg-teal-50 text-teal-600' },
+  revenue: { label: L.type_revenue, color: 'bg-status-success-bg text-status-success' },
+  expense: { label: L.type_expense, color: 'bg-status-warning-bg text-status-warning' },
+  cost: { label: L.type_cost, color: 'bg-purple-50 text-purple-600' },
 }
 
 export function AccountsPage() {
@@ -44,7 +45,7 @@ export function AccountsPage() {
 
   const handleEdit = (account: Account) => {
     if (account.is_system_locked) {
-      toast.error('系統科目不可編輯')
+      toast.error(L.error_system_locked)
       return
     }
     setEditingAccount(account)
@@ -53,25 +54,25 @@ export function AccountsPage() {
 
   const handleDelete = async (account: Account) => {
     if (account.is_system_locked) {
-      toast.error('系統科目不可刪除')
+      toast.error(L.error_system_locked)
       return
     }
 
     const confirmed = await confirm(
       `確定要刪除科目「${account.code} ${account.name}」嗎？`,
       {
-        title: '刪除科目',
-        confirmText: '刪除',
-        cancelText: '取消',
+        title: L.confirm_delete_title,
+        confirmText: L.action_delete,
+        cancelText: ACCOUNT_DIALOG_LABELS.btn_cancel,
       }
     )
 
     if (confirmed) {
       try {
         await deleteAccount(account.id)
-        toast.success('科目已刪除')
+        toast.success(L.toast_deleted)
       } catch {
-        toast.error('刪除失敗')
+        toast.error(L.toast_delete_failed)
       }
     }
   }
@@ -80,21 +81,21 @@ export function AccountsPage() {
     try {
       if (editingAccount) {
         await update(editingAccount.id, data)
-        toast.success('科目已更新')
+        toast.success(ACCOUNT_DIALOG_LABELS.toast_updated)
       } else {
         await create(data as Omit<Account, 'id' | 'created_at' | 'updated_at'>)
-        toast.success('科目已新增')
+        toast.success(ACCOUNT_DIALOG_LABELS.toast_created)
       }
       setShowDialog(false)
     } catch {
-      toast.error('儲存失敗')
+      toast.error(ACCOUNT_DIALOG_LABELS.toast_save_failed)
     }
   }
 
   const columns: Column<Account>[] = [
     {
       key: 'code',
-      label: '科目代碼',
+      label: L.col_code,
       width: '120px',
       render: (value: unknown) => (
         <span className="font-mono">{String(value)}</span>
@@ -102,11 +103,11 @@ export function AccountsPage() {
     },
     {
       key: 'name',
-      label: '科目名稱',
+      label: L.col_name,
     },
     {
       key: 'account_type',
-      label: '類型',
+      label: L.col_type,
       width: '100px',
       render: (value: unknown) => {
         const config = typeConfig[value as AccountType]
@@ -119,23 +120,23 @@ export function AccountsPage() {
     },
     {
       key: 'is_system_locked',
-      label: '系統科目',
+      label: L.col_system,
       width: '100px',
-      render: (value: unknown) => value ? <Badge variant="secondary">系統</Badge> : null,
+      render: (value: unknown) => value ? <Badge variant="secondary">{L.system_yes}</Badge> : null,
     },
     {
       key: 'is_active',
-      label: '狀態',
+      label: L.col_status,
       width: '80px',
       render: (value: unknown) => (
         <Badge variant={value ? 'default' : 'outline'}>
-          {value ? '啟用' : '停用'}
+          {value ? L.status_active : L.status_inactive}
         </Badge>
       ),
     },
     {
       key: 'actions',
-      label: '操作',
+      label: L.col_status,
       width: '100px',
       render: (_: unknown, row: Account) => (
         <div className="flex gap-1">
@@ -164,13 +165,13 @@ export function AccountsPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="科目表管理"
+        title={L.page_title}
         icon={BookOpen}
         badge={filteredAccounts.length}
         actions={
           <Button onClick={handleAdd} size="sm">
             <Plus size={16} className="mr-1" />
-            新增科目
+            {L.btn_add}
           </Button>
         }
       />
@@ -179,7 +180,7 @@ export function AccountsPage() {
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="搜尋科目代碼或名稱..."
+            placeholder={L.search_placeholder}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-9"
@@ -192,7 +193,7 @@ export function AccountsPage() {
           columns={columns}
           data={filteredAccounts}
           isLoading={isLoading}
-          emptyMessage="尚無科目資料"
+          emptyMessage={L.empty_message}
         />
       </div>
 

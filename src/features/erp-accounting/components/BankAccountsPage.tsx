@@ -12,6 +12,7 @@ import { BankAccountDialog } from './BankAccountDialog'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { toast } from 'sonner'
 import type { BankAccount } from '@/types/accounting.types'
+import { BANK_ACCOUNTS_PAGE_LABELS as L, BANK_ACCOUNT_DIALOG_LABELS as DL } from '../constants/labels'
 
 export function BankAccountsPage() {
   const { items: bankAccounts, isLoading, create, update, delete: deleteAccount } = useBankAccounts()
@@ -43,18 +44,18 @@ export function BankAccountsPage() {
     const confirmed = await confirm(
       `確定要刪除「${account.name}」嗎？`,
       {
-        title: '刪除銀行帳戶',
-        confirmText: '刪除',
-        cancelText: '取消',
+        title: L.confirm_delete_title,
+        confirmText: L.action_delete,
+        cancelText: DL.btn_cancel,
       }
     )
 
     if (confirmed) {
       try {
         await deleteAccount(account.id)
-        toast.success('銀行帳戶已刪除')
+        toast.success(L.toast_deleted)
       } catch {
-        toast.error('刪除失敗')
+        toast.error(L.toast_delete_failed)
       }
     }
   }
@@ -63,47 +64,47 @@ export function BankAccountsPage() {
     try {
       if (editingAccount) {
         await update(editingAccount.id, data)
-        toast.success('銀行帳戶已更新')
+        toast.success(DL.toast_updated)
       } else {
         await create(data as Omit<BankAccount, 'id' | 'created_at' | 'updated_at'>)
-        toast.success('銀行帳戶已新增')
+        toast.success(DL.toast_created)
       }
       setShowDialog(false)
     } catch {
-      toast.error('儲存失敗')
+      toast.error(DL.toast_save_failed)
     }
   }
 
   const columns: Column<BankAccount>[] = [
     {
       key: 'name',
-      label: '帳戶名稱',
+      label: L.col_name,
     },
     {
       key: 'bank_name',
-      label: '銀行名稱',
+      label: L.col_bank,
       render: (value: unknown) => String(value) || '-',
     },
     {
       key: 'account_number',
-      label: '帳號',
+      label: L.col_account_number,
       render: (value: unknown) => (
         <span className="font-mono text-sm">{String(value) || '-'}</span>
       ),
     },
     {
       key: 'is_active',
-      label: '狀態',
+      label: L.col_status,
       width: '80px',
       render: (value: unknown) => (
         <Badge variant={value ? 'default' : 'outline'}>
-          {value ? '啟用' : '停用'}
+          {value ? L.status_active : L.status_inactive}
         </Badge>
       ),
     },
     {
       key: 'actions',
-      label: '操作',
+      label: '',
       width: '100px',
       render: (_: unknown, row: BankAccount) => (
         <div className="flex gap-1">
@@ -130,13 +131,13 @@ export function BankAccountsPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="銀行帳戶管理"
+        title={L.page_title}
         icon={Building2}
         badge={filteredAccounts.length}
         actions={
           <Button onClick={handleAdd} size="sm">
             <Plus size={16} className="mr-1" />
-            新增帳戶
+            {L.btn_add}
           </Button>
         }
       />
@@ -145,7 +146,7 @@ export function BankAccountsPage() {
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="搜尋帳戶名稱或銀行..."
+            placeholder={L.search_placeholder}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-9"
@@ -158,7 +159,7 @@ export function BankAccountsPage() {
           columns={columns}
           data={filteredAccounts}
           isLoading={isLoading}
-          emptyMessage="尚無銀行帳戶資料"
+          emptyMessage={L.empty_message}
         />
       </div>
 

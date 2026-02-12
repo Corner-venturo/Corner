@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label'
 import { useAuthStore } from '@/stores/auth-store'
 import { toast } from 'sonner'
 import type { JournalVoucher } from '@/types/accounting.types'
+import { REVERSE_VOUCHER_LABELS as L } from '../constants/labels'
 
 interface ReverseVoucherDialogProps {
   open: boolean
@@ -35,7 +36,7 @@ export function ReverseVoucherDialog({
 
   const handleSubmit = async () => {
     if (!reason.trim()) {
-      toast.error('請輸入反沖原因')
+      toast.error(L.error_reason_required)
       return
     }
 
@@ -59,14 +60,14 @@ export function ReverseVoucherDialog({
       const result = await response.json()
 
       if (!result.success) {
-        throw new Error(result.error || '反沖失敗')
+        throw new Error(result.error || L.toast_failed)
       }
 
       toast.success(`反沖成功，新傳票編號：${result.voucherNo}`)
       setReason('')
       onSuccess()
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : '反沖失敗')
+      toast.error(error instanceof Error ? error.message : L.toast_failed)
     } finally {
       setIsSubmitting(false)
     }
@@ -76,7 +77,7 @@ export function ReverseVoucherDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent level={1}>
         <DialogHeader>
-          <DialogTitle>反沖傳票</DialogTitle>
+          <DialogTitle>{L.title}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -87,11 +88,11 @@ export function ReverseVoucherDialog({
           </div>
 
           <div className="space-y-2">
-            <Label>反沖原因 *</Label>
+            <Label>{L.label_reason} *</Label>
             <Textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="請說明反沖原因..."
+              placeholder={L.placeholder_reason}
               rows={3}
             />
           </div>
@@ -104,7 +105,7 @@ export function ReverseVoucherDialog({
         <DialogFooter>
           <Button variant="outline" className="gap-1" onClick={() => onOpenChange(false)}>
             <X size={16} />
-            取消
+            {L.btn_cancel}
           </Button>
           <Button
             variant="destructive"
@@ -113,7 +114,7 @@ export function ReverseVoucherDialog({
             disabled={isSubmitting || !reason.trim()}
           >
             <RotateCcw size={16} />
-            {isSubmitting ? '處理中...' : '確認反沖'}
+            {isSubmitting ? L.btn_processing : L.btn_confirm}
           </Button>
         </DialogFooter>
       </DialogContent>

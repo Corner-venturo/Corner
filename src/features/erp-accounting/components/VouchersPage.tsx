@@ -10,12 +10,13 @@ import { VoucherDetailDialog } from './VoucherDetailDialog'
 import { ReverseVoucherDialog } from './ReverseVoucherDialog'
 import { VoucherFormDialog } from './VoucherFormDialog'
 import type { JournalVoucher, VoucherStatus } from '@/types/accounting.types'
+import { VOUCHERS_PAGE_LABELS as L } from '../constants/labels'
 
 const statusConfig: Record<VoucherStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
-  draft: { label: '草稿', variant: 'secondary' },
-  posted: { label: '已過帳', variant: 'default' },
-  reversed: { label: '已反沖', variant: 'destructive' },
-  locked: { label: '已鎖定', variant: 'outline' },
+  draft: { label: L.status_draft, variant: 'secondary' },
+  posted: { label: L.status_posted, variant: 'default' },
+  reversed: { label: L.status_reversed, variant: 'destructive' },
+  locked: { label: L.status_locked, variant: 'outline' },
 }
 
 export function VouchersPage() {
@@ -49,7 +50,7 @@ export function VouchersPage() {
   const columns: Column<JournalVoucher>[] = [
     {
       key: 'voucher_no',
-      label: '傳票編號',
+      label: L.col_voucher_no,
       width: '140px',
       render: (value: unknown) => (
         <span className="font-mono text-sm">{String(value)}</span>
@@ -57,12 +58,12 @@ export function VouchersPage() {
     },
     {
       key: 'voucher_date',
-      label: '日期',
+      label: L.col_date,
       width: '100px',
     },
     {
       key: 'memo',
-      label: '摘要',
+      label: L.col_description,
       render: (value: unknown) => (
         <span className="text-sm text-muted-foreground line-clamp-1">
           {String(value) || '-'}
@@ -71,7 +72,7 @@ export function VouchersPage() {
     },
     {
       key: 'total_debit',
-      label: '借方',
+      label: L.col_debit,
       width: '120px',
       align: 'right',
       render: (value: unknown) => (
@@ -82,7 +83,7 @@ export function VouchersPage() {
     },
     {
       key: 'total_credit',
-      label: '貸方',
+      label: L.col_credit,
       width: '120px',
       align: 'right',
       render: (value: unknown) => (
@@ -93,7 +94,7 @@ export function VouchersPage() {
     },
     {
       key: 'status',
-      label: '狀態',
+      label: L.col_status,
       width: '100px',
       render: (value: unknown) => {
         const config = statusConfig[value as VoucherStatus]
@@ -102,7 +103,7 @@ export function VouchersPage() {
     },
     {
       key: 'actions',
-      label: '操作',
+      label: L.col_actions,
       width: '140px',
       render: (_: unknown, row: JournalVoucher) => (
         <div className="flex gap-1">
@@ -110,7 +111,7 @@ export function VouchersPage() {
             size="sm"
             variant="ghost"
             onClick={() => handleViewDetail(row)}
-            title="查看"
+            title={L.action_view}
           >
             <Eye size={14} />
           </Button>
@@ -119,7 +120,7 @@ export function VouchersPage() {
               size="sm"
               variant="ghost"
               onClick={() => handleEdit(row)}
-              title="編輯"
+              title={L.action_edit}
             >
               <Pencil size={14} />
             </Button>
@@ -130,7 +131,7 @@ export function VouchersPage() {
               variant="ghost"
               onClick={() => handleReverse(row)}
               className="text-destructive hover:text-destructive"
-              title="反沖"
+              title={L.action_reverse}
             >
               <RotateCcw size={14} />
             </Button>
@@ -146,7 +147,7 @@ export function VouchersPage() {
       <div className="flex justify-end p-4 border-b">
         <Button onClick={handleCreate} className="gap-2">
           <Plus size={16} />
-          新增傳票
+          {L.btn_add}
         </Button>
       </div>
 
@@ -155,7 +156,7 @@ export function VouchersPage() {
           columns={columns}
           data={vouchers}
           isLoading={isLoading}
-          emptyMessage="尚無傳票資料"
+          emptyMessage={L.empty_message}
         />
       </div>
 
