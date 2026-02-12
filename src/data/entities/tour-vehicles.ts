@@ -6,31 +6,32 @@
 
 import { createEntityHook } from '../core/createEntityHook'
 import { CACHE_PRESETS } from '../core/types'
+import type { Database } from '@/lib/supabase/types'
+
+type TourVehicleRow = Database['public']['Tables']['tour_vehicles']['Row']
 
 export interface TourVehicle {
   id: string
   tour_id: string
-  vehicle_type: string
-  vehicle_number?: string
-  driver_name?: string
-  driver_phone?: string
-  capacity?: number
-  start_date?: string
-  end_date?: string
-  price?: number
-  notes?: string
-  workspace_id?: string
-  created_at?: string
-  updated_at?: string
+  vehicle_name: string
+  vehicle_type: string | null
+  capacity: number
+  display_order: number | null
+  driver_name: string | null
+  driver_phone: string | null
+  license_plate: string | null
+  notes: string | null
+  created_at: string | null
+  updated_at: string | null
 }
 
 export const tourVehicleEntity = createEntityHook<TourVehicle>('tour_vehicles', {
   list: {
     select: '*',
-    orderBy: { column: 'start_date', ascending: true },
+    orderBy: { column: 'display_order', ascending: true },
   },
   slim: {
-    select: 'id,tour_id,vehicle_type,vehicle_number,driver_name',
+    select: 'id,tour_id,vehicle_name,vehicle_type,capacity,driver_name,license_plate,display_order',
   },
   detail: { select: '*' },
   cache: CACHE_PRESETS.high,

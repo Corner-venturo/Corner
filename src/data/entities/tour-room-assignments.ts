@@ -9,13 +9,11 @@ import { CACHE_PRESETS } from '../core/types'
 
 export interface TourRoomAssignment {
   id: string
-  tour_room_id: string
-  member_id: string
-  bed_type?: string
-  notes?: string
-  workspace_id?: string
-  created_at?: string
-  updated_at?: string
+  room_id: string
+  order_member_id: string
+  bed_number: number | null
+  created_at: string | null
+  updated_at: string | null
 }
 
 export const tourRoomAssignmentEntity = createEntityHook<TourRoomAssignment>('tour_room_assignments', {
@@ -24,7 +22,7 @@ export const tourRoomAssignmentEntity = createEntityHook<TourRoomAssignment>('to
     orderBy: { column: 'created_at', ascending: true },
   },
   slim: {
-    select: 'id,tour_room_id,member_id',
+    select: 'id,room_id,order_member_id',
   },
   detail: { select: '*' },
   cache: CACHE_PRESETS.high,

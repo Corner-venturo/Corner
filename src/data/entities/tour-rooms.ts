@@ -11,16 +11,16 @@ export interface TourRoom {
   id: string
   tour_id: string
   room_type: string
-  room_number: string
-  hotel_name?: string
-  check_in_date?: string
-  check_out_date?: string
-  price?: number
-  notes?: string
-  display_order?: number
-  workspace_id?: string
-  created_at?: string
-  updated_at?: string
+  room_number: string | null
+  hotel_name: string | null
+  night_number: number
+  capacity: number
+  amount: number | null
+  booking_code: string | null
+  notes: string | null
+  display_order: number | null
+  created_at: string | null
+  updated_at: string | null
 }
 
 export const tourRoomEntity = createEntityHook<TourRoom>('tour_rooms', {
@@ -29,7 +29,7 @@ export const tourRoomEntity = createEntityHook<TourRoom>('tour_rooms', {
     orderBy: { column: 'display_order', ascending: true },
   },
   slim: {
-    select: 'id,tour_id,room_type,room_number,hotel_name',
+    select: 'id,tour_id,room_type,room_number,hotel_name,night_number,capacity,display_order',
   },
   detail: { select: '*' },
   cache: CACHE_PRESETS.high,

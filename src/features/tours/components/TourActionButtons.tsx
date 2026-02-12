@@ -22,6 +22,7 @@ import {
 import { cn } from '@/lib/utils'
 import { Tour, Quote, User } from '@/stores/types'
 import type { Proposal } from '@/types/proposal.types'
+import { TOUR_ACTIONS } from '../constants'
 
 // 擴展 Tour 類型，增加提案標記
 type TourOrProposal = Tour & {
@@ -100,10 +101,10 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                 onProposalClick?.(proposal)
               }}
               className="px-1.5 py-0.5 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-              title="查看版本"
+              title={TOUR_ACTIONS.view_versions}
             >
               <ClipboardList size={14} />
-              <span>版本</span>
+              <span>{TOUR_ACTIONS.versions}</span>
             </button>
 
             {/* 編輯 */}
@@ -114,10 +115,10 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                   onProposalEdit?.(proposal)
                 }}
                 className="px-1.5 py-0.5 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-                title="編輯"
+                title={TOUR_ACTIONS.edit}
               >
                 <Edit2 size={14} />
-                <span>編輯</span>
+                <span>{TOUR_ACTIONS.edit}</span>
               </button>
             )}
 
@@ -129,10 +130,10 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                   onProposalArchive?.(proposal)
                 }}
                 className="px-1.5 py-0.5 text-morandi-secondary/60 hover:text-morandi-secondary hover:bg-morandi-secondary/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-                title="封存"
+                title={TOUR_ACTIONS.archive}
               >
                 <Archive size={14} />
-                <span>封存</span>
+                <span>{TOUR_ACTIONS.archive}</span>
               </button>
             )}
 
@@ -144,10 +145,10 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                   onProposalDelete?.(proposal)
                 }}
                 className="px-1.5 py-0.5 text-morandi-red/60 hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-                title="刪除"
+                title={TOUR_ACTIONS.delete}
               >
                 <Trash2 size={14} />
-                <span>刪除</span>
+                <span>{TOUR_ACTIONS.delete}</span>
               </button>
             )}
           </div>
@@ -181,10 +182,10 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               handleCreateChannel(tour)
             }}
             className="px-1.5 py-0.5 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-secondary/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-            title="建立工作空間頻道"
+            title={TOUR_ACTIONS.create_channel}
           >
             <MessageSquare size={14} />
-            <span>頻道</span>
+            <span>{TOUR_ACTIONS.channel}</span>
           </button>
 
           {/* 報價與行程（整合） */}
@@ -206,10 +207,10 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               }
             }}
             className="px-1.5 py-0.5 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-            title="報價與行程管理"
+            title={TOUR_ACTIONS.quote_management}
           >
             <Calculator size={14} />
-            <span>報價/行程</span>
+            <span>{TOUR_ACTIONS.quote_itinerary}</span>
           </button>
 
           {/* 設計 */}
@@ -220,10 +221,10 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               router.push(`/brochure?tour_id=${tour.id}`)
             }}
             className="px-1.5 py-0.5 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-            title="設計手冊或網頁行程"
+            title={TOUR_ACTIONS.design_title}
           >
             <Palette size={14} />
-            <span>設計</span>
+            <span>{TOUR_ACTIONS.design}</span>
           </button>
 
           {/* 合約管理 */}
@@ -237,10 +238,10 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               }
             }}
             className="px-1.5 py-0.5 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-            title="合約管理"
+            title={TOUR_ACTIONS.contract_title}
           >
             <FileSignature size={14} />
-            <span>合約</span>
+            <span>{TOUR_ACTIONS.contract}</span>
           </button>
 
           {/* 需求總覽 */}
@@ -252,10 +253,10 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               }
             }}
             className="px-1.5 py-0.5 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-            title="需求總覽"
+            title={TOUR_ACTIONS.requirements_title}
           >
             <ListChecks size={14} />
-            <span>需求</span>
+            <span>{TOUR_ACTIONS.requirements}</span>
           </button>
 
           {/* 封存/解除封存 */}
@@ -279,10 +280,10 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                 ? 'text-morandi-gold/60 hover:text-morandi-gold hover:bg-morandi-gold/10'
                 : 'text-morandi-secondary/60 hover:text-morandi-secondary hover:bg-morandi-secondary/10'
             )}
-            title={tour.archived ? '解除封存' : '封存'}
+            title={tour.archived ? TOUR_ACTIONS.unarchive : TOUR_ACTIONS.archive}
           >
             {tour.archived ? <ArchiveRestore size={14} /> : <Archive size={14} />}
-            <span>{tour.archived ? '解封' : '封存'}</span>
+            <span>{tour.archived ? TOUR_ACTIONS.unarchive_short : TOUR_ACTIONS.archive}</span>
           </button>
 
           {/* 結案（僅進行中狀態可見） */}
@@ -293,10 +294,10 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                 onCloseTour(tour)
               }}
               className="px-1.5 py-0.5 text-morandi-green hover:bg-morandi-green/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-              title="結案"
+              title={TOUR_ACTIONS.close_tour}
             >
               <FileCheck size={14} />
-              <span>結案</span>
+              <span>{TOUR_ACTIONS.close_tour}</span>
             </button>
           )}
 
@@ -307,10 +308,10 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               setDeleteConfirm({ isOpen: true, tour })
             }}
             className="px-1.5 py-0.5 text-morandi-red/60 hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-            title="刪除"
+            title={TOUR_ACTIONS.delete}
           >
             <Trash2 size={14} />
-            <span>刪除</span>
+            <span>{TOUR_ACTIONS.delete}</span>
           </button>
         </div>
       )

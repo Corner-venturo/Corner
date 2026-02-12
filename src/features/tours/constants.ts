@@ -272,3 +272,50 @@ export const TOUR_LINK_ITINERARY = {
 export const TOUR_ITINERARY_DIALOG = {
   loading: '載入行程表...',
 } as const
+
+// ============================================================
+// TourActionButtons
+// ============================================================
+export const TOUR_ACTIONS = {
+  view_versions: '查看版本',
+  versions: '版本',
+  edit: '編輯',
+  archive: '封存',
+  unarchive: '解除封存',
+  unarchive_short: '解封',
+  delete: '刪除',
+  channel: '頻道',
+  create_channel: '建立工作空間頻道',
+  quote_itinerary: '報價/行程',
+  quote_management: '報價與行程管理',
+  design: '設計',
+  design_title: '設計手冊或網頁行程',
+  contract: '合約',
+  contract_title: '合約管理',
+  requirements: '需求',
+  requirements_title: '需求總覽',
+  close_tour: '結案',
+} as const
+
+// ============================================================
+// TourClosingDialog
+// ============================================================
+export const TOUR_CLOSING = {
+  title: (code: string) => `結案 - ${code}`,
+  label_name: '團名',
+  label_orders: '訂單數',
+  orders_unit: '筆',
+  label_revenue: '總收入',
+  label_cost: '總成本',
+  label_gross: '毛利',
+  section_bonus: '獎金設定',
+  label_sales_bonus: '業務獎金',
+  label_op_bonus: 'OP 獎金',
+  label_bonus_total: '獎金總計',
+  closing_note: '結案後將自動產生獎金請款單，狀態變更為「結案」。',
+  printing: '生成中...',
+  print_report: '列印報表',
+  cancel: '取消',
+  submitting: '處理中...',
+  confirm: '確認結案',
+} as const
