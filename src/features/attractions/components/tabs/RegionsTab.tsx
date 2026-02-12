@@ -15,6 +15,7 @@ import { useCountries, useRegions, useCities } from '@/data'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { ATTRACTIONS_LIST_LABELS, REGIONS_TAB_LABELS } from '../../constants/labels';
 
 // 使用 @/data 中定義的型別
 type Country = NonNullable<ReturnType<typeof useCountries>['items']>[number]
@@ -58,7 +59,7 @@ export default function RegionsTab() {
 
   // 取得地區名稱
   const getRegionName = (regionId: string) => {
-    if (!regionId) return '未分類'
+    if (!regionId) return REGIONS_TAB_LABELS.未分類
     const region = regions.find(r => r.id === regionId)
     return region?.name || regionId
   }
@@ -68,7 +69,7 @@ export default function RegionsTab() {
     () => [
       {
         key: 'name',
-        label: '國家名稱',
+        label: REGIONS_TAB_LABELS.國家名稱,
         sortable: true,
         filterable: true,
         render: (_value, row) => (
@@ -80,30 +81,30 @@ export default function RegionsTab() {
       },
       {
         key: 'code',
-        label: '代碼',
+        label: REGIONS_TAB_LABELS.代碼,
         render: (_value, row) => <span className="text-sm font-mono">{row.code || '-'}</span>,
       },
       {
         key: 'has_regions',
-        label: '有地區',
+        label: REGIONS_TAB_LABELS.有地區,
         render: (_value, row) => (
           <span className={row.has_regions ? 'text-status-success' : 'text-muted-foreground'}>
-            {row.has_regions ? '是' : '否'}
+            {row.has_regions ? '是' : REGIONS_TAB_LABELS.否}
           </span>
         ),
       },
       {
         key: 'is_active',
-        label: '狀態',
+        label: ATTRACTIONS_LIST_LABELS.狀態,
         render: (_value, row) => (
           <span className={row.is_active ? 'text-status-success' : 'text-muted-foreground'}>
-            {row.is_active ? '啟用' : '停用'}
+            {row.is_active ? '啟用' : ATTRACTIONS_LIST_LABELS.停用}
           </span>
         ),
       },
       {
         key: 'id',
-        label: '城市',
+        label: REGIONS_TAB_LABELS.城市,
         render: (_value, row) => {
           const cityCount = cities.filter(c => c.country_id === row.id).length
           return (
@@ -130,7 +131,7 @@ export default function RegionsTab() {
           columns={countryColumns}
           data={countries}
           isLoading={loading}
-          emptyMessage="尚無國家資料"
+          emptyMessage={REGIONS_TAB_LABELS.尚無國家資料}
         />
       </div>
 

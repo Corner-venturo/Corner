@@ -5,6 +5,7 @@ import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { Attraction, hasMissingData } from '../types'
 import type { Country, City } from '@/stores/region-store'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { ATTRACTIONS_LIST_LABELS } from '../constants/labels';
 
 // ============================================
 // 景點列表組件（使用 EnhancedTable）
@@ -38,7 +39,7 @@ export function AttractionsList({
   const columns = [
     {
       key: 'image',
-      label: '圖片',
+      label: ATTRACTIONS_LIST_LABELS.圖片,
       sortable: false,
       render: (_: unknown, attraction: Attraction) => (
         <div className="w-20">
@@ -62,7 +63,7 @@ export function AttractionsList({
     },
     {
       key: 'name',
-      label: '景點名稱',
+      label: ATTRACTIONS_LIST_LABELS.景點名稱,
       sortable: true,
       render: (_: unknown, attraction: Attraction) => {
         const missing = hasMissingData(attraction)
@@ -92,7 +93,7 @@ export function AttractionsList({
     },
     {
       key: 'category',
-      label: '類別',
+      label: ATTRACTIONS_LIST_LABELS.類別,
       sortable: true,
       render: (_: unknown, attraction: Attraction) => (
         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-morandi-blue/10 text-morandi-blue">
@@ -102,17 +103,17 @@ export function AttractionsList({
     },
     {
       key: 'description',
-      label: '簡介',
+      label: ATTRACTIONS_LIST_LABELS.簡介,
       sortable: false,
       render: (_: unknown, attraction: Attraction) => (
         <div className="min-w-[200px] text-sm text-morandi-secondary">
-          <p className="line-clamp-2 leading-relaxed">{attraction.description || '暫無簡介'}</p>
+          <p className="line-clamp-2 leading-relaxed">{attraction.description || ATTRACTIONS_LIST_LABELS.暫無簡介}</p>
         </div>
       ),
     },
     {
       key: 'duration_minutes',
-      label: '時長',
+      label: ATTRACTIONS_LIST_LABELS.時長,
       sortable: true,
       render: (_: unknown, attraction: Attraction) => (
         <div className="text-center text-sm text-morandi-secondary">
@@ -122,7 +123,7 @@ export function AttractionsList({
     },
     {
       key: 'tags',
-      label: '標籤',
+      label: ATTRACTIONS_LIST_LABELS.標籤,
       sortable: false,
       render: (_: unknown, attraction: Attraction) => (
         <div className="flex flex-wrap gap-1 min-w-[120px]">
@@ -144,7 +145,7 @@ export function AttractionsList({
     },
     {
       key: 'is_active',
-      label: '狀態',
+      label: ATTRACTIONS_LIST_LABELS.狀態,
       sortable: true,
       render: (_: unknown, attraction: Attraction) => (
         <span
@@ -155,7 +156,7 @@ export function AttractionsList({
               : 'bg-morandi-container text-morandi-secondary'
           )}
         >
-          {attraction.is_active ? '啟用' : '停用'}
+          {attraction.is_active ? '啟用' : ATTRACTIONS_LIST_LABELS.停用}
         </span>
       ),
     },
@@ -186,7 +187,7 @@ export function AttractionsList({
                 }}
                 disabled={isFirst}
                 className="h-7 w-7 p-0 text-morandi-secondary hover:bg-morandi-container disabled:opacity-30"
-                title="上移"
+                title={ATTRACTIONS_LIST_LABELS.上移}
               >
                 <ChevronUp size={14} />
               </Button>
@@ -199,7 +200,7 @@ export function AttractionsList({
                 }}
                 disabled={isLast}
                 className="h-7 w-7 p-0 text-morandi-secondary hover:bg-morandi-container disabled:opacity-30"
-                title="下移"
+                title={ATTRACTIONS_LIST_LABELS.下移}
               >
                 <ChevronDown size={14} />
               </Button>
@@ -214,7 +215,7 @@ export function AttractionsList({
               onEdit(attraction)
             }}
             className="h-8 px-2 text-morandi-blue hover:bg-morandi-blue/10"
-            title="編輯"
+            title={ATTRACTIONS_LIST_LABELS.編輯}
           >
             <Edit2 size={14} />
           </Button>
@@ -226,7 +227,7 @@ export function AttractionsList({
               onToggleStatus(attraction)
             }}
             className="h-8 px-2"
-            title={attraction.is_active ? '停用' : '啟用'}
+            title={attraction.is_active ? '停用' : ATTRACTIONS_LIST_LABELS.啟用}
           >
             <Power
               size={14}
@@ -241,7 +242,7 @@ export function AttractionsList({
               onDelete(attraction.id)
             }}
             className="h-8 px-2 hover:text-morandi-red hover:bg-morandi-red/10"
-            title="刪除"
+            title={ATTRACTIONS_LIST_LABELS.刪除}
           >
             <Trash2 size={14} />
           </Button>

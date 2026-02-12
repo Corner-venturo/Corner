@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox'
 import { AttractionFormData } from '../../types'
 import type { Country, Region, City } from '@/stores/region-store'
+import { ATTRACTION_FORM_LABELS, DATABASE_MANAGEMENT_PAGE_LABELS } from '../../constants/labels';
 
 interface AttractionFormProps {
   formData: AttractionFormData
@@ -34,7 +35,7 @@ export function AttractionForm({
           <Input
             value={formData.name}
             onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
-            placeholder="例如: 太宰府天滿宮"
+            placeholder={ATTRACTION_FORM_LABELS.例如_太宰府天滿宮}
             required
           />
         </div>
@@ -45,7 +46,7 @@ export function AttractionForm({
           <Input
             value={formData.english_name}
             onChange={e => setFormData(prev => ({ ...prev, english_name: e.target.value }))}
-            placeholder="例如: Dazaifu Tenmangu"
+            placeholder={ATTRACTION_FORM_LABELS.例如_Dazaifu_Tenmangu}
           />
         </div>
       </div>
@@ -56,7 +57,7 @@ export function AttractionForm({
         <textarea
           value={formData.description}
           onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
-          placeholder="景點簡介..."
+          placeholder={ATTRACTION_FORM_LABELS.景點簡介}
           className="w-full px-3 py-2 border border-border rounded-md bg-card text-sm min-h-[80px]"
         />
       </div>
@@ -77,7 +78,7 @@ export function AttractionForm({
             }
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="請選擇" />
+              <SelectValue placeholder={ATTRACTION_FORM_LABELS.請選擇} />
             </SelectTrigger>
             <SelectContent>
               {countries.map((c) => (
@@ -103,7 +104,7 @@ export function AttractionForm({
               }
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="請選擇" />
+                <SelectValue placeholder={ATTRACTION_FORM_LABELS.請選擇} />
               </SelectTrigger>
               <SelectContent>
                 {availableRegions.map((r) => (
@@ -123,7 +124,7 @@ export function AttractionForm({
             onValueChange={value => setFormData(prev => ({ ...prev, city_id: value === '_none_' ? '' : value }))}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="不指定" />
+              <SelectValue placeholder={ATTRACTION_FORM_LABELS.不指定} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="_none_">不指定</SelectItem>
@@ -146,14 +147,14 @@ export function AttractionForm({
             onValueChange={value => setFormData(prev => ({ ...prev, category: value }))}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="景點" />
+              <SelectValue placeholder={DATABASE_MANAGEMENT_PAGE_LABELS.景點} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="景點">景點</SelectItem>
-              <SelectItem value="餐廳">餐廳</SelectItem>
-              <SelectItem value="住宿">住宿</SelectItem>
-              <SelectItem value="購物">購物</SelectItem>
-              <SelectItem value="交通">交通</SelectItem>
+              <SelectItem value={DATABASE_MANAGEMENT_PAGE_LABELS.景點}>景點</SelectItem>
+              <SelectItem value={DATABASE_MANAGEMENT_PAGE_LABELS.餐廳}>餐廳</SelectItem>
+              <SelectItem value={DATABASE_MANAGEMENT_PAGE_LABELS.住宿}>住宿</SelectItem>
+              <SelectItem value={DATABASE_MANAGEMENT_PAGE_LABELS.購物}>購物</SelectItem>
+              <SelectItem value={DATABASE_MANAGEMENT_PAGE_LABELS.交通}>交通</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -163,7 +164,7 @@ export function AttractionForm({
           <Input
             value={formData.tags}
             onChange={e => setFormData(prev => ({ ...prev, tags: e.target.value }))}
-            placeholder="例如: 文化,神社,歷史"
+            placeholder={ATTRACTION_FORM_LABELS.例如_文化_神社_歷史}
           />
         </div>
       </div>
@@ -208,7 +209,7 @@ export function AttractionForm({
         <Input
           value={formData.address}
           onChange={e => setFormData(prev => ({ ...prev, address: e.target.value }))}
-          placeholder="完整地址..."
+          placeholder={ATTRACTION_FORM_LABELS.完整地址}
         />
       </div>
 
@@ -218,7 +219,7 @@ export function AttractionForm({
         <textarea
           value={formData.notes}
           onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-          placeholder="內部使用備註..."
+          placeholder={ATTRACTION_FORM_LABELS.內部使用備註}
           className="w-full px-3 py-2 border border-border rounded-md bg-card text-sm min-h-[60px]"
         />
       </div>

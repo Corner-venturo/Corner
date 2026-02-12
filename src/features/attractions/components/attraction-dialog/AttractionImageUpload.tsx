@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { isFeatureAvailable } from '@/lib/feature-restrictions'
 import { ImageEditor, type ImageEditorSettings } from '@/components/ui/image-editor'
 import { logger } from '@/lib/utils/logger'
+import { ATTRACTION_IMAGE_UPLOAD_LABELS } from '../../constants/labels';
 
 interface ImagePositionAdjusterProps {
   url: string
@@ -102,7 +103,7 @@ function ImagePositionAdjuster({
       >
         <img
           src={url}
-          alt="景點圖片"
+          alt={ATTRACTION_IMAGE_UPLOAD_LABELS.景點圖片}
           className="w-full h-full object-cover"
           style={{
             objectPosition: position === 'top' ? 'top' : position === 'bottom' ? 'bottom' : 'center',
@@ -116,7 +117,7 @@ function ImagePositionAdjuster({
         type="button"
         onClick={() => setIsEditorOpen(true)}
         className="absolute right-1 top-1 bg-morandi-gold text-white rounded p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-morandi-gold-hover"
-        title="編輯圖片"
+        title={ATTRACTION_IMAGE_UPLOAD_LABELS.編輯圖片}
       >
         <Pencil size={12} />
       </button>

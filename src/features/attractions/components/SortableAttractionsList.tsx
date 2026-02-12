@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { Attraction } from '../types'
 import type { Country, City } from '@/stores/region-store'
+import { ATTRACTIONS_LIST_LABELS, SORTABLE_ATTRACTIONS_LIST_LABELS } from '../constants/labels';
 
 // ============================================
 // 可拖拽的景點項目組件
@@ -76,7 +77,7 @@ function SortableAttractionItem({
           {...attributes}
           {...listeners}
           className="flex-shrink-0 p-1 text-morandi-muted hover:text-morandi-primary cursor-grab active:cursor-grabbing"
-          title="拖拽排序"
+          title={SORTABLE_ATTRACTIONS_LIST_LABELS.拖拽排序}
         >
           <GripVertical size={16} />
         </div>
@@ -129,7 +130,7 @@ function SortableAttractionItem({
                       : 'bg-morandi-container text-morandi-secondary'
                   )}
                 >
-                  {attraction.is_active ? '啟用' : '停用'}
+                  {attraction.is_active ? '啟用' : ATTRACTIONS_LIST_LABELS.停用}
                 </span>
               </div>
             </div>
@@ -141,7 +142,7 @@ function SortableAttractionItem({
                 size="sm"
                 onClick={() => onEdit(attraction)}
                 className="h-8 px-2 text-morandi-blue hover:bg-morandi-blue/10"
-                title="編輯"
+                title={ATTRACTIONS_LIST_LABELS.編輯}
               >
                 <Edit2 size={14} />
               </Button>
@@ -150,7 +151,7 @@ function SortableAttractionItem({
                 size="sm"
                 onClick={() => onToggleStatus(attraction)}
                 className="h-8 px-2"
-                title={attraction.is_active ? '停用' : '啟用'}
+                title={attraction.is_active ? '停用' : ATTRACTIONS_LIST_LABELS.啟用}
               >
                 <Power
                   size={14}
@@ -162,7 +163,7 @@ function SortableAttractionItem({
                 size="sm"
                 onClick={() => onDelete(attraction.id)}
                 className="h-8 px-2 hover:text-morandi-red hover:bg-morandi-red/10"
-                title="刪除"
+                title={ATTRACTIONS_LIST_LABELS.刪除}
               >
                 <Trash2 size={14} />
               </Button>

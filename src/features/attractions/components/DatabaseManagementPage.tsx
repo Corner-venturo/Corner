@@ -7,6 +7,7 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAttractionsDialog } from '../hooks/useAttractionsDialog'
 import { useCountries } from '@/data'
+import { ATTRACTIONS_DIALOG_LABELS, DATABASE_MANAGEMENT_PAGE_LABELS } from '../constants/labels';
 
 // Lazy load tabs - 只有切換到該 tab 才載入組件
 const RegionsTab = lazy(() => import('./tabs/RegionsTab'))
@@ -76,35 +77,35 @@ export default function DatabaseManagementPage() {
 
   // 分類選項
   const categoryOptions = [
-    { value: '景點', label: '景點' },
-    { value: '餐廳', label: '餐廳' },
-    { value: '住宿', label: '住宿' },
-    { value: '購物', label: '購物' },
-    { value: '交通', label: '交通' },
+    { value: DATABASE_MANAGEMENT_PAGE_LABELS.景點, label: '景點' },
+    { value: DATABASE_MANAGEMENT_PAGE_LABELS.餐廳, label: '餐廳' },
+    { value: DATABASE_MANAGEMENT_PAGE_LABELS.住宿, label: '住宿' },
+    { value: DATABASE_MANAGEMENT_PAGE_LABELS.購物, label: '購物' },
+    { value: DATABASE_MANAGEMENT_PAGE_LABELS.交通, label: '交通' },
   ]
 
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="旅遊資料庫"
+        title={DATABASE_MANAGEMENT_PAGE_LABELS.旅遊資料庫}
         icon={MapPin}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '資料庫管理', href: '/database' },
-          { label: '旅遊資料庫', href: '/database/attractions' },
+          { label: DATABASE_MANAGEMENT_PAGE_LABELS.首頁, href: '/' },
+          { label: DATABASE_MANAGEMENT_PAGE_LABELS.資料庫管理, href: '/database' },
+          { label: DATABASE_MANAGEMENT_PAGE_LABELS.旅遊資料庫, href: '/database/attractions' },
         ]}
         tabs={[
-          { value: 'regions', label: '國家/區域', icon: Globe },
-          { value: 'attractions', label: '景點活動', icon: MapPin },
-          { value: 'michelin', label: '米其林餐廳', icon: Star },
-          { value: 'experiences', label: '頂級體驗', icon: Sparkles },
+          { value: 'regions', label: DATABASE_MANAGEMENT_PAGE_LABELS.國家_區域, icon: Globe },
+          { value: 'attractions', label: DATABASE_MANAGEMENT_PAGE_LABELS.景點活動, icon: MapPin },
+          { value: 'michelin', label: DATABASE_MANAGEMENT_PAGE_LABELS.米其林餐廳, icon: Star },
+          { value: 'experiences', label: DATABASE_MANAGEMENT_PAGE_LABELS.頂級體驗, icon: Sparkles },
         ]}
         activeTab={activeTab}
         onTabChange={handleTabChange}
         showSearch={activeTab === 'attractions'}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        searchPlaceholder="搜尋景點名稱..."
+        searchPlaceholder={DATABASE_MANAGEMENT_PAGE_LABELS.搜尋景點名稱}
         filters={
           activeTab !== 'regions' ? (
             <>
@@ -142,7 +143,7 @@ export default function DatabaseManagementPage() {
         showClearFilters={activeTab !== 'regions' && Boolean(hasActiveFilters)}
         onClearFilters={clearFilters}
         onAdd={activeTab === 'attractions' ? openAdd : undefined}
-        addLabel="新增景點"
+        addLabel={ATTRACTIONS_DIALOG_LABELS.新增景點}
       />
 
       <div className="flex-1 overflow-auto">

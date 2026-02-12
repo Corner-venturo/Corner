@@ -18,6 +18,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { ATTRACTIONS_LIST_LABELS, MICHELIN_RESTAURANTS_TAB_LABELS, PREMIUM_EXPERIENCES_TAB_LABELS } from '../../constants/labels';
 
 interface PremiumExperience {
   id: string
@@ -100,7 +101,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)
       logger.error('載入頂級體驗失敗:', error)
-      toast.error('載入失敗：' + errorMessage)
+      toast.error(MICHELIN_RESTAURANTS_TAB_LABELS.載入失敗 + errorMessage)
     } finally {
       setLoading(false)
     }
@@ -108,8 +109,8 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
 
   // 刪除體驗
   const handleDelete = async (id: string) => {
-    const confirmed = await confirm('確定要刪除此體驗？', {
-      title: '刪除體驗',
+    const confirmed = await confirm(PREMIUM_EXPERIENCES_TAB_LABELS.確定要刪除此體驗, {
+      title: PREMIUM_EXPERIENCES_TAB_LABELS.刪除體驗,
       type: 'warning',
     })
     if (!confirmed) return
@@ -118,9 +119,9 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
       const { error } = await supabase.from('premium_experiences').delete().eq('id', id)
       if (error) throw error
       await loadExperiences()
-      toast.success('刪除成功')
+      toast.success(MICHELIN_RESTAURANTS_TAB_LABELS.刪除成功)
     } catch (error) {
-      toast.error('刪除失敗')
+      toast.error(MICHELIN_RESTAURANTS_TAB_LABELS.刪除失敗)
     }
   }
 
@@ -149,9 +150,9 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
       if (error) throw error
       await loadExperiences()
       handleCloseEdit()
-      toast.success('更新成功')
+      toast.success(MICHELIN_RESTAURANTS_TAB_LABELS.更新成功)
     } catch (error) {
-      toast.error('更新失敗')
+      toast.error(MICHELIN_RESTAURANTS_TAB_LABELS.更新失敗)
     }
   }
 
@@ -169,7 +170,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
         .eq('id', experience.id)
 
       if (error) throw error
-      toast.success(newStatus ? '已啟用' : '已停用')
+      toast.success(newStatus ? '已啟用' : MICHELIN_RESTAURANTS_TAB_LABELS.已停用)
     } catch (error) {
       setExperiences(prev =>
         prev.map(item =>
@@ -200,13 +201,13 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
   const getExclusivityLabel = (level: string) => {
     switch (level) {
       case 'ultra_exclusive':
-        return '極致獨家'
+        return PREMIUM_EXPERIENCES_TAB_LABELS.極致獨家
       case 'highly_exclusive':
-        return '高度獨家'
+        return PREMIUM_EXPERIENCES_TAB_LABELS.高度獨家
       case 'exclusive':
-        return '獨家'
+        return PREMIUM_EXPERIENCES_TAB_LABELS.獨家
       case 'premium':
-        return '精品'
+        return PREMIUM_EXPERIENCES_TAB_LABELS.精品
       default:
         return level
     }
@@ -215,13 +216,13 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
   // 類別文字
   const getCategoryLabel = (category: string) => {
     const labels: Record<string, string> = {
-      cultural_immersion: '文化沉浸',
-      exclusive_access: '獨家通道',
-      culinary_mastery: '烹飪大師',
-      artisan_workshop: '工藝工作坊',
-      private_performance: '私人表演',
-      nature_adventure: '自然探險',
-      wellness_retreat: '養生靜修',
+      cultural_immersion: PREMIUM_EXPERIENCES_TAB_LABELS.文化沉浸,
+      exclusive_access: PREMIUM_EXPERIENCES_TAB_LABELS.獨家通道,
+      culinary_mastery: PREMIUM_EXPERIENCES_TAB_LABELS.烹飪大師,
+      artisan_workshop: PREMIUM_EXPERIENCES_TAB_LABELS.工藝工作坊,
+      private_performance: PREMIUM_EXPERIENCES_TAB_LABELS.私人表演,
+      nature_adventure: PREMIUM_EXPERIENCES_TAB_LABELS.自然探險,
+      wellness_retreat: PREMIUM_EXPERIENCES_TAB_LABELS.養生靜修,
     }
     return labels[category] || category
   }
@@ -237,7 +238,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
     () => [
       {
         key: 'name',
-        label: '體驗名稱',
+        label: PREMIUM_EXPERIENCES_TAB_LABELS.體驗名稱,
         sortable: true,
         render: (_: unknown, experience: PremiumExperience) => (
           <div className="min-w-[180px]">
@@ -250,7 +251,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
       },
       {
         key: 'exclusivity_level',
-        label: '獨特性',
+        label: PREMIUM_EXPERIENCES_TAB_LABELS.獨特性,
         sortable: true,
         render: (_: unknown, experience: PremiumExperience) => (
           <span
@@ -264,7 +265,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
       },
       {
         key: 'category',
-        label: '類別',
+        label: ATTRACTIONS_LIST_LABELS.類別,
         sortable: true,
         render: (_: unknown, experience: PremiumExperience) => (
           <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-morandi-gold/10 text-morandi-gold">
@@ -274,7 +275,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
       },
       {
         key: 'city',
-        label: '地點',
+        label: MICHELIN_RESTAURANTS_TAB_LABELS.地點,
         sortable: false,
         render: (_: unknown, experience: PremiumExperience) => {
           const country = countries.find(c => c.id === experience.country_id)
@@ -288,7 +289,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
       },
       {
         key: 'expert_name',
-        label: '專家',
+        label: PREMIUM_EXPERIENCES_TAB_LABELS.專家,
         sortable: true,
         render: (_: unknown, experience: PremiumExperience) => (
           <div className="min-w-[120px]">
@@ -311,7 +312,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
       },
       {
         key: 'duration',
-        label: '時長',
+        label: ATTRACTIONS_LIST_LABELS.時長,
         sortable: false,
         render: (_: unknown, experience: PremiumExperience) => (
           <div className="flex items-center gap-1 text-sm text-morandi-secondary">
@@ -328,7 +329,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
       },
       {
         key: 'participants',
-        label: '人數',
+        label: PREMIUM_EXPERIENCES_TAB_LABELS.人數,
         sortable: false,
         render: (_: unknown, experience: PremiumExperience) => (
           <div className="flex items-center gap-1 text-sm text-morandi-secondary">
@@ -347,7 +348,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
       },
       {
         key: 'price',
-        label: '價格',
+        label: MICHELIN_RESTAURANTS_TAB_LABELS.價格,
         sortable: false,
         render: (_: unknown, experience: PremiumExperience) => (
           <div className="text-sm text-morandi-gold font-medium min-w-[100px]">
@@ -364,7 +365,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
       },
       {
         key: 'is_active',
-        label: '狀態',
+        label: ATTRACTIONS_LIST_LABELS.狀態,
         sortable: true,
         render: (_: unknown, experience: PremiumExperience) => (
           <span
@@ -375,7 +376,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
                 : 'bg-morandi-container text-morandi-secondary'
             )}
           >
-            {experience.is_active ? '啟用' : '停用'}
+            {experience.is_active ? '啟用' : ATTRACTIONS_LIST_LABELS.停用}
           </span>
         ),
       },
@@ -405,7 +406,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
                     handleEdit(experience)
                   }}
                   className="h-8 px-2 text-morandi-blue hover:bg-morandi-blue/10"
-                  title="編輯"
+                  title={ATTRACTIONS_LIST_LABELS.編輯}
                 >
                   <Edit2 size={14} />
                 </Button>
@@ -417,7 +418,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
                     handleToggleStatus(experience)
                   }}
                   className="h-8 px-2"
-                  title={experience.is_active ? '停用' : '啟用'}
+                  title={experience.is_active ? '停用' : ATTRACTIONS_LIST_LABELS.啟用}
                 >
                   <Power
                     size={14}
@@ -432,7 +433,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
                     handleDelete(experience.id)
                   }}
                   className="h-8 px-2 hover:text-morandi-red hover:bg-morandi-red/10"
-                  title="刪除"
+                  title={ATTRACTIONS_LIST_LABELS.刪除}
                 >
                   <Trash2 size={14} />
                 </Button>

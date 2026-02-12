@@ -20,6 +20,7 @@ import { SortableAttractionsList } from '../SortableAttractionsList'
 import { useCountries, useRegions, useCities } from '@/data'
 import { Button } from '@/components/ui/button'
 import { ArrowUpDown, List, SortAsc, Loader2 } from 'lucide-react'
+import { ATTRACTIONS_TAB_LABELS } from '../../constants/labels';
 
 // Dynamic import for large dialog component (807 lines)
 const AttractionsDialog = dynamic(
@@ -170,7 +171,7 @@ export default function AttractionsTab({
           ) : (
             <SortAsc size={14} className="mr-1.5" />
           )}
-          {isSorting ? '排序中...' : '按名稱排序'}
+          {isSorting ? '排序中...' : ATTRACTIONS_TAB_LABELS.按名稱排序}
         </Button>
 
         {/* 右側：檢視切換 */}

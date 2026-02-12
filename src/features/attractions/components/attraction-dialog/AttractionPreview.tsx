@@ -3,6 +3,7 @@
 import { AttractionFormData } from '../../types'
 import type { Country, Region, City } from '@/stores/region-store'
 import { ImagePosition } from '../../hooks/useAttractionForm'
+import { ATTRACTION_PREVIEW_LABELS } from '../../constants/labels';
 
 interface AttractionPreviewProps {
   formData: AttractionFormData
@@ -54,7 +55,7 @@ export function AttractionPreview({
 
       {/* 基本資訊 */}
       <div className="space-y-2">
-        <h4 className="text-base font-medium">{formData.name || '未命名景點'}</h4>
+        <h4 className="text-base font-medium">{formData.name || ATTRACTION_PREVIEW_LABELS.未命名景點}</h4>
         {formData.english_name && (
           <div className="text-sm text-morandi-muted">{formData.english_name}</div>
         )}
@@ -63,7 +64,7 @@ export function AttractionPreview({
       {/* 地點 */}
       <div className="text-sm">
         <span className="text-morandi-muted">地點：</span>
-        {[country?.name, region?.name, city?.name].filter(Boolean).join(' / ') || '未設定'}
+        {[country?.name, region?.name, city?.name].filter(Boolean).join(' / ') || ATTRACTION_PREVIEW_LABELS.未設定}
       </div>
 
       {/* 類別與標籤 */}

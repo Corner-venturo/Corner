@@ -14,6 +14,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { isFeatureAvailable } from '@/lib/feature-restrictions'
 import { Button } from '@/components/ui/button'
 import { Sparkles, Loader2 } from 'lucide-react'
+import { ATTRACTIONS_DIALOG_LABELS } from '../constants/labels';
 
 interface AttractionsDialogProps {
   open: boolean
@@ -68,7 +69,7 @@ export function AttractionsDialog({
   // AI 補充景點資料
   const handleAiSuggest = async () => {
     if (!formData.name) {
-      void alert('請先填寫景點名稱', 'warning')
+      void alert(ATTRACTIONS_DIALOG_LABELS.請先填寫景點名稱, 'warning')
       return
     }
 
@@ -100,7 +101,7 @@ export function AttractionsDialog({
       const result = await response.json()
 
       if (!result.success) {
-        throw new Error(result.error || 'AI 補充失敗')
+        throw new Error(result.error || ATTRACTIONS_DIALOG_LABELS.AI_補充失敗)
       }
 
       const suggestion = result.data.suggestion
@@ -136,7 +137,7 @@ export function AttractionsDialog({
 
     const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'))
     if (imageFiles.length === 0) {
-      void alert('請選擇圖片檔案', 'warning')
+      void alert(ATTRACTIONS_DIALOG_LABELS.請選擇圖片檔案, 'warning')
       return
     }
 
@@ -194,8 +195,8 @@ export function AttractionsDialog({
 
   // 新增網址圖片
   const handleAddUrlImage = async () => {
-    const url = await prompt('請輸入圖片網址', {
-      title: '新增圖片',
+    const url = await prompt(ATTRACTIONS_DIALOG_LABELS.請輸入圖片網址, {
+      title: ATTRACTIONS_DIALOG_LABELS.新增圖片,
       placeholder: 'https://...',
     })
     if (url && url.trim()) {
@@ -265,7 +266,7 @@ export function AttractionsDialog({
       return
     }
 
-    void alert('請拖曳圖片檔案', 'warning')
+    void alert(ATTRACTIONS_DIALOG_LABELS.請拖曳圖片檔案, 'warning')
   }
 
   const handleSubmit = async () => {
@@ -287,7 +288,7 @@ export function AttractionsDialog({
   // 自訂標題（包含 AI 補充按鈕）
   const dialogTitle = (
     <div className="flex items-center gap-3">
-      <span>{attraction ? '編輯景點' : '新增景點'}</span>
+      <span>{attraction ? '編輯景點' : ATTRACTIONS_DIALOG_LABELS.新增景點}</span>
       {showAiSuggest && attraction && (
         <Button
           type="button"
@@ -314,7 +315,7 @@ export function AttractionsDialog({
       onOpenChange={open => !open && onClose()}
       title={dialogTitle}
       onSubmit={handleSubmit}
-      submitLabel={attraction ? '更新' : '新增'}
+      submitLabel={attraction ? '更新' : ATTRACTIONS_DIALOG_LABELS.新增}
       submitDisabled={!formData.name || !formData.country_id}
       maxWidth="2xl"
       contentClassName="max-h-[90vh] overflow-y-auto"

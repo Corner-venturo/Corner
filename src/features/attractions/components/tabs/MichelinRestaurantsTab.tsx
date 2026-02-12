@@ -17,6 +17,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { ATTRACTIONS_LIST_LABELS, MICHELIN_RESTAURANTS_TAB_LABELS } from '../../constants/labels';
 
 interface MichelinRestaurant {
   id: string
@@ -92,7 +93,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)
       logger.error('載入米其林餐廳失敗:', error)
-      toast.error('載入失敗：' + errorMessage)
+      toast.error(MICHELIN_RESTAURANTS_TAB_LABELS.載入失敗 + errorMessage)
     } finally {
       setLoading(false)
     }
@@ -100,8 +101,8 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
 
   // 刪除餐廳
   const handleDelete = async (id: string) => {
-    const confirmed = await confirm('確定要刪除此餐廳？', {
-      title: '刪除餐廳',
+    const confirmed = await confirm(MICHELIN_RESTAURANTS_TAB_LABELS.確定要刪除此餐廳, {
+      title: MICHELIN_RESTAURANTS_TAB_LABELS.刪除餐廳,
       type: 'warning',
     })
     if (!confirmed) return
@@ -110,9 +111,9 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
       const { error } = await supabase.from('michelin_restaurants').delete().eq('id', id)
       if (error) throw error
       await loadRestaurants()
-      toast.success('刪除成功')
+      toast.success(MICHELIN_RESTAURANTS_TAB_LABELS.刪除成功)
     } catch (error) {
-      toast.error('刪除失敗')
+      toast.error(MICHELIN_RESTAURANTS_TAB_LABELS.刪除失敗)
     }
   }
 
@@ -141,9 +142,9 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
       if (error) throw error
       await loadRestaurants()
       handleCloseEdit()
-      toast.success('更新成功')
+      toast.success(MICHELIN_RESTAURANTS_TAB_LABELS.更新成功)
     } catch (error) {
-      toast.error('更新失敗')
+      toast.error(MICHELIN_RESTAURANTS_TAB_LABELS.更新失敗)
     }
   }
 
@@ -161,7 +162,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
         .eq('id', restaurant.id)
 
       if (error) throw error
-      toast.success(newStatus ? '已啟用' : '已停用')
+      toast.success(newStatus ? '已啟用' : MICHELIN_RESTAURANTS_TAB_LABELS.已停用)
     } catch (error) {
       setRestaurants(prev =>
         prev.map(item =>
@@ -194,7 +195,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
     () => [
       {
         key: 'name',
-        label: '餐廳名稱',
+        label: MICHELIN_RESTAURANTS_TAB_LABELS.餐廳名稱,
         sortable: true,
         render: (_: unknown, restaurant: MichelinRestaurant) => (
           <div className="min-w-[180px]">
@@ -207,13 +208,13 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
       },
       {
         key: 'michelin_stars',
-        label: '星級',
+        label: MICHELIN_RESTAURANTS_TAB_LABELS.星級,
         sortable: true,
         render: (_: unknown, restaurant: MichelinRestaurant) => renderStars(restaurant.michelin_stars),
       },
       {
         key: 'city',
-        label: '地點',
+        label: MICHELIN_RESTAURANTS_TAB_LABELS.地點,
         sortable: false,
         render: (_: unknown, restaurant: MichelinRestaurant) => {
           const country = countries.find(c => c.id === restaurant.country_id)
@@ -227,7 +228,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
       },
       {
         key: 'chef_name',
-        label: '主廚',
+        label: MICHELIN_RESTAURANTS_TAB_LABELS.主廚,
         sortable: true,
         render: (_: unknown, restaurant: MichelinRestaurant) => (
           <div className="text-sm text-morandi-secondary">{restaurant.chef_name || '-'}</div>
@@ -235,7 +236,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
       },
       {
         key: 'cuisine_type',
-        label: '料理類型',
+        label: MICHELIN_RESTAURANTS_TAB_LABELS.料理類型,
         sortable: false,
         render: (_: unknown, restaurant: MichelinRestaurant) => (
           <div className="flex flex-wrap gap-1 min-w-[120px]">
@@ -257,7 +258,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
       },
       {
         key: 'price',
-        label: '價格',
+        label: MICHELIN_RESTAURANTS_TAB_LABELS.價格,
         sortable: false,
         render: (_: unknown, restaurant: MichelinRestaurant) => (
           <div className="text-sm text-morandi-gold font-medium">
@@ -269,7 +270,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
       },
       {
         key: 'phone',
-        label: '電話',
+        label: MICHELIN_RESTAURANTS_TAB_LABELS.電話,
         sortable: false,
         render: (_: unknown, restaurant: MichelinRestaurant) => (
           <div className="text-sm text-morandi-secondary">{restaurant.phone || '-'}</div>
@@ -277,7 +278,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
       },
       {
         key: 'is_active',
-        label: '狀態',
+        label: ATTRACTIONS_LIST_LABELS.狀態,
         sortable: true,
         render: (_: unknown, restaurant: MichelinRestaurant) => (
           <span
@@ -288,7 +289,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
                 : 'bg-morandi-container text-morandi-secondary'
             )}
           >
-            {restaurant.is_active ? '啟用' : '停用'}
+            {restaurant.is_active ? '啟用' : ATTRACTIONS_LIST_LABELS.停用}
           </span>
         ),
       },
@@ -318,7 +319,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
                     handleEdit(restaurant)
                   }}
                   className="h-8 px-2 text-morandi-blue hover:bg-morandi-blue/10"
-                  title="編輯"
+                  title={ATTRACTIONS_LIST_LABELS.編輯}
                 >
                   <Edit2 size={14} />
                 </Button>
@@ -330,7 +331,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
                     handleToggleStatus(restaurant)
                   }}
                   className="h-8 px-2"
-                  title={restaurant.is_active ? '停用' : '啟用'}
+                  title={restaurant.is_active ? '停用' : ATTRACTIONS_LIST_LABELS.啟用}
                 >
                   <Power
                     size={14}
@@ -345,7 +346,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
                     handleDelete(restaurant.id)
                   }}
                   className="h-8 px-2 hover:text-morandi-red hover:bg-morandi-red/10"
-                  title="刪除"
+                  title={ATTRACTIONS_LIST_LABELS.刪除}
                 >
                   <Trash2 size={14} />
                 </Button>
