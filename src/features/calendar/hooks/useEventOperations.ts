@@ -98,7 +98,6 @@ export function useEventOperations() {
       logger.log('[Calendar] 新增事件:', {
         title: newEvent.title,
         owner_id: user.id,
-        workspace_id: user.workspace_id
       })
 
       await createCalendarEvent({

@@ -17,7 +17,7 @@ export async function sendMessageAction({
     return { error: auth.error.error }
   }
 
-  const { user, workspaceId } = auth.data
+  const { user } = auth.data
 
   if (!content.trim()) {
     return { error: 'Message cannot be empty.' }
@@ -31,7 +31,6 @@ export async function sendMessageAction({
       channel_id: channelId,
       user_id: user.id,
       content: content.trim(),
-      workspace_id: workspaceId,
     })
 
   if (error) {

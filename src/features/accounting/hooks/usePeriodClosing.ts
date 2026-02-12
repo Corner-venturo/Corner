@@ -306,7 +306,6 @@ export function usePeriodClosing() {
       const { data: voucher, error: voucherError } = await supabase
         .from('journal_vouchers')
         .insert({
-          workspace_id: user.workspace_id,
           voucher_no: voucherNo,
           voucher_date: voucherDate,
           memo: `${preview.period.label} 期末結轉`,
@@ -382,7 +381,6 @@ export function usePeriodClosing() {
       const { error: closingError } = await supabase
         .from('accounting_period_closings')
         .insert({
-          workspace_id: user.workspace_id,
           period_type: preview.period.type,
           period_start: preview.period.startDate,
           period_end: preview.period.endDate,

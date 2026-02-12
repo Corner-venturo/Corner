@@ -83,13 +83,7 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
     }
     const dataWithCategory = data as CreateRateData
 
-    if (!user?.workspace_id) {
-      toast.error('無法取得工作區資訊')
-      return
-    }
-
     const result = await supabase.from('transportation_rates').insert({
-      workspace_id: user.workspace_id,
       country_id: data.country_id || null,
       country_name: countryName,
       vehicle_type: data.vehicle_type || dataWithCategory?.category || '',

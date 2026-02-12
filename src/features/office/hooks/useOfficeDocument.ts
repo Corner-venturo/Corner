@@ -57,7 +57,6 @@ export function useOfficeDocument(): UseOfficeDocumentReturn {
       const { data, error: fetchError } = await supabase
         .from('office_documents')
         .select('*')
-        .eq('workspace_id', workspaceId)
         .is('tour_id', null)
         .order('updated_at', { ascending: false })
 
@@ -127,7 +126,6 @@ export function useOfficeDocument(): UseOfficeDocumentReturn {
       const { data: newDoc, error: insertError } = await supabase
         .from('office_documents')
         .insert({
-          workspace_id: workspaceId,
           name,
           type,
           data: (data || {}) as Database['public']['Tables']['office_documents']['Insert']['data'],

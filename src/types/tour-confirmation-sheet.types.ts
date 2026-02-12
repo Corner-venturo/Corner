@@ -48,7 +48,7 @@ export interface TourConfirmationSheet extends BaseEntity {
   foreign_currency: string | null // JP, TH, US...
   exchange_rate: number | null // 例如：0.22（1日圓 = 0.22台幣）
 
-  workspace_id: string
+  workspace_id?: string | null
 }
 
 export type ConfirmationSheetStatus = 'draft' | 'confirmed' | 'in_progress' | 'completed'
@@ -118,7 +118,7 @@ export interface TourConfirmationItem extends BaseEntity {
   // 備註
   notes: string | null
 
-  workspace_id: string
+  workspace_id?: string | null
 }
 
 export type ConfirmationItemCategory =

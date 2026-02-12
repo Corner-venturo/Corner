@@ -6,6 +6,7 @@
 
 import { useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
+import { getRequiredWorkspaceId } from '@/lib/workspace-context'
 import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
 
@@ -111,7 +112,7 @@ export function usePayroll() {
    * 取得薪資期間列表
    */
   const fetchPeriods = useCallback(async (year?: number) => {
-    if (!user?.workspace_id) return
+    if (!user) return
 
     setLoading(true)
     setError(null)
@@ -120,7 +121,7 @@ export function usePayroll() {
       let query = supabase
         .from('payroll_periods')
         .select('*')
-        .eq('workspace_id', user.workspace_id)
+        
         .order('year', { ascending: false })
         .order('month', { ascending: false })
 
@@ -143,13 +144,13 @@ export function usePayroll() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id])
+  }, [user])
 
   /**
    * 建立薪資期間
    */
   const createPeriod = useCallback(async (year: number, month: number): Promise<PayrollPeriod | null> => {
-    if (!user?.workspace_id) return null
+    if (!user) return null
 
     setLoading(true)
     setError(null)
@@ -159,7 +160,7 @@ export function usePayroll() {
       const { data: existing } = await supabase
         .from('payroll_periods')
         .select('id')
-        .eq('workspace_id', user.workspace_id)
+        
         .eq('year', year)
         .eq('month', month)
         .single()
@@ -176,7 +177,7 @@ export function usePayroll() {
       const { data, error: insertError } = await supabase
         .from('payroll_periods')
         .insert({
-          workspace_id: user.workspace_id,
+          workspace_id: getRequiredWorkspaceId(),
           year,
           month,
           start_date: startDate.toISOString().split('T')[0],
@@ -201,13 +202,13 @@ export function usePayroll() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id, fetchPeriods])
+  }, [user, fetchPeriods])
 
   /**
    * 取得薪資紀錄
    */
   const fetchRecords = useCallback(async (periodId: string) => {
-    if (!user?.workspace_id) return
+    if (!user) return
 
     setLoading(true)
     setError(null)
@@ -219,7 +220,7 @@ export function usePayroll() {
           *,
           employee:employees!payroll_records_employee_id_fkey(id, chinese_name, display_name)
         `)
-        .eq('workspace_id', user.workspace_id)
+        
         .eq('payroll_period_id', periodId)
         .order('created_at', { ascending: true })
 
@@ -261,13 +262,13 @@ export function usePayroll() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id])
+  }, [user])
 
   /**
    * 計算並建立薪資紀錄
    */
   const calculatePayroll = useCallback(async (periodId: string): Promise<boolean> => {
-    if (!user?.workspace_id) return false
+    if (!user) return false
 
     setLoading(true)
     setError(null)
@@ -293,7 +294,7 @@ export function usePayroll() {
       const { data: employees, error: empError } = await supabase
         .from('employees')
         .select('id, chinese_name, display_name, salary_info')
-        .eq('workspace_id', user.workspace_id)
+        
         .eq('is_active', true)
 
       if (empError) throw empError
@@ -302,7 +303,7 @@ export function usePayroll() {
       const { data: attendanceRecords, error: attError } = await supabase
         .from('attendance_records')
         .select('*')
-        .eq('workspace_id', user.workspace_id)
+        
         .gte('date', period.start_date)
         .lte('date', period.end_date)
 
@@ -315,7 +316,7 @@ export function usePayroll() {
           *,
           leave_type:leave_types!leave_requests_leave_type_id_fkey(id, is_paid)
         `)
-        .eq('workspace_id', user.workspace_id)
+        
         .eq('status', 'approved')
         .gte('start_date', period.start_date)
         .lte('end_date', period.end_date)
@@ -372,7 +373,7 @@ export function usePayroll() {
         const netSalary = grossSalary - unpaidLeaveDeduction
 
         payrollRecords.push({
-          workspace_id: user.workspace_id,
+          workspace_id: getRequiredWorkspaceId(),
           payroll_period_id: periodId,
           employee_id: emp.id,
           base_salary: baseSalary,
@@ -425,13 +426,13 @@ export function usePayroll() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id, fetchPeriods, fetchRecords])
+  }, [user, fetchPeriods, fetchRecords])
 
   /**
    * 更新薪資紀錄
    */
   const updateRecord = useCallback(async (id: string, input: Partial<PayrollRecordInput>): Promise<boolean> => {
-    if (!user?.workspace_id) return false
+    if (!user) return false
 
     setLoading(true)
     setError(null)
@@ -466,7 +467,7 @@ export function usePayroll() {
           updated_at: new Date().toISOString(),
         })
         .eq('id', id)
-        .eq('workspace_id', user.workspace_id)
+        
 
       if (updateError) throw updateError
 
@@ -480,13 +481,13 @@ export function usePayroll() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id, fetchRecords])
+  }, [user, fetchRecords])
 
   /**
    * 確認薪資期間
    */
   const confirmPeriod = useCallback(async (periodId: string): Promise<boolean> => {
-    if (!user?.workspace_id || !user.id) return false
+    if (!user?.id) return false
 
     setLoading(true)
     setError(null)
@@ -500,7 +501,7 @@ export function usePayroll() {
           confirmed_at: new Date().toISOString(),
         })
         .eq('id', periodId)
-        .eq('workspace_id', user.workspace_id)
+        
 
       if (updateError) throw updateError
 
@@ -514,13 +515,13 @@ export function usePayroll() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id, user?.id, fetchPeriods])
+  }, [user?.id, fetchPeriods])
 
   /**
    * 標記為已發放
    */
   const markAsPaid = useCallback(async (periodId: string): Promise<boolean> => {
-    if (!user?.workspace_id) return false
+    if (!user) return false
 
     setLoading(true)
     setError(null)
@@ -530,7 +531,7 @@ export function usePayroll() {
         .from('payroll_periods')
         .update({ status: 'paid' })
         .eq('id', periodId)
-        .eq('workspace_id', user.workspace_id)
+        
 
       if (updateError) throw updateError
 
@@ -544,7 +545,7 @@ export function usePayroll() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id, fetchPeriods])
+  }, [user, fetchPeriods])
 
   /**
    * 計算薪資統計

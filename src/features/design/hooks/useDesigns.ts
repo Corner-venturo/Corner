@@ -71,7 +71,6 @@ export function useDesigns() {
     const { data, error } = await supabase
       .from('brochure_documents')
       .insert({
-        workspace_id: workspaceId,
         design_type: params.design_type,
         tour_id: params.tour_id || null,
         tour_code: params.tour_code || null,
@@ -185,7 +184,6 @@ export function useDesigns() {
       .from('brochure_documents')
       .delete()
       .eq('id', id)
-      .eq('workspace_id', workspaceId)
       .select()
       .single()
 

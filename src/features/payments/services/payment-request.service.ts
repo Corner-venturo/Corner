@@ -142,10 +142,6 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
     const itemIndex = existingItems.length + 1
     const itemNumber = `${request.code}-${itemIndex}`
 
-    // 確保有 workspace_id（RLS 必須）
-    // 優先使用 request.workspace_id，但如果不存在則從 auth context 取得
-    const workspaceId = request.workspace_id || getRequiredWorkspaceId()
-
     // 資料庫欄位是 unitprice（無底線），轉換欄位名稱
     const item = {
       id: crypto.randomUUID(),
@@ -161,7 +157,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       notes: itemData.notes,
       sort_order: itemData.sort_order,
       tour_request_id: itemData.tour_request_id || null, // 關聯需求單
-      workspace_id: workspaceId, // RLS 需要
+      // workspace_id auto-set by DB trigger
       created_at: now,
       updated_at: now,
     }

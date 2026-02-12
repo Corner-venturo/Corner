@@ -5,7 +5,7 @@ import { logger } from '@/lib/utils/logger'
 import { ValidationError } from '@/core/errors/app-errors'
 import { generateTourCode as generateTourCodeUtil } from '@/stores/utils/code-generator'
 import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
-import { getRequiredWorkspaceId } from '@/lib/workspace-context'
+// workspace_id is now auto-set by DB trigger
 import { BaseEntity } from '@/core/types/common'
 import { supabase } from '@/lib/supabase/client'
 import { invalidateTours } from '@/data'
@@ -315,11 +315,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
     const yearStart = new Date(targetYear, 0, 1)
     const departureDate = today > yearStart ? today : yearStart
 
-    // 取得 workspace_id（RLS 必須）
-    const workspaceId = getRequiredWorkspaceId()
-
     const specialTour: Partial<Tour> = {
-      workspace_id: workspaceId,
       code: tourCode,
       name: `${targetYear}年度${type.name}`,
       departure_date: formatDate(departureDate),

@@ -153,7 +153,6 @@ export function useTourOperations(params: UseTourOperationsParams) {
           controller_id: newTour.controller_id || undefined,
           outbound_flight: parseFlightText(newTour.outbound_flight_text),
           return_flight: parseFlightText(newTour.return_flight_text),
-          workspace_id: workspaceId, // RLS 必須
         }
 
         const createdTour = await actions.create(tourData)
@@ -190,7 +189,6 @@ export function useTourOperations(params: UseTourOperationsParams) {
             total_amount: totalAmount,
             paid_amount: 0,
             remaining_amount: totalAmount,
-            workspace_id: workspaceId,
             created_at: now,
             updated_at: now,
           }

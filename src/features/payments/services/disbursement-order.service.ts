@@ -7,7 +7,7 @@ import {
   invalidatePaymentRequests,
 } from '@/data'
 import { ValidationError } from '@/core/errors/app-errors'
-import { getRequiredWorkspaceId } from '@/lib/workspace-context'
+// workspace_id is now auto-set by DB trigger
 
 class DisbursementOrderService extends BaseService<DisbursementOrder> {
   protected resourceName = 'disbursement_orders'
@@ -124,9 +124,6 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
    * 使用請款單創建出納單
    */
   async createWithRequests(paymentRequestIds: string[], note?: string): Promise<DisbursementOrder> {
-    // 取得 workspace_id（RLS 必須）
-    const workspaceId = getRequiredWorkspaceId()
-
     // 從 Supabase 取得請款單並計算總金額
     const { data: requests, error: reqError } = await supabase
       .from('payment_requests')
@@ -147,7 +144,6 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
     const orderNumber = `P${disbursementDate.replace(/-/g, '').slice(2)}${String.fromCharCode(65 + (existingOrders?.length || 0))}`
 
     const orderData = {
-      workspace_id: workspaceId,
       order_number: orderNumber,
       disbursement_date: disbursementDate,
       payment_request_ids: [...paymentRequestIds],

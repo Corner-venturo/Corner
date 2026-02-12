@@ -6,6 +6,7 @@
 
 import { useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
+import { getRequiredWorkspaceId } from '@/lib/workspace-context'
 import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
 
@@ -63,7 +64,7 @@ export function useLeaveTypes() {
    * 取得所有假別類型
    */
   const fetchLeaveTypes = useCallback(async () => {
-    if (!user?.workspace_id) return
+    if (!user) return
 
     setLoading(true)
     setError(null)
@@ -72,7 +73,7 @@ export function useLeaveTypes() {
       const { data, error: queryError } = await supabase
         .from('leave_types')
         .select('*')
-        .eq('workspace_id', user.workspace_id)
+        
         .order('code', { ascending: true })
 
       if (queryError) throw queryError
@@ -85,13 +86,13 @@ export function useLeaveTypes() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id])
+  }, [user])
 
   /**
    * 新增假別類型
    */
   const createLeaveType = useCallback(async (input: LeaveTypeInput): Promise<boolean> => {
-    if (!user?.workspace_id) return false
+    if (!user) return false
 
     setLoading(true)
     setError(null)
@@ -100,7 +101,7 @@ export function useLeaveTypes() {
       const { error: insertError } = await supabase
         .from('leave_types')
         .insert({
-          workspace_id: user.workspace_id,
+          workspace_id: getRequiredWorkspaceId(),
           name: input.name,
           code: input.code,
           days_per_year: input.days_per_year ?? null,
@@ -121,13 +122,13 @@ export function useLeaveTypes() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id, fetchLeaveTypes])
+  }, [user, fetchLeaveTypes])
 
   /**
    * 更新假別類型
    */
   const updateLeaveType = useCallback(async (id: string, input: Partial<LeaveTypeInput>): Promise<boolean> => {
-    if (!user?.workspace_id) return false
+    if (!user) return false
 
     setLoading(true)
     setError(null)
@@ -140,7 +141,7 @@ export function useLeaveTypes() {
           updated_at: new Date().toISOString(),
         })
         .eq('id', id)
-        .eq('workspace_id', user.workspace_id)
+        
 
       if (updateError) throw updateError
 
@@ -154,13 +155,13 @@ export function useLeaveTypes() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id, fetchLeaveTypes])
+  }, [user, fetchLeaveTypes])
 
   /**
    * 刪除假別類型
    */
   const deleteLeaveType = useCallback(async (id: string): Promise<boolean> => {
-    if (!user?.workspace_id) return false
+    if (!user) return false
 
     setLoading(true)
     setError(null)
@@ -170,7 +171,7 @@ export function useLeaveTypes() {
         .from('leave_types')
         .delete()
         .eq('id', id)
-        .eq('workspace_id', user.workspace_id)
+        
 
       if (deleteError) throw deleteError
 
@@ -184,20 +185,20 @@ export function useLeaveTypes() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id, fetchLeaveTypes])
+  }, [user, fetchLeaveTypes])
 
   /**
    * 初始化預設假別
    */
   const initializeDefaultTypes = useCallback(async (): Promise<boolean> => {
-    if (!user?.workspace_id) return false
+    if (!user) return false
 
     setLoading(true)
     setError(null)
 
     try {
       const insertData = DEFAULT_LEAVE_TYPES.map(type => ({
-        workspace_id: user.workspace_id!,
+        workspace_id: getRequiredWorkspaceId(),
         name: type.name,
         code: type.code,
         days_per_year: type.days_per_year ?? null,
@@ -222,7 +223,7 @@ export function useLeaveTypes() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id, fetchLeaveTypes])
+  }, [user, fetchLeaveTypes])
 
   return {
     loading,

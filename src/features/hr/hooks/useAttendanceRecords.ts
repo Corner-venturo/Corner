@@ -6,6 +6,7 @@
 
 import { useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
+import { getRequiredWorkspaceId } from '@/lib/workspace-context'
 import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
 
@@ -95,7 +96,7 @@ export function useAttendanceRecords() {
     end_date?: string
     status?: AttendanceStatus
   }) => {
-    if (!user?.workspace_id) return
+    if (!user) return
 
     setLoading(true)
     setError(null)
@@ -107,7 +108,7 @@ export function useAttendanceRecords() {
           *,
           employee:employees!attendance_records_employee_id_fkey(id, chinese_name, display_name)
         `)
-        .eq('workspace_id', user.workspace_id)
+        
         .order('date', { ascending: false })
 
       if (filters?.employee_id) {
@@ -155,13 +156,13 @@ export function useAttendanceRecords() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id])
+  }, [user])
 
   /**
    * 新增出勤紀錄
    */
   const createRecord = useCallback(async (input: AttendanceRecordInput): Promise<boolean> => {
-    if (!user?.workspace_id) return false
+    if (!user) return false
 
     setLoading(true)
     setError(null)
@@ -185,7 +186,7 @@ export function useAttendanceRecords() {
       const { error: insertError } = await supabase
         .from('attendance_records')
         .insert({
-          workspace_id: user.workspace_id,
+          workspace_id: getRequiredWorkspaceId(),
           employee_id: input.employee_id,
           date: input.date,
           clock_in: input.clock_in ?? null,
@@ -209,13 +210,13 @@ export function useAttendanceRecords() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id, fetchRecords])
+  }, [user, fetchRecords])
 
   /**
    * 更新出勤紀錄
    */
   const updateRecord = useCallback(async (id: string, input: Partial<AttendanceRecordInput>): Promise<boolean> => {
-    if (!user?.workspace_id) return false
+    if (!user) return false
 
     setLoading(true)
     setError(null)
@@ -243,7 +244,7 @@ export function useAttendanceRecords() {
         .from('attendance_records')
         .update(updateData)
         .eq('id', id)
-        .eq('workspace_id', user.workspace_id)
+        
 
       if (updateError) throw updateError
 
@@ -257,13 +258,13 @@ export function useAttendanceRecords() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id, fetchRecords])
+  }, [user, fetchRecords])
 
   /**
    * 刪除出勤紀錄
    */
   const deleteRecord = useCallback(async (id: string): Promise<boolean> => {
-    if (!user?.workspace_id) return false
+    if (!user) return false
 
     setLoading(true)
     setError(null)
@@ -273,7 +274,7 @@ export function useAttendanceRecords() {
         .from('attendance_records')
         .delete()
         .eq('id', id)
-        .eq('workspace_id', user.workspace_id)
+        
 
       if (deleteError) throw deleteError
 
@@ -287,7 +288,7 @@ export function useAttendanceRecords() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id, fetchRecords])
+  }, [user, fetchRecords])
 
   /**
    * 計算出勤統計
@@ -316,7 +317,7 @@ export function useAttendanceRecords() {
    * 打卡
    */
   const clockIn = useCallback(async (employeeId: string): Promise<boolean> => {
-    if (!user?.workspace_id) return false
+    if (!user) return false
 
     const today = new Date().toISOString().split('T')[0]
     const currentTime = new Date().toTimeString().slice(0, 5)
@@ -325,7 +326,7 @@ export function useAttendanceRecords() {
     const { data: existing } = await supabase
       .from('attendance_records')
       .select('id')
-      .eq('workspace_id', user.workspace_id)
+      
       .eq('employee_id', employeeId)
       .eq('date', today)
       .single()
@@ -340,13 +341,13 @@ export function useAttendanceRecords() {
       date: today,
       clock_in: currentTime,
     })
-  }, [user?.workspace_id, createRecord])
+  }, [user, createRecord])
 
   /**
    * 打卡下班
    */
   const clockOut = useCallback(async (employeeId: string): Promise<boolean> => {
-    if (!user?.workspace_id) return false
+    if (!user) return false
 
     const today = new Date().toISOString().split('T')[0]
     const currentTime = new Date().toTimeString().slice(0, 5)
@@ -355,7 +356,7 @@ export function useAttendanceRecords() {
     const { data: existing, error: fetchError } = await supabase
       .from('attendance_records')
       .select('id, clock_in')
-      .eq('workspace_id', user.workspace_id)
+      
       .eq('employee_id', employeeId)
       .eq('date', today)
       .single()
@@ -383,7 +384,7 @@ export function useAttendanceRecords() {
       work_hours: workHours,
       overtime_hours: overtimeHours,
     })
-  }, [user?.workspace_id, updateRecord])
+  }, [user, updateRecord])
 
   return {
     loading,

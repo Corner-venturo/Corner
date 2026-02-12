@@ -56,7 +56,6 @@ async function generateVoucherNo(workspaceId: string): Promise<string> {
   const { data } = await supabase
     .from('journal_vouchers')
     .select('voucher_no')
-    .eq('workspace_id', workspaceId)
     .like('voucher_no', `${prefix}%`)
     .order('voucher_no', { ascending: false })
     .limit(1)

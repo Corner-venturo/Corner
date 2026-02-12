@@ -7,6 +7,7 @@
 import { useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
+import { getRequiredWorkspaceId } from '@/lib/workspace-context'
 import { logger } from '@/lib/utils/logger'
 
 // ============================================
@@ -82,7 +83,7 @@ export function useLeaveRequests() {
     start_date?: string
     end_date?: string
   }) => {
-    if (!user?.workspace_id) return
+    if (!user) return
 
     setLoading(true)
     setError(null)
@@ -95,7 +96,7 @@ export function useLeaveRequests() {
           employee:employees!leave_requests_employee_id_fkey(id, chinese_name, display_name),
           leave_type:leave_types!leave_requests_leave_type_id_fkey(id, name)
         `)
-        .eq('workspace_id', user.workspace_id)
+        
         .order('created_at', { ascending: false })
 
       if (filters?.status) {
@@ -149,13 +150,13 @@ export function useLeaveRequests() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id])
+  }, [user])
 
   /**
    * 新增請假申請
    */
   const createRequest = useCallback(async (input: LeaveRequestInput): Promise<boolean> => {
-    if (!user?.workspace_id) return false
+    if (!user) return false
 
     setLoading(true)
     setError(null)
@@ -164,7 +165,7 @@ export function useLeaveRequests() {
       const { error: insertError } = await supabase
         .from('leave_requests')
         .insert({
-          workspace_id: user.workspace_id,
+          workspace_id: getRequiredWorkspaceId(),
           employee_id: input.employee_id,
           leave_type_id: input.leave_type_id,
           start_date: input.start_date,
@@ -189,13 +190,13 @@ export function useLeaveRequests() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id, fetchRequests])
+  }, [user, fetchRequests])
 
   /**
    * 審核請假申請
    */
   const approveRequest = useCallback(async (id: string): Promise<boolean> => {
-    if (!user?.workspace_id || !user.id) return false
+    if (!user?.id) return false
 
     setLoading(true)
     setError(null)
@@ -206,7 +207,7 @@ export function useLeaveRequests() {
         .from('leave_requests')
         .select('*')
         .eq('id', id)
-        .eq('workspace_id', user.workspace_id)
+        
         .single()
 
       if (fetchError) throw fetchError
@@ -259,13 +260,13 @@ export function useLeaveRequests() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id, user?.id, fetchRequests])
+  }, [user?.id, fetchRequests])
 
   /**
    * 駁回請假申請
    */
   const rejectRequest = useCallback(async (id: string, reason: string): Promise<boolean> => {
-    if (!user?.workspace_id || !user.id) return false
+    if (!user?.id) return false
 
     setLoading(true)
     setError(null)
@@ -281,7 +282,7 @@ export function useLeaveRequests() {
           updated_at: new Date().toISOString(),
         })
         .eq('id', id)
-        .eq('workspace_id', user.workspace_id)
+        
 
       if (updateError) throw updateError
 
@@ -295,13 +296,13 @@ export function useLeaveRequests() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id, user?.id, fetchRequests])
+  }, [user?.id, fetchRequests])
 
   /**
    * 取消請假申請
    */
   const cancelRequest = useCallback(async (id: string): Promise<boolean> => {
-    if (!user?.workspace_id) return false
+    if (!user) return false
 
     setLoading(true)
     setError(null)
@@ -314,7 +315,7 @@ export function useLeaveRequests() {
           updated_at: new Date().toISOString(),
         })
         .eq('id', id)
-        .eq('workspace_id', user.workspace_id)
+        
 
       if (updateError) throw updateError
 
@@ -328,13 +329,13 @@ export function useLeaveRequests() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id, fetchRequests])
+  }, [user, fetchRequests])
 
   /**
    * 取得員工假別餘額
    */
   const fetchBalances = useCallback(async (employeeId: string, year?: number) => {
-    if (!user?.workspace_id) return
+    if (!user) return
 
     setLoading(true)
     setError(null)
@@ -376,7 +377,7 @@ export function useLeaveRequests() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id])
+  }, [user])
 
   /**
    * 初始化員工假別餘額
@@ -386,7 +387,7 @@ export function useLeaveRequests() {
     year: number,
     leaveTypes: { id: string; days_per_year: number | null }[]
   ): Promise<boolean> => {
-    if (!user?.workspace_id) return false
+    if (!user) return false
 
     setLoading(true)
     setError(null)
@@ -398,7 +399,7 @@ export function useLeaveRequests() {
           employee_id: employeeId,
           leave_type_id: type.id,
           year,
-          workspace_id: user.workspace_id!,
+          workspace_id: getRequiredWorkspaceId(),
           entitled_days: type.days_per_year!,
           used_days: 0,
           remaining_days: type.days_per_year!,
@@ -424,7 +425,7 @@ export function useLeaveRequests() {
     } finally {
       setLoading(false)
     }
-  }, [user?.workspace_id, fetchBalances])
+  }, [user, fetchBalances])
 
   return {
     loading,
