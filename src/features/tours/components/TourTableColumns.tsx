@@ -10,6 +10,7 @@ import { TableColumn } from '@/components/ui/enhanced-table'
 import { Tour } from '@/stores/types'
 import { cn } from '@/lib/utils'
 import { DateCell } from '@/components/table-cells'
+import { TOUR_TABLE } from '../constants'
 
 interface UseTourTableColumnsParams {
   getStatusColor: (status: string) => string
@@ -21,7 +22,7 @@ export function useTourTableColumns({ getStatusColor }: UseTourTableColumnsParam
     () => [
       {
         key: 'code',
-        label: '團號',
+        label: TOUR_TABLE.col_code,
         sortable: true,
         width: '110px',
         render: (value, row) => {
@@ -44,14 +45,14 @@ export function useTourTableColumns({ getStatusColor }: UseTourTableColumnsParam
       },
       {
         key: 'name',
-        label: '旅遊團名稱',
+        label: TOUR_TABLE.col_name,
         sortable: true,
         width: '180px',
         render: (value) => <span className="text-sm text-morandi-primary">{String(value || "")}</span>,
       },
       {
         key: 'departure_date',
-        label: '出發日期',
+        label: TOUR_TABLE.col_departure,
         sortable: true,
         width: '100px',
         render: (value, row) => {
@@ -61,7 +62,7 @@ export function useTourTableColumns({ getStatusColor }: UseTourTableColumnsParam
       },
       {
         key: 'status',
-        label: '狀態',
+        label: TOUR_TABLE.col_status,
         sortable: true,
         width: '80px',
         render: (value, row) => {

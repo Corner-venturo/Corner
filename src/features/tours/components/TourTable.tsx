@@ -6,6 +6,7 @@ import { Tour } from '@/stores/types'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { TourMobileCard } from './TourMobileCard'
 import { useTourTableColumns } from './TourTableColumns'
+import { TOUR_TABLE } from '../constants'
 
 interface TourTableProps {
   tours: Tour[]
@@ -51,8 +52,8 @@ export const TourTable: React.FC<TourTableProps> = ({
         ) : tours.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <MapPin size={48} className="text-morandi-secondary/30 mb-4" />
-            <p className="text-morandi-secondary">沒有找到旅遊團</p>
-            <p className="text-sm text-morandi-secondary/70 mt-1">請調整篩選條件或新增旅遊團</p>
+            <p className="text-morandi-secondary">{TOUR_TABLE.empty_title}</p>
+            <p className="text-sm text-morandi-secondary/70 mt-1">{TOUR_TABLE.empty_subtitle}</p>
           </div>
         ) : (
           tours.map(tour => (

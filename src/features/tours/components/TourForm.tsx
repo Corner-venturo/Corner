@@ -13,6 +13,7 @@ import {
   TourSettings,
   TourOrderSection,
 } from './tour-form'
+import { TOUR_FORM } from '../constants'
 
 interface TourFormProps {
   isOpen: boolean
@@ -83,10 +84,10 @@ export function TourForm({
         <DialogHeader>
           <DialogTitle>
             {mode === 'edit'
-              ? '編輯旅遊團'
+              ? TOUR_FORM.title_edit
               : isFromProposal
-                ? '提案轉開團'
-                : '新增旅遊團 & 訂單'}
+                ? TOUR_FORM.title_convert
+                : TOUR_FORM.title_create}
           </DialogTitle>
         </DialogHeader>
 
@@ -104,7 +105,7 @@ export function TourForm({
           {/* Left side - Tour info */}
           <div className={`flex-1 ${mode === 'create' ? 'pr-6 border-r border-border' : ''}`}>
             <div className="h-full overflow-y-auto">
-              <h3 className="text-lg font-medium text-morandi-primary mb-4">旅遊團資訊</h3>
+              <h3 className="text-lg font-medium text-morandi-primary mb-4">{TOUR_FORM.section_info}</h3>
               <div className="space-y-4">
                 <TourBasicInfo
                   newTour={newTour}
@@ -139,7 +140,7 @@ export function TourForm({
         <div className="flex justify-end space-x-2 pt-6 border-t border-border mt-6">
           <Button variant="outline" onClick={onClose} disabled={submitting} className="gap-2">
             <X size={16} />
-            取消
+            {TOUR_FORM.cancel}
           </Button>
           <Button
             onClick={onSubmit}
@@ -154,18 +155,18 @@ export function TourForm({
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
             {mode === 'edit'
-              ? (submitting ? '儲存中...' : '儲存變更')
+              ? (submitting ? TOUR_FORM.submit_saving : TOUR_FORM.submit_save)
               : isFromProposal
                 ? (submitting
-                    ? '轉開團中...'
+                    ? TOUR_FORM.submit_converting
                     : newOrder.contact_person
-                      ? '確認轉開團並建立訂單'
-                      : '確認轉開團')
+                      ? TOUR_FORM.submit_convert_with_order
+                      : TOUR_FORM.submit_convert)
                 : (submitting
-                    ? '建立中...'
+                    ? TOUR_FORM.submit_creating
                     : newOrder.contact_person
-                      ? '新增旅遊團 & 訂單'
-                      : '新增旅遊團')}
+                      ? TOUR_FORM.submit_create_with_order
+                      : TOUR_FORM.submit_create)}
           </Button>
         </div>
 

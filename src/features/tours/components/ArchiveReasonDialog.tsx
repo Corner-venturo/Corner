@@ -8,12 +8,13 @@ import { Button } from '@/components/ui/button'
 import { Archive, Check, X } from 'lucide-react'
 import { Tour } from '@/stores/types'
 import { cn } from '@/lib/utils'
+import { TOUR_ARCHIVE } from '../constants'
 
 // 封存原因選項
 export const ARCHIVE_REASONS = [
-  { value: 'no_deal', label: '沒成交', description: '客戶最終未成交' },
-  { value: 'cancelled', label: '取消', description: '客戶或公司取消此團' },
-  { value: 'test_error', label: '測試錯誤', description: '測試用資料或操作錯誤' },
+  { value: 'no_deal', label: TOUR_ARCHIVE.reason_no_deal, description: TOUR_ARCHIVE.reason_no_deal_desc },
+  { value: 'cancelled', label: TOUR_ARCHIVE.reason_cancelled, description: TOUR_ARCHIVE.reason_cancelled_desc },
+  { value: 'test_error', label: TOUR_ARCHIVE.reason_test_error, description: TOUR_ARCHIVE.reason_test_error_desc },
 ] as const
 
 export type ArchiveReason = typeof ARCHIVE_REASONS[number]['value']
@@ -51,16 +52,16 @@ export function ArchiveReasonDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-morandi-gold">
             <Archive size={20} />
-            封存旅遊團
+            {TOUR_ARCHIVE.title}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <p className="text-sm text-morandi-primary">
-            確定要封存旅遊團 <span className="font-semibold">「{tour?.name}」</span> 嗎？
+            {TOUR_ARCHIVE.confirm_text(tour?.name)}
           </p>
 
           <div className="space-y-2">
-            <p className="text-sm font-medium text-morandi-primary">請選擇封存原因：</p>
+            <p className="text-sm font-medium text-morandi-primary">{TOUR_ARCHIVE.select_reason}</p>
             <div className="space-y-2">
               {ARCHIVE_REASONS.map((reason) => (
                 <button
@@ -82,18 +83,18 @@ export function ArchiveReasonDialog({
 
           <div className="bg-morandi-gold/5 border border-morandi-gold/20 rounded-lg p-3 space-y-2">
             <p className="text-sm text-morandi-secondary">
-              封存後，此旅遊團將：
+              {TOUR_ARCHIVE.after_archive_title}
             </p>
             <ul className="text-sm text-morandi-secondary space-y-1 ml-4">
-              <li>• 從列表中隱藏（可在「封存」分頁查看）</li>
-              <li>• 自動斷開關聯的報價單和行程表</li>
+              <li>{TOUR_ARCHIVE.after_archive_hidden}</li>
+              <li>{TOUR_ARCHIVE.after_archive_unlink}</li>
             </ul>
           </div>
         </div>
         <div className="flex justify-end gap-2 mt-4">
           <Button variant="outline" onClick={handleClose} className="gap-2">
             <X size={16} />
-            取消
+            {TOUR_ARCHIVE.cancel}
           </Button>
           <Button
             onClick={handleConfirm}
@@ -101,7 +102,7 @@ export function ArchiveReasonDialog({
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
             <Check size={16} />
-            確認封存
+            {TOUR_ARCHIVE.confirm}
           </Button>
         </div>
       </DialogContent>

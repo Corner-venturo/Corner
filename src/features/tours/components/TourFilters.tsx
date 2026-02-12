@@ -21,6 +21,7 @@ import {
   Plane,
   ChevronDown,
 } from 'lucide-react'
+import { TOUR_FILTERS } from '../constants'
 
 interface TourFiltersProps {
   searchQuery: string
@@ -41,23 +42,23 @@ export const TourFilters: React.FC<TourFiltersProps> = ({
 }) => {
   return (
     <ResponsiveHeader
-      title="旅遊團管理"
+      title={TOUR_FILTERS.page_title}
       icon={MapPin}
       breadcrumb={[
-        { label: '首頁', href: '/' },
-        { label: '旅遊團管理', href: '/tours' },
+        { label: TOUR_FILTERS.breadcrumb_home, href: '/' },
+        { label: TOUR_FILTERS.breadcrumb_tours, href: '/tours' },
       ]}
       showSearch={true}
       searchTerm={searchQuery}
       onSearchChange={onSearchChange}
-      searchPlaceholder="搜尋旅遊團..."
+      searchPlaceholder={TOUR_FILTERS.search_placeholder}
       tabs={[
-        { value: 'all', label: '全部', icon: BarChart3 },
-        { value: '提案', label: '提案', icon: FileText },
-        { value: '進行中', label: '進行中', icon: Calendar },
-        { value: '結案', label: '結案', icon: FileCheck },
-        { value: '特殊團', label: '特殊團', icon: Star },
-        { value: 'archived', label: '封存', icon: Archive },
+        { value: 'all', label: TOUR_FILTERS.tab_all, icon: BarChart3 },
+        { value: '提案', label: TOUR_FILTERS.tab_proposal, icon: FileText },
+        { value: '進行中', label: TOUR_FILTERS.tab_active, icon: Calendar },
+        { value: '結案', label: TOUR_FILTERS.tab_closed, icon: FileCheck },
+        { value: '特殊團', label: TOUR_FILTERS.tab_special, icon: Star },
+        { value: 'archived', label: TOUR_FILTERS.tab_archived, icon: Archive },
       ]}
       activeTab={activeTab}
       onTabChange={onTabChange}
@@ -66,18 +67,18 @@ export const TourFilters: React.FC<TourFiltersProps> = ({
           <DropdownMenuTrigger asChild>
             <Button className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1.5">
               <Plus size={16} />
-              新增
+              {TOUR_FILTERS.add_button}
               <ChevronDown size={14} />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem onClick={onAddProposal} className="gap-2 cursor-pointer">
               <FileText size={16} className="text-morandi-gold" />
-              <span>新增提案</span>
+              <span>{TOUR_FILTERS.add_proposal}</span>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={onAddTour} className="gap-2 cursor-pointer">
               <Plane size={16} className="text-status-info" />
-              <span>直接開團</span>
+              <span>{TOUR_FILTERS.add_tour_direct}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
