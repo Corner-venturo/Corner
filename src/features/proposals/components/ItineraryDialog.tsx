@@ -40,15 +40,16 @@ import {
 } from 'lucide-react'
 import { AttractionSelector } from '@/components/editor/AttractionSelector'
 import { HotelSelector, type LuxuryHotel } from '@/components/editor/HotelSelector'
+import { BROCHURE_PREVIEW_DIALOG_LABELS, ITINERARY_DIALOG_LABELS } from '../constants/labels';
 
 // 預設顏色選項
 const COLOR_OPTIONS = [
-  { value: '', label: '預設', color: '#3a3633' },
-  { value: '#3b82f6', label: '藍色', color: '#3b82f6' },
-  { value: '#ef4444', label: '紅色', color: '#ef4444' },
-  { value: '#22c55e', label: '綠色', color: '#22c55e' },
-  { value: '#f59e0b', label: '橙色', color: '#f59e0b' },
-  { value: '#8b5cf6', label: '紫色', color: '#8b5cf6' },
+  { value: '', label: ITINERARY_DIALOG_LABELS.預設, color: '#3a3633' },
+  { value: '#3b82f6', label: ITINERARY_DIALOG_LABELS.藍色, color: '#3b82f6' },
+  { value: '#ef4444', label: ITINERARY_DIALOG_LABELS.紅色, color: '#ef4444' },
+  { value: '#22c55e', label: ITINERARY_DIALOG_LABELS.綠色, color: '#22c55e' },
+  { value: '#f59e0b', label: ITINERARY_DIALOG_LABELS.橙色, color: '#f59e0b' },
+  { value: '#8b5cf6', label: ITINERARY_DIALOG_LABELS.紫色, color: '#8b5cf6' },
 ]
 import type { ProposalPackage } from '@/types/proposal.types'
 import type {
@@ -118,7 +119,7 @@ export function ItineraryDialog({
     })
 
     return {
-      title: pkg?.version_name || '行程表',
+      title: pkg?.version_name || BROCHURE_PREVIEW_DIALOG_LABELS.行程表,
       subtitle: '',
       startDate,
       days,
@@ -412,22 +413,22 @@ export function ItineraryDialog({
   const formatDate = (dateStr: string): string => {
     if (!dateStr) return ''
     const date = new Date(dateStr)
-    const weekdays = ['日', '一', '二', '三', '四', '五', '六']
+    const weekdays = [ITINERARY_DIALOG_LABELS.日, ITINERARY_DIALOG_LABELS.一, ITINERARY_DIALOG_LABELS.二, ITINERARY_DIALOG_LABELS.三, ITINERARY_DIALOG_LABELS.四, ITINERARY_DIALOG_LABELS.五, ITINERARY_DIALOG_LABELS.六]
     return `${date.getMonth() + 1}/${date.getDate()} (${weekdays[date.getDay()]})`
   }
 
   // 儲存
   const handleSave = useCallback(async () => {
     if (!onSave) {
-      window.alert('儲存功能未啟用')
+      window.alert(ITINERARY_DIALOG_LABELS.儲存功能未啟用)
       return
     }
     setSaving(true)
     try {
       await onSave(data)
-      window.alert('儲存成功')
+      window.alert(ITINERARY_DIALOG_LABELS.儲存成功)
     } catch {
-      window.alert('儲存失敗')
+      window.alert(ITINERARY_DIALOG_LABELS.儲存失敗)
     } finally {
       setSaving(false)
     }
@@ -511,11 +512,11 @@ export function ItineraryDialog({
         break
       case 'name':
         value = attraction.name || ''
-        placeholder = attraction.mealType && attraction.mealType !== 'none' ? '餐廳名稱' : '景點名稱'
+        placeholder = attraction.mealType && attraction.mealType !== 'none' ? ITINERARY_DIALOG_LABELS.餐廳名稱 : ITINERARY_DIALOG_LABELS.景點名稱
         break
       case 'menu':
         value = attraction.menu || ''
-        placeholder = '菜色內容'
+        placeholder = ITINERARY_DIALOG_LABELS.菜色內容
         break
     }
 
@@ -624,7 +625,7 @@ export function ItineraryDialog({
             <Input
               value={data.title}
               onChange={(e) => setData((prev) => ({ ...prev, title: e.target.value }))}
-              placeholder="輸入行程標題..."
+              placeholder={ITINERARY_DIALOG_LABELS.輸入行程標題}
               className="mt-1 h-8"
             />
           </div>
@@ -633,7 +634,7 @@ export function ItineraryDialog({
             <Input
               value={data.subtitle || ''}
               onChange={(e) => setData((prev) => ({ ...prev, subtitle: e.target.value }))}
-              placeholder="輸入副標題..."
+              placeholder={ITINERARY_DIALOG_LABELS.輸入副標題}
               className="mt-1 h-8"
             />
           </div>
@@ -659,7 +660,7 @@ export function ItineraryDialog({
           <button
             onClick={addDay}
             className="px-3 py-2 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
-            title="新增一天"
+            title={ITINERARY_DIALOG_LABELS.新增一天}
           >
             <Plus size={16} />
           </button>
@@ -677,7 +678,7 @@ export function ItineraryDialog({
                   type="button"
                   onClick={() => insertSymbolToTitle(' → ')}
                   className="p-1.5 bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors"
-                  title="插入箭頭"
+                  title={ITINERARY_DIALOG_LABELS.插入箭頭}
                 >
                   <ArrowRight size={14} className="text-morandi-primary" />
                 </button>
@@ -685,7 +686,7 @@ export function ItineraryDialog({
                   type="button"
                   onClick={() => insertSymbolToTitle(' ⇀ ')}
                   className="px-2 py-1 text-xs bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors font-medium"
-                  title="插入鉤箭頭"
+                  title={ITINERARY_DIALOG_LABELS.插入鉤箭頭}
                 >
                   ⇀
                 </button>
@@ -693,7 +694,7 @@ export function ItineraryDialog({
                   type="button"
                   onClick={() => insertSymbolToTitle(' · ')}
                   className="px-2 py-1 text-xs bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors font-medium"
-                  title="插入間隔點"
+                  title={ITINERARY_DIALOG_LABELS.插入間隔點}
                 >
                   ·
                 </button>
@@ -701,7 +702,7 @@ export function ItineraryDialog({
                   type="button"
                   onClick={() => insertSymbolToTitle(' | ')}
                   className="p-1.5 bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors"
-                  title="插入直線"
+                  title={ITINERARY_DIALOG_LABELS.插入直線}
                 >
                   <Minus size={14} className="text-morandi-primary" />
                 </button>
@@ -709,7 +710,7 @@ export function ItineraryDialog({
                   type="button"
                   onClick={() => insertSymbolToTitle(' ⭐ ')}
                   className="p-1.5 bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors"
-                  title="插入星號"
+                  title={ITINERARY_DIALOG_LABELS.插入星號}
                 >
                   <Sparkles size={14} className="text-morandi-gold" />
                 </button>
@@ -717,7 +718,7 @@ export function ItineraryDialog({
                   type="button"
                   onClick={() => insertSymbolToTitle(' ✈ ')}
                   className="px-2 py-1 text-xs bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors"
-                  title="插入飛機"
+                  title={ITINERARY_DIALOG_LABELS.插入飛機}
                 >
                   ✈
                 </button>
@@ -738,7 +739,7 @@ export function ItineraryDialog({
               id="day-title-input"
               value={activeDay.title || ''}
               onChange={(e) => updateDayTitle(e.target.value)}
-              placeholder="台北 ✈ 福岡空港 → 由布院 · 金麟湖 → 阿蘇溫泉"
+              placeholder={ITINERARY_DIALOG_LABELS.台北_福岡空港_由布院_金麟湖_阿蘇溫泉}
               className="h-8 text-sm"
             />
           </div>
@@ -771,7 +772,7 @@ export function ItineraryDialog({
                       type="button"
                       onClick={() => openAttractionSelector(rowIndex)}
                       className="p-1 text-morandi-muted hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
-                      title="在此行下方插入景點"
+                      title={ITINERARY_DIALOG_LABELS.在此行下方插入景點}
                     >
                       <Plus size={14} />
                     </button>
@@ -795,7 +796,7 @@ export function ItineraryDialog({
                             ? 'bg-morandi-gold text-white'
                             : 'text-morandi-muted hover:bg-morandi-container'
                         )}
-                        title="早餐"
+                        title={ITINERARY_DIALOG_LABELS.早餐}
                       >
                         <Coffee size={14} />
                       </button>
@@ -807,7 +808,7 @@ export function ItineraryDialog({
                             ? 'bg-morandi-gold text-white'
                             : 'text-morandi-muted hover:bg-morandi-container'
                         )}
-                        title="午餐"
+                        title={ITINERARY_DIALOG_LABELS.午餐}
                       >
                         <UtensilsCrossed size={14} />
                       </button>
@@ -819,7 +820,7 @@ export function ItineraryDialog({
                             ? 'bg-morandi-gold text-white'
                             : 'text-morandi-muted hover:bg-morandi-container'
                         )}
-                        title="晚餐"
+                        title={ITINERARY_DIALOG_LABELS.晚餐}
                       >
                         <Moon size={14} />
                       </button>
@@ -830,7 +831,7 @@ export function ItineraryDialog({
                       <button
                         onClick={() => triggerImageUpload(activeDay.id, attraction.id)}
                         className="p-1.5 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
-                        title="上傳照片"
+                        title={ITINERARY_DIALOG_LABELS.上傳照片}
                       >
                         <Upload size={14} />
                       </button>
@@ -845,7 +846,7 @@ export function ItineraryDialog({
                         onClick={() => setColorPickerOpen(colorPickerOpen === rowIndex ? null : rowIndex)}
                         className="p-1.5 rounded transition-colors hover:bg-morandi-container"
                         style={{ color: attraction.color || '#3a3633' }}
-                        title="選擇顏色"
+                        title={ITINERARY_DIALOG_LABELS.選擇顏色}
                       >
                         <Palette size={14} />
                       </button>
@@ -892,7 +893,7 @@ export function ItineraryDialog({
               size="sm"
               onClick={() => openAttractionSelector(null)}
               className="gap-1 text-xs text-morandi-gold hover:text-morandi-gold-hover"
-              title="從景點庫選擇"
+              title={ITINERARY_DIALOG_LABELS.從景點庫選擇}
             >
               <Plus size={12} />
               從景點庫新增
@@ -929,7 +930,7 @@ export function ItineraryDialog({
                         <X size={10} />
                       </button>
                       <span className="absolute bottom-0 left-0 right-0 text-[8px] text-center bg-black/50 text-white truncate px-0.5">
-                        {attraction.name || '景點'}
+                        {attraction.name || ITINERARY_DIALOG_LABELS.景點}
                       </span>
                     </div>
                   ))
@@ -946,7 +947,7 @@ export function ItineraryDialog({
               <Input
                 value={activeDay.accommodation || ''}
                 onChange={(e) => updateDayAccommodation(e.target.value)}
-                placeholder="輸入飯店名稱..."
+                placeholder={ITINERARY_DIALOG_LABELS.輸入飯店名稱}
                 className="h-8 text-sm flex-1"
               />
               <Button
@@ -980,7 +981,7 @@ export function ItineraryDialog({
               className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
               <Save size={16} />
-              {saving ? '儲存中...' : '儲存'}
+              {saving ? ITINERARY_DIALOG_LABELS.儲存中 : ITINERARY_DIALOG_LABELS.儲存}
             </Button>
           </div>
         </div>
@@ -1081,7 +1082,7 @@ function generatePrintHtml(data: TimelineItineraryData): string {
     @page { size: A4 portrait; margin: 10mm; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: "標楷體", "Microsoft JhengHei", sans-serif;
+      font-family: ITINERARY_DIALOG_LABELS.標楷體, "Microsoft JhengHei", sans-serif;
       font-size: 11pt;
       line-height: 1.5;
       padding: 10mm;

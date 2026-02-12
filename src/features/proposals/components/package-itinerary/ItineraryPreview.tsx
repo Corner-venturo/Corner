@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog'
 import type { FlightInfo } from '@/types/flight.types'
 import type { PreviewDayData } from './types'
+import { BROCHURE_PREVIEW_DIALOG_LABELS } from '../../constants/labels';
 
 interface ItineraryPreviewProps {
   isOpen: boolean
@@ -83,7 +84,7 @@ export function ItineraryPreview({
               <div className="flex items-start justify-between">
                 <div>
                   <h1 className="text-xl font-bold text-morandi-primary mb-1">
-                    {title || '行程表'}
+                    {title || BROCHURE_PREVIEW_DIALOG_LABELS.行程表}
                   </h1>
                 </div>
                 <div className="text-right text-sm text-morandi-secondary">

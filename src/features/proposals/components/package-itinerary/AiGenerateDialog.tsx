@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { AI_THEMES, type AccommodationStatus } from './types'
+import { AI_GENERATE_DIALOG_LABELS } from '../../constants/labels';
 
 interface AiGenerateDialogProps {
   isOpen: boolean
@@ -61,7 +62,7 @@ export function AiGenerateDialog({
           <div className="flex items-center gap-4 p-3 bg-morandi-container/30 rounded-lg">
             <div className="flex-1">
               <div className="text-[10px] text-morandi-secondary">目的地</div>
-              <div className="text-sm font-medium">{destination || '未設定'}</div>
+              <div className="text-sm font-medium">{destination || AI_GENERATE_DIALOG_LABELS.未設定}</div>
             </div>
             <div className="flex-1">
               <div className="text-[10px] text-morandi-secondary">天數</div>

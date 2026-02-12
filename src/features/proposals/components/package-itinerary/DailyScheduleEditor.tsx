@@ -6,6 +6,7 @@
 
 import { Input } from '@/components/ui/input'
 import type { DailyScheduleItem } from './types'
+import { DAILY_SCHEDULE_EDITOR_LABELS, ITINERARY_DIALOG_LABELS } from '../../constants/labels';
 
 interface DailyScheduleEditorProps {
   dailySchedule: DailyScheduleItem[]
@@ -42,7 +43,7 @@ export function DailyScheduleEditor({
             <Input
               value={day.route || ''}
               onChange={e => onUpdateDay(idx, 'route', e.target.value)}
-              placeholder={isFirst ? '抵達目的地' : isLast ? '返回台灣' : '今日行程標題'}
+              placeholder={isFirst ? DAILY_SCHEDULE_EDITOR_LABELS.抵達目的地 : isLast ? DAILY_SCHEDULE_EDITOR_LABELS.返回台灣 : DAILY_SCHEDULE_EDITOR_LABELS.今日行程標題}
               className="h-8 text-sm mb-2"
             />
             {/* 表格式餐食（三欄） */}
@@ -50,9 +51,9 @@ export function DailyScheduleEditor({
               {/* 早餐 */}
               <div className="relative">
                 <Input
-                  value={day.hotelBreakfast ? '飯店早餐' : (day.meals.breakfast || '')}
+                  value={day.hotelBreakfast ? DAILY_SCHEDULE_EDITOR_LABELS.飯店早餐 : (day.meals.breakfast || '')}
                   onChange={e => onUpdateDay(idx, 'meals.breakfast', e.target.value)}
-                  placeholder="早餐"
+                  placeholder={ITINERARY_DIALOG_LABELS.早餐}
                   className="h-8 text-xs pl-7"
                   disabled={day.hotelBreakfast}
                 />
@@ -62,16 +63,16 @@ export function DailyScheduleEditor({
                     checked={day.hotelBreakfast}
                     onChange={e => onUpdateDay(idx, 'hotelBreakfast', e.target.checked)}
                     className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded border-border text-morandi-gold focus:ring-morandi-gold cursor-pointer"
-                    title="飯店早餐"
+                    title={DAILY_SCHEDULE_EDITOR_LABELS.飯店早餐}
                   />
                 )}
               </div>
               {/* 午餐 */}
               <div className="relative">
                 <Input
-                  value={day.lunchSelf ? '敬請自理' : (day.meals.lunch || '')}
+                  value={day.lunchSelf ? DAILY_SCHEDULE_EDITOR_LABELS.敬請自理 : (day.meals.lunch || '')}
                   onChange={e => onUpdateDay(idx, 'meals.lunch', e.target.value)}
-                  placeholder="午餐"
+                  placeholder={ITINERARY_DIALOG_LABELS.午餐}
                   className="h-8 text-xs pl-7"
                   disabled={day.lunchSelf}
                 />
@@ -80,7 +81,7 @@ export function DailyScheduleEditor({
                   checked={day.lunchSelf || false}
                   onChange={e => onUpdateDay(idx, 'lunchSelf', e.target.checked)}
                   className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded border-border text-morandi-gold focus:ring-morandi-gold cursor-pointer"
-                  title="敬請自理"
+                  title={DAILY_SCHEDULE_EDITOR_LABELS.敬請自理}
                 />
               </div>
               {/* 晚餐 */}
@@ -88,7 +89,7 @@ export function DailyScheduleEditor({
                 <Input
                   value={day.dinnerSelf ? '敬請自理' : (day.meals.dinner || '')}
                   onChange={e => onUpdateDay(idx, 'meals.dinner', e.target.value)}
-                  placeholder="晚餐"
+                  placeholder={ITINERARY_DIALOG_LABELS.晚餐}
                   className="h-8 text-xs pl-7"
                   disabled={day.dinnerSelf}
                 />
@@ -97,7 +98,7 @@ export function DailyScheduleEditor({
                   checked={day.dinnerSelf || false}
                   onChange={e => onUpdateDay(idx, 'dinnerSelf', e.target.checked)}
                   className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded border-border text-morandi-gold focus:ring-morandi-gold cursor-pointer"
-                  title="敬請自理"
+                  title={DAILY_SCHEDULE_EDITOR_LABELS.敬請自理}
                 />
               </div>
             </div>
@@ -107,7 +108,7 @@ export function DailyScheduleEditor({
                 <Input
                   value={day.sameAsPrevious ? `同上 (${getPreviousAccommodation(idx) || ''})` : (day.accommodation || '')}
                   onChange={e => onUpdateDay(idx, 'accommodation', e.target.value)}
-                  placeholder="住宿飯店"
+                  placeholder={DAILY_SCHEDULE_EDITOR_LABELS.住宿飯店}
                   className="h-8 text-xs pl-7"
                   disabled={day.sameAsPrevious}
                 />
@@ -117,7 +118,7 @@ export function DailyScheduleEditor({
                     checked={day.sameAsPrevious}
                     onChange={e => onUpdateDay(idx, 'sameAsPrevious', e.target.checked)}
                     className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded border-border text-morandi-gold focus:ring-morandi-gold cursor-pointer"
-                    title="續住"
+                    title={DAILY_SCHEDULE_EDITOR_LABELS.續住}
                   />
                 )}
               </div>

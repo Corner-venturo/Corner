@@ -25,6 +25,7 @@ import { formatDateTW } from '@/lib/utils/format-date'
 import { supabase } from '@/lib/supabase/client'
 import type { Itinerary, ItineraryVersionRecord } from '@/stores/types'
 import { PROPOSAL_LABELS } from '../constants'
+import { BROCHURE_PREVIEW_DIALOG_LABELS } from '../constants/labels';
 
 interface BrochurePreviewDialogProps {
   isOpen: boolean
@@ -107,7 +108,7 @@ export function BrochurePreviewDialog({
       <!DOCTYPE html>
       <html>
       <head>
-        <title>${itinerary.title || '行程表'}</title>
+        <title>${itinerary.title || BROCHURE_PREVIEW_DIALOG_LABELS.行程表}</title>
         <style>
           @page { size: A4; margin: 10mm; }
           body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; padding: 20px; }

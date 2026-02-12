@@ -41,6 +41,7 @@ import { RestaurantSelector, type CombinedRestaurant } from '@/components/editor
 import { HotelSelector } from '@/components/editor/hotel-selector'
 import { AttractionSelector } from '@/components/editor/attraction-selector'
 import { PROPOSAL_LABELS } from '../constants'
+import { ADD_MANUAL_REQUEST_DIALOG_LABELS } from '../constants/labels';
 
 // 需求類別（統一使用 accommodation/meal）
 const CATEGORIES = [
@@ -275,13 +276,13 @@ export function AddManualRequestDialog({
 
       await createTourRequest(insertData as any)
 
-      toast({ title: '需求已新增' })
+      toast({ title: ADD_MANUAL_REQUEST_DIALOG_LABELS.需求已新增 })
       resetForm()
       onSuccess?.()
       onClose()
     } catch (error) {
       logger.error('新增需求失敗:', error)
-      toast({ title: '新增失敗', variant: 'destructive' })
+      toast({ title: ADD_MANUAL_REQUEST_DIALOG_LABELS.新增失敗, variant: 'destructive' })
     } finally {
       setSaving(false)
     }
@@ -312,7 +313,7 @@ export function AddManualRequestDialog({
                 onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="選擇類別" />
+                  <SelectValue placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.選擇類別} />
                 </SelectTrigger>
                 <SelectContent>
                   {CATEGORIES.map((cat) => (
@@ -330,7 +331,7 @@ export function AddManualRequestDialog({
               <Input
                 value={formData.title}
                 onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="例如：機場接送、全程領隊"
+                placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.例如_機場接送_全程領隊}
               />
             </div>
 
@@ -340,7 +341,7 @@ export function AddManualRequestDialog({
               <Input
                 value={formData.supplierName}
                 onChange={(e) => setFormData(prev => ({ ...prev, supplierName: e.target.value }))}
-                placeholder="例如：車行名稱、領隊姓名"
+                placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.例如_車行名稱_領隊姓名}
               />
             </div>
 
@@ -353,7 +354,7 @@ export function AddManualRequestDialog({
                   onValueChange={(value) => setFormData(prev => ({ ...prev, recipientWorkspaceId: value === 'none' ? '' : value }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder={loadingWorkspaces ? '載入中...' : '選擇供應商（選填）'} />
+                    <SelectValue placeholder={loadingWorkspaces ? ADD_MANUAL_REQUEST_DIALOG_LABELS.載入中 : ADD_MANUAL_REQUEST_DIALOG_LABELS.選擇供應商_選填} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">不發送（內部處理）</SelectItem>
@@ -382,7 +383,7 @@ export function AddManualRequestDialog({
                     <Input
                       value={formData.driverName}
                       onChange={(e) => setFormData(prev => ({ ...prev, driverName: e.target.value }))}
-                      placeholder="司機姓名"
+                      placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.司機姓名}
                       className="h-8 text-sm"
                     />
                   </div>
@@ -391,7 +392,7 @@ export function AddManualRequestDialog({
                     <Input
                       value={formData.plateNumber}
                       onChange={(e) => setFormData(prev => ({ ...prev, plateNumber: e.target.value }))}
-                      placeholder="車牌號碼"
+                      placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.車牌號碼}
                       className="h-8 text-sm"
                     />
                   </div>
@@ -400,7 +401,7 @@ export function AddManualRequestDialog({
                     <Input
                       value={formData.driverPhone}
                       onChange={(e) => setFormData(prev => ({ ...prev, driverPhone: e.target.value }))}
-                      placeholder="司機電話"
+                      placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.司機電話}
                       className="h-8 text-sm"
                     />
                   </div>
@@ -444,9 +445,9 @@ export function AddManualRequestDialog({
                       className="gap-2"
                     >
                       <Search size={16} />
-                      {formData.category === 'meal' && '選擇餐廳'}
-                      {formData.category === 'accommodation' && '選擇飯店'}
-                      {formData.category === 'activity' && '選擇景點'}
+                      {formData.category === 'meal' && ADD_MANUAL_REQUEST_DIALOG_LABELS.選擇餐廳}
+                      {formData.category === 'accommodation' && ADD_MANUAL_REQUEST_DIALOG_LABELS.選擇飯店}
+                      {formData.category === 'activity' && ADD_MANUAL_REQUEST_DIALOG_LABELS.選擇景點}
                     </Button>
                   )}
                 </div>
@@ -487,12 +488,12 @@ export function AddManualRequestDialog({
                 className="w-24"
               />
               <p className="text-xs text-morandi-secondary">
-                {formData.category === 'transport' && '台數'}
-                {formData.category === 'guide' && '人數'}
-                {formData.category === 'accommodation' && '間數'}
+                {formData.category === 'transport' && ADD_MANUAL_REQUEST_DIALOG_LABELS.台數}
+                {formData.category === 'guide' && ADD_MANUAL_REQUEST_DIALOG_LABELS.人數}
+                {formData.category === 'accommodation' && ADD_MANUAL_REQUEST_DIALOG_LABELS.間數}
                 {formData.category === 'meal' && '人數'}
                 {formData.category === 'activity' && '人數'}
-                {formData.category === 'other' && '數量'}
+                {formData.category === 'other' && ADD_MANUAL_REQUEST_DIALOG_LABELS.數量}
               </p>
             </div>
 
@@ -502,7 +503,7 @@ export function AddManualRequestDialog({
               <Textarea
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="其他需求說明..."
+                placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.其他需求說明}
                 rows={4}
               />
             </div>

@@ -39,6 +39,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { logger } from '@/lib/utils/logger'
 import type { Proposal, ProposalPackage } from '@/types/proposal.types'
 import type { Tour } from '@/stores/types'
+import { ADD_MANUAL_REQUEST_DIALOG_LABELS, PACKAGE_LIST_PANEL_LABELS, TOUR_REQUEST_FORM_DIALOG_LABELS } from '../constants/labels';
 
 // 分類對應表（TourRequest category → supplier_type_code）
 const CATEGORY_TO_SUPPLIER_TYPE: Record<string, string> = {
@@ -61,20 +62,20 @@ interface RequestItem {
 
 // 分類對應的欄位標題
 const CATEGORY_COLUMNS: Record<string, { dateLabel: string; titleLabel: string; qtyLabel: string }> = {
-  hotel: { dateLabel: '日期', titleLabel: '房型', qtyLabel: '間數' },
-  restaurant: { dateLabel: '日期', titleLabel: '餐別', qtyLabel: '人數' },
-  transport: { dateLabel: '日期', titleLabel: '路線/車型', qtyLabel: '台數' },
-  activity: { dateLabel: '日期', titleLabel: '項目', qtyLabel: '人數' },
-  other: { dateLabel: '日期', titleLabel: '項目', qtyLabel: '數量' },
+  hotel: { dateLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.日期, titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.房型, qtyLabel: ADD_MANUAL_REQUEST_DIALOG_LABELS.間數 },
+  restaurant: { dateLabel: '日期', titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.餐別, qtyLabel: ADD_MANUAL_REQUEST_DIALOG_LABELS.人數 },
+  transport: { dateLabel: '日期', titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.路線_車型, qtyLabel: ADD_MANUAL_REQUEST_DIALOG_LABELS.台數 },
+  activity: { dateLabel: '日期', titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.項目, qtyLabel: '人數' },
+  other: { dateLabel: '日期', titleLabel: '項目', qtyLabel: ADD_MANUAL_REQUEST_DIALOG_LABELS.數量 },
 }
 
 // 分類中文名
 const CATEGORY_NAMES: Record<string, string> = {
-  hotel: '住宿',
-  restaurant: '餐飲',
-  transport: '交通',
-  activity: '門票/活動',
-  other: '其他',
+  hotel: PACKAGE_LIST_PANEL_LABELS.住宿,
+  restaurant: PACKAGE_LIST_PANEL_LABELS.餐飲,
+  transport: PACKAGE_LIST_PANEL_LABELS.交通,
+  activity: TOUR_REQUEST_FORM_DIALOG_LABELS.門票_活動,
+  other: PACKAGE_LIST_PANEL_LABELS.其他,
 }
 
 interface TourRequestFormDialogProps {
@@ -180,7 +181,7 @@ export function TourRequestFormDialog({
 
   // [Planned] 我方資訊 - 待整合 workspace settings
   const [companyInfo, setCompanyInfo] = useState({
-    name: '角落旅行社',
+    name: TOUR_REQUEST_FORM_DIALOG_LABELS.角落旅行社,
     phone: '',
     fax: '',
     sales: '',
@@ -215,7 +216,7 @@ export function TourRequestFormDialog({
 
   // 取得欄位設定
   const columns = CATEGORY_COLUMNS[category] || CATEGORY_COLUMNS.other
-  const categoryName = CATEGORY_NAMES[category] || '需求'
+  const categoryName = CATEGORY_NAMES[category] || TOUR_REQUEST_FORM_DIALOG_LABELS.需求
 
   // 更新項目
   const updateItem = (id: string, field: keyof RequestItem, value: string | number) => {
@@ -509,19 +510,19 @@ export function TourRequestFormDialog({
       // 全部存檔成功後，開啟新視窗列印
       const printWindow = window.open('', '_blank', 'width=900,height=700')
       if (!printWindow) {
-        toast({ title: '請允許彈出視窗以進行列印', variant: 'destructive' })
+        toast({ title: TOUR_REQUEST_FORM_DIALOG_LABELS.請允許彈出視窗以進行列印, variant: 'destructive' })
         return
       }
 
       printWindow.document.write(printContent)
       printWindow.document.close()
 
-      toast({ title: '需求單已發送並存檔', description: '狀態已更新為「已發送」' })
+      toast({ title: TOUR_REQUEST_FORM_DIALOG_LABELS.需求單已發送並存檔, description: TOUR_REQUEST_FORM_DIALOG_LABELS.狀態已更新為_已發送 })
     } catch (err) {
       logger.error('需求單處理失敗:', err)
       toast({ 
-        title: '存檔失敗', 
-        description: '請重試或聯繫系統管理員',
+        title: TOUR_REQUEST_FORM_DIALOG_LABELS.存檔失敗, 
+        description: TOUR_REQUEST_FORM_DIALOG_LABELS.請重試或聯繫系統管理員,
         variant: 'destructive' 
       })
     } finally {

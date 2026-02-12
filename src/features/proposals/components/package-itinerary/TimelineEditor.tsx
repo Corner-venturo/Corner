@@ -7,6 +7,7 @@
 import { Plus, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { DailyScheduleItem, SimpleActivity } from './types'
+import { DAILY_SCHEDULE_EDITOR_LABELS, ITINERARY_DIALOG_LABELS } from '../../constants/labels';
 
 interface TimelineEditorProps {
   dailySchedule: DailyScheduleItem[]
@@ -39,7 +40,7 @@ export function TimelineEditor({
   if (startDate) {
     const date = new Date(startDate)
     date.setDate(date.getDate() + idx)
-    const weekdays = ['日', '一', '二', '三', '四', '五', '六']
+    const weekdays = [ITINERARY_DIALOG_LABELS.日, ITINERARY_DIALOG_LABELS.一, ITINERARY_DIALOG_LABELS.二, ITINERARY_DIALOG_LABELS.三, ITINERARY_DIALOG_LABELS.四, ITINERARY_DIALOG_LABELS.五, ITINERARY_DIALOG_LABELS.六]
     dateLabel = `${date.getMonth() + 1}/${date.getDate()} (${weekdays[date.getDay()]})`
   }
 
@@ -96,7 +97,7 @@ export function TimelineEditor({
             type="text"
             value={day.route || ''}
             onChange={e => onUpdateDay(idx, 'route', e.target.value)}
-            placeholder={idx === 0 ? '抵達目的地' : idx === dailySchedule.length - 1 ? '返回台灣' : '今日行程標題'}
+            placeholder={idx === 0 ? DAILY_SCHEDULE_EDITOR_LABELS.抵達目的地 : idx === dailySchedule.length - 1 ? DAILY_SCHEDULE_EDITOR_LABELS.返回台灣 : DAILY_SCHEDULE_EDITOR_LABELS.今日行程標題}
             className="w-full h-8 px-3 text-xs border border-border rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold"
           />
 
@@ -106,9 +107,9 @@ export function TimelineEditor({
             <div className="relative">
               <input
                 type="text"
-                value={day.hotelBreakfast ? '飯店早餐' : (day.meals.breakfast || '')}
+                value={day.hotelBreakfast ? DAILY_SCHEDULE_EDITOR_LABELS.飯店早餐 : (day.meals.breakfast || '')}
                 onChange={e => onUpdateDay(idx, 'meals.breakfast', e.target.value)}
-                placeholder="早餐"
+                placeholder={ITINERARY_DIALOG_LABELS.早餐}
                 disabled={day.hotelBreakfast}
                 className="w-full h-8 pl-7 pr-3 text-xs border border-border rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold disabled:text-morandi-secondary"
               />
@@ -118,7 +119,7 @@ export function TimelineEditor({
                   checked={day.hotelBreakfast}
                   onChange={e => onUpdateDay(idx, 'hotelBreakfast', e.target.checked)}
                   className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded border-border text-morandi-gold focus:ring-morandi-gold cursor-pointer"
-                  title="飯店早餐"
+                  title={DAILY_SCHEDULE_EDITOR_LABELS.飯店早餐}
                 />
               )}
             </div>
@@ -126,9 +127,9 @@ export function TimelineEditor({
             <div className="relative">
               <input
                 type="text"
-                value={day.lunchSelf ? '敬請自理' : (day.meals.lunch || '')}
+                value={day.lunchSelf ? DAILY_SCHEDULE_EDITOR_LABELS.敬請自理 : (day.meals.lunch || '')}
                 onChange={e => onUpdateDay(idx, 'meals.lunch', e.target.value)}
-                placeholder="午餐"
+                placeholder={ITINERARY_DIALOG_LABELS.午餐}
                 disabled={day.lunchSelf}
                 className="w-full h-8 pl-7 pr-3 text-xs border border-border rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold disabled:text-morandi-secondary"
               />
@@ -137,7 +138,7 @@ export function TimelineEditor({
                 checked={day.lunchSelf || false}
                 onChange={e => onUpdateDay(idx, 'lunchSelf', e.target.checked)}
                 className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded border-border text-morandi-gold focus:ring-morandi-gold cursor-pointer"
-                title="敬請自理"
+                title={DAILY_SCHEDULE_EDITOR_LABELS.敬請自理}
               />
             </div>
             {/* 晚餐 */}
@@ -146,7 +147,7 @@ export function TimelineEditor({
                 type="text"
                 value={day.dinnerSelf ? '敬請自理' : (day.meals.dinner || '')}
                 onChange={e => onUpdateDay(idx, 'meals.dinner', e.target.value)}
-                placeholder="晚餐"
+                placeholder={ITINERARY_DIALOG_LABELS.晚餐}
                 disabled={day.dinnerSelf}
                 className="w-full h-8 pl-7 pr-3 text-xs border border-border rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold disabled:text-morandi-secondary"
               />
@@ -155,7 +156,7 @@ export function TimelineEditor({
                 checked={day.dinnerSelf || false}
                 onChange={e => onUpdateDay(idx, 'dinnerSelf', e.target.checked)}
                 className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded border-border text-morandi-gold focus:ring-morandi-gold cursor-pointer"
-                title="敬請自理"
+                title={DAILY_SCHEDULE_EDITOR_LABELS.敬請自理}
               />
             </div>
           </div>
@@ -167,7 +168,7 @@ export function TimelineEditor({
                 type="text"
                 value={day.sameAsPrevious ? `同上 (${getPreviousAccommodation(idx) || ''})` : (day.accommodation || '')}
                 onChange={e => onUpdateDay(idx, 'accommodation', e.target.value)}
-                placeholder="住宿飯店"
+                placeholder={DAILY_SCHEDULE_EDITOR_LABELS.住宿飯店}
                 disabled={day.sameAsPrevious}
                 className="w-full h-8 pl-7 pr-3 text-xs border border-border rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold disabled:text-morandi-secondary"
               />
@@ -177,7 +178,7 @@ export function TimelineEditor({
                   checked={day.sameAsPrevious}
                   onChange={e => onUpdateDay(idx, 'sameAsPrevious', e.target.checked)}
                   className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded border-border text-morandi-gold focus:ring-morandi-gold cursor-pointer"
-                  title="續住"
+                  title={DAILY_SCHEDULE_EDITOR_LABELS.續住}
                 />
               )}
             </div>
@@ -236,7 +237,7 @@ export function TimelineEditor({
                         e.preventDefault()
                       }
                     }}
-                    placeholder="景點名稱"
+                    placeholder={ITINERARY_DIALOG_LABELS.景點名稱}
                     rows={1}
                     className="flex-1 px-2 py-2 text-xs bg-transparent border-0 focus:outline-none focus:bg-white resize-none leading-tight"
                     style={{ minHeight: '32px' }}

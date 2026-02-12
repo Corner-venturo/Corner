@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { DatePicker } from '@/components/ui/date-picker'
 import type { FlightInfo, FlightSegmentInfo } from '@/types/flight.types'
+import { FLIGHT_SECTION_LABELS, TOUR_REQUEST_FORM_DIALOG_LABELS } from '../../constants/labels';
 
 interface FlightSectionProps {
   // 去程
@@ -135,14 +136,14 @@ export function FlightSection({
             <Input
               value={outboundFlightNumber}
               onChange={e => onOutboundFlightNumberChange(e.target.value.toUpperCase())}
-              placeholder="航班號碼 (如 BR108)"
+              placeholder={FLIGHT_SECTION_LABELS.航班號碼_如_BR108}
               className="h-8 text-xs flex-1"
               onKeyDown={e => e.key === 'Enter' && onSearchOutbound()}
             />
             <DatePicker
               value={outboundFlightDate}
               onChange={date => onOutboundFlightDateChange(date || '')}
-              placeholder="日期"
+              placeholder={TOUR_REQUEST_FORM_DIALOG_LABELS.日期}
               className="h-8 text-xs w-32"
             />
             <Button
@@ -224,14 +225,14 @@ export function FlightSection({
             <Input
               value={returnFlightNumber}
               onChange={e => onReturnFlightNumberChange(e.target.value.toUpperCase())}
-              placeholder="航班號碼 (如 BR107)"
+              placeholder={FLIGHT_SECTION_LABELS.航班號碼_如_BR107}
               className="h-8 text-xs flex-1"
               onKeyDown={e => e.key === 'Enter' && onSearchReturn()}
             />
             <DatePicker
               value={returnFlightDate}
               onChange={date => onReturnFlightDateChange(date || '')}
-              placeholder="日期"
+              placeholder={TOUR_REQUEST_FORM_DIALOG_LABELS.日期}
               className="h-8 text-xs w-32"
             />
             <Button

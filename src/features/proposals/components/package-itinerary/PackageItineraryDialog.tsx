@@ -24,6 +24,7 @@ import { TimelineEditor } from './TimelineEditor'
 import { ItineraryPreviewContent } from './ItineraryPreview'
 import { AiGenerateDialog } from './AiGenerateDialog'
 import { VersionDropdown } from './VersionDropdown'
+import { PACKAGE_ITINERARY_DIALOG_LABELS } from '../../constants/labels';
 
 export function PackageItineraryDialog({
   isOpen,
@@ -62,7 +63,7 @@ export function PackageItineraryDialog({
               outboundFlight={hook.formData.outboundFlight}
               returnFlight={hook.formData.returnFlight}
               dailyData={hook.getPreviewDailyData()}
-              companyName={hook.currentUser?.workspace_code || '旅行社'}
+              companyName={hook.currentUser?.workspace_code || PACKAGE_ITINERARY_DIALOG_LABELS.旅行社}
               isDomestic={hook.isDomestic}
               onEdit={() => hook.setViewMode('edit')}
               onPrint={hook.handlePrintPreview}
@@ -75,7 +76,7 @@ export function PackageItineraryDialog({
                 <DialogHeader className="mb-4">
                   <DialogTitle className="flex items-center gap-2">
                     <FileText className="w-5 h-5 text-morandi-gold" />
-                    {hook.isEditMode ? '編輯行程表' : '建立行程表'}
+                    {hook.isEditMode ? PACKAGE_ITINERARY_DIALOG_LABELS.編輯行程表 : PACKAGE_ITINERARY_DIALOG_LABELS.建立行程表}
                     <span className="text-sm font-normal text-morandi-secondary">
                       {pkg.version_name} - {proposal.title}
                     </span>
@@ -98,7 +99,7 @@ export function PackageItineraryDialog({
                     <Input
                       value={hook.formData.title}
                       onChange={e => hook.setFormData({ ...hook.formData, title: e.target.value })}
-                      placeholder="行程表標題"
+                      placeholder={PACKAGE_ITINERARY_DIALOG_LABELS.行程表標題}
                     />
                   </div>
 
@@ -108,7 +109,7 @@ export function PackageItineraryDialog({
                       <Input
                         value={pkg.country_id && pkg.main_city_id
                           ? `${pkg.country_id} (${pkg.main_city_id})`
-                          : pkg.country_id || '(未設定)'}
+                          : pkg.country_id || PACKAGE_ITINERARY_DIALOG_LABELS.未設定_2}
                         disabled
                         className="bg-muted"
                       />
@@ -229,7 +230,7 @@ export function PackageItineraryDialog({
                         ) : (
                           <Save className="w-3 h-3" />
                         )}
-                        {hook.isEditMode ? '更新行程' : '建立行程'}
+                        {hook.isEditMode ? PACKAGE_ITINERARY_DIALOG_LABELS.更新行程 : PACKAGE_ITINERARY_DIALOG_LABELS.建立行程}
                       </Button>
                     </div>
                   </div>
@@ -240,7 +241,7 @@ export function PackageItineraryDialog({
               <div className="w-1/2 pl-6 overflow-y-auto">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-bold text-morandi-primary">
-                    {hook.isTimelineMode ? '時間軸行程' : '每日行程'}
+                    {hook.isTimelineMode ? PACKAGE_ITINERARY_DIALOG_LABELS.時間軸行程 : PACKAGE_ITINERARY_DIALOG_LABELS.每日行程}
                   </h3>
                   {/* 時間軸模式切換 */}
                   <button
@@ -251,10 +252,10 @@ export function PackageItineraryDialog({
                         ? 'bg-morandi-gold text-white shadow-sm'
                         : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50 border border-morandi-container'
                     }`}
-                    title={hook.isTimelineMode ? '切換簡易模式' : '切換時間軸模式'}
+                    title={hook.isTimelineMode ? PACKAGE_ITINERARY_DIALOG_LABELS.切換簡易模式 : PACKAGE_ITINERARY_DIALOG_LABELS.切換時間軸模式}
                   >
                     <Clock size={12} />
-                    <span>{hook.isTimelineMode ? '簡易模式' : '時間軸'}</span>
+                    <span>{hook.isTimelineMode ? PACKAGE_ITINERARY_DIALOG_LABELS.簡易模式 : PACKAGE_ITINERARY_DIALOG_LABELS.時間軸}</span>
                   </button>
                 </div>
 

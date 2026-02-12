@@ -31,6 +31,7 @@ import { BrochurePreviewDialog } from './BrochurePreviewDialog'
 import { RequirementSyncDialog } from './RequirementSyncDialog'
 import type { Proposal, ProposalPackage, CreatePackageData } from '@/types/proposal.types'
 import { PROPOSAL_LABELS } from '../constants'
+import { PACKAGE_LIST_PANEL_LABELS } from '../constants/labels';
 
 interface PackageListPanelProps {
   proposal: Proposal
@@ -265,7 +266,7 @@ export function PackageListPanel({
             }> = []
             dailyData.forEach((day, idx) => {
               const dayLabel = `Day${idx + 1}`
-              if (day.meals?.lunch && day.meals.lunch !== '自理') {
+              if (day.meals?.lunch && day.meals.lunch !== PACKAGE_LIST_PANEL_LABELS.自理) {
                 mealItems.push({
                   id: `meal-lunch-day${idx + 1}-${Date.now()}`,
                   name: `${dayLabel} 午餐：${day.meals.lunch}`,
@@ -289,13 +290,13 @@ export function PackageListPanel({
 
             // 建立完整的 categories
             categories = [
-              { id: 'transport', name: '交通', items: [], total: 0 },
-              { id: 'group-transport', name: '團體分攤', items: [], total: 0 },
-              { id: 'accommodation', name: '住宿', items: accommodationItems, total: 0 },
-              { id: 'meals', name: '餐飲', items: mealItems, total: 0 },
-              { id: 'activities', name: '活動', items: [], total: 0 },
-              { id: 'others', name: '其他', items: [], total: 0 },
-              { id: 'guide', name: '領隊導遊', items: [], total: 0 },
+              { id: 'transport', name: PACKAGE_LIST_PANEL_LABELS.交通, items: [], total: 0 },
+              { id: 'group-transport', name: PACKAGE_LIST_PANEL_LABELS.團體分攤, items: [], total: 0 },
+              { id: 'accommodation', name: PACKAGE_LIST_PANEL_LABELS.住宿, items: accommodationItems, total: 0 },
+              { id: 'meals', name: PACKAGE_LIST_PANEL_LABELS.餐飲, items: mealItems, total: 0 },
+              { id: 'activities', name: PACKAGE_LIST_PANEL_LABELS.活動, items: [], total: 0 },
+              { id: 'others', name: PACKAGE_LIST_PANEL_LABELS.其他, items: [], total: 0 },
+              { id: 'guide', name: PACKAGE_LIST_PANEL_LABELS.領隊導遊, items: [], total: 0 },
             ]
 
             // 更新住宿天數
