@@ -12,10 +12,12 @@
  * - 樂觀更新
  */
 
+import { useState, useEffect } from 'react'
 import useSWR, { mutate as globalMutate } from 'swr'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
+import { get_cache, set_cache, invalidate_cache_pattern } from '@/lib/cache/indexeddb-cache'
 import { canCrossWorkspace, type UserRole } from '@/lib/rbac-config'
 import { shouldCrossWorkspace } from '@/lib/workspace-context'
 import {
@@ -165,12 +167,33 @@ export function createEntityHook<T extends BaseEntity>(
   }
 
   // ============================================
+  // useIdbFallback - 從 IndexedDB 載入快取作為 fallback
+  // ============================================
+  function useIdbFallback<D>(cache_key: string | null): D | undefined {
+    const [fallback, setFallback] = useState<D | undefined>(undefined)
+
+    useEffect(() => {
+      if (!cache_key) return
+      let cancelled = false
+      get_cache<D>(cache_key).then(entry => {
+        if (!cancelled && entry) {
+          setFallback(entry.data)
+        }
+      })
+      return () => { cancelled = true }
+    }, [cache_key])
+
+    return fallback
+  }
+
+  // ============================================
   // useList - 列表 Hook
   // ============================================
   function useList(options?: { enabled?: boolean }): ListResult<T> {
     const { isReady, hasHydrated } = useAuth()
     const enabled = options?.enabled !== false // 預設為 true
     const swrKey = isReady && enabled ? cacheKeyList : null
+    const idb_fallback = useIdbFallback<T[]>(swrKey)
 
     const { data, error, isLoading, mutate } = useSWR<T[]>(
       swrKey,
@@ -209,7 +232,13 @@ export function createEntityHook<T extends BaseEntity>(
 
         return (data || []) as unknown as T[]
       },
-      swrConfig
+      {
+        ...swrConfig,
+        fallbackData: idb_fallback,
+        onSuccess: (fresh_data: T[]) => {
+          set_cache(cacheKeyList, fresh_data)
+        },
+      }
     )
 
     return {
@@ -229,6 +258,7 @@ export function createEntityHook<T extends BaseEntity>(
     const { isReady, hasHydrated } = useAuth()
     const enabled = options?.enabled !== false // 預設為 true
     const swrKey = isReady && enabled ? cacheKeySlim : null
+    const idb_fallback = useIdbFallback<T[]>(swrKey)
 
     const { data, error, isLoading, mutate } = useSWR<T[]>(
       swrKey,
@@ -254,7 +284,13 @@ export function createEntityHook<T extends BaseEntity>(
         // ⚠️ 強制轉型為 T[]，實際上只有 slim.select 的欄位有值
         return (data || []) as unknown as T[]
       },
-      swrConfig
+      {
+        ...swrConfig,
+        fallbackData: idb_fallback,
+        onSuccess: (fresh_data: T[]) => {
+          set_cache(cacheKeySlim, fresh_data)
+        },
+      }
     )
 
     return {
@@ -272,6 +308,7 @@ export function createEntityHook<T extends BaseEntity>(
     const { isReady, hasHydrated } = useAuth()
     // Skip pattern: id 為 null 時不發請求
     const swrKey = isReady && id ? `${cacheKeyPrefix}:detail:${id}` : null
+    const idb_fallback = useIdbFallback<T | null>(swrKey)
 
     const { data, error, isLoading, mutate } = useSWR<T | null>(
       swrKey,
@@ -295,7 +332,15 @@ export function createEntityHook<T extends BaseEntity>(
 
         return data as unknown as T
       },
-      swrConfig
+      {
+        ...swrConfig,
+        fallbackData: idb_fallback,
+        onSuccess: (fresh_data: T | null) => {
+          if (swrKey && fresh_data) {
+            set_cache(swrKey, fresh_data)
+          }
+        },
+      }
     )
 
     return {
@@ -571,11 +616,14 @@ export function createEntityHook<T extends BaseEntity>(
   // invalidate - 使快取失效
   // ============================================
   async function invalidate(): Promise<void> {
-    await globalMutate(
-      (key: string) => typeof key === 'string' && key.startsWith(cacheKeyPrefix),
-      undefined,
-      { revalidate: true }
-    )
+    await Promise.all([
+      globalMutate(
+        (key: string) => typeof key === 'string' && key.startsWith(cacheKeyPrefix),
+        undefined,
+        { revalidate: true }
+      ),
+      invalidate_cache_pattern(cacheKeyPrefix),
+    ])
   }
 
   // ============================================
