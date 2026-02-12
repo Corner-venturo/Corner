@@ -559,6 +559,26 @@ export function usePayroll() {
     setError(null)
 
     try {
+      // 狀態轉換驗證
+      const { data: period, error: fetchError } = await supabase
+        .from('payroll_periods')
+        .select('status')
+        .eq('id', periodId)
+        .single()
+
+      if (fetchError || !period) throw new Error('找不到薪資期間')
+
+      const VALID_PAYROLL_TRANSITIONS: Record<string, string[]> = {
+        'draft': ['processing', 'confirmed'],
+        'processing': ['draft'],
+        'confirmed': ['paid', 'draft'],
+        'paid': [],
+      }
+
+      if (!VALID_PAYROLL_TRANSITIONS[period.status]?.includes('paid')) {
+        throw new Error(`無法從「${period.status}」轉為「paid」`)
+      }
+
       const { error: updateError } = await supabase
         .from('payroll_periods')
         .update({ status: 'paid' })
