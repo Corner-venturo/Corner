@@ -22,6 +22,7 @@ import type {
 import { MATERIAL_ICON_PATHS, ICON_VIEWBOX_SIZE } from '@/features/designer/components/core/icon-paths'
 import { STICKER_PATHS, getStickerViewBox } from '@/features/designer/components/core/sticker-paths'
 import { loadFontsForPDF, getFontName, type FontStyle } from './font-loader'
+import { renderSvgPath, renderGradientShape } from './svg-renderer'
 import { logger } from '@/lib/utils/logger'
 
 // ============================================
@@ -145,7 +146,7 @@ function renderText(doc: jsPDF, el: TextElement): void {
 /**
  * 渲染形狀元素
  */
-function renderShape(doc: jsPDF, el: ShapeElement): void {
+async function renderShape(doc: jsPDF, el: ShapeElement): Promise<void> {
   const x = pxToMm(el.x)
   const y = pxToMm(el.y)
   const width = pxToMm(el.width)
@@ -195,10 +196,25 @@ function renderShape(doc: jsPDF, el: ShapeElement): void {
       break
   }
 
-  // 處理漸層（需要光柵化）
+  // 處理漸層 — 使用 svg2pdf.js 向量渲染
   if (el.gradient) {
-    logger.warn('[PDF] Gradient shapes will be rasterized for now')
-    // TODO: 漸層形狀需要光柵化處理
+    const shapeMap: Record<string, 'rect' | 'circle' | 'ellipse'> = {
+      rectangle: 'rect',
+      circle: 'circle',
+      ellipse: 'ellipse',
+    }
+    const angle = el.gradient.direction === 'horizontal' ? 0 : 90
+    await renderGradientShape(doc, {
+      shape: shapeMap[el.variant] ?? 'rect',
+      x, y, width, height,
+      gradient: {
+        type: el.gradient.type,
+        angle,
+        stops: el.gradient.colorStops,
+      },
+      cornerRadius: el.cornerRadius ? pxToMm(el.cornerRadius) : undefined,
+      opacity: el.opacity,
+    })
   }
 
   // 重置透明度
@@ -264,7 +280,7 @@ function blobToBase64(blob: Blob): Promise<string> {
 /**
  * 渲染圖標元素
  */
-function renderIcon(doc: jsPDF, el: IconElement): void {
+async function renderIcon(doc: jsPDF, el: IconElement): Promise<void> {
   const pathData = MATERIAL_ICON_PATHS[el.icon]
   if (!pathData) {
     logger.warn(`[PDF] Icon "${el.icon}" not found`)
@@ -285,14 +301,20 @@ function renderIcon(doc: jsPDF, el: IconElement): void {
     doc.setGState(doc.GState({ opacity: el.opacity }))
   }
 
-  // 解析並繪製 SVG Path
-  // jsPDF 不直接支援 SVG Path，需要使用 lines() 方法
-  // 這裡簡化處理，對於複雜圖標可能需要光柵化
+  // 使用 svg2pdf.js 渲染 SVG Path
   try {
-    // 嘗試繪製簡單的佔位符（實際需要解析 path）
-    doc.rect(x, y, size, size, 'F')
+    await renderSvgPath(doc, {
+      pathData: pathData,
+      x, y,
+      width: size,
+      height: size,
+      fill: el.color,
+      opacity: el.opacity,
+      viewBox: `0 0 ${ICON_VIEWBOX_SIZE} ${ICON_VIEWBOX_SIZE}`,
+    })
   } catch (error) {
     logger.error('[PDF] Failed to render icon:', error)
+    doc.rect(x, y, size, size, 'F')
   }
 
   // 重置透明度
@@ -341,7 +363,7 @@ function renderLine(doc: jsPDF, el: LineElement): void {
 /**
  * 渲染貼紙元素
  */
-function renderSticker(doc: jsPDF, el: StickerElement): void {
+async function renderSticker(doc: jsPDF, el: StickerElement): Promise<void> {
   // 貼紙使用 SVG Path，處理方式類似圖標
   const x = pxToMm(el.x)
   const y = pxToMm(el.y)
@@ -359,9 +381,25 @@ function renderSticker(doc: jsPDF, el: StickerElement): void {
     doc.setGState(doc.GState({ opacity: el.opacity }))
   }
 
-  // 簡化處理：繪製矩形佔位符
-  // TODO: 實作完整的 SVG Path 解析
-  doc.rect(x, y, width, height, 'F')
+  // 使用 svg2pdf.js 渲染 SVG Path
+  const stickerDef = STICKER_PATHS[el.stickerId]
+  if (stickerDef) {
+    try {
+      const vb = stickerDef.viewBox
+      await renderSvgPath(doc, {
+        pathData: stickerDef.path,
+        x, y, width, height,
+        fill: el.primaryColor ?? stickerDef.defaultColor ?? '#000000',
+        opacity: el.opacity,
+        viewBox: `0 0 ${vb.width} ${vb.height}`,
+      })
+    } catch (error) {
+      logger.error('[PDF] Failed to render sticker:', error)
+      doc.rect(x, y, width, height, 'F')
+    }
+  } else {
+    doc.rect(x, y, width, height, 'F')
+  }
 
   // 重置透明度
   if (el.opacity !== undefined && el.opacity < 1) {
@@ -391,19 +429,19 @@ async function renderElement(doc: jsPDF, el: CanvasElement): Promise<void> {
       renderText(doc, el)
       break
     case 'shape':
-      renderShape(doc, el)
+      await renderShape(doc, el)
       break
     case 'image':
       await renderImage(doc, el)
       break
     case 'icon':
-      renderIcon(doc, el)
+      await renderIcon(doc, el)
       break
     case 'line':
       renderLine(doc, el)
       break
     case 'sticker':
-      renderSticker(doc, el)
+      await renderSticker(doc, el)
       break
     case 'group':
       await renderGroup(doc, el)
