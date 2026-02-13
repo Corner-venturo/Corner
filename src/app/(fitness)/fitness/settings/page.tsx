@@ -7,14 +7,15 @@ import { useAuthStore } from '@/stores/auth-store'
 import { localDB } from '@/lib/db'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
+import { FITNESS_SETTINGS_LABELS } from './constants/labels'
 
 export default function FitnessSettingsPage() {
   const router = useRouter()
   const { user, logout } = useAuthStore()
 
   const handleLogout = async () => {
-    const confirmed = await confirm('確定要登出嗎？', {
-      title: '登出',
+    const confirmed = await confirm(FITNESS_SETTINGS_LABELS.LOGOUT_CONFIRM_MESSAGE, {
+      title: FITNESS_SETTINGS_LABELS.LOGOUT_CONFIRM_TITLE,
       type: 'warning',
     })
     if (confirmed) {
@@ -25,9 +26,9 @@ export default function FitnessSettingsPage() {
 
   const handleClearData = async () => {
     const confirmed = await confirm(
-      '⚠️ 警告：這將清除所有本地健身資料（訓練記錄、身體數據、目標等）。\n\n此操作無法復原，確定要繼續嗎？',
+      FITNESS_SETTINGS_LABELS.CLEAR_DATA_CONFIRM_MESSAGE,
       {
-        title: '清除本地資料',
+        title: FITNESS_SETTINGS_LABELS.CLEAR_DATA_CONFIRM_TITLE,
         type: 'warning',
       }
     )
@@ -43,11 +44,11 @@ export default function FitnessSettingsPage() {
           localStorage.removeItem(key)
         })
 
-        await alert('本地資料已清除', 'success')
+        await alert(FITNESS_SETTINGS_LABELS.CLEAR_DATA_SUCCESS, 'success')
         router.push('/fitness')
       } catch (error) {
         logger.error('清除資料失敗:', error)
-        await alert('清除資料失敗，請稍後再試', 'error')
+        await alert(FITNESS_SETTINGS_LABELS.CLEAR_DATA_ERROR, 'error')
       }
     }
   }
@@ -56,7 +57,7 @@ export default function FitnessSettingsPage() {
     <FitnessLayout activeTab="settings">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-card border-b border-border px-4 py-4">
-        <h1 className="text-xl font-bold text-foreground">設定</h1>
+        <h1 className="text-xl font-bold text-foreground">{FITNESS_SETTINGS_LABELS.PAGE_TITLE}</h1>
       </div>
 
       <div className="px-4 pt-6 space-y-6">
@@ -68,7 +69,7 @@ export default function FitnessSettingsPage() {
             </div>
             <div>
               <div className="font-medium text-foreground">
-                {user?.display_name || user?.chinese_name || '使用者'}
+                {user?.display_name || user?.chinese_name || FITNESS_SETTINGS_LABELS.DEFAULT_USER_NAME}
               </div>
               <div className="text-sm text-muted-foreground">{user?.personal_info?.email}</div>
             </div>
@@ -86,9 +87,9 @@ export default function FitnessSettingsPage() {
               <Trash2 className="w-5 h-5 text-morandi-gold" />
             </div>
             <div className="flex-1 text-left">
-              <div className="font-medium text-foreground">清除本地資料</div>
+              <div className="font-medium text-foreground">{FITNESS_SETTINGS_LABELS.CLEAR_DATA_TITLE}</div>
               <div className="text-xs text-muted-foreground">
-                清除所有健身記錄和設定
+                {FITNESS_SETTINGS_LABELS.CLEAR_DATA_DESC}
               </div>
             </div>
           </button>
@@ -102,9 +103,9 @@ export default function FitnessSettingsPage() {
               <LogOut className="w-5 h-5 text-morandi-red" />
             </div>
             <div className="flex-1 text-left">
-              <div className="font-medium text-foreground">登出</div>
+              <div className="font-medium text-foreground">{FITNESS_SETTINGS_LABELS.LOGOUT_TITLE}</div>
               <div className="text-xs text-muted-foreground">
-                登出 Corner Fitness
+                {FITNESS_SETTINGS_LABELS.LOGOUT_DESC}
               </div>
             </div>
           </button>
@@ -118,19 +119,18 @@ export default function FitnessSettingsPage() {
             </div>
             <div className="flex-1">
               <div className="font-medium text-foreground mb-2">
-                關於 Corner Fitness
+                {FITNESS_SETTINGS_LABELS.ABOUT_TITLE}
               </div>
               <div className="text-sm text-muted-foreground space-y-1">
-                <p>版本：1.0.0</p>
+                <p>{FITNESS_SETTINGS_LABELS.ABOUT_VERSION}</p>
                 <p>
-                  簡潔優雅的健身記錄工具，專為 Corner
-                  團隊設計。
+                  {FITNESS_SETTINGS_LABELS.ABOUT_DESC}
                 </p>
                 <p className="mt-3 pt-3 border-t border-border space-y-1">
-                  <span className="block">• 支援 134+ 訓練動作</span>
-                  <span className="block">• 訓練容量自動計算</span>
-                  <span className="block">• PWA 離線使用</span>
-                  <span className="block">• 多裝置同步（開發中）</span>
+                  <span className="block">{FITNESS_SETTINGS_LABELS.ABOUT_FEATURE_1}</span>
+                  <span className="block">{FITNESS_SETTINGS_LABELS.ABOUT_FEATURE_2}</span>
+                  <span className="block">{FITNESS_SETTINGS_LABELS.ABOUT_FEATURE_3}</span>
+                  <span className="block">{FITNESS_SETTINGS_LABELS.ABOUT_FEATURE_4}</span>
                 </p>
               </div>
             </div>
@@ -142,7 +142,7 @@ export default function FitnessSettingsPage() {
           onClick={() => router.push('/')}
           className="w-full py-3 text-sm text-muted-foreground border border-border rounded-xl hover:bg-muted/50 transition-colors"
         >
-          ← 返回 Corner 主系統
+          {FITNESS_SETTINGS_LABELS.BACK_TO_MAIN}
         </button>
       </div>
     </FitnessLayout>
