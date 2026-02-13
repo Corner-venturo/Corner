@@ -7,6 +7,8 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '@/lib/supabase/client'
+import { createTourMealSetting } from '@/data/entities/tour-meal-settings'
+import { createTourTable } from '@/data/entities/tour-tables'
 import { useAuthStore } from '@/stores'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -202,13 +204,12 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
           s => s.day_number === meal.day_number && s.meal_type === meal.meal_type
         )
         if (!existing) {
-          await supabase.from('tour_meal_settings').insert({
+          await createTourMealSetting({
             tour_id: tourId,
             day_number: meal.day_number,
             meal_type: meal.meal_type,
             restaurant_name: meal.restaurant_name,
             enabled: false,
-            workspace_id: user?.workspace_id,
           })
         }
       }
@@ -251,16 +252,13 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
       const existingTables = tables.filter(t => t.meal_setting_id === selectedMealSettingId)
       const nextNumber = existingTables.length + 1
 
-      const { error } = await supabase.from('tour_tables').insert({
+      await createTourTable({
         tour_id: tourId,
         meal_setting_id: selectedMealSettingId,
         table_number: nextNumber,
         capacity: newTableCapacity,
         display_order: existingTables.length,
-        workspace_id: user?.workspace_id,
       })
-
-      if (error) throw error
 
       toast.success(`已新增 ${nextNumber} 桌 (${newTableCapacity}人)`)
       setShowAddTable(false)

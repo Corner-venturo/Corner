@@ -8,6 +8,7 @@ import { useMemo, useCallback, useState } from 'react'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
+import { deleteMember } from '@/data/entities/members'
 import type { Tour, Order } from '@/stores/types'
 
 /**
@@ -75,7 +76,7 @@ export function useVisasData() {
           .single()
 
         if (memberToDelete) {
-          await supabase.from('order_members').delete().eq('id', memberToDelete.id)
+          await deleteMember(memberToDelete.id)
         }
       }
 

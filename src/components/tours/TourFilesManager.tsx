@@ -12,6 +12,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
+import { createFolder, updateFolder, deleteFolder } from '@/data/entities/folders'
+import { createFile, updateFile, deleteFile } from '@/data/entities/files'
 import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
 import { toast } from 'sonner'
@@ -491,10 +493,10 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
         // 檢查是否是資料夾
         const item = items.find(i => i.id === id)
         if (item?.type === 'folder') {
-          await supabase.from('folders').delete().eq('id', id)
+          await deleteFolder(id)
         } else if (!item?.dbType) {
           // 只能刪除實體檔案
-          await supabase.from('files').delete().eq('id', id)
+          await deleteFile(id)
         }
       }
 
@@ -514,8 +516,7 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
     try {
       const actualParentId = parentId?.startsWith('folder-') ? null : parentId
 
-      await supabase.from('folders').insert({
-        workspace_id: workspaceId,
+      await createFolder({
         tour_id: tourId,
         name,
         parent_id: actualParentId,
@@ -557,8 +558,7 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
         if (uploadError) throw uploadError
 
         // 寫入 DB
-        await supabase.from('files').insert({
-          workspace_id: workspaceId,
+        await createFile({
           tour_id: tourId,
           folder_id: actualFolderId,
           filename,
@@ -568,7 +568,7 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
           extension: ext,
           storage_path: filename,
           storage_bucket: 'workspace-files',
-          category,
+          category: category as string,
           source: 'upload',
         })
       }
@@ -588,9 +588,9 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
       if (!item) return
 
       if (item.type === 'folder' && !itemId.startsWith('folder-')) {
-        await supabase.from('folders').update({ name: newName }).eq('id', itemId)
+        await updateFolder(itemId, { name: newName })
       } else if (item.type === 'file' && !item.dbType) {
-        await supabase.from('files').update({ original_filename: newName }).eq('id', itemId)
+        await updateFile(itemId, { original_filename: newName })
       } else {
         toast.error(COMP_TOURS_LABELS.此項目無法重新命名)
         return

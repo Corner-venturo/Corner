@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Sparkles, Award, Users, Clock, Edit2, Power, Trash2, X, Save } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
+import { deletePremiumExperience } from '@/data/entities/premium-experiences'
 import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { toast } from 'sonner'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
@@ -116,8 +117,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
     if (!confirmed) return
 
     try {
-      const { error } = await supabase.from('premium_experiences').delete().eq('id', id)
-      if (error) throw error
+      await deletePremiumExperience(id)
       await loadExperiences()
       toast.success(MICHELIN_RESTAURANTS_TAB_LABELS.刪除成功)
     } catch (error) {

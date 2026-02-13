@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Star, Edit2, Power, Trash2, X, Save } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
+import { deleteMichelinRestaurant } from '@/data/entities/michelin-restaurants'
 import { toast } from 'sonner'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { cn } from '@/lib/utils'
@@ -108,8 +109,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
     if (!confirmed) return
 
     try {
-      const { error } = await supabase.from('michelin_restaurants').delete().eq('id', id)
-      if (error) throw error
+      await deleteMichelinRestaurant(id)
       await loadRestaurants()
       toast.success(MICHELIN_RESTAURANTS_TAB_LABELS.刪除成功)
     } catch (error) {
