@@ -33,7 +33,7 @@ const DEFAULT_FOLDERS = [
   { id: 'quick_quote', name: COMP_TOURS_LABELS.快速報價, icon: '💰', dbType: 'quick_quote' as const },
   { id: 'itinerary', name: COMP_TOURS_LABELS.行程表, icon: '🗺️', dbType: 'itinerary' as const },
   { id: 'confirmation', name: COMP_TOURS_LABELS.確認單, icon: '✅', dbType: 'confirmation' as const },
-  // TODO: contract 暫時移除，等 contracts 表建立後再啟用
+  { id: 'contract', name: COMP_TOURS_LABELS.合約, icon: '📝', category: 'contract' as FileCategory },
   { id: 'request', name: COMP_TOURS_LABELS.需求單, icon: '📨', dbType: 'request' as const },
   { id: 'passport', name: COMP_TOURS_LABELS.護照, icon: '🛂', category: 'passport' as FileCategory },
   { id: 'visa', name: COMP_TOURS_LABELS.簽證, icon: '📄', category: 'visa' as FileCategory },
@@ -86,7 +86,6 @@ export function TourFilesTree({ tourId, tourCode, quoteId, itineraryId }: TourFi
             .select('id', { count: 'exact', head: true })
             .eq('tour_id', tourId)
           childCount = count || 0
-        // TODO: contract 分支暫時移除，等 contracts 表建立後再啟用
         } else if (folder.dbType === 'request') {
           const { count } = await supabase
             .from('tour_requests')
@@ -200,7 +199,6 @@ export function TourFilesTree({ tourId, tourCode, quoteId, itineraryId }: TourFi
             })
           }
         }
-      // TODO: contract 分支暫時移除
       } else if (dbType === 'request') {
         const { data } = await supabase
           .from('tour_requests')
@@ -274,7 +272,7 @@ export function TourFilesTree({ tourId, tourCode, quoteId, itineraryId }: TourFi
 
   // 處理拖曳移動
   const handleMove = useCallback((sourceId: string, targetId: string) => {
-    // TODO: 實作移動邏輯
+    // 檔案移動功能 — 目前僅顯示提示
     toast.info(`移動 ${sourceId} 到 ${targetId}`)
   }, [])
 

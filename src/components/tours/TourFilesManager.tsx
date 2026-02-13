@@ -46,8 +46,7 @@ const DEFAULT_TOUR_FOLDERS: TourFolder[] = [
   { name: COMP_TOURS_LABELS.快速報價, category: 'quick_quote', icon: '💰', dbType: 'quick_quote' },
   { name: COMP_TOURS_LABELS.行程表, category: 'itinerary', icon: '🗺️', dbType: 'itinerary' },
   { name: COMP_TOURS_LABELS.確認單, category: 'confirmation', icon: '✅', dbType: 'confirmation' },
-  // TODO: 合約功能暫未實作，contracts 表尚未建立
-  // { name: '合約', category: 'contract', icon: '📝', dbType: 'contract' },
+  { name: COMP_TOURS_LABELS.合約, category: 'contract', icon: '📝' },
   { name: COMP_TOURS_LABELS.需求單, category: 'request', icon: '📨', dbType: 'request' },
   { name: COMP_TOURS_LABELS.護照, category: 'passport', icon: '🛂' },
   { name: COMP_TOURS_LABELS.簽證, category: 'visa', icon: '📄' },
@@ -357,7 +356,6 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
         }
         break
       }
-      // TODO: contract case 暫時移除，等 contracts 表建立後再啟用
       case 'request': {
         const { data } = await supabase
           .from('tour_requests')
@@ -625,7 +623,6 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
       quick_quote: { label: COMP_TOURS_LABELS.新增快速報價, path: `/quotes/quick?tour_id=${tourId}` },
       itinerary: { label: COMP_TOURS_LABELS.新增行程表, path: `/itinerary/block-editor?tour_id=${tourId}` },
       confirmation: { label: COMP_TOURS_LABELS.建立確認單, path: `/tours/${tourCode}/confirmation` },
-      // TODO: contract action 暫時移除
       request: { label: COMP_TOURS_LABELS.新增需求單, path: `/tours/${tourCode}?tab=requirements` },
     }
     
