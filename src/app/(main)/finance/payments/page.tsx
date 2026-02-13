@@ -15,6 +15,7 @@ import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
+import { FinanceLabels } from '../constants/labels'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
@@ -122,8 +123,8 @@ export default function PaymentsPage() {
       await handleCreateReceipt(data)
       setIsDialogOpen(false)
     } catch (error) {
-      logger.error('建立收款單失敗:', error)
-      void alert('建立收款單失敗', 'error')
+      logger.error(FinanceLabels.createReceiptFailedPrefix + ':', error)
+      void alert(FinanceLabels.createReceiptFailedTitle, 'error')
     }
   }
 
@@ -133,24 +134,24 @@ export default function PaymentsPage() {
 
   // 表格欄位
   const columns: TableColumn<Receipt>[] = [
-    { key: 'receipt_number', label: '收款單號', sortable: true },
-    { key: 'receipt_date', label: '收款日期', sortable: true, render: (value) => <DateCell date={String(value)} /> },
-    { key: 'order_number', label: '訂單編號', sortable: true },
-    { key: 'tour_name', label: '團名', sortable: true },
-    { key: 'receipt_amount', label: '應收金額', sortable: true, render: (value) => <CurrencyCell amount={Number(value)} /> },
-    { key: 'actual_amount', label: '實收金額', sortable: true, render: (value) => <CurrencyCell amount={Number(value) || 0} /> },
-    { key: 'status', label: '狀態', render: (value) => <StatusCell type="receipt" status={String(value)} /> },
-    { key: 'actions', label: '操作', render: (_, row) => <ActionCell actions={[{ icon: Edit2, label: '編輯', onClick: () => loadReceiptForEdit(row) }]} /> },
+    { key: 'receipt_number', label: FinanceLabels.receiptNumber, sortable: true },
+    { key: 'receipt_date', label: FinanceLabels.receiptDate, sortable: true, render: (value) => <DateCell date={String(value)} /> },
+    { key: 'order_number', label: FinanceLabels.orderNumber, sortable: true },
+    { key: 'tour_name', label: FinanceLabels.tourName, sortable: true },
+    { key: 'receipt_amount', label: FinanceLabels.receiptAmount, sortable: true, render: (value) => <CurrencyCell amount={Number(value)} /> },
+    { key: 'actual_amount', label: FinanceLabels.actualAmount, sortable: true, render: (value) => <CurrencyCell amount={Number(value) || 0} /> },
+    { key: 'status', label: FinanceLabels.status, render: (value) => <StatusCell type="receipt" status={String(value)} /> },
+    { key: 'actions', label: FinanceLabels.actions, render: (_, row) => <ActionCell actions={[{ icon: Edit2, label: FinanceLabels.edit, onClick: () => loadReceiptForEdit(row) }]} /> },
   ]
 
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="收款管理"
+        title={FinanceLabels.paymentManagement}
         showSearch={true}
         searchTerm={searchQuery}
         onSearchChange={setSearchQuery}
-        searchPlaceholder="搜尋收款單號、訂單編號、團名..."
+        searchPlaceholder={FinanceLabels.searchReceiptPlaceholder}
         actions={
           <div className="flex gap-2">
             <Button
@@ -160,7 +161,7 @@ export default function PaymentsPage() {
               className="text-morandi-secondary"
             >
               <FileDown size={16} className="mr-2" />
-              匯出 Excel
+              {FinanceLabels.exportExcel}
             </Button>
             {canBatchConfirm && (
               <Button
@@ -170,7 +171,7 @@ export default function PaymentsPage() {
                 className="text-morandi-gold border-morandi-gold hover:bg-morandi-gold/10"
               >
                 <CheckSquare size={16} className="mr-2" />
-                批量確認
+                {FinanceLabels.batchConfirm}
               </Button>
             )}
             <Button
@@ -179,7 +180,7 @@ export default function PaymentsPage() {
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
               <Layers size={16} className="mr-2" />
-              批量收款
+              {FinanceLabels.batchPayment}
             </Button>
             <Button
               size="sm"
@@ -187,7 +188,7 @@ export default function PaymentsPage() {
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
               <Plus size={16} className="mr-2" />
-              新增收款
+              {FinanceLabels.addPayment}
             </Button>
           </div>
         }

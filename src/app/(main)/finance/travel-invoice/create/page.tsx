@@ -10,6 +10,7 @@ import { getTodayString } from '@/lib/utils/format-date'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, Trash2, FileText } from 'lucide-react'
+import { FinanceLabels } from '../constants/labels'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { ContentContainer } from '@/components/layout/content-container'
 import { Button } from '@/components/ui/button'
@@ -99,12 +100,12 @@ export default function CreateInvoicePage() {
 
     // 驗證
     if (!buyerInfo.buyerName) {
-      setError('請輸入買受人名稱')
+      setError(FinanceLabels.enterBuyerNameError)
       return
     }
 
     if (items.some(item => !item.item_name || item.item_price <= 0)) {
-      setError('請完整填寫商品資訊')
+      setError(FinanceLabels.completeProductInfoError)
       return
     }
 
@@ -120,14 +121,14 @@ export default function CreateInvoicePage() {
 
       router.push('/finance/travel-invoice')
     } catch (error) {
-      setError(error instanceof Error ? error.message : '發生未知錯誤')
+      setError(error instanceof Error ? error.message : FinanceLabels.unknownError)
     }
   }
 
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="開立新發票"
+        title={FinanceLabels.invoiceCreateTitle}
         icon={FileText}
         showBackButton={true}
         onBack={() => router.push('/finance/travel-invoice')}
@@ -145,33 +146,33 @@ export default function CreateInvoicePage() {
           {/* 基本資訊 */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">基本資訊</CardTitle>
+              <CardTitle className="text-base">{FinanceLabels.basicInfo}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="invoice_date">開立日期</Label>
+                  <Label htmlFor="invoice_date">{FinanceLabels.issueDate}</Label>
                   <DatePicker
                     value={invoice_date}
                     onChange={(date) => setInvoiceDate(date)}
-                    placeholder="選擇日期"
+                    placeholder={FinanceLabels.selectDate}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="tax_type">課稅別</Label>
+                  <Label htmlFor="tax_type">{FinanceLabels.taxType}</Label>
                   <Select value={tax_type} onValueChange={(value) => setTaxType(value as 'dutiable' | 'zero' | 'free')}>
                     <SelectTrigger className="h-10">
-                      <SelectValue placeholder="選擇課稅別" />
+                      <SelectValue placeholder={FinanceLabels.selectTaxType} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="dutiable">應稅</SelectItem>
-                      <SelectItem value="zero">零稅率</SelectItem>
-                      <SelectItem value="free">免稅</SelectItem>
+                      <SelectItem value="dutiable">{FinanceLabels.dutiable}</SelectItem>
+                      <SelectItem value="zero">{FinanceLabels.zeroRate}</SelectItem>
+                      <SelectItem value="free">{FinanceLabels.taxFree}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label>申報註記</Label>
+                  <Label>{FinanceLabels.reportStatus}</Label>
                   <div className="flex items-center gap-4 h-10">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -182,7 +183,7 @@ export default function CreateInvoicePage() {
                         onChange={() => setReportStatus('unreported')}
                         className="w-4 h-4 accent-primary"
                       />
-                      <span className="text-sm">未申報</span>
+                      <span className="text-sm">{FinanceLabels.unreported}</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -193,7 +194,7 @@ export default function CreateInvoicePage() {
                         onChange={() => setReportStatus('reported')}
                         className="w-4 h-4 accent-primary"
                       />
-                      <span className="text-sm">已申報</span>
+                      <span className="text-sm">{FinanceLabels.reported}</span>
                     </label>
                   </div>
                 </div>
@@ -204,46 +205,46 @@ export default function CreateInvoicePage() {
           {/* 買受人資訊 */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">買受人資訊</CardTitle>
+              <CardTitle className="text-base">{FinanceLabels.buyerInfo}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="buyerName">買受人名稱 *</Label>
+                  <Label htmlFor="buyerName">{FinanceLabels.buyerNameRequired}</Label>
                   <Input
                     id="buyerName"
                     value={buyerInfo.buyerName}
                     onChange={e => setBuyerInfo({ ...buyerInfo, buyerName: e.target.value })}
-                    placeholder="請輸入買受人名稱"
+                    placeholder={FinanceLabels.enterBuyerName}
                     required
                   />
                 </div>
                 <div>
-                  <Label htmlFor="buyerUBN">統一編號</Label>
+                  <Label htmlFor="buyerUBN">{FinanceLabels.unifiedBusinessNumber}</Label>
                   <Input
                     id="buyerUBN"
                     value={buyerInfo.buyerUBN}
                     onChange={e => setBuyerInfo({ ...buyerInfo, buyerUBN: e.target.value })}
-                    placeholder="8 碼數字"
+                    placeholder={FinanceLabels.ubnPlaceholder}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="buyerEmail">Email</Label>
+                  <Label htmlFor="buyerEmail">{FinanceLabels.email}</Label>
                   <Input
                     id="buyerEmail"
                     type="email"
                     value={buyerInfo.buyerEmail}
                     onChange={e => setBuyerInfo({ ...buyerInfo, buyerEmail: e.target.value })}
-                    placeholder="用於寄送電子收據"
+                    placeholder={FinanceLabels.emailForReceipt}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="buyerMobile">手機號碼</Label>
+                  <Label htmlFor="buyerMobile">{FinanceLabels.mobileNumber}</Label>
                   <Input
                     id="buyerMobile"
                     value={buyerInfo.buyerMobile}
                     onChange={e => setBuyerInfo({ ...buyerInfo, buyerMobile: e.target.value })}
-                    placeholder="09xxxxxxxx"
+                    placeholder={FinanceLabels.mobilePlaceholder}
                   />
                 </div>
               </div>
@@ -253,17 +254,17 @@ export default function CreateInvoicePage() {
           {/* 商品明細 - 表格式 */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">商品明細</CardTitle>
+              <CardTitle className="text-base">{FinanceLabels.productDetails}</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               {/* 表格標題 */}
               <div className="grid grid-cols-12 gap-2 px-4 py-2 bg-muted/50 border-y text-sm font-medium text-muted-foreground">
-                <div className="col-span-4">摘要</div>
-                <div className="col-span-1 text-center">數量</div>
-                <div className="col-span-2 text-right">單價</div>
-                <div className="col-span-2 text-center">單位</div>
-                <div className="col-span-2 text-right">金額</div>
-                <div className="col-span-1 text-center">處理</div>
+                <div className="col-span-4">{FinanceLabels.summary}</div>
+                <div className="col-span-1 text-center">{FinanceLabels.quantity}</div>
+                <div className="col-span-2 text-right">{FinanceLabels.unitPrice}</div>
+                <div className="col-span-2 text-center">{FinanceLabels.unit}</div>
+                <div className="col-span-2 text-right">{FinanceLabels.amount}</div>
+                <div className="col-span-1 text-center">{FinanceLabels.handle}</div>
               </div>
 
               {/* 項目列表 */}
@@ -274,7 +275,7 @@ export default function CreateInvoicePage() {
                       <Input
                         value={item.item_name}
                         onChange={e => updateItem(index, 'item_name', e.target.value)}
-                        placeholder="商品名稱"
+                        placeholder={FinanceLabels.productName}
                         className="h-9"
                       />
                     </div>
@@ -335,23 +336,23 @@ export default function CreateInvoicePage() {
                   className="text-primary"
                 >
                   <Plus className="mr-1 h-4 w-4" />
-                  新增一列
+                  {FinanceLabels.addRow}
                 </Button>
               </div>
 
               {/* 備註欄位 */}
               <div className="px-4 py-3 border-t">
                 <div className="flex items-start gap-4">
-                  <Label className="pt-2 shrink-0">備註</Label>
+                  <Label className="pt-2 shrink-0">{FinanceLabels.remarks}</Label>
                   <div className="flex-1">
                     <Input
                       value={remark}
                       onChange={e => setRemark(e.target.value.slice(0, 50))}
-                      placeholder="請輸入備註（限 50 字）"
+                      placeholder={FinanceLabels.remarksPlaceholder}
                       maxLength={50}
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                      可輸入大小寫英文、中文（限 50 字，不可輸入符號，例如：/ , - = 等）
+                      {FinanceLabels.remarksNote}
                     </p>
                   </div>
                   <span className="text-sm text-muted-foreground pt-2">
@@ -363,7 +364,7 @@ export default function CreateInvoicePage() {
               {/* 總計 */}
               <div className="px-4 py-4 border-t bg-muted/30">
                 <div className="flex justify-end items-center gap-4">
-                  <span className="text-sm font-medium">總計</span>
+                  <span className="text-sm font-medium">{FinanceLabels.total}</span>
                   <span className="text-xl font-bold text-primary min-w-[120px] text-right">
                     NT$ {total_amount.toLocaleString()}
                   </span>
@@ -381,7 +382,7 @@ export default function CreateInvoicePage() {
               onClick={() => router.push('/finance/travel-invoice')}
               className="min-w-[120px]"
             >
-              取消
+              {FinanceLabels.cancel}
             </Button>
             <Button
               type="submit"
@@ -389,7 +390,7 @@ export default function CreateInvoicePage() {
               disabled={isLoading}
               className="min-w-[120px]"
             >
-              {isLoading ? '開立中...' : '開立發票'}
+              {isLoading ? FinanceLabels.issuing : FinanceLabels.issueInvoice}
             </Button>
           </div>
         </form>
