@@ -49,6 +49,9 @@ export const DESIGNER_LABELS = {
   高: '高',
   X: 'X',
   Y: 'Y',
+  上傳圖片後會裁切成此形狀: '上傳圖片後會裁切成此形狀',
+  顏色漸層: '顏色/漸層',
+  圖片遮罩: '圖片遮罩',
 };
 
 // PropertiesPanel 函數

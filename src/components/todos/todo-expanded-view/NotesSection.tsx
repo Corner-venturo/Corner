@@ -8,6 +8,7 @@ import { MessageSquare, Edit2, X, Save, Plus } from 'lucide-react'
 import { NotesSectionProps } from './types'
 import { useAuthStore } from '@/stores/auth-store'
 import { generateUUID } from '@/lib/utils/uuid'
+import { COMMON_LABELS, BUTTON_LABELS, PLACEHOLDER_LABELS, TOOLTIP_LABELS } from '../constants/labels'
 
 export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
   const [newNote, setNewNote] = useState('')
@@ -50,7 +51,7 @@ export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
         user.chinese_name ||
         user.english_name ||
         user.personal_info?.email ||
-        '未知使用者',
+        COMMON_LABELS.unknownUser,
       read_by: [user.id],
     }
 
@@ -73,7 +74,7 @@ export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
     <div className="bg-card border border-border rounded-xl p-4 shadow-sm flex-1 flex flex-col min-h-0">
       <h4 className="text-sm font-semibold text-morandi-primary mb-3 flex items-center gap-1.5">
         <MessageSquare size={14} className="text-morandi-gold" />
-        備註
+        {COMMON_LABELS.notes}
       </h4>
       <div className="space-y-2 mb-3 max-h-[250px] overflow-y-auto">
         {(todo.notes || []).map((note, index) => (
@@ -106,7 +107,7 @@ export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
                     className="bg-morandi-gold hover:bg-morandi-gold-hover text-white h-7 text-xs gap-1.5"
                   >
                     <Save size={12} />
-                    儲存
+                    {BUTTON_LABELS.save}
                   </Button>
                   <Button
                     size="sm"
@@ -115,7 +116,7 @@ export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
                     className="h-7 text-xs gap-1.5"
                   >
                     <X size={12} />
-                    取消
+                    {BUTTON_LABELS.cancel}
                   </Button>
                 </div>
               </div>
@@ -129,7 +130,7 @@ export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
                       setEditingNoteContent(note.content)
                     }}
                     className="p-1 hover:bg-morandi-gold/10 rounded text-morandi-secondary hover:text-morandi-gold"
-                    title="編輯備註"
+                    title={TOOLTIP_LABELS.editNote}
                   >
                     <Edit2 size={12} />
                   </button>
@@ -139,14 +140,14 @@ export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
                       onUpdate({ notes: newNotes })
                     }}
                     className="p-1 hover:bg-morandi-red/10 rounded text-morandi-red"
-                    title="刪除備註"
+                    title={TOOLTIP_LABELS.deleteNote}
                   >
                     <X size={12} />
                   </button>
                 </div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-xs font-medium text-morandi-primary">
-                    {note.author_name || '未知使用者'}
+                    {note.author_name || COMMON_LABELS.unknownUser}
                   </span>
                   <span className="text-xs text-morandi-muted">
                     {new Date(note.timestamp).toLocaleString()}
@@ -163,7 +164,7 @@ export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
 
       <div className="flex gap-2">
         <Textarea
-          placeholder="新增備註... (Enter 送出，Shift+Enter 換行)"
+          placeholder={PLACEHOLDER_LABELS.addNote}
           value={newNote}
           onChange={e => setNewNote(e.target.value)}
           onKeyDown={handleNoteKeyDown}
@@ -177,7 +178,7 @@ export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
           className="bg-morandi-gold hover:bg-morandi-gold-hover text-white shadow-sm gap-1.5"
         >
           <Plus size={14} />
-          新增
+          {BUTTON_LABELS.add}
         </Button>
       </div>
     </div>

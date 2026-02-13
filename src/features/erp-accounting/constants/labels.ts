@@ -191,3 +191,19 @@ export const VOUCHER_FORM_LABELS_EXT = {
   title_add: '新增傳票',
   title_edit: '編輯傳票',
 }
+
+// 動態消息生成函數
+export const CONFIRMATION_MESSAGES = {
+  deleteAccount: (code: string, name: string) => `確定要刪除科目「${code} ${name}」嗎？`,
+  deleteBankAccount: (name: string) => `確定要刪除「${name}」嗎？`,
+}
+
+export const SUCCESS_MESSAGES = {
+  reverseSuccess: (voucherNo: string) => `反沖成功，新傳票編號：${voucherNo}`,
+  saveVoucherDraft: (voucherNo: string) => `傳票 ${voucherNo} 已儲存為草稿`,
+  saveVoucherPosted: (voucherNo: string) => `傳票 ${voucherNo} 已過帳`,
+}
+
+export const CALCULATION_MESSAGES = {
+  imbalanceAmount: (amount: number) => `${amount.toLocaleString()}`,
+}

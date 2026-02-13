@@ -12,7 +12,7 @@ import { BankAccountDialog } from './BankAccountDialog'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { toast } from 'sonner'
 import type { BankAccount } from '@/types/accounting.types'
-import { BANK_ACCOUNTS_PAGE_LABELS as L, BANK_ACCOUNT_DIALOG_LABELS as DL } from '../constants/labels'
+import { BANK_ACCOUNTS_PAGE_LABELS as L, BANK_ACCOUNT_DIALOG_LABELS as DL, CONFIRMATION_MESSAGES } from '../constants/labels'
 
 export function BankAccountsPage() {
   const { items: bankAccounts, isLoading, create, update, delete: deleteAccount } = useBankAccounts()
@@ -42,7 +42,7 @@ export function BankAccountsPage() {
 
   const handleDelete = async (account: BankAccount) => {
     const confirmed = await confirm(
-      `確定要刪除「${account.name}」嗎？`,
+      CONFIRMATION_MESSAGES.deleteBankAccount(account.name),
       {
         title: L.confirm_delete_title,
         confirmText: L.action_delete,

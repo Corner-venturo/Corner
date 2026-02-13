@@ -12,7 +12,7 @@ import { AccountDialog } from './AccountDialog'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { toast } from 'sonner'
 import type { Account, AccountType } from '@/types/accounting.types'
-import { ACCOUNTS_PAGE_LABELS as L, ACCOUNT_DIALOG_LABELS } from '../constants/labels'
+import { ACCOUNTS_PAGE_LABELS as L, ACCOUNT_DIALOG_LABELS, CONFIRMATION_MESSAGES } from '../constants/labels'
 
 const typeConfig: Record<AccountType, { label: string; color: string }> = {
   asset: { label: L.type_asset, color: 'bg-status-info-bg text-status-info' },
@@ -59,7 +59,7 @@ export function AccountsPage() {
     }
 
     const confirmed = await confirm(
-      `確定要刪除科目「${account.code} ${account.name}」嗎？`,
+      CONFIRMATION_MESSAGES.deleteAccount(account.code, account.name),
       {
         title: L.confirm_delete_title,
         confirmText: L.action_delete,

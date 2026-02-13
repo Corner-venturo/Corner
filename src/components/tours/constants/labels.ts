@@ -466,3 +466,18 @@ export const CHECKIN_MEMBER_LIST_LABELS = {
   取消: '取消',
   報到: '報到',
 };
+
+// CheckinQRCode 模組的 UI 標籤
+export const CHECKIN_QR_CODE_LABELS = {
+  報到_QR_Code: '報到 QR Code',
+  複製連結: '複製連結',
+  下載: '下載',
+  列印: '列印',
+  報到_QR_Code_標題: (code: string) => `${code} 報到 QR Code`,
+  團號: '團號:',
+  出發: '出發:',
+  報到說明: '報到說明：',
+  使用手機掃描上方_QR_Code: '使用手機掃描上方 QR Code',
+  輸入您的姓名和身分證末4碼: '輸入您的姓名和身分證末4碼',
+  確認資訊後點擊確認報到: '確認資訊後點擊「確認報到」',
+};

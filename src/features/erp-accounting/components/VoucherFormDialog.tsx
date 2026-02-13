@@ -22,6 +22,7 @@ import { getTodayString } from '@/lib/utils/format-date'
 import { useAuthStore } from '@/stores/auth-store'
 import { useAccounts } from '../hooks'
 import type { JournalVoucher, VoucherStatus, Account } from '@/types/accounting.types'
+import { VOUCHER_FORM_LABELS_EXT, SUCCESS_MESSAGES, CALCULATION_MESSAGES } from '../constants/labels'
 
 interface VoucherFormDialogProps {
   open: boolean
@@ -306,7 +307,7 @@ export function VoucherFormDialog({
       <DialogContent level={1} className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
-            {isEditMode ? '編輯傳票' : '新增傳票'}
+            {isEditMode ? VOUCHER_FORM_LABELS_EXT.title_edit : VOUCHER_FORM_LABELS_EXT.title_add}
             {voucher && (
               <Badge variant={voucher.status === 'draft' ? 'secondary' : 'default'}>
                 {voucher.status === 'draft' ? '草稿' : '已過帳'}
@@ -319,7 +320,7 @@ export function VoucherFormDialog({
           {/* 傳票頭資訊 */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>傳票日期 *</Label>
+              <Label>{VOUCHER_FORM_LABELS_EXT.label_voucher_date} *</Label>
               <Input
                 type="date"
                 value={voucherDate}
@@ -328,7 +329,7 @@ export function VoucherFormDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label>傳票編號</Label>
+              <Label>{VOUCHER_FORM_LABELS_EXT.label_voucher_no}</Label>
               <Input
                 value={voucher?.voucher_no || '（自動產生）'}
                 disabled
@@ -338,7 +339,7 @@ export function VoucherFormDialog({
           </div>
 
           <div className="space-y-2">
-            <Label>摘要</Label>
+            <Label>{VOUCHER_FORM_LABELS_EXT.label_memo}</Label>
             <Textarea
               value={memo}
               onChange={(e) => setMemo(e.target.value)}
@@ -351,7 +352,7 @@ export function VoucherFormDialog({
           {/* 分錄明細 */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-base font-medium">分錄明細</Label>
+              <Label className="text-base font-medium">{VOUCHER_FORM_LABELS_EXT.label_entry_details}</Label>
               {canEdit && (
                 <Button
                   type="button"
@@ -361,7 +362,7 @@ export function VoucherFormDialog({
                   className="gap-1"
                 >
                   <Plus size={14} />
-                  新增行
+                  {VOUCHER_FORM_LABELS_EXT.btn_add_line}
                 </Button>
               )}
             </div>
@@ -370,11 +371,11 @@ export function VoucherFormDialog({
               <table className="w-full text-sm">
                 <thead className="bg-muted">
                   <tr>
-                    <th className="px-3 py-2 text-left w-12">#</th>
-                    <th className="px-3 py-2 text-left min-w-[200px]">科目</th>
-                    <th className="px-3 py-2 text-left">摘要</th>
-                    <th className="px-3 py-2 text-right w-28">借方</th>
-                    <th className="px-3 py-2 text-right w-28">貸方</th>
+                    <th className="px-3 py-2 text-left w-12">{VOUCHER_FORM_LABELS_EXT.col_line_no}</th>
+                    <th className="px-3 py-2 text-left min-w-[200px]">{VOUCHER_FORM_LABELS_EXT.col_account}</th>
+                    <th className="px-3 py-2 text-left">{VOUCHER_FORM_LABELS_EXT.col_memo}</th>
+                    <th className="px-3 py-2 text-right w-28">{VOUCHER_FORM_LABELS_EXT.col_debit}</th>
+                    <th className="px-3 py-2 text-right w-28">{VOUCHER_FORM_LABELS_EXT.col_credit}</th>
                     {canEdit && <th className="px-3 py-2 w-12"></th>}
                   </tr>
                 </thead>
@@ -443,7 +444,7 @@ export function VoucherFormDialog({
                 </tbody>
                 <tfoot className="bg-muted font-medium">
                   <tr>
-                    <td colSpan={3} className="px-3 py-2 text-right">合計</td>
+                    <td colSpan={3} className="px-3 py-2 text-right">{VOUCHER_FORM_LABELS_EXT.total_label}</td>
                     <td className="px-3 py-2 text-right font-mono">
                       {totals.debit.toLocaleString()}
                     </td>
@@ -459,12 +460,12 @@ export function VoucherFormDialog({
             {/* 借貸平衡狀態 */}
             {totals.debit !== totals.credit && (
               <div className="p-3 bg-destructive/10 text-destructive rounded-lg text-sm">
-                ⚠️ 借貸不平衡！差額：{Math.abs(totals.debit - totals.credit).toLocaleString()}
+                {VOUCHER_FORM_LABELS_EXT.imbalance_warning}{CALCULATION_MESSAGES.imbalanceAmount(Math.abs(totals.debit - totals.credit))}
               </div>
             )}
             {totals.isBalanced && (
               <div className="p-3 bg-green-500/10 text-green-600 rounded-lg text-sm">
-                ✓ 借貸平衡
+                {VOUCHER_FORM_LABELS_EXT.balanced_message}
               </div>
             )}
           </div>

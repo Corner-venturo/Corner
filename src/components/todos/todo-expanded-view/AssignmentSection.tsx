@@ -9,6 +9,7 @@ import { AssignmentSectionProps } from './types'
 import { useEmployeesSlim } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { DatePicker } from '@/components/ui/date-picker'
+import { FORM_LABELS, COMMON_LABELS, PLACEHOLDER_LABELS, TOOLTIP_LABELS, TODO_STATUS_LABELS } from '../constants/labels'
 
 export function AssignmentSection({ todo, onUpdate, readOnly = false }: AssignmentSectionProps) {
   const router = useRouter()
@@ -21,10 +22,10 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
     if (todo.assignee) {
       // 優先檢查當前登入用戶，再檢查員工列表
       if (user?.id === todo.assignee) {
-        setAssigneeName(user.display_name || user.chinese_name || user.personal_info?.email || '未知員工')
+        setAssigneeName(user.display_name || user.chinese_name || user.personal_info?.email || COMMON_LABELS.unknownEmployee)
       } else {
         const assignee = employees.find(e => e.id === todo.assignee)
-        setAssigneeName(assignee?.display_name || assignee?.chinese_name || '未知員工')
+        setAssigneeName(assignee?.display_name || assignee?.chinese_name || COMMON_LABELS.unknownEmployee)
       }
     } else {
       setAssigneeName('')
@@ -50,14 +51,14 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
         {assigneeName && (
           <div className="flex items-center gap-3 pb-3 border-b border-border">
             <UserCheck size={18} className="text-morandi-gold" />
-            <span className="text-sm text-morandi-secondary min-w-[60px]">指派給:</span>
+            <span className="text-sm text-morandi-secondary min-w-[60px]">{FORM_LABELS.assignTo}</span>
             <div className="flex items-center gap-2 px-3 py-1.5 bg-morandi-gold/10 border border-morandi-gold/30 rounded-lg">
               <span className="text-sm font-medium text-morandi-gold">{assigneeName}</span>
               {!readOnly && (
                 <button
                   onClick={() => onUpdate({ assignee: undefined })}
                   className="p-0.5 hover:bg-morandi-red/10 rounded text-morandi-secondary hover:text-morandi-red"
-                  title="取消指派"
+                  title={TOOLTIP_LABELS.removeAssignment}
                 >
                   <X size={12} />
                 </button>
@@ -72,21 +73,21 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
           <div className="flex items-center gap-2">
             {readOnly ? (
               <span className={cn('text-sm font-medium', getDeadlineColor())}>
-                {todo.deadline || '未設定'}
+                {todo.deadline || COMMON_LABELS.notSet}
               </span>
             ) : (
               <>
                 <DatePicker
                   value={todo.deadline || ''}
                   onChange={date => onUpdate({ deadline: date })}
-                  placeholder="選擇日期"
+                  placeholder={PLACEHOLDER_LABELS.selectDate}
                   className={cn('text-sm font-medium h-9 w-[160px]', getDeadlineColor())}
                 />
                 {todo.deadline && (
                   <button
                     onClick={() => onUpdate({ deadline: '' })}
                     className="p-1 hover:bg-morandi-red/10 rounded text-morandi-secondary hover:text-morandi-red"
-                    title="清除期限"
+                    title={TOOLTIP_LABELS.clearDeadline}
                   >
                     <X size={14} />
                   </button>
@@ -112,7 +113,7 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
                 readOnly && 'cursor-default'
               )}
             >
-              待辦
+              {TODO_STATUS_LABELS.pending}
             </button>
             <button
               onClick={() => !readOnly && onUpdate({ status: 'in_progress' })}
@@ -126,7 +127,7 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
                 readOnly && 'cursor-default'
               )}
             >
-              進行中
+              {TODO_STATUS_LABELS.in_progress}
             </button>
             <button
               onClick={() => !readOnly && onUpdate({ status: 'completed' })}
@@ -140,7 +141,7 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
                 readOnly && 'cursor-default'
               )}
             >
-              完成
+              {TODO_STATUS_LABELS.completed}
             </button>
             <button
               onClick={() => !readOnly && onUpdate({ status: 'cancelled' })}
@@ -154,7 +155,7 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
                 readOnly && 'cursor-default'
               )}
             >
-              取消
+              {TODO_STATUS_LABELS.cancelled}
             </button>
           </div>
         </div>
@@ -164,7 +165,7 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
         <div className="pt-3 mt-3 border-t border-border">
           <span className="text-xs font-medium text-morandi-primary flex items-center gap-1.5 mb-2">
             <FileText size={12} className="text-morandi-gold" />
-            關聯項目
+            {COMMON_LABELS.relatedItems}
           </span>
           <div className="flex flex-wrap gap-1.5">
             {todo.related_items.map((item, index) => (

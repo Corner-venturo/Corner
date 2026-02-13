@@ -22,6 +22,14 @@ import { usePaymentData } from '@/app/(main)/finance/payments/hooks/usePaymentDa
 import type { ReceiptItem } from '@/stores'
 import { alert } from '@/lib/ui/alert-dialog'
 import { ReceiptType, RECEIPT_TYPE_OPTIONS } from '@/types/receipt.types'
+import { 
+  FORM_LABELS, 
+  PLACEHOLDER_LABELS, 
+  BUTTON_LABELS, 
+  CONTACT_LABELS, 
+  BANK_OPTIONS, 
+  MESSAGE_LABELS 
+} from '../constants/labels'
 
 interface QuickReceiptProps {
   onSubmit?: () => void

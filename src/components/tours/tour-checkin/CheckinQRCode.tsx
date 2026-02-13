@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Copy, Download, Printer, QrCode, Calendar, MapPin } from 'lucide-react'
 import { toast } from 'sonner'
 import { formatDateMonthDayChinese } from '@/lib/utils/format-date'
-import { COMP_TOURS_LABELS } from '../constants/labels'
+import { COMP_TOURS_LABELS, CHECKIN_QR_CODE_LABELS } from '../constants/labels'
 
 interface CheckinQRCodeProps {
   tour: Tour
@@ -79,7 +79,7 @@ export function CheckinQRCode({ tour }: CheckinQRCodeProps) {
       <!DOCTYPE html>
       <html>
         <head>
-          <title>${tour.code} 報到 QR Code</title>
+          <title>${CHECKIN_QR_CODE_LABELS.報到_QR_Code_標題(tour.code)}</title>
           <style>
             body {
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -137,19 +137,19 @@ export function CheckinQRCode({ tour }: CheckinQRCodeProps) {
           <div class="container">
             <div class="title">${tour.name}</div>
             <div class="info">
-              團號: ${tour.code}<br/>
-              出發: ${formatDateMonthDayChinese(tour.departure_date)}
+              ${CHECKIN_QR_CODE_LABELS.團號} ${tour.code}<br/>
+              ${CHECKIN_QR_CODE_LABELS.出發} ${formatDateMonthDayChinese(tour.departure_date)}
             </div>
             <div class="qr-wrapper">
               ${svgData}
             </div>
             <div class="url">${checkinUrl}</div>
             <div class="instructions">
-              <strong>報到說明：</strong>
+              <strong>${CHECKIN_QR_CODE_LABELS.報到說明}</strong>
               <ol>
-                <li>使用手機掃描上方 QR Code</li>
-                <li>輸入您的姓名和身分證末4碼</li>
-                <li>確認資訊後點擊「確認報到」</li>
+                <li>${CHECKIN_QR_CODE_LABELS.使用手機掃描上方_QR_Code}</li>
+                <li>${CHECKIN_QR_CODE_LABELS.輸入您的姓名和身分證末4碼}</li>
+                <li>${CHECKIN_QR_CODE_LABELS.確認資訊後點擊確認報到}</li>
               </ol>
             </div>
           </div>
@@ -166,7 +166,7 @@ export function CheckinQRCode({ tour }: CheckinQRCodeProps) {
     <div className="bg-card rounded-lg border border-border p-4">
       <h3 className="text-sm font-medium text-morandi-secondary mb-4 flex items-center gap-2">
         <QrCode size={16} />
-        報到 QR Code
+        {CHECKIN_QR_CODE_LABELS.報到_QR_Code}
       </h3>
 
       <div className="flex flex-col md:flex-row gap-6">
@@ -221,7 +221,7 @@ export function CheckinQRCode({ tour }: CheckinQRCodeProps) {
               className="gap-1"
             >
               <Copy size={14} />
-              複製連結
+              {CHECKIN_QR_CODE_LABELS.複製連結}
             </Button>
             <Button
               variant="outline"
@@ -230,7 +230,7 @@ export function CheckinQRCode({ tour }: CheckinQRCodeProps) {
               className="gap-1"
             >
               <Download size={14} />
-              下載
+              {CHECKIN_QR_CODE_LABELS.下載}
             </Button>
             <Button
               variant="outline"
@@ -239,7 +239,7 @@ export function CheckinQRCode({ tour }: CheckinQRCodeProps) {
               className="gap-1"
             >
               <Printer size={14} />
-              列印
+              {CHECKIN_QR_CODE_LABELS.列印}
             </Button>
           </div>
         </div>

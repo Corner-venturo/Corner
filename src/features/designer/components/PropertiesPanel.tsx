@@ -173,7 +173,7 @@ export function PropertiesPanel({
       <div className="p-3 border-b border-border flex items-center gap-2">
         {getTypeIcon(properties.type as string)}
         <h3 className="font-medium text-sm text-morandi-primary">
-          {getTypeName(properties.type as string)}
+          {getObjectType(properties.type as string)}
         </h3>
       </div>
 
@@ -248,7 +248,7 @@ export function PropertiesPanel({
 
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <Label className="text-xs text-morandi-primary">粗細</Label>
+                <Label className="text-xs text-morandi-primary">{DESIGNER_LABELS.粗細}</Label>
                 <FontWeightPicker
                   fontWeight={String(properties.fontWeight || 'normal')}
                   onChange={(weight) => updateProperty('fontWeight', weight)}
@@ -257,7 +257,7 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label className="text-xs text-morandi-primary">對齊</Label>
+              <Label className="text-xs text-morandi-primary">{DESIGNER_LABELS.對齊}</Label>
               <TextAlignPicker
                 textAlign={(properties.textAlign as string) || 'left'}
                 onChange={(align) => updateProperty('textAlign', align)}
@@ -270,11 +270,11 @@ export function PropertiesPanel({
         <div>
           <div className="flex items-center gap-1 mb-2">
             <Move size={12} className="text-morandi-secondary" />
-            <Label className="text-xs text-morandi-primary">位置</Label>
+            <Label className="text-xs text-morandi-primary">{DESIGNER_LABELS.位置}</Label>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <Label className="text-[10px] text-morandi-muted">X</Label>
+              <Label className="text-[10px] text-morandi-muted">{DESIGNER_LABELS.X}</Label>
               <Input
                 type="number"
                 value={String(properties.left || 0)}
@@ -283,7 +283,7 @@ export function PropertiesPanel({
               />
             </div>
             <div>
-              <Label className="text-[10px] text-morandi-muted">Y</Label>
+              <Label className="text-[10px] text-morandi-muted">{DESIGNER_LABELS.Y}</Label>
               <Input
                 type="number"
                 value={String(properties.top || 0)}
@@ -299,7 +299,7 @@ export function PropertiesPanel({
           <div>
             <div className="flex items-center gap-1 mb-2">
               <Maximize2 size={12} className="text-morandi-secondary" />
-              <Label className="text-xs text-morandi-primary">大小</Label>
+              <Label className="text-xs text-morandi-primary">{DESIGNER_LABELS.大小}</Label>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
@@ -316,7 +316,7 @@ export function PropertiesPanel({
                 />
               </div>
               <div>
-                <Label className="text-[10px] text-morandi-muted">高</Label>
+                <Label className="text-[10px] text-morandi-muted">{DESIGNER_LABELS.高}</Label>
                 <Input
                   type="number"
                   value={String(properties.height || 0)}
@@ -336,7 +336,7 @@ export function PropertiesPanel({
         <div>
           <div className="flex items-center gap-1 mb-2">
             <RotateCw size={12} className="text-morandi-secondary" />
-            <Label className="text-xs text-morandi-primary">旋轉</Label>
+            <Label className="text-xs text-morandi-primary">{DESIGNER_LABELS.旋轉}</Label>
           </div>
           <div className="flex items-center gap-2">
             <Input
@@ -345,7 +345,7 @@ export function PropertiesPanel({
               onChange={(e) => updateProperty('angle', parseInt(e.target.value))}
               className="w-20 text-sm h-8"
             />
-            <span className="text-xs text-morandi-secondary">度</span>
+            <span className="text-xs text-morandi-secondary">{DESIGNER_LABELS.度}</span>
           </div>
         </div>
 
@@ -353,7 +353,7 @@ export function PropertiesPanel({
         <div>
           <div className="flex items-center gap-1 mb-2">
             <Palette size={12} className="text-morandi-secondary" />
-            <Label className="text-xs text-morandi-primary">填充</Label>
+            <Label className="text-xs text-morandi-primary">{DESIGNER_LABELS.填充}</Label>
           </div>
           <div className="space-y-3">
             {/* 漸層/純色填充 */}
@@ -407,7 +407,7 @@ export function PropertiesPanel({
                   onClick={() => selectedObject && onImageFill(selectedObject)}
                 >
                   <Upload size={14} />
-                  上傳圖片填充
+{DESIGNER_LABELS.上傳圖片填充}
                 </Button>
                 <p className="text-[10px] text-morandi-muted mt-1">
                   上傳圖片後會裁切成此形狀
@@ -418,7 +418,7 @@ export function PropertiesPanel({
             {/* 邊框顏色 */}
             {properties.stroke !== undefined && (
               <div className="flex items-center gap-2">
-                <Label className="text-[10px] text-morandi-muted w-8">邊框</Label>
+                <Label className="text-[10px] text-morandi-muted w-8">{DESIGNER_LABELS.邊框}</Label>
                 <input
                   type="color"
                   value={String(properties.stroke || '#000000')}
@@ -456,7 +456,7 @@ export function PropertiesPanel({
         {/* 透明度 */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <Label className="text-xs text-morandi-primary">透明度</Label>
+            <Label className="text-xs text-morandi-primary">{DESIGNER_LABELS.透明度}</Label>
             <span className="text-xs text-morandi-muted">{String(properties.opacity || 100)}%</span>
           </div>
           <Slider
@@ -491,32 +491,7 @@ function getTypeIcon(type: string) {
   }
 }
 
-function getTypeName(type: string) {
-  switch (type) {
-    case 'i-text':
-    case 'text':
-    case 'textbox':
-      return '文字'
-    case 'rect':
-      return '矩形'
-    case 'circle':
-      return '圓形'
-    case 'image':
-      return '圖片'
-    case 'line':
-      return '線條'
-    case 'group':
-      return '群組'
-    case 'path':
-      return '圖案'
-    case 'polygon':
-      return '多邊形'
-    case 'triangle':
-      return '三角形'
-    default:
-      return '元素'
-  }
-}
+// getTypeName function removed, now using getObjectType from labels
 
 // 檢查是否為形狀類型（支援圖片遮罩填充）
 function isShapeType(type: string): boolean {
