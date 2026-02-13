@@ -28,6 +28,7 @@ import { IconPicker } from './IconPicker'
 import { ImageLibraryPicker } from './ImageLibraryPicker'
 import { ColorfulIconPicker } from './ColorfulIconPicker'
 import { QRCodeGenerator } from './QRCodeGenerator'
+import { DESIGNER_LABELS } from '../constants/labels'
 import type { StickerCategory } from './types'
 
 interface ElementLibraryProps {
@@ -47,16 +48,16 @@ interface ElementLibraryProps {
 
 // 線條樣式選項
 const LINE_OPTIONS = [
-  { id: 'solid', name: '實線', icon: Minus, style: 'solid' as const, arrow: false },
-  { id: 'dashed', name: '虛線', icon: MoreHorizontal, style: 'dashed' as const, arrow: false },
-  { id: 'dotted', name: '點線', icon: MoreHorizontal, style: 'dotted' as const, arrow: false },
-  { id: 'arrow', name: '箭頭', icon: ArrowRight, style: 'solid' as const, arrow: true },
+  { id: 'solid', name: DESIGNER_LABELS.實線, icon: Minus, style: 'solid' as const, arrow: false },
+  { id: 'dashed', name: DESIGNER_LABELS.虛線, icon: MoreHorizontal, style: 'dashed' as const, arrow: false },
+  { id: 'dotted', name: DESIGNER_LABELS.點線, icon: MoreHorizontal, style: 'dotted' as const, arrow: false },
+  { id: 'arrow', name: DESIGNER_LABELS.箭頭, icon: ArrowRight, style: 'solid' as const, arrow: true },
 ]
 
 // 基本形狀
 const BASIC_SHAPES = [
-  { id: 'rectangle', name: '矩形', icon: Square },
-  { id: 'circle', name: '圓形', icon: Circle },
+  { id: 'rectangle', name: DESIGNER_LABELS.矩形, icon: Square },
+  { id: 'circle', name: DESIGNER_LABELS.圓形, icon: Circle },
 ]
 
 export function ElementLibrary({
@@ -80,15 +81,15 @@ export function ElementLibrary({
   return (
     <div className="w-64 h-full bg-white border-r border-border flex flex-col">
       <div className="p-3 border-b border-border h-[42px] flex items-center">
-        <h3 className="font-medium text-sm text-morandi-primary">元素庫</h3>
+        <h3 className="font-medium text-sm text-morandi-primary">{DESIGNER_LABELS.元素庫}</h3>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
         <TabsList className="grid grid-cols-5 mx-2 mt-2">
-          <TabsTrigger value="elements" className="text-xs px-1">基本</TabsTrigger>
-          <TabsTrigger value="colorful" className="text-xs px-1">彩色</TabsTrigger>
-          <TabsTrigger value="icons" className="text-xs px-1">圖示</TabsTrigger>
-          <TabsTrigger value="images" className="text-xs px-1">圖片</TabsTrigger>
+          <TabsTrigger value="elements" className="text-xs px-1">{DESIGNER_LABELS.基本}</TabsTrigger>
+          <TabsTrigger value="colorful" className="text-xs px-1">{DESIGNER_LABELS.彩色}</TabsTrigger>
+          <TabsTrigger value="icons" className="text-xs px-1">{DESIGNER_LABELS.圖示}</TabsTrigger>
+          <TabsTrigger value="images" className="text-xs px-1">{DESIGNER_LABELS.圖片}</TabsTrigger>
           <TabsTrigger value="qrcode" className="text-xs px-1">QR</TabsTrigger>
         </TabsList>
 
@@ -98,7 +99,7 @@ export function ElementLibrary({
             <div className="p-3 space-y-4">
               {/* 文字 */}
               <div>
-                <h4 className="text-xs font-medium text-morandi-secondary mb-2">文字</h4>
+                <h4 className="text-xs font-medium text-morandi-secondary mb-2">{DESIGNER_LABELS.文字}</h4>
                 <Button
                   variant="outline"
                   size="sm"
@@ -106,13 +107,13 @@ export function ElementLibrary({
                   onClick={onAddText}
                 >
                   <Type size={16} />
-                  新增文字
+                  {DESIGNER_LABELS.新增文字}
                 </Button>
               </div>
 
               {/* 形狀 */}
               <div>
-                <h4 className="text-xs font-medium text-morandi-secondary mb-2">形狀</h4>
+                <h4 className="text-xs font-medium text-morandi-secondary mb-2">{DESIGNER_LABELS.形狀}</h4>
                 <div className="grid grid-cols-2 gap-2">
                   {BASIC_SHAPES.map((shape) => (
                     <Button
@@ -132,7 +133,7 @@ export function ElementLibrary({
               {/* 時間軸 */}
               {onAddTimeline && (
                 <div>
-                  <h4 className="text-xs font-medium text-morandi-secondary mb-2">時間軸</h4>
+                  <h4 className="text-xs font-medium text-morandi-secondary mb-2">{DESIGNER_LABELS.時間軸}</h4>
                   <div className="grid grid-cols-2 gap-2">
                     <Button
                       variant="outline"
@@ -141,7 +142,7 @@ export function ElementLibrary({
                       onClick={() => onAddTimeline({ orientation: 'vertical', pointCount: 3 })}
                     >
                       <Clock size={20} className="text-morandi-gold" />
-                      <span className="text-[10px]">垂直時間軸</span>
+                      <span className="text-[10px]">{DESIGNER_LABELS.垂直時間軸}</span>
                     </Button>
                     <Button
                       variant="outline"
@@ -150,7 +151,7 @@ export function ElementLibrary({
                       onClick={() => onAddTimeline({ orientation: 'horizontal', pointCount: 3 })}
                     >
                       <Clock size={20} className="text-morandi-gold rotate-90" />
-                      <span className="text-[10px]">水平時間軸</span>
+                      <span className="text-[10px]">{DESIGNER_LABELS.水平時間軸}</span>
                     </Button>
                   </div>
 
@@ -163,7 +164,7 @@ export function ElementLibrary({
                       onClick={onAddTimelinePoint}
                     >
                       <Plus size={14} />
-                      新增時間點
+                      {DESIGNER_LABELS.新增時間點}
                     </Button>
                   )}
                 </div>
@@ -265,7 +266,7 @@ export function QuickInsertBar({
         size="sm"
         className="h-8 w-8 p-0"
         onClick={onAddText}
-        title="新增文字"
+        title={DESIGNER_LABELS.新增文字}
       >
         <Type size={16} />
       </Button>
@@ -274,7 +275,7 @@ export function QuickInsertBar({
         size="sm"
         className="h-8 w-8 p-0"
         onClick={() => onAddShape('rectangle')}
-        title="新增矩形"
+        title={DESIGNER_LABELS.新增矩形}
       >
         <Square size={16} />
       </Button>
@@ -283,7 +284,7 @@ export function QuickInsertBar({
         size="sm"
         className="h-8 w-8 p-0"
         onClick={() => onAddShape('circle')}
-        title="新增圓形"
+        title={DESIGNER_LABELS.新增圓形}
       >
         <Circle size={16} />
       </Button>
@@ -293,7 +294,7 @@ export function QuickInsertBar({
         size="sm"
         className="h-8 w-8 p-0"
         onClick={() => onAddLine()}
-        title="新增線條"
+        title={DESIGNER_LABELS.新增線條}
       >
         <Minus size={16} />
       </Button>
@@ -302,7 +303,7 @@ export function QuickInsertBar({
         size="sm"
         className="h-8 w-8 p-0"
         onClick={() => onAddLine({ arrow: true })}
-        title="新增箭頭"
+        title={DESIGNER_LABELS.新增箭頭}
       >
         <ArrowRight size={16} />
       </Button>

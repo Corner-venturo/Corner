@@ -7,6 +7,7 @@
 
 import { cn } from '@/lib/utils'
 import type { CanvasPage, CanvasElement } from '@/features/designer/components/types'
+import { DESIGNER_LABELS } from '../constants/labels'
 
 // ============================================
 // 頁面縮圖組件
@@ -130,7 +131,7 @@ export function DualPagePreview({
             height: canvasHeight * zoom,
           }}
         >
-          <span className="text-morandi-muted text-sm">封底/空白頁</span>
+          <span className="text-morandi-muted text-sm">{DESIGNER_LABELS.封底空白頁}</span>
         </div>
       )
     }
@@ -146,7 +147,7 @@ export function DualPagePreview({
           height: canvasHeight * zoom,
         }}
         onClick={() => index !== null && onSelectPage(index)}
-        title={`點擊編輯: ${page.name}`}
+        title={`${DESIGNER_LABELS.點擊編輯}${page.name}`}
       >
         <div
           className="absolute inset-0 bg-white shadow-lg rounded overflow-hidden"
@@ -156,12 +157,12 @@ export function DualPagePreview({
         </div>
 
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-2 py-1 rounded">
-          {index !== null ? `第 ${index + 1} 頁` : ''} - {page.name}
+          {index !== null ? `${DESIGNER_LABELS.第}${index + 1}${DESIGNER_LABELS.頁}` : ''} - {page.name}
         </div>
 
         {isCurrentPage && (
           <div className="absolute top-2 right-2 bg-morandi-gold text-white text-xs px-2 py-0.5 rounded">
-            編輯中
+            {DESIGNER_LABELS.編輯中}
           </div>
         )}
       </div>

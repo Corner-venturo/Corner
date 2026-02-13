@@ -169,3 +169,49 @@ export const COMP_ORDERS_LABELS = {
   驗證完成: '驗證完成！',
   點擊進行圖片增強: '點擊進行圖片增強',
 };
+
+// MemberTableHeader 相關標籤
+export const MEMBER_TABLE_HEADER_LABELS = {
+  seq: '序',
+  chinese_name: '中文姓名',
+  order_code: '單號',
+  identity: '身份',
+  passport_name: '護照拼音',
+  birth_date: '出生年月日',
+  gender: '性別',
+  id_number: '身分證號',
+  passport_number: '護照號碼',
+  passport_expiry: '護照效期',
+  special_meal: '飲食禁忌',
+  total_payable: '應付金額',
+  deposit_amount: '訂金',
+  balance: '尾款',
+  remarks: '備註',
+  room: '分房',
+  vehicle: '分車',
+  pnr: 'PNR',
+  ticket_number: '機票號碼',
+  ticketing_deadline: '開票期限',
+  flight_cost: '機票金額',
+  actions: '操作',
+};
+
+// ExportDialog 相關標籤
+export const EXPORT_DIALOG_LABELS = {
+  export_member_list: '匯出成員名單',
+  select_fields_to_export: '選擇要匯出的欄位',
+  select_all: '全選',
+  deselect_all: '取消全選',
+  cancel: '取消',
+  excel: 'Excel',
+  print: '列印',
+  member_list: '成員名單',
+  departure_date: '出發日期：',
+  not_set: '未設定',
+  total_count: '總人數：',
+  people_unit: ' 人',
+  seq_number: '序',
+  team_member_list: '團員名單',
+  gender_male: '男',
+  gender_female: '女',
+};

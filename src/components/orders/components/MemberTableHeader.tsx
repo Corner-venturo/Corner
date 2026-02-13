@@ -8,6 +8,7 @@
 import React, { useCallback, useRef } from 'react'
 import type { ColumnVisibility } from '../OrderMembersExpandable'
 import type { HotelColumn } from '../hooks/useRoomVehicleAssignments'
+import { MEMBER_TABLE_HEADER_LABELS as L } from '../constants/labels'
 
 interface MemberTableHeaderProps {
   mode: 'order' | 'tour'
@@ -170,7 +171,7 @@ export function MemberTableHeader({
           onResize={onColumnResize}
           className={`${thStickyClass} ${seqLeft}`}
         >
-          序
+          {L.seq}
         </ResizableTh>
 
         {/* 凍結欄位：中文姓名 */}
@@ -180,67 +181,67 @@ export function MemberTableHeader({
           onResize={onColumnResize}
           className={`${thStickyClass} ${nameLeft}`}
         >
-          中文姓名
+          {L.chinese_name}
         </ResizableTh>
 
         {/* 團體模式：訂單編號 */}
         {mode === 'tour' && orderCount > 1 && (
           <ResizableTh columnId="order_code" width={getWidth('order_code')} onResize={onColumnResize} className={thBaseClass}>
-            單號
+            {L.order_code}
           </ResizableTh>
         )}
 
         {/* 可選：身份 */}
         {showIdentityColumn && (
           <ResizableTh columnId="identity" width={getWidth('identity')} onResize={onColumnResize} className={thBaseClass}>
-            身份
+            {L.identity}
           </ResizableTh>
         )}
 
         {cv.passport_name && (
           <ResizableTh columnId="passport_name" width={getWidth('passport_name')} onResize={onColumnResize} className={thBaseClass}>
-            護照拼音
+            {L.passport_name}
           </ResizableTh>
         )}
         {cv.birth_date && (
           <ResizableTh columnId="birth_date" width={getWidth('birth_date')} onResize={onColumnResize} className={thBaseClass}>
-            出生年月日
+            {L.birth_date}
           </ResizableTh>
         )}
         {cv.gender && (
           <ResizableTh columnId="gender" width={getWidth('gender')} onResize={onColumnResize} className={thBaseClass}>
-            性別
+            {L.gender}
           </ResizableTh>
         )}
         {cv.id_number && (
           <ResizableTh columnId="id_number" width={getWidth('id_number')} onResize={onColumnResize} className={thBaseClass}>
-            身分證號
+            {L.id_number}
           </ResizableTh>
         )}
 
         {/* 護照資訊 */}
         {cv.passport_number && (
           <ResizableTh columnId="passport_number" width={getWidth('passport_number')} onResize={onColumnResize} className={thBaseClass}>
-            護照號碼
+            {L.passport_number}
           </ResizableTh>
         )}
         {cv.passport_expiry && (
           <ResizableTh columnId="passport_expiry" width={getWidth('passport_expiry')} onResize={onColumnResize} className={thBaseClass}>
-            護照效期
+            {L.passport_expiry}
           </ResizableTh>
         )}
 
         {/* 其他資訊 */}
         {cv.special_meal && (
           <ResizableTh columnId="special_meal" width={getWidth('special_meal')} onResize={onColumnResize} className={thBaseClass}>
-            飲食禁忌
+            {L.special_meal}
           </ResizableTh>
         )}
 
         {/* 金額 */}
         {cv.total_payable && (
           <ResizableTh columnId="total_payable" width={getWidth('total_payable')} onResize={onColumnResize} className={thBaseClass}>
-            應付金額
+            {L.total_payable}
           </ResizableTh>
         )}
         {cv.deposit_amount && (

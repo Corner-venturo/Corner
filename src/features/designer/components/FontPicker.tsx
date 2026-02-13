@@ -15,49 +15,50 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
+import { DESIGNER_LABELS } from '../constants/labels'
 
 // 可用字體列表
 const FONTS = [
   // 中文字體 - 黑體系列
-  { name: 'Noto Sans TC', label: '思源黑體', category: '中文黑體' },
-  { name: 'Taipei Sans TC', label: '台北黑體', category: '中文黑體' },
-  { name: 'Cubic', label: '俐方體', category: '中文黑體' },
+  { name: 'Noto Sans TC', label: DESIGNER_LABELS.思源黑體, category: DESIGNER_LABELS.中文黑體 },
+  { name: 'Taipei Sans TC', label: DESIGNER_LABELS.台北黑體, category: DESIGNER_LABELS.中文黑體 },
+  { name: 'Cubic', label: DESIGNER_LABELS.俐方體, category: DESIGNER_LABELS.中文黑體 },
   // 中文字體 - 宋體/明體系列
-  { name: 'Noto Serif TC', label: '思源宋體', category: '中文宋體' },
-  { name: 'Zhi Mang Xing', label: '芫荽明體', category: '中文宋體' },
+  { name: 'Noto Serif TC', label: DESIGNER_LABELS.思源宋體, category: DESIGNER_LABELS.中文宋體 },
+  { name: 'Zhi Mang Xing', label: DESIGNER_LABELS.芫荽明體, category: DESIGNER_LABELS.中文宋體 },
   // 中文字體 - 書法/手寫
-  { name: 'LXGW WenKai TC', label: '霞鶩文楷', category: '中文手寫' },
-  { name: 'Ma Shan Zheng', label: '馬善政楷書', category: '中文手寫' },
-  { name: 'Zhi Mang Xing', label: '芝麻行書', category: '中文手寫' },
-  { name: 'Liu Jian Mao Cao', label: '流建毛草', category: '中文手寫' },
-  { name: 'Long Cang', label: '龍藏', category: '中文手寫' },
+  { name: 'LXGW WenKai TC', label: DESIGNER_LABELS.霞鶩文楷, category: DESIGNER_LABELS.中文手寫 },
+  { name: 'Ma Shan Zheng', label: DESIGNER_LABELS.馬善政楷書, category: DESIGNER_LABELS.中文手寫 },
+  { name: 'Zhi Mang Xing', label: DESIGNER_LABELS.芝麻行書, category: DESIGNER_LABELS.中文手寫 },
+  { name: 'Liu Jian Mao Cao', label: DESIGNER_LABELS.流建毛草, category: DESIGNER_LABELS.中文手寫 },
+  { name: 'Long Cang', label: DESIGNER_LABELS.龍藏, category: DESIGNER_LABELS.中文手寫 },
   // 中文字體 - 圓體/可愛
-  { name: 'Zen Maru Gothic', label: '禪丸黑體', category: '中文圓體' },
+  { name: 'Zen Maru Gothic', label: DESIGNER_LABELS.禪丸黑體, category: DESIGNER_LABELS.中文圓體 },
   // 日文字體（旅遊手冊常用）
-  { name: 'Noto Sans JP', label: '思源黑體 JP', category: '日文' },
-  { name: 'Noto Serif JP', label: '思源宋體 JP', category: '日文' },
-  { name: 'Zen Kaku Gothic New', label: '禪角黑體', category: '日文' },
-  { name: 'Shippori Mincho', label: '汐風明朝', category: '日文' },
-  { name: 'Kosugi Maru', label: '小杉丸', category: '日文' },
+  { name: 'Noto Sans JP', label: DESIGNER_LABELS.思源黑體JP, category: DESIGNER_LABELS.日文 },
+  { name: 'Noto Serif JP', label: DESIGNER_LABELS.思源宋體JP, category: DESIGNER_LABELS.日文 },
+  { name: 'Zen Kaku Gothic New', label: DESIGNER_LABELS.禪角黑體, category: DESIGNER_LABELS.日文 },
+  { name: 'Shippori Mincho', label: DESIGNER_LABELS.汐風明朝, category: DESIGNER_LABELS.日文 },
+  { name: 'Kosugi Maru', label: DESIGNER_LABELS.小杉丸, category: DESIGNER_LABELS.日文 },
   // 英文字體 - 無襯線
-  { name: 'Inter', label: 'Inter', category: '英文無襯線' },
-  { name: 'Roboto', label: 'Roboto', category: '英文無襯線' },
-  { name: 'Open Sans', label: 'Open Sans', category: '英文無襯線' },
-  { name: 'Lato', label: 'Lato', category: '英文無襯線' },
-  { name: 'Montserrat', label: 'Montserrat', category: '英文無襯線' },
-  { name: 'Poppins', label: 'Poppins', category: '英文無襯線' },
-  { name: 'Quicksand', label: 'Quicksand', category: '英文無襯線' },
+  { name: 'Inter', label: 'Inter', category: DESIGNER_LABELS.英文無襯線 },
+  { name: 'Roboto', label: 'Roboto', category: DESIGNER_LABELS.英文無襯線 },
+  { name: 'Open Sans', label: 'Open Sans', category: DESIGNER_LABELS.英文無襯線 },
+  { name: 'Lato', label: 'Lato', category: DESIGNER_LABELS.英文無襯線 },
+  { name: 'Montserrat', label: 'Montserrat', category: DESIGNER_LABELS.英文無襯線 },
+  { name: 'Poppins', label: 'Poppins', category: DESIGNER_LABELS.英文無襯線 },
+  { name: 'Quicksand', label: 'Quicksand', category: DESIGNER_LABELS.英文無襯線 },
   // 英文字體 - 襯線
-  { name: 'Playfair Display', label: 'Playfair Display', category: '英文襯線' },
-  { name: 'Merriweather', label: 'Merriweather', category: '英文襯線' },
-  { name: 'Libre Baskerville', label: 'Libre Baskerville', category: '英文襯線' },
-  { name: 'Cormorant Garamond', label: 'Cormorant', category: '英文襯線' },
+  { name: 'Playfair Display', label: 'Playfair Display', category: DESIGNER_LABELS.英文襯線 },
+  { name: 'Merriweather', label: 'Merriweather', category: DESIGNER_LABELS.英文襯線 },
+  { name: 'Libre Baskerville', label: 'Libre Baskerville', category: DESIGNER_LABELS.英文襯線 },
+  { name: 'Cormorant Garamond', label: 'Cormorant', category: DESIGNER_LABELS.英文襯線 },
   // 英文字體 - 手寫/裝飾
-  { name: 'Dancing Script', label: 'Dancing Script', category: '英文手寫' },
-  { name: 'Pacifico', label: 'Pacifico', category: '英文手寫' },
-  { name: 'Great Vibes', label: 'Great Vibes', category: '英文手寫' },
-  { name: 'Caveat', label: 'Caveat', category: '英文手寫' },
-  { name: 'Satisfy', label: 'Satisfy', category: '英文手寫' },
+  { name: 'Dancing Script', label: 'Dancing Script', category: DESIGNER_LABELS.英文手寫 },
+  { name: 'Pacifico', label: 'Pacifico', category: DESIGNER_LABELS.英文手寫 },
+  { name: 'Great Vibes', label: 'Great Vibes', category: DESIGNER_LABELS.英文手寫 },
+  { name: 'Caveat', label: 'Caveat', category: DESIGNER_LABELS.英文手寫 },
+  { name: 'Satisfy', label: 'Satisfy', category: DESIGNER_LABELS.英文手寫 },
 ]
 
 // 字體大小選項
@@ -182,13 +183,13 @@ interface FontWeightPickerProps {
 }
 
 const FONT_WEIGHTS = [
-  { value: 'normal', label: '正常' },
-  { value: 'bold', label: '粗體' },
-  { value: '100', label: '極細' },
-  { value: '300', label: '細' },
-  { value: '500', label: '中等' },
-  { value: '700', label: '粗' },
-  { value: '900', label: '極粗' },
+  { value: 'normal', label: DESIGNER_LABELS.正常 },
+  { value: 'bold', label: DESIGNER_LABELS.粗體 },
+  { value: '100', label: DESIGNER_LABELS.極細 },
+  { value: '300', label: DESIGNER_LABELS.細 },
+  { value: '500', label: DESIGNER_LABELS.中等 },
+  { value: '700', label: DESIGNER_LABELS.粗 },
+  { value: '900', label: DESIGNER_LABELS.極粗 },
 ]
 
 export function FontWeightPicker({ fontWeight, onChange }: FontWeightPickerProps) {
@@ -239,10 +240,10 @@ interface TextAlignPickerProps {
 
 export function TextAlignPicker({ textAlign, onChange }: TextAlignPickerProps) {
   const alignments = [
-    { value: 'left', label: '靠左' },
-    { value: 'center', label: '置中' },
-    { value: 'right', label: '靠右' },
-    { value: 'justify', label: '兩端' },
+    { value: 'left', label: DESIGNER_LABELS.靠左 },
+    { value: 'center', label: DESIGNER_LABELS.置中 },
+    { value: 'right', label: DESIGNER_LABELS.靠右 },
+    { value: 'justify', label: DESIGNER_LABELS.兩端 },
   ]
 
   return (
