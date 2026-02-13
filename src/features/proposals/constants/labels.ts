@@ -23,6 +23,19 @@ export const ADD_MANUAL_REQUEST_DIALOG_LABELS = {
 
 export const BROCHURE_PREVIEW_DIALOG_LABELS = {
   行程表: '行程表',
+  簡易行程表: '簡易行程表',
+  編輯: '編輯',
+  目的地標籤: '目的地：',
+  出發日期標籤: '出發日期：',
+  行程天數標籤: '行程天數：',
+  天: '天',
+  去程航班: '去程航班：',
+  回程航班: '回程航班：',
+  日期: '日期',
+  行程內容: '行程內容',
+  住宿: '住宿',
+  本行程表由: '本行程表由',
+  提供: '提供',
 };
 
 export const ITINERARY_DIALOG_LABELS = {

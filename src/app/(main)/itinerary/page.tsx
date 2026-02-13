@@ -30,6 +30,7 @@ import { useItineraryActions } from './hooks/useItineraryActions'
 import { useItineraryTableColumns } from './hooks/useItineraryTableColumns'
 import { useItineraryFilters } from './hooks/useItineraryFilters'
 import { stripHtml } from '@/lib/utils/string-utils'
+import { LABELS } from './constants/labels'
 
 const statusFilters = ['全部', '提案', '進行中', '公司範例', '結案']
 
@@ -129,7 +130,7 @@ export default function ItineraryPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="行程管理"
+        title={LABELS.ITINERARY_MANAGEMENT}
         showSearch={true}
         searchTerm={pageState.searchTerm}
         onSearchChange={pageState.setSearchTerm}
@@ -159,8 +160,8 @@ export default function ItineraryPage() {
                 <SelectValue placeholder="我的行程" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="__mine__">我的行程</SelectItem>
-                <SelectItem value="all">全部作者</SelectItem>
+                <SelectItem value="__mine__">{LABELS.MY_ITINERARY}</SelectItem>
+                <SelectItem value="all">{LABELS.ALL_AUTHORS}</SelectItem>
                 {filteredEmployeesForSelect.map(emp => (
                   <SelectItem key={emp.id} value={emp.id}>
                     {emp.display_name || emp.chinese_name || emp.english_name || emp.email}
@@ -185,10 +186,10 @@ export default function ItineraryPage() {
                 }}
               >
                 <SelectTrigger className="w-auto min-w-[100px] h-8 text-sm border-morandi-blue/30">
-                  <SelectValue placeholder="全部分公司" />
+                  <SelectValue placeholder={LABELS.ALL_COMPANIES} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">全部分公司</SelectItem>
+                  <SelectItem value="all">{LABELS.ALL_COMPANIES}</SelectItem>
                   {workspaces.map((ws: { id: string; name: string }) => (
                     <SelectItem key={ws.id} value={ws.id}>
                       {ws.name}
@@ -284,39 +285,39 @@ function CreateItineraryDialog({
             <DialogHeader className="mb-4">
               <DialogTitle className="flex items-center gap-2">
                 <CalendarDays className="w-5 h-5 text-morandi-gold" />
-                新增行程表
+                {LABELS.NEW_ITINERARY_TABLE}
               </DialogTitle>
             </DialogHeader>
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="newItineraryTitle">行程名稱 *</Label>
+                <Label htmlFor="newItineraryTitle">{LABELS.ITINERARY_NAME_REQUIRED}</Label>
                 <Input
                   id="newItineraryTitle"
-                  placeholder="例：沖繩五日遊"
+                  placeholder={LABELS.EXAMPLE_OKINAWA}
                   value={formState.newItineraryTitle}
                   onChange={e => formState.setNewItineraryTitle(e.target.value)}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="newItineraryTourCode">行程編號（選填）</Label>
+                <Label htmlFor="newItineraryTourCode">{LABELS.ITINERARY_CODE_OPTIONAL}</Label>
                 <Input
                   id="newItineraryTourCode"
-                  placeholder="例：25JOK21CIG"
+                  placeholder={LABELS.EXAMPLE_TOUR_CODE}
                   value={formState.newItineraryTourCode}
                   onChange={e => formState.setNewItineraryTourCode(e.target.value)}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label>國家</Label>
+                <Label>{LABELS.COUNTRY}</Label>
                 <Select
                   value={formState.newItineraryCountry}
                   onValueChange={formState.setNewItineraryCountry}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="選擇國家" />
+                    <SelectValue placeholder={LABELS.SELECT_COUNTRY} />
                   </SelectTrigger>
                   <SelectContent>
                     {countries.map(country => (
@@ -330,21 +331,21 @@ function CreateItineraryDialog({
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>出發日期 *</Label>
+                  <Label>{LABELS.DEPARTURE_DATE_REQUIRED}</Label>
                   <DatePicker
                     value={formState.newItineraryDepartureDate}
                     onChange={date => formState.setNewItineraryDepartureDate(date)}
-                    placeholder="選擇出發日期"
+                    placeholder={LABELS.SELECT_DEPARTURE_DATE}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>行程天數 *</Label>
+                  <Label>{LABELS.DAYS_REQUIRED}</Label>
                   <Select
                     value={formState.newItineraryDays}
                     onValueChange={formState.setNewItineraryDays}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="選擇天數" />
+                      <SelectValue placeholder={LABELS.SELECT_DAYS} />
                     </SelectTrigger>
                     <SelectContent>
                       {[3, 4, 5, 6, 7, 8, 9, 10].map(day => (
@@ -370,7 +371,7 @@ function CreateItineraryDialog({
                   className="gap-2"
                 >
                   <X size={16} />
-                  取消
+                  {LABELS.CANCEL}
                 </Button>
                 <Button
                   onClick={onCreateItinerary}
@@ -378,11 +379,11 @@ function CreateItineraryDialog({
                   className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1"
                 >
                   {formState.isCreatingItinerary ? (
-                    <>建立中...</>
+                    <>{LABELS.CREATING}</>
                   ) : (
                     <>
                       <Plane size={14} />
-                      建立行程
+                      {LABELS.CREATE_ITINERARY}
                     </>
                   )}
                 </Button>
@@ -412,13 +413,13 @@ function FlightInputSection({ formState, flightSearch }: FlightInputSectionProps
   return (
     <div className="pt-4 mt-4 relative">
       <div className="absolute top-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-morandi-muted/40 to-transparent" />
-      <Label className="text-morandi-primary mb-3 block">航班資訊（選填）</Label>
+      <Label className="text-morandi-primary mb-3 block">{LABELS.FLIGHT_INFO_OPTIONAL}</Label>
       <div className="space-y-3">
         {/* 去程航班 */}
         <div className="p-2 rounded-lg border border-morandi-muted/30 space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-morandi-primary">去程</span>
+              <span className="text-xs font-medium text-morandi-primary">{LABELS.OUTBOUND}</span>
               {formState.newItineraryOutboundFlight?.departureDate && (
                 <span className="text-xs text-morandi-gold font-medium">({formState.newItineraryOutboundFlight.departureDate})</span>
               )}
@@ -432,20 +433,20 @@ function FlightInputSection({ formState, flightSearch }: FlightInputSectionProps
               className="h-5 text-[10px] gap-1 px-2"
             >
               {flightSearch.loadingOutboundFlight ? <Loader2 size={10} className="animate-spin" /> : <Search size={10} />}
-              查詢
+              {LABELS.SEARCH_BUTTON}
             </Button>
           </div>
           {/* 多航段選擇器 */}
           {flightSearch.outboundSegments.length > 0 && (
             <div className="bg-card p-2 rounded border border-morandi-gold/30 space-y-1">
               <div className="flex items-center justify-between">
-                <p className="text-[10px] text-morandi-secondary">此航班有多個航段，請選擇：</p>
+                <p className="text-[10px] text-morandi-secondary">{LABELS.MULTIPLE_SEGMENTS_SELECT}</p>
                 <button
                   type="button"
                   onClick={flightSearch.clearOutboundSegments}
                   className="text-[10px] text-morandi-secondary hover:text-morandi-primary"
                 >
-                  取消
+                  {LABELS.CANCEL}
                 </button>
               </div>
               {flightSearch.outboundSegments.map((seg, i) => (
@@ -468,12 +469,12 @@ function FlightInputSection({ formState, flightSearch }: FlightInputSectionProps
             </div>
           )}
           <div className="grid grid-cols-6 gap-1">
-            <Input placeholder="航班" value={formState.newItineraryOutboundFlight?.flightNumber || ''} onChange={e => formState.setNewItineraryOutboundFlight(prev => ({ ...prev, flightNumber: e.target.value, airline: prev?.airline || '', departureAirport: prev?.departureAirport || 'TPE', arrivalAirport: prev?.arrivalAirport || '', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
-            <Input placeholder="航空" value={formState.newItineraryOutboundFlight?.airline || ''} onChange={e => formState.setNewItineraryOutboundFlight(prev => ({ ...prev, airline: e.target.value, flightNumber: prev?.flightNumber || '', departureAirport: prev?.departureAirport || 'TPE', arrivalAirport: prev?.arrivalAirport || '', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
-            <Input placeholder="出發" value={formState.newItineraryOutboundFlight?.departureAirport || ''} onChange={e => formState.setNewItineraryOutboundFlight(prev => ({ ...prev, departureAirport: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', arrivalAirport: prev?.arrivalAirport || '', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
-            <Input placeholder="抵達" value={formState.newItineraryOutboundFlight?.arrivalAirport || ''} onChange={e => formState.setNewItineraryOutboundFlight(prev => ({ ...prev, arrivalAirport: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || 'TPE', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
-            <Input placeholder="起飛" value={formState.newItineraryOutboundFlight?.departureTime || ''} onChange={e => formState.setNewItineraryOutboundFlight(prev => ({ ...prev, departureTime: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || 'TPE', arrivalAirport: prev?.arrivalAirport || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
-            <Input placeholder="降落" value={formState.newItineraryOutboundFlight?.arrivalTime || ''} onChange={e => formState.setNewItineraryOutboundFlight(prev => ({ ...prev, arrivalTime: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || 'TPE', arrivalAirport: prev?.arrivalAirport || '', departureTime: prev?.departureTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+            <Input placeholder={LABELS.FLIGHT} value={formState.newItineraryOutboundFlight?.flightNumber || ''} onChange={e => formState.setNewItineraryOutboundFlight(prev => ({ ...prev, flightNumber: e.target.value, airline: prev?.airline || '', departureAirport: prev?.departureAirport || 'TPE', arrivalAirport: prev?.arrivalAirport || '', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+            <Input placeholder={LABELS.AIRLINE} value={formState.newItineraryOutboundFlight?.airline || ''} onChange={e => formState.setNewItineraryOutboundFlight(prev => ({ ...prev, airline: e.target.value, flightNumber: prev?.flightNumber || '', departureAirport: prev?.departureAirport || 'TPE', arrivalAirport: prev?.arrivalAirport || '', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+            <Input placeholder={LABELS.DEPARTURE} value={formState.newItineraryOutboundFlight?.departureAirport || ''} onChange={e => formState.setNewItineraryOutboundFlight(prev => ({ ...prev, departureAirport: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', arrivalAirport: prev?.arrivalAirport || '', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+            <Input placeholder={LABELS.ARRIVAL} value={formState.newItineraryOutboundFlight?.arrivalAirport || ''} onChange={e => formState.setNewItineraryOutboundFlight(prev => ({ ...prev, arrivalAirport: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || 'TPE', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+            <Input placeholder={LABELS.TAKEOFF} value={formState.newItineraryOutboundFlight?.departureTime || ''} onChange={e => formState.setNewItineraryOutboundFlight(prev => ({ ...prev, departureTime: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || 'TPE', arrivalAirport: prev?.arrivalAirport || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+            <Input placeholder={LABELS.LANDING} value={formState.newItineraryOutboundFlight?.arrivalTime || ''} onChange={e => formState.setNewItineraryOutboundFlight(prev => ({ ...prev, arrivalTime: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || 'TPE', arrivalAirport: prev?.arrivalAirport || '', departureTime: prev?.departureTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
           </div>
         </div>
 
@@ -481,7 +482,7 @@ function FlightInputSection({ formState, flightSearch }: FlightInputSectionProps
         <div className="p-2 rounded-lg border border-morandi-muted/30 space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-morandi-primary">回程</span>
+              <span className="text-xs font-medium text-morandi-primary">{LABELS.RETURN}</span>
               {formState.newItineraryReturnFlight?.departureDate && (
                 <span className="text-xs text-morandi-gold font-medium">({formState.newItineraryReturnFlight.departureDate})</span>
               )}
@@ -495,20 +496,20 @@ function FlightInputSection({ formState, flightSearch }: FlightInputSectionProps
               className="h-5 text-[10px] gap-1 px-2"
             >
               {flightSearch.loadingReturnFlight ? <Loader2 size={10} className="animate-spin" /> : <Search size={10} />}
-              查詢
+              {LABELS.SEARCH_BUTTON}
             </Button>
           </div>
           {/* 多航段選擇器 */}
           {flightSearch.returnSegments.length > 0 && (
             <div className="bg-card p-2 rounded border border-morandi-gold/30 space-y-1">
               <div className="flex items-center justify-between">
-                <p className="text-[10px] text-morandi-secondary">此航班有多個航段，請選擇：</p>
+                <p className="text-[10px] text-morandi-secondary">{LABELS.MULTIPLE_SEGMENTS_SELECT}</p>
                 <button
                   type="button"
                   onClick={flightSearch.clearReturnSegments}
                   className="text-[10px] text-morandi-secondary hover:text-morandi-primary"
                 >
-                  取消
+                  {LABELS.CANCEL}
                 </button>
               </div>
               {flightSearch.returnSegments.map((seg, i) => (
@@ -531,12 +532,12 @@ function FlightInputSection({ formState, flightSearch }: FlightInputSectionProps
             </div>
           )}
           <div className="grid grid-cols-6 gap-1">
-            <Input placeholder="航班" value={formState.newItineraryReturnFlight?.flightNumber || ''} onChange={e => formState.setNewItineraryReturnFlight(prev => ({ ...prev, flightNumber: e.target.value, airline: prev?.airline || '', departureAirport: prev?.departureAirport || '', arrivalAirport: prev?.arrivalAirport || 'TPE', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
-            <Input placeholder="航空" value={formState.newItineraryReturnFlight?.airline || ''} onChange={e => formState.setNewItineraryReturnFlight(prev => ({ ...prev, airline: e.target.value, flightNumber: prev?.flightNumber || '', departureAirport: prev?.departureAirport || '', arrivalAirport: prev?.arrivalAirport || 'TPE', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
-            <Input placeholder="出發" value={formState.newItineraryReturnFlight?.departureAirport || ''} onChange={e => formState.setNewItineraryReturnFlight(prev => ({ ...prev, departureAirport: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', arrivalAirport: prev?.arrivalAirport || 'TPE', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
-            <Input placeholder="抵達" value={formState.newItineraryReturnFlight?.arrivalAirport || ''} onChange={e => formState.setNewItineraryReturnFlight(prev => ({ ...prev, arrivalAirport: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || '', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
-            <Input placeholder="起飛" value={formState.newItineraryReturnFlight?.departureTime || ''} onChange={e => formState.setNewItineraryReturnFlight(prev => ({ ...prev, departureTime: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || '', arrivalAirport: prev?.arrivalAirport || 'TPE', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
-            <Input placeholder="降落" value={formState.newItineraryReturnFlight?.arrivalTime || ''} onChange={e => formState.setNewItineraryReturnFlight(prev => ({ ...prev, arrivalTime: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || '', arrivalAirport: prev?.arrivalAirport || 'TPE', departureTime: prev?.departureTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+            <Input placeholder={LABELS.FLIGHT} value={formState.newItineraryReturnFlight?.flightNumber || ''} onChange={e => formState.setNewItineraryReturnFlight(prev => ({ ...prev, flightNumber: e.target.value, airline: prev?.airline || '', departureAirport: prev?.departureAirport || '', arrivalAirport: prev?.arrivalAirport || 'TPE', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+            <Input placeholder={LABELS.AIRLINE} value={formState.newItineraryReturnFlight?.airline || ''} onChange={e => formState.setNewItineraryReturnFlight(prev => ({ ...prev, airline: e.target.value, flightNumber: prev?.flightNumber || '', departureAirport: prev?.departureAirport || '', arrivalAirport: prev?.arrivalAirport || 'TPE', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+            <Input placeholder={LABELS.DEPARTURE} value={formState.newItineraryReturnFlight?.departureAirport || ''} onChange={e => formState.setNewItineraryReturnFlight(prev => ({ ...prev, departureAirport: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', arrivalAirport: prev?.arrivalAirport || 'TPE', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+            <Input placeholder={LABELS.ARRIVAL} value={formState.newItineraryReturnFlight?.arrivalAirport || ''} onChange={e => formState.setNewItineraryReturnFlight(prev => ({ ...prev, arrivalAirport: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || '', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+            <Input placeholder={LABELS.TAKEOFF} value={formState.newItineraryReturnFlight?.departureTime || ''} onChange={e => formState.setNewItineraryReturnFlight(prev => ({ ...prev, departureTime: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || '', arrivalAirport: prev?.arrivalAirport || 'TPE', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+            <Input placeholder={LABELS.LANDING} value={formState.newItineraryReturnFlight?.arrivalTime || ''} onChange={e => formState.setNewItineraryReturnFlight(prev => ({ ...prev, arrivalTime: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || '', arrivalAirport: prev?.arrivalAirport || 'TPE', departureTime: prev?.departureTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
           </div>
         </div>
       </div>
@@ -616,7 +617,7 @@ function DailyItineraryPreview({ formState }: DailyItineraryPreviewProps) {
 
   return (
     <div className="w-1/2 p-6 overflow-y-auto">
-      <h3 className="text-sm font-bold text-morandi-primary mb-4">每日行程</h3>
+      <h3 className="text-sm font-bold text-morandi-primary mb-4">{LABELS.DAILY_ITINERARY}</h3>
       {formState.newItineraryDays ? (
         <div className="space-y-3">
           {Array.from({ length: parseInt(formState.newItineraryDays) }, (_, i) => {
@@ -641,26 +642,26 @@ function DailyItineraryPreview({ formState }: DailyItineraryPreviewProps) {
                   {dateLabel && <span className="text-xs text-morandi-secondary">({dateLabel})</span>}
                 </div>
                 <Input
-                  placeholder={isFirst ? '抵達目的地' : isLast ? '返回台灣' : '每日標題'}
+                  placeholder={isFirst ? LABELS.ARRIVE_DESTINATION : isLast ? LABELS.RETURN_TAIWAN : LABELS.DAILY_TITLE}
                   className="h-8 text-sm mb-2"
                   value={dayData.title}
                   onChange={e => updateDayData(i, 'title', e.target.value)}
                 />
                 <div className="grid grid-cols-3 gap-2">
                   <Input
-                    placeholder={isFirst ? '溫暖的家' : '早餐'}
+                    placeholder={isFirst ? LABELS.WARM_HOME : LABELS.BREAKFAST}
                     className="h-8 text-xs"
                     value={dayData.breakfast}
                     onChange={e => updateDayData(i, 'breakfast', e.target.value)}
                   />
                   <Input
-                    placeholder="午餐"
+                    placeholder={LABELS.LUNCH}
                     className="h-8 text-xs"
                     value={dayData.lunch}
                     onChange={e => updateDayData(i, 'lunch', e.target.value)}
                   />
                   <Input
-                    placeholder="晚餐"
+                    placeholder={LABELS.DINNER}
                     className="h-8 text-xs"
                     value={dayData.dinner}
                     onChange={e => updateDayData(i, 'dinner', e.target.value)}
@@ -678,7 +679,7 @@ function DailyItineraryPreview({ formState }: DailyItineraryPreviewProps) {
                           className="w-3.5 h-3.5 rounded border-morandi-muted text-morandi-gold focus:ring-morandi-gold"
                         />
                         <span className="text-xs text-morandi-secondary">
-                          續住
+                          {LABELS.SAME_ACCOMMODATION}
                           {dayData.isSameAccommodation && effectiveAccommodation && (
                             <span className="text-morandi-gold ml-1">（{effectiveAccommodation}）</span>
                           )}
@@ -688,7 +689,7 @@ function DailyItineraryPreview({ formState }: DailyItineraryPreviewProps) {
                     {/* 住宿輸入欄位 */}
                     {!dayData.isSameAccommodation && (
                       <Input
-                        placeholder="住宿飯店"
+                        placeholder={LABELS.ACCOMMODATION_HOTEL}
                         className="h-8 text-xs"
                         value={dayData.accommodation}
                         onChange={e => updateDayData(i, 'accommodation', e.target.value)}
@@ -702,7 +703,7 @@ function DailyItineraryPreview({ formState }: DailyItineraryPreviewProps) {
         </div>
       ) : (
         <div className="flex items-center justify-center h-48 text-morandi-secondary text-sm">
-          請先選擇行程天數
+          {LABELS.SELECT_DAYS_FIRST}
         </div>
       )}
     </div>
@@ -722,15 +723,15 @@ function PasswordDialog({ isOpen, onOpenChange, passwordInput, onPasswordChange,
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent level={1} className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>編輯進行中行程</DialogTitle>
+          <DialogTitle>{LABELS.EDIT_ONGOING_ITINERARY}</DialogTitle>
         </DialogHeader>
         <div className="py-4">
           <p className="text-sm text-morandi-secondary mb-4">
-            此行程已綁定旅遊團，為避免誤觸修改，請輸入公司密碼以解鎖編輯。
+            {LABELS.EDIT_PASSWORD_WARNING}
           </p>
           <Input
             type="password"
-            placeholder="請輸入公司密碼"
+            placeholder={LABELS.ENTER_COMPANY_PASSWORD}
             value={passwordInput}
             onChange={e => onPasswordChange(e.target.value)}
             onKeyDown={e => {
@@ -743,11 +744,11 @@ function PasswordDialog({ isOpen, onOpenChange, passwordInput, onPasswordChange,
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} className="gap-2">
             <X size={16} />
-            取消
+            {LABELS.CANCEL}
           </Button>
           <Button onClick={onSubmit} className="gap-2">
             <Check size={16} />
-            套用
+            {LABELS.APPLY}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -782,26 +783,26 @@ function DuplicateDialog({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent level={1} className="max-w-md">
         <DialogHeader>
-          <DialogTitle>複製行程</DialogTitle>
+          <DialogTitle>{LABELS.COPY_ITINERARY}</DialogTitle>
         </DialogHeader>
         <div className="py-4 space-y-4">
           <p className="text-sm text-morandi-secondary">
-            正在複製：<span className="font-medium text-morandi-primary">{stripHtml(duplicateSource?.title)}</span>
+            {LABELS.COPYING_PREFIX}<span className="font-medium text-morandi-primary">{stripHtml(duplicateSource?.title)}</span>
           </p>
           <div className="space-y-2">
-            <Label htmlFor="duplicateTourCode">行程編號 *</Label>
+            <Label htmlFor="duplicateTourCode">{LABELS.ITINERARY_CODE_REQUIRED}</Label>
             <Input
               id="duplicateTourCode"
-              placeholder="請輸入新的行程編號"
+              placeholder={LABELS.ENTER_NEW_CODE}
               value={duplicateTourCode}
               onChange={e => onTourCodeChange(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="duplicateTitle">行程名稱 *</Label>
+            <Label htmlFor="duplicateTitle">{LABELS.ITINERARY_NAME_REQUIRED}</Label>
             <Input
               id="duplicateTitle"
-              placeholder="請輸入新的行程名稱"
+              placeholder={LABELS.ENTER_NEW_NAME}
               value={duplicateTitle}
               onChange={e => onTitleChange(e.target.value)}
               onKeyDown={e => {
@@ -812,8 +813,8 @@ function DuplicateDialog({
             />
           </div>
           <p className="text-xs text-morandi-muted">
-            封面、行程內容、圖片等將會完整複製。<br />
-            關聯的報價單也會一併複製（客戶資料會清空，價格保留）。
+            {LABELS.COPY_DESCRIPTION1}<br />
+            {LABELS.COPY_DESCRIPTION2}
           </p>
         </div>
         <DialogFooter>
@@ -824,7 +825,7 @@ function DuplicateDialog({
             className="gap-2"
           >
             <X size={16} />
-            取消
+            {LABELS.CANCEL}
           </Button>
           <Button
             onClick={onSubmit}
@@ -832,7 +833,7 @@ function DuplicateDialog({
             className="gap-2"
           >
             <Check size={16} />
-            {isDuplicating ? '複製中...' : '確認複製'}
+            {isDuplicating ? LABELS.COPYING : LABELS.CONFIRM_COPY}
           </Button>
         </DialogFooter>
       </DialogContent>

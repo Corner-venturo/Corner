@@ -39,6 +39,7 @@ import { cn } from '@/lib/utils'
 import { CurrencyCell } from '@/components/table-cells'
 
 import { toast } from 'sonner'
+import { ACCOUNTING_PAGE_LABELS } from '@/constants/labels'
 
 export default function AccountingPage() {
   const router = useRouter()
@@ -64,11 +65,11 @@ export default function AccountingPage() {
 
   // 常用分類配置
   const quickCategories = [
-    { id: '4', name: '餐費' },
-    { id: '5', name: '交通' },
-    { id: '6', name: '購物' },
-    { id: '7', name: '娛樂' },
-    { id: '8', name: '其他' },
+    { id: '4', name: ACCOUNTING_PAGE_LABELS.MEAL },
+    { id: '5', name: ACCOUNTING_PAGE_LABELS.TRANSPORT },
+    { id: '6', name: ACCOUNTING_PAGE_LABELS.SHOPPING },
+    { id: '7', name: ACCOUNTING_PAGE_LABELS.ENTERTAINMENT },
+    { id: '8', name: ACCOUNTING_PAGE_LABELS.OTHER },
   ]
 
   // 今日交易
@@ -85,15 +86,15 @@ export default function AccountingPage() {
   // 快速記帳處理
   const handleQuickTransaction = useCallback(async () => {
     if (!quickAmount) {
-      toast.error('請輸入金額')
+      toast.error(ACCOUNTING_PAGE_LABELS.ENTER_AMOUNT)
       return
     }
     if (!quickCategory) {
-      toast.error('請選擇分類')
+      toast.error(ACCOUNTING_PAGE_LABELS.SELECT_CATEGORY)
       return
     }
     if (!quickAccount) {
-      toast.error('請選擇帳戶')
+      toast.error(ACCOUNTING_PAGE_LABELS.SELECT_ACCOUNT_MSG)
       return
     }
 
@@ -101,7 +102,7 @@ export default function AccountingPage() {
     const accountData = accounts.find(a => a.id === quickAccount)
 
     if (!categoryData || !accountData) {
-      toast.error('找不到選擇的分類或帳戶')
+      toast.error(ACCOUNTING_PAGE_LABELS.CATEGORY_OR_ACCOUNT_NOT_FOUND)
       return
     }
 
@@ -122,14 +123,14 @@ export default function AccountingPage() {
 
       // 清空表單並顯示成功提示
       setQuickAmount('')
-      toast.success('記帳成功')
+      toast.success(ACCOUNTING_PAGE_LABELS.ACCOUNTING_SUCCESS)
 
       // 重新聚焦到金額輸入
       setTimeout(() => {
         amountInputRef.current?.focus()
       }, 100)
     } catch (error) {
-      toast.error('記帳失敗，請稍後再試')
+      toast.error(ACCOUNTING_PAGE_LABELS.ACCOUNTING_FAILED)
     }
   }, [quickAmount, quickCategory, quickAccount, categories, accounts, today, createTransaction])
 
@@ -177,11 +178,11 @@ export default function AccountingPage() {
     <>
       {/* 使用標準 ResponsiveHeader - 添加自定義按鈕 */}
       <ResponsiveHeader
-        title="記帳管理"
+        title={ACCOUNTING_PAGE_LABELS.ACCOUNTING_MANAGEMENT}
         icon={CreditCard}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '記帳管理', href: '/accounting' },
+          { label: ACCOUNTING_PAGE_LABELS.HOME, href: '/' },
+          { label: ACCOUNTING_PAGE_LABELS.ACCOUNTING_MANAGEMENT, href: '/accounting' },
         ]}
       >
         {/* 自定義按鈕群組 */}
@@ -192,7 +193,7 @@ export default function AccountingPage() {
             size="sm"
           >
             <Wallet className="h-4 w-4 mr-1.5" />
-            <span className="hidden sm:inline">帳戶管理</span>
+            <span className="hidden sm:inline">{ACCOUNTING_PAGE_LABELS.ACCOUNT_MANAGEMENT}</span>
           </Button>
           <Button
             onClick={() => {
@@ -207,7 +208,7 @@ export default function AccountingPage() {
             className="btn-gradient-primary"
           >
             <Plus className="h-4 w-4 mr-1.5" />
-            <span className="hidden sm:inline">新增記帳</span>
+            <span className="hidden sm:inline">{ACCOUNTING_PAGE_LABELS.NEW_TRANSACTION}</span>
           </Button>
         </div>
       </ResponsiveHeader>
@@ -221,7 +222,7 @@ export default function AccountingPage() {
             {/* 支出卡片 */}
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>本月支出</CardDescription>
+                <CardDescription>{ACCOUNTING_PAGE_LABELS.MONTHLY_EXPENSE}</CardDescription>
                 <div className="text-2xl text-foreground">
                   <CurrencyCell amount={stats?.monthly_expense || 0} />
                 </div>
@@ -229,7 +230,7 @@ export default function AccountingPage() {
               <CardContent>
                 {expenseDifference > 0 && (
                   <div className="text-xs text-morandi-green flex items-center gap-1">
-                    <span>↓ 比上月省</span>
+                    <span>↓ {ACCOUNTING_PAGE_LABELS.SAVE_FROM_LAST_MONTH}</span>
                     <CurrencyCell amount={expenseDifference} variant="income" />
                   </div>
                 )}
@@ -239,7 +240,7 @@ export default function AccountingPage() {
             {/* 收入卡片 */}
             <Card>
               <CardHeader>
-                <CardDescription>本月收入</CardDescription>
+                <CardDescription>{ACCOUNTING_PAGE_LABELS.MONTHLY_INCOME}</CardDescription>
                 <div className="text-2xl">
                   <CurrencyCell amount={stats?.monthly_income || 0} variant="income" />
                 </div>
@@ -249,8 +250,8 @@ export default function AccountingPage() {
             {/* 月底倒數 */}
             <Card>
               <CardHeader>
-                <CardDescription>距離月底</CardDescription>
-                <CardTitle className="text-2xl text-morandi-gold">{daysToEndOfMonth} 天</CardTitle>
+                <CardDescription>{ACCOUNTING_PAGE_LABELS.DAYS_TO_END_OF_MONTH}</CardDescription>
+                <CardTitle className="text-2xl text-morandi-gold">{daysToEndOfMonth}{ACCOUNTING_PAGE_LABELS.DAYS_SUFFIX}</CardTitle>
               </CardHeader>
             </Card>
           </div>
@@ -259,14 +260,14 @@ export default function AccountingPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">今日交易</CardTitle>
+                <CardTitle className="text-lg">{ACCOUNTING_PAGE_LABELS.TODAY_TRANSACTIONS}</CardTitle>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => router.push('/accounting/transactions')}
                   className="text-sm text-primary hover:text-primary/90"
                 >
-                  查看全部
+                  {ACCOUNTING_PAGE_LABELS.VIEW_ALL}
                   <ChevronRight size={16} className="ml-1" />
                 </Button>
               </div>
@@ -310,9 +311,9 @@ export default function AccountingPage() {
               ) : (
                 <div className="text-center py-12">
                   <Package size={48} className="mx-auto mb-3 text-muted-foreground" />
-                  <p className="text-foreground">今日還沒有交易紀錄</p>
+                  <p className="text-foreground">{ACCOUNTING_PAGE_LABELS.NO_TODAY_TRANSACTIONS}</p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    點擊右上角「新增記帳」開始
+                    {ACCOUNTING_PAGE_LABELS.CLICK_ADD_TO_START}
                   </p>
                 </div>
               )}
@@ -325,7 +326,7 @@ export default function AccountingPage() {
           {/* 頂部統計卡片 */}
           <Card>
             <CardHeader>
-              <CardDescription>本月支出</CardDescription>
+              <CardDescription>{ACCOUNTING_PAGE_LABELS.MONTHLY_EXPENSE}</CardDescription>
               <div className="text-3xl">
                 <CurrencyCell amount={stats?.monthly_expense || 0} />
               </div>
@@ -335,17 +336,17 @@ export default function AccountingPage() {
                 <div className="flex items-center gap-1 text-morandi-green">
                   <TrendingUp size={14} />
                   <span className="flex items-center gap-1">
-                    收入 <CurrencyCell amount={stats?.monthly_income || 0} variant="income" />
+                    {ACCOUNTING_PAGE_LABELS.INCOME} <CurrencyCell amount={stats?.monthly_income || 0} variant="income" />
                   </span>
                 </div>
                 {expenseDifference > 0 && (
                   <span className="text-morandi-green flex items-center gap-1">
-                    ↓ 省 <CurrencyCell amount={expenseDifference} variant="income" />
+                    ↓ {ACCOUNTING_PAGE_LABELS.SAVE} <CurrencyCell amount={expenseDifference} variant="income" />
                   </span>
                 )}
               </div>
               <div className="text-xs text-muted-foreground mt-2">
-                距離月底 {daysToEndOfMonth} 天
+                {ACCOUNTING_PAGE_LABELS.DAYS_TO_END_OF_MONTH} {daysToEndOfMonth}{ACCOUNTING_PAGE_LABELS.DAYS_SUFFIX}
               </div>
             </CardContent>
           </Card>
@@ -355,18 +356,18 @@ export default function AccountingPage() {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Zap className="w-5 h-5 text-primary" />
-                <h2 className="text-lg font-semibold text-foreground">快速記帳</h2>
+                <h2 className="text-lg font-semibold text-foreground">{ACCOUNTING_PAGE_LABELS.QUICK_ACCOUNTING}</h2>
               </div>
             </CardHeader>
             <CardContent>
               {/* 帳戶選擇 */}
               <div className="mb-4">
-                <label className="text-xs text-muted-foreground mb-2 block">帳戶</label>
+                <label className="text-xs text-muted-foreground mb-2 block">{ACCOUNTING_PAGE_LABELS.ACCOUNT}</label>
                 <Select value={quickAccount} onValueChange={setQuickAccount}>
                   <SelectTrigger ref={accountSelectRef} className="h-12 rounded-lg">
                     <SelectValue>
                       <Wallet size={16} className="inline mr-2" />
-                      {accounts.find(a => a.id === quickAccount)?.name || '請選擇帳戶'}
+                      {accounts.find(a => a.id === quickAccount)?.name || ACCOUNTING_PAGE_LABELS.SELECT_ACCOUNT}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
@@ -378,7 +379,7 @@ export default function AccountingPage() {
                       ))
                     ) : (
                       <SelectItem value="none" disabled>
-                        尚無帳戶，請先新增
+                        {ACCOUNTING_PAGE_LABELS.NO_ACCOUNT_ADD_FIRST}
                       </SelectItem>
                     )}
                   </SelectContent>
@@ -389,7 +390,7 @@ export default function AccountingPage() {
               <div className="grid grid-cols-3 gap-3 mb-4">
                 {/* 金額輸入 */}
                 <div className="col-span-1">
-                  <label className="text-xs text-muted-foreground mb-1 block">金額</label>
+                  <label className="text-xs text-muted-foreground mb-1 block">{ACCOUNTING_PAGE_LABELS.AMOUNT}</label>
                   <input
                     ref={amountInputRef}
                     type="number"
@@ -403,11 +404,11 @@ export default function AccountingPage() {
 
                 {/* 分類選擇 */}
                 <div className="col-span-1">
-                  <label className="text-xs text-muted-foreground mb-1 block">分類</label>
+                  <label className="text-xs text-muted-foreground mb-1 block">{ACCOUNTING_PAGE_LABELS.CATEGORY}</label>
                   <Select value={quickCategory} onValueChange={setQuickCategory}>
                     <SelectTrigger ref={categorySelectRef} className="h-12 rounded-lg">
                       <SelectValue>
-                        {quickCategories.find(c => c.id === quickCategory)?.name || '餐費'}
+                        {quickCategories.find(c => c.id === quickCategory)?.name || ACCOUNTING_PAGE_LABELS.MEAL}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
@@ -432,14 +433,14 @@ export default function AccountingPage() {
                     variant="default"
                   >
                     <Plus size={18} className="mr-1" />
-                    記帳
+                    {ACCOUNTING_PAGE_LABELS.ACCOUNTING_BUTTON}
                   </Button>
                 </div>
               </div>
 
               {/* 常用分類快速選擇 */}
               <div className="space-y-3">
-                <div className="text-xs text-muted-foreground">常用分類</div>
+                <div className="text-xs text-muted-foreground">{ACCOUNTING_PAGE_LABELS.COMMON_CATEGORIES}</div>
                 <div className="grid grid-cols-3 gap-2">
                   {quickCategories.map(category => (
                     <Button
@@ -461,14 +462,14 @@ export default function AccountingPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-foreground">今日交易</h3>
+                <h3 className="text-lg font-semibold text-foreground">{ACCOUNTING_PAGE_LABELS.TODAY_TRANSACTIONS}</h3>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => router.push('/accounting/transactions')}
                   className="text-sm text-primary hover:text-primary/90"
                 >
-                  查看全部
+                  {ACCOUNTING_PAGE_LABELS.VIEW_ALL}
                   <ChevronRight size={16} className="ml-1" />
                 </Button>
               </div>
@@ -512,8 +513,8 @@ export default function AccountingPage() {
               ) : (
                 <div className="text-center py-12">
                   <Package size={48} className="mx-auto mb-3 text-muted-foreground" />
-                  <p className="text-foreground">今日還沒有交易紀錄</p>
-                  <p className="text-sm text-muted-foreground mt-1">使用上方快速記帳開始吧</p>
+                  <p className="text-foreground">{ACCOUNTING_PAGE_LABELS.NO_TODAY_TRANSACTIONS}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{ACCOUNTING_PAGE_LABELS.USE_QUICK_ACCOUNTING_ABOVE}</p>
                 </div>
               )}
             </CardContent>

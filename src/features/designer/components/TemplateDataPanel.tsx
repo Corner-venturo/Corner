@@ -33,6 +33,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import type { MealIconType, DailyItinerary } from '../templates/definitions/types'
+import { TEMPLATE_DATA_PANEL_LABELS } from '@/constants/labels'
 
 // 編輯器元件
 import {
@@ -48,16 +49,16 @@ export type { TocItem, SimplePage } from './editors'
 
 // 餐食圖標選項
 const MEAL_ICON_OPTIONS: { value: MealIconType; label: string }[] = [
-  { value: 'bakery_dining', label: '麵包/早餐' },
-  { value: 'flight_class', label: '機上餐' },
-  { value: 'restaurant', label: '一般餐廳' },
-  { value: 'ramen_dining', label: '拉麵/日式' },
-  { value: 'soup_kitchen', label: '湯品' },
-  { value: 'skillet', label: '鍋物' },
-  { value: 'bento', label: '便當' },
-  { value: 'rice_bowl', label: '飯類' },
-  { value: 'coffee', label: '咖啡/輕食' },
-  { value: 'dinner_dining', label: '晚餐' },
+  { value: 'bakery_dining', label: TEMPLATE_DATA_PANEL_LABELS.麵包_早餐 },
+  { value: 'flight_class', label: TEMPLATE_DATA_PANEL_LABELS.機上餐 },
+  { value: 'restaurant', label: TEMPLATE_DATA_PANEL_LABELS.一般餐廳 },
+  { value: 'ramen_dining', label: TEMPLATE_DATA_PANEL_LABELS.拉麵_日式 },
+  { value: 'soup_kitchen', label: TEMPLATE_DATA_PANEL_LABELS.湯品 },
+  { value: 'skillet', label: TEMPLATE_DATA_PANEL_LABELS.鍋物 },
+  { value: 'bento', label: TEMPLATE_DATA_PANEL_LABELS.便當 },
+  { value: 'rice_bowl', label: TEMPLATE_DATA_PANEL_LABELS.飯類 },
+  { value: 'coffee', label: TEMPLATE_DATA_PANEL_LABELS.咖啡_輕食 },
+  { value: 'dinner_dining', label: TEMPLATE_DATA_PANEL_LABELS.晚餐_選項 },
 ]
 
 interface SimplePage {
@@ -101,11 +102,11 @@ export function TemplateDataPanel({
     return (
       <div className="h-full flex flex-col">
         <div className="p-3 border-b border-border flex-shrink-0">
-          <h3 className="font-medium text-sm text-morandi-primary">模板數據</h3>
+          <h3 className="font-medium text-sm text-morandi-primary">{TEMPLATE_DATA_PANEL_LABELS.模板數據}</h3>
         </div>
         <div className="flex-1 flex items-center justify-center p-4">
           <p className="text-sm text-morandi-secondary text-center">
-            請先選擇模板
+            {TEMPLATE_DATA_PANEL_LABELS.請先選擇模板}
           </p>
         </div>
       </div>
@@ -181,25 +182,25 @@ export function TemplateDataPanel({
   return (
     <div className="h-full flex flex-col">
       <div className="p-3 border-b border-border flex-shrink-0">
-        <h3 className="font-medium text-sm text-morandi-primary">模板數據</h3>
+        <h3 className="font-medium text-sm text-morandi-primary">{TEMPLATE_DATA_PANEL_LABELS.模板數據}</h3>
         <p className="text-xs text-morandi-secondary mt-1">
-          修改後自動更新畫布
+          {TEMPLATE_DATA_PANEL_LABELS.修改後自動更新畫布}
         </p>
       </div>
 
       <div className="flex-1 overflow-y-auto p-3 space-y-4">
         {/* 頁面類型提示 */}
         <div className="text-xs text-morandi-secondary bg-morandi-container/30 rounded px-2 py-1">
-          {currentPageType === 'cover' && '封面頁'}
-          {currentPageType === 'toc' && '目錄頁'}
-          {currentPageType === 'itinerary' && '行程總覽'}
-          {currentPageType === 'daily' && '每日行程'}
-          {currentPageType === 'memo' && '備忘錄'}
-          {currentPageType === 'hotel' && '飯店介紹'}
-          {currentPageType === 'hotelMulti' && '飯店介紹'}
-          {currentPageType === 'attraction' && '景點介紹'}
-          {currentPageType === 'vehicle' && '分車名單'}
-          {currentPageType === 'table' && '分桌名單'}
+          {currentPageType === 'cover' && TEMPLATE_DATA_PANEL_LABELS.封面頁}
+          {currentPageType === 'toc' && TEMPLATE_DATA_PANEL_LABELS.目錄頁}
+          {currentPageType === 'itinerary' && TEMPLATE_DATA_PANEL_LABELS.行程總覽}
+          {currentPageType === 'daily' && TEMPLATE_DATA_PANEL_LABELS.每日行程}
+          {currentPageType === 'memo' && TEMPLATE_DATA_PANEL_LABELS.備忘錄}
+          {currentPageType === 'hotel' && TEMPLATE_DATA_PANEL_LABELS.飯店介紹}
+          {currentPageType === 'hotelMulti' && TEMPLATE_DATA_PANEL_LABELS.飯店介紹}
+          {currentPageType === 'attraction' && TEMPLATE_DATA_PANEL_LABELS.景點介紹}
+          {currentPageType === 'vehicle' && TEMPLATE_DATA_PANEL_LABELS.分車名單}
+          {currentPageType === 'table' && TEMPLATE_DATA_PANEL_LABELS.分桌名單}
         </div>
 
         {/* 封面圖片 - 只在封面和目錄頁顯示 */}
@@ -208,7 +209,7 @@ export function TemplateDataPanel({
             <div className="space-y-2">
               <Label className="text-xs flex items-center gap-1.5">
                 <ImageIcon size={12} />
-                封面圖片
+                {TEMPLATE_DATA_PANEL_LABELS.封面圖片}
               </Label>
               {templateData.coverImage ? (
                 <div className="space-y-2">
@@ -228,7 +229,7 @@ export function TemplateDataPanel({
                       onClick={onAdjustCoverPosition}
                     >
                       <Move size={12} />
-                      調整位置
+                      {TEMPLATE_DATA_PANEL_LABELS.調整位置}
                     </Button>
                     <Button
                       variant="outline"
@@ -237,7 +238,7 @@ export function TemplateDataPanel({
                       onClick={onUploadCoverImage}
                     >
                       <Upload size={12} />
-                      更換
+                      {TEMPLATE_DATA_PANEL_LABELS.更換}
                     </Button>
                   </div>
                 </div>
@@ -248,7 +249,7 @@ export function TemplateDataPanel({
                   onClick={onUploadCoverImage}
                 >
                   <Upload size={16} />
-                  上傳封面圖片
+                  {TEMPLATE_DATA_PANEL_LABELS.上傳封面圖片}
                 </Button>
               )}
             </div>
@@ -263,12 +264,12 @@ export function TemplateDataPanel({
             <div className="space-y-1.5">
               <Label className="text-xs flex items-center gap-1.5">
                 <FileText size={12} />
-                主標題
+                {TEMPLATE_DATA_PANEL_LABELS.主標題}
               </Label>
               <Input
                 value={(templateData.mainTitle as string) || ''}
                 onChange={(e) => updateField('mainTitle', e.target.value)}
-                placeholder="輸入主標題..."
+                placeholder={TEMPLATE_DATA_PANEL_LABELS.輸入主標題}
                 className="h-8 text-sm"
               />
             </div>
@@ -277,7 +278,7 @@ export function TemplateDataPanel({
             <div className="space-y-1.5">
               <Label className="text-xs flex items-center gap-1.5">
                 <FileText size={12} />
-                副標題
+                {TEMPLATE_DATA_PANEL_LABELS.副標題}
               </Label>
               <Input
                 value={(templateData.subtitle as string) || ''}
@@ -291,7 +292,7 @@ export function TemplateDataPanel({
             <div className="space-y-1.5">
               <Label className="text-xs flex items-center gap-1.5">
                 <MapPin size={12} />
-                目的地
+                {TEMPLATE_DATA_PANEL_LABELS.目的地}
               </Label>
               <Input
                 value={(templateData.destination as string) || ''}
@@ -305,7 +306,7 @@ export function TemplateDataPanel({
             <div className="space-y-1.5">
               <Label className="text-xs flex items-center gap-1.5">
                 <Calendar size={12} />
-                旅遊日期
+                {TEMPLATE_DATA_PANEL_LABELS.旅遊日期}
               </Label>
               <Input
                 value={(templateData.travelDates as string) || ''}
@@ -319,7 +320,7 @@ export function TemplateDataPanel({
             <div className="space-y-1.5">
               <Label className="text-xs flex items-center gap-1.5">
                 <Building2 size={12} />
-                公司名稱
+                {TEMPLATE_DATA_PANEL_LABELS.公司名稱}
               </Label>
               <Input
                 value={(templateData.companyName as string) || ''}
@@ -333,7 +334,7 @@ export function TemplateDataPanel({
             <div className="space-y-1.5">
               <Label className="text-xs flex items-center gap-1.5">
                 <Hash size={12} />
-                團號
+                {TEMPLATE_DATA_PANEL_LABELS.團號}
               </Label>
               <Input
                 value={(templateData.tourCode as string) || ''}
@@ -372,7 +373,7 @@ export function TemplateDataPanel({
                 )}
                 <Clock size={12} className="text-morandi-secondary" />
                 <span className="text-xs font-medium text-morandi-primary flex-1">
-                  集合 / 領隊資訊
+                  {TEMPLATE_DATA_PANEL_LABELS.集合_領隊資訊}
                 </span>
               </button>
 
@@ -380,7 +381,7 @@ export function TemplateDataPanel({
                 <div className="p-2 pt-0 space-y-2 border-t border-border/30">
                   {/* 集合時間 */}
                   <div className="space-y-1">
-                    <Label className="text-[10px] text-morandi-primary">集合時間</Label>
+                    <Label className="text-[10px] text-morandi-primary">{TEMPLATE_DATA_PANEL_LABELS.集合時間}</Label>
                     <Input
                       value={(templateData.meetingTime as string) || ''}
                       onChange={(e) => updateField('meetingTime', e.target.value)}
@@ -391,7 +392,7 @@ export function TemplateDataPanel({
 
                   {/* 集合地點 */}
                   <div className="space-y-1">
-                    <Label className="text-[10px] text-morandi-primary">集合地點</Label>
+                    <Label className="text-[10px] text-morandi-primary">{TEMPLATE_DATA_PANEL_LABELS.集合地點}</Label>
                     <Input
                       value={(templateData.meetingPlace as string) || ''}
                       onChange={(e) => updateField('meetingPlace', e.target.value)}
@@ -402,7 +403,7 @@ export function TemplateDataPanel({
 
                   {/* 領隊姓名 */}
                   <div className="space-y-1">
-                    <Label className="text-[10px] text-morandi-primary">領隊姓名</Label>
+                    <Label className="text-[10px] text-morandi-primary">{TEMPLATE_DATA_PANEL_LABELS.領隊姓名}</Label>
                     <Input
                       value={(templateData.leaderName as string) || ''}
                       onChange={(e) => updateField('leaderName', e.target.value)}
@@ -413,7 +414,7 @@ export function TemplateDataPanel({
 
                   {/* 領隊電話 */}
                   <div className="space-y-1">
-                    <Label className="text-[10px] text-morandi-primary">領隊電話</Label>
+                    <Label className="text-[10px] text-morandi-primary">{TEMPLATE_DATA_PANEL_LABELS.領隊電話}</Label>
                     <Input
                       value={(templateData.leaderPhone as string) || ''}
                       onChange={(e) => updateField('leaderPhone', e.target.value)}
@@ -430,7 +431,7 @@ export function TemplateDataPanel({
               <div className="space-y-2">
                 <Label className="text-xs flex items-center gap-1.5">
                   <Calendar size={12} />
-                  每日行程
+                  {TEMPLATE_DATA_PANEL_LABELS.每日行程}
                 </Label>
                 <div className="space-y-2">
                   {(templateData.dailyItineraries as DailyItinerary[])?.map((day, idx) => (
@@ -462,11 +463,11 @@ export function TemplateDataPanel({
                         <div className="p-2 pt-0 space-y-2 border-t border-border/30">
                           {/* 行程標題 */}
                           <div className="space-y-1">
-                            <Label className="text-[10px] text-morandi-primary">行程標題</Label>
+                            <Label className="text-[10px] text-morandi-primary">{TEMPLATE_DATA_PANEL_LABELS.行程標題}</Label>
                             <Input
                               value={day.title || ''}
                               onChange={(e) => updateDailyItinerary(idx, 'title', e.target.value)}
-                              placeholder="行程標題..."
+                              placeholder={TEMPLATE_DATA_PANEL_LABELS.行程標題_placeholder}
                               className="h-7 text-xs"
                             />
                           </div>

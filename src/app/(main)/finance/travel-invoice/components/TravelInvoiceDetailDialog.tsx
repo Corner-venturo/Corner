@@ -23,6 +23,7 @@ import { Label } from '@/components/ui/label'
 import { useTravelInvoiceStore } from '@/stores/travel-invoice-store'
 import { alert } from '@/lib/ui/alert-dialog'
 import type { TravelInvoice } from '@/stores/travel-invoice-store'
+import { TRAVEL_INVOICE_LABELS } from '@/constants/labels'
 
 interface TravelInvoiceDetailDialogProps {
   invoice: TravelInvoice | null
@@ -51,7 +52,7 @@ export function TravelInvoiceDetailDialog({
   const handleVoid = async () => {
     if (!invoice) return
     if (!voidReason.trim()) {
-      await alert('請填寫作廢原因', 'error')
+      await alert(TRAVEL_INVOICE_LABELS.PLEASE_FILL_VOID_REASON, 'error')
       return
     }
 
@@ -60,17 +61,17 @@ export function TravelInvoiceDetailDialog({
       setShowVoidDialog(false)
       setVoidReason('')
     } catch (error) {
-      await alert(error instanceof Error ? error.message : '發生未知錯誤', 'error')
+      await alert(error instanceof Error ? error.message : TRAVEL_INVOICE_LABELS.UNKNOWN_ERROR, 'error')
     }
   }
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
-      pending: { label: '待處理', variant: 'secondary' },
-      issued: { label: '已開立', variant: 'default' },
-      voided: { label: '已作廢', variant: 'destructive' },
-      allowance: { label: '已折讓', variant: 'outline' },
-      failed: { label: '失敗', variant: 'destructive' },
+      pending: { label: TRAVEL_INVOICE_LABELS.PENDING, variant: 'secondary' },
+      issued: { label: TRAVEL_INVOICE_LABELS.ISSUED, variant: 'default' },
+      voided: { label: TRAVEL_INVOICE_LABELS.VOIDED, variant: 'destructive' },
+      allowance: { label: TRAVEL_INVOICE_LABELS.ALLOWANCE, variant: 'outline' },
+      failed: { label: TRAVEL_INVOICE_LABELS.FAILED, variant: 'destructive' },
     }
     const config = statusMap[status] || { label: status, variant: 'secondary' as const }
     return <Badge variant={config.variant}>{config.label}</Badge>
@@ -96,31 +97,31 @@ export function TravelInvoiceDetailDialog({
             {/* 基本資訊 */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-base">基本資訊</CardTitle>
+                <CardTitle className="text-base">{TRAVEL_INVOICE_LABELS.BASIC_INFO}</CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <p className="text-sm text-morandi-secondary">發票號碼</p>
+                  <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.INVOICE_NUMBER}</p>
                   <p className="font-medium text-morandi-primary">
-                    {invoice.invoice_number || '尚未取得'}
+                    {invoice.invoice_number || TRAVEL_INVOICE_LABELS.NOT_OBTAINED_YET}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-morandi-secondary">開立日期</p>
+                  <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.ISSUE_DATE}</p>
                   <p className="font-medium text-morandi-primary">{invoice.invoice_date}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-morandi-secondary">課稅別</p>
+                  <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.TAX_TYPE}</p>
                   <p className="font-medium text-morandi-primary">
                     {invoice.tax_type === 'dutiable'
-                      ? '應稅'
+                      ? TRAVEL_INVOICE_LABELS.TAXABLE
                       : invoice.tax_type === 'zero'
-                        ? '零稅率'
-                        : '免稅'}
+                        ? TRAVEL_INVOICE_LABELS.ZERO_RATE
+                        : TRAVEL_INVOICE_LABELS.TAX_FREE}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-morandi-secondary">總金額</p>
+                  <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.TOTAL_AMOUNT}</p>
                   <p className="font-medium text-lg text-morandi-gold">
                     <CurrencyCell amount={invoice.total_amount} className="font-medium text-lg text-morandi-gold" />
                   </p>
@@ -131,29 +132,29 @@ export function TravelInvoiceDetailDialog({
             {/* 買受人資訊 */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-base">買受人資訊</CardTitle>
+                <CardTitle className="text-base">{TRAVEL_INVOICE_LABELS.BUYER_INFO}</CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-morandi-secondary">名稱</p>
+                  <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.NAME}</p>
                   <p className="font-medium text-morandi-primary">
                     {invoice.buyerInfo.buyerName || '-'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-morandi-secondary">統一編號</p>
+                  <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.UBN_NUMBER}</p>
                   <p className="font-medium text-morandi-primary">
                     {invoice.buyerInfo.buyerUBN || '-'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-morandi-secondary">Email</p>
+                  <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.EMAIL}</p>
                   <p className="font-medium text-morandi-primary">
                     {invoice.buyerInfo.buyerEmail || '-'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-morandi-secondary">手機</p>
+                  <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.MOBILE}</p>
                   <p className="font-medium text-morandi-primary">
                     {invoice.buyerInfo.buyerMobile || '-'}
                   </p>
@@ -164,7 +165,7 @@ export function TravelInvoiceDetailDialog({
             {/* 商品明細 */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-base">商品明細</CardTitle>
+                <CardTitle className="text-base">{TRAVEL_INVOICE_LABELS.PRODUCT_DETAILS}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="border border-border/60 rounded-lg overflow-hidden">
@@ -172,19 +173,19 @@ export function TravelInvoiceDetailDialog({
                     <thead className="bg-morandi-container/40 border-b border-border/60">
                       <tr>
                         <th className="text-left py-3 px-4 text-sm font-medium text-morandi-primary">
-                          商品名稱
+                          {TRAVEL_INVOICE_LABELS.PRODUCT_NAME}
                         </th>
                         <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary">
-                          數量
+                          {TRAVEL_INVOICE_LABELS.QUANTITY}
                         </th>
                         <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary">
-                          單位
+                          {TRAVEL_INVOICE_LABELS.UNIT}
                         </th>
                         <th className="text-right py-3 px-4 text-sm font-medium text-morandi-primary">
-                          單價
+                          {TRAVEL_INVOICE_LABELS.UNIT_PRICE}
                         </th>
                         <th className="text-right py-3 px-4 text-sm font-medium text-morandi-primary">
-                          金額
+                          {TRAVEL_INVOICE_LABELS.AMOUNT}
                         </th>
                       </tr>
                     </thead>
@@ -216,17 +217,17 @@ export function TravelInvoiceDetailDialog({
             {invoice.status === 'issued' && invoice.randomNum && (
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base">發票資訊</CardTitle>
+                  <CardTitle className="text-base">{TRAVEL_INVOICE_LABELS.INVOICE_INFO}</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-morandi-secondary">隨機碼</p>
+                    <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.RANDOM_CODE}</p>
                     <p className="font-medium font-mono text-morandi-primary">
                       {invoice.randomNum}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-morandi-secondary">條碼</p>
+                    <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.BARCODE}</p>
                     <p className="font-medium font-mono text-sm text-morandi-primary">
                       {invoice.barcode || '-'}
                     </p>
@@ -239,11 +240,11 @@ export function TravelInvoiceDetailDialog({
             {invoice.status === 'voided' && (
               <Card className="border-status-danger/30">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base text-status-danger">作廢資訊</CardTitle>
+                  <CardTitle className="text-base text-status-danger">{TRAVEL_INVOICE_LABELS.VOID_INFO}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <div>
-                    <p className="text-sm text-morandi-secondary">作廢時間</p>
+                    <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.VOID_TIME}</p>
                     <p className="font-medium text-morandi-primary">
                       {invoice.voidDate
                         ? <DateCell date={invoice.voidDate} format="time" showIcon={false} className="font-medium text-morandi-primary" />
@@ -251,7 +252,7 @@ export function TravelInvoiceDetailDialog({
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-morandi-secondary">作廢原因</p>
+                    <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.VOID_REASON}</p>
                     <p className="font-medium text-morandi-primary">
                       {invoice.voidReason || '-'}
                     </p>
@@ -264,7 +265,7 @@ export function TravelInvoiceDetailDialog({
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => onOpenChange(false)} className="gap-2">
               <X size={16} />
-              關閉
+              {TRAVEL_INVOICE_LABELS.CLOSE}
             </Button>
             {invoice.status === 'issued' && (
               <Button
@@ -273,7 +274,7 @@ export function TravelInvoiceDetailDialog({
                 className="gap-2"
               >
                 <FileX size={16} />
-                作廢發票
+                {TRAVEL_INVOICE_LABELS.VOID_INVOICE}
               </Button>
             )}
           </DialogFooter>
@@ -285,23 +286,23 @@ export function TravelInvoiceDetailDialog({
       <Dialog open={showVoidDialog} onOpenChange={setShowVoidDialog}>
         <DialogContent level={2} className="max-w-md">
           <DialogHeader>
-            <DialogTitle>作廢發票</DialogTitle>
+            <DialogTitle>{TRAVEL_INVOICE_LABELS.VOID_INVOICE}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="voidReason">作廢原因 *</Label>
+              <Label htmlFor="voidReason">{TRAVEL_INVOICE_LABELS.VOID_REASON_REQUIRED}</Label>
               <Input
                 id="voidReason"
                 value={voidReason}
                 onChange={e => setVoidReason(e.target.value)}
-                placeholder="請輸入作廢原因"
+                placeholder={TRAVEL_INVOICE_LABELS.ENTER_VOID_REASON}
               />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowVoidDialog(false)} className="gap-2">
               <X size={16} />
-              取消
+              {TRAVEL_INVOICE_LABELS.CANCEL}
             </Button>
             <Button
               variant="destructive"
@@ -310,7 +311,7 @@ export function TravelInvoiceDetailDialog({
               className="gap-2"
             >
               <Check size={16} />
-              確認作廢
+              {TRAVEL_INVOICE_LABELS.CONFIRM_VOID}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -13,7 +13,7 @@ import { X, Printer } from 'lucide-react'
 import { Quote, QuickQuoteItem } from '@/types/quote.types'
 import { supabase } from '@/lib/supabase/client'
 import { COMPANY } from '@/lib/constants/company'
-import { PRINTABLE_QUICK_QUOTE_LABELS, PAYMENT_INFO_LABELS } from '@/constants/labels';
+import { PRINTABLE_QUICK_QUOTE_LABELS, PAYMENT_INFO_LABELS, DIALOGS_CONTAINER_LABELS, ACCOMMODATION_ITEM_ROW_LABELS, QUOTES_PAGE_LABELS, QUOTES_LIST_LABELS, QUICK_QUOTE_SECTION_LABELS } from '@/constants/labels';
 
 interface PrintableQuickQuoteProps {
   quote: Quote
@@ -416,11 +416,11 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
         <div className="flex justify-end gap-2 p-4 border-b">
           <Button onClick={onClose} variant="outline" className="gap-2">
             <X className="h-4 w-4" />
-            關閉
+            {DIALOGS_CONTAINER_LABELS.關閉}
           </Button>
           <Button onClick={handlePrint} className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white">
             <Printer className="h-4 w-4" />
-            列印
+            {PRINTABLE_QUICK_QUOTE_LABELS.列印}
           </Button>
         </div>
 
@@ -438,7 +438,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
               </div>
             ) : (
               <div style={{ position: 'absolute', left: 0, top: 0, fontSize: '12px', color: '#9CA3AF' }}>
-                角落旅行社
+                {PRINTABLE_QUICK_QUOTE_LABELS.角落旅行社}
               </div>
             )}
             <div className="title-area" style={{ textAlign: 'center', padding: '8px 0' }}>
@@ -446,7 +446,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
                 QUOTATION
               </div>
               <h1 className="title" style={{ fontSize: '20px', fontWeight: 'bold', color: '#333333', margin: 0 }}>
-                報價請款單
+                {PRINTABLE_QUICK_QUOTE_LABELS.報價請款單}
               </h1>
             </div>
           </div>
@@ -454,43 +454,43 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
           {/* 客戶資訊 */}
           <div className="info-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px', fontSize: '13px' }}>
             <div className="info-row" style={{ display: 'flex' }}>
-              <span className="info-label" style={{ fontWeight: 600, width: '80px', flexShrink: 0 }}>團體名稱：</span>
+              <span className="info-label" style={{ fontWeight: 600, width: '80px', flexShrink: 0 }}>{PRINTABLE_QUICK_QUOTE_LABELS.團體名稱標籤}</span>
               <span className="info-value" style={{ flex: 1, borderBottom: '1px solid #ccc', paddingBottom: '2px' }}>{quote.customer_name}</span>
             </div>
             <div className="info-row" style={{ display: 'flex' }}>
-              <span className="info-label" style={{ fontWeight: 600, width: '80px', flexShrink: 0 }}>團體編號：</span>
+              <span className="info-label" style={{ fontWeight: 600, width: '80px', flexShrink: 0 }}>{PRINTABLE_QUICK_QUOTE_LABELS.團體編號標籤}</span>
               <span className="info-value" style={{ flex: 1, borderBottom: '1px solid #ccc', paddingBottom: '2px' }}>{quote.tour_code || ''}</span>
             </div>
             <div className="info-row" style={{ display: 'flex' }}>
-              <span className="info-label" style={{ fontWeight: 600, width: '80px', flexShrink: 0 }}>聯絡電話：</span>
+              <span className="info-label" style={{ fontWeight: 600, width: '80px', flexShrink: 0 }}>{PRINTABLE_QUICK_QUOTE_LABELS.聯絡電話標籤}</span>
               <span className="info-value" style={{ flex: 1, borderBottom: '1px solid #ccc', paddingBottom: '2px' }}>{quote.contact_phone || ''}</span>
             </div>
             <div className="info-row" style={{ display: 'flex' }}>
-              <span className="info-label" style={{ fontWeight: 600, width: '80px', flexShrink: 0 }}>承辦業務：</span>
+              <span className="info-label" style={{ fontWeight: 600, width: '80px', flexShrink: 0 }}>{PRINTABLE_QUICK_QUOTE_LABELS.承辦業務標籤}</span>
               <span className="info-value" style={{ flex: 1, borderBottom: '1px solid #ccc', paddingBottom: '2px' }}>{quote.handler_name || 'William'}</span>
             </div>
             <div className="info-row full" style={{ display: 'flex', gridColumn: 'span 2' }}>
-              <span className="info-label" style={{ fontWeight: 600, width: '80px', flexShrink: 0 }}>通訊地址：</span>
+              <span className="info-label" style={{ fontWeight: 600, width: '80px', flexShrink: 0 }}>{PRINTABLE_QUICK_QUOTE_LABELS.通訊地址標籤}</span>
               <span className="info-value" style={{ flex: 1, borderBottom: '1px solid #ccc', paddingBottom: '2px' }}>{quote.contact_address || ''}</span>
             </div>
             <div className="info-row" style={{ display: 'flex' }}>
-              <span className="info-label" style={{ fontWeight: 600, width: '80px', flexShrink: 0 }}>開單日期：</span>
+              <span className="info-label" style={{ fontWeight: 600, width: '80px', flexShrink: 0 }}>{PRINTABLE_QUICK_QUOTE_LABELS.開單日期標籤}</span>
               <span className="info-value" style={{ flex: 1, borderBottom: '1px solid #ccc', paddingBottom: '2px' }}>{quote.issue_date || getTodayString()}</span>
             </div>
           </div>
 
           {/* 收費明細表 */}
           <div className="section-title" style={{ fontSize: '16px', fontWeight: 600, color: '#333333', marginBottom: '8px' }}>
-            收費明細表 ▽
+            {PRINTABLE_QUICK_QUOTE_LABELS.收費明細表}
           </div>
           <table className="items-table" style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, border: '1px solid #E5E7EB', borderRadius: '8px', overflow: 'hidden', marginBottom: '20px', fontSize: '13px' }}>
             <thead>
               <tr style={{ backgroundColor: '#FAF7F2' }}>
-                <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 600, color: '#333333', borderBottom: '1px solid #E5E7EB', width: '35%' }}>摘要</th>
-                <th style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, color: '#333333', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '10%' }}>數量</th>
-                <th style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, color: '#333333', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '15%' }}>單價</th>
-                <th style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, color: '#333333', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '15%' }}>金額</th>
-                <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 600, color: '#333333', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '25%' }}>備註</th>
+                <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 600, color: '#333333', borderBottom: '1px solid #E5E7EB', width: '35%' }}>{PRINTABLE_QUICK_QUOTE_LABELS.摘要}</th>
+                <th style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, color: '#333333', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '10%' }}>{PRINTABLE_QUICK_QUOTE_LABELS.數量}</th>
+                <th style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, color: '#333333', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '15%' }}>{ACCOMMODATION_ITEM_ROW_LABELS.單價}</th>
+                <th style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, color: '#333333', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '15%' }}>{QUOTES_PAGE_LABELS.金額}</th>
+                <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 600, color: '#333333', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '25%' }}>{ACCOMMODATION_ITEM_ROW_LABELS.備註}</th>
               </tr>
             </thead>
             <tbody>
@@ -516,7 +516,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
               {items.length === 0 && (
                 <tr>
                   <td colSpan={5} style={{ padding: '32px 12px', textAlign: 'center', color: '#9CA3AF' }}>
-                    尚無收費項目
+                    {PRINTABLE_QUICK_QUOTE_LABELS.尚無收費項目}
                   </td>
                 </tr>
               )}
@@ -526,7 +526,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
           {/* 費用說明 - 只有有資料才顯示 */}
           {quote.expense_description && (
             <div style={{ marginBottom: '20px', padding: '12px 16px', backgroundColor: '#FAF7F2', border: '1px solid #E5E7EB', borderRadius: '8px' }}>
-              <div style={{ fontWeight: 600, color: '#333333', marginBottom: '8px', fontSize: '14px' }}>費用說明</div>
+              <div style={{ fontWeight: 600, color: '#333333', marginBottom: '8px', fontSize: '14px' }}>{PRINTABLE_QUICK_QUOTE_LABELS.費用說明}</div>
               <div style={{ color: '#4B5563', fontSize: '13px', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
                 {quote.expense_description}
               </div>
@@ -538,23 +538,23 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
             {quote.received_amount && quote.received_amount > 0 ? (
               <>
                 <div className="summary-item" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span className="summary-label" style={{ fontSize: '11px', fontWeight: 600, color: '#333333' }}>應收金額</span>
+                  <span className="summary-label" style={{ fontSize: '11px', fontWeight: 600, color: '#333333' }}>{PRINTABLE_QUICK_QUOTE_LABELS.應收金額}</span>
                   <span className="summary-value" style={{ fontSize: '18px', fontWeight: 'bold', color: '#333333' }}>NT$ {totalAmount.toLocaleString()}</span>
                 </div>
                 <div className="divider" style={{ width: '1px', height: '24px', backgroundColor: '#D1D5DB' }} />
                 <div className="summary-item" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span className="summary-label" style={{ fontSize: '11px', fontWeight: 600, color: '#333333' }}>已收金額</span>
+                  <span className="summary-label" style={{ fontSize: '11px', fontWeight: 600, color: '#333333' }}>{PRINTABLE_QUICK_QUOTE_LABELS.已收金額}</span>
                   <span className="summary-value" style={{ fontSize: '18px', fontWeight: 'bold', color: '#333333' }}>NT$ {(quote.received_amount || 0).toLocaleString()}</span>
                 </div>
                 <div className="divider" style={{ width: '1px', height: '24px', backgroundColor: '#D1D5DB' }} />
                 <div className="summary-item" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span className="summary-label" style={{ fontSize: '11px', fontWeight: 600, color: '#333333' }}>應收餘額</span>
+                  <span className="summary-label" style={{ fontSize: '11px', fontWeight: 600, color: '#333333' }}>{PRINTABLE_QUICK_QUOTE_LABELS.應收餘額}</span>
                   <span className="summary-value" style={{ fontSize: '18px', fontWeight: 'bold', color: balanceAmount > 0 ? '#DC2626' : '#059669' }}>NT$ {balanceAmount.toLocaleString()}</span>
                 </div>
               </>
             ) : (
               <>
-                <span className="summary-label" style={{ fontSize: '11px', fontWeight: 600, color: '#333333' }}>應收金額</span>
+                <span className="summary-label" style={{ fontSize: '11px', fontWeight: 600, color: '#333333' }}>{PRINTABLE_QUICK_QUOTE_LABELS.應收金額}</span>
                 <span className="summary-value" style={{ fontSize: '18px', fontWeight: 'bold', color: '#333333' }}>NT$ {totalAmount.toLocaleString()}</span>
               </>
             )}
@@ -563,34 +563,34 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
           {/* 付款資訊 */}
           <div className="payment-section" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', paddingTop: '16px', borderTop: '1px solid #F3F4F6', marginBottom: '16px', fontSize: '13px' }}>
             <div>
-              <div className="payment-title" style={{ fontWeight: 600, color: '#333333', marginBottom: '8px' }}>匯款資訊</div>
+              <div className="payment-title" style={{ fontWeight: 600, color: '#333333', marginBottom: '8px' }}>{PRINTABLE_QUICK_QUOTE_LABELS.匯款資訊}</div>
               <div className="payment-info" style={{ color: '#4B5563', lineHeight: 1.8 }}>
-                <div>戶名：角落旅行社股份有限公司</div>
+                <div>{PRINTABLE_QUICK_QUOTE_LABELS.戶名_角落旅行社}</div>
                 <div>{PAYMENT_INFO_LABELS.銀行}</div>
                 <div>{PAYMENT_INFO_LABELS.分行}</div>
                 <div>{PAYMENT_INFO_LABELS.帳號}</div>
               </div>
             </div>
             <div>
-              <div className="payment-title" style={{ fontWeight: 600, color: '#333333', marginBottom: '8px' }}>支票資訊</div>
+              <div className="payment-title" style={{ fontWeight: 600, color: '#333333', marginBottom: '8px' }}>{PRINTABLE_QUICK_QUOTE_LABELS.支票資訊}</div>
               <div className="payment-info" style={{ color: '#4B5563', lineHeight: 1.8 }}>
-                <div>抬頭：角落旅行社股份有限公司</div>
-                <div className="warning" style={{ color: '#DC2626', fontWeight: 600 }}>禁止背書轉讓</div>
-                <div className="note" style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '8px' }}>（請於出發日前付清餘額）</div>
+                <div>{PRINTABLE_QUICK_QUOTE_LABELS.抬頭_角落旅行社}</div>
+                <div className="warning" style={{ color: '#DC2626', fontWeight: 600 }}>{PRINTABLE_QUICK_QUOTE_LABELS.禁止背書轉讓}</div>
+                <div className="note" style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '8px' }}>{PRINTABLE_QUICK_QUOTE_LABELS.請於出發日前付清餘額}</div>
               </div>
             </div>
           </div>
 
           {/* 收據資訊 */}
           <div className="receipt-section" style={{ paddingTop: '16px', borderTop: '1px solid #F3F4F6', marginBottom: '24px', fontSize: '13px' }}>
-            <div className="payment-title" style={{ fontWeight: 600, color: '#333333', marginBottom: '8px' }}>收據資訊</div>
+            <div className="payment-title" style={{ fontWeight: 600, color: '#333333', marginBottom: '8px' }}>{PRINTABLE_QUICK_QUOTE_LABELS.收據資訊}</div>
             <div className="receipt-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '8px' }}>
               <div className="receipt-row" style={{ display: 'flex' }}>
-                <span className="receipt-label" style={{ fontWeight: 600, color: '#4B5563', width: '130px', flexShrink: 0 }}>開立代收轉付抬頭：</span>
+                <span className="receipt-label" style={{ fontWeight: 600, color: '#4B5563', width: '130px', flexShrink: 0 }}>{PRINTABLE_QUICK_QUOTE_LABELS.開立代收轉付抬頭}</span>
                 <span className="receipt-value" style={{ flex: 1, borderBottom: '1px solid #E5E7EB' }}>{'\u00A0'}</span>
               </div>
               <div className="receipt-row" style={{ display: 'flex' }}>
-                <span className="receipt-label" style={{ fontWeight: 600, color: '#4B5563', width: '130px', flexShrink: 0 }}>開立代收轉付統編：</span>
+                <span className="receipt-label" style={{ fontWeight: 600, color: '#4B5563', width: '130px', flexShrink: 0 }}>{PRINTABLE_QUICK_QUOTE_LABELS.開立代收轉付統編}</span>
                 <span className="receipt-value" style={{ flex: 1, borderBottom: '1px solid #E5E7EB' }}>{'\u00A0'}</span>
               </div>
             </div>
@@ -602,7 +602,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
               {COMPANY.subtitle}
             </div>
             <div className="footer-copyright" style={{ fontSize: '11px', color: '#D1D5DB' }}>
-              角落旅行社股份有限公司 © {new Date().getFullYear()}
+              {PRINTABLE_QUICK_QUOTE_LABELS.角落旅行社版權} {new Date().getFullYear()}
             </div>
           </div>
         </div>

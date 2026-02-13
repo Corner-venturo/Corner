@@ -19,6 +19,7 @@ import {
   type ManifestationReminderSnapshot,
 } from '@/lib/manifestation/reminder'
 import { logger } from '@/lib/utils/logger'
+import { MANIFESTATION_NOTEBOOK_LABELS } from '@/constants/labels'
 
 interface ManifestationRecord {
   id: string
@@ -264,7 +265,7 @@ export default function ManifestationNotebook() {
           )}
         >
           <PenLine className="w-4 h-4" />
-          今日顯化
+          {MANIFESTATION_NOTEBOOK_LABELS.今日顯化}
           {isCompletedToday && <Check className="w-3 h-3 text-morandi-green" />}
         </button>
         <button
@@ -277,7 +278,7 @@ export default function ManifestationNotebook() {
           )}
         >
           <Book className="w-4 h-4" />
-          章節練習
+          {MANIFESTATION_NOTEBOOK_LABELS.章節練習}
           <span className="text-xs bg-morandi-container px-1.5 py-0.5 rounded-full">
             {entries.filter(e => e.is_completed).length}/15
           </span>
@@ -292,7 +293,7 @@ export default function ManifestationNotebook() {
           )}
         >
           <BookOpen className="w-4 h-4" />
-          歷史紀錄
+          {MANIFESTATION_NOTEBOOK_LABELS.歷史紀錄}
         </button>
       </div>
 
@@ -300,10 +301,10 @@ export default function ManifestationNotebook() {
       {activeTab === 'daily' && (
         <div className="mb-4 p-3 bg-morandi-container/20 rounded-lg">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-morandi-secondary">這週顯化曲線</span>
+            <span className="text-xs text-morandi-secondary">{MANIFESTATION_NOTEBOOK_LABELS.這週顯化曲線}</span>
             {snapshot.streak > 0 && (
               <span className="text-xs font-medium text-morandi-gold bg-morandi-gold/10 px-2 py-0.5 rounded-full">
-                連續 {snapshot.streak} 天
+                {MANIFESTATION_NOTEBOOK_LABELS.連續} {snapshot.streak} {MANIFESTATION_NOTEBOOK_LABELS.天}
               </span>
             )}
           </div>
@@ -339,7 +340,7 @@ export default function ManifestationNotebook() {
               <div className="p-3 bg-morandi-gold/10 border border-morandi-gold/30 rounded-lg text-center">
                 <p className="text-sm text-morandi-gold font-medium flex items-center justify-center gap-2">
                   <Sparkles className="w-4 h-4" />
-                  太棒了！今日顯化已記錄
+                  {MANIFESTATION_NOTEBOOK_LABELS.太棒了今日顯化已記錄}
                 </p>
               </div>
             )}
@@ -347,20 +348,20 @@ export default function ManifestationNotebook() {
             <div>
               <label className="flex items-center gap-2 text-xs font-medium text-morandi-primary mb-2">
                 <Star className="w-3.5 h-3.5 text-morandi-gold" />
-                今日意念
+                {MANIFESTATION_NOTEBOOK_LABELS.今日意念}
               </label>
               <Input
                 type="text"
                 value={intention}
                 onChange={(e) => setIntention(e.target.value)}
-                placeholder="今天我想要專注在..."
+                placeholder={MANIFESTATION_NOTEBOOK_LABELS.今天我想要專注在}
               />
             </div>
 
             <div>
               <label className="flex items-center gap-2 text-xs font-medium text-morandi-primary mb-2">
                 <Heart className="w-3.5 h-3.5 text-morandi-red" />
-                感恩三件事
+                {MANIFESTATION_NOTEBOOK_LABELS.感恩三件事}
               </label>
               <div className="space-y-2">
                 {gratitudes.map((gratitude, index) => (
@@ -369,7 +370,7 @@ export default function ManifestationNotebook() {
                     type="text"
                     value={gratitude}
                     onChange={(e) => handleGratitudeChange(index, e.target.value)}
-                    placeholder={`感恩 ${index + 1}...`}
+                    placeholder={`${MANIFESTATION_NOTEBOOK_LABELS.感恩} ${index + 1}...`}
                   />
                 ))}
               </div>
@@ -378,13 +379,13 @@ export default function ManifestationNotebook() {
             <div>
               <label className="flex items-center gap-2 text-xs font-medium text-morandi-primary mb-2">
                 <Zap className="w-3.5 h-3.5 text-morandi-gold" />
-                魔法語句
+                {MANIFESTATION_NOTEBOOK_LABELS.魔法語句}
               </label>
               <Input
                 type="text"
                 value={magicPhrase}
                 onChange={(e) => setMagicPhrase(e.target.value)}
-                placeholder="我值得擁有美好的一切..."
+                placeholder={MANIFESTATION_NOTEBOOK_LABELS.我值得擁有美好的一切}
               />
             </div>
 
@@ -399,7 +400,7 @@ export default function ManifestationNotebook() {
               )}
             >
               <Sparkles className="w-4 h-4" />
-              {isSaving ? '保存中...' : '完成今日顯化'}
+              {isSaving ? MANIFESTATION_NOTEBOOK_LABELS.保存中 : MANIFESTATION_NOTEBOOK_LABELS.完成今日顯化}
             </Button>
           </div>
         )}
@@ -454,7 +455,7 @@ export default function ManifestationNotebook() {
               className="flex items-center gap-1 text-sm text-morandi-secondary hover:text-morandi-primary"
             >
               <ArrowLeft className="w-4 h-4" />
-              返回章節列表
+              {MANIFESTATION_NOTEBOOK_LABELS.返回章節列表}
             </button>
 
             {(() => {
@@ -465,7 +466,7 @@ export default function ManifestationNotebook() {
                 <>
                   <div className="p-4 rounded-lg" style={{ backgroundColor: `${chapter.color}20` }}>
                     <h3 className="font-semibold text-morandi-primary">
-                      第 {chapter.id} 章：{chapter.title}
+                      {MANIFESTATION_NOTEBOOK_LABELS.第} {chapter.id} {MANIFESTATION_NOTEBOOK_LABELS.章}{chapter.title}
                     </h3>
                     <p className="text-sm text-morandi-secondary mt-1 italic">
                       「{chapter.quote}」
@@ -478,7 +479,7 @@ export default function ManifestationNotebook() {
 
                   <div className="border-t pt-4">
                     <h4 className="font-medium text-sm text-morandi-primary mb-2">
-                      練習指引
+                      {MANIFESTATION_NOTEBOOK_LABELS.練習指引}
                     </h4>
                     <ul className="text-sm text-morandi-secondary space-y-1">
                       {chapter.exercise.instructions.map((instruction, i) => (
@@ -494,12 +495,12 @@ export default function ManifestationNotebook() {
                     {chapter.exercise.fields.includes('desire') && (
                       <div>
                         <label className="text-xs font-medium text-morandi-primary mb-1 block">
-                          我的渴望
+                          {MANIFESTATION_NOTEBOOK_LABELS.我的渴望}
                         </label>
                         <Textarea
                           value={(chapterForm.desire as string) || ''}
                           onChange={(e) => setChapterForm({ ...chapterForm, desire: e.target.value })}
-                          placeholder="我想要..."
+                          placeholder={MANIFESTATION_NOTEBOOK_LABELS.我想要}
                           rows={3}
                         />
                       </div>
@@ -508,12 +509,12 @@ export default function ManifestationNotebook() {
                     {chapter.exercise.fields.includes('dialogue') && (
                       <div>
                         <label className="text-xs font-medium text-morandi-primary mb-1 block">
-                          與渴望的對話
+                          {MANIFESTATION_NOTEBOOK_LABELS.與渴望的對話}
                         </label>
                         <Textarea
                           value={(chapterForm.dialogue as string) || ''}
                           onChange={(e) => setChapterForm({ ...chapterForm, dialogue: e.target.value })}
-                          placeholder="記錄你與內在的對話..."
+                          placeholder={MANIFESTATION_NOTEBOOK_LABELS.記錄你與內在的對話}
                           rows={4}
                         />
                       </div>
@@ -522,12 +523,12 @@ export default function ManifestationNotebook() {
                     {chapter.exercise.fields.includes('small_action') && (
                       <div>
                         <label className="text-xs font-medium text-morandi-primary mb-1 block">
-                          小行動
+                          {MANIFESTATION_NOTEBOOK_LABELS.小行動}
                         </label>
                         <Input
                           value={(chapterForm.small_action as string) || ''}
                           onChange={(e) => setChapterForm({ ...chapterForm, small_action: e.target.value })}
-                          placeholder="今天我要做的一個小行動..."
+                          placeholder={MANIFESTATION_NOTEBOOK_LABELS.今天我要做的一個小行動}
                         />
                       </div>
                     )}
@@ -535,12 +536,12 @@ export default function ManifestationNotebook() {
                     {chapter.exercise.fields.includes('gratitude') && (
                       <div>
                         <label className="text-xs font-medium text-morandi-primary mb-1 block">
-                          感恩
+                          {MANIFESTATION_NOTEBOOK_LABELS.感恩}
                         </label>
                         <Textarea
                           value={(chapterForm.gratitude as string) || ''}
                           onChange={(e) => setChapterForm({ ...chapterForm, gratitude: e.target.value })}
-                          placeholder="我感謝..."
+                          placeholder={MANIFESTATION_NOTEBOOK_LABELS.我感謝}
                           rows={3}
                         />
                       </div>
@@ -549,12 +550,12 @@ export default function ManifestationNotebook() {
                     {chapter.exercise.fields.includes('notes') && (
                       <div>
                         <label className="text-xs font-medium text-morandi-primary mb-1 block">
-                          筆記
+                          {MANIFESTATION_NOTEBOOK_LABELS.筆記}
                         </label>
                         <Textarea
                           value={(chapterForm.notes as string) || ''}
                           onChange={(e) => setChapterForm({ ...chapterForm, notes: e.target.value })}
-                          placeholder="其他想記錄的..."
+                          placeholder={MANIFESTATION_NOTEBOOK_LABELS.其他想記錄的}
                           rows={3}
                         />
                       </div>
@@ -566,7 +567,7 @@ export default function ManifestationNotebook() {
                     className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
                   >
                     <Check className="w-4 h-4" />
-                    完成練習
+                    {MANIFESTATION_NOTEBOOK_LABELS.完成練習}
                   </Button>
                 </>
               )
@@ -578,12 +579,12 @@ export default function ManifestationNotebook() {
         {activeTab === 'history' && (
           <div className="space-y-3">
             {isLoadingHistory ? (
-              <div className="text-center py-8 text-morandi-secondary">載入中...</div>
+              <div className="text-center py-8 text-morandi-secondary">{MANIFESTATION_NOTEBOOK_LABELS.載入中}</div>
             ) : records.length === 0 ? (
               <div className="text-center py-8 text-morandi-secondary">
                 <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                <p>還沒有任何紀錄</p>
-                <p className="text-xs mt-1">開始你的第一次顯化吧！</p>
+                <p>{MANIFESTATION_NOTEBOOK_LABELS.還沒有任何紀錄}</p>
+                <p className="text-xs mt-1">{MANIFESTATION_NOTEBOOK_LABELS.開始你的第一次顯化吧}</p>
               </div>
             ) : (
               <>

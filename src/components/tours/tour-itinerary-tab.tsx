@@ -165,9 +165,9 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                 dinner: day.meals?.dinner || '',
               },
               accommodation: day.accommodation || '',
-              hotelBreakfast: day.meals?.breakfast === '飯店早餐',
-              lunchSelf: day.meals?.lunch === '敬請自理',
-              dinnerSelf: day.meals?.dinner === '敬請自理',
+              hotelBreakfast: day.meals?.breakfast === COMP_TOURS_LABELS.飯店早餐,
+              lunchSelf: day.meals?.lunch === COMP_TOURS_LABELS.敬請自理,
+              dinnerSelf: day.meals?.dinner === COMP_TOURS_LABELS.敬請自理,
               sameAsPrevious: day.isSameAccommodation || false,
             }))
             setDailySchedule(schedule)
@@ -231,14 +231,14 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
       }
       const isFirst = idx === 0
       const isLast = idx === dailySchedule.length - 1
-      const defaultTitle = isFirst ? '抵達目的地' : isLast ? '返回台灣' : `第 ${day.day} 天行程`
+      const defaultTitle = isFirst ? COMP_TOURS_LABELS.抵達目的地 : isLast ? COMP_TOURS_LABELS.返回台灣 : `${TOUR_ITINERARY_TAB_LABELS.第(day.day)} 天行程`
       const dayTitle = day.route?.trim() || defaultTitle
-      const breakfast = day.hotelBreakfast ? '飯店早餐' : day.meals.breakfast
-      const lunch = day.lunchSelf ? '敬請自理' : day.meals.lunch
-      const dinner = day.dinnerSelf ? '敬請自理' : day.meals.dinner
+      const breakfast = day.hotelBreakfast ? COMP_TOURS_LABELS.飯店早餐 : day.meals.breakfast
+      const lunch = day.lunchSelf ? COMP_TOURS_LABELS.敬請自理 : day.meals.lunch
+      const dinner = day.dinnerSelf ? COMP_TOURS_LABELS.敬請自理 : day.meals.dinner
       let accommodation = day.accommodation || ''
       if (day.sameAsPrevious && idx > 0) {
-        accommodation = getPreviousAccommodation(idx) || '續住'
+        accommodation = getPreviousAccommodation(idx) || COMP_TOURS_LABELS.續住
       }
       return {
         dayLabel: `Day ${day.day}`,
@@ -253,7 +253,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
   // 儲存行程表
   const handleSave = async () => {
     if (!title.trim()) {
-      toast.error('請輸入行程標題')
+      toast.error(TOUR_ITINERARY_TAB_LABELS.請輸入行程標題)
       return
     }
 
@@ -270,14 +270,14 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
 
         const isFirst = idx === 0
         const isLast = idx === dailySchedule.length - 1
-        const defaultTitle = isFirst ? '抵達目的地' : isLast ? '返回台灣' : `第 ${day.day} 天行程`
+        const defaultTitle = isFirst ? COMP_TOURS_LABELS.抵達目的地 : isLast ? COMP_TOURS_LABELS.返回台灣 : `${TOUR_ITINERARY_TAB_LABELS.第(day.day)} 天行程`
         const dayTitle = day.route?.trim() || defaultTitle
-        const breakfast = day.hotelBreakfast ? '飯店早餐' : day.meals.breakfast
-        const lunch = day.lunchSelf ? '敬請自理' : day.meals.lunch
-        const dinner = day.dinnerSelf ? '敬請自理' : day.meals.dinner
+        const breakfast = day.hotelBreakfast ? COMP_TOURS_LABELS.飯店早餐 : day.meals.breakfast
+        const lunch = day.lunchSelf ? COMP_TOURS_LABELS.敬請自理 : day.meals.lunch
+        const dinner = day.dinnerSelf ? COMP_TOURS_LABELS.敬請自理 : day.meals.dinner
         let accommodation = day.accommodation || ''
         if (day.sameAsPrevious) {
-          accommodation = getPreviousAccommodation(idx) || '續住'
+          accommodation = getPreviousAccommodation(idx) || COMP_TOURS_LABELS.續住
         }
 
         return {
@@ -289,7 +289,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
           activities: [],
           recommendations: [],
           meals: { breakfast, lunch, dinner },
-          accommodation: day.sameAsPrevious ? `同上 (${getPreviousAccommodation(idx) || ''})` : accommodation,
+          accommodation: day.sameAsPrevious ? `${TOUR_ITINERARY_TAB_LABELS.同上} (${getPreviousAccommodation(idx) || ''})` : accommodation,
           isSameAccommodation: day.sameAsPrevious || false,
           images: [],
         }
@@ -349,7 +349,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
       refresh()
     } catch (error) {
       logger.error(TOUR_ITINERARY_TAB_LABELS.儲存行程表失敗, error)
-      toast.error('儲存失敗')
+      toast.error(COMP_TOURS_LABELS.儲存失敗)
     } finally {
       setSaving(false)
     }
@@ -431,7 +431,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
           </tbody>
         </table>
         <div class="footer">
-          本行程表由 ${companyName} 提供 | 列印日期：${new Date().toLocaleDateString('zh-TW')}
+          ${TOUR_ITINERARY_TAB_LABELS.本行程表由_公司_提供_列印日期.replace('{company}', companyName).replace('{date}', new Date().toLocaleDateString('zh-TW'))}
         </div>
       </body>
       </html>
@@ -463,11 +463,11 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => setViewMode('edit')}>
               <Edit2 className="w-4 h-4 mr-1" />
-              編輯
+              {TOUR_ITINERARY_TAB_LABELS.編輯}
             </Button>
             <Button size="sm" onClick={handlePrint} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white">
               <Printer className="w-4 h-4 mr-1" />
-              列印
+              {TOUR_ITINERARY_TAB_LABELS.列印}
             </Button>
           </div>
         </div>
@@ -488,12 +488,12 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="bg-morandi-gold text-white">
-                <th className="border border-morandi-gold/50 px-3 py-2 text-left w-20">日期</th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-left">行程內容</th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">早餐</th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">午餐</th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">晚餐</th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-left w-32">住宿</th>
+                <th className="border border-morandi-gold/50 px-3 py-2 text-left w-20">{TOUR_ITINERARY_TAB_LABELS.日期_表頭}</th>
+                <th className="border border-morandi-gold/50 px-3 py-2 text-left">{TOUR_ITINERARY_TAB_LABELS.行程內容}</th>
+                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">{TOUR_ITINERARY_TAB_LABELS.早餐_表頭}</th>
+                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">{TOUR_ITINERARY_TAB_LABELS.午餐_表頭}</th>
+                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">{TOUR_ITINERARY_TAB_LABELS.晚餐_表頭}</th>
+                <th className="border border-morandi-gold/50 px-3 py-2 text-left w-32">{TOUR_ITINERARY_TAB_LABELS.住宿_表頭}</th>
               </tr>
             </thead>
             <tbody>
@@ -525,43 +525,43 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
         <div className="flex items-center justify-between mb-4">
           <h3 className="flex items-center gap-2 text-sm font-bold text-morandi-primary">
             <FileText className="w-4 h-4 text-morandi-gold" />
-            {currentItineraryId ? '編輯行程表' : '建立行程表'}
+            {currentItineraryId ? COMP_TOURS_LABELS.編輯行程表 : COMP_TOURS_LABELS.建立行程表}
           </h3>
           <Button variant="outline" size="sm" onClick={() => setViewMode('preview')} className="h-6 px-2 text-[10px] gap-1">
             <Eye size={10} />
-            預覽
+            {TOUR_ITINERARY_TAB_LABELS.預覽}
           </Button>
         </div>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label className="text-xs text-morandi-primary">行程標題 *</Label>
+            <Label className="text-xs text-morandi-primary">{TOUR_ITINERARY_TAB_LABELS.行程標題_必填}</Label>
             <Input
               value={title}
               onChange={e => setTitle(e.target.value)}
-              placeholder="行程表標題"
+              placeholder={TOUR_ITINERARY_TAB_LABELS.行程表標題}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-xs text-morandi-primary">目的地</Label>
-              <Input value={tour.location || '(未設定)'} disabled className="bg-muted" />
+              <Label className="text-xs text-morandi-primary">{TOUR_ITINERARY_TAB_LABELS.目的地}</Label>
+              <Input value={tour.location || COMP_TOURS_LABELS.未設定} disabled className="bg-muted" />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs text-morandi-primary">行程天數</Label>
-              <Input value={`${dailySchedule.length} 天`} disabled className="bg-muted" />
+              <Label className="text-xs text-morandi-primary">{TOUR_ITINERARY_TAB_LABELS.行程天數}</Label>
+              <Input value={`${dailySchedule.length} ${TOUR_ITINERARY_TAB_LABELS.天}`} disabled className="bg-muted" />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-xs text-morandi-primary">出發日期</Label>
-              <Input value={tour.departure_date || '(未設定)'} disabled className="bg-muted" />
+              <Label className="text-xs text-morandi-primary">{TOUR_ITINERARY_TAB_LABELS.出發日期}</Label>
+              <Input value={tour.departure_date || COMP_TOURS_LABELS.未設定} disabled className="bg-muted" />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs text-morandi-primary">回程日期</Label>
-              <Input value={tour.return_date || '(未設定)'} disabled className="bg-muted" />
+              <Label className="text-xs text-morandi-primary">{TOUR_ITINERARY_TAB_LABELS.回程日期}</Label>
+              <Input value={tour.return_date || COMP_TOURS_LABELS.未設定} disabled className="bg-muted" />
             </div>
           </div>
 
@@ -570,13 +570,13 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
             <div className="space-y-3">
               <Label className="text-xs text-morandi-primary flex items-center gap-1">
                 <Plane size={12} />
-                航班資訊（選填）
+                {TOUR_ITINERARY_TAB_LABELS.航班資訊_選填}
               </Label>
 
               {/* 去程航班 */}
               <div className="border rounded-lg p-3 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">去程航班</span>
+                  <span className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.去程}</span>
                   {outboundFlight && (
                     <button type="button" onClick={() => setOutboundFlight(null)} className="text-destructive hover:text-destructive/80 p-1">
                       <Trash2 size={12} />
@@ -596,7 +596,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                   </div>
                 ) : outboundSegments.length > 0 ? (
                   <div className="space-y-2">
-                    <p className="text-xs text-muted-foreground">此航班有多個航段，請選擇：</p>
+                    <p className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.此航班有多個航段_請選擇}</p>
                     {outboundSegments.map((seg, i) => (
                       <button
                         key={i}
@@ -608,21 +608,21 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                         <span className="text-xs text-muted-foreground ml-2">{seg.departureTime} - {seg.arrivalTime}</span>
                       </button>
                     ))}
-                    <button type="button" onClick={clearOutboundSegments} className="text-xs text-muted-foreground hover:text-foreground">取消</button>
+                    <button type="button" onClick={clearOutboundSegments} className="text-xs text-muted-foreground hover:text-foreground">{COMP_TOURS_LABELS.取消}</button>
                   </div>
                 ) : (
                   <div className="flex gap-2">
                     <Input
                       value={outboundFlightNumber}
                       onChange={e => setOutboundFlightNumber(e.target.value.toUpperCase())}
-                      placeholder="航班號碼 (如 BR108)"
+                      placeholder={COMP_TOURS_LABELS.航班號碼_如_BR108}
                       className="h-8 text-xs flex-1"
                       onKeyDown={e => e.key === 'Enter' && handleSearchOutboundFlight()}
                     />
                     <DatePicker
                       value={outboundFlightDate}
                       onChange={date => setOutboundFlightDate(date || '')}
-                      placeholder="日期"
+                      placeholder={COMP_TOURS_LABELS.日期}
                       className="h-8 text-xs w-28"
                     />
                     <Button type="button" size="sm" onClick={handleSearchOutboundFlight} disabled={searchingOutbound} className="h-8 px-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white">
@@ -635,7 +635,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
               {/* 回程航班 */}
               <div className="border rounded-lg p-3 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">回程航班</span>
+                  <span className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.回程}</span>
                   {returnFlight && (
                     <button type="button" onClick={() => setReturnFlight(null)} className="text-destructive hover:text-destructive/80 p-1">
                       <Trash2 size={12} />
@@ -655,7 +655,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                   </div>
                 ) : returnSegments.length > 0 ? (
                   <div className="space-y-2">
-                    <p className="text-xs text-muted-foreground">此航班有多個航段，請選擇：</p>
+                    <p className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.此航班有多個航段_請選擇}</p>
                     {returnSegments.map((seg, i) => (
                       <button
                         key={i}
@@ -667,21 +667,21 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                         <span className="text-xs text-muted-foreground ml-2">{seg.departureTime} - {seg.arrivalTime}</span>
                       </button>
                     ))}
-                    <button type="button" onClick={clearReturnSegments} className="text-xs text-muted-foreground hover:text-foreground">取消</button>
+                    <button type="button" onClick={clearReturnSegments} className="text-xs text-muted-foreground hover:text-foreground">{COMP_TOURS_LABELS.取消}</button>
                   </div>
                 ) : (
                   <div className="flex gap-2">
                     <Input
                       value={returnFlightNumber}
                       onChange={e => setReturnFlightNumber(e.target.value.toUpperCase())}
-                      placeholder="航班號碼 (如 BR107)"
+                      placeholder={COMP_TOURS_LABELS.航班號碼_如_BR107}
                       className="h-8 text-xs flex-1"
                       onKeyDown={e => e.key === 'Enter' && handleSearchReturnFlight()}
                     />
                     <DatePicker
                       value={returnFlightDate}
                       onChange={date => setReturnFlightDate(date || '')}
-                      placeholder="日期"
+                      placeholder={COMP_TOURS_LABELS.日期}
                       className="h-8 text-xs w-28"
                     />
                     <Button type="button" size="sm" onClick={handleSearchReturnFlight} disabled={searchingReturn} className="h-8 px-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white">
@@ -697,7 +697,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
           <div className="flex justify-end pt-4 border-t">
             <Button size="sm" onClick={handleSave} disabled={saving || !title.trim()} className="h-7 px-3 text-xs bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1">
               {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
-              {currentItineraryId ? '更新行程' : '建立行程'}
+              {currentItineraryId ? COMP_TOURS_LABELS.更新行程 : COMP_TOURS_LABELS.建立行程}
             </Button>
           </div>
         </div>
@@ -705,7 +705,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
 
       {/* 右側：每日行程 */}
       <div className="w-full lg:w-1/2 p-4 overflow-y-auto">
-        <h3 className="text-sm font-bold text-morandi-primary mb-4">每日行程</h3>
+        <h3 className="text-sm font-bold text-morandi-primary mb-4">{TOUR_ITINERARY_TAB_LABELS.每日行程}</h3>
         <div className="space-y-3">
           {dailySchedule.map((day, idx) => {
             const isFirst = idx === 0
@@ -734,7 +734,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                         updateDaySchedule(idx, 'route', currentValue + ' → ')
                       }}
                       className="p-1 bg-muted/50 hover:bg-morandi-gold/20 rounded transition-colors"
-                      title="插入箭頭"
+                      title={COMP_TOURS_LABELS.插入箭頭}
                     >
                       <ArrowRight size={12} className="text-morandi-secondary" />
                     </button>
@@ -745,7 +745,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                         updateDaySchedule(idx, 'route', currentValue + ' ⇀ ')
                       }}
                       className="px-1.5 py-0.5 text-[10px] bg-muted/50 hover:bg-morandi-gold/20 rounded transition-colors font-medium text-morandi-secondary"
-                      title="插入鉤箭頭"
+                      title={COMP_TOURS_LABELS.插入鉤箭頭}
                     >
                       ⇀
                     </button>
@@ -756,7 +756,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                         updateDaySchedule(idx, 'route', currentValue + ' · ')
                       }}
                       className="px-1.5 py-0.5 text-[10px] bg-muted/50 hover:bg-morandi-gold/20 rounded transition-colors font-medium text-morandi-secondary"
-                      title="插入間隔點"
+                      title={COMP_TOURS_LABELS.插入間隔點}
                     >
                       ·
                     </button>
@@ -767,7 +767,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                         updateDaySchedule(idx, 'route', currentValue + ' | ')
                       }}
                       className="p-1 bg-muted/50 hover:bg-morandi-gold/20 rounded transition-colors"
-                      title="插入直線"
+                      title={COMP_TOURS_LABELS.插入直線}
                     >
                       <Minus size={12} className="text-morandi-secondary" />
                     </button>
@@ -778,7 +778,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                         updateDaySchedule(idx, 'route', currentValue + ' ⭐ ')
                       }}
                       className="p-1 bg-muted/50 hover:bg-morandi-gold/20 rounded transition-colors"
-                      title="插入星號"
+                      title={COMP_TOURS_LABELS.插入星號}
                     >
                       <Sparkles size={12} className="text-morandi-gold" />
                     </button>
@@ -789,7 +789,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                         updateDaySchedule(idx, 'route', currentValue + ' ✈ ')
                       }}
                       className="px-1.5 py-0.5 text-[10px] bg-muted/50 hover:bg-morandi-gold/20 rounded transition-colors text-morandi-secondary"
-                      title="插入飛機"
+                      title={COMP_TOURS_LABELS.插入飛機}
                     >
                       ✈
                     </button>
@@ -798,7 +798,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                 <Input
                   value={day.route || ''}
                   onChange={e => updateDaySchedule(idx, 'route', e.target.value)}
-                  placeholder={isFirst ? '抵達目的地' : isLast ? '返回台灣' : '今日行程標題'}
+                  placeholder={isFirst ? COMP_TOURS_LABELS.抵達目的地 : isLast ? COMP_TOURS_LABELS.返回台灣 : COMP_TOURS_LABELS.今日行程標題}
                   className="h-8 text-sm mb-2"
                 />
                 {/* 餐食（三欄） */}
@@ -806,9 +806,9 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                   {/* 早餐 */}
                   <div className="relative">
                     <Input
-                      value={day.hotelBreakfast ? '飯店早餐' : (day.meals.breakfast || '')}
+                      value={day.hotelBreakfast ? COMP_TOURS_LABELS.飯店早餐 : (day.meals.breakfast || '')}
                       onChange={e => updateDaySchedule(idx, 'meals.breakfast', e.target.value)}
-                      placeholder="早餐"
+                      placeholder={COMP_TOURS_LABELS.早餐}
                       className={`h-8 text-xs ${!isFirst ? 'pr-7' : ''}`}
                       disabled={day.hotelBreakfast}
                     />
@@ -817,7 +817,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                         type="button"
                         onClick={() => updateDaySchedule(idx, 'hotelBreakfast', !day.hotelBreakfast)}
                         className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
-                        title="飯店早餐"
+                        title={COMP_TOURS_LABELS.飯店早餐}
                       >
                         <Check
                           size={14}
@@ -829,9 +829,9 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                   {/* 午餐 */}
                   <div className="relative">
                     <Input
-                      value={day.lunchSelf ? '敬請自理' : (day.meals.lunch || '')}
+                      value={day.lunchSelf ? COMP_TOURS_LABELS.敬請自理 : (day.meals.lunch || '')}
                       onChange={e => updateDaySchedule(idx, 'meals.lunch', e.target.value)}
-                      placeholder="午餐"
+                      placeholder={COMP_TOURS_LABELS.午餐}
                       className="h-8 text-xs pr-7"
                       disabled={day.lunchSelf}
                     />
@@ -839,7 +839,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                       type="button"
                       onClick={() => updateDaySchedule(idx, 'lunchSelf', !day.lunchSelf)}
                       className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
-                      title="敬請自理"
+                      title={COMP_TOURS_LABELS.敬請自理}
                     >
                       <Check
                         size={14}
@@ -850,9 +850,9 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                   {/* 晚餐 */}
                   <div className="relative">
                     <Input
-                      value={day.dinnerSelf ? '敬請自理' : (day.meals.dinner || '')}
+                      value={day.dinnerSelf ? COMP_TOURS_LABELS.敬請自理 : (day.meals.dinner || '')}
                       onChange={e => updateDaySchedule(idx, 'meals.dinner', e.target.value)}
-                      placeholder="晚餐"
+                      placeholder={COMP_TOURS_LABELS.晚餐}
                       className="h-8 text-xs pr-7"
                       disabled={day.dinnerSelf}
                     />
@@ -860,7 +860,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                       type="button"
                       onClick={() => updateDaySchedule(idx, 'dinnerSelf', !day.dinnerSelf)}
                       className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
-                      title="敬請自理"
+                      title={COMP_TOURS_LABELS.敬請自理}
                     >
                       <Check
                         size={14}
@@ -873,9 +873,9 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                 {!isLast && (
                   <div className="relative mt-1.5">
                     <Input
-                      value={day.sameAsPrevious ? `同上 (${getPreviousAccommodation(idx) || ''})` : (day.accommodation || '')}
+                      value={day.sameAsPrevious ? `${TOUR_ITINERARY_TAB_LABELS.同上} (${getPreviousAccommodation(idx) || ''})` : (day.accommodation || '')}
                       onChange={e => updateDaySchedule(idx, 'accommodation', e.target.value)}
-                      placeholder="住宿飯店"
+                      placeholder={COMP_TOURS_LABELS.住宿飯店}
                       className={`h-8 text-xs ${idx > 0 ? 'pr-7' : ''}`}
                       disabled={day.sameAsPrevious}
                     />
@@ -884,7 +884,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                         type="button"
                         onClick={() => updateDaySchedule(idx, 'sameAsPrevious', !day.sameAsPrevious)}
                         className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
-                        title="續住"
+                        title={COMP_TOURS_LABELS.續住}
                       >
                         <Check
                           size={14}

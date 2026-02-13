@@ -20,6 +20,7 @@ import { ShareTodoDialog } from '../ShareTodoDialog'
 import { CreateReceiptDialog } from '../CreateReceiptDialog'
 import { CreatePaymentRequestDialog } from '../CreatePaymentRequestDialog'
 import { PLACEHOLDER_TEXT } from './constants'
+import { DIALOGS_CONTAINER_LABELS } from '@/constants/labels'
 
 // 機票狀態 Dialog 組件
 function TicketStatusDialog({
@@ -105,9 +106,9 @@ function TicketStatusDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Ticket size={20} className="text-morandi-gold" />
-            確認機票狀況
+            {COMP_WORKSPACE_LABELS.確認機票狀況}
           </DialogTitle>
-          <DialogDescription>選擇查詢區間，機器人會回傳未開票旅客清單</DialogDescription>
+          <DialogDescription>{DIALOGS_CONTAINER_LABELS.選擇查詢區間_機器人會回傳未開票旅客清單}</DialogDescription>
         </DialogHeader>
         <div className="py-4 space-y-4">
           <div className="flex gap-2">
@@ -138,13 +139,13 @@ function TicketStatusDialog({
           )}
 
           <p className="text-xs text-morandi-secondary text-center">
-            點擊後機器人會在聊天室回覆查詢結果
+            {DIALOGS_CONTAINER_LABELS.點擊後機器人會在聊天室回覆查詢結果}
           </p>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={handleClose} className="gap-2">
             <X size={16} />
-            取消
+            {DIALOGS_CONTAINER_LABELS.取消}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -341,12 +342,12 @@ export function DialogsContainer({
       <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
         <DialogContent level={1}>
           <DialogHeader>
-            <DialogTitle>頻道設定</DialogTitle>
-            <DialogDescription>管理 #{selectedChannel?.name} 的設定</DialogDescription>
+            <DialogTitle>{DIALOGS_CONTAINER_LABELS.頻道設定}</DialogTitle>
+            <DialogDescription>{DIALOGS_CONTAINER_LABELS.管理頻道的設定.replace('{channelName}', selectedChannel?.name || '')}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">頻道名稱</label>
+              <label className="text-sm font-medium text-morandi-primary">{DIALOGS_CONTAINER_LABELS.頻道名稱}</label>
               <Input
                 value={editChannelName}
                 onChange={e => setEditChannelName(e.target.value)}
@@ -354,7 +355,7 @@ export function DialogsContainer({
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">頻道描述</label>
+              <label className="text-sm font-medium text-morandi-primary">{DIALOGS_CONTAINER_LABELS.頻道描述}</label>
               <Input
                 value={editChannelDescription}
                 onChange={e => setEditChannelDescription(e.target.value)}
@@ -364,18 +365,18 @@ export function DialogsContainer({
             <div className="pt-4 border-t border-border">
               <Button variant="destructive" className="w-full" onClick={onDeleteChannel}>
                 <Trash2 size={16} className="mr-2" />
-                刪除頻道
+                {DIALOGS_CONTAINER_LABELS.刪除頻道}
               </Button>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowSettingsDialog(false)} className="gap-2">
               <X size={16} />
-              取消
+              {DIALOGS_CONTAINER_LABELS.取消}
             </Button>
             <Button onClick={onUpdateChannel} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
               <Save size={16} />
-              儲存變更
+              {DIALOGS_CONTAINER_LABELS.儲存變更}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -385,27 +386,27 @@ export function DialogsContainer({
       <Dialog open={showShareQuoteDialog} onOpenChange={setShowShareQuoteDialog}>
         <DialogContent level={1}>
           <DialogHeader>
-            <DialogTitle>分享報價單</DialogTitle>
-            <DialogDescription>選擇要分享到頻道的報價單</DialogDescription>
+            <DialogTitle>{COMP_WORKSPACE_LABELS.分享報價單}</DialogTitle>
+            <DialogDescription>{DIALOGS_CONTAINER_LABELS.選擇要分享到頻道的報價單}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">報價單編號</label>
+              <label className="text-sm font-medium text-morandi-primary">{DIALOGS_CONTAINER_LABELS.報價單編號}</label>
               <Input placeholder={PLACEHOLDER_TEXT.QUOTE_SEARCH} />
             </div>
             <div className="border border-morandi-container rounded-lg p-3 space-y-2">
-              <p className="text-sm text-morandi-secondary">暫無報價單資料</p>
-              <p className="text-xs text-morandi-secondary">提示：完整功能將連接報價單系統</p>
+              <p className="text-sm text-morandi-secondary">{DIALOGS_CONTAINER_LABELS.暫無報價單資料}</p>
+              <p className="text-xs text-morandi-secondary">{DIALOGS_CONTAINER_LABELS.提示_完整功能將連接報價單系統}</p>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowShareQuoteDialog(false)} className="gap-2">
               <X size={16} />
-              取消
+              {DIALOGS_CONTAINER_LABELS.取消}
             </Button>
             <Button onClick={() => setShowShareQuoteDialog(false)} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
               <Share2 size={16} />
-              分享到頻道
+              {DIALOGS_CONTAINER_LABELS.分享到頻道}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -415,27 +416,27 @@ export function DialogsContainer({
       <Dialog open={showShareTourDialog} onOpenChange={setShowShareTourDialog}>
         <DialogContent level={1}>
           <DialogHeader>
-            <DialogTitle>分享團況</DialogTitle>
-            <DialogDescription>選擇要分享到頻道的團況資訊</DialogDescription>
+            <DialogTitle>{DIALOGS_CONTAINER_LABELS.分享團況}</DialogTitle>
+            <DialogDescription>{DIALOGS_CONTAINER_LABELS.選擇要分享到頻道的團況資訊}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">團號</label>
+              <label className="text-sm font-medium text-morandi-primary">{DIALOGS_CONTAINER_LABELS.團號}</label>
               <Input placeholder={PLACEHOLDER_TEXT.TOUR_SEARCH} />
             </div>
             <div className="border border-morandi-container rounded-lg p-3 space-y-2">
-              <p className="text-sm text-morandi-secondary">暫無團況資料</p>
-              <p className="text-xs text-morandi-secondary">提示：完整功能將連接團況管理系統</p>
+              <p className="text-sm text-morandi-secondary">{DIALOGS_CONTAINER_LABELS.暫無團況資料}</p>
+              <p className="text-xs text-morandi-secondary">{DIALOGS_CONTAINER_LABELS.提示_完整功能將連接團況管理系統}</p>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowShareTourDialog(false)} className="gap-2">
               <X size={16} />
-              取消
+              {DIALOGS_CONTAINER_LABELS.取消}
             </Button>
             <Button onClick={() => setShowShareTourDialog(false)} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
               <Share2 size={16} />
-              分享到頻道
+              {DIALOGS_CONTAINER_LABELS.分享到頻道}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -445,31 +446,31 @@ export function DialogsContainer({
       <Dialog open={showNewPaymentDialog} onOpenChange={setShowNewPaymentDialog}>
         <DialogContent level={1}>
           <DialogHeader>
-            <DialogTitle>新增請款單</DialogTitle>
-            <DialogDescription>建立新請款單並分享到頻道</DialogDescription>
+            <DialogTitle>{COMP_WORKSPACE_LABELS.新增請款單}</DialogTitle>
+            <DialogDescription>{DIALOGS_CONTAINER_LABELS.建立新請款單並分享到頻道}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">請款項目</label>
+              <label className="text-sm font-medium text-morandi-primary">{DIALOGS_CONTAINER_LABELS.請款項目}</label>
               <Input placeholder={PLACEHOLDER_TEXT.PAYMENT_ITEM} />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">請款金額</label>
+              <label className="text-sm font-medium text-morandi-primary">{DIALOGS_CONTAINER_LABELS.請款金額}</label>
               <Input type="number" placeholder={PLACEHOLDER_TEXT.PAYMENT_AMOUNT} />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">請款原因</label>
+              <label className="text-sm font-medium text-morandi-primary">{DIALOGS_CONTAINER_LABELS.請款原因}</label>
               <Input placeholder={PLACEHOLDER_TEXT.PAYMENT_REASON} />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowNewPaymentDialog(false)} className="gap-2">
               <X size={16} />
-              取消
+              {DIALOGS_CONTAINER_LABELS.取消}
             </Button>
             <Button onClick={() => setShowNewPaymentDialog(false)} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
               <Plus size={16} />
-              建立並分享
+              {DIALOGS_CONTAINER_LABELS.建立並分享}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -479,31 +480,31 @@ export function DialogsContainer({
       <Dialog open={showNewReceiptDialog} onOpenChange={setShowNewReceiptDialog}>
         <DialogContent level={1}>
           <DialogHeader>
-            <DialogTitle>新增收款單</DialogTitle>
-            <DialogDescription>建立新收款單並分享到頻道</DialogDescription>
+            <DialogTitle>{COMP_WORKSPACE_LABELS.新增收款單}</DialogTitle>
+            <DialogDescription>{DIALOGS_CONTAINER_LABELS.建立新收款單並分享到頻道}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">收款項目</label>
+              <label className="text-sm font-medium text-morandi-primary">{DIALOGS_CONTAINER_LABELS.收款項目}</label>
               <Input placeholder={PLACEHOLDER_TEXT.RECEIPT_ITEM} />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">收款金額</label>
+              <label className="text-sm font-medium text-morandi-primary">{DIALOGS_CONTAINER_LABELS.收款金額}</label>
               <Input type="number" placeholder={PLACEHOLDER_TEXT.RECEIPT_AMOUNT} />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">付款人</label>
+              <label className="text-sm font-medium text-morandi-primary">{DIALOGS_CONTAINER_LABELS.付款人}</label>
               <Input placeholder={PLACEHOLDER_TEXT.PAYER_NAME} />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowNewReceiptDialog(false)} className="gap-2">
               <X size={16} />
-              取消
+              {DIALOGS_CONTAINER_LABELS.取消}
             </Button>
             <Button onClick={() => setShowNewReceiptDialog(false)} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
               <Plus size={16} />
-              建立並分享
+              {DIALOGS_CONTAINER_LABELS.建立並分享}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -536,31 +537,31 @@ export function DialogsContainer({
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Calendar size={20} className="text-morandi-primary" />
-                復盤
+                {COMP_WORKSPACE_LABELS.復盤}
               </DialogTitle>
-              <DialogDescription>團體進度、確認單/需求單狀況、收支概況</DialogDescription>
+              <DialogDescription>{DIALOGS_CONTAINER_LABELS.團體進度_確認單_需求單狀況_收支概況}</DialogDescription>
             </DialogHeader>
             <div className="py-4 space-y-4">
               {/* 團體進度 */}
               <div className="border border-morandi-container rounded-lg p-4">
-                <h4 className="font-medium text-morandi-primary mb-2">團體進度</h4>
-                <p className="text-sm text-morandi-secondary">顯示目前進行中的團...</p>
+                <h4 className="font-medium text-morandi-primary mb-2">{DIALOGS_CONTAINER_LABELS.團體進度}</h4>
+                <p className="text-sm text-morandi-secondary">{DIALOGS_CONTAINER_LABELS.顯示目前進行中的團}</p>
               </div>
               {/* 確認單/需求單 */}
               <div className="border border-morandi-container rounded-lg p-4">
-                <h4 className="font-medium text-morandi-primary mb-2">確認單 / 需求單</h4>
-                <p className="text-sm text-morandi-secondary">顯示待處理的確認單和需求單...</p>
+                <h4 className="font-medium text-morandi-primary mb-2">{DIALOGS_CONTAINER_LABELS.確認單_需求單}</h4>
+                <p className="text-sm text-morandi-secondary">{DIALOGS_CONTAINER_LABELS.顯示待處理的確認單和需求單}</p>
               </div>
               {/* 收支狀況 */}
               <div className="border border-morandi-container rounded-lg p-4">
-                <h4 className="font-medium text-morandi-primary mb-2">團體收支</h4>
-                <p className="text-sm text-morandi-secondary">顯示各團收支概況...</p>
+                <h4 className="font-medium text-morandi-primary mb-2">{DIALOGS_CONTAINER_LABELS.團體收支}</h4>
+                <p className="text-sm text-morandi-secondary">{DIALOGS_CONTAINER_LABELS.顯示各團收支概況}</p>
               </div>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowTourReviewDialog(false)} className="gap-2">
                 <X size={16} />
-                關閉
+                {DIALOGS_CONTAINER_LABELS.關閉}
               </Button>
             </DialogFooter>
           </DialogContent>
