@@ -50,6 +50,7 @@ export const PLACEHOLDER_LABELS = {
   noOrdersInGroup: '此團體沒有訂單',
   selectOrder: '請選擇訂單...',
   selectAccount: '請選擇匯入帳戶',
+  disbursementNotes: '請款相關說明...',
 }
 
 // 標題和對話框
@@ -61,7 +62,9 @@ export const DIALOG_LABELS = {
 export const FORM_LABELS = {
   assignTo: '指派給:',
   group: '團體',
+  groupRequired: '團體 *',
   order: '訂單',
+  orderOptional: '訂單（選填）',
   paymentMethod: '收款方式 *',
   amount: '金額 *',
   transactionDate: '交易日期 *',
@@ -104,6 +107,42 @@ export const MESSAGE_LABELS = {
   amountRequired: '收款金額不能為 0',
   receiptCreateSuccess: '收款單建立成功',
   createFailed: '建立失敗，請稍後再試',
+  requiredFields: '請填寫必填欄位（團體、請款日期、至少一項請款項目）',
+  groupNotFound: '找不到選中的團體',
+  disbursementCreateSuccess: '請款單建立成功',
+}
+
+// 快速操作標籤
+export const QUICK_ACTION_LABELS = {
+  receipt: '收款',
+  invoice: '請款',
+  pnr: 'PNR',
+  share: '共享',
+}
+
+// 載入訊息
+export const LOADING_LABELS = {
+  loading: '載入中...',
+  loadingReceiptData: '載入團體和訂單資料中...',
+}
+
+// 共享相關
+export const SHARE_LABELS = {
+  shareTask: '共享待辦',
+  shareDescription: '分享這個任務給團隊成員',
+  shareTo: '共享給',
+  permission: '權限',
+  viewOnly: '僅檢視',
+  canEdit: '可編輯',
+  messageOptional: '訊息（選填）',
+  messageToMember: '給成員的訊息...',
+  selectMember: '選擇成員',
+  selectPermission: '選擇權限',
+  noOtherEmployees: '尚無其他員工',
+  sharing: '共享中...',
+  shareSuccess: '待辦事項已成功共享！',
+  shareFailed: '共享失敗，請稍後再試',
+  selectMemberWarning: '請選擇要共享的成員',
 }
 
 // 訊息生成函數
@@ -111,3 +150,7 @@ export const getPublicTodoMessages = () => ({
   title: '這是公開的待辦事項',
   subtitle: '只有建立者和共享者可以編輯',
 })
+
+// 建立請款單按鈕文字函數
+export const createDisbursementButtonText = (itemCount: number, totalAmount: number) => 
+  `建立請款單 (${itemCount} 項，${totalAmount})`

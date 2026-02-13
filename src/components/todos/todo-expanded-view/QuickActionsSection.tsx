@@ -17,6 +17,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { Receipt, FileText, Plane, UserPlus } from 'lucide-react'
 import { QuickActionsSectionProps, QuickActionContentProps, QuickActionTabConfig } from './types'
 import { alert } from '@/lib/ui/alert-dialog'
+import { QUICK_ACTION_LABELS, LOADING_LABELS, SHARE_LABELS } from '../constants/labels'
 // 使用懶加載避免打包問題
 const QuickReceipt = lazy(() =>
   import('../quick-actions/quick-receipt').then(m => ({ default: m.QuickReceipt }))
@@ -29,10 +30,10 @@ const QuickPNR = lazy(() =>
 )
 
 const quickActionTabs: QuickActionTabConfig[] = [
-  { key: 'receipt' as const, label: '收款', icon: Receipt },
-  { key: 'invoice' as const, label: '請款', icon: FileText },
-  { key: 'pnr' as const, label: 'PNR', icon: Plane },
-  { key: 'share' as const, label: '共享', icon: UserPlus },
+  { key: 'receipt' as const, label: QUICK_ACTION_LABELS.receipt, icon: Receipt },
+  { key: 'invoice' as const, label: QUICK_ACTION_LABELS.invoice, icon: FileText },
+  { key: 'pnr' as const, label: QUICK_ACTION_LABELS.pnr, icon: Plane },
+  { key: 'share' as const, label: QUICK_ACTION_LABELS.share, icon: UserPlus },
 ]
 
 export function QuickActionsSection({ activeTab, onTabChange }: QuickActionsSectionProps) {
@@ -78,7 +79,7 @@ export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: Quick
   // 共享待辦的處理函數
   const handleShareTodo = React.useCallback(async () => {
     if (!shareData.targetUserId) {
-      void alert('請選擇要共享的成員', 'warning')
+      void alert(SHARE_LABELS.selectMemberWarning, 'warning')
       return
     }
 
@@ -99,10 +100,10 @@ export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: Quick
 
       // 重置表單
       setShareData({ targetUserId: '', permission: 'view', message: '' })
-      await alert('待辦事項已成功共享！', 'success')
+      await alert(SHARE_LABELS.shareSuccess, 'success')
       onClose?.()
     } catch (error) {
-      void alert('共享失敗，請稍後再試', 'error')
+      void alert(SHARE_LABELS.shareFailed, 'error')
     } finally {
       setIsSharing(false)
     }
@@ -139,7 +140,7 @@ export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: Quick
   // 加載中的元件
   const LoadingFallback = (
     <div className="flex items-center justify-center h-full">
-      <div className="text-sm text-morandi-secondary">載入中...</div>
+      <div className="text-sm text-morandi-secondary">{LOADING_LABELS.loading}</div>
     </div>
   )
 
@@ -148,7 +149,7 @@ export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: Quick
       if (isLoadingReceipt) {
         return (
           <div className="flex items-center justify-center h-full">
-            <div className="text-sm text-morandi-secondary">載入團體和訂單資料中...</div>
+            <div className="text-sm text-morandi-secondary">{LOADING_LABELS.loadingReceiptData}</div>
           </div>
         )
       }
@@ -180,19 +181,19 @@ export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: Quick
               <UserPlus size={16} className="text-morandi-gold" />
             </div>
             <div>
-              <h5 className="text-sm font-semibold text-morandi-primary">共享待辦</h5>
-              <p className="text-xs text-morandi-secondary">分享這個任務給團隊成員</p>
+              <h5 className="text-sm font-semibold text-morandi-primary">{SHARE_LABELS.shareTask}</h5>
+              <p className="text-xs text-morandi-secondary">{SHARE_LABELS.shareDescription}</p>
             </div>
           </div>
           <div className="space-y-3">
             <div>
-              <label className="block text-xs font-medium text-morandi-primary mb-1">共享給</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">{SHARE_LABELS.shareTo}</label>
               <Select
                 value={shareData.targetUserId}
                 onValueChange={value => setShareData(prev => ({ ...prev, targetUserId: value }))}
               >
                 <SelectTrigger className="shadow-sm h-9 text-xs">
-                  <SelectValue placeholder="選擇成員" />
+                  <SelectValue placeholder={SHARE_LABELS.selectMember} />
                 </SelectTrigger>
                 <SelectContent>
                   {otherEmployees.length > 0 ? (
@@ -203,14 +204,14 @@ export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: Quick
                     ))
                   ) : (
                     <SelectItem value="none" disabled>
-                      尚無其他員工
+                      {SHARE_LABELS.noOtherEmployees}
                     </SelectItem>
                   )}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-morandi-primary mb-1">權限</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">{SHARE_LABELS.permission}</label>
               <Select
                 value={shareData.permission}
                 onValueChange={(value: 'view' | 'edit') =>
@@ -218,20 +219,20 @@ export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: Quick
                 }
               >
                 <SelectTrigger className="shadow-sm h-9 text-xs">
-                  <SelectValue placeholder="選擇權限" />
+                  <SelectValue placeholder={SHARE_LABELS.selectPermission} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="view">僅檢視</SelectItem>
-                  <SelectItem value="edit">可編輯</SelectItem>
+                  <SelectItem value="view">{SHARE_LABELS.viewOnly}</SelectItem>
+                  <SelectItem value="edit">{SHARE_LABELS.canEdit}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
               <label className="block text-xs font-medium text-morandi-primary mb-1">
-                訊息（選填）
+                {SHARE_LABELS.messageOptional}
               </label>
               <Textarea
-                placeholder="給成員的訊息..."
+                placeholder={SHARE_LABELS.messageToMember}
                 rows={2}
                 className="shadow-sm text-xs"
                 value={shareData.message}
@@ -244,7 +245,7 @@ export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: Quick
               className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white shadow-md h-9 text-xs gap-1.5"
             >
               <UserPlus size={14} />
-              {isSharing ? '共享中...' : '共享待辦'}
+              {isSharing ? SHARE_LABELS.sharing : SHARE_LABELS.shareTask}
             </Button>
           </div>
         </div>

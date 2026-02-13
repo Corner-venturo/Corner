@@ -20,6 +20,13 @@ import { EditableRequestItemList } from '@/features/finance/requests/components/
 import { RequestDateInput } from '@/features/finance/requests/components/RequestDateInput'
 import { alert } from '@/lib/ui/alert-dialog'
 import { CurrencyCell } from '@/components/table-cells'
+import { 
+  FORM_LABELS, 
+  PLACEHOLDER_LABELS, 
+  MESSAGE_LABELS, 
+  CONTACT_LABELS,
+  createDisbursementButtonText 
+} from '../constants/labels'
 
 interface QuickDisbursementProps {
   onSubmit?: () => void
@@ -48,12 +55,12 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
 
   const handleSubmit = async () => {
     if (!formData.tour_id || requestItems.length === 0 || !formData.request_date) {
-      void alert('請填寫必填欄位（團體、請款日期、至少一項請款項目）', 'warning')
+      void alert(MESSAGE_LABELS.requiredFields, 'warning')
       return
     }
 
     if (!selectedTour) {
-      void alert('找不到選中的團體', 'warning')
+      void alert(MESSAGE_LABELS.groupNotFound, 'warning')
       return
     }
 
@@ -66,12 +73,12 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
         selectedOrder?.order_number || undefined
       )
 
-      await alert('請款單建立成功', 'success')
+      await alert(MESSAGE_LABELS.disbursementCreateSuccess, 'success')
       resetForm()
       onSubmit?.()
     } catch (error) {
       logger.error('❌ Create Request Error:', error)
-      void alert('建立失敗，請稍後再試', 'error')
+      void alert(MESSAGE_LABELS.createFailed, 'error')
     }
   }
 
@@ -81,7 +88,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
       <div className="grid grid-cols-2 gap-3">
         {/* 選擇團體 */}
         <div>
-          <Label className="text-sm font-medium text-morandi-primary">團體 *</Label>
+          <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.groupRequired}</Label>
           <Combobox
             options={(tours || []).map(tour => ({
               value: tour.id,
@@ -99,14 +106,14 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
                 order_id: autoOrderId,
               }))
             }}
-            placeholder="請選擇團體..."
+            placeholder={PLACEHOLDER_LABELS.selectGroup}
             className="mt-1"
           />
         </div>
 
         {/* 選擇訂單 */}
         <div>
-          <Label className="text-sm font-medium text-morandi-primary">訂單（選填）</Label>
+          <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.orderOptional}</Label>
           <Select
             disabled={!formData.tour_id || filteredOrders.length === 0}
             value={formData.order_id}
@@ -116,17 +123,17 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
               <SelectValue
                 placeholder={
                   !formData.tour_id
-                    ? '請先選擇團體'
+                    ? PLACEHOLDER_LABELS.selectGroupFirst
                     : filteredOrders.length === 0
-                      ? '此團體沒有訂單'
-                      : '請選擇訂單...'
+                      ? PLACEHOLDER_LABELS.noOrdersInGroup
+                      : PLACEHOLDER_LABELS.selectOrder
                 }
               />
             </SelectTrigger>
             <SelectContent>
               {filteredOrders.map(order => (
                 <SelectItem key={order.id} value={order.id}>
-                  {order.order_number} - {order.contact_person || '無聯絡人'}
+                  {order.order_number} - {order.contact_person || CONTACT_LABELS.noContact}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -157,9 +164,9 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
 
       {/* Note */}
       <div className="pt-3 border-t border-morandi-container/20">
-        <label className="text-sm font-medium text-morandi-primary mb-2 block">備註</label>
+        <label className="text-sm font-medium text-morandi-primary mb-2 block">{FORM_LABELS.remarks}</label>
         <Textarea
-          placeholder="請款相關說明..."
+          placeholder={PLACEHOLDER_LABELS.disbursementNotes}
           rows={2}
           value={formData.notes}
           onChange={e => setFormData(prev => ({ ...prev, note: e.target.value }))}

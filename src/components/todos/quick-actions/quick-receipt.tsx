@@ -98,12 +98,12 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
   // 儲存
   const handleSave = async () => {
     if (!selectedOrderId) {
-      void alert('請選擇訂單', 'warning')
+      void alert(MESSAGE_LABELS.selectOrder, 'warning')
       return
     }
 
     if (!paymentItem.amount || paymentItem.amount === 0) {
-      void alert('收款金額不能為 0', 'warning')
+      void alert(MESSAGE_LABELS.amountRequired, 'warning')
       return
     }
 
@@ -113,12 +113,12 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
         paymentItems: [paymentItem as ReceiptItem],
       })
 
-      await alert('收款單建立成功', 'success')
+      await alert(MESSAGE_LABELS.receiptCreateSuccess, 'success')
       onSubmit?.()
       resetForm()
     } catch (error) {
       logger.error('❌ Save Error:', error)
-      void alert('建立失敗，請稍後再試', 'error')
+      void alert(MESSAGE_LABELS.createFailed, 'error')
     }
   }
 
@@ -389,7 +389,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
         className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white"
       >
         <ReceiptIcon size={16} className="mr-2" />
-        建立收款單
+        {BUTTON_LABELS.create}
       </Button>
     </div>
   )
