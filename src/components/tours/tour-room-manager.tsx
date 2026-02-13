@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
+import { createTourRoom, deleteTourRoom } from '@/data/entities/tour-rooms'
 import { useAuthStore } from '@/stores'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -99,17 +100,14 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
     try {
       const currentNightRooms = rooms.filter(r => r.night_number === selectedNight)
 
-      const { error } = await supabase.from('tour_rooms').insert({
+      await createTourRoom({
         tour_id: tourId,
         room_type: newRoom.room_type,
         capacity: newRoom.capacity,
         hotel_name: newRoom.hotel_name || null,
         night_number: selectedNight,
         display_order: currentNightRooms.length,
-        workspace_id: user?.workspace_id,
       })
-
-      if (error) throw error
 
       toast.success(COMP_TOURS_LABELS.房間已新增)
       setShowAddRoom(false)
@@ -129,12 +127,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
     if (!confirmed) return
 
     try {
-      const { error } = await supabase
-        .from('tour_rooms')
-        .delete()
-        .eq('id', roomId)
-
-      if (error) throw error
+      await deleteTourRoom(roomId)
 
       toast.success(COMP_TOURS_LABELS.房間已刪除)
       loadRooms()

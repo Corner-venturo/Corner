@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
+import { createTourVehicle, deleteTourVehicle } from '@/data/entities/tour-vehicles'
 import { useAuthStore } from '@/stores'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -73,7 +74,7 @@ export function TourVehicleTab({ tourId, members }: TourVehicleTabProps) {
     }
 
     try {
-      const { error } = await supabase.from('tour_vehicles').insert({
+      await createTourVehicle({
         tour_id: tourId,
         vehicle_name: newVehicle.vehicle_name,
         vehicle_type: newVehicle.vehicle_type,
@@ -82,10 +83,7 @@ export function TourVehicleTab({ tourId, members }: TourVehicleTabProps) {
         driver_phone: newVehicle.driver_phone || null,
         license_plate: newVehicle.license_plate || null,
         display_order: vehicles.length,
-        workspace_id: user?.workspace_id,
       })
-
-      if (error) throw error
 
       toast.success(COMP_TOURS_LABELS.車輛已新增)
       setShowAddVehicle(false)
@@ -112,12 +110,7 @@ export function TourVehicleTab({ tourId, members }: TourVehicleTabProps) {
     if (!confirmed) return
 
     try {
-      const { error } = await supabase
-        .from('tour_vehicles')
-        .delete()
-        .eq('id', vehicleId)
-
-      if (error) throw error
+      await deleteTourVehicle(vehicleId)
 
       toast.success(COMP_TOURS_LABELS.車輛已刪除)
       loadVehicles()
