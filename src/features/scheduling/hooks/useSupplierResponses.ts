@@ -119,7 +119,7 @@ export function useSupplierResponses(options?: UseSupplierResponsesOptions) {
 
       // 只查詢發給當前 workspace 的需求的回覆
       // 或者當前 workspace 發出的回覆（供應商視角）
-      // TODO: 可能需要更精確的權限過濾
+      // RLS 已在 DB 層處理 workspace 權限過濾
 
       if (requestId) {
         query = query.eq('request_id', requestId)

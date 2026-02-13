@@ -3,7 +3,7 @@
  * 
  * 當確認單交接時呼叫，將行程資料同步到 online_trips 表
  * 
- * TODO: online_trips 表建立後，重新執行 supabase gen types 更新類型
+ * online_trips 表已建立，types 已更新
  */
 
 import { createClient } from '@supabase/supabase-js'
