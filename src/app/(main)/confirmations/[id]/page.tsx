@@ -24,6 +24,7 @@ import type {
 import type { ParsedHTMLConfirmation } from '@/lib/pnr-parser'
 import { toast } from 'sonner'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
+import { LABELS } from '../constants/labels'
 
 export default function EditConfirmationPage() {
   const router = useRouter()
@@ -82,7 +83,7 @@ export default function EditConfirmationPage() {
     }
 
     if (!formData.booking_number) {
-      toast.error('請填寫訂單編號')
+      toast.error(LABELS.BOOKING_NUMBER_REQUIRED)
       return
     }
 
@@ -98,11 +99,11 @@ export default function EditConfirmationPage() {
         updated_by: auth.user!.id,
       } as Partial<Confirmation>)
 
-      toast.success('確認單已更新')
+      toast.success(LABELS.CONFIRMATION_UPDATED)
       router.push('/confirmations')
     } catch (error) {
       logger.error('更新失敗:', error)
-      toast.error('更新失敗')
+      toast.error(LABELS.UPDATE_FAILED)
     } finally {
       setIsSaving(false)
     }
@@ -119,7 +120,7 @@ export default function EditConfirmationPage() {
       const ticket = parsed.ticketNumbers.find(t => t.passenger === name)
       return {
         nameEn: name,
-        cabin: parsed.segments[0]?.cabin || '經濟',
+        cabin: parsed.segments[0]?.cabin || LABELS.ECONOMY_CLASS,
         ticketNumber: ticket?.number || '',
         bookingCode: parsed.recordLocator,
       }
@@ -157,7 +158,7 @@ export default function EditConfirmationPage() {
       data: flightData,
     })
 
-    toast.success('PNR 已成功匯入！')
+    toast.success(LABELS.PNR_IMPORT_SUCCESS)
   }
 
   const currentConfirmation = confirmations.find(c => c.id === id)
@@ -165,7 +166,7 @@ export default function EditConfirmationPage() {
   if (isLoadingConfirmations) {
     return (
       <div className="h-full flex items-center justify-center">
-        <div className="text-morandi-secondary">載入中...</div>
+        <div className="text-morandi-secondary">{LABELS.LOADING}</div>
       </div>
     )
   }
@@ -174,19 +175,19 @@ export default function EditConfirmationPage() {
     return (
       <div className="h-full flex flex-col">
         <ResponsiveHeader
-          title="編輯確認單"
+          title={LABELS.EDIT_CONFIRMATION}
           breadcrumb={[
-            { label: '首頁', href: '/' },
-            { label: '確認單管理', href: '/confirmations' },
-            { label: '編輯確認單', href: '#' },
+            { label: LABELS.HOME, href: '/' },
+            { label: LABELS.CONFIRMATIONS_MANAGEMENT, href: '/confirmations' },
+            { label: LABELS.EDIT_CONFIRMATION, href: '#' },
           ]}
           showBackButton={true}
         />
         <div className="flex-1 flex items-center justify-center">
           <NotFoundState
-            title="找不到該確認單"
-            description="您要找的確認單可能已被刪除或不存在"
-            backButtonLabel="返回確認單列表"
+            title={LABELS.NOT_FOUND_TITLE}
+            description={LABELS.NOT_FOUND_DESCRIPTION}
+            backButtonLabel={LABELS.BACK_TO_CONFIRMATIONS}
             backHref="/confirmations"
           />
         </div>
@@ -198,11 +199,11 @@ export default function EditConfirmationPage() {
     <div className="h-full flex flex-col">
       {/* 頁面頂部 */}
       <ResponsiveHeader
-        title="編輯確認單"
+        title={LABELS.EDIT_CONFIRMATION}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '確認單管理', href: '/confirmations' },
-          { label: '編輯確認單', href: '#' },
+          { label: LABELS.HOME, href: '/' },
+          { label: LABELS.CONFIRMATIONS_MANAGEMENT, href: '/confirmations' },
+          { label: LABELS.EDIT_CONFIRMATION, href: '#' },
         ]}
         showBackButton={true}
         actions={
@@ -214,7 +215,7 @@ export default function EditConfirmationPage() {
                 className="gap-2"
               >
                 <Upload className="h-4 w-4" />
-                匯入 PNR
+                {LABELS.IMPORT_PNR}
               </Button>
             )}
             <Button
@@ -223,15 +224,15 @@ export default function EditConfirmationPage() {
               className="gap-2"
             >
               <Printer className="h-4 w-4" />
-              列印
+              {LABELS.PRINT}
             </Button>
             <Button variant="outline" onClick={() => router.push('/confirmations')} className="gap-2">
               <X size={16} />
-              取消
+              {LABELS.CANCEL}
             </Button>
             <Button onClick={handleSave} disabled={isSaving} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
               <Save size={16} />
-              {isSaving ? '儲存中...' : '更新確認單'}
+              {isSaving ? LABELS.SAVE : LABELS.UPDATE_CONFIRMATION}
             </Button>
           </div>
         }

@@ -4,6 +4,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import type { ConfirmationFormData, AccommodationData } from '@/types/confirmation.types'
+import { LABELS } from '../constants/labels'
 
 interface AccommodationFormProps {
   formData: ConfirmationFormData
@@ -65,7 +66,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
       {/* 訂單編號 */}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="booking_number">訂單編號 *</Label>
+          <Label htmlFor="booking_number">{LABELS.BOOKING_NUMBER}</Label>
           <Input
             id="booking_number"
             value={formData.booking_number}
@@ -74,7 +75,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="confirmation_number">飯店確認編號</Label>
+          <Label htmlFor="confirmation_number">{LABELS.CONFIRMATION_NUMBER}</Label>
           <Input
             id="confirmation_number"
             value={formData.confirmation_number || ''}
@@ -86,10 +87,10 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
 
       {/* 飯店資訊 */}
       <div className="space-y-4 p-4 bg-muted rounded-md">
-        <h3 className="font-semibold text-morandi-primary">飯店資訊</h3>
+        <h3 className="font-semibold text-morandi-primary">{LABELS.HOTEL_INFO}</h3>
 
         <div className="space-y-2">
-          <Label htmlFor="hotelName">飯店名稱 *</Label>
+          <Label htmlFor="hotelName">{LABELS.HOTEL_NAME}</Label>
           <Input
             id="hotelName"
             value={data.hotelName || ''}
@@ -99,7 +100,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="hotelAddress">地址 *</Label>
+          <Label htmlFor="hotelAddress">{LABELS.HOTEL_ADDRESS}</Label>
           <Input
             id="hotelAddress"
             value={data.hotelAddress || ''}
@@ -109,7 +110,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
         </div>
 
         <div className="space-y-2">
-          <Label>電話</Label>
+          <Label>{LABELS.PHONE}</Label>
           {(data.hotelPhone || []).map((phone, index) => (
             <div key={index} className="flex gap-2">
               <Input
@@ -118,19 +119,19 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
                 placeholder="+86-21-62218638"
               />
               <Button type="button" variant="outline" size="sm" onClick={() => removePhone(index)}>
-                刪除
+                {LABELS.DELETE}
               </Button>
             </div>
           ))}
           <Button type="button" variant="outline" size="sm" onClick={addPhone}>
-            + 新增電話
+            {LABELS.ADD_PHONE}
           </Button>
         </div>
       </div>
 
       {/* 入住資訊 */}
       <div className="space-y-4 p-4 bg-muted rounded-md">
-        <h3 className="font-semibold text-morandi-primary">入住資訊</h3>
+        <h3 className="font-semibold text-morandi-primary">{LABELS.CHECK_IN_INFO}</h3>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">

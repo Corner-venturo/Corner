@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { FileText, Upload, CheckCircle, X } from 'lucide-react'
 import { parseFlightConfirmation, type ParsedHTMLConfirmation } from '@/lib/pnr-parser'
 import { toast } from 'sonner'
+import { LABELS } from '../constants/labels'
 
 interface ImportPNRDialogProps {
   isOpen: boolean
@@ -22,7 +23,7 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
 
   const handleParse = () => {
     if (!rawInput.trim()) {
-      toast.error('請貼上 PNR 內容')
+      toast.error(LABELS.PASTE_PNR_CONTENT)
       return
     }
 
@@ -39,9 +40,9 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
       }
 
       setParsedData(parsed as ParsedHTMLConfirmation)
-      toast.success('PNR 解析成功！')
+      toast.success(LABELS.PNR_PARSE_SUCCESS)
     } catch (error) {
-      toast.error('PNR 格式錯誤，請檢查內容')
+      toast.error(LABELS.PNR_FORMAT_ERROR)
       logger.error('PNR 解析失敗', error)
     } finally {
       setIsParsing(false)
