@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import {
   X,
   Download,
@@ -120,6 +120,31 @@ export function FilePreview({ onBack }: FilePreviewProps) {
   const categoryInfo = FILE_CATEGORY_INFO[file.category]
   const isImage = file.content_type?.startsWith('image/')
 
+  // 圖片預覽 URL
+  const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const [imageLoading, setImageLoading] = useState(false)
+
+  useEffect(() => {
+    if (!isImage) {
+      setImageUrl(null)
+      return
+    }
+    let cancelled = false
+    setImageLoading(true)
+    fetch(`/api/files/${file.id}/download`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled && data.url) setImageUrl(data.url)
+      })
+      .catch(() => {
+        if (!cancelled) setImageUrl(null)
+      })
+      .finally(() => {
+        if (!cancelled) setImageLoading(false)
+      })
+    return () => { cancelled = true }
+  }, [file.id, isImage])
+
   const handleDownload = async () => {
     await downloadFile(file.id)
   }
@@ -160,8 +185,16 @@ export function FilePreview({ onBack }: FilePreviewProps) {
         <div className="p-4">
           {isImage ? (
             <div className="aspect-video bg-muted rounded-lg flex items-center justify-center overflow-hidden">
-              {/* TODO: 使用實際的圖片 URL */}
-              <Image className="w-16 h-16 text-muted-foreground" />
+              {imageLoading ? (
+                <div className="animate-pulse flex flex-col items-center gap-2">
+                  <Image className="w-12 h-12 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">載入中...</span>
+                </div>
+              ) : imageUrl ? (
+                <img src={imageUrl} alt={file.filename} className="max-w-full max-h-full object-contain" />
+              ) : (
+                <Image className="w-16 h-16 text-muted-foreground" />
+              )}
             </div>
           ) : (
             <div className="aspect-video bg-muted rounded-lg flex flex-col items-center justify-center">
