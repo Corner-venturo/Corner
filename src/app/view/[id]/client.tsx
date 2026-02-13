@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import TourPage from '@/components/TourPage'
 import { Loader2 } from 'lucide-react'
 import { logger } from '@/lib/utils/logger'
+import { PUBLIC_VIEW_LABELS } from './constants/labels'
 
 interface ItineraryData {
   title?: string
@@ -38,7 +39,7 @@ export default function PublicViewClient({ id }: PublicViewClientProps) {
   useEffect(() => {
     async function fetchItinerary() {
       if (!id) {
-        setError('缺少行程 ID')
+        setError(PUBLIC_VIEW_LABELS.ERROR_MISSING_ID)
         setLoading(false)
         return
       }
@@ -48,7 +49,7 @@ export default function PublicViewClient({ id }: PublicViewClientProps) {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}))
-          throw new Error(errorData.error || '無法載入行程')
+          throw new Error(errorData.error || PUBLIC_VIEW_LABELS.ERROR_LOAD_FAILED)
         }
 
         const result = await response.json()
@@ -56,7 +57,7 @@ export default function PublicViewClient({ id }: PublicViewClientProps) {
         setData(result.data || result)
       } catch (err) {
         logger.error('載入行程失敗:', err)
-        setError(err instanceof Error ? err.message : '載入行程時發生錯誤')
+        setError(err instanceof Error ? err.message : PUBLIC_VIEW_LABELS.ERROR_LOAD_GENERIC)
       } finally {
         setLoading(false)
       }
@@ -70,7 +71,7 @@ export default function PublicViewClient({ id }: PublicViewClientProps) {
       <div className="min-h-screen flex items-center justify-center bg-morandi-background">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin text-morandi-primary mx-auto mb-4" />
-          <p className="text-morandi-secondary">載入行程中...</p>
+          <p className="text-morandi-secondary">{PUBLIC_VIEW_LABELS.LOADING_ITINERARY}</p>
         </div>
       </div>
     )
@@ -83,7 +84,7 @@ export default function PublicViewClient({ id }: PublicViewClientProps) {
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-status-danger-bg flex items-center justify-center">
             <span className="text-2xl">!</span>
           </div>
-          <h1 className="text-xl font-semibold text-morandi-primary mb-2">無法載入行程</h1>
+          <h1 className="text-xl font-semibold text-morandi-primary mb-2">{PUBLIC_VIEW_LABELS.ERROR_TITLE}</h1>
           <p className="text-morandi-secondary">{error}</p>
         </div>
       </div>
@@ -94,7 +95,7 @@ export default function PublicViewClient({ id }: PublicViewClientProps) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-morandi-background">
         <div className="text-center">
-          <p className="text-morandi-secondary">找不到此行程</p>
+          <p className="text-morandi-secondary">{PUBLIC_VIEW_LABELS.ERROR_NOT_FOUND}</p>
         </div>
       </div>
     )
