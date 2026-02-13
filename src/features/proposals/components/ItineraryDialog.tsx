@@ -1020,7 +1020,7 @@ function generatePrintHtml(data: TimelineItineraryData): string {
   const formatDate = (dateStr: string): string => {
     if (!dateStr) return ''
     const date = new Date(dateStr)
-    const weekdays = ['日', '一', '二', '三', '四', '五', '六']
+    const weekdays = [ITINERARY_DIALOG_LABELS.日, ITINERARY_DIALOG_LABELS.一, ITINERARY_DIALOG_LABELS.二, ITINERARY_DIALOG_LABELS.三, ITINERARY_DIALOG_LABELS.四, ITINERARY_DIALOG_LABELS.五, ITINERARY_DIALOG_LABELS.六]
     return `${date.getMonth() + 1}/${date.getDate()} (${weekdays[date.getDay()]})`
   }
 
@@ -1077,12 +1077,12 @@ function generatePrintHtml(data: TimelineItineraryData): string {
 <html>
 <head>
   <meta charset="utf-8">
-  <title>${data.title || '行程表'}</title>
+  <title>${data.title || BROCHURE_PREVIEW_DIALOG_LABELS.行程表}</title>
   <style>
     @page { size: A4 portrait; margin: 10mm; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: ITINERARY_DIALOG_LABELS.標楷體, "Microsoft JhengHei", sans-serif;
+      font-family: "${ITINERARY_DIALOG_LABELS.標楷體}", "Microsoft JhengHei", sans-serif;
       font-size: 11pt;
       line-height: 1.5;
       padding: 10mm;
@@ -1182,11 +1182,11 @@ function generatePrintHtml(data: TimelineItineraryData): string {
 </head>
 <body>
   <div class="print-controls">
-    <button class="btn-outline" onclick="window.close()">關閉</button>
-    <button class="btn-primary" onclick="window.print()">列印</button>
+    <button class="btn-outline" onclick="window.close()">${ITINERARY_DIALOG_LABELS.關閉}</button>
+    <button class="btn-primary" onclick="window.print()">${ITINERARY_DIALOG_LABELS.列印}</button>
   </div>
   <div class="header">
-    <h1>${data.title || '行程表'}</h1>
+    <h1>${data.title || BROCHURE_PREVIEW_DIALOG_LABELS.行程表}</h1>
     ${data.subtitle ? `<div class="subtitle">${data.subtitle}</div>` : ''}
   </div>
   ${daysHtml}

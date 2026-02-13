@@ -64,10 +64,10 @@ interface RequestItem {
 // 分類對應的欄位標題
 const CATEGORY_COLUMNS: Record<string, { dateLabel: string; titleLabel: string; qtyLabel: string }> = {
   hotel: { dateLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.日期, titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.房型, qtyLabel: ADD_MANUAL_REQUEST_DIALOG_LABELS.間數 },
-  restaurant: { dateLabel: '日期', titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.餐別, qtyLabel: ADD_MANUAL_REQUEST_DIALOG_LABELS.人數 },
-  transport: { dateLabel: '日期', titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.路線_車型, qtyLabel: ADD_MANUAL_REQUEST_DIALOG_LABELS.台數 },
-  activity: { dateLabel: '日期', titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.項目, qtyLabel: '人數' },
-  other: { dateLabel: '日期', titleLabel: '項目', qtyLabel: ADD_MANUAL_REQUEST_DIALOG_LABELS.數量 },
+  restaurant: { dateLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.日期, titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.餐別, qtyLabel: ADD_MANUAL_REQUEST_DIALOG_LABELS.人數 },
+  transport: { dateLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.日期, titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.路線_車型, qtyLabel: ADD_MANUAL_REQUEST_DIALOG_LABELS.台數 },
+  activity: { dateLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.日期, titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.項目, qtyLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.人數 },
+  other: { dateLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.日期, titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.項目, qtyLabel: ADD_MANUAL_REQUEST_DIALOG_LABELS.數量 },
 }
 
 // 分類中文名
@@ -302,39 +302,39 @@ export function TourRequestFormDialog({
       </head>
       <body>
         <div class="print-controls">
-          <button class="btn-outline" onclick="window.close()">關閉</button>
-          <button class="btn-primary" onclick="window.print()">列印</button>
+          <button class="btn-outline" onclick="window.close()">${TOUR_REQUEST_FORM_DIALOG_LABELS.關閉}</button>
+          <button class="btn-primary" onclick="window.print()">${TOUR_REQUEST_FORM_DIALOG_LABELS.列印}</button>
         </div>
 
         <div class="header">
           ${logoUrl ? `<img src="${logoUrl}" class="logo" alt="Logo" />` : '<div style="position:absolute;left:0;top:0;font-size:12px;color:#999;">角落旅行社</div>'}
           <div class="title-area">
             <div class="subtitle">REQUEST FORM</div>
-            <div class="title">${categoryName}需求單</div>
+            <div class="title">${categoryName}${TOUR_REQUEST_FORM_DIALOG_LABELS.需求單}</div>
           </div>
         </div>
 
         <div class="info-grid">
           <div class="info-section">
-            <div class="info-title">我方資訊</div>
-            <div class="info-row">公司：${companyInfo.name}</div>
-            ${companyInfo.phone || companyInfo.fax ? `<div class="info-row">${companyInfo.phone ? `電話：${companyInfo.phone}` : ''}${companyInfo.phone && companyInfo.fax ? '　' : ''}${companyInfo.fax ? `傳真：${companyInfo.fax}` : ''}</div>` : ''}
-            ${companyInfo.sales || companyInfo.assistant ? `<div class="info-row">${companyInfo.sales ? `業務：${companyInfo.sales}` : ''}${companyInfo.sales && companyInfo.assistant ? '　' : ''}${companyInfo.assistant ? `助理：${companyInfo.assistant}` : ''}</div>` : ''}
+            <div class="info-title">${TOUR_REQUEST_FORM_DIALOG_LABELS.我方資訊}</div>
+            <div class="info-row">${TOUR_REQUEST_FORM_DIALOG_LABELS.公司}${companyInfo.name}</div>
+            ${companyInfo.phone || companyInfo.fax ? `<div class="info-row">${companyInfo.phone ? `${TOUR_REQUEST_FORM_DIALOG_LABELS.電話}${companyInfo.phone}` : ''}${companyInfo.phone && companyInfo.fax ? '　' : ''}${companyInfo.fax ? `${TOUR_REQUEST_FORM_DIALOG_LABELS.傳真}${companyInfo.fax}` : ''}</div>` : ''}
+            ${companyInfo.sales || companyInfo.assistant ? `<div class="info-row">${companyInfo.sales ? `${TOUR_REQUEST_FORM_DIALOG_LABELS.業務}${companyInfo.sales}` : ''}${companyInfo.sales && companyInfo.assistant ? '　' : ''}${companyInfo.assistant ? `${TOUR_REQUEST_FORM_DIALOG_LABELS.助理}${companyInfo.assistant}` : ''}</div>` : ''}
           </div>
           <div class="info-section">
-            <div class="info-title">廠商資訊</div>
-            <div class="info-row">廠商：${supplierInfo.name}</div>
-            ${cityInfo.customCity || supplierInfo.contactPerson ? `<div class="info-row">${cityInfo.customCity ? `城市：${cityInfo.customCity}` : ''}${cityInfo.customCity && supplierInfo.contactPerson ? '　' : ''}${supplierInfo.contactPerson ? `聯絡人：${supplierInfo.contactPerson}` : ''}</div>` : ''}
-            ${supplierInfo.phone || supplierInfo.fax ? `<div class="info-row">${supplierInfo.phone ? `電話：${supplierInfo.phone}` : ''}${supplierInfo.phone && supplierInfo.fax ? '　' : ''}${supplierInfo.fax ? `傳真：${supplierInfo.fax}` : ''}</div>` : ''}
+            <div class="info-title">${TOUR_REQUEST_FORM_DIALOG_LABELS.廠商資訊}</div>
+            <div class="info-row">${TOUR_REQUEST_FORM_DIALOG_LABELS.廠商}${supplierInfo.name}</div>
+            ${cityInfo.customCity || supplierInfo.contactPerson ? `<div class="info-row">${cityInfo.customCity ? `${TOUR_REQUEST_FORM_DIALOG_LABELS.城市}${cityInfo.customCity}` : ''}${cityInfo.customCity && supplierInfo.contactPerson ? '　' : ''}${supplierInfo.contactPerson ? `${TOUR_REQUEST_FORM_DIALOG_LABELS.聯絡人}${supplierInfo.contactPerson}` : ''}</div>` : ''}
+            ${supplierInfo.phone || supplierInfo.fax ? `<div class="info-row">${supplierInfo.phone ? `${TOUR_REQUEST_FORM_DIALOG_LABELS.電話}${supplierInfo.phone}` : ''}${supplierInfo.phone && supplierInfo.fax ? '　' : ''}${supplierInfo.fax ? `${TOUR_REQUEST_FORM_DIALOG_LABELS.傳真}${supplierInfo.fax}` : ''}</div>` : ''}
           </div>
         </div>
 
         <div class="tour-info">
           <div class="tour-grid">
-            <div>團號：${tourCode || tour?.code || '-'}</div>
-            <div>團名：${tourName || tour?.name || proposal?.title || '-'}</div>
-            <div>出發日期：${formatDate(departureDate || pkg?.start_date)}</div>
-            <div>人數：${pax || proposal?.group_size || '-'} 人</div>
+            <div>${TOUR_REQUEST_FORM_DIALOG_LABELS.團號}${tourCode || tour?.code || '-'}</div>
+            <div>${TOUR_REQUEST_FORM_DIALOG_LABELS.團名}${tourName || tour?.name || proposal?.title || '-'}</div>
+            <div>${TOUR_REQUEST_FORM_DIALOG_LABELS.出發日期}${formatDate(departureDate || pkg?.start_date)}</div>
+            <div>${TOUR_REQUEST_FORM_DIALOG_LABELS.人數}${pax || proposal?.group_size || '-'} ${TOUR_REQUEST_FORM_DIALOG_LABELS.人}</div>
           </div>
         </div>
 
@@ -344,8 +344,8 @@ export function TourRequestFormDialog({
               <th>${columns.dateLabel}</th>
               <th>${columns.titleLabel}</th>
               <th class="text-center">${columns.qtyLabel}</th>
-              <th class="text-right">單價</th>
-              <th>備註</th>
+              <th class="text-right">${TOUR_REQUEST_FORM_DIALOG_LABELS.單價}</th>
+              <th>${TOUR_REQUEST_FORM_DIALOG_LABELS.備註}</th>
             </tr>
           </thead>
           <tbody>

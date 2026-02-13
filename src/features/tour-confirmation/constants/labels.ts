@@ -100,7 +100,6 @@ export const TOUR_CONFIRMATION_SHEET_PAGE_LABELS = {
   新增: '新增',
   尚無項目: '尚無{0}項目',
   選擇: '選擇',
-  航班: '航班',
   車子: '車子',
   去程: '去程',
   回程: '回程',
@@ -139,6 +138,11 @@ export const ITEM_EDIT_DIALOG_ADDITIONAL_LABELS = {
   備註: '備註',
   取消: '取消',
   儲存: '儲存',
+  單價: '單價',
+  數量: '數量',
+  小計: '小計',
+  預計支出: '預計支出',
+  實際支出: '實際支出',
 };
 
 export const DAILY_ITINERARY_SECTION_LABELS = {
