@@ -72,7 +72,7 @@ export const DASHBOARD_LABELS = {
   emergency: '緊急！',
   days: '天',
   infant: '嬰兒',
-  notes: '注意事項',
+  pnrNotes: '注意事項',
   
   // Remittance Widget
   remittanceComparison: '匯款比較',
@@ -93,7 +93,7 @@ export const DASHBOARD_LABELS = {
   paused: '已暫停',
   start: '開始',
   stop: '暫停',
-  reset: '歸零',
+  timerReset: '歸零',
   
   // Visa Widget
   visaRequirement: '簽證需求',
@@ -109,7 +109,6 @@ export const DASHBOARD_LABELS = {
   weatherDescription: '查詢歷史或預報天氣',
   selectCity: '選擇城市',
   selectDateLabel: '選擇日期',
-  loading: '載入中...',
   
   // Weather Weekly Widget
   weeklyWeather: '7天天氣',
