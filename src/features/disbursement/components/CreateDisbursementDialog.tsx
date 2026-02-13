@@ -73,7 +73,7 @@ export function CreateDisbursementDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent level={1} size="full" className="h-[85vh] overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0">
-          <DialogTitle className="text-xl">新增出納單</DialogTitle>
+          <DialogTitle className="text-xl">{DISBURSEMENT_LABELS.新增出納單}</DialogTitle>
         </DialogHeader>
 
         <div className="flex-1 min-h-0 flex flex-col space-y-4">
@@ -104,14 +104,14 @@ export function CreateDisbursementDialog({
         <DialogFooter className="flex-shrink-0 mt-4">
           <Button variant="outline" onClick={() => handleClose(false)} className="gap-1">
             <X size={16} />
-            取消
+            {DISBURSEMENT_LABELS.取消}
           </Button>
           <Button
             onClick={handleCreate}
             disabled={selectedRequestIds.length === 0 || isSubmitting}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
-            {isSubmitting ? DISBURSEMENT_LABELS.建立中 : `建立出納單（${selectedRequestIds.length} 筆）`}
+            {isSubmitting ? DISBURSEMENT_LABELS.建立中 : DISBURSEMENT_LABELS.建立出納單數量.replace('{count}', selectedRequestIds.length.toString())}
           </Button>
         </DialogFooter>
       </DialogContent>

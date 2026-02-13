@@ -55,7 +55,6 @@ export const SUPPLIER_LABELS = {
   
   // Business info
   businessHours: '營業時間',
-  website: '官方網站',
   description: '描述',
   services: '服務項目',
   

@@ -117,7 +117,7 @@ export function DisbursementDialog({
       subtitle={`${orderNumber} • ${typeof nextThursday === 'string' ? nextThursday : formatDateTW(nextThursday)}`}
       onSubmit={onCreate}
       onCancel={onCancel}
-      submitLabel={`建立出納單 (${selectedRequests.length} 筆)`}
+      submitLabel={DISBURSEMENT_LABELS.建立出納單筆.replace('{count}', selectedRequests.length.toString())}
       submitDisabled={selectedRequests.length === 0}
       maxWidth="6xl"
       contentClassName="max-h-[70vh] overflow-hidden flex flex-col"
@@ -127,7 +127,7 @@ export function DisbursementDialog({
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <FileText className="h-16 w-16 mx-auto mb-4 text-morandi-secondary opacity-50" />
-              <p className="text-lg text-morandi-secondary">目前沒有待出帳的請款單</p>
+              <p className="text-lg text-morandi-secondary">{DISBURSEMENT_LABELS.目前沒有待出帳的請款單}</p>
             </div>
           </div>
         ) : (
@@ -135,10 +135,10 @@ export function DisbursementDialog({
             {/* 統計和搜尋 */}
             <div className="flex items-center justify-between py-3 px-4 border-b bg-muted">
               <div className="flex items-center space-x-4">
-                <span className="font-medium">共 {pendingRequests.length} 筆請款單</span>
+                <span className="font-medium">{DISBURSEMENT_LABELS.共筆請款單.replace('{count}', pendingRequests.length.toString())}</span>
                 {selectedRequests.length > 0 && (
                   <span className="text-sm text-morandi-secondary">
-                    • 已選 {selectedRequests.length} 筆 •
+                    {DISBURSEMENT_LABELS.已選筆.replace('{count}', selectedRequests.length.toString())}
                     <span className="font-bold text-morandi-primary ml-1">
                       <CurrencyCell amount={selectedAmount} />
                     </span>
