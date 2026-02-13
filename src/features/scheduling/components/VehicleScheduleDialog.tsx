@@ -12,6 +12,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { FleetScheduleFormData, FleetVehicle } from '@/types/fleet.types'
 import { getVehicleTypeLabel } from '@/types/fleet.types'
+import { SCHEDULING_LABELS } from '../constants/labels'
 
 interface VehicleScheduleDialogProps {
   isOpen: boolean
@@ -41,21 +42,21 @@ export const VehicleScheduleDialog: React.FC<VehicleScheduleDialogProps> = ({
     <FormDialog
       open={isOpen}
       onOpenChange={open => !open && onClose()}
-      title={isEditMode ? '編輯車輛調度' : '新增車輛調度'}
-      subtitle={selectedVehicle ? `${selectedVehicle.license_plate} - ${getVehicleTypeLabel(selectedVehicle.vehicle_type)}` : '選擇車輛'}
+      title={isEditMode ? SCHEDULING_LABELS.編輯車輛調度 : SCHEDULING_LABELS.新增車輛調度}
+      subtitle={selectedVehicle ? `${selectedVehicle.license_plate} - ${getVehicleTypeLabel(selectedVehicle.vehicle_type)}` : SCHEDULING_LABELS.選擇車輛}
       onSubmit={onSubmit}
-      submitLabel={isEditMode ? '儲存變更' : '新增調度'}
+      submitLabel={isEditMode ? SCHEDULING_LABELS.儲存變更 : SCHEDULING_LABELS.新增調度}
       submitDisabled={!formData.vehicle_id || !formData.start_date || !formData.end_date}
       maxWidth="xl"
     >
       <div className="space-y-6">
         {/* 車輛選擇 */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">車輛資訊</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{SCHEDULING_LABELS.車輛資訊}</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-morandi-primary">
-                選擇車輛 <span className="text-morandi-red">*</span>
+                {SCHEDULING_LABELS.選擇車輛} <span className="text-morandi-red">*</span>
               </label>
               <Select
                 value={formData.vehicle_id}
@@ -70,7 +71,7 @@ export const VehicleScheduleDialog: React.FC<VehicleScheduleDialogProps> = ({
                 }}
               >
                 <SelectTrigger className="mt-1 w-full">
-                  <SelectValue placeholder="選擇車輛" />
+                  <SelectValue placeholder={SCHEDULING_LABELS.選擇車輛} />
                 </SelectTrigger>
                 <SelectContent>
                   {vehicles.filter(v => v.status === 'available').map(vehicle => (
@@ -86,27 +87,27 @@ export const VehicleScheduleDialog: React.FC<VehicleScheduleDialogProps> = ({
 
         {/* 日期範圍 */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">調度日期</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{SCHEDULING_LABELS.調度日期}</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-morandi-primary">
-                開始日期 <span className="text-morandi-red">*</span>
+                {SCHEDULING_LABELS.開始日期} <span className="text-morandi-red">*</span>
               </label>
               <DatePicker
                 value={formData.start_date}
                 onChange={date => onFormFieldChange('start_date', date)}
-                placeholder="選擇開始日期"
+                placeholder={SCHEDULING_LABELS.選擇開始日期}
                 className="mt-1"
               />
             </div>
             <div>
               <label className="text-sm font-medium text-morandi-primary">
-                結束日期 <span className="text-morandi-red">*</span>
+                {SCHEDULING_LABELS.結束日期} <span className="text-morandi-red">*</span>
               </label>
               <DatePicker
                 value={formData.end_date}
                 onChange={date => onFormFieldChange('end_date', date)}
-                placeholder="選擇結束日期"
+                placeholder={SCHEDULING_LABELS.選擇結束日期}
                 className="mt-1"
               />
             </div>
@@ -115,19 +116,19 @@ export const VehicleScheduleDialog: React.FC<VehicleScheduleDialogProps> = ({
 
         {/* 客戶/團資訊 */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">客戶 / 團資訊</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{SCHEDULING_LABELS.客戶團資訊}</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">客戶名稱</label>
+              <label className="text-sm font-medium text-morandi-primary">{SCHEDULING_LABELS.客戶名稱}</label>
               <Input
                 value={formData.client_name}
                 onChange={e => onFormFieldChange('client_name', e.target.value)}
-                placeholder="例如：○○旅行社"
+                placeholder={SCHEDULING_LABELS.例如旅行社}
                 className="mt-1"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">團號</label>
+              <label className="text-sm font-medium text-morandi-primary">{SCHEDULING_LABELS.團號}</label>
               <Input
                 value={formData.tour_code}
                 onChange={e => onFormFieldChange('tour_code', e.target.value)}
