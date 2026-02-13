@@ -8,6 +8,7 @@ import { useCountries, useCities } from '@/data'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { ITINERARY_LABELS } from '../constants/labels'
 
 // 型別定義
 interface DailyScheduleItem {
@@ -319,7 +320,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
       {/* 每日行程 */}
       <section>
         <div className="flex items-center justify-between mb-3 pb-2 border-b border-morandi-container">
-          <h3 className="text-base font-bold text-morandi-primary">每日行程</h3>
+          <h3 className="text-base font-bold text-morandi-primary">{ITINERARY_LABELS.每日行程}</h3>
           <Button
             onClick={() => {
               updateField('dailySchedule', [
@@ -336,7 +337,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
             className="h-7 text-xs bg-morandi-gold hover:bg-morandi-gold-hover"
           >
             <Plus size={14} className="mr-1" />
-            新增天數
+            {ITINERARY_LABELS.新增天數}
           </Button>
         </div>
         <div className="space-y-3">
