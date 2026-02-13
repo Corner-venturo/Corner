@@ -21,7 +21,6 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import * as fabric from 'fabric'
 import { Button } from '@/components/ui/button'
 import { useDocumentStore, type BrochureEntityType } from '@/stores/document-store'
-import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
 import {
@@ -42,14 +41,12 @@ import { DesignTypeSelector, DESIGN_TYPES, type DesignType } from '@/features/de
 import { STICKER_PATHS } from '@/features/designer/components/core/sticker-paths'
 
 // Designer 工具和類型
-import { needsScaling, calculateScaleFactor, scaleFabricData, NEW_A5_WIDTH, NEW_A5_HEIGHT } from '@/features/designer/utils/scaling'
-import { calculatePageNumber, formatPageNumber } from '@/features/designer/utils/page-number'
-import { generatePageFromTemplate, styleSeries, itineraryToTemplateData } from '@/features/designer/templates/engine'
+import { generatePageFromTemplate, styleSeries } from '@/features/designer/templates/engine'
 import { generateBrochurePDF } from '@/lib/pdf/brochure-pdf-generator'
 
 // 類型
 import type { CanvasPage, CanvasElement } from '@/features/designer/components/types'
-import type { StyleSeries, TemplateData } from '@/features/designer/templates/engine'
+import type { TemplateData } from '@/features/designer/templates/engine'
 import type { MemoPageContent } from '@/features/designer/components/PageListSidebar'
 import type { ImageEditorSettings } from '@/components/ui/image-editor'
 
@@ -59,6 +56,8 @@ import {
   useCoverImageHandlers,
   useDailyImageHandlers,
   useKeyboardAndPan,
+  useVersionLoader,
+  useDesignerSetup,
 } from './hooks'
 import {
   DesignerHeader,
@@ -107,7 +106,7 @@ export default function DesignerPage() {
   const [generatedPages, setGeneratedPages] = useState<CanvasPage[]>([])
   const [currentPageIndex, setCurrentPageIndex] = useState(0)
   const [templateData, setTemplateData] = useState<Record<string, unknown> | null>(null)
-  const [selectedStyle, setSelectedStyle] = useState<StyleSeries | null>(null)
+  const [selectedStyle, setSelectedStyle] = useState<(typeof styleSeries)[number] | null>(null)
   const [showPageList, setShowPageList] = useState(true)
   const [showLeftPanel, setShowLeftPanel] = useState(false)
   const [showRightPanel, setShowRightPanel] = useState(true)
@@ -317,6 +316,25 @@ export default function DesignerPage() {
     addImage,
   })
 
+  const {
+    handleSelectDesignType,
+    handleBrochureStart,
+    handleTemplateComplete,
+  } = useDesignerSetup({
+    entityId,
+    entityType,
+    workspaceId,
+    setManualTourId,
+    setManualItineraryId,
+    setSelectedDesignType,
+    setGeneratedPages,
+    setCurrentPageIndex,
+    setTemplateData,
+    setSelectedStyle,
+    setShowTemplateSelector,
+    loadOrCreateDocument,
+  })
+
   // ============================================
   // 監聽選取變化
   // ============================================
@@ -338,26 +356,6 @@ export default function DesignerPage() {
       canvas.off('selection:cleared')
     }
   }, [canvas])
-
-  // ============================================
-  // 頁面切換後更新頁碼
-  // ============================================
-  useEffect(() => {
-    if (!canvas || !isCanvasReady) return
-
-    const timer = setTimeout(() => {
-      const pageNumber = calculatePageNumber(currentPageIndex, generatedPages)
-
-      if (pageNumber === null) {
-        updateElementByName('頁碼', { text: '' })
-      } else {
-        const pageNumberStr = formatPageNumber(pageNumber)
-        updateElementByName('頁碼', { text: pageNumberStr })
-      }
-    }, 100)
-
-    return () => clearTimeout(timer)
-  }, [canvas, isCanvasReady, currentPageIndex, generatedPages, updateElementByName])
 
   // ============================================
   // 雙擊封面占位框時開啟上傳對話框
@@ -432,140 +430,26 @@ export default function DesignerPage() {
   }, [_hasHydrated, entityId, workspaceId, entityType, selectedDesignType, loadOrCreateDocument])
 
   // ============================================
-  // 選擇設計類型
+  // Version Loading & Page Number Updates
   // ============================================
-  const handleSelectDesignType = useCallback(async (type: DesignType) => {
-    setSelectedDesignType(type)
-
-    if (entityId && workspaceId) {
-      try {
-        await loadOrCreateDocument('brochure', entityId, workspaceId, entityType, undefined, true)
-      } catch (err) {
-        logger.error('Failed to create document:', err)
-      }
-    }
-  }, [entityId, entityType, workspaceId, loadOrCreateDocument])
-
-  // ============================================
-  // 手冊類型開始設計
-  // ============================================
-  const handleBrochureStart = useCallback(async (
-    type: DesignType,
-    selectedTourId: string,
-    selectedItineraryId: string | null,
-    styleId: string
-  ) => {
-    setManualTourId(selectedTourId)
-    setManualItineraryId(selectedItineraryId)
-    setSelectedDesignType(type)
-
-    const style = styleSeries.find(s => s.id === styleId) || styleSeries[0]
-    setSelectedStyle(style)
-
-    const effectiveEntityId = selectedTourId
-
-    try {
-      let data: TemplateData = {
-        mainTitle: '旅遊手冊',
-        companyName: 'Corner Travel',
-      }
-
-      if (selectedItineraryId) {
-        const { data: itineraryData } = await supabase
-          .from('itineraries')
-          .select('*')
-          .eq('id', selectedItineraryId)
-          .single()
-
-        if (itineraryData) {
-          data = itineraryToTemplateData({
-            title: itineraryData.title ?? undefined,
-            subtitle: itineraryData.subtitle ?? undefined,
-            tour_code: itineraryData.tour_code ?? undefined,
-            cover_image: itineraryData.cover_image ?? undefined,
-            country: itineraryData.country ?? undefined,
-            city: itineraryData.city ?? undefined,
-            departure_date: itineraryData.departure_date ?? undefined,
-            return_date: (itineraryData as { return_date?: string | null }).return_date ?? undefined,
-            duration_days: itineraryData.duration_days ?? undefined,
-            meeting_info: (itineraryData.meeting_info as Record<string, unknown>) ?? undefined,
-            leader: (itineraryData.leader as Record<string, unknown>) ?? undefined,
-            outbound_flight: (itineraryData.outbound_flight as Record<string, unknown>) ?? undefined,
-            return_flight: (itineraryData.return_flight as Record<string, unknown>) ?? undefined,
-            daily_itinerary: (itineraryData.daily_itinerary as Array<Record<string, unknown>>) ?? undefined,
-          })
-        }
-      } else if (selectedTourId) {
-        const { data: tourData } = await supabase
-          .from('tours')
-          .select('*')
-          .eq('id', selectedTourId)
-          .single()
-
-        if (tourData) {
-          let durationDays = 1
-          if (tourData.departure_date && tourData.return_date) {
-            try {
-              const start = new Date(tourData.departure_date)
-              const end = new Date(tourData.return_date)
-              durationDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
-            } catch {
-              durationDays = 1
-            }
-          }
-
-          data = itineraryToTemplateData({
-            title: tourData.name ?? undefined,
-            tour_code: tourData.code ?? undefined,
-            departure_date: tourData.departure_date ?? undefined,
-            return_date: tourData.return_date ?? undefined,
-            duration_days: durationDays,
-            outbound_flight: (tourData.outbound_flight as Record<string, unknown>) ?? undefined,
-            return_flight: (tourData.return_flight as Record<string, unknown>) ?? undefined,
-          })
-        }
-      }
-
-      const coverTemplateId = style.templates.cover
-      const coverPage = generatePageFromTemplate(coverTemplateId, data)
-
-      setGeneratedPages([coverPage])
-      setCurrentPageIndex(0)
-      setTemplateData(data as Record<string, unknown>)
-
-      if (effectiveEntityId && workspaceId) {
-        await loadOrCreateDocument('brochure', effectiveEntityId, workspaceId, 'tour', undefined, true)
-      }
-    } catch (err) {
-      logger.error('Failed to start brochure:', err)
-    }
-  }, [workspaceId, loadOrCreateDocument])
+  useVersionLoader({
+    isCanvasReady,
+    currentVersion,
+    setGeneratedPages,
+    setCurrentPageIndex,
+    setTemplateData,
+    setSelectedStyle,
+    setLoadingStage,
+    loadCanvasData,
+    loadCanvasPage,
+    initPageHistory,
+    updateElementByName,
+    generatedPages,
+    currentPageIndex,
+  })
 
   // ============================================
-  // 模板選擇完成
-  // ============================================
-  const handleTemplateComplete = useCallback(async (
-    pages: CanvasPage[],
-    itineraryTemplateData: Record<string, unknown> | null,
-    style: StyleSeries,
-  ) => {
-    setGeneratedPages(pages)
-    setCurrentPageIndex(0)
-    setTemplateData(itineraryTemplateData)
-    setSelectedStyle(style)
-    setShowTemplateSelector(false)
-
-    if (entityId && workspaceId) {
-      try {
-        await loadOrCreateDocument('brochure', entityId, workspaceId, entityType, undefined, true)
-      } catch (err) {
-        logger.error('Failed to create document:', err)
-      }
-    }
-  }, [entityId, entityType, workspaceId, loadOrCreateDocument])
-
-  // ============================================
-  // Initialize Canvas & Load Data
+  // Initialize Canvas
   // ============================================
   useEffect(() => {
     if (showTemplateSelector) return
@@ -606,165 +490,6 @@ export default function DesignerPage() {
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [isCanvasReady, fitToContainer])
-
-  // ============================================
-  // 載入版本資料
-  // ============================================
-  useEffect(() => {
-    if (!isCanvasReady || !currentVersion) return
-
-    setLoadingStage('rendering_canvas', 90)
-
-    const versionData = currentVersion.data as Record<string, unknown>
-    if (versionData.version === 1 && Array.isArray(versionData.pages)) {
-      interface SavedPage {
-        id: string
-        name: string
-        templateKey?: string
-        width: number
-        height: number
-        backgroundColor: string
-        elements: CanvasElement[]
-        fabricData?: Record<string, unknown>
-        memoPageContent?: MemoPageContent
-        dayIndex?: number
-      }
-      const savedPages = versionData.pages as SavedPage[]
-      const savedPageIndex = typeof versionData.currentPageIndex === 'number' ? versionData.currentPageIndex : 0
-      const savedTemplateData = versionData.templateData as Record<string, unknown> | null
-      const savedStyleId = versionData.styleId as string | null
-
-      const restoredPages = savedPages.map(page => {
-        let fixedTemplateKey = page.templateKey
-        if (page.name?.includes('行程總覽') && page.templateKey === 'daily') {
-          fixedTemplateKey = 'itinerary'
-        }
-        if (page.name?.includes('目錄') && page.templateKey === 'general') {
-          fixedTemplateKey = 'toc'
-        }
-
-        const shouldScale = needsScaling(page.width, page.height)
-        const scaleFactor = shouldScale ? calculateScaleFactor(page.width) : 1
-        const scaledWidth = shouldScale ? NEW_A5_WIDTH : page.width
-        const scaledHeight = shouldScale ? NEW_A5_HEIGHT : page.height
-        const scaledFabricData = shouldScale && page.fabricData
-          ? scaleFabricData(page.fabricData, scaleFactor)
-          : page.fabricData
-
-        const scaledElements = shouldScale
-          ? page.elements.map((el): CanvasElement => {
-              const scaled = { ...el } as CanvasElement & {
-                width?: number
-                height?: number
-                style?: { fontSize: number; [key: string]: unknown }
-                size?: number
-                cornerRadius?: number
-                strokeWidth?: number
-              }
-              scaled.x = el.x * scaleFactor
-              scaled.y = el.y * scaleFactor
-              if ('width' in el && el.width) scaled.width = el.width * scaleFactor
-              if ('height' in el && el.height) scaled.height = el.height * scaleFactor
-              if (el.type === 'text' && 'style' in el) {
-                scaled.style = { ...el.style, fontSize: el.style.fontSize * scaleFactor }
-              }
-              if (el.type === 'icon' && 'size' in el) {
-                scaled.size = el.size * scaleFactor
-              }
-              if (el.type === 'shape') {
-                if ('cornerRadius' in el && el.cornerRadius) scaled.cornerRadius = el.cornerRadius * scaleFactor
-                if ('strokeWidth' in el && el.strokeWidth) scaled.strokeWidth = el.strokeWidth * scaleFactor
-              }
-              return scaled as CanvasElement
-            })
-          : page.elements
-
-        const restoredPage: CanvasPage & { dayIndex?: number; memoPageContent?: MemoPageContent } = {
-          id: page.id,
-          name: page.name,
-          templateKey: fixedTemplateKey,
-          width: scaledWidth,
-          height: scaledHeight,
-          backgroundColor: page.backgroundColor,
-          elements: scaledElements,
-          fabricData: scaledFabricData,
-        }
-        if (page.memoPageContent) {
-          restoredPage.memoPageContent = page.memoPageContent
-        }
-        if (typeof page.dayIndex === 'number') {
-          restoredPage.dayIndex = page.dayIndex
-        }
-        return restoredPage
-      }) as CanvasPage[]
-
-      let dailyCount = 0
-      for (const page of restoredPages) {
-        if (page.templateKey === 'daily') {
-          const pageWithDayIndex = page as CanvasPage & { dayIndex?: number }
-          if (typeof pageWithDayIndex.dayIndex !== 'number') {
-            pageWithDayIndex.dayIndex = dailyCount
-          }
-          dailyCount++
-        }
-      }
-
-      setGeneratedPages(restoredPages)
-      setCurrentPageIndex(savedPageIndex)
-      if (savedTemplateData) {
-        setTemplateData(savedTemplateData)
-      }
-
-      if (savedStyleId) {
-        const style = styleSeries.find(s => s.id === savedStyleId)
-        if (style) {
-          setSelectedStyle(style)
-        }
-      }
-
-      const currentPageData = restoredPages[savedPageIndex]
-      const hasValidFabricData = currentPageData?.fabricData &&
-        typeof currentPageData.fabricData === 'object' &&
-        Array.isArray((currentPageData.fabricData as { objects?: unknown[] }).objects)
-
-      if (hasValidFabricData && currentPageData.fabricData) {
-        loadCanvasData(currentPageData.fabricData).then(() => {
-          setLoadingStage('idle', 100)
-          initPageHistory(currentPageData.id)
-        })
-      } else if (restoredPages[savedPageIndex]) {
-        loadCanvasPage(restoredPages[savedPageIndex]).then(() => {
-          setLoadingStage('idle', 100)
-          initPageHistory(restoredPages[savedPageIndex].id)
-        })
-      } else {
-        setLoadingStage('idle', 100)
-      }
-    } else {
-      loadCanvasData(versionData).then(() => {
-        setLoadingStage('idle', 100)
-        initPageHistory('legacy-page')
-      })
-    }
-  }, [isCanvasReady, currentVersion, loadCanvasData, loadCanvasPage, setLoadingStage, initPageHistory])
-
-  // ============================================
-  // Load Generated Pages (初次載入)
-  // ============================================
-  const initialLoadDoneRef = useRef(false)
-  useEffect(() => {
-    if (!isCanvasReady || generatedPages.length === 0) return
-    if (currentVersion) return
-    if (initialLoadDoneRef.current) return
-    initialLoadDoneRef.current = true
-
-    const firstPage = generatedPages[0]
-    if (firstPage) {
-      loadCanvasPage(firstPage).then(() => {
-        initPageHistory(firstPage.id)
-      })
-    }
-  }, [isCanvasReady, generatedPages, currentVersion, loadCanvasPage, initPageHistory])
 
   // ============================================
   // Save Handler
@@ -845,8 +570,8 @@ export default function DesignerPage() {
         a.download = `${storeDocument?.name || '手冊'}.pdf`
         a.click()
       }
-    } catch (error) {
-      logger.error('[PDF Export] Failed:', error)
+    } catch (err) {
+      logger.error('[PDF Export] Failed:', err)
       alert('PDF 匯出失敗，請稍後再試')
     } finally {
       setIsExporting(false)
@@ -858,8 +583,6 @@ export default function DesignerPage() {
   // ============================================
   const handleTemplateDataChange = useCallback((newData: Record<string, unknown>) => {
     setTemplateData(newData)
-    // 簡化版：只更新 templateData，複雜的同步邏輯已移除
-    // 實際同步由 TemplateDataPanel 內部處理
   }, [])
 
   // ============================================
