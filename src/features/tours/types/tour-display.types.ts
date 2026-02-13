@@ -1,14 +1,9 @@
 /**
  * TourPageData - 行程展示頁面統一類型
  *
- * 解決技術債：多個 section 組件各自定義 TourDisplayData
- * 此類型整合 TourFormData 並加入展示層所需的欄位
- *
- * 🔧 技術債說明：
- * - 39 個 section 元件各自定義 TourDisplayData
- * - 逐一修改所有元件改用此統一類型需要大量工作
- * - 目前使用 `& Record<string, unknown>` 保持相容性
- * - TODO: 逐步將 section 元件改用此統一類型
+ * 整合 TourFormData 並加入展示層所需的欄位。
+ * 34 個 section 元件已統一使用此類型。
+ * 剩餘小工具元件（SectionTitle、DailyImageCarousel）接收獨立 props，屬正常設計。
  */
 
 // 從 tour-form 統一匯出基礎類型
