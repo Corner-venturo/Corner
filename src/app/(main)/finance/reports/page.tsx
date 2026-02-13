@@ -9,6 +9,8 @@ import {
   TrendingUp,
   AlertCircle,
   ArrowRight,
+  Wallet,
+  BarChart3,
 } from 'lucide-react'
 
 // 報表卡片組件
@@ -87,6 +89,20 @@ export default function ReportsPage() {
             href="/finance/reports/unclosed-tours"
             icon={AlertCircle}
             iconColor="text-morandi-red"
+          />
+          <ReportCard
+            title="未收款報表"
+            description="尚有未收款項的訂單，含已出發逾期提醒"
+            href="/finance/reports/unpaid-orders"
+            icon={Wallet}
+            iconColor="text-morandi-red"
+          />
+          <ReportCard
+            title="團收支總覽"
+            description="每團收入、成本、毛利與毛利率一覽"
+            href="/finance/reports/tour-pnl"
+            icon={BarChart3}
+            iconColor="text-morandi-blue"
           />
         </div>
       </ContentContainer>
