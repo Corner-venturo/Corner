@@ -13,7 +13,7 @@ import { X, Printer } from 'lucide-react'
 import { Quote, QuickQuoteItem } from '@/types/quote.types'
 import { supabase } from '@/lib/supabase/client'
 import { COMPANY } from '@/lib/constants/company'
-import { PRINTABLE_QUICK_QUOTE_LABELS } from '../constants/labels';
+import { PRINTABLE_QUICK_QUOTE_LABELS, PAYMENT_INFO_LABELS } from '@/constants/labels';
 
 interface PrintableQuickQuoteProps {
   quote: Quote
@@ -566,9 +566,9 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
               <div className="payment-title" style={{ fontWeight: 600, color: '#333333', marginBottom: '8px' }}>匯款資訊</div>
               <div className="payment-info" style={{ color: '#4B5563', lineHeight: 1.8 }}>
                 <div>戶名：角落旅行社股份有限公司</div>
-                <div>銀行：國泰世華銀行 (013)</div>
-                <div>分行：大同分行 (0626)</div>
-                <div>帳號：062-03-500821-2</div>
+                <div>{PAYMENT_INFO_LABELS.銀行}</div>
+                <div>{PAYMENT_INFO_LABELS.分行}</div>
+                <div>{PAYMENT_INFO_LABELS.帳號}</div>
               </div>
             </div>
             <div>

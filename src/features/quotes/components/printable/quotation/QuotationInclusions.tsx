@@ -6,6 +6,7 @@
 
 import React from 'react'
 import { MORANDI_COLORS } from '../shared/print-styles'
+import { QUOTATION_INCLUSIONS_LABELS } from '@/constants/labels'
 
 export const QuotationInclusions: React.FC = () => {
   return (
@@ -20,7 +21,7 @@ export const QuotationInclusions: React.FC = () => {
           <li>• 行程表所列之餐食費用</li>
           <li>• 行程表所列之門票費用</li>
           <li>• 專業導遊服務</li>
-          <li>• 旅遊責任險 500 萬元</li>
+          <li>• {QUOTATION_INCLUSIONS_LABELS.旅遊責任險}</li>
         </ul>
       </div>
       <div>

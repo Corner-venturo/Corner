@@ -6,6 +6,7 @@
 
 import React from 'react'
 import { MORANDI_COLORS } from '../shared/print-styles'
+import { PAYMENT_INFO_LABELS } from '@/constants/labels'
 
 export const QuickQuotePaymentInfo: React.FC = () => {
   return (
@@ -19,9 +20,9 @@ export const QuickQuotePaymentInfo: React.FC = () => {
         </h4>
         <div className="space-y-1" style={{ color: MORANDI_COLORS.gray }}>
           <div>戶名：角落旅行社股份有限公司</div>
-          <div>銀行：國泰世華銀行 (013)</div>
-          <div>分行：大同分行 (0626)</div>
-          <div>帳號：062-03-500821-2</div>
+          <div>{PAYMENT_INFO_LABELS.銀行}</div>
+          <div>{PAYMENT_INFO_LABELS.分行}</div>
+          <div>{PAYMENT_INFO_LABELS.帳號}</div>
         </div>
       </div>
       <div>

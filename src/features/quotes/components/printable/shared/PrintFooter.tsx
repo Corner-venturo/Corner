@@ -7,6 +7,7 @@
 import React from 'react'
 import { COMPANY } from '@/lib/constants/company'
 import { MORANDI_COLORS } from './print-styles'
+import { PRINT_FOOTER_LABELS } from '@/constants/labels'
 
 export const PrintFooter: React.FC = () => {
   return (
@@ -24,7 +25,7 @@ export const PrintFooter: React.FC = () => {
         </p>
       </div>
       <div className="text-center text-xs" style={{ color: MORANDI_COLORS.lightGray }}>
-        <span>角落旅行社股份有限公司 © {new Date().getFullYear()}</span>
+        <span>{PRINT_FOOTER_LABELS.角落旅行社版權.replace('{year}', new Date().getFullYear().toString())}</span>
       </div>
     </div>
   )
