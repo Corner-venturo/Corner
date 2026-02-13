@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 import { Todo } from '@/stores/types'
 import { format } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
+import { TODO_STATUS_LABELS, COMMON_LABELS } from './constants/labels'
 
 interface TodoCardProps {
   todo: Todo
@@ -46,10 +47,10 @@ export function TodoCard({
 
   // 狀態標籤 - 使用 Morandi 配色
   const statusConfig = {
-    pending: { label: '待辦', color: 'bg-morandi-container/30 text-morandi-secondary' },
-    in_progress: { label: '進行中', color: 'bg-morandi-gold/20 text-morandi-gold' },
-    completed: { label: '完成', color: 'bg-morandi-green/20 text-morandi-green' },
-    cancelled: { label: '取消', color: 'bg-morandi-red/20 text-morandi-red' },
+    pending: { label: TODO_STATUS_LABELS.pending, color: 'bg-morandi-container/30 text-morandi-secondary' },
+    in_progress: { label: TODO_STATUS_LABELS.in_progress, color: 'bg-morandi-gold/20 text-morandi-gold' },
+    completed: { label: TODO_STATUS_LABELS.completed, color: 'bg-morandi-green/20 text-morandi-green' },
+    cancelled: { label: TODO_STATUS_LABELS.cancelled, color: 'bg-morandi-red/20 text-morandi-red' },
   }
 
   const status = statusConfig[todo.status]
@@ -118,7 +119,7 @@ export function TodoCard({
         {isShared && (
           <span className="px-2 py-0.5 rounded text-xs font-medium bg-status-info-bg text-status-info flex items-center gap-1">
             <Users size={12} />
-            共享
+            {COMMON_LABELS.shared}
           </span>
         )}
       </div>

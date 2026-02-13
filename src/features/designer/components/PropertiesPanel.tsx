@@ -29,6 +29,7 @@ import { FontPicker, FontWeightPicker, TextAlignPicker } from './FontPicker'
 import { GradientPicker, cssGradientToFabric } from './GradientPicker'
 import { MaskedImageAdjustment, ImageFiltersSection } from './properties-panel'
 import { cn } from '@/lib/utils'
+import { DESIGNER_LABELS, getObjectType } from '../constants/labels'
 
 interface PropertiesPanelProps {
   canvas: fabric.Canvas | null
@@ -97,7 +98,7 @@ export function PropertiesPanel({
               fontSize: firstTextObj?.fontSize || (selectedObject as fabric.IText).fontSize,
               fontWeight: firstTextObj?.fontWeight || (selectedObject as fabric.IText).fontWeight,
               textAlign: firstTextObj?.textAlign || (selectedObject as fabric.IText).textAlign,
-              text: isMultiSelect ? `${selectedObjects.length} 個文字` : (selectedObject as fabric.IText).text,
+              text: isMultiSelect ? `${selectedObjects.length} ${DESIGNER_LABELS.個文字}` : (selectedObject as fabric.IText).text,
             }
           : {}),
         // 標記多選狀態
@@ -154,11 +155,11 @@ export function PropertiesPanel({
     return (
       <div className="w-64 h-full bg-white border-l border-border flex flex-col">
         <div className="p-3 border-b border-border">
-          <h3 className="font-medium text-sm text-morandi-primary">屬性</h3>
+          <h3 className="font-medium text-sm text-morandi-primary">{DESIGNER_LABELS.屬性}</h3>
         </div>
         <div className="flex-1 flex items-center justify-center p-4">
           <p className="text-sm text-morandi-secondary text-center">
-            選取元素以編輯屬性
+            {DESIGNER_LABELS.選取元素以編輯屬性}
           </p>
         </div>
       </div>
@@ -183,11 +184,11 @@ export function PropertiesPanel({
             {/* 多選時顯示選中數量，單選時可編輯文字 */}
             {isMultiSelect ? (
               <div className="p-2 bg-morandi-container/30 rounded text-sm text-morandi-secondary">
-                已選擇 {selectedObjects.length} 個文字元素
+{DESIGNER_LABELS.已選擇} {selectedObjects.length} {DESIGNER_LABELS.個文字元素}
               </div>
             ) : (
               <div>
-                <Label className="text-xs text-morandi-primary">文字內容</Label>
+                <Label className="text-xs text-morandi-primary">{DESIGNER_LABELS.文字內容}</Label>
                 <Input
                   value={(properties.text as string) || ''}
                   onChange={(e) => {
@@ -202,7 +203,7 @@ export function PropertiesPanel({
             <div>
               <div className="flex items-center gap-1 mb-2">
                 <Type size={12} className="text-morandi-secondary" />
-                <Label className="text-xs text-morandi-primary">字級</Label>
+                <Label className="text-xs text-morandi-primary">{DESIGNER_LABELS.字級}</Label>
               </div>
               <div className="flex items-center gap-2">
                 <Input
@@ -236,7 +237,7 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label className="text-xs text-morandi-primary">字體</Label>
+              <Label className="text-xs text-morandi-primary">{DESIGNER_LABELS.字體}</Label>
               <FontPicker
                 fontFamily={(properties.fontFamily as string) || 'Noto Sans TC'}
                 fontSize={(properties.fontSize as number) || 24}

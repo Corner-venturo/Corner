@@ -25,7 +25,7 @@ import {
   Clock,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { COMP_TOURS_LABELS } from '../constants/labels'
+import { COMP_TOURS_LABELS, CHECKIN_MEMBER_LIST_LABELS } from '../constants/labels'
 
 type FilterType = 'all' | 'checked_in' | 'not_checked_in'
 
@@ -106,7 +106,7 @@ export function CheckinMemberList({
       <div className="px-4 py-3 border-b border-border flex items-center justify-between">
         <h3 className="text-sm font-medium text-morandi-primary flex items-center gap-2">
           <Users size={16} />
-          報到名單
+          {CHECKIN_MEMBER_LIST_LABELS.報到名單}
         </h3>
         <Button
           variant="ghost"
@@ -116,7 +116,7 @@ export function CheckinMemberList({
           className="gap-1"
         >
           <RefreshCw size={14} className={cn(loading && 'animate-spin')} />
-          重新整理
+          {CHECKIN_MEMBER_LIST_LABELS.重新整理}
         </Button>
       </div>
 
@@ -133,7 +133,7 @@ export function CheckinMemberList({
                 : 'bg-morandi-container/50 text-morandi-secondary hover:bg-morandi-container'
             )}
           >
-            全部 {stats.total}
+            {CHECKIN_MEMBER_LIST_LABELS.全部(stats.total)}
           </button>
           <button
             onClick={() => setFilter('checked_in')}
@@ -145,7 +145,7 @@ export function CheckinMemberList({
             )}
           >
             <UserCheck size={14} />
-            已報到 {stats.checkedIn}
+            {CHECKIN_MEMBER_LIST_LABELS.已報到_過濾器(stats.checkedIn)}
           </button>
           <button
             onClick={() => setFilter('not_checked_in')}
@@ -157,7 +157,7 @@ export function CheckinMemberList({
             )}
           >
             <UserX size={14} />
-            未報到 {stats.notCheckedIn}
+            {CHECKIN_MEMBER_LIST_LABELS.未報到_過濾器(stats.notCheckedIn)}
           </button>
         </div>
 
@@ -214,7 +214,7 @@ export function CheckinMemberList({
                   </span>
                   {member.checked_in && (
                     <span className="text-xs bg-morandi-green/20 text-morandi-green px-2 py-0.5 rounded">
-                      已報到
+                      {CHECKIN_MEMBER_LIST_LABELS.已報到_狀態標籤}
                     </span>
                   )}
                 </div>
@@ -246,7 +246,7 @@ export function CheckinMemberList({
                     ) : (
                       <X size={14} />
                     )}
-                    取消
+                    {CHECKIN_MEMBER_LIST_LABELS.取消}
                   </Button>
                 ) : (
                   <Button
@@ -261,7 +261,7 @@ export function CheckinMemberList({
                     ) : (
                       <Check size={14} />
                     )}
-                    報到
+                    {CHECKIN_MEMBER_LIST_LABELS.報到}
                   </Button>
                 )}
               </div>

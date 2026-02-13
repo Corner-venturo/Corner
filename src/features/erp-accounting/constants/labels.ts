@@ -158,4 +158,36 @@ export const REVERSE_VOUCHER_LABELS = {
   btn_processing: '處理中...',
   error_reason_required: '請輸入反沖原因',
   toast_failed: '反沖失敗',
+  error_user_incomplete: '用戶資訊不完整',
+  info_target_voucher: '即將反沖以下傳票：',
+  warning_irreversible: '⚠️ 反沖後將產生一張新的反向傳票，原傳票狀態將變更為「已反沖」。此操作無法復原。',
+}
+
+export const VOUCHER_DETAIL_LABELS_EXT = {
+  status_locked: '已鎖定',
+  loading_text: '載入中...',
+  no_data_text: '無分錄資料',
+  total_label: '合計',
+  imbalance_warning: '⚠️ 借貸不平衡！差額：',
+}
+
+export const VOUCHER_FORM_LABELS_EXT = {
+  label_voucher_date: '傳票日期',
+  label_voucher_no: '傳票編號',
+  label_memo: '摘要',
+  label_entry_details: '分錄明細',
+  btn_add_line: '新增行',
+  col_line_no: '#',
+  col_account: '科目',
+  col_memo: '摘要',
+  col_debit: '借方',
+  col_credit: '貸方',
+  total_label: '合計',
+  imbalance_warning: '⚠️ 借貸不平衡！差額：',
+  balanced_message: '✓ 借貸已平衡',
+  btn_cancel: '取消',
+  btn_save_draft: '儲存草稿',
+  btn_post: '過帳',
+  title_add: '新增傳票',
+  title_edit: '編輯傳票',
 }

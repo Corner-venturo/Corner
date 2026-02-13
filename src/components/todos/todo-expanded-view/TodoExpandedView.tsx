@@ -19,6 +19,7 @@ import { NotesSection } from './NotesSection'
 import { AssignmentSection } from './AssignmentSection'
 import { QuickActionsSection, QuickActionContent } from './QuickActionsSection'
 import { useAuthStore } from '@/stores/auth-store'
+import { DIALOG_LABELS, COMMON_LABELS, PLACEHOLDER_LABELS, BUTTON_LABELS } from '../constants/labels'
 
 export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewProps) {
   const { activeTab, setActiveTab } = useTodoExpandedView()
@@ -41,13 +42,13 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
     <Dialog open={!!todo} onOpenChange={(open) => !open && onClose()}>
       <DialogContent level={1} className="w-full max-w-[95vw] sm:max-w-[600px] max-h-[95vh] sm:max-h-[85vh] flex flex-col p-0 gap-0">
         <VisuallyHidden>
-          <DialogTitle>{todo.title || '待辦事項詳情'}</DialogTitle>
+          <DialogTitle>{todo.title || DIALOG_LABELS.todoDetails}</DialogTitle>
         </VisuallyHidden>
         {/* 唯讀提示 */}
         {!canEdit && (
           <div className="absolute top-1 left-1 z-10 flex items-center gap-1 bg-morandi-gold/20 text-morandi-gold px-2 py-1 rounded-lg text-xs">
             <Eye size={12} />
-            <span>唯讀模式</span>
+            <span>{COMMON_LABELS.readOnlyMode}</span>
           </div>
         )}
 
@@ -65,7 +66,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
                       value={todo.title}
                       onChange={value => onUpdate({ title: value })}
                       className="text-lg font-bold border-none shadow-none p-0 h-auto focus-visible:ring-0 bg-transparent"
-                      placeholder="輸入任務標題..."
+                      placeholder={PLACEHOLDER_LABELS.enterTaskTitle}
                     />
                   ) : (
                     <div className="text-lg font-bold text-morandi-primary">{todo.title}</div>
@@ -74,7 +75,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
 
                 {/* 右邊：優先級 */}
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className="text-xs text-morandi-secondary">優先級:</span>
+                  <span className="text-xs text-morandi-secondary">{COMMON_LABELS.priority}:</span>
                   <StarRating
                     value={todo.priority}
                     onChange={canEdit ? (value => onUpdate({ priority: value as 1 | 2 | 3 | 4 | 5 })) : undefined}
@@ -102,7 +103,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
                   className="flex-1 bg-gradient-to-r from-morandi-gold to-status-warning hover:from-morandi-gold/90 hover:to-status-warning/90 text-white shadow-md hover:shadow-lg transition-all gap-2"
                 >
                   <Check size={16} />
-                  標記完成
+                  {BUTTON_LABELS.markComplete}
                 </Button>
                 <Button
                   variant="outline"
@@ -114,7 +115,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
                   className="flex-1 border-morandi-container/50 hover:bg-morandi-container/20 hover:border-morandi-gold/20 shadow-sm transition-all gap-2"
                 >
                   <Calendar size={16} />
-                  延期一週
+                  {BUTTON_LABELS.extendWeek}
                 </Button>
               </div>
             )}

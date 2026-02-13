@@ -3,7 +3,7 @@
 import { Switch } from '@/components/ui/switch'
 import { Users, UserCheck, UserX } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { COMP_TOURS_LABELS } from '../constants/labels'
+import { COMP_TOURS_LABELS, CHECKIN_SETTINGS_LABELS } from '../constants/labels'
 
 interface CheckinStats {
   total: number
@@ -24,7 +24,7 @@ export function CheckinSettings({ enableCheckin, onToggle, stats }: CheckinSetti
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* 報到設定 */}
       <div className="bg-card rounded-lg border border-border p-4">
-        <h3 className="text-sm font-medium text-morandi-secondary mb-3">報到設定</h3>
+        <h3 className="text-sm font-medium text-morandi-secondary mb-3">{CHECKIN_SETTINGS_LABELS.報到設定}</h3>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className={cn(
@@ -34,7 +34,7 @@ export function CheckinSettings({ enableCheckin, onToggle, stats }: CheckinSetti
               <UserCheck size={20} className={enableCheckin ? 'text-morandi-green' : 'text-morandi-muted'} />
             </div>
             <div>
-              <p className="font-medium text-morandi-primary">啟用報到功能</p>
+              <p className="font-medium text-morandi-primary">{CHECKIN_SETTINGS_LABELS.啟用報到功能}</p>
               <p className="text-xs text-morandi-secondary">
                 {enableCheckin ? COMP_TOURS_LABELS.旅客可掃描_QR_Code_報到 : COMP_TOURS_LABELS.報到功能已關閉}
               </p>
@@ -49,14 +49,14 @@ export function CheckinSettings({ enableCheckin, onToggle, stats }: CheckinSetti
 
       {/* 報到統計 */}
       <div className="bg-card rounded-lg border border-border p-4">
-        <h3 className="text-sm font-medium text-morandi-secondary mb-3">報到統計</h3>
+        <h3 className="text-sm font-medium text-morandi-secondary mb-3">{CHECKIN_SETTINGS_LABELS.報到統計}</h3>
         <div className="space-y-3">
           {/* 進度條 */}
           <div className="flex items-center gap-3">
             <div className="flex-1">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-sm font-medium text-morandi-primary">
-                  已報到: {stats.checkedIn} / {stats.total}
+                  {CHECKIN_SETTINGS_LABELS.已報到(stats.checkedIn, stats.total)}
                 </span>
                 <span className="text-sm font-bold text-morandi-gold">{percentage}%</span>
               </div>
@@ -74,21 +74,21 @@ export function CheckinSettings({ enableCheckin, onToggle, stats }: CheckinSetti
             <div className="text-center">
               <div className="flex items-center justify-center gap-1 text-morandi-secondary">
                 <Users size={14} />
-                <span className="text-xs">總人數</span>
+                <span className="text-xs">{CHECKIN_SETTINGS_LABELS.總人數}</span>
               </div>
               <p className="text-lg font-bold text-morandi-primary">{stats.total}</p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center gap-1 text-morandi-green">
                 <UserCheck size={14} />
-                <span className="text-xs">已報到</span>
+                <span className="text-xs">{CHECKIN_SETTINGS_LABELS.已報到_簡稱}</span>
               </div>
               <p className="text-lg font-bold text-morandi-green">{stats.checkedIn}</p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center gap-1 text-morandi-red">
                 <UserX size={14} />
-                <span className="text-xs">未報到</span>
+                <span className="text-xs">{CHECKIN_SETTINGS_LABELS.未報到}</span>
               </div>
               <p className="text-lg font-bold text-morandi-red">{stats.notCheckedIn}</p>
             </div>

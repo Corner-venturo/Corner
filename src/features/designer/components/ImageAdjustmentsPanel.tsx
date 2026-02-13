@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { RotateCcw } from 'lucide-react'
 import type { ImageAdjustments } from './types'
 import { DEFAULT_IMAGE_ADJUSTMENTS } from './types'
+import { DESIGNER_LABELS } from '../constants/labels'
 
 interface AdjustmentSliderProps {
   label: string
@@ -78,31 +79,31 @@ export function ImageAdjustmentsPanel({
       {/* 光線調整 */}
       <div className="space-y-3">
         <h4 className="text-[10px] uppercase tracking-wider text-morandi-muted font-semibold">
-          光線
+          {DESIGNER_LABELS.光線}
         </h4>
         <AdjustmentSlider
-          label="曝光度"
+          label={DESIGNER_LABELS.曝光度}
           value={adjustments.exposure}
           min={-100}
           max={100}
           onChange={(v) => handleChange('exposure', v)}
         />
         <AdjustmentSlider
-          label="對比度"
+          label={DESIGNER_LABELS.對比度}
           value={adjustments.contrast}
           min={-100}
           max={100}
           onChange={(v) => handleChange('contrast', v)}
         />
         <AdjustmentSlider
-          label="高光"
+          label={DESIGNER_LABELS.高光}
           value={adjustments.highlights}
           min={-100}
           max={100}
           onChange={(v) => handleChange('highlights', v)}
         />
         <AdjustmentSlider
-          label="陰影"
+          label={DESIGNER_LABELS.陰影}
           value={adjustments.shadows}
           min={-100}
           max={100}
@@ -113,24 +114,24 @@ export function ImageAdjustmentsPanel({
       {/* 色彩調整 */}
       <div className="space-y-3">
         <h4 className="text-[10px] uppercase tracking-wider text-morandi-muted font-semibold">
-          色彩
+          {DESIGNER_LABELS.色彩}
         </h4>
         <AdjustmentSlider
-          label="飽和度"
+          label={DESIGNER_LABELS.飽和度}
           value={adjustments.saturation}
           min={-100}
           max={100}
           onChange={(v) => handleChange('saturation', v)}
         />
         <AdjustmentSlider
-          label="色溫"
+          label={DESIGNER_LABELS.色溫}
           value={adjustments.temperature}
           min={-100}
           max={100}
           onChange={(v) => handleChange('temperature', v)}
         />
         <AdjustmentSlider
-          label="色調"
+          label={DESIGNER_LABELS.色調}
           value={adjustments.tint}
           min={-100}
           max={100}
@@ -141,17 +142,17 @@ export function ImageAdjustmentsPanel({
       {/* 效果 */}
       <div className="space-y-3">
         <h4 className="text-[10px] uppercase tracking-wider text-morandi-muted font-semibold">
-          效果
+          {DESIGNER_LABELS.效果}
         </h4>
         <AdjustmentSlider
-          label="銳利度"
+          label={DESIGNER_LABELS.銳利度}
           value={adjustments.clarity}
           min={-100}
           max={100}
           onChange={(v) => handleChange('clarity', v)}
         />
         <AdjustmentSlider
-          label="暈影"
+          label={DESIGNER_LABELS.暈影}
           value={adjustments.vignette}
           min={0}
           max={100}
@@ -169,7 +170,7 @@ export function ImageAdjustmentsPanel({
           className="w-full gap-1.5 text-xs"
         >
           <RotateCcw size={12} />
-          重置所有調整
+          {DESIGNER_LABELS.重置所有調整}
         </Button>
       )}
     </div>

@@ -443,3 +443,26 @@ export const COMP_TOURS_LABELS = {
   馬尼拉: '馬尼拉',
   高雄: '高雄',
 };
+
+// CheckinSettings 模組的 UI 標籤
+export const CHECKIN_SETTINGS_LABELS = {
+  報到設定: '報到設定',
+  啟用報到功能: '啟用報到功能',
+  報到統計: '報到統計',
+  已報到: (checkedIn: number, total: number) => `已報到: ${checkedIn} / ${total}`,
+  總人數: '總人數',
+  已報到_簡稱: '已報到',
+  未報到: '未報到',
+};
+
+// CheckinMemberList 模組的 UI 標籤
+export const CHECKIN_MEMBER_LIST_LABELS = {
+  報到名單: '報到名單',
+  重新整理: '重新整理',
+  全部: (total: number) => `全部 ${total}`,
+  已報到_過濾器: (checkedIn: number) => `已報到 ${checkedIn}`,
+  未報到_過濾器: (notCheckedIn: number) => `未報到 ${notCheckedIn}`,
+  已報到_狀態標籤: '已報到',
+  取消: '取消',
+  報到: '報到',
+};
