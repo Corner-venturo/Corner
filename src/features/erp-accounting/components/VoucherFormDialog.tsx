@@ -212,7 +212,7 @@ export function VoucherFormDialog({
 
     try {
       let voucherId = voucher?.id
-      let voucherNo = voucher?.voucher_no
+      let voucherNo = voucher?.voucher_no || ''
 
       if (isEditMode && voucherId) {
         // 編輯模式：更新傳票
