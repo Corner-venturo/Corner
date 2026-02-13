@@ -28,6 +28,7 @@ import type {
   PreviewDayData,
   AccommodationStatus,
 } from './types'
+import { PROPOSAL_LABELS } from '../../constants'
 
 interface UsePackageItineraryOptions {
   isOpen: boolean
@@ -443,7 +444,7 @@ export function usePackageItinerary({
       return firstVersion?.note || stripHtml(existingItinerary?.title) || '主版本'
     }
     const record = versionRecords[selectedVersionIndex]
-    return record?.note || `版本 ${record?.version || selectedVersionIndex + 1}`
+    return record?.note || PROPOSAL_LABELS.brochurePreview.versionLabel(record?.version || selectedVersionIndex + 1)
   }, [selectedVersionIndex, versionRecords, existingItinerary])
 
   // 產生預覽資料
@@ -920,7 +921,7 @@ export function usePackageItinerary({
       const newVersion: ItineraryVersionRecord = {
         id: crypto.randomUUID(),
         version: versionRecords.length + 1,
-        note: `版本 ${versionRecords.length + 1}`,
+        note: PROPOSAL_LABELS.brochurePreview.versionLabel(versionRecords.length + 1),
         daily_itinerary: formattedDailyItinerary,
         features: existingItinerary.features || [],
         focus_cards: existingItinerary.focus_cards || [],

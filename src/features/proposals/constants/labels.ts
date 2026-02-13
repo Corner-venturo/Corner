@@ -181,5 +181,8 @@ export const FLIGHT_SECTION_LABELS = {
 export const VERSION_DROPDOWN_LABELS = {
   主版本: '主版本',
   當前編輯中: '當前編輯中',
+  版本歷史: (count: number) => `版本歷史 (${count})`,
+  當前: '當前',
+  版本: (v: number) => `版本 ${v}`,
 };
 

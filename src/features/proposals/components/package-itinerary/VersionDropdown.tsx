@@ -42,7 +42,7 @@ export function VersionDropdown({
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 mb-2" align="start">
         <div className="px-2 py-1.5 text-xs font-medium text-morandi-primary border-b border-border">
-          版本歷史 ({versionRecords.length > 0 ? versionRecords.length : 1})
+          {VERSION_DROPDOWN_LABELS.版本歷史(versionRecords.length > 0 ? versionRecords.length : 1)}
         </div>
         {/* 主版本（當前狀態） */}
         <DropdownMenuItem
@@ -52,14 +52,14 @@ export function VersionDropdown({
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
               <span className="font-medium text-sm">{stripHtml(existingItinerary?.title) || VERSION_DROPDOWN_LABELS.主版本}</span>
-              <span className="text-[10px] text-morandi-secondary bg-morandi-container px-1.5 py-0.5 rounded">主版本</span>
+              <span className="text-[10px] text-morandi-secondary bg-morandi-container px-1.5 py-0.5 rounded">{VERSION_DROPDOWN_LABELS.主版本}</span>
             </div>
             <span className="text-xs text-morandi-secondary">
               {existingItinerary?.updated_at ? new Date(existingItinerary.updated_at).toLocaleString('zh-TW') : VERSION_DROPDOWN_LABELS.當前編輯中}
             </span>
           </div>
           {selectedVersionIndex === -1 && (
-            <div className="text-xs bg-morandi-gold text-white px-1.5 py-0.5 rounded">當前</div>
+            <div className="text-xs bg-morandi-gold text-white px-1.5 py-0.5 rounded">{VERSION_DROPDOWN_LABELS.當前}</div>
           )}
         </DropdownMenuItem>
         {/* 其他版本記錄 */}
@@ -73,14 +73,14 @@ export function VersionDropdown({
             >
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-medium text-sm">{record.note || `版本 ${record.version}`}</span>
+                  <span className="font-medium text-sm">{record.note || VERSION_DROPDOWN_LABELS.版本(record.version)}</span>
                 </div>
                 <span className="text-xs text-morandi-secondary">
                   {record.created_at ? new Date(record.created_at).toLocaleString('zh-TW') : ''}
                 </span>
               </div>
               {isCurrentVersion && (
-                <div className="text-xs bg-morandi-gold text-white px-1.5 py-0.5 rounded">當前</div>
+                <div className="text-xs bg-morandi-gold text-white px-1.5 py-0.5 rounded">{VERSION_DROPDOWN_LABELS.當前}</div>
               )}
             </DropdownMenuItem>
           )

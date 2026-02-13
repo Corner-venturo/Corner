@@ -222,7 +222,7 @@ export function BrochurePreviewDialog({
                       onClick={() => setSelectedVersionIndex(idx)}
                       className={selectedVersionIndex === idx ? 'bg-morandi-gold/10' : ''}
                     >
-                      {record.note || `版本 ${record.version}`}
+                      {record.note || PROPOSAL_LABELS.brochurePreview.versionLabel(record.version)}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
