@@ -239,7 +239,7 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
                     {LOCAL_PRICING_DIALOG_LABELS.人數變更提醒內容1.replace('{totalParticipants}', totalParticipants.toString()).replace('{matchedParticipants}', (matchedTier?.participants || 0).toString())}
                   </p>
                   <p className="text-amber-700 mt-1">
-                    確認後，報價單檻次表將以 <strong>{totalParticipants} 人</strong> 作為第一個檻次。
+                    {LOCAL_PRICING_DIALOG_LABELS.人數變更提醒內容2前}<strong>{totalParticipants} 人</strong>{LOCAL_PRICING_DIALOG_LABELS.人數變更提醒內容2後}
                   </p>
                 </div>
               </div>
@@ -248,14 +248,14 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowConfirmation(false)}>
                 <X className="w-4 h-4 mr-2" />
-                返回修改
+                {LOCAL_PRICING_DIALOG_LABELS.返回修改}
               </Button>
               <Button
                 onClick={handleFinalConfirm}
                 className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
                 <Check className="w-4 h-4 mr-2" />
-                確認更新
+                {LOCAL_PRICING_DIALOG_LABELS.確認更新}
               </Button>
             </DialogFooter>
           </>

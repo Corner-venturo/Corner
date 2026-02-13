@@ -44,7 +44,7 @@ export const SaveVersionDialog: React.FC<SaveVersionDialogProps> = ({
         <div className="flex justify-end space-x-2">
           <Button type="button" variant="outline" onClick={handleCancel} className="gap-2">
             <X size={16} />
-            取消
+            {SAVE_VERSION_DIALOG_LABELS.取消}
           </Button>
           <Button
             type="submit"
@@ -52,13 +52,13 @@ export const SaveVersionDialog: React.FC<SaveVersionDialogProps> = ({
             className="bg-morandi-green hover:bg-morandi-green-hover text-white gap-2"
           >
             <Save size={16} />
-            保存 <span className="ml-1 text-xs opacity-70">(Enter)</span>
+            <span dangerouslySetInnerHTML={{ __html: SAVE_VERSION_DIALOG_LABELS.保存快捷鍵 }} />
           </Button>
         </div>
       }
     >
       <div>
-        <label className="text-sm font-medium text-morandi-primary">版本名稱</label>
+        <label className="text-sm font-medium text-morandi-primary">{SAVE_VERSION_DIALOG_LABELS.版本名稱}</label>
         <Input
           value={versionName}
           onChange={e => setVersionName(e.target.value)}

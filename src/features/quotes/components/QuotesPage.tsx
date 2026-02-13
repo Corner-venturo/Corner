@@ -203,7 +203,7 @@ export const QuotesPage: React.FC = () => {
     },
     {
       key: 'group_size',
-      label: '人數',
+      label: QUOTES_PAGE_LABELS.人數,
       width: '80px',
       render: (_: unknown, row: Quote) => (
         <div className="flex items-center gap-1 text-sm text-morandi-secondary">
