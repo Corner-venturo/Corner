@@ -607,14 +607,14 @@ export default function ManifestationNotebook() {
                           isToday ? 'text-morandi-gold' : 'text-morandi-primary'
                         )}>
                           {formatDate(record.record_date)}
-                          {isToday && <span className="ml-1 text-xs">(今天)</span>}
+                          {isToday && <span className="ml-1 text-xs">{MANIFESTATION_NOTEBOOK_LABELS.今天}</span>}
                         </span>
                       </div>
 
                       {content.intention && (
                         <div className="mb-2">
                           <span className="text-xs text-morandi-secondary flex items-center gap-1">
-                            <Star className="w-3 h-3" /> 意念
+                            <Star className="w-3 h-3" /> {MANIFESTATION_NOTEBOOK_LABELS.意念}
                           </span>
                           <p className="text-sm text-morandi-primary">{content.intention}</p>
                         </div>

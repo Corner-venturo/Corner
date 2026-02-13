@@ -476,13 +476,13 @@ export function TemplateDataPanel({
                           <div className="space-y-1">
                             <Label className="text-[10px] text-morandi-primary flex items-center gap-1">
                               <Utensils size={10} />
-                              早餐
+                              {TEMPLATE_DATA_PANEL_LABELS.早餐}
                             </Label>
                             <div className="flex gap-1">
                               <Input
                                 value={day.meals?.breakfast || ''}
                                 onChange={(e) => updateDailyItinerary(idx, 'mealBreakfast', e.target.value)}
-                                placeholder="早餐..."
+                                placeholder={TEMPLATE_DATA_PANEL_LABELS.早餐_placeholder}
                                 className="h-7 text-xs flex-1"
                               />
                               <Select
@@ -490,7 +490,7 @@ export function TemplateDataPanel({
                                 onValueChange={(v) => updateDailyItinerary(idx, 'mealIconBreakfast', v)}
                               >
                                 <SelectTrigger className="h-7 w-20 text-[10px]">
-                                  <SelectValue placeholder="圖標" />
+                                  <SelectValue placeholder={TEMPLATE_DATA_PANEL_LABELS.圖標} />
                                 </SelectTrigger>
                                 <SelectContent>
                                   {MEAL_ICON_OPTIONS.map((opt) => (
