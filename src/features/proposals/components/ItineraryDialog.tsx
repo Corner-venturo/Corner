@@ -604,7 +604,7 @@ export function ItineraryDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Clock size={18} className="text-morandi-gold" />
-            時間軸行程編輯器
+            {ITINERARY_DIALOG_LABELS.時間軸行程編輯器}
           </DialogTitle>
         </DialogHeader>
 
@@ -621,7 +621,7 @@ export function ItineraryDialog({
         {/* 標題區 */}
         <div className="grid grid-cols-2 gap-4 pb-4 border-b border-border">
           <div>
-            <Label className="text-xs text-morandi-primary">行程標題</Label>
+            <Label className="text-xs text-morandi-primary">{ITINERARY_DIALOG_LABELS.行程標題}</Label>
             <Input
               value={data.title}
               onChange={(e) => setData((prev) => ({ ...prev, title: e.target.value }))}
@@ -630,7 +630,7 @@ export function ItineraryDialog({
             />
           </div>
           <div>
-            <Label className="text-xs text-morandi-primary">副標題</Label>
+            <Label className="text-xs text-morandi-primary">{ITINERARY_DIALOG_LABELS.副標題}</Label>
             <Input
               value={data.subtitle || ''}
               onChange={(e) => setData((prev) => ({ ...prev, subtitle: e.target.value }))}
@@ -671,7 +671,7 @@ export function ItineraryDialog({
           {/* 每日標題 */}
           <div className="py-3 border-b border-border/50 shrink-0">
             <div className="flex items-center justify-between mb-1">
-              <Label className="text-xs text-morandi-primary">今日主題</Label>
+              <Label className="text-xs text-morandi-primary">{ITINERARY_DIALOG_LABELS.今日主題}</Label>
               <div className="flex items-center gap-1">
                 {/* 符號插入按鈕 */}
                 <button
@@ -730,7 +730,7 @@ export function ItineraryDialog({
                     className="h-7 px-2 text-morandi-red hover:bg-morandi-red/10 ml-2"
                   >
                     <Trash2 size={14} className="mr-1" />
-                    刪除此天
+                    {ITINERARY_DIALOG_LABELS.刪除此天}
                   </Button>
                 )}
               </div>
@@ -751,13 +751,13 @@ export function ItineraryDialog({
             <thead>
               <tr className="text-xs text-morandi-secondary border-b border-border/30">
                 <th className="py-2 px-1 text-center font-medium w-8"></th>
-                <th className="py-2 px-2 text-left font-medium w-16">開始</th>
-                <th className="py-2 px-2 text-left font-medium w-16">結束</th>
-                <th className="py-2 px-2 text-left font-medium">景點/餐廳</th>
-                <th className="py-2 px-2 text-left font-medium w-40">菜色</th>
-                <th className="py-2 px-2 text-center font-medium w-24">餐食</th>
-                <th className="py-2 px-2 text-center font-medium w-16">照片</th>
-                <th className="py-2 px-2 text-center font-medium w-10">色</th>
+                <th className="py-2 px-2 text-left font-medium w-16">{ITINERARY_DIALOG_LABELS.開始}</th>
+                <th className="py-2 px-2 text-left font-medium w-16">{ITINERARY_DIALOG_LABELS.結束}</th>
+                <th className="py-2 px-2 text-left font-medium">{ITINERARY_DIALOG_LABELS.景點_餐廳}</th>
+                <th className="py-2 px-2 text-left font-medium w-40">{ITINERARY_DIALOG_LABELS.菜色}</th>
+                <th className="py-2 px-2 text-center font-medium w-24">{ITINERARY_DIALOG_LABELS.餐食}</th>
+                <th className="py-2 px-2 text-center font-medium w-16">{ITINERARY_DIALOG_LABELS.照片}</th>
+                <th className="py-2 px-2 text-center font-medium w-10">{ITINERARY_DIALOG_LABELS.色}</th>
                 <th className="py-2 px-2 text-center font-medium w-10"></th>
               </tr>
             </thead>
@@ -896,7 +896,7 @@ export function ItineraryDialog({
               title={ITINERARY_DIALOG_LABELS.從景點庫選擇}
             >
               <Plus size={12} />
-              從景點庫新增
+              {ITINERARY_DIALOG_LABELS.從景點庫新增}
             </Button>
             <Button
               variant="ghost"
@@ -905,7 +905,7 @@ export function ItineraryDialog({
               className="gap-1 text-xs text-morandi-secondary hover:text-morandi-gold"
             >
               <Plus size={12} />
-              手動新增
+              {ITINERARY_DIALOG_LABELS.手動新增}
             </Button>
           </div>
           </div>
@@ -913,7 +913,7 @@ export function ItineraryDialog({
           {/* 已上傳的照片預覽 */}
           {activeDay.attractions.some(a => a.images.length > 0) && (
             <div className="py-3 border-t border-border/50">
-              <div className="text-xs text-morandi-secondary mb-2">已上傳照片：</div>
+              <div className="text-xs text-morandi-secondary mb-2">{ITINERARY_DIALOG_LABELS.已上傳照片}</div>
               <div className="flex flex-wrap gap-2">
                 {activeDay.attractions.map((attraction, attrIndex) =>
                   attraction.images.map((img) => (
@@ -943,7 +943,7 @@ export function ItineraryDialog({
           <div className="py-3 border-t border-border/50">
             <div className="flex items-center gap-2">
               <Building2 size={16} className="text-morandi-gold shrink-0" />
-              <Label className="text-xs text-morandi-primary shrink-0">當晚住宿：</Label>
+              <Label className="text-xs text-morandi-primary shrink-0">{ITINERARY_DIALOG_LABELS.當晚住宿}</Label>
               <Input
                 value={activeDay.accommodation || ''}
                 onChange={(e) => updateDayAccommodation(e.target.value)}
@@ -958,7 +958,7 @@ export function ItineraryDialog({
                 className="h-8 px-2 gap-1 text-xs text-morandi-gold hover:text-morandi-gold-hover shrink-0"
               >
                 <Database size={14} />
-                從飯店庫選擇
+                {ITINERARY_DIALOG_LABELS.從飯店庫選擇}
               </Button>
             </div>
           </div>
@@ -969,11 +969,11 @@ export function ItineraryDialog({
           <div className="flex gap-2">
             <Button variant="outline" onClick={onClose} className="gap-2">
               <X size={16} />
-              關閉
+              {ITINERARY_DIALOG_LABELS.關閉}
             </Button>
             <Button variant="outline" onClick={handlePrint} className="gap-2">
               <Printer size={16} />
-              列印
+              {ITINERARY_DIALOG_LABELS.列印}
             </Button>
             <Button
               onClick={handleSave}

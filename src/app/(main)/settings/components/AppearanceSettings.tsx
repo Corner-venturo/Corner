@@ -2,6 +2,7 @@ import { Card } from '@/components/ui/card'
 import { Palette, Check, Sun, Moon, Snowflake } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Theme } from '../types'
+import { LABELS } from '../constants/labels'
 
 interface AppearanceSettingsProps {
   currentTheme: 'morandi' | 'modern-dark' | 'nordic'
@@ -11,8 +12,8 @@ interface AppearanceSettingsProps {
 const themes: Theme[] = [
   {
     id: 'morandi' as const,
-    name: '莫蘭迪優雅',
-    description: '柔和的色彩，溫暖的米色背景，適合長時間使用',
+    name: LABELS.MORANDI_THEME_NAME,
+    description: LABELS.MORANDI_THEME_DESC,
     icon: Sun,
     preview: {
       bg: '#F9F8F6',
@@ -24,8 +25,8 @@ const themes: Theme[] = [
   },
   {
     id: 'modern-dark' as const,
-    name: '現代深色',
-    description: '深色背景，高對比度，現代感十足的設計',
+    name: LABELS.MODERN_DARK_NAME,
+    description: LABELS.MODERN_DARK_DESC,
     icon: Moon,
     preview: {
       bg: '#36393f',
@@ -37,8 +38,8 @@ const themes: Theme[] = [
   },
   {
     id: 'nordic' as const,
-    name: '北歐簡約',
-    description: '清新明亮，極簡設計，專注於內容呈現',
+    name: LABELS.NORDIC_THEME_NAME,
+    description: LABELS.NORDIC_THEME_DESC,
     icon: Snowflake,
     preview: {
       bg: '#F8F8F8',
@@ -55,7 +56,7 @@ export function AppearanceSettings({ currentTheme, onThemeChange }: AppearanceSe
     <Card className="rounded-xl shadow-lg border border-border p-8">
       <div className="flex items-center gap-3 mb-6">
         <Palette className="h-6 w-6 text-morandi-gold" />
-        <h2 className="text-xl font-semibold">主題設定</h2>
+        <h2 className="text-xl font-semibold">{LABELS.THEME_SETTINGS}</h2>
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
@@ -147,8 +148,7 @@ export function AppearanceSettings({ currentTheme, onThemeChange }: AppearanceSe
 
       <div className="mt-6 p-4 bg-morandi-container/20 rounded-lg">
         <p className="text-sm text-morandi-secondary">
-          <strong>提示：</strong>主題設定會立即生效並自動儲存。
-          不同主題適合不同的使用場景和個人喜好。
+          <strong>{LABELS.THEME_TIP_TITLE}</strong>{LABELS.THEME_TIP_DESC}
         </p>
       </div>
     </Card>

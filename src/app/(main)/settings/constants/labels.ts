@@ -129,4 +129,15 @@ export const LABELS = {
   DATA_ISOLATION: '資料隔離（前端 filter）',
   ROLE_LABELS: '角色標籤（admin, tour_leader 等）',
   REFERENCE_DOC: '參考文檔：',
+  
+  // Appearance Settings
+  THEME_SETTINGS: '主題設定',
+  MORANDI_THEME_NAME: '莫蘭迪優雅',
+  MORANDI_THEME_DESC: '柔和的色彩，溫暖的米色背景，適合長時間使用',
+  MODERN_DARK_NAME: '現代深色',
+  MODERN_DARK_DESC: '深色背景，高對比度，現代感十足的設計',
+  NORDIC_THEME_NAME: '北歐簡約',
+  NORDIC_THEME_DESC: '清新明亮，極簡設計，專注於內容呈現',
+  THEME_TIP_TITLE: '提示：',
+  THEME_TIP_DESC: '主題設定會立即生效並自動儲存。不同主題適合不同的使用場景和個人喜好。',
 }
