@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { logger } from '@/lib/utils/logger'
 import { formatDateChinese } from '@/lib/utils/format-date'
+import { QUOTE_CONFIRM_PAGE_LABELS } from './constants/labels'
 
 interface QuoteInfo {
   code: string
@@ -61,12 +62,12 @@ export default function QuoteConfirmPage() {
           setError(data.error)
         } else {
           setState('error')
-          setError(data.error || '無法載入報價單資訊')
+          setError(data.error || QUOTE_CONFIRM_PAGE_LABELS.LOAD_ERROR_DEFAULT)
         }
       } catch (err) {
         logger.error('載入報價單失敗:', err)
         setState('error')
-        setError('網路錯誤，請稍後再試')
+        setError(QUOTE_CONFIRM_PAGE_LABELS.NETWORK_ERROR)
       }
     }
 
@@ -78,7 +79,7 @@ export default function QuoteConfirmPage() {
   // 提交確認
   async function handleConfirm() {
     if (!name.trim()) {
-      setError('請填寫您的姓名')
+      setError(QUOTE_CONFIRM_PAGE_LABELS.NAME_REQUIRED_ERROR)
       return
     }
 
@@ -106,12 +107,12 @@ export default function QuoteConfirmPage() {
         setState('already_confirmed')
       } else {
         setState('ready')
-        setError(data.error || '確認失敗')
+        setError(data.error || QUOTE_CONFIRM_PAGE_LABELS.CONFIRM_ERROR_DEFAULT)
       }
     } catch (err) {
       logger.error('確認失敗:', err)
       setState('ready')
-      setError('網路錯誤，請稍後再試')
+      setError(QUOTE_CONFIRM_PAGE_LABELS.NETWORK_ERROR)
     }
   }
 
@@ -143,7 +144,7 @@ export default function QuoteConfirmPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-morandi-gold/10 mb-4">
             <Building2 className="w-8 h-8 text-morandi-gold" />
           </div>
-          <h1 className="text-2xl font-semibold text-morandi-primary">報價確認</h1>
+          <h1 className="text-2xl font-semibold text-morandi-primary">{QUOTE_CONFIRM_PAGE_LABELS.PAGE_TITLE}</h1>
         </div>
 
         {/* 主要卡片 */}
@@ -152,7 +153,7 @@ export default function QuoteConfirmPage() {
           {state === 'loading' && (
             <div className="flex flex-col items-center py-12">
               <Loader2 className="w-10 h-10 text-morandi-gold animate-spin mb-4" />
-              <p className="text-morandi-secondary">載入報價單資訊...</p>
+              <p className="text-morandi-secondary">{QUOTE_CONFIRM_PAGE_LABELS.LOADING_QUOTE}</p>
             </div>
           )}
 
@@ -162,10 +163,10 @@ export default function QuoteConfirmPage() {
               <div className="w-16 h-16 rounded-full bg-morandi-red/10 flex items-center justify-center mb-4">
                 <AlertCircle className="w-8 h-8 text-morandi-red" />
               </div>
-              <h2 className="text-lg font-medium text-morandi-primary mb-2">無法載入報價單</h2>
+              <h2 className="text-lg font-medium text-morandi-primary mb-2">{QUOTE_CONFIRM_PAGE_LABELS.LOAD_ERROR_TITLE}</h2>
               <p className="text-morandi-secondary text-center">{error}</p>
               <p className="text-sm text-morandi-muted mt-4">
-                如有疑問，請聯繫您的業務人員
+                {QUOTE_CONFIRM_PAGE_LABELS.LOAD_ERROR_CONTACT}
               </p>
             </div>
           )}
@@ -176,9 +177,9 @@ export default function QuoteConfirmPage() {
               <div className="w-16 h-16 rounded-full bg-morandi-green/10 flex items-center justify-center mb-4">
                 <CheckCircle2 className="w-8 h-8 text-morandi-green" />
               </div>
-              <h2 className="text-lg font-medium text-morandi-primary mb-2">報價單已確認</h2>
+              <h2 className="text-lg font-medium text-morandi-primary mb-2">{QUOTE_CONFIRM_PAGE_LABELS.ALREADY_CONFIRMED_TITLE}</h2>
               <p className="text-morandi-secondary text-center">
-                此報價單已完成確認，無需重複操作
+                {QUOTE_CONFIRM_PAGE_LABELS.ALREADY_CONFIRMED_MESSAGE}
               </p>
             </div>
           )}
@@ -190,12 +191,12 @@ export default function QuoteConfirmPage() {
               <div className="bg-morandi-container/30 rounded-lg p-4 mb-6">
                 <div className="flex justify-between items-start mb-3">
                   <div>
-                    <p className="text-sm text-morandi-secondary">報價單編號</p>
+                    <p className="text-sm text-morandi-secondary">{QUOTE_CONFIRM_PAGE_LABELS.QUOTE_NUMBER}</p>
                     <p className="font-medium text-morandi-primary">{quote.code}</p>
                   </div>
                   {quote.total_amount && (
                     <div className="text-right">
-                      <p className="text-sm text-morandi-secondary">總金額</p>
+                      <p className="text-sm text-morandi-secondary">{QUOTE_CONFIRM_PAGE_LABELS.TOTAL_AMOUNT}</p>
                       <p className="font-semibold text-morandi-gold text-lg">
                         {formatCurrency(quote.total_amount)}
                       </p>
@@ -210,26 +211,26 @@ export default function QuoteConfirmPage() {
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   {quote.destination && (
                     <div>
-                      <span className="text-morandi-secondary">目的地：</span>
+                      <span className="text-morandi-secondary">{QUOTE_CONFIRM_PAGE_LABELS.DESTINATION_LABEL}</span>
                       <span className="text-morandi-primary">{quote.destination}</span>
                     </div>
                   )}
                   {quote.days && (
                     <div>
-                      <span className="text-morandi-secondary">天數：</span>
-                      <span className="text-morandi-primary">{quote.days} 天</span>
+                      <span className="text-morandi-secondary">{QUOTE_CONFIRM_PAGE_LABELS.DAYS_LABEL}</span>
+                      <span className="text-morandi-primary">{quote.days}{QUOTE_CONFIRM_PAGE_LABELS.DAYS_SUFFIX}</span>
                     </div>
                   )}
                   {quote.start_date && (
                     <div>
-                      <span className="text-morandi-secondary">出發：</span>
+                      <span className="text-morandi-secondary">{QUOTE_CONFIRM_PAGE_LABELS.DEPARTURE_LABEL}</span>
                       <span className="text-morandi-primary">{formatDate(quote.start_date)}</span>
                     </div>
                   )}
                   {quote.number_of_people && (
                     <div>
-                      <span className="text-morandi-secondary">人數：</span>
-                      <span className="text-morandi-primary">{quote.number_of_people} 人</span>
+                      <span className="text-morandi-secondary">{QUOTE_CONFIRM_PAGE_LABELS.PEOPLE_COUNT_LABEL}</span>
+                      <span className="text-morandi-primary">{quote.number_of_people}{QUOTE_CONFIRM_PAGE_LABELS.PEOPLE_SUFFIX}</span>
                     </div>
                   )}
                 </div>
@@ -239,54 +240,54 @@ export default function QuoteConfirmPage() {
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="name" className="text-morandi-primary">
-                    確認人姓名 <span className="text-morandi-red">*</span>
+                    {QUOTE_CONFIRM_PAGE_LABELS.CONFIRM_NAME_LABEL} <span className="text-morandi-red">{QUOTE_CONFIRM_PAGE_LABELS.CONFIRM_NAME_REQUIRED}</span>
                   </Label>
                   <Input
                     id="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="請輸入您的姓名"
+                    placeholder={QUOTE_CONFIRM_PAGE_LABELS.NAME_PLACEHOLDER}
                     className="mt-1"
                   />
                 </div>
 
                 <div>
                   <Label htmlFor="email" className="text-morandi-primary">
-                    Email（選填）
+                    {QUOTE_CONFIRM_PAGE_LABELS.EMAIL_LABEL}
                   </Label>
                   <Input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="example@email.com"
+                    placeholder={QUOTE_CONFIRM_PAGE_LABELS.EMAIL_PLACEHOLDER}
                     className="mt-1"
                   />
                 </div>
 
                 <div>
                   <Label htmlFor="phone" className="text-morandi-primary">
-                    聯絡電話（選填）
+                    {QUOTE_CONFIRM_PAGE_LABELS.PHONE_LABEL}
                   </Label>
                   <Input
                     id="phone"
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="0912-345-678"
+                    placeholder={QUOTE_CONFIRM_PAGE_LABELS.PHONE_PLACEHOLDER}
                     className="mt-1"
                   />
                 </div>
 
                 <div>
                   <Label htmlFor="notes" className="text-morandi-primary">
-                    備註（選填）
+                    {QUOTE_CONFIRM_PAGE_LABELS.NOTES_LABEL}
                   </Label>
                   <Textarea
                     id="notes"
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    placeholder="如有其他需求請在此說明"
+                    placeholder={QUOTE_CONFIRM_PAGE_LABELS.NOTES_PLACEHOLDER}
                     className="mt-1"
                     rows={3}
                   />
@@ -305,11 +306,11 @@ export default function QuoteConfirmPage() {
                   size="lg"
                 >
                   <Check className="w-5 h-5" />
-                  確認報價單
+                  {QUOTE_CONFIRM_PAGE_LABELS.CONFIRM_BUTTON}
                 </Button>
 
                 <p className="text-xs text-morandi-muted text-center">
-                  點擊確認表示您已閱讀並同意報價內容
+                  {QUOTE_CONFIRM_PAGE_LABELS.CONFIRM_AGREEMENT}
                 </p>
               </div>
             </>
@@ -319,7 +320,7 @@ export default function QuoteConfirmPage() {
           {state === 'confirming' && (
             <div className="flex flex-col items-center py-12">
               <Loader2 className="w-10 h-10 text-morandi-gold animate-spin mb-4" />
-              <p className="text-morandi-secondary">處理中...</p>
+              <p className="text-morandi-secondary">{QUOTE_CONFIRM_PAGE_LABELS.PROCESSING}</p>
             </div>
           )}
 
@@ -329,13 +330,13 @@ export default function QuoteConfirmPage() {
               <div className="w-16 h-16 rounded-full bg-morandi-green/10 flex items-center justify-center mb-4">
                 <CheckCircle2 className="w-8 h-8 text-morandi-green" />
               </div>
-              <h2 className="text-lg font-medium text-morandi-primary mb-2">確認成功！</h2>
+              <h2 className="text-lg font-medium text-morandi-primary mb-2">{QUOTE_CONFIRM_PAGE_LABELS.SUCCESS_TITLE}</h2>
               <p className="text-morandi-secondary text-center">
-                感謝您的確認，我們的業務人員將盡快與您聯繫
+                {QUOTE_CONFIRM_PAGE_LABELS.SUCCESS_MESSAGE}
               </p>
               {quote && (
                 <p className="text-sm text-morandi-muted mt-4">
-                  報價單編號：{quote.code}
+                  {QUOTE_CONFIRM_PAGE_LABELS.QUOTE_NUMBER_PREFIX}{quote.code}
                 </p>
               )}
             </div>
@@ -344,7 +345,7 @@ export default function QuoteConfirmPage() {
 
         {/* 版權資訊 */}
         <p className="text-center text-xs text-morandi-muted mt-6">
-          © {new Date().getFullYear()} Venturo Travel
+          {QUOTE_CONFIRM_PAGE_LABELS.COPYRIGHT.replace('{year}', new Date().getFullYear().toString())}
         </p>
       </div>
     </div>
