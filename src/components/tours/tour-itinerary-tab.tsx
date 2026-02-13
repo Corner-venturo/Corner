@@ -23,6 +23,7 @@ import { useFlightSearch } from '@/hooks'
 import { syncItineraryToQuote } from '@/lib/utils/itinerary-quote-sync'
 import type { Tour, Itinerary } from '@/stores/types'
 import type { FlightInfo } from '@/types/flight.types'
+import { COMP_TOURS_LABELS, TOUR_ITINERARY_TAB_LABELS } from './constants/labels'
 
 // 每日行程項目
 interface DailyScheduleItem {
@@ -180,7 +181,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
           setReturnFlightDate(tour.return_date || '')
         }
       } catch (err) {
-        logger.error('載入行程表失敗', err)
+        logger.error(TOUR_ITINERARY_TAB_LABELS.載入行程表失敗, err)
       } finally {
         setLoading(false)
       }

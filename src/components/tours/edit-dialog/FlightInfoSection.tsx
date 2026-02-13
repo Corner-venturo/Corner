@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Search, Loader2, Plane } from 'lucide-react'
 import { FlightInfo } from '@/stores/types'
-import { COMP_TOURS_LABELS } from '../constants/labels'
+import { COMP_TOURS_LABELS, FLIGHT_INFO_SECTION_LABELS } from '../constants/labels'
 
 interface FlightInfoSectionProps {
   outboundFlight: FlightInfo
@@ -30,13 +30,13 @@ export function FlightInfoSection({
     <div className="border-t pt-4">
       <div className="flex items-center gap-2 mb-3">
         <Plane className="w-4 h-4 text-morandi-gold" />
-        <label className="text-sm font-medium text-morandi-primary">航班資訊（選填）</label>
+        <label className="text-sm font-medium text-morandi-primary">{FLIGHT_INFO_SECTION_LABELS.航班資訊_選填}</label>
       </div>
 
       {/* 去程航班 */}
       <div className="bg-morandi-container/30 p-3 rounded-lg mb-3">
         <div className="flex items-center justify-between mb-2">
-          <h4 className="text-xs font-bold text-morandi-primary">去程航班</h4>
+          <h4 className="text-xs font-bold text-morandi-primary">{FLIGHT_INFO_SECTION_LABELS.去程航班}</h4>
           <Button
             type="button"
             size="sm"
@@ -50,7 +50,7 @@ export function FlightInfoSection({
             ) : (
               <Search size={12} />
             )}
-            查詢航班
+            {FLIGHT_INFO_SECTION_LABELS.查詢航班}
           </Button>
         </div>
         <div className="grid grid-cols-4 gap-2">

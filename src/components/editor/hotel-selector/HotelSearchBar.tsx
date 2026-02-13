@@ -65,7 +65,7 @@ export function HotelSearchBar({
             <SelectValue placeholder={COMP_EDITOR_LABELS.全部國家} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="__all__">全部國家</SelectItem>
+            <SelectItem value="__all__">{COMP_EDITOR_LABELS.全部國家}</SelectItem>
             {countries.map(country => (
               <SelectItem key={country.id} value={country.id}>
                 {country.name}
@@ -81,7 +81,7 @@ export function HotelSearchBar({
               <SelectValue placeholder={COMP_EDITOR_LABELS.全部區域} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="__all__">全部區域</SelectItem>
+              <SelectItem value="__all__">{COMP_EDITOR_LABELS.全部區域}</SelectItem>
               {regions.map(region => (
                 <SelectItem key={region.id} value={region.id}>
                   {region.name}
@@ -98,7 +98,7 @@ export function HotelSearchBar({
               <SelectValue placeholder={COMP_EDITOR_LABELS.全部城市} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="__all__">全部城市</SelectItem>
+              <SelectItem value="__all__">{COMP_EDITOR_LABELS.全部城市}</SelectItem>
               {cities.map(city => (
                 <SelectItem key={city.id} value={city.id}>
                   {city.name}
@@ -114,7 +114,7 @@ export function HotelSearchBar({
             <SelectValue placeholder={COMP_EDITOR_LABELS.全部品牌} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="__all__">全部品牌</SelectItem>
+            <SelectItem value="__all__">{COMP_EDITOR_LABELS.全部品牌}</SelectItem>
             {brands.map(brand => (
               <SelectItem key={brand} value={brand}>
                 {brand}
@@ -145,7 +145,7 @@ export function HotelSearchBar({
           className={`rounded-xl h-11 gap-1.5 ${showManualInput ? 'bg-morandi-gold/10 border-morandi-gold' : ''}`}
         >
           <PenLine size={16} />
-          手動輸入
+{COMP_EDITOR_LABELS.手動輸入}
         </Button>
       </div>
 
@@ -172,7 +172,7 @@ export function HotelSearchBar({
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-lg h-10 px-4 gap-1.5"
           >
             <Plus size={16} />
-            新增
+{COMP_EDITOR_LABELS.新增}
           </Button>
         </div>
       )}

@@ -72,7 +72,7 @@ export function RestaurantSearchInput({
           <SelectValue placeholder={COMP_EDITOR_LABELS.全部國家} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="__all__">全部國家</SelectItem>
+          <SelectItem value="__all__">{COMP_EDITOR_LABELS.全部國家}</SelectItem>
           {countries.map(country => (
             <SelectItem key={country.id} value={country.id}>
               {country.name}
@@ -88,7 +88,7 @@ export function RestaurantSearchInput({
             <SelectValue placeholder={COMP_EDITOR_LABELS.全部區域} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="__all__">全部區域</SelectItem>
+            <SelectItem value="__all__">{COMP_EDITOR_LABELS.全部區域}</SelectItem>
             {regions.map(region => (
               <SelectItem key={region.id} value={region.id}>
                 {region.name}
@@ -105,7 +105,7 @@ export function RestaurantSearchInput({
             <SelectValue placeholder={COMP_EDITOR_LABELS.全部城市} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="__all__">全部城市</SelectItem>
+            <SelectItem value="__all__">{COMP_EDITOR_LABELS.全部城市}</SelectItem>
             {cities.map(city => (
               <SelectItem key={city.id} value={city.id}>
                 {city.name}
@@ -122,7 +122,7 @@ export function RestaurantSearchInput({
             <SelectValue placeholder={COMP_EDITOR_LABELS.全部分類} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="__all__">全部分類</SelectItem>
+            <SelectItem value="__all__">{COMP_EDITOR_LABELS.全部分類}</SelectItem>
             {RESTAURANT_CATEGORIES.map(cat => (
               <SelectItem key={cat.value} value={cat.value}>
                 {cat.label}

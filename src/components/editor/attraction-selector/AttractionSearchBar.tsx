@@ -53,7 +53,7 @@ export function AttractionSearchBar({
             <SelectValue placeholder={COMP_EDITOR_LABELS.全部國家} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="__all__">全部國家</SelectItem>
+            <SelectItem value="__all__">{COMP_EDITOR_LABELS.全部國家}</SelectItem>
             {countries.map(country => (
               <SelectItem key={country.id} value={country.id}>
                 {country.name}
@@ -69,7 +69,7 @@ export function AttractionSearchBar({
               <SelectValue placeholder={COMP_EDITOR_LABELS.全部城市} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="__all__">全部城市</SelectItem>
+              <SelectItem value="__all__">{COMP_EDITOR_LABELS.全部城市}</SelectItem>
               {cities.map(city => (
                 <SelectItem key={city.id} value={city.id}>
                   {city.name}
@@ -88,7 +88,7 @@ export function AttractionSearchBar({
           className={`rounded-lg h-9 gap-1 ${showManualInput ? 'bg-morandi-gold/10 border-morandi-gold/30' : ''}`}
         >
           <PenLine size={14} />
-          手動
+{COMP_EDITOR_LABELS.手動}
         </Button>
       </div>
 
