@@ -83,7 +83,7 @@ export function ContractFormFields({
       const member = members.find(m => m.id === selectedMemberIds[0])
       return member?.name || COMP_CONTRACTS_LABELS._1_人
     }
-    return `${selectedMemberIds.length} 人`
+    return `${selectedMemberIds.length} ${COMP_CONTRACTS_LABELS.人}`
   }
 
   return (
@@ -91,7 +91,7 @@ export function ContractFormFields({
       {/* 旅客資訊 */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-morandi-primary">旅客資訊（甲方）</h3>
+          <h3 className="text-sm font-semibold text-morandi-primary">{COMP_CONTRACTS_LABELS.旅客資訊_甲方}</h3>
           {members.length > 0 && (
             <div className="relative">
               <button
