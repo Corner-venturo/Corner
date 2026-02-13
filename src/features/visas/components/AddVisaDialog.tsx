@@ -432,34 +432,34 @@ export function AddVisaDialog({
           {/* 狀態 */}
           <div className="grid grid-cols-4 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">狀態</label>
+              <label className="text-sm font-medium text-morandi-primary">{L.label_status}</label>
               <Select
                 value={applicants[0].status || 'pending'}
                 onValueChange={value => updateApplicant(applicants[0].id, 'status', value)}
               >
                 <SelectTrigger className="w-full mt-1 h-10">
-                  <SelectValue placeholder="選擇狀態" />
+                  <SelectValue placeholder={L.placeholder_status} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pending">待送件</SelectItem>
-                  <SelectItem value="submitted">已送件</SelectItem>
-                  <SelectItem value="collected">已取件</SelectItem>
-                  <SelectItem value="returned">已歸還</SelectItem>
-                  <SelectItem value="rejected">退件</SelectItem>
+                  <SelectItem value="pending">{L.status_pending}</SelectItem>
+                  <SelectItem value="submitted">{L.status_submitted}</SelectItem>
+                  <SelectItem value="collected">{L.status_collected}</SelectItem>
+                  <SelectItem value="returned">{L.status_returned}</SelectItem>
+                  <SelectItem value="rejected">{L.status_rejected}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">送件單位</label>
+              <label className="text-sm font-medium text-morandi-primary">{L.label_vendor}</label>
               <Input
                 value={applicants[0].vendor || ''}
                 onChange={e => updateApplicant(applicants[0].id, 'vendor', e.target.value)}
                 className="mt-1"
-                placeholder="輸入送件單位"
+                placeholder={L.placeholder_vendor}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">成本</label>
+              <label className="text-sm font-medium text-morandi-primary">{L.label_cost}</label>
               <Input
                 type="number"
                 value={applicants[0].cost || 0}
@@ -472,42 +472,42 @@ export function AddVisaDialog({
           {/* 日期資訊 */}
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">送件時間</label>
+              <label className="text-sm font-medium text-morandi-primary">{L.label_submit_date}</label>
               <DatePicker
                 value={applicants[0].actual_submission_date || ''}
                 onChange={date => updateApplicant(applicants[0].id, 'actual_submission_date', date || '')}
                 className="mt-1"
-                placeholder="選擇日期"
+                placeholder={L.placeholder_date}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">證件歸還</label>
+              <label className="text-sm font-medium text-morandi-primary">{L.label_doc_return}</label>
               <DatePicker
                 value={applicants[0].documents_returned_date || ''}
                 onChange={date => updateApplicant(applicants[0].id, 'documents_returned_date', date || '')}
                 className="mt-1"
-                placeholder="選擇日期"
+                placeholder={L.placeholder_date}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">取件時間</label>
+              <label className="text-sm font-medium text-morandi-primary">{L.label_pickup_date}</label>
               <DatePicker
                 value={applicants[0].pickup_date || ''}
                 onChange={date => updateApplicant(applicants[0].id, 'pickup_date', date || '')}
                 className="mt-1"
-                placeholder="選擇日期"
+                placeholder={L.placeholder_date}
               />
             </div>
           </div>
 
           {/* 備註 */}
           <div>
-            <label className="text-sm font-medium text-morandi-primary">備註</label>
+            <label className="text-sm font-medium text-morandi-primary">{L.label_notes}</label>
             <textarea
               value={applicants[0].notes || ''}
               onChange={e => updateApplicant(applicants[0].id, 'notes', e.target.value)}
               className="w-full mt-1 p-2 border border-border rounded-md bg-card text-sm min-h-[80px]"
-              placeholder="輸入備註..."
+              placeholder={L.placeholder_notes}
             />
           </div>
         </div>
