@@ -9,6 +9,7 @@ import { PasswordData } from '../types'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 import { supabase } from '@/lib/supabase/client'
 import { compressAvatarImage } from '@/lib/image-utils'
+import { LABELS } from '../constants/labels'
 
 interface AccountSettingsProps {
   user: {
@@ -53,13 +54,13 @@ export function AccountSettings({
 
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
     if (!allowedTypes.includes(file.type)) {
-      await alertWarning('只支援 JPG、PNG、GIF、WebP 格式的圖片')
+      await alertWarning(LABELS.UNSUPPORTED_IMAGE_FORMAT)
       return
     }
 
     // 放寬原始檔案大小限制（因為會自動壓縮）
     if (file.size > 10 * 1024 * 1024) {
-      await alertWarning('檔案大小不能超過 10MB')
+      await alertWarning(LABELS.FILE_SIZE_TOO_LARGE)
       return
     }
 
@@ -84,7 +85,7 @@ export function AccountSettings({
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || '上傳失敗')
+        throw new Error(errorData.error || LABELS.UPLOAD_FAILED)
       }
 
       const { publicUrl } = await response.json()
@@ -97,10 +98,10 @@ export function AccountSettings({
       if (updateError) throw updateError
 
       setCurrentAvatarUrl(publicUrl)
-      await alertSuccess('頭像上傳成功')
+      await alertSuccess(LABELS.AVATAR_UPLOAD_SUCCESS)
     } catch (error) {
       logger.error('頭像上傳失敗:', error)
-      await alertError('頭像上傳失敗：' + (error instanceof Error ? error.message : '未知錯誤'))
+      await alertError(LABELS.AVATAR_UPLOAD_FAILED + (error instanceof Error ? error.message : '未知錯誤'))
     } finally {
       setAvatarUploading(false)
       if (fileInputRef.current) {
@@ -118,28 +119,28 @@ export function AccountSettings({
     }
 
     if (!user) {
-      await alertWarning('請先登入')
+      await alertWarning(LABELS.PLEASE_LOGIN_FIRST)
       return
     }
 
     if (!passwordData.currentPassword) {
-      await alertWarning('請輸入目前密碼！')
+      await alertWarning(LABELS.CURRENT_PASSWORD_REQUIRED)
       return
     }
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      await alertWarning('新密碼與確認密碼不符！')
+      await alertWarning(LABELS.PASSWORDS_NOT_MATCH)
       return
     }
 
     if (passwordData.newPassword.length < 8) {
-      await alertWarning('密碼長度至少需要8個字元！')
+      await alertWarning(LABELS.PASSWORD_TOO_SHORT)
       return
     }
 
     // 檢查網路狀態
     if (!navigator.onLine) {
-      await alertWarning('目前離線，無法修改密碼。請連接網路後再試。', '網路未連接')
+      await alertWarning(LABELS.OFFLINE_PASSWORD_CHANGE, LABELS.NETWORK_DISCONNECTED)
       return
     }
 
@@ -161,17 +162,17 @@ export function AccountSettings({
       const result = await response.json()
 
       if (!result.success) {
-        await alertError(result.error || '密碼更新失敗')
+        await alertError(result.error || LABELS.PASSWORD_UPDATE_FAILED)
         setPasswordUpdateLoading(false)
         return
       }
 
-      await alertSuccess('密碼更新成功！', '更新成功')
+      await alertSuccess(LABELS.PASSWORD_UPDATE_SUCCESS, LABELS.UPDATE_SUCCESS)
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
       setShowPasswordSection(false)
     } catch (error) {
       logger.error('密碼更新過程中發生錯誤:', error)
-      await alertError('密碼更新失敗，請稍後再試')
+      await alertError(LABELS.PASSWORD_UPDATE_ERROR)
     } finally {
       setPasswordUpdateLoading(false)
     }
@@ -181,7 +182,7 @@ export function AccountSettings({
     <Card className="rounded-xl shadow-lg border border-border p-8">
       <div className="flex items-center gap-3 mb-6">
         <Lock className="h-6 w-6 text-morandi-gold" />
-        <h2 className="text-xl font-semibold">帳號安全</h2>
+        <h2 className="text-xl font-semibold">{LABELS.ACCOUNT_SECURITY}</h2>
       </div>
 
       <div className="space-y-6">
@@ -194,7 +195,7 @@ export function AccountSettings({
                   {currentAvatarUrl ? (
                     <img
                       src={currentAvatarUrl}
-                      alt="頭像"
+                      alt={LABELS.AVATAR}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -221,9 +222,9 @@ export function AccountSettings({
                 />
               </div>
               <div>
-                <h3 className="font-medium mb-1">個人頭像</h3>
-                <p className="text-sm text-morandi-secondary">點擊相機圖示更換頭像</p>
-                <p className="text-xs text-morandi-muted mt-1">支援 JPG、PNG、GIF、WebP（自動壓縮）</p>
+                <h3 className="font-medium mb-1">{LABELS.PERSONAL_AVATAR}</h3>
+                <p className="text-sm text-morandi-secondary">{LABELS.CLICK_CAMERA_TO_CHANGE}</p>
+                <p className="text-xs text-morandi-muted mt-1">{LABELS.SUPPORTED_IMAGE_FORMATS}</p>
               </div>
             </div>
           </div>
@@ -233,12 +234,12 @@ export function AccountSettings({
         <div className="p-6 border border-border rounded-lg bg-card">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h3 className="font-medium mb-1">修改密碼</h3>
-              <p className="text-sm text-morandi-secondary">定期更換密碼以保護您的帳號安全</p>
+              <h3 className="font-medium mb-1">{LABELS.CHANGE_PASSWORD}</h3>
+              <p className="text-sm text-morandi-secondary">{LABELS.PASSWORD_SECURITY_TIP}</p>
             </div>
             <Button variant="outline" onClick={() => setShowPasswordSection(!showPasswordSection)} className="gap-2">
               {showPasswordSection ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-              {showPasswordSection ? '收合' : '修改密碼'}
+              {showPasswordSection ? LABELS.COLLAPSE : LABELS.CHANGE_PASSWORD}
             </Button>
           </div>
 
@@ -247,7 +248,7 @@ export function AccountSettings({
               {/* 目前密碼 */}
               <div>
                 <label className="block text-sm font-medium text-morandi-primary mb-1">
-                  目前密碼
+                  {LABELS.CURRENT_PASSWORD}
                 </label>
                 <div className="relative">
                   <Input
@@ -259,7 +260,7 @@ export function AccountSettings({
                         currentPassword: e.target.value,
                       })
                     }
-                    placeholder="請輸入目前密碼"
+                    placeholder={LABELS.CURRENT_PASSWORD_PLACEHOLDER}
                     className="pr-10"
                   />
                   <button
@@ -275,7 +276,7 @@ export function AccountSettings({
               {/* 新密碼 */}
               <div>
                 <label className="block text-sm font-medium text-morandi-primary mb-1">
-                  新密碼
+                  {LABELS.NEW_PASSWORD}
                 </label>
                 <Input
                   type={showPassword ? 'text' : 'password'}
@@ -286,14 +287,14 @@ export function AccountSettings({
                       newPassword: e.target.value,
                     })
                   }
-                  placeholder="至少8個字元"
+                  placeholder={LABELS.NEW_PASSWORD_PLACEHOLDER}
                 />
               </div>
 
               {/* 確認新密碼 */}
               <div>
                 <label className="block text-sm font-medium text-morandi-primary mb-1">
-                  確認新密碼
+                  {LABELS.CONFIRM_NEW_PASSWORD}
                 </label>
                 <Input
                   type={showPassword ? 'text' : 'password'}
@@ -304,7 +305,7 @@ export function AccountSettings({
                       confirmPassword: e.target.value,
                     })
                   }
-                  placeholder="再次輸入新密碼"
+                  placeholder={LABELS.CONFIRM_PASSWORD_PLACEHOLDER}
                 />
               </div>
 
@@ -312,9 +313,9 @@ export function AccountSettings({
               {passwordData.newPassword && passwordData.confirmPassword && (
                 <div className="text-sm">
                   {passwordData.newPassword === passwordData.confirmPassword ? (
-                    <span className="text-status-success">✓ 密碼確認一致</span>
+                    <span className="text-status-success">{LABELS.PASSWORD_MATCH}</span>
                   ) : (
-                    <span className="text-status-danger">✗ 密碼確認不一致</span>
+                    <span className="text-status-danger">{LABELS.PASSWORD_MISMATCH}</span>
                   )}
                 </div>
               )}
@@ -332,7 +333,7 @@ export function AccountSettings({
                   }
                   className="bg-morandi-gold hover:bg-morandi-gold-hover"
                 >
-                  {passwordUpdateLoading ? '更新中...' : '更新密碼'}
+                  {passwordUpdateLoading ? LABELS.UPDATING : LABELS.UPDATE_PASSWORD}
                 </Button>
                 <Button
                   variant="outline"
@@ -347,17 +348,17 @@ export function AccountSettings({
                   className="gap-2"
                 >
                   <X size={16} />
-                  取消
+                  {LABELS.CANCEL}
                 </Button>
               </div>
 
               {/* 密碼要求提示 */}
               <div className="text-xs text-morandi-muted bg-morandi-container/30 p-3 rounded">
-                <p className="font-medium mb-1">📝 密碼要求：</p>
+                <p className="font-medium mb-1">{LABELS.PASSWORD_REQUIREMENTS_TITLE}</p>
                 <ul className="list-disc list-inside space-y-1">
-                  <li>至少8個字元</li>
-                  <li>建議包含數字和字母</li>
-                  <li>需要先輸入目前密碼進行驗證</li>
+                  <li>{LABELS.PASSWORD_REQ_LENGTH}</li>
+                  <li>{LABELS.PASSWORD_REQ_FORMAT}</li>
+                  <li>{LABELS.PASSWORD_REQ_CURRENT}</li>
                 </ul>
               </div>
             </div>

@@ -11,6 +11,7 @@ import { MENU_ITEMS, MENU_CATEGORIES, getMenuItemsByCategory } from '@/lib/const
 import type { MenuItem } from '@/lib/constants/menu-items'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { Save, RotateCcw } from 'lucide-react'
+import { LABELS } from '../constants/labels'
 
 export default function MenuSettingsPage() {
   const { user } = useAuthStore()
@@ -44,9 +45,9 @@ export default function MenuSettingsPage() {
       await updateEmployee(user.id, {
         hidden_menu_items: hiddenMenuItems,
       })
-      await alert('選單設定已儲存', 'success')
+      await alert(LABELS.MENU_SETTINGS_SAVED, 'success')
     } catch (error) {
-      await alert('儲存失敗，請稍後再試', 'error')
+      await alert(LABELS.SAVE_FAILED, 'error')
     } finally {
       setIsSaving(false)
     }
@@ -54,8 +55,8 @@ export default function MenuSettingsPage() {
 
   // 重設為預設值（全部顯示）
   const handleReset = async () => {
-    const confirmed = await confirm('確定要重設為預設值嗎？所有選單都會顯示。', {
-      title: '重設選單',
+    const confirmed = await confirm(LABELS.RESET_CONFIRM_MESSAGE, {
+      title: LABELS.RESET_MENU_TITLE,
       type: 'warning',
     })
     if (confirmed) {
@@ -73,7 +74,7 @@ export default function MenuSettingsPage() {
       <Card key={category}>
         <CardHeader>
           <CardTitle className="text-lg">{MENU_CATEGORIES[category]}</CardTitle>
-          <CardDescription>選擇要在側邊欄顯示的功能</CardDescription>
+          <CardDescription>{LABELS.SELECT_SIDEBAR_FEATURES}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {items.map(item => {
@@ -104,9 +105,9 @@ export default function MenuSettingsPage() {
   return (
     <div className="container max-w-4xl py-8 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">選單設定</h1>
+        <h1 className="text-3xl font-bold">{LABELS.MENU_SETTINGS}</h1>
         <p className="text-muted-foreground mt-2">
-          自訂側邊欄顯示的功能選單。隱藏不常用的功能，讓工作區更整潔。
+          {LABELS.MENU_SETTINGS_DESC}
         </p>
       </div>
 
@@ -114,9 +115,9 @@ export default function MenuSettingsPage() {
         {/* 核心功能說明 */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">核心功能</CardTitle>
+            <CardTitle className="text-lg">{LABELS.CORE_FEATURES}</CardTitle>
             <CardDescription>
-              儀表板、工作區、設定等核心功能無法隱藏，確保系統正常運作。
+              {LABELS.CORE_FEATURES_DESC}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -138,11 +139,11 @@ export default function MenuSettingsPage() {
       <div className="flex gap-3 pt-4 border-t">
         <Button onClick={handleSave} disabled={isSaving} className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
           <Save size={16} />
-          {isSaving ? '儲存中...' : '儲存設定'}
+          {isSaving ? LABELS.SAVING : LABELS.SAVE_SETTINGS}
         </Button>
         <Button variant="outline" onClick={handleReset} className="gap-2">
           <RotateCcw size={16} />
-          重設為預設
+          {LABELS.RESET_TO_DEFAULT}
         </Button>
       </div>
 
@@ -150,7 +151,7 @@ export default function MenuSettingsPage() {
       <Card className="bg-muted">
         <CardContent className="pt-6">
           <p className="text-sm text-muted-foreground">
-            目前隱藏 <span className="font-bold text-foreground">{hiddenMenuItems.length}</span> 個選單項目
+            {LABELS.HIDDEN_ITEMS_COUNT.replace('{count}', hiddenMenuItems.length.toString())}
           </p>
         </CardContent>
       </Card>

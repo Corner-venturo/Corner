@@ -19,6 +19,7 @@ import {
   DevToolsSettings,
   NewebPaySettings,
 } from './components'
+import { LABELS } from './constants/labels'
 
 // 強制客戶端渲染，不預取伺服器資料
 export const dynamic = 'force-dynamic'
@@ -74,10 +75,10 @@ export default function SettingsPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="系統設定"
+        title={LABELS.SYSTEM_SETTINGS}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '設定', href: '/settings' },
+          { label: LABELS.HOME, href: '/' },
+          { label: LABELS.SETTINGS, href: '/settings' },
         ]}
         actions={
           <div className="flex items-center gap-3">
@@ -90,7 +91,7 @@ export default function SettingsPage() {
                     user.chinese_name ||
                     user.english_name ||
                     user.personal_info?.email ||
-                    '使用者'}
+                    LABELS.USER}
                 </span>
               </div>
             )}
@@ -102,7 +103,7 @@ export default function SettingsPage() {
               className="flex items-center gap-2 text-morandi-red border-morandi-red hover:bg-morandi-red hover:text-white"
             >
               <LogOut className="h-4 w-4" />
-              登出
+              {LABELS.LOGOUT}
             </Button>
           </div>
         }
@@ -119,10 +120,10 @@ export default function SettingsPage() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-morandi-primary mb-2">
-                    歡迎！請完成帳號設定
+                    {LABELS.WELCOME_TITLE}
                   </h3>
                   <p className="text-sm text-morandi-secondary mb-4">
-                    這是您首次登入系統，請完成以下設定以確保帳號安全：
+                    {LABELS.FIRST_LOGIN_DESC}
                   </p>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3 p-3 bg-card/60 rounded-lg">
@@ -130,8 +131,8 @@ export default function SettingsPage() {
                         <Lock className="w-4 h-4 text-morandi-gold" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-morandi-primary">1. 修改密碼</p>
-                        <p className="text-xs text-morandi-secondary">請將預設密碼改為您自己的密碼</p>
+                        <p className="text-sm font-medium text-morandi-primary">{LABELS.CHANGE_PASSWORD_TITLE}</p>
+                        <p className="text-xs text-morandi-secondary">{LABELS.CHANGE_PASSWORD_DESC}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-card/60 rounded-lg">
@@ -139,8 +140,8 @@ export default function SettingsPage() {
                         <Camera className="w-4 h-4 text-morandi-gold" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-morandi-primary">2. 上傳頭像</p>
-                        <p className="text-xs text-morandi-secondary">上傳您的照片，方便同事辨認</p>
+                        <p className="text-sm font-medium text-morandi-primary">{LABELS.UPLOAD_AVATAR_TITLE}</p>
+                        <p className="text-xs text-morandi-secondary">{LABELS.UPLOAD_AVATAR_DESC}</p>
                       </div>
                     </div>
                   </div>
@@ -151,7 +152,7 @@ export default function SettingsPage() {
                       onClick={handleDismissSetup}
                       className="text-morandi-secondary hover:text-morandi-primary"
                     >
-                      稍後再說
+                      {LABELS.SKIP_LATER}
                     </Button>
                   </div>
                 </div>

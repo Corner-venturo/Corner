@@ -12,6 +12,7 @@ import { Plus, Building2, Users, Shield, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
+import { LABELS } from '../constants/labels'
 
 /**
  * Workspace 管理頁面
@@ -41,7 +42,7 @@ export default function WorkspacesPage() {
 
   const handleCreate = async () => {
     if (!newWorkspace.name || !user) {
-      toast.error('請填寫工作空間名稱')
+      toast.error(LABELS.WORKSPACE_NAME_REQUIRED_MSG)
       return
     }
 
@@ -57,8 +58,8 @@ export default function WorkspacesPage() {
         // Automatically create an announcement channel
         await createChannel({
           workspace_id: createdWs.id,
-          name: '公告',
-          description: '此頻道用於發布全工作空間的重要公告。',
+          name: LABELS.ANNOUNCEMENT,
+          description: LABELS.ANNOUNCEMENT_CHANNEL_DESC,
           type: 'PUBLIC',
           is_announcement: true,
           created_by: user.id,
@@ -73,10 +74,10 @@ export default function WorkspacesPage() {
             logger.log(`Bot created for workspace: ${createdWs.id}`)
           }
         } catch (botError) {
-          logger.warn('建立機器人失敗（不影響 workspace 建立）:', botError)
+          logger.warn(LABELS.BOT_CREATION_FAILED, botError)
         }
 
-        toast.success('工作空間、公告頻道和機器人已建立')
+        toast.success(LABELS.WORKSPACE_CREATED_SUCCESS)
       }
 
       setNewWorkspace({ name: '', description: '' })
@@ -84,7 +85,7 @@ export default function WorkspacesPage() {
 
     } catch (error) {
       logger.error('Failed to create workspace or announcement channel:', error)
-      toast.error('建立失敗')
+      toast.error(LABELS.CREATION_FAILED)
     }
   }
 
@@ -97,9 +98,9 @@ export default function WorkspacesPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-morandi-primary mb-2">工作空間管理</h1>
+          <h1 className="text-3xl font-bold text-morandi-primary mb-2">{LABELS.WORKSPACE_MANAGEMENT}</h1>
           <p className="text-morandi-secondary">
-            管理多分公司設定，實現資料隔離（台北公司 vs 台中分公司）
+            {LABELS.WORKSPACE_MANAGEMENT_DESC}
           </p>
         </div>
         <Button
@@ -107,7 +108,7 @@ export default function WorkspacesPage() {
           className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
         >
           <Plus size={16} className="mr-2" />
-          新增工作空間
+          {LABELS.ADD_WORKSPACE}
         </Button>
       </div>
 
@@ -116,15 +117,15 @@ export default function WorkspacesPage() {
         <div className="flex items-start gap-4">
           <Shield className="text-morandi-gold mt-1" size={24} />
           <div>
-            <h3 className="font-semibold text-morandi-primary mb-2">什麼是資料隔離？</h3>
+            <h3 className="font-semibold text-morandi-primary mb-2">{LABELS.DATA_ISOLATION_TITLE}</h3>
             <p className="text-sm text-morandi-secondary mb-3">
-              工作空間可以確保不同分公司的資料獨立管理：
+              {LABELS.DATA_ISOLATION_DESC}
             </p>
             <ul className="text-sm text-morandi-secondary space-y-1 ml-4">
-              <li>• 台北員工預設看到台北的旅遊團、訂單、客戶</li>
-              <li>• 台中員工預設看到台中的旅遊團、訂單、客戶</li>
-              <li>• 系統管理員可以切換工作空間查看所有資料</li>
-              <li>• 員工資料、航空公司、飯店等主檔仍然全公司共享</li>
+              <li>{LABELS.DATA_ISOLATION_POINT1}</li>
+              <li>{LABELS.DATA_ISOLATION_POINT2}</li>
+              <li>{LABELS.DATA_ISOLATION_POINT3}</li>
+              <li>{LABELS.DATA_ISOLATION_POINT4}</li>
             </ul>
           </div>
         </div>
@@ -153,7 +154,7 @@ export default function WorkspacesPage() {
                   <h3 className="font-semibold text-lg text-morandi-primary">
                     {workspace.name}
                   </h3>
-                  <p className="text-sm text-morandi-secondary">{workspace.description || '無描述'}</p>
+                  <p className="text-sm text-morandi-secondary">{workspace.description || LABELS.NO_DESCRIPTION}</p>
                 </div>
               </div>
               <div
@@ -163,7 +164,7 @@ export default function WorkspacesPage() {
                     : 'bg-morandi-muted/20 text-morandi-muted'
                 }`}
               >
-                {workspace.is_active ? '啟用' : '停用'}
+                {workspace.is_active ? LABELS.STATUS_ACTIVE : LABELS.STATUS_INACTIVE}
               </div>
             </div>
 
@@ -173,7 +174,7 @@ export default function WorkspacesPage() {
 
             <div className="flex items-center gap-2 text-sm text-morandi-secondary mb-4">
               <Users size={16} />
-              <span>員工數：{getEmployeeCount(workspace.id)} 人</span>
+              <span>{LABELS.EMPLOYEE_COUNT.replace('{count}', getEmployeeCount(workspace.id).toString())}</span>
             </div>
 
             <div className="flex gap-2">
@@ -183,15 +184,15 @@ export default function WorkspacesPage() {
                 onClick={() => toggleActive(workspace.id, workspace.is_active ?? false)}
                 className="flex-1"
               >
-                {workspace.is_active ? '停用' : '啟用'}
+                {workspace.is_active ? LABELS.STATUS_INACTIVE : LABELS.STATUS_ACTIVE}
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => void alert('編輯功能開發中', 'info')}
+                onClick={() => void alert(LABELS.EDIT_FEATURE_COMING, 'info')}
                 className="flex-1"
               >
-                編輯
+                {LABELS.EDIT}
               </Button>
             </div>
           </Card>
@@ -202,32 +203,32 @@ export default function WorkspacesPage() {
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent level={1} className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-morandi-primary">新增工作空間</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-morandi-primary">{LABELS.ADD_WORKSPACE_TITLE}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                名稱 <span className="text-morandi-red">*</span>
+                {LABELS.WORKSPACE_NAME_LABEL} <span className="text-morandi-red">{LABELS.WORKSPACE_NAME_REQUIRED}</span>
               </label>
               <Input
                 value={newWorkspace.name}
                 onChange={e => setNewWorkspace(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="例如：台北總公司、台中分公司"
+                placeholder={LABELS.WORKSPACE_NAME_PLACEHOLDER}
                 className="border-morandi-container/30"
               />
             </div>
 
             <div>
               <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                說明
+                {LABELS.WORKSPACE_DESCRIPTION_LABEL}
               </label>
               <Input
                 value={newWorkspace.description}
                 onChange={e =>
                   setNewWorkspace(prev => ({ ...prev, description: e.target.value }))
                 }
-                placeholder="簡短說明此工作空間"
+                placeholder={LABELS.WORKSPACE_DESCRIPTION_PLACEHOLDER}
                 className="border-morandi-container/30"
               />
             </div>
@@ -240,7 +241,7 @@ export default function WorkspacesPage() {
               className="flex-1 gap-2"
             >
               <X size={16} />
-              取消
+              {LABELS.CANCEL}
             </Button>
             <Button
               onClick={handleCreate}
@@ -248,7 +249,7 @@ export default function WorkspacesPage() {
               className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
             >
               <Plus size={16} />
-              建立
+              {LABELS.CREATE}
             </Button>
           </div>
         </DialogContent>
@@ -258,14 +259,14 @@ export default function WorkspacesPage() {
       {workspaces?.length === 0 && !showAddDialog && (
         <Card className="border-dashed border-2 border-morandi-container/30 p-12 text-center">
           <Building2 size={48} className="text-morandi-muted mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-morandi-primary mb-2">尚未建立工作空間</h3>
-          <p className="text-morandi-secondary mb-4">開始建立第一個工作空間以啟用多分公司管理</p>
+          <h3 className="text-lg font-semibold text-morandi-primary mb-2">{LABELS.NO_WORKSPACE_TITLE}</h3>
+          <p className="text-morandi-secondary mb-4">{LABELS.NO_WORKSPACE_DESC}</p>
           <Button
             onClick={() => setShowAddDialog(true)}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
             <Plus size={16} className="mr-2" />
-            新增工作空間
+            {LABELS.ADD_WORKSPACE}
           </Button>
         </Card>
       )}
