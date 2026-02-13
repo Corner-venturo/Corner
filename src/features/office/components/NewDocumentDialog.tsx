@@ -36,14 +36,6 @@ const documentTypes: DocumentTypeOption[] = [
     icon: FileText,
     color: 'text-blue-600 bg-blue-50 hover:bg-blue-100',
   },
-  // TODO: Univer Slides 功能尚未完整，暫時隱藏
-  // {
-  //   type: 'slides',
-  //   label: '簡報',
-  //   description: '類似 PowerPoint，適合製作演示文稿',
-  //   icon: Presentation,
-  //   color: 'text-orange-600 bg-orange-50 hover:bg-orange-100',
-  // },
 ]
 
 interface NewDocumentDialogProps {
