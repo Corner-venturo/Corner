@@ -303,7 +303,7 @@ export function PropertiesPanel({
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <Label className="text-[10px] text-morandi-muted">寬</Label>
+                <Label className="text-[10px] text-morandi-muted">{DESIGNER_LABELS.寬}</Label>
                 <Input
                   type="number"
                   value={String(properties.width || 0)}
@@ -358,7 +358,7 @@ export function PropertiesPanel({
           <div className="space-y-3">
             {/* 漸層/純色填充 */}
             <div>
-              <Label className="text-[10px] text-morandi-muted mb-1 block">顏色/漸層</Label>
+              <Label className="text-[10px] text-morandi-muted mb-1 block">{DESIGNER_LABELS.顏色漸層}</Label>
               <GradientPicker
                 value={getFillValue(properties.fill)}
                 onChange={(value, isSolid) => {
@@ -399,7 +399,7 @@ export function PropertiesPanel({
             {/* 圖片填充（僅形狀支援） */}
             {isShapeType(properties.type as string) && onImageFill && (
               <div>
-                <Label className="text-[10px] text-morandi-muted mb-1 block">圖片遮罩</Label>
+                <Label className="text-[10px] text-morandi-muted mb-1 block">{DESIGNER_LABELS.圖片遮罩}</Label>
                 <Button
                   variant="outline"
                   size="sm"
@@ -410,7 +410,7 @@ export function PropertiesPanel({
 {DESIGNER_LABELS.上傳圖片填充}
                 </Button>
                 <p className="text-[10px] text-morandi-muted mt-1">
-                  上傳圖片後會裁切成此形狀
+                  {DESIGNER_LABELS.上傳圖片後會裁切成此形狀}
                 </p>
               </div>
             )}
