@@ -118,20 +118,17 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
 
       if (confirmed) {
         try {
-          const { supabase } = await import('@/lib/supabase/client')
+          const { deleteProposal } = await import('@/data/entities/proposals')
+          const { proposalPackageEntity } = await import('@/data/entities/proposal-packages')
 
           // 先刪除相關套件
           if (packages.length > 0) {
-            const { error: pkgError } = await supabase
-              .from('proposal_packages')
-              .delete()
-              .eq('proposal_id', proposal.id)
-            if (pkgError) throw pkgError
+            const packageIds = packages.map(p => p.id)
+            await proposalPackageEntity.batchRemove(packageIds)
           }
 
           // 再刪除提案
-          const { error } = await supabase.from('proposals').delete().eq('id', proposal.id)
-          if (error) throw error
+          await deleteProposal(proposal.id)
 
           refreshProposals()
           refreshPackages()

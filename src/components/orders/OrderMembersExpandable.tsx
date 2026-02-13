@@ -40,6 +40,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { supabase } from '@/lib/supabase/client'
+import { updateMember } from '@/data/entities/members'
 import { logger } from '@/lib/utils/logger'
 import { useOcrRecognition } from '@/hooks'
 import { useCustomers, useTour } from '@/data'
@@ -467,7 +468,7 @@ export function OrderMembersExpandable({
         ))
         // 更新資料庫
         try {
-          await supabase.from('order_members').update({ identity: COMP_ORDERS_LABELS.領隊_2, sort_order: 0 }).eq('id', memberId)
+          await updateMember(memberId, { identity: COMP_ORDERS_LABELS.領隊_2, sort_order: 0 } as Parameters<typeof updateMember>[1])
           logger.info(`已將 ${currentMember.chinese_name} 設為領隊並排到第一位`)
         } catch (error) {
           logger.error(COMP_ORDERS_LABELS.設定領隊失敗, error)
@@ -479,7 +480,7 @@ export function OrderMembersExpandable({
     // 一般欄位更新
     membersData.setMembers(membersData.members.map(m => m.id === memberId ? { ...m, [field]: value } : m))
     try {
-      await supabase.from('order_members').update({ [field]: value }).eq('id', memberId)
+      await updateMember(memberId, { [field]: value })
     } catch (error) {
       logger.error(COMP_ORDERS_LABELS.更新欄位失敗, error)
     }
