@@ -30,11 +30,12 @@ import {
   type ClosingPreviewItem,
   type ClosingHistory,
 } from '../hooks/usePeriodClosing'
+import { PERIOD_CLOSING_LABELS } from '@/constants/labels'
 
 const PERIOD_TYPE_OPTIONS: { value: PeriodType; label: string }[] = [
-  { value: 'month', label: '月結' },
-  { value: 'quarter', label: '季結' },
-  { value: 'year', label: '年結' },
+  { value: 'month', label: PERIOD_CLOSING_LABELS.月結 },
+  { value: 'quarter', label: PERIOD_CLOSING_LABELS.季結 },
+  { value: 'year', label: PERIOD_CLOSING_LABELS.年結 },
 ]
 
 const MONTH_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
@@ -43,10 +44,10 @@ const MONTH_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
 }))
 
 const QUARTER_OPTIONS = [
-  { value: 1, label: 'Q1（1-3月）' },
-  { value: 2, label: 'Q2（4-6月）' },
-  { value: 3, label: 'Q3（7-9月）' },
-  { value: 4, label: 'Q4（10-12月）' },
+  { value: 1, label: PERIOD_CLOSING_LABELS.Q1 },
+  { value: 2, label: PERIOD_CLOSING_LABELS.Q2 },
+  { value: 3, label: PERIOD_CLOSING_LABELS.Q3 },
+  { value: 4, label: PERIOD_CLOSING_LABELS.Q4 },
 ]
 
 

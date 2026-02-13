@@ -13,6 +13,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { useAccountingReports, type BalanceSheetResult } from '../../hooks/useAccountingReports'
 import { formatDate } from '@/lib/utils/format-date'
 import { formatCurrency } from '@/lib/utils/format-currency'
+import { BALANCE_SHEET_LABELS } from '@/constants/labels'
 
 export function BalanceSheetReport() {
   const { loading, error, fetchBalanceSheet } = useAccountingReports()
@@ -255,12 +256,12 @@ export function BalanceSheetReport() {
             {/* 會計等式驗證 */}
             <div className="bg-morandi-container/30 rounded-lg p-4 border border-border">
               <div className="flex items-center justify-center gap-4 text-lg">
-                <span className="font-bold text-blue-600">資產 {formatCurrency(data.total_assets)}</span>
+                <span className="font-bold text-blue-600">{BALANCE_SHEET_LABELS.資產.replace('{amount}', formatCurrency(data.total_assets))}</span>
                 <span className="text-morandi-secondary">=</span>
-                <span className="font-bold text-purple-600">負債 {formatCurrency(data.total_liabilities)}</span>
+                <span className="font-bold text-purple-600">{BALANCE_SHEET_LABELS.負債.replace('{amount}', formatCurrency(data.total_liabilities))}</span>
                 <span className="text-morandi-secondary">+</span>
                 <span className={`font-bold ${data.equity >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  權益 {formatCurrency(data.equity)}
+                  {BALANCE_SHEET_LABELS.權益.replace('{amount}', formatCurrency(data.equity))}
                 </span>
               </div>
             </div>
