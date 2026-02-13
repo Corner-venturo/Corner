@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Calculator } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { evaluateExpression } from '@/components/widgets/calculator/calculatorUtils'
+import { DASHBOARD_LABELS } from '@/features/dashboard/constants/labels'
 
 export function CalculatorWidget() {
   const [inputValue, setInputValue] = useState('')
@@ -188,10 +189,10 @@ export function CalculatorWidget() {
               </div>
               <div className="flex-1">
                 <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">
-                  計算機
+                  {DASHBOARD_LABELS.calculator}
                 </p>
                 <p className="text-xs text-morandi-secondary/90 mt-1.5 leading-relaxed">
-                  快速運算，精準無誤
+                  {DASHBOARD_LABELS.calculatorDescription}
                 </p>
               </div>
             </div>
@@ -203,7 +204,7 @@ export function CalculatorWidget() {
                 className="w-3.5 h-3.5 rounded border-morandi-gold/30 text-morandi-gold focus:ring-morandi-gold/20 cursor-pointer"
               />
               <span className="text-xs text-morandi-secondary/90 group-hover:text-morandi-primary transition-colors font-medium">
-                順序
+                {DASHBOARD_LABELS.sequentialMode}
               </span>
             </label>
           </div>
@@ -224,7 +225,7 @@ export function CalculatorWidget() {
               onKeyDown={handleKeyDown}
               autoComplete="off"
               className="w-full bg-transparent border-none outline-none text-right font-mono text-sm text-morandi-secondary/80 mb-1 placeholder:text-morandi-muted/40 font-medium"
-              placeholder="輸入算式"
+              placeholder={DASHBOARD_LABELS.inputExpression}
             />
             {/* 即時結果（大字黑色） */}
             <div className="text-right text-3xl font-bold text-morandi-primary font-mono tracking-tight">
@@ -299,7 +300,7 @@ export function CalculatorWidget() {
               onClick={() => handleButtonClick('C')}
               className="h-10 text-sm font-semibold col-span-2 bg-card border-2 border-morandi-gold/30 text-morandi-primary hover:bg-status-danger-bg hover:text-status-danger hover:border-status-danger shadow-sm hover:shadow-md transition-all rounded-xl"
             >
-              清除
+              {DASHBOARD_LABELS.clear}
             </Button>
           </div>
         </div>

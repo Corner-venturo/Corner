@@ -46,6 +46,23 @@ export const LINK_TOUR_DIALOG_LABELS = {
 
 export const LOCAL_PRICING_DIALOG_LABELS = {
   人數: '人數',
+  LOCAL報價: 'Local 報價',
+  目前總人數: '目前總人數：',
+  人: ' 人',
+  檻次: '檻次',
+  人數門檻: '人數門檻',
+  單價成本: '單價（成本）',
+  檻次編號: '檻次 {index}',
+  新增檻次: '新增檻次',
+  取消: '取消',
+  確認: '確認',
+  人數變更提醒: '人數變更提醒',
+  人數變更提醒內容1: '目前總人數（{totalParticipants} 人）將使用「{matchedParticipants} 人」檻次的報價。',
+  人數變更提醒內容2: '確認後，報價單檻次表將以 {totalParticipants} 人 作為第一個檻次。',
+  返回修改: '返回修改',
+  確認更新: '確認更新',
+  人將使用檻次的報價: '{totalParticipants} 人將使用「{matchedParticipants} 人」檻次的報價：',
+  元每人: '${unitPrice}/人',
 };
 
 export const PARTICIPANT_COUNT_EDITOR_LABELS = {
@@ -182,6 +199,7 @@ export const QUOTES_PAGE_LABELS = {
   搜尋團號_團名: '搜尋團號、團名...',
   尚無獨立報價單: '尚無獨立報價單',
   尚無報價單資料: '尚無報價單資料',
+  人數: '人數',
 };
 
 export const RESOURCE_SELECT_BUTTON_LABELS = {
@@ -193,6 +211,10 @@ export const RESOURCE_SELECT_BUTTON_LABELS = {
 export const SAVE_VERSION_DIALOG_LABELS = {
   保存版本: '保存版本',
   例如_初版_修正版_最終版等: '例如：初版、修正版、最終版等',
+  取消: '取消',
+  保存: '保存',
+  保存快捷鍵: '保存 <span className="ml-1 text-xs opacity-70">(Enter)</span>',
+  版本名稱: '版本名稱',
 };
 
 export const SELLING_PRICE_SECTION_LABELS = {
@@ -202,6 +224,16 @@ export const SELLING_PRICE_SECTION_LABELS = {
 export const SYNC_TO_ITINERARY_DIALOG_LABELS = {
   同步餐飲到行程表: '同步餐飲到行程表',
   自理: '自理',
+  取消: '取消',
+  確認同步: '確認同步',
+  將同步到行程表: '將同步到行程表：',
+  沒有需要同步的變更: '沒有需要同步的變更',
+  以下餐飲將會更新: '以下 {count} 項餐飲將會更新：',
+  天數: '天數',
+  餐別: '餐別',
+  原本: '原本',
+  更新後: '更新後',
+  空: '（空）',
 };
 
 export const QUICK_QUOTE_ITEMS_TABLE_LABELS = {

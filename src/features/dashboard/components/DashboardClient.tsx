@@ -21,6 +21,7 @@ import {
 } from '@dnd-kit/core'
 import { arrayMove, SortableContext, rectSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { DASHBOARD_LABELS } from '@/features/dashboard/constants/labels'
 
 // Sortable Widget Component (remains the same)
 function SortableWidget({ id, widget }: { id: string; widget: (typeof AVAILABLE_WIDGETS)[0] }) {
@@ -122,7 +123,7 @@ export function DashboardClient() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-morandi-gold/20 mx-auto"></div>
-          <p className="mt-4 text-morandi-muted">載入中...</p>
+          <p className="mt-4 text-morandi-muted">{DASHBOARD_LABELS.loading}</p>
         </div>
       </div>
     )
@@ -131,8 +132,8 @@ export function DashboardClient() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="首頁"
-        breadcrumb={[{ label: '首頁', href: '/' }]}
+        title={DASHBOARD_LABELS.home}
+        breadcrumb={[{ label: DASHBOARD_LABELS.home, href: '/' }]}
         actions={
           <WidgetSettingsDialog activeWidgets={activeWidgets} onToggleWidget={toggleWidget} />
         }

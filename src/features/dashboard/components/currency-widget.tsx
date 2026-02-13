@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { DollarSign, ArrowRightLeft, TrendingUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { DASHBOARD_LABELS } from '@/features/dashboard/constants/labels'
 
 export function CurrencyWidget() {
   // 預設匯率（1 外幣 = ? 台幣）
@@ -12,42 +13,42 @@ export function CurrencyWidget() {
       USD: {
         rate: 31.5,
         symbol: '$',
-        name: '美金',
+        name: DASHBOARD_LABELS.usd,
         color: 'from-morandi-green/30 to-morandi-green/10',
         gradient: 'bg-gradient-to-br from-status-success-bg via-card to-morandi-green/5',
       },
       JPY: {
         rate: 0.21,
         symbol: '¥',
-        name: '日幣',
+        name: DASHBOARD_LABELS.jpy,
         color: 'from-morandi-red/30 to-morandi-red/10',
         gradient: 'bg-gradient-to-br from-status-danger-bg via-card to-morandi-red/5',
       },
       KRW: {
         rate: 0.024,
         symbol: '₩',
-        name: '韓元',
+        name: DASHBOARD_LABELS.krw,
         color: 'from-morandi-secondary/40 to-morandi-container/60',
         gradient: 'bg-gradient-to-br from-morandi-container/20 via-card to-morandi-secondary/10',
       },
       CNY: {
         rate: 4.35,
         symbol: '¥',
-        name: '人民幣',
+        name: DASHBOARD_LABELS.cny,
         color: 'from-status-warning-bg to-morandi-gold/20',
         gradient: 'bg-gradient-to-br from-status-warning-bg via-card to-morandi-gold/10',
       },
       VND: {
         rate: 0.00127,
         symbol: '₫',
-        name: '越南盾',
+        name: DASHBOARD_LABELS.vnd,
         color: 'from-morandi-green/40 to-morandi-green/20',
         gradient: 'bg-gradient-to-br from-morandi-green/10 via-card to-morandi-container/20',
       },
       IDR: {
         rate: 0.002,
         symbol: 'Rp',
-        name: '印尼盾',
+        name: DASHBOARD_LABELS.idr,
         color: 'from-morandi-red/30 to-morandi-container/40',
         gradient: 'bg-gradient-to-br from-morandi-red/5 via-card to-morandi-container/10',
       },
@@ -149,10 +150,10 @@ export function CurrencyWidget() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">
-                匯率換算
+                {DASHBOARD_LABELS.exchangeRate}
               </p>
               <p className="text-xs text-morandi-secondary/90 mt-1.5 leading-relaxed">
-                輕鬆計算各國貨幣，掌握即時匯率
+                {DASHBOARD_LABELS.currencyDescription}
               </p>
             </div>
           </div>
@@ -160,7 +161,7 @@ export function CurrencyWidget() {
           {/* Currency Selection */}
           <div className="rounded-xl bg-card/70 p-3.5 shadow-md border border-border/40">
             <label className="text-xs font-semibold text-morandi-primary mb-2 block">
-              選擇貨幣
+              {DASHBOARD_LABELS.selectCurrency}
             </label>
             <Select
               value={selectedCurrency}
@@ -170,7 +171,7 @@ export function CurrencyWidget() {
               }}
             >
               <SelectTrigger className="w-full px-3.5 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm">
-                <SelectValue placeholder="選擇貨幣" />
+                <SelectValue placeholder={DASHBOARD_LABELS.selectCurrency} />
               </SelectTrigger>
               <SelectContent>
                 {Object.entries(DEFAULT_RATES).map(([code, info]) => (
@@ -188,7 +189,7 @@ export function CurrencyWidget() {
               {/* Left Input - 根據 direction 決定顯示哪個貨幣 */}
               <div className="flex-1">
                 <label className="text-xs font-semibold text-morandi-primary mb-2 block">
-                  {direction === 'twd-to-foreign' ? '台幣 (TWD)' : `${currencyInfo.name} (${selectedCurrency})`}
+                  {direction === 'twd-to-foreign' ? `${DASHBOARD_LABELS.twd} (TWD)` : `${currencyInfo.name} (${selectedCurrency})`}
                 </label>
                 <div className="relative group">
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-morandi-secondary/70 text-xs font-semibold">
@@ -208,7 +209,7 @@ export function CurrencyWidget() {
               <button
                 onClick={swapDirection}
                 className="p-2.5 hover:bg-card/80 rounded-xl transition-all group mb-0.5 shadow-sm hover:shadow-md border border-transparent hover:border-border/60"
-                title="交換左右位置"
+                title={DASHBOARD_LABELS.exchangePositions}
               >
                 <ArrowRightLeft className={cn(
                   "h-4 w-4 text-morandi-gold group-hover:scale-110 transition-all duration-300",
@@ -219,7 +220,7 @@ export function CurrencyWidget() {
               {/* Right Input - 根據 direction 決定顯示哪個貨幣 */}
               <div className="flex-1">
                 <label className="text-xs font-semibold text-morandi-primary mb-2 block">
-                  {direction === 'twd-to-foreign' ? `${currencyInfo.name} (${selectedCurrency})` : '台幣 (TWD)'}
+                  {direction === 'twd-to-foreign' ? `${currencyInfo.name} (${selectedCurrency})` : `${DASHBOARD_LABELS.twd} (TWD)`}
                 </label>
                 <div className="relative group">
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-morandi-secondary/70 text-xs font-semibold">
@@ -250,7 +251,7 @@ export function CurrencyWidget() {
                 }}
                 className="text-xs text-morandi-gold hover:text-morandi-gold/80 font-semibold transition-all hover:scale-105 px-2 py-1 rounded-lg hover:bg-morandi-gold/10"
               >
-                重設
+                {DASHBOARD_LABELS.reset}
               </button>
             </div>
             <input

@@ -133,7 +133,7 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <MapPin size={18} className="text-morandi-gold" />
-            Local 報價
+            {LOCAL_PRICING_DIALOG_LABELS.LOCAL報價}
           </DialogTitle>
         </DialogHeader>
 
@@ -141,16 +141,16 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
           <>
             {/* 目前總人數提示 */}
             <div className="bg-morandi-container/30 rounded-lg px-4 py-3 text-sm">
-              <span className="text-morandi-secondary">目前總人數：</span>
-              <span className="font-semibold text-morandi-primary ml-1">{totalParticipants} 人</span>
+              <span className="text-morandi-secondary">{LOCAL_PRICING_DIALOG_LABELS.目前總人數}</span>
+              <span className="font-semibold text-morandi-primary ml-1">{totalParticipants}{LOCAL_PRICING_DIALOG_LABELS.人}</span>
             </div>
 
             {/* 檻次輸入區 */}
             <div className="space-y-3">
               <div className="grid grid-cols-[80px_1fr_1fr_40px] gap-2 text-xs text-morandi-secondary font-medium px-1">
-                <span>檻次</span>
-                <span>人數門檻</span>
-                <span>單價（成本）</span>
+                <span>{LOCAL_PRICING_DIALOG_LABELS.檻次}</span>
+                <span>{LOCAL_PRICING_DIALOG_LABELS.人數門檻}</span>
+                <span>{LOCAL_PRICING_DIALOG_LABELS.單價成本}</span>
                 <span></span>
               </div>
 
@@ -159,7 +159,7 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
                   key={tier.id}
                   className="grid grid-cols-[80px_1fr_1fr_40px] gap-2 items-center"
                 >
-                  <span className="text-sm text-morandi-secondary px-1">檻次 {index + 1}</span>
+                  <span className="text-sm text-morandi-secondary px-1">{LOCAL_PRICING_DIALOG_LABELS.檻次編號.replace('{index}', `${index + 1}`)}</span>
                   <Input
                     type="number"
                     value={tier.participants || ''}
@@ -196,7 +196,7 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
                 className="w-full gap-2"
               >
                 <Plus size={14} />
-                新增檻次
+                {LOCAL_PRICING_DIALOG_LABELS.新增檻次}
               </Button>
             </div>
 
@@ -204,10 +204,10 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
             {matchedTier && matchedTier.unitPrice > 0 && (
               <div className="bg-morandi-gold/10 rounded-lg px-4 py-3 text-sm">
                 <span className="text-morandi-secondary">
-                  {totalParticipants} 人將使用「{matchedTier.participants} 人」檻次的報價：
+                  {LOCAL_PRICING_DIALOG_LABELS.人將使用檻次的報價.replace('{totalParticipants}', totalParticipants.toString()).replace('{matchedParticipants}', matchedTier.participants.toString())}
                 </span>
                 <span className="font-semibold text-morandi-gold ml-1">
-                  ${matchedTier.unitPrice.toLocaleString()}/人
+                  {LOCAL_PRICING_DIALOG_LABELS.元每人.replace('{unitPrice}', matchedTier.unitPrice.toLocaleString())}
                 </span>
               </div>
             )}
@@ -215,7 +215,7 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
             <DialogFooter>
               <Button variant="outline" onClick={handleClose}>
                 <X className="w-4 h-4 mr-2" />
-                取消
+                {LOCAL_PRICING_DIALOG_LABELS.取消}
               </Button>
               <Button
                 onClick={handleConfirmClick}
@@ -223,7 +223,7 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
                 disabled={tiers.some(t => !t.participants || t.participants <= 0 || !t.unitPrice || t.unitPrice <= 0)}
               >
                 <Check className="w-4 h-4 mr-2" />
-                確認
+                {LOCAL_PRICING_DIALOG_LABELS.確認}
               </Button>
             </DialogFooter>
           </>
@@ -234,9 +234,9 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
               <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
                 <AlertTriangle size={20} className="text-amber-600 flex-shrink-0 mt-0.5" />
                 <div className="text-sm">
-                  <p className="font-medium text-amber-800">人數變更提醒</p>
+                  <p className="font-medium text-amber-800">{LOCAL_PRICING_DIALOG_LABELS.人數變更提醒}</p>
                   <p className="text-amber-700 mt-1">
-                    目前總人數（{totalParticipants} 人）將使用「{matchedTier?.participants} 人」檻次的報價。
+                    {LOCAL_PRICING_DIALOG_LABELS.人數變更提醒內容1.replace('{totalParticipants}', totalParticipants.toString()).replace('{matchedParticipants}', (matchedTier?.participants || 0).toString())}
                   </p>
                   <p className="text-amber-700 mt-1">
                     確認後，報價單檻次表將以 <strong>{totalParticipants} 人</strong> 作為第一個檻次。

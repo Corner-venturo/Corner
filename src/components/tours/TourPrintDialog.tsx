@@ -21,6 +21,7 @@ import {
   CLASS_NAMES,
   STATUS_NAMES,
 } from './tour-print-constants'
+import { TOUR_PRINT_DIALOG_LABELS } from './constants/labels'
 
 interface TourPrintDialogProps {
   isOpen: boolean
@@ -1036,7 +1037,7 @@ export function TourPrintDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Printer size={18} />
-            列印 - {tour.code}
+{TOUR_PRINT_DIALOG_LABELS.列印} - {tour.code}
           </DialogTitle>
         </DialogHeader>
 
@@ -1044,24 +1045,24 @@ export function TourPrintDialog({
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="members" className="gap-1">
               <Users size={14} />
-              成員名單
+{TOUR_PRINT_DIALOG_LABELS.成員名單}
             </TabsTrigger>
             <TabsTrigger value="flight" className="gap-1">
               <Plane size={14} />
-              航班確認
+              {TOUR_PRINT_DIALOG_LABELS.航班確認}
             </TabsTrigger>
             <TabsTrigger value="hotel" className="gap-1">
               <Hotel size={14} />
-              住宿確認
+              {TOUR_PRINT_DIALOG_LABELS.住宿確認}
             </TabsTrigger>
           </TabsList>
 
           {/* 成員名單 Tab */}
           <TabsContent value="members" className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-morandi-secondary">選擇要匯出的欄位</span>
+              <span className="text-sm text-morandi-secondary">{TOUR_PRINT_DIALOG_LABELS.選擇要匯出的欄位}</span>
               <Button variant="ghost" size="sm" onClick={toggleAllColumns}>
-                {Object.values(columns).every(v => v) ? '取消全選' : '全選'}
+                {Object.values(columns).every(v => v) ? TOUR_PRINT_DIALOG_LABELS.取消全選 : TOUR_PRINT_DIALOG_LABELS.全選}
               </Button>
             </div>
             <div className="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto">
@@ -1083,15 +1084,15 @@ export function TourPrintDialog({
             <div className="flex justify-end gap-2 pt-4 border-t border-morandi-border">
               <Button variant="outline" onClick={onClose}>
                 <X size={16} className="mr-1" />
-                取消
+                {TOUR_PRINT_DIALOG_LABELS.取消}
               </Button>
               <Button variant="outline" onClick={handleExportExcel}>
                 <FileSpreadsheet size={16} className="mr-1" />
-                Excel
+                {TOUR_PRINT_DIALOG_LABELS.Excel}
               </Button>
               <Button onClick={handlePrintMembers} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white">
                 <Printer size={16} className="mr-1" />
-                列印
+                {TOUR_PRINT_DIALOG_LABELS.列印}
               </Button>
             </div>
           </TabsContent>
@@ -1099,16 +1100,16 @@ export function TourPrintDialog({
           {/* 航班確認單 Tab */}
           <TabsContent value="flight" className="space-y-4">
             <div className="text-sm text-morandi-secondary mb-2">
-              選擇要列印航班確認單的成員（每人一頁）
+              {TOUR_PRINT_DIALOG_LABELS.選擇要列印航班確認單的成員_每人一頁}
               {loadingPnr && (
                 <span className="ml-2 inline-flex items-center gap-1">
                   <Loader2 size={12} className="animate-spin" />
-                  載入航班資料中...
+                  {TOUR_PRINT_DIALOG_LABELS.載入航班資料中}
                 </span>
               )}
               {!loadingPnr && pnrData.length > 0 && (
                 <span className="ml-2 text-morandi-green">
-                  已載入 {pnrData.length} 筆 PNR 資料
+                  {TOUR_PRINT_DIALOG_LABELS.已載入_筆_PNR_資料(pnrData.length)}
                 </span>
               )}
             </div>

@@ -11,7 +11,7 @@ const AddRequestDialog = dynamic(() => import('@/features/finance/requests/compo
 import { InvoiceDialog } from '@/components/finance/invoice-dialog'
 import type { Order as OrderType } from '@/types/order.types'
 import { logger } from '@/lib/utils/logger'
-import { COMP_TOURS_LABELS } from './constants/labels'
+import { COMP_TOURS_LABELS, TOUR_ORDERS_LABELS } from './constants/labels'
 
 interface TourOrdersProps {
   tour: Tour
@@ -97,7 +97,7 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-morandi-secondary">載入中...</div>
+        <div className="text-morandi-secondary">{TOUR_ORDERS_LABELS.載入中}</div>
       </div>
     )
   }

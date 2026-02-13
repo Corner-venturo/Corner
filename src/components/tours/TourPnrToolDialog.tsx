@@ -46,7 +46,7 @@ import { toast } from 'sonner'
 import type { OrderMember } from '@/components/orders/order-member.types'
 import type { PNR, PNRSegment } from '@/types/pnr.types'
 import type { Json } from '@/lib/supabase/types'
-import { COMP_TOURS_LABELS } from './constants/labels'
+import { COMP_TOURS_LABELS, TOUR_PNR_TOOL_DIALOG_LABELS } from './constants/labels'
 
 // 航班擴充欄位編輯狀態
 interface SegmentEditData {
@@ -577,7 +577,7 @@ export function TourPnrToolDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Plane size={20} className="text-morandi-gold" />
-            PNR 電報工具
+{TOUR_PNR_TOOL_DIALOG_LABELS.PNR_電報工具}
             <span className="text-sm font-normal text-morandi-secondary ml-2">
               {tourCode} - {tourName}
             </span>
@@ -603,7 +603,7 @@ export function TourPnrToolDialog({
                 className="gap-1"
               >
                 <Clipboard size={14} />
-                從剪貼簿貼上
+{TOUR_PNR_TOOL_DIALOG_LABELS.從剪貼簿貼上}
               </Button>
               <Button
                 size="sm"
@@ -611,7 +611,7 @@ export function TourPnrToolDialog({
                 disabled={!rawPNR.trim()}
                 className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
-                解析電報
+{TOUR_PNR_TOOL_DIALOG_LABELS.解析電報}
               </Button>
               {parsedPNR && (
                 <Button
