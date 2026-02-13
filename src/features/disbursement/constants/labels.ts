@@ -71,4 +71,5 @@ export const DISBURSEMENT_LABELS = {
   已選筆: '• 已選 {count} 筆 •',
   取消: '取消',
   建立出納單數量: '建立出納單（{count} 筆）',
+  筆: '筆',
 };

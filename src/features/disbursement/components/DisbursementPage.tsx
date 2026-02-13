@@ -86,7 +86,7 @@ export function DisbursementPage() {
       label: DISBURSEMENT_LABELS.請款單數,
       render: (value) => (
         <div className="text-center">
-          {Array.isArray(value) ? value.length : 0} 筆
+          {Array.isArray(value) ? value.length : 0} {DISBURSEMENT_LABELS.筆}
         </div>
       ),
     },
