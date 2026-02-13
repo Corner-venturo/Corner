@@ -31,7 +31,7 @@ import { alert } from '@/lib/ui/alert-dialog'
 import { formatDate } from '@/lib/utils/format-date'
 import { useWorkspaceId } from '@/lib/workspace-context'
 import type { UserRole } from '@/lib/rbac-config'
-import { ADD_RECEIPT_DIALOG_LABELS, ADD_REQUEST_DIALOG_LABELS, BATCH_RECEIPT_DIALOG_LABELS, PAYMENT_ITEM_ROW_LABELS } from '../../constants/labels';
+import { ADD_RECEIPT_DIALOG_LABELS, ADD_REQUEST_DIALOG_LABELS, BATCH_RECEIPT_DIALOG_LABELS, PAYMENT_ITEM_ROW_LABELS, ADD_REQUEST_FORM_LABELS } from '../../constants/labels';
 
 /**
  * 可以建立公司請款的角色
@@ -309,7 +309,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
       if (!formData.expense_type || !formData.request_date) return ADD_REQUEST_DIALOG_LABELS.請選擇費用類型和日期
       return generateCompanyRequestCode(formData.expense_type as CompanyExpenseType, formData.request_date)
     } else if (activeTab === 'batch') {
-      return tourAllocations.length > 0 ? `將建立 ${tourAllocations.length} 筆請款單` : ADD_REQUEST_DIALOG_LABELS.請新增旅遊團分配
+      return tourAllocations.length > 0 ? ADD_REQUEST_FORM_LABELS.將建立N筆請款單(tourAllocations.length) : ADD_REQUEST_DIALOG_LABELS.請新增旅遊團分配
     } else {
       return selectedTour ? generateRequestCode(selectedTour.code) : ADD_REQUEST_DIALOG_LABELS.請先選擇旅遊團
     }
@@ -365,7 +365,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
           return
         }
         if (unallocatedAmount !== 0) {
-          void alert(`還有 NT$ ${Math.abs(unallocatedAmount).toLocaleString()} ${unallocatedAmount > 0 ? '未分配' : BATCH_RECEIPT_DIALOG_LABELS.超出}，請確認分配金額`, 'warning')
+          void alert(`還有 NT$ ${Math.abs(unallocatedAmount).toLocaleString()} ${unallocatedAmount > 0 ? ADD_REQUEST_FORM_LABELS.未分配 : BATCH_RECEIPT_DIALOG_LABELS.超出}，請確認分配金額`, 'warning')
           return
         }
 
@@ -474,9 +474,9 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent level={2} className="max-w-[95vw] w-[95vw] h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader>
-          <DialogTitle>新增請款單</DialogTitle>
+          <DialogTitle>{ADD_REQUEST_FORM_LABELS.新增請款單}</DialogTitle>
           <p className="text-sm text-morandi-secondary">
-            {activeTab === 'batch' ? previewCode : <>請款單號: <span className="font-medium text-morandi-primary">{previewCode}</span> (自動生成)</>}
+            {activeTab === 'batch' ? previewCode : <>{ADD_REQUEST_FORM_LABELS.請款單號}<span className="font-medium text-morandi-primary">{previewCode}</span> {ADD_REQUEST_FORM_LABELS.自動生成}</>}
           </p>
         </DialogHeader>
 
@@ -511,7 +511,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
           <TabsContent value="tour" className="flex-1 overflow-y-auto mt-4 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-morandi-primary">選擇旅遊團 *</label>
+                <label className="text-sm font-medium text-morandi-primary">{ADD_REQUEST_FORM_LABELS.選擇旅遊團_必填}</label>
                 <Combobox
                   options={tourOptions}
                   value={formData.tour_id}
@@ -521,7 +521,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-morandi-primary">選擇訂單（可選）</label>
+                <label className="text-sm font-medium text-morandi-primary">{ADD_REQUEST_FORM_LABELS.選擇訂單_可選}</label>
                 <Combobox
                   options={orderOptions}
                   value={formData.order_id}
@@ -536,7 +536,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                 onChange={(date, isSpecialBilling) => setFormData(prev => ({ ...prev, request_date: date, is_special_billing: isSpecialBilling }))}
               />
               <div>
-                <label className="text-sm font-medium text-morandi-primary">備註</label>
+                <label className="text-sm font-medium text-morandi-primary">{ADD_REQUEST_FORM_LABELS.備註}</label>
                 <Input
                   value={formData.notes}
                   onChange={e => setFormData(prev => ({ ...prev, note: e.target.value }))}
@@ -565,15 +565,15 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-medium text-morandi-primary">
                     需求單項目
-                    {loadingRequestItems && <span className="ml-2 text-morandi-secondary">載入中...</span>}
+                    {loadingRequestItems && <span className="ml-2 text-morandi-secondary">{ADD_REQUEST_FORM_LABELS.載入中}</span>}
                   </h3>
                   {tourRequestItems.length > 0 && (
-                    <span className="text-sm text-morandi-secondary">已選 {selectedRequestCount} 項</span>
+                    <span className="text-sm text-morandi-secondary">{ADD_REQUEST_FORM_LABELS.已選N項(selectedRequestCount)}</span>
                   )}
                 </div>
 
                 {tourRequestItems.length === 0 && !loadingRequestItems ? (
-                  <div className="text-center py-8 text-morandi-secondary">此旅遊團沒有有供應商的需求單項目</div>
+                  <div className="text-center py-8 text-morandi-secondary">{ADD_REQUEST_FORM_LABELS.此旅遊團沒有有供應商的需求單項目}</div>
                 ) : (
                   <div className="border border-border rounded-lg overflow-hidden">
                     <div className="max-h-[300px] overflow-y-auto">
@@ -594,7 +594,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                               </div>
                               <div className="flex items-center gap-1 text-xs text-morandi-secondary">
                                 <Building2 size={12} />
-                                <span>供應商：{item.supplierName}</span>
+                                <span>{ADD_REQUEST_FORM_LABELS.供應商(item.supplierName)}</span>
                               </div>
                               {(item.estimatedCost > 0 || item.finalCost) && (
                                 <div className="text-xs text-morandi-secondary mt-1">
@@ -603,7 +603,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                               )}
                             </div>
                             <div className="w-32 flex-shrink-0">
-                              <div className="text-xs text-morandi-secondary mb-1">請款金額</div>
+                              <div className="text-xs text-morandi-secondary mb-1">{ADD_REQUEST_FORM_LABELS.請款金額}</div>
                               <div className="relative">
                                 <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-morandi-secondary">NT$</span>
                                 <Input
@@ -631,20 +631,20 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
           <TabsContent value="batch" className="flex-1 overflow-y-auto mt-4 space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>請款日期</Label>
+                <Label>{ADD_REQUEST_FORM_LABELS.請款日期}</Label>
                 <DatePicker value={batchDate} onChange={(date) => setBatchDate(date)} placeholder={PAYMENT_ITEM_ROW_LABELS.選擇日期} />
               </div>
               <div>
-                <Label>總金額</Label>
+                <Label>{ADD_REQUEST_FORM_LABELS.總金額}</Label>
                 <Input type="number" placeholder={ADD_REQUEST_DIALOG_LABELS.輸入總金額} value={batchTotalAmount || ''} onChange={e => setBatchTotalAmount(parseFloat(e.target.value) || 0)} />
               </div>
             </div>
 
             <div className="space-y-4 pt-4 border-t border-morandi-container/30">
-              <h3 className="text-sm font-medium text-morandi-primary">請款項目資訊</h3>
+              <h3 className="text-sm font-medium text-morandi-primary">{ADD_REQUEST_FORM_LABELS.請款項目資訊}</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>類別</Label>
+                  <Label>{ADD_REQUEST_FORM_LABELS.類別}</Label>
                   <Select value={batchCategory} onValueChange={(value) => setBatchCategory(value as PaymentItemCategory)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -655,7 +655,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                   </Select>
                 </div>
                 <div>
-                  <Label>供應商</Label>
+                  <Label>{ADD_REQUEST_FORM_LABELS.供應商_label}</Label>
                   <Select value={batchSupplierId} onValueChange={setBatchSupplierId}>
                     <SelectTrigger><SelectValue placeholder={ADD_REQUEST_DIALOG_LABELS.選擇供應商_選填} /></SelectTrigger>
                     <SelectContent className="max-h-[300px] overflow-y-auto">
@@ -667,17 +667,17 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                 </div>
               </div>
               <div>
-                <Label>說明</Label>
+                <Label>{ADD_REQUEST_FORM_LABELS.說明}</Label>
                 <Input placeholder={ADD_REQUEST_DIALOG_LABELS.請款說明_選填} value={batchDescription} onChange={e => setBatchDescription(e.target.value)} />
               </div>
             </div>
 
             <div className="space-y-3 pt-4 border-t border-morandi-container/30">
               <div className="flex items-center justify-between">
-                <Label className="text-base font-semibold">旅遊團分配</Label>
+                <Label className="text-base font-semibold">{ADD_REQUEST_FORM_LABELS.旅遊團分配}</Label>
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={distributeEvenly} disabled={tourAllocations.length === 0 || batchTotalAmount === 0}>平均分配</Button>
-                  <Button size="sm" variant="outline" onClick={addTourAllocation}><Plus className="h-4 w-4 mr-1" />新增旅遊團</Button>
+                  <Button size="sm" variant="outline" onClick={distributeEvenly} disabled={tourAllocations.length === 0 || batchTotalAmount === 0}>{ADD_REQUEST_FORM_LABELS.平均分配}</Button>
+                  <Button size="sm" variant="outline" onClick={addTourAllocation}><Plus className="h-4 w-4 mr-1" />{ADD_REQUEST_FORM_LABELS.新增旅遊團}</Button>
                 </div>
               </div>
 
@@ -686,9 +686,9 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                 <table className="w-full">
                   <thead>
                     <tr className="text-xs text-morandi-primary font-medium bg-morandi-container/40">
-                      <th className="text-left py-2.5 px-3 border-b border-r border-border">旅遊團</th>
-                      <th className="text-right py-2.5 px-3 border-b border-r border-border w-40">分配金額</th>
-                      <th className="text-center py-2.5 px-3 border-b border-border w-16">操作</th>
+                      <th className="text-left py-2.5 px-3 border-b border-r border-border">{ADD_REQUEST_FORM_LABELS.旅遊團}</th>
+                      <th className="text-right py-2.5 px-3 border-b border-r border-border w-40">{ADD_REQUEST_FORM_LABELS.分配金額}</th>
+                      <th className="text-center py-2.5 px-3 border-b border-border w-16">{ADD_REQUEST_FORM_LABELS.操作}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -757,7 +757,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                 )}>
                   <div className="flex items-center gap-2">
                     <AlertCircle className="h-4 w-4 shrink-0" />
-                    <span>{unallocatedAmount > 0 ? '還有金額未分配' : BATCH_RECEIPT_DIALOG_LABELS.分配金額超過總金額}</span>
+                    <span>{unallocatedAmount > 0 ? ADD_REQUEST_FORM_LABELS.還有金額未分配 : BATCH_RECEIPT_DIALOG_LABELS.分配金額超過總金額}</span>
                   </div>
                   <div className="font-medium">
                     未分配：<CurrencyCell amount={Math.abs(unallocatedAmount)} className="inline" />
@@ -767,7 +767,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
             </div>
 
             <div>
-              <Label>備註</Label>
+              <Label>{ADD_REQUEST_FORM_LABELS.備註}</Label>
               <Input placeholder={ADD_REQUEST_DIALOG_LABELS.請款備註_選填} value={batchNote} onChange={e => setBatchNote(e.target.value)} />
             </div>
           </TabsContent>
@@ -786,7 +786,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                   onChange={(date, isSpecialBilling) => setFormData(prev => ({ ...prev, request_date: date, is_special_billing: isSpecialBilling }))}
                 />
                 <div>
-                  <label className="text-sm font-medium text-morandi-primary">備註</label>
+                  <label className="text-sm font-medium text-morandi-primary">{ADD_REQUEST_FORM_LABELS.備註}</label>
                   <Input
                     value={formData.notes}
                     onChange={e => setFormData(prev => ({ ...prev, note: e.target.value }))}
@@ -807,7 +807,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
           <div className="flex items-center text-sm">
             <span className="text-morandi-secondary">
               {activeTab === 'batch'
-                ? `共 ${tourAllocations.filter(a => a.tour_id).length} 筆，總金額`
+                ? ADD_REQUEST_FORM_LABELS.共N筆總金額(tourAllocations.filter(a => a.tour_id).length)
                 : `共 ${activeTab === 'tour' && importFromRequests ? selectedRequestCount : requestItems.length} 項，總金額`
               }
             </span>

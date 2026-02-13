@@ -22,7 +22,7 @@ import { logger } from '@/lib/utils/logger'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
-import { ADD_REQUEST_DIALOG_LABELS, REQUEST_DETAIL_DIALOG_LABELS } from '../../constants/labels';
+import { ADD_REQUEST_DIALOG_LABELS, REQUEST_DETAIL_DIALOG_LABELS, REQUEST_DETAIL_FORM_LABELS } from '../../constants/labels';
 
 interface RequestDetailDialogProps {
   request: PaymentRequest | null
@@ -299,7 +299,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
           <div className="mt-2 mb-4">
             <div className="flex items-center gap-2 mb-2">
               <Layers size={14} className="text-morandi-muted" />
-              <span className="text-xs text-morandi-muted">同批次請款單 ({batchRequests.length} 張，共 <CurrencyCell amount={batchTotalAmount} className="inline text-xs" />)</span>
+              <span className="text-xs text-morandi-muted">{REQUEST_DETAIL_FORM_LABELS.同批次請款單N張共金額(batchRequests.length, batchTotalAmount)}<CurrencyCell amount={batchTotalAmount} className="inline text-xs" />)</span>
             </div>
             <div className="flex flex-wrap gap-1">
               {batchRequests.map((br) => (
@@ -334,11 +334,11 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
             <InfoItem label={REQUEST_DETAIL_DIALOG_LABELS.訂單編號} value={currentRequest.order_number || '-'} />
             <InfoItem label={REQUEST_DETAIL_DIALOG_LABELS.請款人} value={currentRequest.created_by_name || '-'} />
             <div>
-              <p className="text-xs text-morandi-muted mb-1">請款日期</p>
+              <p className="text-xs text-morandi-muted mb-1">{REQUEST_DETAIL_FORM_LABELS.請款日期}</p>
               <DateCell date={currentRequest.created_at} showIcon={false} />
             </div>
             <div>
-              <p className="text-xs text-morandi-muted mb-1">總金額</p>
+              <p className="text-xs text-morandi-muted mb-1">{REQUEST_DETAIL_FORM_LABELS.總金額}</p>
               <CurrencyCell amount={currentRequest.amount || 0} className="font-semibold text-morandi-gold" />
             </div>
           </div>
@@ -366,13 +366,13 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
               {/* 表頭 */}
               <div className="bg-morandi-background/50 border-b border-morandi-container/20">
                 <div className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_96px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_96px]'} px-3 py-2.5`}>
-                  <span className="text-xs font-medium text-morandi-muted">類別</span>
-                  <span className="text-xs font-medium text-morandi-muted">付款對象</span>
-                  <span className="text-xs font-medium text-morandi-muted">說明</span>
-                  <span className="text-xs font-medium text-morandi-muted text-right">單價</span>
-                  <span className="text-xs font-medium text-morandi-muted text-center">數量</span>
-                  <span className="text-xs font-medium text-morandi-muted text-right">小計</span>
-                  {canEdit && <span className="text-xs font-medium text-morandi-muted text-center">操作</span>}
+                  <span className="text-xs font-medium text-morandi-muted">{REQUEST_DETAIL_FORM_LABELS.類別}</span>
+                  <span className="text-xs font-medium text-morandi-muted">{REQUEST_DETAIL_FORM_LABELS.付款對象}</span>
+                  <span className="text-xs font-medium text-morandi-muted">{REQUEST_DETAIL_FORM_LABELS.說明}</span>
+                  <span className="text-xs font-medium text-morandi-muted text-right">{REQUEST_DETAIL_FORM_LABELS.單價}</span>
+                  <span className="text-xs font-medium text-morandi-muted text-center">{REQUEST_DETAIL_FORM_LABELS.數量}</span>
+                  <span className="text-xs font-medium text-morandi-muted text-right">{REQUEST_DETAIL_FORM_LABELS.小計}</span>
+                  {canEdit && <span className="text-xs font-medium text-morandi-muted text-center">{REQUEST_DETAIL_FORM_LABELS.操作}</span>}
                 </div>
               </div>
 
@@ -569,7 +569,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                   <div></div>
                   <div></div>
                   <div></div>
-                  <div className="text-right font-semibold text-sm">合計</div>
+                  <div className="text-right font-semibold text-sm">{REQUEST_DETAIL_FORM_LABELS.合計}</div>
                   <div className="text-right pr-2">
                     <CurrencyCell amount={currentRequest.amount || 0} className="font-bold text-morandi-gold" />
                   </div>
@@ -582,7 +582,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
           {/* 備註 */}
           {currentRequest.notes && (
             <div className="p-4 bg-morandi-background/50 rounded-lg">
-              <h3 className="text-sm font-semibold text-morandi-primary mb-2">備註</h3>
+              <h3 className="text-sm font-semibold text-morandi-primary mb-2">{REQUEST_DETAIL_FORM_LABELS.備註}</h3>
               <p className="text-sm text-morandi-secondary whitespace-pre-wrap">{currentRequest.notes}</p>
             </div>
           )}
