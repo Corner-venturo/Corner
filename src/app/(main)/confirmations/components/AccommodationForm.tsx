@@ -135,15 +135,15 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="checkInDate">入住日期 *</Label>
+            <Label htmlFor="checkInDate">{LABELS.CHECK_IN_DATE}</Label>
             <DatePicker
               value={data.checkInDate || ''}
               onChange={date => updateField('checkInDate', date)}
-              placeholder="選擇日期"
+              placeholder={LABELS.SELECT_DATE_PLACEHOLDER}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="checkInTime">入住時間</Label>
+            <Label htmlFor="checkInTime">{LABELS.CHECK_IN_TIME}</Label>
             <Input
               id="checkInTime"
               value={data.checkInTime || ''}
@@ -155,15 +155,15 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="checkOutDate">退房日期 *</Label>
+            <Label htmlFor="checkOutDate">{LABELS.CHECK_OUT_DATE}</Label>
             <DatePicker
               value={data.checkOutDate || ''}
               onChange={date => updateField('checkOutDate', date)}
-              placeholder="選擇日期"
+              placeholder={LABELS.SELECT_DATE_PLACEHOLDER}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="checkOutTime">退房時間</Label>
+            <Label htmlFor="checkOutTime">{LABELS.CHECK_OUT_TIME}</Label>
             <Input
               id="checkOutTime"
               value={data.checkOutTime || ''}
@@ -175,7 +175,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="roomCount">房數 *</Label>
+            <Label htmlFor="roomCount">{LABELS.ROOM_COUNT}</Label>
             <Input
               id="roomCount"
               type="number"
@@ -184,7 +184,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="nightCount">晚數 *</Label>
+            <Label htmlFor="nightCount">{LABELS.NIGHT_COUNT}</Label>
             <Input
               id="nightCount"
               type="number"
@@ -197,10 +197,10 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
 
       {/* 房型資訊 */}
       <div className="space-y-4 p-4 bg-muted rounded-md">
-        <h3 className="font-semibold text-morandi-primary">房型資訊</h3>
+        <h3 className="font-semibold text-morandi-primary">{LABELS.ROOM_INFO}</h3>
 
         <div className="space-y-2">
-          <Label htmlFor="roomType">房型 *</Label>
+          <Label htmlFor="roomType">{LABELS.ROOM_TYPE}</Label>
           <Input
             id="roomType"
             value={data.roomType || ''}
@@ -210,7 +210,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="guestName">旅客姓名 *</Label>
+          <Label htmlFor="guestName">{LABELS.GUEST_NAME}</Label>
           <Input
             id="guestName"
             value={data.guestName || ''}
@@ -220,7 +220,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="guestCapacity">入住人數</Label>
+          <Label htmlFor="guestCapacity">{LABELS.GUEST_CAPACITY}</Label>
           <Input
             id="guestCapacity"
             value={data.guestCapacity || ''}
@@ -232,14 +232,14 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
 
       {/* 餐點資訊 */}
       <div className="space-y-4 p-4 bg-muted rounded-md">
-        <h3 className="font-semibold text-morandi-primary">餐點資訊</h3>
+        <h3 className="font-semibold text-morandi-primary">{LABELS.MEAL_INFO}</h3>
 
         {(data.meals || []).map((meal, index) => (
           <div key={index} className="flex gap-2">
             <DatePicker
               value={meal.date}
               onChange={date => updateMeal(index, 'date', date)}
-              placeholder="選擇日期"
+              placeholder={LABELS.SELECT_DATE_PLACEHOLDER}
               className="w-40"
             />
             <Input
@@ -249,18 +249,18 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
               className="flex-1"
             />
             <Button type="button" variant="outline" size="sm" onClick={() => removeMeal(index)}>
-              刪除
+              {LABELS.DELETE}
             </Button>
           </div>
         ))}
         <Button type="button" variant="outline" size="sm" onClick={addMeal}>
-          + 新增餐點
+          {LABELS.ADD_MEAL}
         </Button>
       </div>
 
       {/* 重要資訊 */}
       <div className="space-y-2">
-        <Label htmlFor="importantNotes">重要城市資訊 / 備註</Label>
+        <Label htmlFor="importantNotes">{LABELS.IMPORTANT_NOTES}</Label>
         <Textarea
           id="importantNotes"
           value={data.importantNotes || ''}

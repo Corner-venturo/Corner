@@ -100,5 +100,39 @@ export const LABELS = {
   
   // AccommodationForm.tsx additional labels
   ADD_MEAL: '+ 新增餐點',
-  SELECT_DATE_PLACEHOLDER: '選擇日期'
+  SELECT_DATE_PLACEHOLDER: '選擇日期',
+  
+  // FlightForm.tsx labels
+  PASSENGER_INFO: '旅客資訊',
+  EN_NAME: '英文姓名',
+  ZH_NAME: '中文姓名',
+  CABIN_CLASS: '艙等',
+  TICKET_NO: '票號',
+  BOOKING_CODE_LABEL: 'PNR',
+  FLIGHT_INFO: '航班資訊',
+  ROUTE: '航線',
+  DEPARTURE_AIRPORT_LABEL: '出發機場',
+  DEPARTURE_DATE_LABEL: '出發日期',
+  DEPARTURE_TIME_LABEL: '出發時間',
+  ARRIVAL_AIRPORT_LABEL: '抵達機場',
+  ARRIVAL_DATE_LABEL: '抵達日期',
+  ARRIVAL_TIME_LABEL: '抵達時間',
+  AIRLINE_LABEL: '航空公司',
+  FLIGHT_NUMBER_LABEL: '航班號',
+  BAGGAGE_INFO: '行李資訊',
+  PASSENGER_NAME_LABEL: '旅客姓名',
+  PERSONAL_ITEM: '隨身物品',
+  CARRY_ON: '手提行李',
+  CHECKED_BAGGAGE: '託運行李',
+  IMPORTANT_INFO_NOTES: '重要資訊',
+  ADD_PASSENGER: '新增旅客',
+  ADD_FLIGHT: '新增航班',
+  ADD_BAGGAGE: '新增行李',
+  ADD_NOTE: '新增重要資訊',
+  BAGGAGE_DETAILS: '行李詳細資訊',
+  CARRY_ON_DETAIL: '手提行李詳情',
+  CHECKED_DETAIL: '託運行李詳情',
+  PERSONAL_ITEM_DETAIL: '隨身物品詳情',
+  ADD_BAGGAGE_DETAIL: '新增行李詳情',
+  AIRLINE_CONTACT_INFO: '航空公司聯絡資訊'
 } as const

@@ -661,7 +661,7 @@ export function TourPnrToolDialog({
             <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 text-sm">
               <div className="flex items-center gap-2 font-medium mb-2">
                 <Users size={16} />
-                以下乘客未比對到團員（需手動選擇或新增團員）：
+                {TOUR_PNR_TOOL_DIALOG_LABELS.以下乘客未比對到團員_需手動選擇或新增團員}
               </div>
               <ul className="ml-6 space-y-1">
                 {passengerMatches.filter(m => !m.memberId).map(m => (
@@ -854,7 +854,7 @@ export function TourPnrToolDialog({
                     <thead className="bg-morandi-container/40">
                       <tr>
                         <th className="px-3 py-2 text-left font-medium text-morandi-secondary">#</th>
-                        <th className="px-3 py-2 text-left font-medium text-morandi-secondary">PNR 姓名</th>
+                        <th className="px-3 py-2 text-left font-medium text-morandi-secondary">{TOUR_PNR_TOOL_DIALOG_LABELS.PNR_姓名}</th>
                         <th className="px-3 py-2 text-left font-medium text-morandi-secondary w-16">類型</th>
                         <th className="px-3 py-2 text-left font-medium text-morandi-secondary">團員</th>
                         <th className="px-3 py-2 text-left font-medium text-morandi-secondary">

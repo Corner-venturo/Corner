@@ -335,7 +335,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
       if (currentItineraryId) {
         await updateItinerary(currentItineraryId, itineraryData)
         await syncItineraryToQuote(currentItineraryId, formattedDailyItinerary)
-        toast.success('行程表已更新')
+        toast.success(TOUR_ITINERARY_TAB_LABELS.行程表已更新)
       } else {
         const newItinerary = await createItinerary({
           ...itineraryData,
@@ -343,12 +343,12 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
         } as Parameters<typeof createItinerary>[0])
         if (newItinerary?.id) {
           setCurrentItineraryId(newItinerary.id)
-          toast.success('行程表已建立')
+          toast.success(TOUR_ITINERARY_TAB_LABELS.行程表已建立)
         }
       }
       refresh()
     } catch (error) {
-      logger.error('儲存行程表失敗:', error)
+      logger.error(TOUR_ITINERARY_TAB_LABELS.儲存行程表失敗, error)
       toast.error('儲存失敗')
     } finally {
       setSaving(false)
@@ -368,7 +368,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>${title || '行程表'}</title>
+        <title>${title || TOUR_ITINERARY_TAB_LABELS.行程表}</title>
         <style>
           @page { size: A4; margin: 10mm; }
           body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
@@ -389,18 +389,18 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
       <body>
         <div class="header">
           <div style="display: flex; justify-content: space-between;">
-            <div class="title">${title || '行程表'}</div>
+            <div class="title">${title || TOUR_ITINERARY_TAB_LABELS.行程表}</div>
             <div class="company">${companyName}</div>
           </div>
           <div class="info-grid">
-            <div><span class="info-label">目的地：</span>${destination}</div>
-            <div><span class="info-label">出發日期：</span>${tour.departure_date || '-'}</div>
-            <div><span class="info-label">行程天數：</span>${dailyData.length} 天</div>
+            <div><span class="info-label">${TOUR_ITINERARY_TAB_LABELS.目的地_冒號}</span>${destination}</div>
+            <div><span class="info-label">${TOUR_ITINERARY_TAB_LABELS.出發日期}：</span>${tour.departure_date || '-'}</div>
+            <div><span class="info-label">${TOUR_ITINERARY_TAB_LABELS.行程天數_冒號}</span>${dailyData.length} ${TOUR_ITINERARY_TAB_LABELS.天}</div>
           </div>
           ${!isDomestic && (outboundFlight || returnFlight) ? `
           <div class="info-grid" style="margin-top: 8px;">
-            ${outboundFlight ? `<div><span class="info-label">去程航班：</span>${outboundFlight.airline} ${outboundFlight.flightNumber} (${outboundFlight.departureAirport} ${outboundFlight.departureTime} → ${outboundFlight.arrivalAirport} ${outboundFlight.arrivalTime})</div>` : ''}
-            ${returnFlight ? `<div><span class="info-label">回程航班：</span>${returnFlight.airline} ${returnFlight.flightNumber} (${returnFlight.departureAirport} ${returnFlight.departureTime} → ${returnFlight.arrivalAirport} ${returnFlight.arrivalTime})</div>` : ''}
+            ${outboundFlight ? `<div><span class="info-label">${TOUR_ITINERARY_TAB_LABELS.去程航班_冒號}</span>${outboundFlight.airline} ${outboundFlight.flightNumber} (${outboundFlight.departureAirport} ${outboundFlight.departureTime} → ${outboundFlight.arrivalAirport} ${outboundFlight.arrivalTime})</div>` : ''}
+            ${returnFlight ? `<div><span class="info-label">${TOUR_ITINERARY_TAB_LABELS.回程航班_冒號}</span>${returnFlight.airline} ${returnFlight.flightNumber} (${returnFlight.departureAirport} ${returnFlight.departureTime} → ${returnFlight.arrivalAirport} ${returnFlight.arrivalTime})</div>` : ''}
           </div>` : ''}
         </div>
         <table>
@@ -458,7 +458,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
         <div className="flex items-center justify-between">
           <h3 className="flex items-center gap-2 text-lg font-medium">
             <Eye className="w-5 h-5 text-morandi-gold" />
-            簡易行程表預覽
+            {TOUR_ITINERARY_TAB_LABELS.簡易行程表預覽}
           </h3>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => setViewMode('edit')}>
@@ -475,13 +475,13 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
         <div className="border rounded-lg p-6 bg-card">
           <div className="border-b-2 border-morandi-gold pb-4 mb-6">
             <div className="flex items-start justify-between">
-              <h1 className="text-xl font-bold text-morandi-primary">{title || '行程表'}</h1>
+              <h1 className="text-xl font-bold text-morandi-primary">{title || TOUR_ITINERARY_TAB_LABELS.行程表}</h1>
               <span className="text-sm font-semibold text-morandi-gold">{currentUser?.workspace_code || '旅行社'}</span>
             </div>
             <div className="mt-4 grid grid-cols-3 gap-4 text-sm">
-              <div><span className="text-muted-foreground">目的地：</span>{tour.location || '-'}</div>
-              <div><span className="text-muted-foreground">出發日期：</span>{tour.departure_date || '-'}</div>
-              <div><span className="text-muted-foreground">行程天數：</span>{dailyData.length} 天</div>
+              <div><span className="text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.目的地_冒號}</span>{tour.location || '-'}</div>
+              <div><span className="text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.出發日期}：</span>{tour.departure_date || '-'}</div>
+              <div><span className="text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.行程天數_冒號}</span>{dailyData.length} {TOUR_ITINERARY_TAB_LABELS.天}</div>
             </div>
           </div>
 

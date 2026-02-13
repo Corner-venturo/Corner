@@ -2,6 +2,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
+import { LABELS } from '../constants/labels'
 import type { ConfirmationFormData, FlightData } from '@/types/confirmation.types'
 
 interface FlightFormProps {
@@ -88,7 +89,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
     <div className="space-y-6">
       {/* 訂單編號 */}
       <div className="space-y-2">
-        <Label htmlFor="booking_number">訂單編號 *</Label>
+        <Label htmlFor="booking_number">{LABELS.BOOKING_NUMBER}</Label>
         <Input
           id="booking_number"
           value={formData.booking_number}
@@ -99,12 +100,12 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
 
       {/* 旅客資訊 */}
       <div className="space-y-4 p-4 bg-muted rounded-md">
-        <h3 className="font-semibold text-morandi-primary">旅客資訊</h3>
+        <h3 className="font-semibold text-morandi-primary">{LABELS.PASSENGER_INFO}</h3>
         {(data.passengers || []).map((passenger, index) => (
           <div key={index} className="space-y-2 p-3 bg-card rounded border">
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <Label>英文姓名</Label>
+                <Label>{LABELS.EN_NAME}</Label>
                 <Input
                   value={passenger.nameEn}
                   onChange={e => {
@@ -116,7 +117,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                 />
               </div>
               <div>
-                <Label>中文姓名</Label>
+                <Label>{LABELS.ZH_NAME}</Label>
                 <Input
                   value={passenger.nameZh || ''}
                   onChange={e => {
@@ -130,7 +131,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
             </div>
             <div className="grid grid-cols-3 gap-2">
               <div>
-                <Label>艙等</Label>
+                <Label>{LABELS.CABIN_CLASS}</Label>
                 <Input
                   value={passenger.cabin}
                   onChange={e => {
@@ -138,11 +139,11 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                     passengers[index] = { ...passengers[index], cabin: e.target.value }
                     updateData({ passengers })
                   }}
-                  placeholder="經濟艙"
+                  placeholder={LABELS.ECONOMY_CLASS}
                 />
               </div>
               <div>
-                <Label>票號</Label>
+                <Label>{LABELS.TICKET_NO}</Label>
                 <Input
                   value={passenger.ticketNumber}
                   onChange={e => {
@@ -154,7 +155,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                 />
               </div>
               <div>
-                <Label>訂位代號</Label>
+                <Label>{LABELS.BOOKING_CODE_LABEL}</Label>
                 <Input
                   value={passenger.bookingCode}
                   onChange={e => {
@@ -169,17 +170,17 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
           </div>
         ))}
         <Button type="button" variant="outline" size="sm" onClick={addPassenger}>
-          + 新增旅客
+          {LABELS.ADD_PASSENGER}
         </Button>
       </div>
 
       {/* 航班資訊 */}
       <div className="space-y-4 p-4 bg-muted rounded-md">
-        <h3 className="font-semibold text-morandi-primary">航班資訊</h3>
+        <h3 className="font-semibold text-morandi-primary">{LABELS.FLIGHT_INFO}</h3>
         {(data.segments || []).map((segment, index) => (
           <div key={index} className="space-y-2 p-3 bg-card rounded border">
             <div>
-              <Label>航段</Label>
+              <Label>{LABELS.ROUTE}</Label>
               <Input
                 value={segment.route}
                 onChange={e => {
@@ -192,7 +193,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <Label>出發日期</Label>
+                <Label>{LABELS.DEPARTURE_DATE_LABEL}</Label>
                 <DatePicker
                   value={segment.departureDate}
                   onChange={date => {

@@ -563,6 +563,7 @@ export const TOUR_PNR_TOOL_DIALOG_LABELS = {
   旅客比對: '旅客比對',
   類型: '類型',
   團員: '團員',
+  PNR_姓名: 'PNR 姓名',
   行李: '行李',
   選擇團員: '選擇團員...',
   成人: '成人',
@@ -584,10 +585,15 @@ export const TOUR_PNR_TOOL_DIALOG_LABELS = {
 // TourItineraryTab 模組的 UI 標籤
 export const TOUR_ITINERARY_TAB_LABELS = {
   載入行程表失敗: '載入行程表失敗',
+  目的地_冒號: '目的地：',
+  行程天數_冒號: '行程天數：',
+  去程航班_冒號: '去程航班：',
+  回程航班_冒號: '回程航班：',
+  簡易行程表預覽: '簡易行程表預覽',
+  天: '天',
   敬請自理: '敬請自理',
   飯店早餐: '飯店早餐',
   第: (day: number) => `第${day}`,
-  天: '天',
   餐食_早餐: '早餐',
   餐食_午餐: '午餐',
   餐食_晚餐: '晚餐',
@@ -646,6 +652,8 @@ export const TOUR_ITINERARY_TAB_LABELS = {
   未命名行程表: '未命名行程表',
   T1: 'T1',
   T2: 'T2',
+  行程表: '行程表',
+  出發日期: '出發日期',
 };
 
 // TourCosts 模組的 UI 標籤
