@@ -81,13 +81,13 @@ export function PassportUploadZone({
     )}
     <div className="space-y-3">
       <h4 className="text-sm font-medium text-morandi-primary">
-        護照批次辨識 (OCR)
+        {COMP_ORDERS_LABELS.護照批次辨識OCR}
       </h4>
       <p className="text-xs text-morandi-muted">
-        上傳護照照片或 PDF，系統將自動辨識並建立成員資料
+        {COMP_ORDERS_LABELS.上傳護照照片系統自動辨識}
       </p>
       <p className="text-xs text-morandi-gold">
-        💡 圖片模糊？上傳後點擊圖片左上角的 ✨ 按鈕進行銳利化增強
+        {COMP_ORDERS_LABELS.圖片模糊增強提示}
       </p>
 
       {/* 拖放區域 */}
@@ -114,7 +114,7 @@ export function PassportUploadZone({
           {isProcessing ? COMP_ORDERS_LABELS.處理中 : COMP_ORDERS_LABELS.拖放或點擊選擇護照照片_PDF}
         </span>
         <span className="text-xs text-morandi-muted mt-1">
-          支援 JPG、PNG、PDF 格式
+          {COMP_ORDERS_LABELS.支援格式提示}
         </span>
       </label>
 
@@ -123,7 +123,7 @@ export function PassportUploadZone({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm text-morandi-secondary">
-              已選擇 {processedFiles.length} 個檔案
+              {COMP_ORDERS_LABELS.已選擇檔案.replace('{count}', processedFiles.length.toString())}
             </span>
             <Button
               variant="ghost"
@@ -131,7 +131,7 @@ export function PassportUploadZone({
               onClick={() => processedFiles.forEach((_, i) => onRemoveFile(i))}
               className="text-morandi-muted hover:text-status-danger"
             >
-              清空全部
+              {COMP_ORDERS_LABELS.清空全部}
             </Button>
           </div>
 
@@ -144,12 +144,12 @@ export function PassportUploadZone({
             {isUploading ? (
               <>
                 <span className="animate-spin mr-2">⏳</span>
-                辨識中...
+                {COMP_ORDERS_LABELS.辨識中}
               </>
             ) : (
               <>
                 <Upload size={16} className="mr-2" />
-                開始辨識並建立成員 ({processedFiles.length})
+                {COMP_ORDERS_LABELS.開始辨識並建立成員.replace('{count}', processedFiles.length.toString())}
               </>
             )}
           </Button>
@@ -183,7 +183,7 @@ export function PassportUploadZone({
                 )}
                 {pf.isPdf && (
                   <span className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[8px] text-center py-0.5">
-                    PDF
+                    {COMP_ORDERS_LABELS.PDF標籤}
                   </span>
                 )}
               </div>

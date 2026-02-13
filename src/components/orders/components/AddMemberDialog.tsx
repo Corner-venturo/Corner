@@ -58,13 +58,13 @@ export function AddMemberDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent nested level={2} className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>新增成員</DialogTitle>
+          <DialogTitle>{COMP_ORDERS_LABELS.新增成員}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           {/* 手動新增 */}
           <div className="space-y-3">
-            <h4 className="text-sm font-medium text-morandi-primary">手動新增空白成員</h4>
+            <h4 className="text-sm font-medium text-morandi-primary">{COMP_ORDERS_LABELS.手動新增空白成員}</h4>
             <div className="flex items-center gap-2">
               <Input
                 type="number"
@@ -78,14 +78,14 @@ export function AddMemberDialog({
                 className="w-24"
                 placeholder={COMP_ORDERS_LABELS.人數}
               />
-              <span className="text-sm text-morandi-muted">人</span>
+              <span className="text-sm text-morandi-muted">{COMP_ORDERS_LABELS.人數}</span>
               <Button
                 onClick={onConfirm}
                 disabled={!memberCount || memberCount < 1}
                 size="sm"
               >
                 <Plus size={16} className="mr-1" />
-                新增
+                {COMP_ORDERS_LABELS.新增}
               </Button>
             </div>
           </div>

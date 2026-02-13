@@ -217,12 +217,12 @@ export function MemberEditDialog({
             {editMode === 'verify' ? (
               <>
                 <AlertTriangle className="text-status-warning" size={20} />
-                驗證成員資料
+                {COMP_ORDERS_LABELS.驗證成員資料}
               </>
             ) : (
               <>
                 <Pencil className="text-morandi-blue" size={20} />
-                編輯成員資料
+                {COMP_ORDERS_LABELS.編輯成員資料}
               </>
             )}
           </DialogTitle>
@@ -268,7 +268,7 @@ export function MemberEditDialog({
           <div className="flex gap-3">
             <Button variant="outline" className="gap-1" onClick={onClose} disabled={isSaving}>
               <X size={16} />
-              取消
+              {COMP_ORDERS_LABELS.取消}
             </Button>
             <Button
               onClick={onSave}
