@@ -87,6 +87,9 @@ export const ITINERARY_DIALOG_LABELS = {
   從飯店庫選擇: '從飯店庫選擇',
   關閉: '關閉',
   列印: '列印',
+  目的地: '目的地：',
+  行程天數: (days: number) => `${days} 天`,
+  版本: (v: number) => `版本 ${v}`,
 };
 
 export const PACKAGE_ITINERARY_DIALOG_LABELS = {

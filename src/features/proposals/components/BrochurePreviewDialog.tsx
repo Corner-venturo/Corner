@@ -131,7 +131,7 @@ export function BrochurePreviewDialog({
         <div class="header">
           <div style="display: flex; justify-content: space-between;">
             <div>
-              <div class="title">${itinerary.title || '行程表'}</div>
+              <div class="title">${itinerary.title || BROCHURE_PREVIEW_DIALOG_LABELS.行程表}</div>
               ${itinerary.subtitle ? `<div class="subtitle">${itinerary.subtitle}</div>` : ''}
             </div>
             <div class="company">${companyName}</div>
@@ -256,7 +256,7 @@ export function BrochurePreviewDialog({
                 <div className="flex items-start justify-between">
                   <div>
                     <h1 className="text-xl font-bold text-morandi-primary mb-1">
-                      {itinerary.title || '行程表'}
+                      {itinerary.title || BROCHURE_PREVIEW_DIALOG_LABELS.行程表}
                     </h1>
                     {itinerary.subtitle && (
                       <p className="text-sm text-morandi-secondary">{itinerary.subtitle}</p>
