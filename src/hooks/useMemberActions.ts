@@ -9,6 +9,7 @@ import { logger } from '@/lib/utils/logger'
 import { getCurrentWorkspaceId } from '@/lib/workspace-helpers'
 import type { Member } from '@/stores/types'
 import type { Database } from '@/lib/supabase/types'
+import { deleteMember, updateMember } from '@/data/entities/members'
 
 // Supabase Insert 類型（使用 order_members 表）
 type OrderMemberInsert = Database['public']['Tables']['order_members']['Insert']
@@ -129,11 +130,7 @@ export function useMemberActions(): MemberActionsReturn {
         : {}),
     }
 
-    const { error } = await supabase
-      .from('order_members')
-      .update(updatedData as Record<string, unknown>)
-      .eq('id', id)
-    if (error) throw error
+    await updateMember(id, updatedData as Parameters<typeof updateMember>[1])
 
     mutate(SWR_KEY)
   }
@@ -150,8 +147,7 @@ export function useMemberActions(): MemberActionsReturn {
       memberOrderId = member?.order_id ?? undefined
     }
 
-    const { error } = await supabase.from('order_members').delete().eq('id', id)
-    if (error) throw error
+    await deleteMember(id)
 
     mutate(SWR_KEY)
 

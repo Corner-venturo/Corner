@@ -10,6 +10,7 @@ import { OrderFormData } from '@/components/orders/add-order-form'
 import type { CreateInput, UpdateInput } from '@/stores/core/types'
 import { useCountries, useCities, updateCountry, updateCity, updateQuote } from '@/data'
 import { supabase } from '@/lib/supabase/client'
+import { createOrder } from '@/data/entities/orders'
 
 interface TourActions {
   create: (data: CreateInput<Tour>) => Promise<Tour>
@@ -173,27 +174,23 @@ export function useTourOperations(params: UseTourOperationsParams) {
           const memberCount = newOrder.member_count || 1
           const totalAmount = newOrder.total_amount || newTour.price * memberCount
           const now = new Date().toISOString()
-          const orderData = {
-            id: crypto.randomUUID(),
-            order_number,
-            tour_id: createdTour.id,
-            code: code,
-            tour_name: newTour.name,
-            contact_person: newOrder.contact_person,
-            sales_person: newOrder.sales_person || '',
-            assistant: newOrder.assistant || '',
-            member_count: memberCount,
-            payment_status: 'unpaid' as const,
-            total_amount: totalAmount,
-            paid_amount: 0,
-            remaining_amount: totalAmount,
-            created_at: now,
-            updated_at: now,
-          }
-
-          const { error: orderError } = await supabase.from('orders').insert(orderData)
-          if (orderError) {
-            logger.warn('建立訂單失敗:', orderError.message)
+          try {
+            await createOrder({
+              order_number,
+              tour_id: createdTour.id,
+              tour_name: newTour.name,
+              contact_person: newOrder.contact_person,
+              sales_person: newOrder.sales_person || '',
+              assistant: newOrder.assistant || '',
+              member_count: memberCount,
+              payment_status: 'unpaid',
+              total_amount: totalAmount,
+              paid_amount: 0,
+              remaining_amount: totalAmount,
+              code,
+            } as Parameters<typeof createOrder>[0])
+          } catch (orderErr) {
+            logger.warn('建立訂單失敗:', (orderErr as Error).message)
           }
         }
 

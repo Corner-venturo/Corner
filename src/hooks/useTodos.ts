@@ -5,6 +5,7 @@
 import { useEffect } from 'react'
 import useSWR, { mutate } from 'swr'
 import { supabase } from '@/lib/supabase/client'
+import { createTodo as createTodoEntity, updateTodo as updateTodoEntity, deleteTodo as deleteTodoEntity } from '@/data/entities/todos'
 import { getAllTodos } from '@/lib/data/todos'
 import { CACHE_STRATEGY } from '@/lib/swr'
 import type { Todo } from '@/stores/types'
@@ -137,16 +138,13 @@ export function useTodos() {
       // 轉換為 Supabase Insert 類型（Json 欄位需要轉型）
       // 排除 creator 欄位（todos 表沒有此欄位，改用 created_by_legacy）
       const { creator, ...todoWithoutCreator } = newTodo
-      const insertData: TodoInsert = {
+      await createTodoEntity({
         ...todoWithoutCreator,
-        workspace_id,
-        created_by_legacy: creator, // 必填欄位：員工 ID（對應前端的 creator）
-        related_items: newTodo.related_items as unknown as TodoInsert['related_items'],
-        sub_tasks: newTodo.sub_tasks as unknown as TodoInsert['sub_tasks'],
-        notes: newTodo.notes as unknown as TodoInsert['notes'],
-      }
-      const { error } = await supabase.from('todos').insert(insertData)
-      if (error) throw error
+        created_by_legacy: creator,
+        related_items: newTodo.related_items,
+        sub_tasks: newTodo.sub_tasks,
+        notes: newTodo.notes,
+      } as unknown as Parameters<typeof createTodoEntity>[0])
 
       // 成功後重新驗證
       mutate(swrKey)
@@ -183,11 +181,7 @@ export function useTodos() {
     )
 
     try {
-      const { error } = await supabase
-        .from('todos')
-        .update(updatedTodo)
-        .eq('id', id)
-      if (error) throw error
+      await updateTodoEntity(id, updatedTodo as Parameters<typeof updateTodoEntity>[1])
 
       mutate(swrKey)
     } catch (err) {
@@ -206,8 +200,7 @@ export function useTodos() {
     )
 
     try {
-      const { error } = await supabase.from('todos').delete().eq('id', id)
-      if (error) throw error
+      await deleteTodoEntity(id)
 
       mutate(swrKey)
     } catch (err) {
