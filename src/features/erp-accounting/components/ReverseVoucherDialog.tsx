@@ -98,7 +98,7 @@ export function ReverseVoucherDialog({
           </div>
 
           <div className="p-3 bg-status-warning-bg text-morandi-primary rounded-lg text-sm">
-            ⚠️ 反沖後將產生一張新的反向傳票，原傳票狀態將變更為「已反沖」。此操作無法復原。
+            {L.warning_irreversible}
           </div>
         </div>
 
