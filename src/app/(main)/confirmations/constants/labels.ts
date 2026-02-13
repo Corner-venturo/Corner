@@ -19,6 +19,7 @@ export const LABELS = {
   EDIT: '編輯',
   SEARCH: '搜尋',
   CONFIRM: '確認',
+  CLOSE: '關閉',
   
   // 状态和消息
   LOADING: '載入中...',
@@ -59,4 +60,45 @@ export const LABELS = {
   GUEST_CAPACITY: '入住人數',
   MEAL_INFO: '餐點資訊',
   IMPORTANT_NOTES: '重要城市資訊 / 備註',
+  
+  // PrintableConfirmation.tsx
+  FLIGHT_CONFIRMATION_TITLE: '機票確認單',
+  ACCOMMODATION_CONFIRMATION_TITLE: '住宿確認單',
+  BOOKING_CODE: '訂位代號',
+  CONFIRMATION_CODE: '確認號碼',
+  REMARKS: '備註',
+  CORNER_TRAVEL: '角落旅行社',
+  CORNER_TRAVEL_COMPANY: '角落旅行社股份有限公司',
+  
+  // Flight related
+  DISCLAIMER: '**** 此文件資訊僅提供參考, 實際資訊以航空公司及相關旅遊供應商為準 ****',
+  PASSENGER_NAME: '旅客姓名',
+  DATE: '日期',
+  TIME_FLIGHT: '時間  航班',
+  OTHER_INFO: '其他訊息',
+  DIRECT_FLIGHT: '直飛',
+  TRANSIT: '轉機',
+  DEPARTURE: '出發',
+  ARRIVAL: '抵達',
+  TERMINAL: '航站',
+  MEAL: '餐點',
+  TICKET_NUMBER: '機票號碼',
+  AIRLINE_CONTACT: '航空公司確認電話',
+  IMPORTANT_INFO: '重要資訊',
+  
+  // Accommodation related
+  CHECK_IN: '入住',
+  CHECK_OUT: '退房',
+  ROOM_QUANTITY: '房間數量',
+  ACCOMMODATION_DAYS: '住宿天數',
+  ROOMS: '間',
+  NIGHTS: '晚',
+  ROOM_TYPE_COLON: '房型：',
+  GUEST_NAME_COLON: '旅客姓名：',
+  GUEST_CAPACITY_COLON: '入住人數：',
+  MEAL_CONTENT: '餐點內容',
+  
+  // AccommodationForm.tsx additional labels
+  ADD_MEAL: '+ 新增餐點',
+  SELECT_DATE_PLACEHOLDER: '選擇日期'
 } as const
