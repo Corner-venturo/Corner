@@ -128,7 +128,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
       <div className="grid grid-cols-2 gap-3">
         {/* 選擇團體 */}
         <div>
-          <Label className="text-sm font-medium text-morandi-primary">團體</Label>
+          <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.group}</Label>
           <Combobox
             options={(tours || []).map(tour => ({
               value: tour.id,
@@ -145,14 +145,14 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
                 setSelectedOrderId('')
               }
             }}
-            placeholder="請選擇團體..."
+            placeholder={PLACEHOLDER_LABELS.selectGroup}
             className="mt-1"
           />
         </div>
 
         {/* 選擇訂單 */}
         <div>
-          <Label className="text-sm font-medium text-morandi-primary">訂單</Label>
+          <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.order}</Label>
           <Select
             disabled={!selectedTourId || availableOrders.length === 0}
             value={selectedOrderId}
@@ -162,17 +162,17 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
               <SelectValue
                 placeholder={
                   !selectedTourId
-                    ? '請先選擇團體'
+                    ? PLACEHOLDER_LABELS.selectGroupFirst
                     : availableOrders.length === 0
-                      ? '此團體沒有訂單'
-                      : '請選擇訂單...'
+                      ? PLACEHOLDER_LABELS.noOrdersInGroup
+                      : PLACEHOLDER_LABELS.selectOrder
                 }
               />
             </SelectTrigger>
             <SelectContent>
               {availableOrders.map(order => (
                 <SelectItem key={order.id} value={order.id}>
-                  {order.code} - {order.contact_person || '無聯絡人'}
+                  {order.code} - {order.contact_person || CONTACT_LABELS.noContact}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -183,7 +183,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
       {/* 第一排：固定欄位（所有收款方式都有） */}
       <div className="grid grid-cols-3 gap-3">
         <div>
-          <Label className="text-sm font-medium text-morandi-primary">收款方式 *</Label>
+          <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.paymentMethod}</Label>
           <Select
             value={paymentItem.receipt_type?.toString()}
             onValueChange={value => updatePaymentItem({ receipt_type: Number(value) })}
@@ -202,10 +202,10 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
         </div>
 
         <div>
-          <Label className="text-sm font-medium text-morandi-primary">金額 *</Label>
+          <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.amount}</Label>
           <Input
             type="number"
-            placeholder="請輸入金額"
+            placeholder={PLACEHOLDER_LABELS.enterAmount}
             value={paymentItem.amount || ''}
             onChange={e => updatePaymentItem({ amount: Number(e.target.value) })}
             className="mt-1 border-morandi-container/30"
@@ -213,7 +213,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
         </div>
 
         <div>
-          <Label className="text-sm font-medium text-morandi-primary">交易日期 *</Label>
+          <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.transactionDate}</Label>
           <DateInput
             value={paymentItem.transaction_date || ''}
             onChange={value => updatePaymentItem({ transaction_date: value })}
@@ -224,9 +224,9 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <Label className="text-sm font-medium text-morandi-primary">付款人姓名</Label>
+          <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.payerName}</Label>
           <Input
-            placeholder="請輸入付款人姓名"
+            placeholder={PLACEHOLDER_LABELS.enterPayerName}
             value={paymentItem.receipt_account || ''}
             onChange={e => updatePaymentItem({ receipt_account: e.target.value })}
             className="mt-1 border-morandi-container/30"
@@ -234,9 +234,9 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
         </div>
 
         <div>
-          <Label className="text-sm font-medium text-morandi-primary">備註</Label>
+          <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.remarks}</Label>
           <Input
-            placeholder="選填"
+            placeholder={PLACEHOLDER_LABELS.optional}
             value={paymentItem.notes || ''}
             onChange={e => updatePaymentItem({ notes: e.target.value })}
             className="mt-1 border-morandi-container/30"
@@ -247,9 +247,9 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
       {/* 第二排：根據收款方式顯示專屬欄位 */}
       {paymentItem.receipt_type === ReceiptType.CASH && (
         <div className="pt-3 border-t">
-          <Label className="text-sm font-medium text-morandi-primary">經手人</Label>
+          <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.handler}</Label>
           <Input
-            placeholder="請輸入經手人姓名"
+            placeholder={PLACEHOLDER_LABELS.enterHandlerName}
             value={paymentItem.handler_name || ''}
             onChange={e => updatePaymentItem({ handler_name: e.target.value })}
             className="mt-1 border-morandi-container/30"
@@ -260,25 +260,25 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
       {paymentItem.receipt_type === ReceiptType.BANK_TRANSFER && (
         <div className="grid grid-cols-2 gap-3 pt-3 border-t">
           <div>
-            <Label className="text-sm font-medium text-morandi-primary">匯入帳戶 *</Label>
+            <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.depositAccount}</Label>
             <Select
               value={paymentItem.account_info || ''}
               onValueChange={value => updatePaymentItem({ account_info: value })}
             >
               <SelectTrigger className="mt-1 border-morandi-container/30">
-                <SelectValue placeholder="請選擇匯入帳戶" />
+                <SelectValue placeholder={PLACEHOLDER_LABELS.selectAccount} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="國泰">國泰銀行</SelectItem>
-                <SelectItem value="合庫">合作金庫</SelectItem>
+                <SelectItem value="國泰">{BANK_OPTIONS.cathay}</SelectItem>
+                <SelectItem value="合庫">{BANK_OPTIONS.hcb}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label className="text-sm font-medium text-morandi-primary">手續費</Label>
+            <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.fees}</Label>
             <Input
               type="number"
-              placeholder="選填，如有手續費"
+              placeholder={PLACEHOLDER_LABELS.optionalWithFees}
               value={paymentItem.fees || ''}
               onChange={e => updatePaymentItem({ fees: Number(e.target.value) })}
               className="mt-1 border-morandi-container/30"
@@ -290,7 +290,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
       {paymentItem.receipt_type === ReceiptType.CREDIT_CARD && (
         <div className="grid grid-cols-3 gap-3 pt-3 border-t">
           <div>
-            <Label className="text-sm font-medium text-morandi-primary">卡號後四碼</Label>
+            <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.cardLastFour}</Label>
             <Input
               placeholder="1234"
               value={paymentItem.card_last_four || ''}
@@ -302,19 +302,19 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
             />
           </div>
           <div>
-            <Label className="text-sm font-medium text-morandi-primary">授權碼</Label>
+            <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.authCode}</Label>
             <Input
-              placeholder="請輸入授權碼"
+              placeholder={PLACEHOLDER_LABELS.enterAuthCode}
               value={paymentItem.auth_code || ''}
               onChange={e => updatePaymentItem({ auth_code: e.target.value })}
               className="mt-1 border-morandi-container/30"
             />
           </div>
           <div>
-            <Label className="text-sm font-medium text-morandi-primary">手續費</Label>
+            <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.fees}</Label>
             <Input
               type="number"
-              placeholder="選填，如有手續費"
+              placeholder={PLACEHOLDER_LABELS.optionalWithFees}
               value={paymentItem.fees || ''}
               onChange={e => updatePaymentItem({ fees: Number(e.target.value) })}
               className="mt-1 border-morandi-container/30"
@@ -326,18 +326,18 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
       {paymentItem.receipt_type === ReceiptType.CHECK && (
         <div className="grid grid-cols-2 gap-3 pt-3 border-t">
           <div>
-            <Label className="text-sm font-medium text-morandi-primary">支票號碼</Label>
+            <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.checkNumber}</Label>
             <Input
-              placeholder="請輸入支票號碼"
+              placeholder={PLACEHOLDER_LABELS.enterCheckNumber}
               value={paymentItem.check_number || ''}
               onChange={e => updatePaymentItem({ check_number: e.target.value })}
               className="mt-1 border-morandi-container/30"
             />
           </div>
           <div>
-            <Label className="text-sm font-medium text-morandi-primary">開票銀行</Label>
+            <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.issueBank}</Label>
             <Input
-              placeholder="請輸入銀行名稱"
+              placeholder={PLACEHOLDER_LABELS.enterBankName}
               value={paymentItem.check_bank || ''}
               onChange={e => updatePaymentItem({ check_bank: e.target.value })}
               className="mt-1 border-morandi-container/30"
@@ -349,7 +349,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
       {paymentItem.receipt_type === ReceiptType.LINK_PAY && (
         <div className="space-y-3 pt-3 border-t">
           <div>
-            <Label className="text-sm font-medium text-morandi-primary">Email *</Label>
+            <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.email}</Label>
             <Input
               type="email"
               placeholder="user@example.com"
@@ -360,7 +360,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label className="text-sm font-medium text-morandi-primary">付款截止日 *</Label>
+              <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.paymentDeadline}</Label>
               <DateInput
                 value={paymentItem.pay_dateline || ''}
                 onChange={value => updatePaymentItem({ pay_dateline: value })}
@@ -369,10 +369,10 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
             </div>
             <div>
               <Label className="text-sm font-medium text-morandi-primary">
-                付款名稱（客戶看到的）
+                {FORM_LABELS.paymentNameForCustomer}
               </Label>
               <Input
-                placeholder="例如：峇里島五日遊 - 尾款"
+                placeholder={PLACEHOLDER_LABELS.paymentNameExample}
                 value={paymentItem.payment_name || ''}
                 onChange={e => updatePaymentItem({ payment_name: e.target.value })}
                 className="mt-1 border-morandi-container/30"

@@ -285,8 +285,8 @@ export function VoucherFormDialog({
 
       toast.success(
         status === 'posted' 
-          ? `傳票 ${voucherNo} 已過帳` 
-          : `傳票 ${voucherNo} 已儲存為草稿`
+          ? SUCCESS_MESSAGES.saveVoucherPosted(voucherNo) 
+          : SUCCESS_MESSAGES.saveVoucherDraft(voucherNo)
       )
 
       onSuccess()
@@ -474,7 +474,7 @@ export function VoucherFormDialog({
         <DialogFooter className="gap-2">
           <Button variant="outline" className="gap-1" onClick={() => onOpenChange(false)}>
             <X size={16} />
-            取消
+            {VOUCHER_FORM_LABELS_EXT.btn_cancel}
           </Button>
           {canEdit && (
             <>
@@ -485,7 +485,7 @@ export function VoucherFormDialog({
                 className="gap-1"
               >
                 <Save size={16} />
-                {isSubmitting ? '儲存中...' : '儲存草稿'}
+                {isSubmitting ? '儲存中...' : VOUCHER_FORM_LABELS_EXT.btn_save_draft}
               </Button>
               <Button
                 onClick={handlePost}
@@ -493,7 +493,7 @@ export function VoucherFormDialog({
                 className="gap-1"
               >
                 <FileCheck size={16} />
-                {isSubmitting ? '處理中...' : '過帳'}
+                {isSubmitting ? '處理中...' : VOUCHER_FORM_LABELS_EXT.btn_post}
               </Button>
             </>
           )}

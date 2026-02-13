@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label'
 import { useAuthStore } from '@/stores/auth-store'
 import { toast } from 'sonner'
 import type { JournalVoucher } from '@/types/accounting.types'
-import { REVERSE_VOUCHER_LABELS as L } from '../constants/labels'
+import { REVERSE_VOUCHER_LABELS as L, SUCCESS_MESSAGES } from '../constants/labels'
 
 interface ReverseVoucherDialogProps {
   open: boolean
@@ -41,7 +41,7 @@ export function ReverseVoucherDialog({
     }
 
     if (!user?.workspace_id || !user?.id) {
-      toast.error('用戶資訊不完整')
+      toast.error(L.error_user_incomplete)
       return
     }
 
@@ -63,7 +63,7 @@ export function ReverseVoucherDialog({
         throw new Error(result.error || L.toast_failed)
       }
 
-      toast.success(`反沖成功，新傳票編號：${result.voucherNo}`)
+      toast.success(SUCCESS_MESSAGES.reverseSuccess(result.voucherNo))
       setReason('')
       onSuccess()
     } catch (error) {
@@ -82,7 +82,7 @@ export function ReverseVoucherDialog({
 
         <div className="space-y-4">
           <div className="p-4 bg-muted/50 rounded-lg">
-            <p className="text-sm text-muted-foreground">即將反沖以下傳票：</p>
+            <p className="text-sm text-muted-foreground">{L.info_target_voucher}</p>
             <p className="font-mono font-medium">{voucher.voucher_no}</p>
             <p className="text-sm text-muted-foreground mt-1">{voucher.memo}</p>
           </div>

@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import type { JournalVoucher, JournalLine, VoucherStatus } from '@/types/accounting.types'
-import { VOUCHER_DETAIL_LABELS as L } from '../constants/labels'
+import { VOUCHER_DETAIL_LABELS as L, VOUCHER_DETAIL_LABELS_EXT, CALCULATION_MESSAGES } from '../constants/labels'
 
 interface VoucherDetailDialogProps {
   open: boolean
@@ -23,7 +23,7 @@ const statusConfig: Record<VoucherStatus, { label: string; variant: 'default' | 
   draft: { label: L.status_draft, variant: 'secondary' },
   posted: { label: L.status_posted, variant: 'default' },
   reversed: { label: L.status_reversed, variant: 'destructive' },
-  locked: { label: '已鎖定', variant: 'outline' },
+  locked: { label: VOUCHER_DETAIL_LABELS_EXT.status_locked, variant: 'outline' },
 }
 
 interface LineWithAccount extends Omit<JournalLine, 'account'> {
@@ -104,13 +104,13 @@ export function VoucherDetailDialog({
                 {isLoading ? (
                   <tr>
                     <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
-                      載入中...
+                      {VOUCHER_DETAIL_LABELS_EXT.loading_text}
                     </td>
                   </tr>
                 ) : lines.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
-                      無分錄資料
+                      {VOUCHER_DETAIL_LABELS_EXT.no_data_text}
                     </td>
                   </tr>
                 ) : (
@@ -142,7 +142,7 @@ export function VoucherDetailDialog({
               </tbody>
               <tfoot className="bg-muted font-medium">
                 <tr>
-                  <td colSpan={3} className="px-4 py-2 text-right">合計</td>
+                  <td colSpan={3} className="px-4 py-2 text-right">{VOUCHER_DETAIL_LABELS_EXT.total_label}</td>
                   <td className="px-4 py-2 text-right font-mono">
                     {Number(voucher.total_debit).toLocaleString()}
                   </td>
@@ -156,7 +156,7 @@ export function VoucherDetailDialog({
 
           {Number(voucher.total_debit) !== Number(voucher.total_credit) && (
             <div className="p-3 bg-destructive/10 text-destructive rounded-lg text-sm">
-              ⚠️ 借貸不平衡！差額：{Math.abs(Number(voucher.total_debit) - Number(voucher.total_credit)).toLocaleString()}
+              {VOUCHER_DETAIL_LABELS_EXT.imbalance_warning}{CALCULATION_MESSAGES.imbalanceAmount(Math.abs(Number(voucher.total_debit) - Number(voucher.total_credit)))}
             </div>
           )}
         </div>
