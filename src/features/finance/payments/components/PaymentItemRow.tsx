@@ -95,7 +95,7 @@ export function PaymentItemRow({
       }
     } catch (error) {
       toast({
-        title: '產生連結失敗',
+        title: PAYMENT_ITEM_ROW_LABELS.產生連結失敗,
         description: error instanceof Error ? error.message : ADD_RECEIPT_DIALOG_LABELS.請稍後再試,
         variant: 'destructive',
       })
