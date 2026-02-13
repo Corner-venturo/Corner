@@ -538,6 +538,9 @@ export const TOUR_PRINT_DIALOG_LABELS = {
   退房日期: '退房日期',
   此確認單僅供參考_實際訂房資訊以飯店確認為準: '**** 此確認單僅供參考，實際訂房資訊以飯店確認為準 ****',
   取消: '取消',
+  票號_冒號: '票號:',
+  div_class_no_flight_尚無航班資訊_div: '<div class="no-flight">尚無航班資訊</div>',
+  tr_td_colspan_3_style_padding_20px_text_align_center_color_999_尚未設定住宿資訊_td_tr: '<tr><td colspan="3" style="padding: 20px; text-align: center; color: #999;">尚未設定住宿資訊</td></tr>',
 };
 
 // TourPnrToolDialog 模組的 UI 標籤

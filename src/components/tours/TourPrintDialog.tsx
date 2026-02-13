@@ -392,7 +392,7 @@ export function TourPrintDialog({
               </div>
               <div class="flight-content">
                 <div class="flight-departure">
-                  <div class="flight-label">出發 DEPART</div>
+                  <div class="flight-label">${TOUR_PRINT_DIALOG_LABELS.出發_DEPART}</div>
                   <div class="flight-time">${formatTime(seg.departureTime)}</div>
                   <div class="flight-airport">${depAirportName}</div>
                   <div class="flight-terminal">${seg.origin}${depTerminal ? ' ' + depTerminal : ''}</div>
@@ -407,7 +407,7 @@ export function TourPrintDialog({
                   <div class="flight-class">${className}</div>
                 </div>
                 <div class="flight-arrival">
-                  <div class="flight-label">抵達 ARRIVE</div>
+                  <div class="flight-label">${TOUR_PRINT_DIALOG_LABELS.抵達_ARRIVE}</div>
                   <div class="flight-time">${formatTime(seg.arrivalTime)}</div>
                   <div class="flight-airport">${arrAirportName}</div>
                   <div class="flight-terminal">${seg.destination}${arrTerminal ? ' ' + arrTerminal : ''}</div>
@@ -432,7 +432,7 @@ export function TourPrintDialog({
               </div>
               <div class="flight-content">
                 <div class="flight-departure">
-                  <div class="flight-label">出發 DEPART</div>
+                  <div class="flight-label">${TOUR_PRINT_DIALOG_LABELS.出發_DEPART}</div>
                   <div class="flight-time">${outbound.departureTime || '--:--'}</div>
                   <div class="flight-airport">${outbound.departureAirport} ${depCity}</div>
                 </div>
@@ -443,10 +443,10 @@ export function TourPrintDialog({
                     <span class="path-line with-arrow"></span>
                   </div>
                   <div class="flight-duration">${outbound.duration || ''}</div>
-                  <div class="flight-class">經濟艙 Economy</div>
+                  <div class="flight-class">${TOUR_PRINT_DIALOG_LABELS.經濟艙_Economy}</div>
                 </div>
                 <div class="flight-arrival">
-                  <div class="flight-label">抵達 ARRIVE</div>
+                  <div class="flight-label">${TOUR_PRINT_DIALOG_LABELS.抵達_ARRIVE}</div>
                   <div class="flight-time">${outbound.arrivalTime || '--:--'}</div>
                   <div class="flight-airport">${arrCity} ${outbound.arrivalAirport}</div>
                 </div>
@@ -466,7 +466,7 @@ export function TourPrintDialog({
               </div>
               <div class="flight-content">
                 <div class="flight-departure">
-                  <div class="flight-label">出發 DEPART</div>
+                  <div class="flight-label">${TOUR_PRINT_DIALOG_LABELS.出發_DEPART}</div>
                   <div class="flight-time">${returnFlight.departureTime || '--:--'}</div>
                   <div class="flight-airport">${returnFlight.departureAirport} ${depCity}</div>
                 </div>
@@ -477,10 +477,10 @@ export function TourPrintDialog({
                     <span class="path-line with-arrow"></span>
                   </div>
                   <div class="flight-duration">${returnFlight.duration || ''}</div>
-                  <div class="flight-class">經濟艙 Economy</div>
+                  <div class="flight-class">${TOUR_PRINT_DIALOG_LABELS.經濟艙_Economy}</div>
                 </div>
                 <div class="flight-arrival">
-                  <div class="flight-label">抵達 ARRIVE</div>
+                  <div class="flight-label">${TOUR_PRINT_DIALOG_LABELS.抵達_ARRIVE}</div>
                   <div class="flight-time">${returnFlight.arrivalTime || '--:--'}</div>
                   <div class="flight-airport">${arrCity} ${returnFlight.arrivalAirport}</div>
                 </div>
@@ -502,12 +502,12 @@ export function TourPrintDialog({
             <!-- Header -->
             <div class="header">
               <div class="header-left">
-                <div class="company-name">角落旅行社股份有限公司</div>
-                <div class="ticket-label">電子機票號碼 E-TICKET NUMBER</div>
+                <div class="company-name">${TOUR_PRINT_DIALOG_LABELS.角落旅行社股份有限公司}</div>
+                <div class="ticket-label">${TOUR_PRINT_DIALOG_LABELS.電子機票號碼_E_TICKET_NUMBER}</div>
                 <div class="ticket-number">${member.ticket_number || '尚未開票'}</div>
               </div>
               <div class="header-right">
-                <div class="pnr-label">電腦代號 PNR</div>
+                <div class="pnr-label">${TOUR_PRINT_DIALOG_LABELS.電腦代號_PNR}</div>
                 <div class="pnr-box">${member.pnr || '-'}</div>
               </div>
             </div>
@@ -526,13 +526,13 @@ export function TourPrintDialog({
 
             <!-- Flight Cards -->
             <div class="flights-section">
-              ${flightCards.length > 0 ? flightCards.join('') : '<div class="no-flight">尚無航班資訊</div>'}
+              ${flightCards.length > 0 ? flightCards.join('') : TOUR_PRINT_DIALOG_LABELS.div_class_no_flight_尚無航班資訊_div}
             </div>
           </div>
 
           <!-- Footer - 固定在底部 -->
           <div class="footer">
-            <div class="footer-notice">**** 此文件資訊僅供參考，實際資訊以航空公司及相關旅遊供應商為準 ****</div>
+            <div class="footer-notice">${TOUR_PRINT_DIALOG_LABELS.此文件資訊僅供參考_實際資訊以航空公司及相關旅遊供應商為準}</div>
             <div class="footer-contact">
               <span>📍 台北市大同區重慶北路一段67號八樓之二</span>
               <span>📞 886-2-77516051</span>
@@ -920,7 +920,7 @@ export function TourPrintDialog({
       return `
         <div class="page" style="${index > 0 ? 'page-break-before: always;' : ''}">
           <div class="header">
-            <div class="company">角落旅行社股份有限公司</div>
+            <div class="company">${TOUR_PRINT_DIALOG_LABELS.角落旅行社股份有限公司}</div>
             <div class="address">台北市大同區重慶北路一段67號八樓之二</div>
           </div>
 
@@ -945,12 +945,12 @@ export function TourPrintDialog({
               </tr>
             </thead>
             <tbody>
-              ${hotelRows || '<tr><td colspan="3" style="padding: 20px; text-align: center; color: #999;">尚未設定住宿資訊</td></tr>'}
+              ${hotelRows || TOUR_PRINT_DIALOG_LABELS.tr_td_colspan_3_style_padding_20px_text_align_center_color_999_尚未設定住宿資訊_td_tr}
             </tbody>
           </table>
 
           <div class="notice">
-            **** 此確認單僅供參考，實際訂房資訊以飯店確認為準 ****
+            ${TOUR_PRINT_DIALOG_LABELS.此確認單僅供參考_實際訂房資訊以飯店確認為準}
           </div>
         </div>
       `
@@ -1116,7 +1116,7 @@ export function TourPrintDialog({
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm">{selectedCount} / {members.length} 人已選</span>
               <Button variant="ghost" size="sm" onClick={toggleAllMembers}>
-                {selectedCount === members.length ? '取消全選' : '全選'}
+                {selectedCount === members.length ? TOUR_PRINT_DIALOG_LABELS.取消全選 : TOUR_PRINT_DIALOG_LABELS.全選}
               </Button>
             </div>
             <div className="max-h-[250px] overflow-y-auto border border-border rounded-lg">
@@ -1135,7 +1135,7 @@ export function TourPrintDialog({
                     <div className="font-medium truncate">{member.chinese_name || member.passport_name}</div>
                     <div className="text-xs text-morandi-secondary flex gap-2">
                       <span>PNR: {member.pnr || '-'}</span>
-                      <span>票號: {member.ticket_number || '-'}</span>
+                      <span>{TOUR_PRINT_DIALOG_LABELS.票號_冒號} {member.ticket_number || '-'}</span>
                     </div>
                   </div>
                   {member.ticket_number && (
@@ -1147,7 +1147,7 @@ export function TourPrintDialog({
             <div className="flex justify-end gap-2 pt-4 border-t border-morandi-border">
               <Button variant="outline" onClick={onClose}>
                 <X size={16} className="mr-1" />
-                取消
+                {TOUR_PRINT_DIALOG_LABELS.取消}
               </Button>
               <Button
                 onClick={handlePrintFlightConfirmation}
@@ -1163,12 +1163,12 @@ export function TourPrintDialog({
           {/* 住宿確認單 Tab */}
           <TabsContent value="hotel" className="space-y-4">
             <div className="text-sm text-morandi-secondary mb-2">
-              選擇要列印住宿確認單的成員（每人一頁）
+              {TOUR_PRINT_DIALOG_LABELS.選擇要列印住宿確認單的成員_每人一頁}
             </div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm">{selectedCount} / {members.length} 人已選</span>
               <Button variant="ghost" size="sm" onClick={toggleAllMembers}>
-                {selectedCount === members.length ? '取消全選' : '全選'}
+                {selectedCount === members.length ? TOUR_PRINT_DIALOG_LABELS.取消全選 : TOUR_PRINT_DIALOG_LABELS.全選}
               </Button>
             </div>
             <div className="max-h-[250px] overflow-y-auto border border-border rounded-lg">
@@ -1199,7 +1199,7 @@ export function TourPrintDialog({
             <div className="flex justify-end gap-2 pt-4 border-t border-morandi-border">
               <Button variant="outline" onClick={onClose}>
                 <X size={16} className="mr-1" />
-                取消
+                {TOUR_PRINT_DIALOG_LABELS.取消}
               </Button>
               <Button
                 onClick={handlePrintHotelConfirmation}
