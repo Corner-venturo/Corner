@@ -34,7 +34,7 @@ import type {
   CreateConfirmationItem,
   BookingStatus,
 } from '@/types/tour-confirmation-sheet.types'
-import { CONFIRMATION_HEADER_LABELS, COST_SUMMARY_LABELS, ITEM_EDIT_DIALOG_LABELS } from '../constants/labels';
+import { CONFIRMATION_HEADER_LABELS, COST_SUMMARY_LABELS, ITEM_EDIT_DIALOG_LABELS, ITEM_EDIT_DIALOG_ADDITIONAL_LABELS } from '../constants/labels';
 
 interface ItemEditDialogProps {
   open: boolean
@@ -212,7 +212,7 @@ export function ItemEditDialog({
       <DialogContent level={1} className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {isEdit ? '編輯' : ITEM_EDIT_DIALOG_LABELS.新增}{categoryLabels[category]}項目
+            {isEdit ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.編輯 : ITEM_EDIT_DIALOG_LABELS.新增}{categoryLabels[category]}項目
           </DialogTitle>
         </DialogHeader>
 
@@ -220,7 +220,7 @@ export function ItemEditDialog({
           {/* 基本資訊 */}
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <Label>服務日期 *</Label>
+              <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.服務日期必填}</Label>
               <Input
                 type="date"
                 value={formData.service_date || ''}
@@ -230,7 +230,7 @@ export function ItemEditDialog({
             </div>
             {category === 'accommodation' && (
               <div>
-                <Label>退房日期</Label>
+                <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.退房日期}</Label>
                 <Input
                   type="date"
                   value={formData.service_date_end || ''}
@@ -240,7 +240,7 @@ export function ItemEditDialog({
               </div>
             )}
             <div>
-              <Label>日期標籤</Label>
+              <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.日期標籤}</Label>
               <Input
                 placeholder="Day 1"
                 value={formData.day_label || ''}
@@ -254,10 +254,10 @@ export function ItemEditDialog({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label>
-                {category === 'transport' ? '接駁公司' :
-                 category === 'meal' ? '餐廳名稱' :
-                 category === 'accommodation' ? '飯店名稱' :
-                 category === 'activity' ? '場地名稱' : ITEM_EDIT_DIALOG_LABELS.供應商} *
+                {category === 'transport' ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.接駁公司 :
+                 category === 'meal' ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.餐廳名稱 :
+                 category === 'accommodation' ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.飯店名稱 :
+                 category === 'activity' ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.場地名稱 : ITEM_EDIT_DIALOG_LABELS.供應商} *
               </Label>
               <Input
                 value={formData.supplier_name || ''}
@@ -267,8 +267,8 @@ export function ItemEditDialog({
             </div>
             <div>
               <Label>
-                {category === 'transport' ? '接駁地點' :
-                 category === 'accommodation' ? '房型' : ITEM_EDIT_DIALOG_LABELS.項目名稱} *
+                {category === 'transport' ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.接駁地點 :
+                 category === 'accommodation' ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.房型 : ITEM_EDIT_DIALOG_LABELS.項目名稱} *
               </Label>
               <Input
                 value={formData.title || ''}
@@ -280,7 +280,7 @@ export function ItemEditDialog({
 
           {/* 描述 */}
           <div>
-            <Label>描述/備註</Label>
+            <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.描述備註}</Label>
             <Textarea
               value={formData.description || ''}
               onChange={(e) => updateField('description', e.target.value)}
@@ -293,7 +293,7 @@ export function ItemEditDialog({
           {/* 金額 */}
           <div className="grid grid-cols-4 gap-4">
             <div>
-              <Label>單價</Label>
+              <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.單價}</Label>
               <Input
                 type="number"
                 value={formData.unit_price ?? ''}
@@ -302,7 +302,7 @@ export function ItemEditDialog({
               />
             </div>
             <div>
-              <Label>數量</Label>
+              <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.數量}</Label>
               <Input
                 type="number"
                 value={formData.quantity ?? 1}
@@ -312,7 +312,7 @@ export function ItemEditDialog({
               />
             </div>
             <div>
-              <Label>小計</Label>
+              <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.小計}</Label>
               <Input
                 type="number"
                 value={subtotal}
@@ -321,7 +321,7 @@ export function ItemEditDialog({
               />
             </div>
             <div>
-              <Label>幣別</Label>
+              <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.幣別}</Label>
               <Select
                 value={formData.currency || 'TWD'}
                 onValueChange={(v) => updateField('currency', v)}
@@ -342,7 +342,7 @@ export function ItemEditDialog({
           {/* 預計/實際支出 */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>預計支出</Label>
+              <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.預計支出}</Label>
               <Input
                 type="number"
                 value={formData.expected_cost ?? subtotal}
@@ -351,7 +351,7 @@ export function ItemEditDialog({
               />
             </div>
             <div>
-              <Label>實際支出</Label>
+              <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.實際支出}</Label>
               <Input
                 type="number"
                 value={formData.actual_cost ?? ''}
@@ -365,7 +365,7 @@ export function ItemEditDialog({
           {/* 預訂狀態 */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>預訂編號</Label>
+              <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.預訂編號}</Label>
               <Input
                 value={formData.booking_reference || ''}
                 onChange={(e) => updateField('booking_reference', e.target.value)}
@@ -374,7 +374,7 @@ export function ItemEditDialog({
               />
             </div>
             <div>
-              <Label>預訂狀態</Label>
+              <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.預訂狀態}</Label>
               <Select
                 value={formData.booking_status || 'pending'}
                 onValueChange={(v) => updateField('booking_status', v as BookingStatus)}
@@ -397,11 +397,11 @@ export function ItemEditDialog({
           {isEdit && (
             <div className="border-t border-border pt-4 mt-4">
               <h4 className="text-sm font-medium text-morandi-primary mb-3 flex items-center gap-2">
-                📝 領隊記帳
+                📝 {ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.領隊記帳}
               </h4>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>領隊實際支出</Label>
+                  <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.領隊實際支出}</Label>
                   <Input
                     type="number"
                     value={formData.leader_expense ?? ''}
@@ -411,7 +411,7 @@ export function ItemEditDialog({
                   />
                 </div>
                 <div>
-                  <Label>支出備註</Label>
+                  <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.支出備註}</Label>
                   <Input
                     value={formData.leader_expense_note || ''}
                     onChange={(e) => updateField('leader_expense_note', e.target.value)}
@@ -421,21 +421,21 @@ export function ItemEditDialog({
                 </div>
               </div>
               <p className="text-xs text-morandi-secondary mt-2">
-                * 領隊可在 Online App 中填寫實際支出並上傳收據
+                {ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.領隊可在_Online_App_填寫實際支出並上傳收據}
               </p>
 
               {/* 收據照片區 */}
               <div className="mt-4">
                 <Label className="flex items-center gap-2">
                   <ImageIcon size={14} />
-                  收據照片
+                  {ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.收據照片}
                 </Label>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {receiptImages.map((url, index) => (
                     <div key={index} className="relative group">
                       <img
                         src={url}
-                        alt={`收據 ${index + 1}`}
+                        alt={`${ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.收據} ${index + 1}`}
                         className="w-20 h-20 object-cover rounded-lg border border-border"
                       />
                       <button
@@ -455,11 +455,11 @@ export function ItemEditDialog({
                     className="w-20 h-20 border-2 border-dashed border-morandi-container rounded-lg flex flex-col items-center justify-center text-morandi-secondary hover:border-morandi-gold hover:text-morandi-gold transition-colors"
                   >
                     {uploadingImage ? (
-                      <span className="text-xs">上傳中...</span>
+                      <span className="text-xs">{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.上傳中}</span>
                     ) : (
                       <>
                         <Upload size={20} />
-                        <span className="text-xs mt-1">上傳</span>
+                        <span className="text-xs mt-1">{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.上傳}</span>
                       </>
                     )}
                   </button>
@@ -477,7 +477,7 @@ export function ItemEditDialog({
 
           {/* 備註 */}
           <div>
-            <Label>備註</Label>
+            <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.備註}</Label>
             <Textarea
               value={formData.notes || ''}
               onChange={(e) => updateField('notes', e.target.value)}
@@ -492,7 +492,7 @@ export function ItemEditDialog({
         <div className="flex justify-end gap-3 pt-4 border-t border-border">
           <Button variant="outline" onClick={onClose} disabled={saving} className="gap-1">
             <X size={14} />
-            取消
+            {ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.取消}
           </Button>
           <Button
             onClick={handleSave}
@@ -500,7 +500,7 @@ export function ItemEditDialog({
             className="bg-morandi-gold hover:bg-morandi-gold-hover gap-1"
           >
             {isEdit ? <Save size={14} /> : <Plus size={14} />}
-            {isEdit ? '儲存' : '新增'}
+            {isEdit ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.儲存 : ITEM_EDIT_DIALOG_LABELS.新增}
           </Button>
         </div>
       </DialogContent>

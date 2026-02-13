@@ -833,10 +833,10 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-morandi-red">
-        <p>載入失敗：{error}</p>
+        <p>{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.載入失敗.replace('{0}', error)}</p>
         <Button variant="outline" onClick={reload} className="mt-4 gap-2">
           <RefreshCw size={16} />
-          重新載入
+          {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.重新載入}
         </Button>
       </div>
     )
@@ -846,7 +846,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
   if (!workspaceId) {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
-        <p>無法取得工作空間資訊，請重新登入</p>
+        <p>{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.無法取得工作空間資訊請重新登入}</p>
       </div>
     )
   }
@@ -868,7 +868,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
             className="gap-2"
           >
             <Printer size={16} />
-            列印
+            {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.列印}
           </Button>
 
           {incompleteRequests.length > 0 ? (
@@ -880,7 +880,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
               title={`尚有 ${incompleteRequests.length} 項需求未完成`}
             >
               <AlertCircle size={16} />
-              尚有 {incompleteRequests.length} 項待處理
+              {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.尚有項待處理.replace('{0}', incompleteRequests.length.toString())}
             </Button>
           ) : (
             <Button
@@ -895,7 +895,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
               ) : (
                 <Send size={16} />
               )}
-              確認交接
+              {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.確認交接}
             </Button>
           )}
         </div>
@@ -935,16 +935,16 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
             {/* 表頭 */}
             <thead>
               <tr className="bg-morandi-container/50 border-b border-border">
-                <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[4%] border-r border-border/30">分類</th>
-                <th className="px-1 py-2 text-left font-medium text-morandi-primary w-[5%] border-r border-border/30">日期</th>
-                <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[12%] border-r border-border/30">供應商</th>
-                <th className="px-2 py-2 text-left font-medium text-morandi-primary border-r border-border/30">項目說明</th>
-                <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[6%] border-r border-border/30">單價</th>
-                <th className="px-1 py-2 text-center font-medium text-morandi-primary w-[4%] border-r border-border/30">數量</th>
-                <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[6%] border-r border-border/30">小計</th>
-                <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[7%] border-r border-border/30">預計支出</th>
-                <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[7%] border-r border-border/30">實際支出</th>
-                <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[28%]">備註</th>
+                <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[4%] border-r border-border/30">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.分類}</th>
+                <th className="px-1 py-2 text-left font-medium text-morandi-primary w-[5%] border-r border-border/30">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.日期}</th>
+                <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[12%] border-r border-border/30">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.供應商}</th>
+                <th className="px-2 py-2 text-left font-medium text-morandi-primary border-r border-border/30">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.項目說明}</th>
+                <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[6%] border-r border-border/30">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.單價}</th>
+                <th className="px-1 py-2 text-center font-medium text-morandi-primary w-[4%] border-r border-border/30">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.數量}</th>
+                <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[6%] border-r border-border/30">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.小計}</th>
+                <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[7%] border-r border-border/30">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.預計支出}</th>
+                <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[7%] border-r border-border/30">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.實際支出}</th>
+                <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[28%]">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.備註}</th>
               </tr>
             </thead>
             <tbody>
@@ -967,7 +967,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                           className="h-6 px-2 text-xs text-morandi-gold hover:text-morandi-gold-hover"
                         >
                           <Plus size={12} className="mr-1" />
-                          新增
+                          {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.新增}
                         </Button>
                       </td>
                     </tr>
@@ -981,7 +981,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                     {categoryItems.length === 0 && addingCategory !== cat.key ? (
                       <tr className="border-t border-border/50">
                         <td colSpan={10} className="px-3 py-3 text-center text-morandi-secondary text-xs">
-                          尚無{cat.label}項目
+                          {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.尚無項目.replace('{0}', cat.label)}
                         </td>
                       </tr>
                     ) : (
@@ -1086,9 +1086,9 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                             className="text-sm bg-transparent border-0 outline-none cursor-pointer -ml-1"
                             style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none', paddingRight: '16px', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%238b8680\' stroke-width=\'2\'%3E%3Cpath d=\'m6 9 6 6 6-6\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right center' }}
                           >
-                            <option value="">選擇</option>
-                            <option value="flight">航班</option>
-                            <option value="vehicle">車子</option>
+                            <option value="">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.選擇}</option>
+                            <option value="flight">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.航班}</option>
+                            <option value="vehicle">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.車子}</option>
                           </select>
                         </td>
                         {!transportSubType && (
@@ -1112,12 +1112,12 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                                   <div className="text-sm space-x-4">
                                     {tour.outbound_flight && (
                                       <span>
-                                        <span className="text-morandi-green">去程</span> {tour.outbound_flight.airline} {tour.outbound_flight.flightNumber} {tour.outbound_flight.departureAirport}→{tour.outbound_flight.arrivalAirport}
+                                        <span className="text-morandi-green">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.去程}</span> {tour.outbound_flight.airline} {tour.outbound_flight.flightNumber} {tour.outbound_flight.departureAirport}→{tour.outbound_flight.arrivalAirport}
                                       </span>
                                     )}
                                     {tour.return_flight && (
                                       <span>
-                                        <span className="text-morandi-gold">回程</span> {tour.return_flight.airline} {tour.return_flight.flightNumber} {tour.return_flight.departureAirport}→{tour.return_flight.arrivalAirport}
+                                        <span className="text-morandi-gold">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.回程}</span> {tour.return_flight.airline} {tour.return_flight.flightNumber} {tour.return_flight.departureAirport}→{tour.return_flight.arrivalAirport}
                                       </span>
                                     )}
                                   </div>
@@ -1138,7 +1138,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                               ) : manualFlightMode ? (
                                 <div className="space-y-2">
                                   <div className="flex items-center gap-2 text-sm">
-                                    <span className="text-morandi-green font-medium w-10">去程</span>
+                                    <span className="text-morandi-green font-medium w-10">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.去程}</span>
                                     <input
                                       placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.航空}
                                       value={manualFlight.outbound.airline}
@@ -1166,7 +1166,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                                     />
                                   </div>
                                   <div className="flex items-center gap-2 text-sm">
-                                    <span className="text-morandi-gold font-medium w-10">回程</span>
+                                    <span className="text-morandi-gold font-medium w-10">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.回程}</span>
                                     <input
                                       placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.航空}
                                       value={manualFlight.return.airline}
@@ -1211,18 +1211,18 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                                 </div>
                               ) : (
                                 <div className="flex items-center gap-4">
-                                  <span className="text-sm text-morandi-secondary">尚無航班資訊</span>
+                                  <span className="text-sm text-morandi-secondary">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.尚無航班資訊}</span>
                                   <button
                                     onClick={() => setManualFlightMode(true)}
                                     className="px-3 py-1 text-xs font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded"
                                   >
-                                    手動填寫
+                                    {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.手動填寫}
                                   </button>
                                   <button
                                     onClick={() => { setAddingCategory(null); setTransportSubType(null) }}
                                     className="text-morandi-red hover:underline text-xs"
                                   >
-                                    取消
+                                    {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.取消}
                                   </button>
                                 </div>
                               )}
@@ -1261,7 +1261,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                               <input
                                 value={newItemData.title}
                                 onChange={(e) => handleNewItemChange('title', e.target.value)}
-                                placeholder={newItemData.service_date_end ? '全程用車' : '單日用車'}
+                                placeholder={newItemData.service_date_end ? TOUR_CONFIRMATION_SHEET_PAGE_LABELS.全程用車 : TOUR_CONFIRMATION_SHEET_PAGE_LABELS.單日用車}
                                 className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
                               />
                             </td>
@@ -1446,7 +1446,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                 return (
                   <tr className="bg-morandi-container/50 border-t-2 border-border font-medium">
                     <td colSpan={7} className="px-2 py-2 text-right text-morandi-primary">
-                      總計
+                      {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.總計}
                     </td>
                     <td className="px-2 py-2 text-right font-mono text-morandi-primary">
                       {expectedForeign > 0 && (
