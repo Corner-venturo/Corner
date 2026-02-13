@@ -15,6 +15,7 @@ import {
   type TimeboxWeek,
 } from '../hooks/useTimeboxData'
 import { alert } from '@/lib/ui/alert-dialog'
+import { WEEK_REVIEW_DIALOG_LABELS } from '@/constants/labels'
 
 interface WeekReviewDialogProps {
   open: boolean
@@ -237,7 +238,7 @@ export default function WeekReviewDialog({ open, onOpenChange, selectedWeek }: W
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-morandi-gold" />
-            週複盤 - {formatWeekRange(getWeekStart(selectedWeek))}
+            {WEEK_REVIEW_DIALOG_LABELS.週複盤.replace('{weekRange}', formatWeekRange(getWeekStart(selectedWeek)))}
           </DialogTitle>
         </DialogHeader>
 
@@ -246,24 +247,24 @@ export default function WeekReviewDialog({ open, onOpenChange, selectedWeek }: W
           <div className="bg-morandi-container/20 rounded-xl p-4">
             <h3 className="text-sm font-semibold text-morandi-primary mb-3 flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-morandi-gold" />
-              本週統計
+              {WEEK_REVIEW_DIALOG_LABELS.本週統計}
             </h3>
             <div className="grid grid-cols-4 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-morandi-primary">{stats.completionRate}%</div>
-                <div className="text-xs text-morandi-secondary">完成率</div>
+                <div className="text-xs text-morandi-secondary">{WEEK_REVIEW_DIALOG_LABELS.完成率}</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-morandi-primary">{stats.completed}/{stats.total}</div>
-                <div className="text-xs text-morandi-secondary">完成項目</div>
+                <div className="text-xs text-morandi-secondary">{WEEK_REVIEW_DIALOG_LABELS.完成項目}</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-morandi-green">{stats.byType.workout}</div>
-                <div className="text-xs text-morandi-secondary">重訓</div>
+                <div className="text-xs text-morandi-secondary">{WEEK_REVIEW_DIALOG_LABELS.重訓}</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-morandi-gold">{stats.byType.reminder + stats.byType.basic}</div>
-                <div className="text-xs text-morandi-secondary">其他</div>
+                <div className="text-xs text-morandi-secondary">{WEEK_REVIEW_DIALOG_LABELS.其他}</div>
               </div>
             </div>
           </div>
@@ -272,12 +273,12 @@ export default function WeekReviewDialog({ open, onOpenChange, selectedWeek }: W
           <div>
             <label className="flex items-center gap-2 text-sm font-semibold text-morandi-primary mb-2">
               <Sparkles className="h-4 w-4 text-morandi-gold" />
-              本週回顧
+              {WEEK_REVIEW_DIALOG_LABELS.本週回顧}
             </label>
             <Textarea
               value={reviewNotes}
               onChange={(e) => setReviewNotes(e.target.value)}
-              placeholder="這週有什麼收穫？遇到什麼挑戰？有什麼值得慶祝的事？"
+              placeholder={WEEK_REVIEW_DIALOG_LABELS.本週回顧placeholder}
               rows={4}
               className="resize-none"
             />
@@ -287,12 +288,12 @@ export default function WeekReviewDialog({ open, onOpenChange, selectedWeek }: W
           <div>
             <label className="flex items-center gap-2 text-sm font-semibold text-morandi-primary mb-2">
               <Target className="h-4 w-4 text-morandi-gold" />
-              下週目標
+              {WEEK_REVIEW_DIALOG_LABELS.下週目標}
             </label>
             <Textarea
               value={nextWeekGoals}
               onChange={(e) => setNextWeekGoals(e.target.value)}
-              placeholder="下週想達成什麼？有什麼要特別注意的事？"
+              placeholder={WEEK_REVIEW_DIALOG_LABELS.下週目標placeholder}
               rows={3}
               className="resize-none"
             />
@@ -339,7 +340,7 @@ export default function WeekReviewDialog({ open, onOpenChange, selectedWeek }: W
                     <p className="text-xs text-morandi-secondary mt-1">
                       本週有 {currentScheduledBoxes.length} 個排程
                       {nextWeekScheduledBoxes.length > 0 && (
-                        <span className="text-morandi-red">（下週已有 {nextWeekScheduledBoxes.length} 個排程）</span>
+                        <span className="text-morandi-red">（{WEEK_REVIEW_DIALOG_LABELS.下週已有排程.replace('{count}', nextWeekScheduledBoxes.length.toString())}）</span>
                       )}
                     </p>
                   </div>

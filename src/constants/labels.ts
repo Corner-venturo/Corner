@@ -290,3 +290,54 @@ export const ACCOMMODATION_ITEM_ROW_LABELS_EXTRA = {
   DAY: 'DAY{day}',
   同上: '同上 ({prevDayHotelName})',
 };
+
+// === timebox 模組標籤 ===
+
+export const WEEK_REVIEW_DIALOG_LABELS = {
+  週複盤: '週複盤 - {weekRange}',
+  本週統計: '本週統計',
+  完成率: '完成率',
+  完成項目: '完成項目',
+  重訓: '重訓',
+  其他: '其他',
+  本週回顧: '本週回顧',
+  本週回顧placeholder: '這週有什麼收穫？遇到什麼挑戰？有什麼值得慶祝的事？',
+  下週目標: '下週目標',
+  下週目標placeholder: '下週想達成什麼？有什麼重要事項要安排？',
+  下週已有排程: '下週已有 {count} 個排程',
+  複製到下週: '複製到下週',
+  取消: '取消',
+  儲存: '儲存',
+};
+
+export const WORKOUT_DIALOG_LABELS = {
+  動作名稱: '動作名稱 *',
+  例槓鈴臥推: '例: 槓鈴臥推',
+  總動作數: '總動作數:',
+  完成組數: '完成組數:',
+  總訓練量: '總訓練量:',
+  新增動作: '新增動作',
+  儲存訓練: '儲存訓練',
+};
+
+export const STATISTICS_PANEL_LABELS = {
+  今日運動時間: '今日運動時間',
+  本週統計: '本週統計',
+  重訓: '重訓',
+  提醒: '提醒',
+  待辦: '待辦',
+  次: '次',
+  總訓練量: '總訓練量',
+  訓練次數: '訓練次數',
+};
+
+export const BASIC_DIALOG_LABELS = {
+  開始時間: '開始時間',
+  持續時間: '持續時間',
+  預計用時: '預計用時：',
+};
+
+export const MANIFESTATION_NOTEBOOK_LABELS = {
+  意念: '意念',
+  魔法語句: '魔法語句',
+};
