@@ -12,6 +12,7 @@ import { supabase } from '@/lib/supabase/client'
 import { formatDate } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
 import { deleteTour as deleteTourEntity } from '@/data'
+import { ARCHIVE_LABELS } from './constants/labels'
 
 interface ArchivedTour {
   id: string
@@ -298,7 +299,7 @@ export default function ArchiveManagementPage() {
   const tourColumns = [
     {
       key: 'code',
-      label: '團號',
+      label: ARCHIVE_LABELS.COL_CODE,
       width: '140px',
       render: (_: unknown, row: ArchivedTour) => (
         <span className="font-medium text-morandi-primary">{row.code}</span>
@@ -306,20 +307,20 @@ export default function ArchiveManagementPage() {
     },
     {
       key: 'name',
-      label: '團名',
+      label: ARCHIVE_LABELS.COL_NAME,
       render: (_: unknown, row: ArchivedTour) => (
         <span className="text-morandi-secondary">{row.name || row.location || '-'}</span>
       ),
     },
     {
       key: 'departure_date',
-      label: '出發日期',
+      label: ARCHIVE_LABELS.COL_DEPARTURE_DATE,
       width: '120px',
       render: (_: unknown, row: ArchivedTour) => <DateCell date={row.departure_date} />,
     },
     {
       key: 'updated_at',
-      label: '封存時間',
+      label: ARCHIVE_LABELS.COL_ARCHIVED_TIME,
       width: '120px',
       render: (_: unknown, row: ArchivedTour) => (
         <span className="text-sm text-morandi-secondary">
@@ -336,12 +337,12 @@ export default function ArchiveManagementPage() {
           actions={[
             {
               icon: RotateCcw,
-              label: '還原',
+              label: ARCHIVE_LABELS.ACTION_RESTORE,
               onClick: () => handleRestoreTour(row),
             },
             {
               icon: Trash2,
-              label: '永久刪除',
+              label: ARCHIVE_LABELS.ACTION_DELETE_PERMANENT,
               onClick: () => handleDeleteTour(row),
               variant: 'danger',
             },
@@ -355,7 +356,7 @@ export default function ArchiveManagementPage() {
   const orphanedQuotesColumns = [
     {
       key: 'code',
-      label: '報價單號',
+      label: ARCHIVE_LABELS.COL_QUOTE_CODE,
       width: '140px',
       render: (_: unknown, row: OrphanedQuote) => (
         <span className="font-medium text-morandi-primary">{row.code}</span>
@@ -363,14 +364,14 @@ export default function ArchiveManagementPage() {
     },
     {
       key: 'customer_name',
-      label: '客戶名稱',
+      label: ARCHIVE_LABELS.COL_CUSTOMER_NAME,
       render: (_: unknown, row: OrphanedQuote) => (
         <span className="text-morandi-secondary">{row.customer_name || row.name || '-'}</span>
       ),
     },
     {
       key: 'total_amount',
-      label: '金額',
+      label: ARCHIVE_LABELS.COL_AMOUNT,
       width: '120px',
       render: (_: unknown, row: OrphanedQuote) => (
         row.total_amount ? (
@@ -382,7 +383,7 @@ export default function ArchiveManagementPage() {
     },
     {
       key: 'created_at',
-      label: '建立時間',
+      label: ARCHIVE_LABELS.COL_CREATED_TIME,
       width: '120px',
       render: (_: unknown, row: OrphanedQuote) => (
         <span className="text-sm text-morandi-secondary">
@@ -399,7 +400,7 @@ export default function ArchiveManagementPage() {
           actions={[
             {
               icon: Trash2,
-              label: '刪除',
+              label: ARCHIVE_LABELS.ACTION_DELETE,
               onClick: () => handleDeleteOrphanedQuote(row),
               variant: 'danger',
             },
@@ -413,7 +414,7 @@ export default function ArchiveManagementPage() {
   const closedToursColumns = [
     {
       key: 'code',
-      label: '團號',
+      label: ARCHIVE_LABELS.COL_CODE,
       width: '140px',
       render: (_: unknown, row: ClosedTour) => (
         <span className="font-medium text-morandi-primary">{row.code}</span>
@@ -421,20 +422,20 @@ export default function ArchiveManagementPage() {
     },
     {
       key: 'name',
-      label: '團名',
+      label: ARCHIVE_LABELS.COL_NAME,
       render: (_: unknown, row: ClosedTour) => (
         <span className="text-morandi-secondary">{row.name || row.location || '-'}</span>
       ),
     },
     {
       key: 'departure_date',
-      label: '出發日期',
+      label: ARCHIVE_LABELS.COL_DEPARTURE_DATE,
       width: '120px',
       render: (_: unknown, row: ClosedTour) => <DateCell date={row.departure_date} />,
     },
     {
       key: 'closing_date',
-      label: '結案日期',
+      label: ARCHIVE_LABELS.COL_CLOSING_DATE,
       width: '120px',
       render: (_: unknown, row: ClosedTour) => (
         <span className="text-sm text-morandi-secondary">
@@ -451,7 +452,7 @@ export default function ArchiveManagementPage() {
           actions={[
             {
               icon: Archive,
-              label: '封存',
+              label: ARCHIVE_LABELS.ACTION_ARCHIVE,
               onClick: () => handleArchiveClosedTour(row),
             },
           ]}
@@ -464,7 +465,7 @@ export default function ArchiveManagementPage() {
   const itineraryColumns = [
     {
       key: 'tour_code',
-      label: '團號',
+      label: ARCHIVE_LABELS.COL_CODE,
       width: '140px',
       render: (_: unknown, row: ArchivedItinerary) => (
         <span className="font-medium text-morandi-primary">{row.tour_code || '-'}</span>
@@ -472,14 +473,14 @@ export default function ArchiveManagementPage() {
     },
     {
       key: 'title',
-      label: '標題',
+      label: ARCHIVE_LABELS.COL_TITLE,
       render: (_: unknown, row: ArchivedItinerary) => (
         <span className="text-morandi-secondary">{row.title || '-'}</span>
       ),
     },
     {
       key: 'location',
-      label: '地點',
+      label: ARCHIVE_LABELS.COL_LOCATION,
       width: '150px',
       render: (_: unknown, row: ArchivedItinerary) => (
         <span className="text-morandi-secondary">
@@ -489,7 +490,7 @@ export default function ArchiveManagementPage() {
     },
     {
       key: 'archived_at',
-      label: '封存時間',
+      label: ARCHIVE_LABELS.COL_ARCHIVED_TIME,
       width: '120px',
       render: (_: unknown, row: ArchivedItinerary) => (
         <span className="text-sm text-morandi-secondary">
@@ -506,12 +507,12 @@ export default function ArchiveManagementPage() {
           actions={[
             {
               icon: RotateCcw,
-              label: '還原',
+              label: ARCHIVE_LABELS.ACTION_RESTORE,
               onClick: () => handleRestoreItinerary(row),
             },
             {
               icon: Trash2,
-              label: '永久刪除',
+              label: ARCHIVE_LABELS.ACTION_DELETE_PERMANENT,
               onClick: () => handleDeleteItinerary(row),
               variant: 'danger',
             },
@@ -523,21 +524,21 @@ export default function ArchiveManagementPage() {
 
   // 標籤頁定義
   const STATUS_TABS = [
-    { value: 'orphaned-quotes', label: `未關聯報價單 (${orphanedQuotes.length})`, icon: FileQuestion },
-    { value: 'closed', label: `結案旅遊團 (${closedTours.length})`, icon: CheckCircle },
-    { value: 'tours', label: `封存旅遊團 (${archivedTours.length})`, icon: Plane },
-    { value: 'itineraries', label: `封存行程表 (${archivedItineraries.length})`, icon: FileText },
+    { value: 'orphaned-quotes', label: `${ARCHIVE_LABELS.TAB_ORPHANED_QUOTES} (${orphanedQuotes.length})`, icon: FileQuestion },
+    { value: 'closed', label: `${ARCHIVE_LABELS.TAB_CLOSED_TOURS} (${closedTours.length})`, icon: CheckCircle },
+    { value: 'tours', label: `${ARCHIVE_LABELS.TAB_ARCHIVED_TOURS} (${archivedTours.length})`, icon: Plane },
+    { value: 'itineraries', label: `${ARCHIVE_LABELS.TAB_ARCHIVED_ITINERARIES} (${archivedItineraries.length})`, icon: FileText },
   ]
 
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="封存管理"
+        title={ARCHIVE_LABELS.PAGE_TITLE}
         icon={Archive}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '資料庫管理', href: '/database' },
-          { label: '封存管理', href: '/database/archive-management' },
+          { label: ARCHIVE_LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: ARCHIVE_LABELS.BREADCRUMB_DATABASE, href: '/database' },
+          { label: ARCHIVE_LABELS.BREADCRUMB_ARCHIVE, href: '/database/archive-management' },
         ]}
         tabs={STATUS_TABS}
         activeTab={activeTab}
@@ -556,7 +557,7 @@ export default function ArchiveManagementPage() {
               orphanedQuotes.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
                   <FileQuestion className="h-12 w-12 mb-4 opacity-30" />
-                  <p>沒有未關聯旅遊團的報價單</p>
+                  <p>{ARCHIVE_LABELS.EMPTY_ORPHANED_QUOTES}</p>
                 </div>
               ) : (
                 <EnhancedTable
@@ -571,7 +572,7 @@ export default function ArchiveManagementPage() {
               closedTours.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
                   <CheckCircle className="h-12 w-12 mb-4 opacity-30" />
-                  <p>沒有結案的旅遊團</p>
+                  <p>{ARCHIVE_LABELS.EMPTY_CLOSED_TOURS}</p>
                 </div>
               ) : (
                 <EnhancedTable
@@ -586,7 +587,7 @@ export default function ArchiveManagementPage() {
               archivedTours.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
                   <Archive className="h-12 w-12 mb-4 opacity-30" />
-                  <p>沒有封存的旅遊團</p>
+                  <p>{ARCHIVE_LABELS.EMPTY_ARCHIVED_TOURS}</p>
                 </div>
               ) : (
                 <EnhancedTable
@@ -601,7 +602,7 @@ export default function ArchiveManagementPage() {
               archivedItineraries.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
                   <Archive className="h-12 w-12 mb-4 opacity-30" />
-                  <p>沒有封存的行程表</p>
+                  <p>{ARCHIVE_LABELS.EMPTY_ARCHIVED_ITINERARIES}</p>
                 </div>
               ) : (
                 <EnhancedTable
