@@ -95,3 +95,17 @@ temp/
 # Playwright auth state
 tests/e2e/.auth/
 SUPABASE_CREDENTIALS_BACKUP.md
+
+# Large assets (stored in Supabase bucket)
+city-backgrounds/
+city-backgrounds-2/
+city-backgrounds-all/
+
+# Build artifacts / reports
+lint-report.json
+playwright-report/
+*.pdf
+
+# Debug HTML tools
+public/*.html
+!public/contract-templates/
