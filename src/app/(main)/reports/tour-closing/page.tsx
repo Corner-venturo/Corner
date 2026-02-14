@@ -324,42 +324,42 @@ export default function TourClosingReportPage() {
   const columns: TableColumn<TourClosingReport>[] = [
     {
       key: 'code',
-      label: '團號',
+      label: TOUR_CLOSING_LABELS.COL_TOUR_CODE,
       sortable: true,
       render: (value) => <span className="font-mono">{String(value || "")}</span>,
     },
     {
       key: 'name',
-      label: '團名',
+      label: TOUR_CLOSING_LABELS.COL_TOUR_NAME,
       sortable: true,
     },
     {
       key: 'departure_date',
-      label: '出發日',
+      label: TOUR_CLOSING_LABELS.COL_DEPARTURE,
       sortable: true,
       render: (value: unknown) => <DateCell date={value as string} />,
     },
     {
       key: 'closing_date',
-      label: '結團日',
+      label: TOUR_CLOSING_LABELS.COL_CLOSING,
       sortable: true,
       render: (value: unknown) => <DateCell date={value as string} />,
     },
     {
       key: 'total_revenue',
-      label: '收入',
+      label: TOUR_CLOSING_LABELS.COL_REVENUE,
       sortable: true,
       render: (value: unknown) => <CurrencyCell amount={Number(value)} variant="income" />,
     },
     {
       key: 'total_cost',
-      label: '成本',
+      label: TOUR_CLOSING_LABELS.COL_COST,
       sortable: true,
       render: (value: unknown) => <CurrencyCell amount={Number(value)} variant="expense" />,
     },
     {
       key: 'net_profit',
-      label: '淨利',
+      label: TOUR_CLOSING_LABELS.COL_NET_PROFIT,
       sortable: true,
       render: (value: unknown) => (
         <CurrencyCell
@@ -376,7 +376,7 @@ export default function TourClosingReportPage() {
       actions={[
         {
           icon: FileDown,
-          label: '匯出此團',
+          label: TOUR_CLOSING_LABELS.EXPORT_TOUR,
           onClick: () => {
             const month = report.closing_date?.substring(0, 7)
             if (month) {
@@ -411,7 +411,7 @@ export default function TourClosingReportPage() {
                 <SelectValue placeholder={TOUR_CLOSING_LABELS.LABEL_2902} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">全部月份</SelectItem>
+                <SelectItem value="all">{TOUR_CLOSING_LABELS.LABEL_2902}</SelectItem>
                 {availableMonths.map(month => (
                   <SelectItem key={month} value={month}>
                     {month}

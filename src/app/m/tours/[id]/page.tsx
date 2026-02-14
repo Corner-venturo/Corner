@@ -26,19 +26,19 @@ import { ID_LABELS } from './constants/labels'
 type TabType = 'overview' | 'members' | 'rooms' | 'vehicles' | 'finance' | 'todos'
 
 const TABS: { id: TabType; label: string; icon: typeof FileText }[] = [
-  { id: 'overview', label: '總覽', icon: FileText },
-  { id: 'members', label: '成員', icon: Users },
-  { id: 'rooms', label: '分房', icon: Bed },
-  { id: 'vehicles', label: '分車', icon: Bus },
-  { id: 'finance', label: '財務', icon: Wallet },
-  { id: 'todos', label: '待辦', icon: ClipboardList },
+  { id: 'overview', label: ID_LABELS.TAB_OVERVIEW, icon: FileText },
+  { id: 'members', label: ID_LABELS.TAB_MEMBERS, icon: Users },
+  { id: 'rooms', label: ID_LABELS.TAB_ROOMS, icon: Bed },
+  { id: 'vehicles', label: ID_LABELS.TAB_VEHICLES, icon: Bus },
+  { id: 'finance', label: ID_LABELS.TAB_FINANCE, icon: Wallet },
+  { id: 'todos', label: ID_LABELS.TAB_TODOS, icon: ClipboardList },
 ]
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  '提案': { label: '提案', color: 'text-amber-700', bg: 'bg-amber-100' },
-  '進行中': { label: '進行中', color: 'text-green-700', bg: 'bg-green-100' },
-  '結案': { label: '結案', color: 'text-morandi-secondary', bg: 'bg-morandi-container' },
-  '取消': { label: '取消', color: 'text-red-700', bg: 'bg-red-100' },
+  '提案': { label: ID_LABELS.STATUS_PROPOSAL, color: 'text-amber-700', bg: 'bg-amber-100' },
+  '進行中': { label: ID_LABELS.STATUS_IN_PROGRESS, color: 'text-green-700', bg: 'bg-green-100' },
+  '結案': { label: ID_LABELS.STATUS_CLOSED, color: 'text-morandi-secondary', bg: 'bg-morandi-container' },
+  '取消': { label: ID_LABELS.STATUS_CANCELLED, color: 'text-red-700', bg: 'bg-red-100' },
 }
 
 // 資料庫類型
@@ -264,7 +264,7 @@ export default function TourDetailPage() {
         capacity: room.capacity,
         assigned_members: (room.tour_room_assignments || []).map((a) => ({
           id: a.order_members?.id || '',
-          name: a.order_members?.chinese_name || '未命名',
+          name: a.order_members?.chinese_name || ID_LABELS.UNNAMED,
         })),
       }))
 
@@ -317,7 +317,7 @@ export default function TourDetailPage() {
         driver_name: v.driver_name,
         assigned_members: (v.tour_vehicle_assignments || []).map((a) => ({
           id: a.order_members?.id || '',
-          name: a.order_members?.chinese_name || '未命名',
+          name: a.order_members?.chinese_name || ID_LABELS.UNNAMED,
           seat_number: a.seat_number ?? undefined,
         })),
       }))
@@ -342,7 +342,7 @@ export default function TourDetailPage() {
       const formatted: DisplayPayment[] = ((data || []) as DbPayment[]).map((p) => ({
         id: p.id,
         code: p.code,
-        description: p.notes || '無說明',
+        description: p.notes || ID_LABELS.NO_DESCRIPTION,
         amount: p.amount,
         status: (p.status || 'pending') as DisplayPayment['status'],
         supplier_name: p.supplier_name,
@@ -417,7 +417,7 @@ export default function TourDetailPage() {
                 </span>
               </div>
               <div className="text-sm text-morandi-secondary">
-                {tour.name} {durationNights}晚
+                {tour.name} {durationNights}{ID_LABELS.NIGHTS_SUFFIX}
               </div>
             </div>
           </div>
@@ -593,7 +593,7 @@ export default function TourDetailPage() {
                     </span>
                   ))}
                   {vehicle.assigned_members.length === 0 && (
-                    <span className="text-xs text-morandi-muted">尚未分配</span>
+                    <span className="text-xs text-morandi-muted">{ID_LABELS.NOT_ASSIGNED}</span>
                   )}
                 </div>
               </div>
