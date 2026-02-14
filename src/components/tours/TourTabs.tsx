@@ -6,7 +6,7 @@
  * 提供：
  * 1. TOUR_TABS - 頁籤定義（給 ResponsiveHeader 等使用）
  * 2. TourTabContent - 只渲染內容（不含頁籤列）
- * 3. TourTabs - 完整元件（含頁籤列，給 Dialog 用）
+ * 3. TourTabs - 完整元件（含頁籤列，給詳細頁面用）
  */
 
 import { useState, useCallback } from 'react'
@@ -119,7 +119,7 @@ interface TourTabContentProps {
   /** 額外 props 傳給 OrderMembersExpandable */
   workspaceId?: string
   forceShowPnr?: boolean
-  /** PNR 配對 Dialog 控制（Dialog 專用） */
+  /** PNR 配對 Dialog 控制 */
   showPnrMatchDialog?: boolean
   onPnrMatchDialogChange?: (show: boolean) => void
   onPnrMatchSuccess?: () => void
@@ -196,7 +196,7 @@ export function TourTabContent({
 }
 
 // ============================================================================
-// TourTabs - 完整元件（含頁籤列，給 Dialog 用）
+// TourTabs - 完整元件（含頁籤列，給詳細頁面用）
 // ============================================================================
 
 interface TourTabsProps {
