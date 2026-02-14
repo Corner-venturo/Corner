@@ -17,7 +17,6 @@ import { useAuthStore } from '@/stores/auth-store'
 import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
-import { generateId } from '@/lib/data/create-data-store'
 import { createDisbursementSchema } from '@/lib/validations/schemas'
 import { DISBURSEMENT_LABELS } from '../constants/labels'
 
@@ -159,7 +158,7 @@ export function useCreateDisbursement({ pendingRequests, onSuccess }: UseCreateD
 
       const { data, error } = await dynamicFrom('disbursement_orders')
         .insert({
-          id: generateId(),
+          id: crypto.randomUUID(),
           code: orderNumber,
           order_number: orderNumber,
           disbursement_date: disbursementDate,
