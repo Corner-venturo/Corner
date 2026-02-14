@@ -5,10 +5,12 @@
  * 分頁式的時間軸介面，用於編輯每日行程
  * - Tab 切換每日行程
  * - 表格式編輯（點擊儲存格直接編輯，無格線）
+ *
+ * 資料邏輯已抽取至 useItineraryDialogData hook
  */
 
 
-import { useState, useCallback, useRef, useEffect } from 'react'
+import React from 'react'
 import {
   Dialog,
   DialogContent,
@@ -39,9 +41,14 @@ import {
   Building2,
 } from 'lucide-react'
 import { AttractionSelector } from '@/components/editor/AttractionSelector'
-import { HotelSelector, type LuxuryHotel } from '@/components/editor/HotelSelector'
-import { BROCHURE_PREVIEW_DIALOG_LABELS, ITINERARY_DIALOG_LABELS } from '../constants/labels';
-import { generateItineraryPrintHtml } from './itinerary-print-template'
+import { HotelSelector } from '@/components/editor/HotelSelector'
+import { ITINERARY_DIALOG_LABELS } from '../constants/labels'
+import type { ProposalPackage } from '@/types/proposal.types'
+import type {
+  TimelineAttraction,
+  TimelineItineraryData,
+} from '@/types/timeline-itinerary.types'
+import { useItineraryDialogData, type EditableField } from './useItineraryDialogData'
 
 // 預設顏色選項
 const COLOR_OPTIONS = [
@@ -52,16 +59,6 @@ const COLOR_OPTIONS = [
   { value: '#f59e0b', label: ITINERARY_DIALOG_LABELS.橙色, color: '#f59e0b' },
   { value: '#8b5cf6', label: ITINERARY_DIALOG_LABELS.紫色, color: '#8b5cf6' },
 ]
-import type { ProposalPackage } from '@/types/proposal.types'
-import type {
-  TimelineAttraction,
-  TimelineItineraryData,
-} from '@/types/timeline-itinerary.types'
-import {
-  generateId,
-  createEmptyAttraction,
-  createEmptyDay,
-} from '@/types/timeline-itinerary.types'
 
 interface ItineraryDialogProps {
   isOpen: boolean
@@ -70,435 +67,17 @@ interface ItineraryDialogProps {
   onSave?: (timelineData: TimelineItineraryData) => Promise<void>
 }
 
-// 可編輯欄位
-type EditableField = 'startTime' | 'endTime' | 'name' | 'menu'
-
-// 編輯中的儲存格
-interface EditingCell {
-  rowIndex: number
-  field: EditableField
-}
-
 export function ItineraryDialog({
   isOpen,
   onClose,
   pkg,
   onSave,
 }: ItineraryDialogProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const [uploadTarget, setUploadTarget] = useState<{ dayId: string; attractionId: string } | null>(null)
-  const [activeDayIndex, setActiveDayIndex] = useState(0)
-  const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
-  const [colorPickerOpen, setColorPickerOpen] = useState<number | null>(null)
-  const [attractionSelectorOpen, setAttractionSelectorOpen] = useState(false)
-  const [hotelSelectorOpen, setHotelSelectorOpen] = useState(false)
-  const [insertAtRowIndex, setInsertAtRowIndex] = useState<number | null>(null) // 插入到哪一行之後
-  const [saving, setSaving] = useState(false)
-
-  // 計算日期的輔助函數（提前定義）
-  const calcDate = (dayNumber: number, startDate?: string): string => {
-    if (!startDate) return ''
-    const date = new Date(startDate)
-    date.setDate(date.getDate() + dayNumber - 1)
-    return date.toISOString().split('T')[0]
-  }
-
-  // 初始化資料
-  const [data, setData] = useState<TimelineItineraryData>(() => {
-    if (pkg?.timeline_data) {
-      return pkg.timeline_data
-    }
-    const startDate = pkg?.start_date || ''
-    const totalDays = pkg?.days || 1
-
-    // 根據套餐天數自動生成對應的 Day
-    const days = Array.from({ length: totalDays }, (_, index) => {
-      const dayNumber = index + 1
-      return createEmptyDay(dayNumber, calcDate(dayNumber, startDate))
-    })
-
-    return {
-      title: pkg?.version_name || BROCHURE_PREVIEW_DIALOG_LABELS.行程表,
-      subtitle: '',
-      startDate,
-      days,
-    }
-  })
-
-  // 當前選中的日期
-  const activeDay = data.days[activeDayIndex] || data.days[0]
-
-  // 計算日期
-  const calculateDate = useCallback((dayNumber: number, startDate?: string): string => {
-    if (!startDate) return ''
-    const date = new Date(startDate)
-    date.setDate(date.getDate() + dayNumber - 1)
-    return date.toISOString().split('T')[0]
-  }, [])
-
-  // 新增一天
-  const addDay = useCallback(() => {
-    setData((prev) => {
-      const newDayNumber = prev.days.length + 1
-      const newDate = calculateDate(newDayNumber, prev.startDate)
-      return {
-        ...prev,
-        days: [...prev.days, createEmptyDay(newDayNumber, newDate)],
-      }
-    })
-    setActiveDayIndex(data.days.length)
-  }, [calculateDate, data.days.length])
-
-  // 刪除一天
-  const removeDay = useCallback((dayIndex: number) => {
-    setData((prev) => {
-      const newDays = prev.days
-        .filter((_, idx) => idx !== dayIndex)
-        .map((day, index) => ({
-          ...day,
-          dayNumber: index + 1,
-          date: calculateDate(index + 1, prev.startDate),
-        }))
-      return { ...prev, days: newDays.length > 0 ? newDays : [createEmptyDay(1, prev.startDate)] }
-    })
-    if (activeDayIndex >= data.days.length - 1) {
-      setActiveDayIndex(Math.max(0, data.days.length - 2))
-    }
-  }, [calculateDate, activeDayIndex, data.days.length])
-
-  // 更新每日標題
-  const updateDayTitle = useCallback((title: string) => {
-    setData((prev) => ({
-      ...prev,
-      days: prev.days.map((day, idx) =>
-        idx === activeDayIndex ? { ...day, title } : day
-      ),
-    }))
-  }, [activeDayIndex])
-
-  // 更新每日住宿
-  const updateDayAccommodation = useCallback((accommodation: string) => {
-    setData((prev) => ({
-      ...prev,
-      days: prev.days.map((day, idx) =>
-        idx === activeDayIndex ? { ...day, accommodation } : day
-      ),
-    }))
-  }, [activeDayIndex])
-
-  // 插入符號到今日主題
-  const insertSymbolToTitle = useCallback((symbol: string) => {
-    const input = document.querySelector('#day-title-input') as HTMLInputElement
-    if (input) {
-      const currentTitle = activeDay.title || ''
-      const cursorPos = input.selectionStart || currentTitle.length
-      const newValue = currentTitle.slice(0, cursorPos) + symbol + currentTitle.slice(cursorPos)
-      updateDayTitle(newValue)
-      setTimeout(() => {
-        input.focus()
-        input.setSelectionRange(cursorPos + symbol.length, cursorPos + symbol.length)
-      }, 0)
-    }
-  }, [activeDay.title, updateDayTitle])
-
-  // 新增景點
-  const addAttraction = useCallback(() => {
-    setData((prev) => ({
-      ...prev,
-      days: prev.days.map((day, idx) =>
-        idx === activeDayIndex
-          ? { ...day, attractions: [...day.attractions, createEmptyAttraction()] }
-          : day
-      ),
-    }))
-  }, [activeDayIndex])
-
-  // 打開景點選擇器（指定插入位置）
-  const openAttractionSelector = useCallback((rowIndex: number | null = null) => {
-    setInsertAtRowIndex(rowIndex)
-    setAttractionSelectorOpen(true)
-  }, [])
-
-  // 從景點庫選擇後新增
-  const handleAttractionSelect = useCallback((selectedAttractions: { id: string; name: string; english_name?: string; description?: string; thumbnail?: string; images?: string[] }[]) => {
-    const newAttractions = selectedAttractions.map((a) => {
-      // 優先使用 images 陣列，否則用 thumbnail
-      let imageList: { id: string; url: string }[] = []
-      if (a.images && a.images.length > 0) {
-        imageList = a.images.slice(0, 3).map(url => ({ id: generateId(), url }))
-      } else if (a.thumbnail) {
-        imageList = [{ id: generateId(), url: a.thumbnail }]
-      }
-
-      return {
-        id: generateId(),
-        name: a.name,
-        description: a.description || '',
-        images: imageList,
-      }
-    })
-
-    setData((prev) => ({
-      ...prev,
-      days: prev.days.map((day, idx) => {
-        if (idx !== activeDayIndex) return day
-
-        // 如果有指定插入位置，則插入到該行之後
-        if (insertAtRowIndex !== null) {
-          const before = day.attractions.slice(0, insertAtRowIndex + 1)
-          const after = day.attractions.slice(insertAtRowIndex + 1)
-          return {
-            ...day,
-            attractions: [...before, ...newAttractions, ...after],
-          }
-        }
-
-        // 否則加到最後
-        return {
-          ...day,
-          attractions: [...day.attractions, ...newAttractions],
-        }
-      }),
-    }))
-    setAttractionSelectorOpen(false)
-    setInsertAtRowIndex(null)
-  }, [activeDayIndex, insertAtRowIndex])
-
-  // 從飯店庫選擇後更新住宿
-  const handleHotelSelect = useCallback((selectedHotels: LuxuryHotel[]) => {
-    if (selectedHotels.length === 0) return
-    const hotel = selectedHotels[0]
-    // 顯示飯店名稱，如有城市名稱則附加（幫助區分同名飯店）
-    const displayName = hotel.city_name
-      ? `${hotel.name}（${hotel.city_name}）`
-      : hotel.name
-    updateDayAccommodation(displayName)
-    setHotelSelectorOpen(false)
-  }, [updateDayAccommodation])
-
-  // 刪除景點
-  const removeAttraction = useCallback((attractionIndex: number) => {
-    setData((prev) => ({
-      ...prev,
-      days: prev.days.map((day, idx) =>
-        idx === activeDayIndex
-          ? {
-              ...day,
-              attractions:
-                day.attractions.length > 1
-                  ? day.attractions.filter((_, i) => i !== attractionIndex)
-                  : day.attractions,
-            }
-          : day
-      ),
-    }))
-  }, [activeDayIndex])
-
-  // 更新景點欄位
-  const updateAttractionField = useCallback(
-    (attractionIndex: number, field: keyof TimelineAttraction, value: unknown) => {
-      setData((prev) => ({
-        ...prev,
-        days: prev.days.map((day, idx) =>
-          idx === activeDayIndex
-            ? {
-                ...day,
-                attractions: day.attractions.map((a, i) =>
-                  i === attractionIndex ? { ...a, [field]: value } : a
-                ),
-              }
-            : day
-        ),
-      }))
-    },
-    [activeDayIndex]
-  )
-
-  // 壓縮圖片
-  const compressImage = useCallback((file: File, maxWidth = 800): Promise<string> => {
-    return new Promise((resolve) => {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const img = new Image()
-        img.onload = () => {
-          const canvas = document.createElement('canvas')
-          let width = img.width
-          let height = img.height
-          if (width > maxWidth) {
-            height = (height * maxWidth) / width
-            width = maxWidth
-          }
-          canvas.width = width
-          canvas.height = height
-          const ctx = canvas.getContext('2d')
-          ctx?.drawImage(img, 0, 0, width, height)
-          resolve(canvas.toDataURL('image/jpeg', 0.7))
-        }
-        img.src = e.target?.result as string
-      }
-      reader.readAsDataURL(file)
-    })
-  }, [])
-
-  // 處理圖片上傳
-  const handleImageUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (!files || !uploadTarget) return
-
-    const currentDay = data.days.find(d => d.id === uploadTarget.dayId)
-    const currentAttraction = currentDay?.attractions.find(a => a.id === uploadTarget.attractionId)
-    const currentCount = currentAttraction?.images.length || 0
-    const remaining = 3 - currentCount
-
-    if (remaining <= 0) {
-      e.target.value = ''
-      setUploadTarget(null)
-      return
-    }
-
-    const filesToUpload = Array.from(files).slice(0, remaining)
-    const targetDayId = uploadTarget.dayId
-    const targetAttractionId = uploadTarget.attractionId
-
-    for (const file of filesToUpload) {
-      const compressedUrl = await compressImage(file)
-      setData((prev) => ({
-        ...prev,
-        days: prev.days.map((day) =>
-          day.id === targetDayId
-            ? {
-                ...day,
-                attractions: day.attractions.map((a) =>
-                  a.id === targetAttractionId && a.images.length < 3
-                    ? { ...a, images: [...a.images, { id: generateId(), url: compressedUrl }] }
-                    : a
-                ),
-              }
-            : day
-        ),
-      }))
-    }
-
-    e.target.value = ''
-    setUploadTarget(null)
-  }, [uploadTarget, data.days, compressImage])
-
-  // 觸發圖片上傳
-  const triggerImageUpload = useCallback((dayId: string, attractionId: string) => {
-    setUploadTarget({ dayId, attractionId })
-    fileInputRef.current?.click()
-  }, [])
-
-  // 刪除照片
-  const removeImage = useCallback((attractionIndex: number, imageId: string) => {
-    setData((prev) => ({
-      ...prev,
-      days: prev.days.map((day, idx) =>
-        idx === activeDayIndex
-          ? {
-              ...day,
-              attractions: day.attractions.map((a, i) =>
-                i === attractionIndex
-                  ? { ...a, images: a.images.filter((img) => img.id !== imageId) }
-                  : a
-              ),
-            }
-          : day
-      ),
-    }))
-  }, [activeDayIndex])
-
-  // 格式化日期
-  const formatDate = (dateStr: string): string => {
-    if (!dateStr) return ''
-    const date = new Date(dateStr)
-    const weekdays = [ITINERARY_DIALOG_LABELS.日, ITINERARY_DIALOG_LABELS.一, ITINERARY_DIALOG_LABELS.二, ITINERARY_DIALOG_LABELS.三, ITINERARY_DIALOG_LABELS.四, ITINERARY_DIALOG_LABELS.五, ITINERARY_DIALOG_LABELS.六]
-    return `${date.getMonth() + 1}/${date.getDate()} (${weekdays[date.getDay()]})`
-  }
-
-  // 儲存
-  const handleSave = useCallback(async () => {
-    if (!onSave) {
-      window.alert(ITINERARY_DIALOG_LABELS.儲存功能未啟用)
-      return
-    }
-    setSaving(true)
-    try {
-      await onSave(data)
-      window.alert(ITINERARY_DIALOG_LABELS.儲存成功)
-    } catch {
-      window.alert(ITINERARY_DIALOG_LABELS.儲存失敗)
-    } finally {
-      setSaving(false)
-    }
-  }, [data, onSave])
-
-  // 列印
-  const handlePrint = useCallback(() => {
-    const printWindow = window.open('', '_blank')
-    if (!printWindow) return
-    const html = generateItineraryPrintHtml(data)
-    printWindow.document.write(html)
-    printWindow.document.close()
-  }, [data])
-
-  // 點擊儲存格開始編輯
-  const handleCellClick = useCallback((rowIndex: number, field: EditableField) => {
-    setEditingCell({ rowIndex, field })
-  }, [])
-
-  // 鍵盤導航
-  const handleKeyDown = useCallback((e: React.KeyboardEvent, rowIndex: number, field: EditableField) => {
-    const editableFields: EditableField[] = ['startTime', 'endTime', 'name', 'menu']
-    const fieldIndex = editableFields.indexOf(field)
-
-    if (e.key === 'Enter' || e.key === 'Tab') {
-      e.preventDefault()
-      if (e.shiftKey) {
-        if (fieldIndex > 0) {
-          setEditingCell({ rowIndex, field: editableFields[fieldIndex - 1] })
-        } else if (rowIndex > 0) {
-          setEditingCell({ rowIndex: rowIndex - 1, field: editableFields[editableFields.length - 1] })
-        }
-      } else {
-        if (fieldIndex < editableFields.length - 1) {
-          setEditingCell({ rowIndex, field: editableFields[fieldIndex + 1] })
-        } else if (rowIndex < activeDay.attractions.length - 1) {
-          setEditingCell({ rowIndex: rowIndex + 1, field: editableFields[0] })
-        } else {
-          setEditingCell(null)
-        }
-      }
-    } else if (e.key === 'Escape') {
-      setEditingCell(null)
-    } else if (e.key === 'ArrowDown' && rowIndex < activeDay.attractions.length - 1) {
-      e.preventDefault()
-      setEditingCell({ rowIndex: rowIndex + 1, field })
-    } else if (e.key === 'ArrowUp' && rowIndex > 0) {
-      e.preventDefault()
-      setEditingCell({ rowIndex: rowIndex - 1, field })
-    }
-  }, [activeDay.attractions.length])
-
-  // 自動 focus 輸入框
-  useEffect(() => {
-    if (editingCell) {
-      const isTextareaField = editingCell.field === 'name' || editingCell.field === 'menu'
-      if (isTextareaField && textareaRef.current) {
-        textareaRef.current.focus()
-        textareaRef.current.select()
-      } else if (inputRef.current) {
-        inputRef.current.focus()
-        inputRef.current.select()
-      }
-    }
-  }, [editingCell])
+  const h = useItineraryDialogData(pkg, onSave)
 
   // 渲染儲存格
   const renderCell = (attraction: TimelineAttraction, rowIndex: number, field: EditableField, width?: string) => {
-    const isEditing = editingCell?.rowIndex === rowIndex && editingCell?.field === field
+    const isEditing = h.editingCell?.rowIndex === rowIndex && h.editingCell?.field === field
     let value = ''
     let placeholder = ''
 
@@ -521,26 +100,23 @@ export function ItineraryDialog({
         break
     }
 
-    // 時間欄位固定高度，名稱/菜色欄位允許多行
     const isTimeField = field === 'startTime' || field === 'endTime'
     const isTextareaField = field === 'name' || field === 'menu'
 
     if (isEditing) {
       if (isTextareaField) {
-        // 名稱和菜色使用 textarea 支援多行
         return (
           <textarea
-            ref={textareaRef}
+            ref={h.textareaRef}
             value={value}
-            onChange={(e) => updateAttractionField(rowIndex, field, e.target.value)}
-            onBlur={() => setEditingCell(null)}
+            onChange={(e) => h.updateAttractionField(rowIndex, field, e.target.value)}
+            onBlur={() => h.setEditingCell(null)}
             onKeyDown={(e) => {
-              // Shift+Enter 換行，Enter 確認
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault()
-                setEditingCell(null)
+                h.setEditingCell(null)
               } else if (e.key === 'Escape') {
-                setEditingCell(null)
+                h.setEditingCell(null)
               }
             }}
             className={cn(
@@ -553,17 +129,17 @@ export function ItineraryDialog({
       }
       return (
         <input
-          ref={inputRef}
+          ref={h.inputRef}
           value={value}
           onChange={(e) => {
             let newValue = e.target.value
             if (isTimeField) {
               newValue = newValue.replace(/\D/g, '').slice(0, 4)
             }
-            updateAttractionField(rowIndex, field, newValue)
+            h.updateAttractionField(rowIndex, field, newValue)
           }}
-          onBlur={() => setEditingCell(null)}
-          onKeyDown={(e) => handleKeyDown(e, rowIndex, field)}
+          onBlur={() => h.setEditingCell(null)}
+          onKeyDown={(e) => h.handleKeyDown(e, rowIndex, field)}
           className={cn(
             'w-full h-8 px-2 border-none outline-none bg-morandi-gold/10 focus:ring-0',
             isTimeField && 'text-center font-mono text-xs',
@@ -574,7 +150,6 @@ export function ItineraryDialog({
       )
     }
 
-    // 對於 name 和 menu 欄位，套用自訂顏色
     const textColor = (field === 'name' || field === 'menu') && attraction.color && value
       ? { color: attraction.color }
       : {}
@@ -588,7 +163,7 @@ export function ItineraryDialog({
           width
         )}
         style={textColor}
-        onClick={() => handleCellClick(rowIndex, field)}
+        onClick={() => h.handleCellClick(rowIndex, field)}
       >
         {value || placeholder}
       </div>
@@ -599,7 +174,6 @@ export function ItineraryDialog({
 
   return (
     <>
-    {/* 父 Dialog：使用 level={2}（作為子 Dialog 使用） */}
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent level={2} className={DIALOG_SIZES['4xl']}>
         <DialogHeader>
@@ -609,13 +183,12 @@ export function ItineraryDialog({
           </DialogTitle>
         </DialogHeader>
 
-        {/* 隱藏的檔案上傳 input */}
         <input
-          ref={fileInputRef}
+          ref={h.fileInputRef}
           type="file"
           accept="image/*"
           multiple
-          onChange={handleImageUpload}
+          onChange={h.handleImageUpload}
           className="hidden"
         />
 
@@ -624,8 +197,8 @@ export function ItineraryDialog({
           <div>
             <Label className="text-xs text-morandi-primary">{ITINERARY_DIALOG_LABELS.行程標題}</Label>
             <Input
-              value={data.title}
-              onChange={(e) => setData((prev) => ({ ...prev, title: e.target.value }))}
+              value={h.data.title}
+              onChange={(e) => h.setData((prev) => ({ ...prev, title: e.target.value }))}
               placeholder={ITINERARY_DIALOG_LABELS.輸入行程標題}
               className="mt-1 h-8"
             />
@@ -633,8 +206,8 @@ export function ItineraryDialog({
           <div>
             <Label className="text-xs text-morandi-primary">{ITINERARY_DIALOG_LABELS.副標題}</Label>
             <Input
-              value={data.subtitle || ''}
-              onChange={(e) => setData((prev) => ({ ...prev, subtitle: e.target.value }))}
+              value={h.data.subtitle || ''}
+              onChange={(e) => h.setData((prev) => ({ ...prev, subtitle: e.target.value }))}
               placeholder={ITINERARY_DIALOG_LABELS.輸入副標題}
               className="mt-1 h-8"
             />
@@ -643,23 +216,23 @@ export function ItineraryDialog({
 
         {/* Day 分頁 Tabs */}
         <div className="flex items-center gap-1 border-b border-border">
-          {data.days.map((day, index) => (
+          {h.data.days.map((day, index) => (
             <button
               key={day.id}
-              onClick={() => setActiveDayIndex(index)}
+              onClick={() => h.setActiveDayIndex(index)}
               className={cn(
                 'px-4 py-2 text-sm font-medium transition-colors relative',
-                activeDayIndex === index
+                h.activeDayIndex === index
                   ? 'text-morandi-gold border-b-2 border-morandi-gold -mb-[1px]'
                   : 'text-morandi-secondary hover:text-morandi-primary'
               )}
             >
               Day {day.dayNumber}
-              {day.date && <span className="ml-1 text-xs opacity-60">{formatDate(day.date)}</span>}
+              {day.date && <span className="ml-1 text-xs opacity-60">{h.formatDate(day.date)}</span>}
             </button>
           ))}
           <button
-            onClick={addDay}
+            onClick={h.addDay}
             className="px-3 py-2 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
             title={ITINERARY_DIALOG_LABELS.新增一天}
           >
@@ -674,62 +247,34 @@ export function ItineraryDialog({
             <div className="flex items-center justify-between mb-1">
               <Label className="text-xs text-morandi-primary">{ITINERARY_DIALOG_LABELS.今日主題}</Label>
               <div className="flex items-center gap-1">
-                {/* 符號插入按鈕 */}
-                <button
-                  type="button"
-                  onClick={() => insertSymbolToTitle(' → ')}
+                <button type="button" onClick={() => h.insertSymbolToTitle(' → ')}
                   className="p-1.5 bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors"
-                  title={ITINERARY_DIALOG_LABELS.插入箭頭}
-                >
+                  title={ITINERARY_DIALOG_LABELS.插入箭頭}>
                   <ArrowRight size={14} className="text-morandi-primary" />
                 </button>
-                <button
-                  type="button"
-                  onClick={() => insertSymbolToTitle(' ⇀ ')}
+                <button type="button" onClick={() => h.insertSymbolToTitle(' ⇀ ')}
                   className="px-2 py-1 text-xs bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors font-medium"
-                  title={ITINERARY_DIALOG_LABELS.插入鉤箭頭}
-                >
-                  ⇀
-                </button>
-                <button
-                  type="button"
-                  onClick={() => insertSymbolToTitle(' · ')}
+                  title={ITINERARY_DIALOG_LABELS.插入鉤箭頭}>⇀</button>
+                <button type="button" onClick={() => h.insertSymbolToTitle(' · ')}
                   className="px-2 py-1 text-xs bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors font-medium"
-                  title={ITINERARY_DIALOG_LABELS.插入間隔點}
-                >
-                  ·
-                </button>
-                <button
-                  type="button"
-                  onClick={() => insertSymbolToTitle(' | ')}
+                  title={ITINERARY_DIALOG_LABELS.插入間隔點}>·</button>
+                <button type="button" onClick={() => h.insertSymbolToTitle(' | ')}
                   className="p-1.5 bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors"
-                  title={ITINERARY_DIALOG_LABELS.插入直線}
-                >
+                  title={ITINERARY_DIALOG_LABELS.插入直線}>
                   <Minus size={14} className="text-morandi-primary" />
                 </button>
-                <button
-                  type="button"
-                  onClick={() => insertSymbolToTitle(' ⭐ ')}
+                <button type="button" onClick={() => h.insertSymbolToTitle(' ⭐ ')}
                   className="p-1.5 bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors"
-                  title={ITINERARY_DIALOG_LABELS.插入星號}
-                >
+                  title={ITINERARY_DIALOG_LABELS.插入星號}>
                   <Sparkles size={14} className="text-morandi-gold" />
                 </button>
-                <button
-                  type="button"
-                  onClick={() => insertSymbolToTitle(' ✈ ')}
+                <button type="button" onClick={() => h.insertSymbolToTitle(' ✈ ')}
                   className="px-2 py-1 text-xs bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors"
-                  title={ITINERARY_DIALOG_LABELS.插入飛機}
-                >
-                  ✈
-                </button>
-                {data.days.length > 1 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeDay(activeDayIndex)}
-                    className="h-7 px-2 text-morandi-red hover:bg-morandi-red/10 ml-2"
-                  >
+                  title={ITINERARY_DIALOG_LABELS.插入飛機}>✈</button>
+                {h.data.days.length > 1 && (
+                  <Button variant="ghost" size="sm"
+                    onClick={() => h.removeDay(h.activeDayIndex)}
+                    className="h-7 px-2 text-morandi-red hover:bg-morandi-red/10 ml-2">
                     <Trash2 size={14} className="mr-1" />
                     {ITINERARY_DIALOG_LABELS.刪除此天}
                   </Button>
@@ -738,16 +283,15 @@ export function ItineraryDialog({
             </div>
             <Input
               id="day-title-input"
-              value={activeDay.title || ''}
-              onChange={(e) => updateDayTitle(e.target.value)}
+              value={h.activeDay.title || ''}
+              onChange={(e) => h.updateDayTitle(e.target.value)}
               placeholder={ITINERARY_DIALOG_LABELS.台北_福岡空港_由布院_金麟湖_阿蘇溫泉}
               className="h-8 text-sm"
             />
           </div>
 
-          {/* 景點表格區域（固定高度可捲動） */}
+          {/* 景點表格區域 */}
           <div className="h-[280px] overflow-y-auto">
-          {/* 景點表格（無格線） */}
           <table className="w-full text-sm">
             <thead>
               <tr className="text-xs text-morandi-secondary border-b border-border/30">
@@ -763,18 +307,12 @@ export function ItineraryDialog({
               </tr>
             </thead>
             <tbody>
-              {activeDay.attractions.map((attraction, rowIndex) => (
-                <tr
-                  key={attraction.id}
-                  className="hover:bg-morandi-container/20 transition-colors"
-                >
+              {h.activeDay.attractions.map((attraction, rowIndex) => (
+                <tr key={attraction.id} className="hover:bg-morandi-container/20 transition-colors">
                   <td className="py-0.5 w-8">
-                    <button
-                      type="button"
-                      onClick={() => openAttractionSelector(rowIndex)}
+                    <button type="button" onClick={() => h.openAttractionSelector(rowIndex)}
                       className="p-1 text-morandi-muted hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
-                      title={ITINERARY_DIALOG_LABELS.在此行下方插入景點}
-                    >
+                      title={ITINERARY_DIALOG_LABELS.在此行下方插入景點}>
                       <Plus size={14} />
                     </button>
                   </td>
@@ -789,51 +327,31 @@ export function ItineraryDialog({
                   </td>
                   <td className="py-0.5 w-24">
                     <div className="flex items-center justify-center gap-1">
-                      <button
-                        onClick={() => updateAttractionField(rowIndex, 'mealType', attraction.mealType === 'breakfast' ? 'none' : 'breakfast')}
-                        className={cn(
-                          'p-1.5 rounded transition-colors',
-                          attraction.mealType === 'breakfast'
-                            ? 'bg-morandi-gold text-white'
-                            : 'text-morandi-muted hover:bg-morandi-container'
-                        )}
-                        title={ITINERARY_DIALOG_LABELS.早餐}
-                      >
+                      <button onClick={() => h.updateAttractionField(rowIndex, 'mealType', attraction.mealType === 'breakfast' ? 'none' : 'breakfast')}
+                        className={cn('p-1.5 rounded transition-colors',
+                          attraction.mealType === 'breakfast' ? 'bg-morandi-gold text-white' : 'text-morandi-muted hover:bg-morandi-container'
+                        )} title={ITINERARY_DIALOG_LABELS.早餐}>
                         <Coffee size={14} />
                       </button>
-                      <button
-                        onClick={() => updateAttractionField(rowIndex, 'mealType', attraction.mealType === 'lunch' ? 'none' : 'lunch')}
-                        className={cn(
-                          'p-1.5 rounded transition-colors',
-                          attraction.mealType === 'lunch'
-                            ? 'bg-morandi-gold text-white'
-                            : 'text-morandi-muted hover:bg-morandi-container'
-                        )}
-                        title={ITINERARY_DIALOG_LABELS.午餐}
-                      >
+                      <button onClick={() => h.updateAttractionField(rowIndex, 'mealType', attraction.mealType === 'lunch' ? 'none' : 'lunch')}
+                        className={cn('p-1.5 rounded transition-colors',
+                          attraction.mealType === 'lunch' ? 'bg-morandi-gold text-white' : 'text-morandi-muted hover:bg-morandi-container'
+                        )} title={ITINERARY_DIALOG_LABELS.午餐}>
                         <UtensilsCrossed size={14} />
                       </button>
-                      <button
-                        onClick={() => updateAttractionField(rowIndex, 'mealType', attraction.mealType === 'dinner' ? 'none' : 'dinner')}
-                        className={cn(
-                          'p-1.5 rounded transition-colors',
-                          attraction.mealType === 'dinner'
-                            ? 'bg-morandi-gold text-white'
-                            : 'text-morandi-muted hover:bg-morandi-container'
-                        )}
-                        title={ITINERARY_DIALOG_LABELS.晚餐}
-                      >
+                      <button onClick={() => h.updateAttractionField(rowIndex, 'mealType', attraction.mealType === 'dinner' ? 'none' : 'dinner')}
+                        className={cn('p-1.5 rounded transition-colors',
+                          attraction.mealType === 'dinner' ? 'bg-morandi-gold text-white' : 'text-morandi-muted hover:bg-morandi-container'
+                        )} title={ITINERARY_DIALOG_LABELS.晚餐}>
                         <Moon size={14} />
                       </button>
                     </div>
                   </td>
                   <td className="py-0.5 w-16">
                     <div className="flex items-center justify-center gap-1">
-                      <button
-                        onClick={() => triggerImageUpload(activeDay.id, attraction.id)}
+                      <button onClick={() => h.triggerImageUpload(h.activeDay.id, attraction.id)}
                         className="p-1.5 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
-                        title={ITINERARY_DIALOG_LABELS.上傳照片}
-                      >
+                        title={ITINERARY_DIALOG_LABELS.上傳照片}>
                         <Upload size={14} />
                       </button>
                       {attraction.images.length > 0 && (
@@ -843,25 +361,18 @@ export function ItineraryDialog({
                   </td>
                   <td className="py-0.5 w-10">
                     <div className="relative">
-                      <button
-                        onClick={() => setColorPickerOpen(colorPickerOpen === rowIndex ? null : rowIndex)}
+                      <button onClick={() => h.setColorPickerOpen(h.colorPickerOpen === rowIndex ? null : rowIndex)}
                         className="p-1.5 rounded transition-colors hover:bg-morandi-container"
                         style={{ color: attraction.color || '#3a3633' }}
-                        title={ITINERARY_DIALOG_LABELS.選擇顏色}
-                      >
+                        title={ITINERARY_DIALOG_LABELS.選擇顏色}>
                         <Palette size={14} />
                       </button>
-                      {colorPickerOpen === rowIndex && (
+                      {h.colorPickerOpen === rowIndex && (
                         <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-lg shadow-lg p-1 flex gap-1 z-10">
                           {COLOR_OPTIONS.map((opt) => (
-                            <button
-                              key={opt.value}
-                              onClick={() => {
-                                updateAttractionField(rowIndex, 'color', opt.value)
-                                setColorPickerOpen(null)
-                              }}
-                              className={cn(
-                                'w-5 h-5 rounded-full border-2 transition-transform hover:scale-110',
+                            <button key={opt.value}
+                              onClick={() => { h.updateAttractionField(rowIndex, 'color', opt.value); h.setColorPickerOpen(null) }}
+                              className={cn('w-5 h-5 rounded-full border-2 transition-transform hover:scale-110',
                                 attraction.color === opt.value ? 'border-morandi-gold' : 'border-transparent'
                               )}
                               style={{ backgroundColor: opt.color }}
@@ -873,11 +384,9 @@ export function ItineraryDialog({
                     </div>
                   </td>
                   <td className="py-0.5 w-10">
-                    {activeDay.attractions.length > 1 && (
-                      <button
-                        onClick={() => removeAttraction(rowIndex)}
-                        className="p-1.5 text-morandi-muted hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
-                      >
+                    {h.activeDay.attractions.length > 1 && (
+                      <button onClick={() => h.removeAttraction(rowIndex)}
+                        className="p-1.5 text-morandi-muted hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-colors">
                         <X size={14} />
                       </button>
                     )}
@@ -887,24 +396,15 @@ export function ItineraryDialog({
             </tbody>
           </table>
 
-          {/* 新增景點 */}
           <div className="py-2 flex gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => openAttractionSelector(null)}
+            <Button variant="ghost" size="sm" onClick={() => h.openAttractionSelector(null)}
               className="gap-1 text-xs text-morandi-gold hover:text-morandi-gold-hover"
-              title={ITINERARY_DIALOG_LABELS.從景點庫選擇}
-            >
+              title={ITINERARY_DIALOG_LABELS.從景點庫選擇}>
               <Plus size={12} />
               {ITINERARY_DIALOG_LABELS.從景點庫新增}
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={addAttraction}
-              className="gap-1 text-xs text-morandi-secondary hover:text-morandi-gold"
-            >
+            <Button variant="ghost" size="sm" onClick={h.addAttraction}
+              className="gap-1 text-xs text-morandi-secondary hover:text-morandi-gold">
               <Plus size={12} />
               {ITINERARY_DIALOG_LABELS.手動新增}
             </Button>
@@ -912,22 +412,16 @@ export function ItineraryDialog({
           </div>
 
           {/* 已上傳的照片預覽 */}
-          {activeDay.attractions.some(a => a.images.length > 0) && (
+          {h.activeDay.attractions.some(a => a.images.length > 0) && (
             <div className="py-3 border-t border-border/50">
               <div className="text-xs text-morandi-secondary mb-2">{ITINERARY_DIALOG_LABELS.已上傳照片}</div>
               <div className="flex flex-wrap gap-2">
-                {activeDay.attractions.map((attraction, attrIndex) =>
+                {h.activeDay.attractions.map((attraction, attrIndex) =>
                   attraction.images.map((img) => (
                     <div key={img.id} className="relative group">
-                      <img
-                        src={img.url}
-                        alt=""
-                        className="w-16 h-16 object-cover rounded border border-border"
-                      />
-                      <button
-                        onClick={() => removeImage(attrIndex, img.id)}
-                        className="absolute -top-1 -right-1 h-4 w-4 bg-morandi-red text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                      >
+                      <img src={img.url} alt="" className="w-16 h-16 object-cover rounded border border-border" />
+                      <button onClick={() => h.removeImage(attrIndex, img.id)}
+                        className="absolute -top-1 -right-1 h-4 w-4 bg-morandi-red text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <X size={10} />
                       </button>
                       <span className="absolute bottom-0 left-0 right-0 text-[8px] text-center bg-black/50 text-white truncate px-0.5">
@@ -946,18 +440,14 @@ export function ItineraryDialog({
               <Building2 size={16} className="text-morandi-gold shrink-0" />
               <Label className="text-xs text-morandi-primary shrink-0">{ITINERARY_DIALOG_LABELS.當晚住宿}</Label>
               <Input
-                value={activeDay.accommodation || ''}
-                onChange={(e) => updateDayAccommodation(e.target.value)}
+                value={h.activeDay.accommodation || ''}
+                onChange={(e) => h.updateDayAccommodation(e.target.value)}
                 placeholder={ITINERARY_DIALOG_LABELS.輸入飯店名稱}
                 className="h-8 text-sm flex-1"
               />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setHotelSelectorOpen(true)}
-                className="h-8 px-2 gap-1 text-xs text-morandi-gold hover:text-morandi-gold-hover shrink-0"
-              >
+              <Button type="button" variant="ghost" size="sm"
+                onClick={() => h.setHotelSelectorOpen(true)}
+                className="h-8 px-2 gap-1 text-xs text-morandi-gold hover:text-morandi-gold-hover shrink-0">
                 <Database size={14} />
                 {ITINERARY_DIALOG_LABELS.從飯店庫選擇}
               </Button>
@@ -969,43 +459,33 @@ export function ItineraryDialog({
         <div className="flex justify-end pt-4 border-t border-border">
           <div className="flex gap-2">
             <Button variant="outline" onClick={onClose} className="gap-2">
-              <X size={16} />
-              {ITINERARY_DIALOG_LABELS.關閉}
+              <X size={16} /> {ITINERARY_DIALOG_LABELS.關閉}
             </Button>
-            <Button variant="outline" onClick={handlePrint} className="gap-2">
-              <Printer size={16} />
-              {ITINERARY_DIALOG_LABELS.列印}
+            <Button variant="outline" onClick={h.handlePrint} className="gap-2">
+              <Printer size={16} /> {ITINERARY_DIALOG_LABELS.列印}
             </Button>
-            <Button
-              onClick={handleSave}
-              disabled={saving}
-              className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-            >
+            <Button onClick={h.handleSave} disabled={h.saving}
+              className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white">
               <Save size={16} />
-              {saving ? ITINERARY_DIALOG_LABELS.儲存中 : ITINERARY_DIALOG_LABELS.儲存}
+              {h.saving ? ITINERARY_DIALOG_LABELS.儲存中 : ITINERARY_DIALOG_LABELS.儲存}
             </Button>
           </div>
         </div>
       </DialogContent>
     </Dialog>
 
-    {/* 景點選擇器（level={3}） */}
     <AttractionSelector
-      isOpen={attractionSelectorOpen}
-      onClose={() => {
-        setAttractionSelectorOpen(false)
-        setInsertAtRowIndex(null)
-      }}
-      onSelect={handleAttractionSelect}
-      dayTitle={activeDay.title || ''}
+      isOpen={h.attractionSelectorOpen}
+      onClose={() => { h.setAttractionSelectorOpen(false); h.setInsertAtRowIndex(null) }}
+      onSelect={h.handleAttractionSelect}
+      dayTitle={h.activeDay.title || ''}
     />
 
-    {/* 飯店選擇器（level={3}） */}
     <HotelSelector
-      isOpen={hotelSelectorOpen}
-      onClose={() => setHotelSelectorOpen(false)}
+      isOpen={h.hotelSelectorOpen}
+      onClose={() => h.setHotelSelectorOpen(false)}
       tourCountryId={pkg?.country_id || undefined}
-      onSelect={handleHotelSelect}
+      onSelect={h.handleHotelSelect}
     />
     </>
   )
