@@ -3,6 +3,7 @@
 import { getTodayString } from '@/lib/utils/format-date'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import { Plus, Building2, Calendar, CalendarDays, CalendarClock, Cake } from 'lucide-react'
 import { CALENDAR_LABELS } from '@/features/calendar/constants/labels'
 import { CalendarSettingsDialog } from '@/features/calendar/components/calendar-settings-dialog'
@@ -16,7 +17,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import {
-  CalendarGrid,
   CalendarStyles,
   AddEventDialog,
   EditEventDialog,
@@ -24,6 +24,11 @@ import {
   MoreEventsDialog,
   BirthdayListDialog,
 } from '@/features/calendar/components'
+
+const CalendarGrid = dynamic(
+  () => import('@/features/calendar/components/CalendarGrid').then(m => m.CalendarGrid),
+  { ssr: false, loading: () => <div className="flex items-center justify-center h-96"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-morandi-gold" /></div> }
+)
 import {
   useCalendarEvents,
   useCalendarNavigation,
