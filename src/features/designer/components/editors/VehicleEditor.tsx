@@ -456,7 +456,7 @@ export function VehicleEditor({
                   {vehicle.members?.map((member, memberIdx) => (
                     <div key={member.id} className="flex items-center gap-1.5 p-1.5 rounded bg-morandi-container/10">
                       <span className="text-[10px] text-morandi-secondary w-5 text-center">{memberIdx + 1}.</span>
-                      <Input value={member.chineseName || ''} onChange={(e) => updateMemberInVehicle(vehicleIdx, memberIdx, 'chineseName', e.target.value)} placeholder="姓名" className="flex-1 h-6 text-xs" />
+                      <Input value={member.chineseName || ''} onChange={(e) => updateMemberInVehicle(vehicleIdx, memberIdx, 'chineseName', e.target.value)} placeholder={DESIGNER_LABELS.PLACEHOLDER_NAME} className="flex-1 h-6 text-xs" />
                       <button type="button" onClick={() => deleteMemberFromVehicle(vehicleIdx, memberIdx)} className="p-1 rounded text-morandi-muted hover:text-morandi-red hover:bg-morandi-red/10 transition-colors"><Trash2 size={10} /></button>
                     </div>
                   ))}
@@ -466,7 +466,7 @@ export function VehicleEditor({
                       onChange={(e) => setNewMemberNames(prev => ({ ...prev, [vehicle.id]: e.target.value }))}
                       onKeyDown={(e) => { if (e.key === 'Enter' && inputValue.trim()) { if (inputValue.includes('\n') || inputValue.includes(',') || inputValue.includes('，')) { addMembersBatchToVehicle(vehicleIdx, inputValue) } else { addMemberToVehicle(vehicleIdx, inputValue) } } }}
                       onPaste={(e) => { const text = e.clipboardData.getData('text'); if (text.includes('\n')) { e.preventDefault(); addMembersBatchToVehicle(vehicleIdx, text) } }}
-                      placeholder="輸入姓名或貼上名單..."
+                      placeholder={DESIGNER_LABELS.PLACEHOLDER_NAME_LIST}
                       className="h-7 text-xs flex-1"
                     />
                     <Button variant="outline" size="sm" onClick={() => { if (inputValue.includes('\n') || inputValue.includes(',')) { addMembersBatchToVehicle(vehicleIdx, inputValue) } else { addMemberToVehicle(vehicleIdx, inputValue) } }} disabled={!inputValue.trim()} className="h-7 px-2"><Plus size={14} /></Button>
