@@ -42,6 +42,7 @@ import type {
   CategoryKey,
 } from './requirements-list.types'
 import { CATEGORIES, safeGetCategoryKey } from './requirements-list.types'
+import { COMP_REQUIREMENTS_LABELS } from './constants/labels'
 import { parseQuoteItems, groupItemsByCategory } from './parse-quote-items'
 import { useConfirmationSheet } from './use-confirmation-sheet'
 
@@ -131,7 +132,7 @@ export function RequirementsList({
         setStartDate(tour?.departure_date || null)
       }
     } catch (error) {
-      logger.error('載入需求資料失敗:', error)
+      logger.error(COMP_REQUIREMENTS_LABELS.載入需求資料失敗, error)
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -198,10 +199,10 @@ export function RequirementsList({
         if (error) throw error
         if (newRequest) setExistingRequests(prev => [...prev, newRequest as TourRequest])
       }
-      toast({ title: hidden ? '已隱藏' : '已恢復顯示' })
+      toast({ title: hidden ? COMP_REQUIREMENTS_LABELS.已隱藏 : COMP_REQUIREMENTS_LABELS.已恢復顯示 })
     } catch (error) {
-      logger.error('更新隱藏狀態失敗:', error)
-      toast({ title: '操作失敗', variant: 'destructive' })
+      logger.error(COMP_REQUIREMENTS_LABELS.更新隱藏狀態失敗, error)
+      toast({ title: COMP_REQUIREMENTS_LABELS.操作失敗, variant: 'destructive' })
     }
   }, [toast, user, tourId, proposalPackageId, tour, pkg])
 
@@ -253,18 +254,18 @@ export function RequirementsList({
         {/* 標題列 */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-morandi-secondary">共 {totalItems} 項</span>
+            <span className="text-sm text-morandi-secondary">{COMP_REQUIREMENTS_LABELS.共}{totalItems}{COMP_REQUIREMENTS_LABELS.項}</span>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => loadData(false)} disabled={refreshing} className="gap-1">
               <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
-              刷新
+              {COMP_REQUIREMENTS_LABELS.刷新}
             </Button>
             {mode === 'tour' && quoteItems.length > 0 && (
               <Button size="sm" onClick={handleGenerateConfirmationSheet} disabled={generatingSheet}
                 className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white">
                 {generatingSheet ? <Loader2 size={14} className="animate-spin" /> : <ClipboardList size={14} />}
-                產生團確單
+                {COMP_REQUIREMENTS_LABELS.產生團確單}
               </Button>
             )}
           </div>
@@ -274,29 +275,29 @@ export function RequirementsList({
         {!linkedQuoteId ? (
           <div className="bg-card border border-border rounded-lg p-8 text-center">
             <AlertCircle className="mx-auto text-morandi-muted mb-3" size={48} />
-            <p className="text-morandi-secondary mb-2">尚無報價單資料</p>
+            <p className="text-morandi-secondary mb-2">{COMP_REQUIREMENTS_LABELS.尚無報價單資料}</p>
             <p className="text-xs text-morandi-muted">
-              {mode === 'tour' ? '請到「總覽」頁籤點擊「報價單」按鈕進行綁定' : '請先建立報價單'}
+              {mode === 'tour' ? COMP_REQUIREMENTS_LABELS.請到_總覽_頁籤點擊_報價單_按鈕進行綁定 : COMP_REQUIREMENTS_LABELS.請先建立報價單}
             </p>
           </div>
         ) : quoteItems.length === 0 && existingRequests.length === 0 ? (
           <div className="bg-card border border-border rounded-lg p-8 text-center">
             <AlertCircle className="mx-auto text-morandi-muted mb-3" size={48} />
-            <p className="text-morandi-secondary">報價單尚無需求項目</p>
-            <p className="text-xs text-morandi-muted mt-1">請先在報價單填寫交通/住宿/餐食/活動資料</p>
+            <p className="text-morandi-secondary">{COMP_REQUIREMENTS_LABELS.報價單尚無需求項目}</p>
+            <p className="text-xs text-morandi-muted mt-1">{COMP_REQUIREMENTS_LABELS.請先在報價單填寫交通住宿餐食活動資料}</p>
           </div>
         ) : (
           <div className="border border-border rounded-lg overflow-hidden bg-card">
             <table className="w-full text-sm table-fixed">
               <thead>
                 <tr className="bg-morandi-container/50 border-b border-border">
-                  <th className="px-3 py-2.5 text-left font-medium text-morandi-primary w-[70px]">日期</th>
-                  <th className="px-3 py-2.5 text-left font-medium text-morandi-primary w-[140px]">供應商</th>
-                  <th className="px-3 py-2.5 text-left font-medium text-morandi-primary w-[200px]">項目說明</th>
-                  <th className="px-3 py-2.5 text-right font-medium text-morandi-primary w-[80px]">報價</th>
-                  <th className="px-3 py-2.5 text-right font-medium text-morandi-primary w-[80px]">成本</th>
-                  <th className="px-3 py-2.5 text-center font-medium text-morandi-primary w-[80px]">狀態</th>
-                  <th className="px-3 py-2.5 text-center font-medium text-morandi-primary w-[70px]">操作</th>
+                  <th className="px-3 py-2.5 text-left font-medium text-morandi-primary w-[70px]">{COMP_REQUIREMENTS_LABELS.日期}</th>
+                  <th className="px-3 py-2.5 text-left font-medium text-morandi-primary w-[140px]">{COMP_REQUIREMENTS_LABELS.供應商}</th>
+                  <th className="px-3 py-2.5 text-left font-medium text-morandi-primary w-[200px]">{COMP_REQUIREMENTS_LABELS.項目說明}</th>
+                  <th className="px-3 py-2.5 text-right font-medium text-morandi-primary w-[80px]">{COMP_REQUIREMENTS_LABELS.報價}</th>
+                  <th className="px-3 py-2.5 text-right font-medium text-morandi-primary w-[80px]">{COMP_REQUIREMENTS_LABELS.成本}</th>
+                  <th className="px-3 py-2.5 text-center font-medium text-morandi-primary w-[80px]">{COMP_REQUIREMENTS_LABELS.狀態}</th>
+                  <th className="px-3 py-2.5 text-center font-medium text-morandi-primary w-[70px]">{COMP_REQUIREMENTS_LABELS.操作}</th>
                 </tr>
               </thead>
               <tbody>
@@ -341,7 +342,7 @@ export function RequirementsList({
                     const isFirstRowForSupplier = !renderedSuppliers.has(supplierKey)
                     if (isFirstRowForSupplier) renderedSuppliers.add(supplierKey)
 
-                    let statusLabel = '待作業'
+                    let statusLabel = COMP_REQUIREMENTS_LABELS.待作業
                     let statusClass = ''
                     if (!existingRequest) {
                       const config = getStatusConfig('tour_request', 'pending')
@@ -392,7 +393,7 @@ export function RequirementsList({
                                   isHidden ? 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50'
                                     : 'text-morandi-muted hover:text-morandi-secondary hover:bg-morandi-container/30'
                                 )}
-                                title={isHidden ? '恢復顯示' : '隱藏'}>
+                                title={isHidden ? COMP_REQUIREMENTS_LABELS.恢復顯示 : COMP_REQUIREMENTS_LABELS.隱藏}>
                                 {isHidden ? <Eye size={14} /> : <EyeOff size={14} />}
                               </Button>
                             )}
@@ -400,7 +401,7 @@ export function RequirementsList({
                               <Button variant="ghost" size="sm"
                                 onClick={() => openRequestDialog(cat.key, item.supplierName)}
                                 className="h-7 w-7 p-0 text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10"
-                                title="產生需求單">
+                                title={COMP_REQUIREMENTS_LABELS.產生需求單}>
                                 <FileText size={14} />
                               </Button>
                             )}
@@ -416,13 +417,13 @@ export function RequirementsList({
                         <td colSpan={3} className="px-3 py-2">
                           <div className="flex items-center gap-3">
                             <span className="font-medium text-morandi-primary">{cat.label}</span>
-                            <span className="text-xs text-morandi-secondary">({visibleItems.length} 項)</span>
+                            <span className="text-xs text-morandi-secondary">({visibleItems.length}{COMP_REQUIREMENTS_LABELS.項})</span>
                             {hiddenItems.length > 0 && (
                               <button onClick={() => toggleHiddenCategory(cat.key)}
                                 className="flex items-center gap-1 text-xs text-morandi-muted hover:text-morandi-secondary transition-colors">
                                 {isHiddenExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                                 <EyeOff size={12} />
-                                <span>已隱藏({hiddenItems.length})</span>
+                                <span>{COMP_REQUIREMENTS_LABELS.已隱藏}({hiddenItems.length})</span>
                               </button>
                             )}
                           </div>
@@ -435,7 +436,7 @@ export function RequirementsList({
                         <td className="px-3 py-2 text-center">
                           <Button variant="ghost" size="sm" onClick={() => openAddManualDialog(cat.key)}
                             className="h-7 px-2 text-xs text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10 gap-1">
-                            <Plus size={14} />新增
+                            <Plus size={14} />{COMP_REQUIREMENTS_LABELS.新增}
                           </Button>
                         </td>
                       </tr>
@@ -444,7 +445,7 @@ export function RequirementsList({
                         <>
                           <tr className="bg-morandi-muted/10 border-t border-dashed border-morandi-muted/30">
                             <td colSpan={7} className="px-3 py-1.5 text-xs text-morandi-muted">
-                              <div className="flex items-center gap-1"><EyeOff size={12} /><span>已隱藏的項目</span></div>
+                              <div className="flex items-center gap-1"><EyeOff size={12} /><span>{COMP_REQUIREMENTS_LABELS.已隱藏的項目}</span></div>
                             </td>
                           </tr>
                           {hiddenItems.map((trackItem, idx) => renderItem(trackItem, idx, true))}
