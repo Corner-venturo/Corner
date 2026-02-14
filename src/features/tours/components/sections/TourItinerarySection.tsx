@@ -228,7 +228,7 @@ export function TourItinerarySection({
                             <DayLabel dayLabel={dayLabels[index]} isAlternative={day.isAlternative} variant="default" />
                             {day.isAlternative && (
                               <span className="px-2 py-0.5 bg-morandi-container text-morandi-secondary text-xs rounded-full">
-                                建議方案
+                                {TOURS_LABELS.LABEL_1234}
                               </span>
                             )}
                             {day.date && <DateSubtitle date={day.date} />}

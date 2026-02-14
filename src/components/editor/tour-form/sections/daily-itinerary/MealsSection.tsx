@@ -92,7 +92,7 @@ export function MealsSection({
               variant="ghost"
               className="h-5 px-1.5 text-[10px] text-morandi-gold hover:text-morandi-gold-hover"
             >
-              餐廳庫
+              {COMP_EDITOR_LABELS.LABEL_9094}
             </Button>
           </div>
           <input

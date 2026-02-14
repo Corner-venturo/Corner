@@ -407,7 +407,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 )}
               >
                 <Plus size={12} className="mr-1" />
-                新增
+                {CATEGORY_SECTION_LABELS.ADD}
               </Button>
             </div>
           ) : (
