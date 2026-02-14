@@ -1,5 +1,7 @@
 'use client'
 
+import { FLIGHT_SECTION_LABELS } from '../constants/labels'
+
 import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -55,7 +57,7 @@ export function FlightInfoSection({
         </div>
         <div className="grid grid-cols-4 gap-2">
           <div>
-            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">航班號碼</label>
+            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">{FLIGHT_SECTION_LABELS.FLIGHT_NUMBER}</label>
             <Input
               value={outboundFlight.flightNumber}
               onChange={e => onUpdateFlight('outboundFlight', 'flightNumber', e.target.value)}
@@ -64,7 +66,7 @@ export function FlightInfoSection({
             />
           </div>
           <div>
-            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">航空公司</label>
+            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">{FLIGHT_SECTION_LABELS.AIRLINE}</label>
             <Input
               value={outboundFlight.airline}
               onChange={e => onUpdateFlight('outboundFlight', 'airline', e.target.value)}
@@ -73,7 +75,7 @@ export function FlightInfoSection({
             />
           </div>
           <div>
-            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">出發機場</label>
+            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">{FLIGHT_SECTION_LABELS.DEPARTURE_AIRPORT}</label>
             <Input
               value={outboundFlight.departureAirport}
               onChange={e => onUpdateFlight('outboundFlight', 'departureAirport', e.target.value)}
@@ -82,7 +84,7 @@ export function FlightInfoSection({
             />
           </div>
           <div>
-            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">抵達機場</label>
+            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">{FLIGHT_SECTION_LABELS.ARRIVAL_AIRPORT}</label>
             <Input
               value={outboundFlight.arrivalAirport}
               onChange={e => onUpdateFlight('outboundFlight', 'arrivalAirport', e.target.value)}
@@ -91,7 +93,7 @@ export function FlightInfoSection({
             />
           </div>
           <div>
-            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">出發時間</label>
+            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">{FLIGHT_SECTION_LABELS.DEPARTURE_TIME}</label>
             <Input
               value={outboundFlight.departureTime}
               onChange={e => onUpdateFlight('outboundFlight', 'departureTime', e.target.value)}
@@ -100,7 +102,7 @@ export function FlightInfoSection({
             />
           </div>
           <div>
-            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">抵達時間</label>
+            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">{FLIGHT_SECTION_LABELS.ARRIVAL_TIME}</label>
             <Input
               value={outboundFlight.arrivalTime}
               onChange={e => onUpdateFlight('outboundFlight', 'arrivalTime', e.target.value)}
@@ -109,7 +111,7 @@ export function FlightInfoSection({
             />
           </div>
           <div className="col-span-2">
-            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">飛行時間</label>
+            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">{FLIGHT_SECTION_LABELS.FLIGHT_DURATION}</label>
             <Input
               value={outboundFlight.duration || ''}
               onChange={e => onUpdateFlight('outboundFlight', 'duration', e.target.value)}
@@ -123,7 +125,7 @@ export function FlightInfoSection({
       {/* 回程航班 */}
       <div className="bg-morandi-container/20 p-3 rounded-lg">
         <div className="flex items-center justify-between mb-2">
-          <h4 className="text-xs font-bold text-morandi-primary">回程航班</h4>
+          <h4 className="text-xs font-bold text-morandi-primary">{FLIGHT_SECTION_LABELS.RETURN_FLIGHT}</h4>
           <Button
             type="button"
             size="sm"
@@ -142,7 +144,7 @@ export function FlightInfoSection({
         </div>
         <div className="grid grid-cols-4 gap-2">
           <div>
-            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">航班號碼</label>
+            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">{FLIGHT_SECTION_LABELS.FLIGHT_NUMBER}</label>
             <Input
               value={returnFlight.flightNumber}
               onChange={e => onUpdateFlight('returnFlight', 'flightNumber', e.target.value)}
@@ -151,7 +153,7 @@ export function FlightInfoSection({
             />
           </div>
           <div>
-            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">航空公司</label>
+            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">{FLIGHT_SECTION_LABELS.AIRLINE}</label>
             <Input
               value={returnFlight.airline}
               onChange={e => onUpdateFlight('returnFlight', 'airline', e.target.value)}
@@ -160,7 +162,7 @@ export function FlightInfoSection({
             />
           </div>
           <div>
-            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">出發機場</label>
+            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">{FLIGHT_SECTION_LABELS.DEPARTURE_AIRPORT}</label>
             <Input
               value={returnFlight.departureAirport}
               onChange={e => onUpdateFlight('returnFlight', 'departureAirport', e.target.value)}
@@ -169,7 +171,7 @@ export function FlightInfoSection({
             />
           </div>
           <div>
-            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">抵達機場</label>
+            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">{FLIGHT_SECTION_LABELS.ARRIVAL_AIRPORT}</label>
             <Input
               value={returnFlight.arrivalAirport}
               onChange={e => onUpdateFlight('returnFlight', 'arrivalAirport', e.target.value)}
@@ -178,7 +180,7 @@ export function FlightInfoSection({
             />
           </div>
           <div>
-            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">出發時間</label>
+            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">{FLIGHT_SECTION_LABELS.DEPARTURE_TIME}</label>
             <Input
               value={returnFlight.departureTime}
               onChange={e => onUpdateFlight('returnFlight', 'departureTime', e.target.value)}
@@ -187,7 +189,7 @@ export function FlightInfoSection({
             />
           </div>
           <div>
-            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">抵達時間</label>
+            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">{FLIGHT_SECTION_LABELS.ARRIVAL_TIME}</label>
             <Input
               value={returnFlight.arrivalTime}
               onChange={e => onUpdateFlight('returnFlight', 'arrivalTime', e.target.value)}
@@ -196,7 +198,7 @@ export function FlightInfoSection({
             />
           </div>
           <div className="col-span-2">
-            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">飛行時間</label>
+            <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">{FLIGHT_SECTION_LABELS.FLIGHT_DURATION}</label>
             <Input
               value={returnFlight.duration || ''}
               onChange={e => onUpdateFlight('returnFlight', 'duration', e.target.value)}

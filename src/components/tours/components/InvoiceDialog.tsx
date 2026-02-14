@@ -1,5 +1,7 @@
 'use client'
 
+import { INVOICE_LABELS } from '../constants/labels'
+
 import React from 'react'
 import type { Order } from '@/stores/types'
 import { Button } from '@/components/ui/button'
@@ -72,7 +74,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
           {/* 基本資訊 */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label>開立日期</Label>
+              <Label>{INVOICE_LABELS.ISSUE_DATE}</Label>
               <DatePicker
                 value={invoiceDate}
                 onChange={(date) => onInvoiceDateChange(date)}
@@ -80,7 +82,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
               />
             </div>
             <div>
-              <Label>關聯訂單</Label>
+              <Label>{INVOICE_LABELS.RELATED_ORDER}</Label>
               <Select
                 value={invoiceOrderId || '__none__'}
                 onValueChange={value => {
@@ -112,7 +114,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
               </Select>
             </div>
             <div>
-              <Label>申報註記</Label>
+              <Label>{INVOICE_LABELS.DECLARATION_NOTE}</Label>
               <div className="flex items-center gap-4 h-10">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -122,7 +124,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
                     onChange={() => onReportStatusChange('unreported')}
                     className="w-4 h-4"
                   />
-                  <span className="text-sm">未申報</span>
+                  <span className="text-sm">{INVOICE_LABELS.NOT_DECLARED}</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -132,7 +134,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
                     onChange={() => onReportStatusChange('reported')}
                     className="w-4 h-4"
                   />
-                  <span className="text-sm">已申報</span>
+                  <span className="text-sm">{INVOICE_LABELS.DECLARED}</span>
                 </label>
               </div>
             </div>
@@ -140,10 +142,10 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
 
           {/* 買受人資訊 */}
           <div className="border rounded-lg p-4 bg-muted/30">
-            <h4 className="font-medium mb-3">買受人資訊</h4>
+            <h4 className="font-medium mb-3">{INVOICE_LABELS.BUYER_INFO}</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label>買受人名稱 *</Label>
+                <Label>{INVOICE_LABELS.BUYER_NAME}</Label>
                 <Input
                   value={invoiceBuyer.buyerName}
                   onChange={e => onInvoiceBuyerChange({ ...invoiceBuyer, buyerName: e.target.value })}
@@ -151,7 +153,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
                 />
               </div>
               <div>
-                <Label>統一編號</Label>
+                <Label>{INVOICE_LABELS.TAX_ID}</Label>
                 <Input
                   value={invoiceBuyer.buyerUBN || ''}
                   onChange={e => onInvoiceBuyerChange({ ...invoiceBuyer, buyerUBN: e.target.value })}

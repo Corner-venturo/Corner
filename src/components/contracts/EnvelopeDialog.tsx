@@ -1,5 +1,7 @@
 'use client'
 
+import { ENVELOPE_LABELS } from './constants/labels'
+
 import React, { useState, useEffect } from 'react'
 import { Mail, Printer, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -290,7 +292,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
         <div className="space-y-6 py-4">
           {/* 旅遊團資訊 */}
           <div className="bg-morandi-container/20 rounded-lg p-4">
-            <h3 className="text-sm font-semibold text-morandi-primary mb-2">旅遊團資訊</h3>
+            <h3 className="text-sm font-semibold text-morandi-primary mb-2">{ENVELOPE_LABELS.TOUR_INFO}</h3>
             <div className="text-sm text-morandi-primary">
               {tour.code} - {tour.name}
             </div>
@@ -298,10 +300,10 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
 
           {/* 收件人資訊 */}
           <div>
-            <h3 className="text-sm font-semibold text-morandi-primary mb-3">收件人資訊</h3>
+            <h3 className="text-sm font-semibold text-morandi-primary mb-3">{ENVELOPE_LABELS.RECIPIENT_INFO}</h3>
             <div className="space-y-3">
               <div>
-                <label className="text-xs text-morandi-primary block mb-1">收件人姓名 *</label>
+                <label className="text-xs text-morandi-primary block mb-1">{ENVELOPE_LABELS.RECIPIENT_NAME}</label>
                 <Input
                   type="text"
                   value={recipient}

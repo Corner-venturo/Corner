@@ -757,3 +757,37 @@ export const FLIGHT_INFO_SECTION_LABELS = {
   _1h_30m: '1h 30m',
   _2h_15m: '2h 15m',
 };
+
+
+export const INVOICE_LABELS = {
+  ISSUE_DATE: '開立日期',
+  RELATED_ORDER: '關聯訂單',
+  DECLARATION_NOTE: '申報註記',
+  NOT_DECLARED: '未申報',
+  DECLARED: '已申報',
+  BUYER_INFO: '買受人資訊',
+  BUYER_NAME: '買受人名稱 *',
+  TAX_ID: '統一編號',
+}
+
+export const ADD_PAYMENT_LABELS = {
+  TITLE: '新增收款紀錄',
+  RELATED_ORDER: '關聯訂單 (選填)',
+  AMOUNT: '收款金額',
+  DESCRIPTION: '收款說明',
+  PAYMENT_METHOD: '付款方式',
+  BANK_TRANSFER: '銀行轉帳',
+  CREDIT_CARD: '信用卡',
+  CASH: '現金',
+}
+
+export const FLIGHT_SECTION_LABELS = {
+  FLIGHT_NUMBER: '航班號碼',
+  AIRLINE: '航空公司',
+  DEPARTURE_AIRPORT: '出發機場',
+  ARRIVAL_AIRPORT: '抵達機場',
+  DEPARTURE_TIME: '出發時間',
+  ARRIVAL_TIME: '抵達時間',
+  FLIGHT_DURATION: '飛行時間',
+  RETURN_FLIGHT: '回程航班',
+}

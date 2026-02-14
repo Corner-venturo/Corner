@@ -1,5 +1,7 @@
 'use client'
 
+import { CONTRACT_FORM_LABELS } from '../constants/labels'
+
 import React, { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { ContractData } from './types'
@@ -108,7 +110,7 @@ export function ContractFormFields({
                 <div className="absolute right-0 top-full mt-1 w-64 bg-card border border-border rounded-lg shadow-lg z-50 max-h-72 overflow-hidden flex flex-col">
                   {/* 標題列 */}
                   <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-morandi-container/30">
-                    <span className="text-xs text-morandi-secondary">選擇簽約旅客</span>
+                    <span className="text-xs text-morandi-secondary">{CONTRACT_FORM_LABELS.SELECT_SIGNER}</span>
                     <button
                       type="button"
                       onClick={toggleAll}
@@ -135,7 +137,7 @@ export function ContractFormFields({
                       }`}>
                         {selectedMemberIds.length === 0 && <Check size={12} className="text-white" />}
                       </div>
-                      <span className="text-morandi-primary">公司代表簽約</span>
+                      <span className="text-morandi-primary">{CONTRACT_FORM_LABELS.COMPANY_SIGN}</span>
                     </button>
 
                     {/* 成員列表 */}
@@ -185,7 +187,7 @@ export function ContractFormFields({
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs text-morandi-primary block mb-1">姓名</label>
+            <label className="text-xs text-morandi-primary block mb-1">{CONTRACT_FORM_LABELS.NAME}</label>
             <Input
               type="text"
               value={contractData.travelerName || ''}
@@ -193,7 +195,7 @@ export function ContractFormFields({
             />
           </div>
           <div>
-            <label className="text-xs text-morandi-primary block mb-1">身分證字號</label>
+            <label className="text-xs text-morandi-primary block mb-1">{CONTRACT_FORM_LABELS.ID_NUMBER}</label>
             <Input
               type="text"
               value={contractData.travelerIdNumber || ''}
@@ -201,7 +203,7 @@ export function ContractFormFields({
             />
           </div>
           <div className="col-span-2">
-            <label className="text-xs text-morandi-primary block mb-1">住址</label>
+            <label className="text-xs text-morandi-primary block mb-1">{CONTRACT_FORM_LABELS.ADDRESS}</label>
             <Input
               type="text"
               value={contractData.travelerAddress || ''}
@@ -209,7 +211,7 @@ export function ContractFormFields({
             />
           </div>
           <div>
-            <label className="text-xs text-morandi-primary block mb-1">電話</label>
+            <label className="text-xs text-morandi-primary block mb-1">{CONTRACT_FORM_LABELS.PHONE}</label>
             <Input
               type="text"
               value={contractData.travelerPhone || ''}
@@ -221,10 +223,10 @@ export function ContractFormFields({
 
       {/* 集合時地 */}
       <div>
-        <h3 className="text-sm font-semibold text-morandi-primary mb-3">集合時地</h3>
+        <h3 className="text-sm font-semibold text-morandi-primary mb-3">{CONTRACT_FORM_LABELS.MEETING_PLACE}</h3>
         <div className="space-y-2">
           <div>
-            <label className="text-xs text-morandi-primary block mb-1">集合時間</label>
+            <label className="text-xs text-morandi-primary block mb-1">{CONTRACT_FORM_LABELS.MEETING_TIME}</label>
             <Input
               type="datetime-local"
               value={(() => {

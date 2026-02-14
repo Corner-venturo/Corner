@@ -64,3 +64,35 @@ export const COMP_CONTRACTS_LABELS = {
   CANCEL: '取消',
   CONFIRM_SELECT: '確認選擇',
 };
+
+
+export const CONTRACT_DIALOG_LABELS = {
+  MANAGEMENT: '合約管理',
+  CONTRACT: '合約',
+  MANAGE_DESC: '管理此旅遊團的合約',
+  SELECT_PASSENGERS: '選擇旅客',
+  PASSENGER: '旅客',
+  SELECT_DESC: '選擇要加入合約的旅客',
+  TOUR_INFO: '旅遊團資訊',
+  TOUR_CODE: '團號',
+}
+
+export const CONTRACT_FORM_LABELS = {
+  SELECT_SIGNER: '選擇簽約旅客',
+  COMPANY_SIGN: '公司代表簽約',
+  NAME: '姓名',
+  ID_NUMBER: '身分證字號',
+  ADDRESS: '住址',
+  PHONE: '電話',
+  MEETING_PLACE: '集合時地',
+  MEETING_TIME: '集合時間',
+}
+
+export const ENVELOPE_LABELS = {
+  SENDER: '寄件人',
+  PHONE_PREFIX: '電話：',
+  RECIPIENT: '收件人',
+  TOUR_INFO: '旅遊團資訊',
+  RECIPIENT_INFO: '收件人資訊',
+  RECIPIENT_NAME: '收件人姓名 *',
+}

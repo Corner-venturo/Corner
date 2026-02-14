@@ -1,5 +1,7 @@
 'use client'
 
+import { ADD_PAYMENT_LABELS } from '../constants/labels'
+
 import React from 'react'
 import type { Order } from '@/stores/types'
 import { Button } from '@/components/ui/button'
@@ -38,11 +40,11 @@ export const AddPaymentDialog = React.memo(function AddPaymentDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent level={2} className="max-w-md">
         <DialogHeader>
-          <DialogTitle>新增收款紀錄</DialogTitle>
+          <DialogTitle>{ADD_PAYMENT_LABELS.TITLE}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-morandi-primary">關聯訂單 (選填)</label>
+            <label className="text-sm font-medium text-morandi-primary">{ADD_PAYMENT_LABELS.RELATED_ORDER}</label>
             <Select value={selectedOrderId || '__none__'} onValueChange={(v) => onSelectedOrderIdChange(v === '__none__' ? '' : v)}>
               <SelectTrigger className="mt-1 w-full">
                 <SelectValue placeholder="- 不關聯特定訂單 -" />
@@ -59,7 +61,7 @@ export const AddPaymentDialog = React.memo(function AddPaymentDialog({
           </div>
 
           <div>
-            <label className="text-sm font-medium text-morandi-primary">收款金額</label>
+            <label className="text-sm font-medium text-morandi-primary">{ADD_PAYMENT_LABELS.AMOUNT}</label>
             <Input
               type="number"
               value={newPayment.amount || ''}
@@ -72,7 +74,7 @@ export const AddPaymentDialog = React.memo(function AddPaymentDialog({
           </div>
 
           <div>
-            <label className="text-sm font-medium text-morandi-primary">收款說明</label>
+            <label className="text-sm font-medium text-morandi-primary">{ADD_PAYMENT_LABELS.DESCRIPTION}</label>
             <Input
               value={newPayment.description}
               onChange={e => onNewPaymentChange({ ...newPayment, description: e.target.value })}
@@ -82,7 +84,7 @@ export const AddPaymentDialog = React.memo(function AddPaymentDialog({
           </div>
 
           <div>
-            <label className="text-sm font-medium text-morandi-primary">付款方式</label>
+            <label className="text-sm font-medium text-morandi-primary">{ADD_PAYMENT_LABELS.PAYMENT_METHOD}</label>
             <Select
               value={newPayment.method}
               onValueChange={value => onNewPaymentChange({ ...newPayment, method: value })}
@@ -91,9 +93,9 @@ export const AddPaymentDialog = React.memo(function AddPaymentDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="bank_transfer">銀行轉帳</SelectItem>
-                <SelectItem value="credit_card">信用卡</SelectItem>
-                <SelectItem value="cash">現金</SelectItem>
+                <SelectItem value="bank_transfer">{ADD_PAYMENT_LABELS.BANK_TRANSFER}</SelectItem>
+                <SelectItem value="credit_card">{ADD_PAYMENT_LABELS.CREDIT_CARD}</SelectItem>
+                <SelectItem value="cash">{ADD_PAYMENT_LABELS.CASH}</SelectItem>
                 <SelectItem value="check">支票</SelectItem>
               </SelectContent>
             </Select>

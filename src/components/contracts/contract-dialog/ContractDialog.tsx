@@ -1,5 +1,7 @@
 'use client'
 
+import { CONTRACT_DIALOG_LABELS } from '../constants/labels'
+
 import React, { useEffect, useState } from 'react'
 import { FileSignature, Save, Printer, X, Plus, ArrowLeft, Edit2, Loader2, Users, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -150,7 +152,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <FileSignature className="w-5 h-5 text-morandi-gold" />
-                <span>合約管理</span>
+                <span>{CONTRACT_DIALOG_LABELS.MANAGEMENT}</span>
                 <span className="text-sm text-morandi-secondary font-normal">- {tour.code}</span>
               </DialogTitle>
             </DialogHeader>
@@ -161,9 +163,9 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
               <div className="flex-shrink-0 px-4 py-3">
                 <div className="flex items-center gap-2">
                   <FileSignature className="w-4 h-4 text-morandi-primary" />
-                  <span className="text-sm font-medium text-morandi-primary">合約</span>
+                  <span className="text-sm font-medium text-morandi-primary">{CONTRACT_DIALOG_LABELS.CONTRACT}</span>
                 </div>
-                <p className="text-xs text-morandi-secondary mt-1">管理此旅遊團的合約</p>
+                <p className="text-xs text-morandi-secondary mt-1">{CONTRACT_DIALOG_LABELS.MANAGE_DESC}</p>
               </div>
 
               {/* 分割線 */}
@@ -255,7 +257,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                   <ArrowLeft className="w-4 h-4" />
                 </button>
                 <Users className="w-5 h-5 text-morandi-gold" />
-                <span>選擇旅客</span>
+                <span>{CONTRACT_DIALOG_LABELS.SELECT_PASSENGERS}</span>
               </DialogTitle>
             </DialogHeader>
 
@@ -266,9 +268,9 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                 <div>
                   <div className="flex items-center gap-2">
                     <Users className="w-4 h-4 text-morandi-primary" />
-                    <span className="text-sm font-medium text-morandi-primary">旅客</span>
+                    <span className="text-sm font-medium text-morandi-primary">{CONTRACT_DIALOG_LABELS.PASSENGER}</span>
                   </div>
-                  <p className="text-xs text-morandi-secondary mt-1">選擇要加入合約的旅客</p>
+                  <p className="text-xs text-morandi-secondary mt-1">{CONTRACT_DIALOG_LABELS.SELECT_DESC}</p>
                 </div>
                 <button
                   onClick={toggleSelectAll}
@@ -380,11 +382,11 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                 {/* 旅遊團資訊 */}
                 <div className="border border-border rounded-lg overflow-hidden bg-card">
                   <div className="bg-morandi-container/50 border-b border-border/60 px-4 py-2">
-                    <span className="text-sm font-medium text-morandi-primary">旅遊團資訊</span>
+                    <span className="text-sm font-medium text-morandi-primary">{CONTRACT_DIALOG_LABELS.TOUR_INFO}</span>
                   </div>
                   <div className="p-4 grid grid-cols-2 gap-3">
                     <div>
-                      <div className="text-xs text-morandi-secondary">團號</div>
+                      <div className="text-xs text-morandi-secondary">{CONTRACT_DIALOG_LABELS.TOUR_CODE}</div>
                       <div className="text-sm text-morandi-primary font-medium">{tour.code}</div>
                     </div>
                     <div>
