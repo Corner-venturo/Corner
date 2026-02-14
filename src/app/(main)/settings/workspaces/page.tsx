@@ -90,7 +90,12 @@ export default function WorkspacesPage() {
   }
 
   const toggleActive = async (id: string, currentStatus: boolean) => {
-    await updateWorkspace(id, { is_active: !currentStatus })
+    try {
+      await updateWorkspace(id, { is_active: !currentStatus })
+    } catch (error) {
+      logger.error('Failed to toggle workspace active status:', error)
+      toast.error(LABELS.CREATION_FAILED)
+    }
   }
 
   return (

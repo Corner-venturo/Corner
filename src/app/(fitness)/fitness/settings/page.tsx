@@ -19,8 +19,13 @@ export default function FitnessSettingsPage() {
       type: 'warning',
     })
     if (confirmed) {
-      await logout()
-      router.push('/login')
+      try {
+        await logout()
+        router.push('/login')
+      } catch (error) {
+        logger.error('Logout failed:', error)
+        await alert(FITNESS_SETTINGS_LABELS.CLEAR_DATA_ERROR, 'error')
+      }
     }
   }
 
