@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { useTravelerChat } from '../hooks/useTravelerChat'
 import { TourList } from './TourList'
 import { ConversationChat } from './ConversationChat'
+import { LABELS } from '../constants/labels'
 
 /**
  * 旅伴通訊中心 - 主組件
@@ -44,7 +45,7 @@ export function TravelerChatCenter() {
         <div className="h-14 px-4 border-b border-border/50 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             <MessageCircle size={20} className="text-morandi-gold" />
-            <h2 className="font-semibold text-morandi-primary">旅伴通訊</h2>
+            <h2 className="font-semibold text-morandi-primary">{LABELS.travelerChat}</h2>
             {totalUnread > 0 && (
               <span className="px-1.5 py-0.5 text-xs font-medium bg-morandi-red text-white rounded-full">
                 {totalUnread}
@@ -69,11 +70,11 @@ export function TravelerChatCenter() {
         <div className="px-4 py-2 border-b border-border/30 bg-morandi-container/20 flex items-center gap-4 text-xs text-morandi-secondary">
           <span className="flex items-center gap-1">
             <MessageCircle size={12} />
-            {tourGroups.length} 團
+            {LABELS.tourCount(tourGroups.length)}
           </span>
           <span className="flex items-center gap-1">
             <Users size={12} />
-            {totalTravelers} 位旅伴
+            {LABELS.travelerCount(totalTravelers)}
           </span>
         </div>
 

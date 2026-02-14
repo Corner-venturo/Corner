@@ -16,6 +16,7 @@ import {
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import type { ConversationDetail, ConversationMessage } from '../types'
+import { LABELS } from '../constants/labels'
 
 interface ConversationChatProps {
   detail: ConversationDetail | undefined
@@ -61,16 +62,16 @@ export function ConversationChat({
 
   // 找到發送者名稱
   const getSenderName = (msg: ConversationMessage) => {
-    if (!msg.sender_id) return '系統'
+    if (!msg.sender_id) return LABELS.system
 
     // 檢查是員工還是旅伴
     if (msg.metadata?.sender_type === 'employee' && msg.metadata?.employee_id) {
       const emp = detail?.employees.find(e => e.id === msg.metadata?.employee_id)
-      return emp?.display_name || '員工'
+      return emp?.display_name || LABELS.staff
     }
 
     const traveler = detail?.travelers.find(t => t.id === msg.sender_id)
-    return traveler?.name || '旅伴'
+    return traveler?.name || LABELS.traveler
   }
 
   const getSenderAvatar = (msg: ConversationMessage) => {
@@ -101,7 +102,7 @@ export function ConversationChat({
     return (
       <div className="flex flex-col items-center justify-center h-full text-morandi-secondary">
         <MessageCircle size={48} className="mb-4 opacity-50" />
-        <p>選擇一個對話開始聊天</p>
+        <p>{LABELS.selectConversation}</p>
       </div>
     )
   }
@@ -127,15 +128,15 @@ export function ConversationChat({
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-medium text-morandi-primary">
-            {tour?.tour_code} - {isAnnouncement ? '公告' : '客服'}
+            {tour?.tour_code} - {isAnnouncement ? LABELS.announcement : LABELS.customerService}
           </h3>
           <p className="text-xs text-morandi-secondary truncate">
-            {tour?.name} · {detail.travelers.length} 位旅伴
+            {tour?.name} · {LABELS.travelerCount(detail.travelers.length)}
           </p>
         </div>
         {!detail.conversation.is_open && (
           <span className="px-2 py-1 text-xs bg-morandi-container text-morandi-secondary rounded">
-            尚未開啟
+            {LABELS.notOpenYet}
           </span>
         )}
       </div>
@@ -159,7 +160,7 @@ export function ConversationChat({
       <div className="p-4 border-t border-border/50 bg-card shrink-0">
         {!detail.conversation.is_open ? (
           <div className="text-center text-sm text-morandi-secondary py-2">
-            對話尚未開啟，無法發送訊息
+            {LABELS.cannotSendNotOpen}
           </div>
         ) : (
           <div className="flex items-end gap-2">
@@ -169,20 +170,20 @@ export function ConversationChat({
                 value={message}
                 onChange={e => setMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={isAnnouncement ? '發送公告給所有旅伴...' : '回覆旅伴訊息...'}
+                placeholder={isAnnouncement ? LABELS.announcementPlaceholder : LABELS.replyPlaceholder}
                 className="w-full min-h-[40px] max-h-[120px] px-3 py-2 pr-20 text-sm border border-border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
                 rows={1}
               />
               <div className="absolute right-2 bottom-2 flex items-center gap-1">
                 <button
                   className="p-1 text-morandi-secondary hover:text-morandi-primary transition-colors"
-                  title="上傳圖片"
+                  title={LABELS.uploadImage}
                 >
                   <ImageIcon size={16} />
                 </button>
                 <button
                   className="p-1 text-morandi-secondary hover:text-morandi-primary transition-colors"
-                  title="上傳檔案"
+                  title={LABELS.uploadFile}
                 >
                   <Paperclip size={16} />
                 </button>

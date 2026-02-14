@@ -15,6 +15,7 @@ import {
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import type { TourGroup, TourConversation } from '../types'
+import { LABELS } from '../constants/labels'
 
 interface TourListProps {
   tourGroups: TourGroup[]
@@ -53,17 +54,17 @@ export function TourList({
 
   const getDaysUntilDeparture = (dateStr: string) => {
     const days = differenceInDays(new Date(dateStr), new Date())
-    if (days < 0) return '已出發'
-    if (days === 0) return '今天出發'
-    if (days === 1) return '明天出發'
-    return `${days} 天後出發`
+    if (days < 0) return LABELS.departed
+    if (days === 0) return LABELS.departToday
+    if (days === 1) return LABELS.departTomorrow
+    return LABELS.departInDays(days)
   }
 
   if (tourGroups.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-morandi-secondary">
         <MessageCircle size={48} className="mb-4 opacity-50" />
-        <p>尚無團對話</p>
+        <p>{LABELS.noConversations}</p>
       </div>
     )
   }
@@ -127,7 +128,7 @@ export function TourList({
                     )}
                     onClick={(e) => handleToggle(e, group.tourId, !group.isOpen)}
                     disabled={isTogglingThis}
-                    title={group.isOpen ? '關閉旅伴通訊' : '開啟旅伴通訊'}
+                    title={group.isOpen ? LABELS.closeTravelerChat : LABELS.openTravelerChat}
                   >
                     {isTogglingThis ? (
                       <span className="animate-spin">⏳</span>
@@ -160,11 +161,11 @@ export function TourList({
                     </span>
                     <span className="flex items-center gap-1">
                       <Users size={12} />
-                      {group.conversations[0]?.traveler_count || 0} 位旅伴
+                      {LABELS.travelerCount(group.conversations[0]?.traveler_count || 0)}
                     </span>
                     {group.openAt && (
                       <span className="flex items-center gap-1">
-                        開啟於 {format(new Date(group.openAt), 'MM/dd HH:mm')}
+                        {LABELS.openedAt} {format(new Date(group.openAt), 'MM/dd HH:mm')}
                       </span>
                     )}
                   </div>
@@ -213,7 +214,7 @@ function ConversationItem({ conversation, isSelected, onClick }: ConversationIte
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="text-sm text-morandi-primary">
-            {isAnnouncement ? '公告' : '客服'}
+            {isAnnouncement ? LABELS.announcement : LABELS.customerService}
           </span>
           {conversation.unread_count > 0 && (
             <span className="px-1.5 py-0.5 text-xs font-medium bg-morandi-red text-white rounded-full">
