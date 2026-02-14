@@ -1,3 +1,4 @@
+'use client'
 /**
  * RequirementSyncDialog - 需求確認單 Dialog
  *
@@ -8,7 +9,6 @@
  * - Tour 模式：開團後使用
  */
 
-'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import {

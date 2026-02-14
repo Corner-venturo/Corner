@@ -1,8 +1,8 @@
+'use client'
 /**
  * 飯店區塊編輯器
  */
 
-'use client'
 
 import { useCallback } from 'react'
 import { Input } from '@/components/ui/input'

@@ -1,9 +1,9 @@
+'use client'
 /**
  * LinkTourDialog - 報價單成交時選擇關聯旅遊團
  * 可選擇：新建旅遊團 / 關聯現有旅遊團
  */
 
-'use client'
 
 import React, { useState, useMemo, useEffect } from 'react'
 import {

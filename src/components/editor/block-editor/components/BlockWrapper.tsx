@@ -1,10 +1,10 @@
+'use client'
 /**
  * 區塊包裝器
  *
  * 為每個區塊提供標題、控制按鈕和收合功能
  */
 
-'use client'
 
 import { useState, ReactNode } from 'react'
 import {

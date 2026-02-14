@@ -1,10 +1,10 @@
+'use client'
 /**
  * 區塊編輯器主組件
  *
  * 整合工具箱、畫布和預覽功能
  */
 
-'use client'
 
 import { useMemo } from 'react'
 import { BlockCanvas } from './BlockCanvas'

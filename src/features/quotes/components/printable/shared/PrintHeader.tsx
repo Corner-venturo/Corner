@@ -1,8 +1,8 @@
+'use client'
 /**
  * PrintHeader - 列印頁首組件（共用）
  */
 
-'use client'
 
 import React from 'react'
 import { MORANDI_COLORS } from './print-styles'

@@ -1,9 +1,9 @@
+'use client'
 /**
  * CustomCostFieldsSection - 自訂費用欄位區域
  * 團體模式使用，管理自訂費用項目
  */
 
-'use client'
 
 import React, { useState } from 'react'
 import { Coins, Plus, Trash2, X } from 'lucide-react'

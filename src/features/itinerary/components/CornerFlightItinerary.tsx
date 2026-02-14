@@ -1,9 +1,9 @@
+'use client'
 /**
  * Corner 風格機票行程單組件
  * 用於生成機票行程單 PDF
  */
 
-'use client'
 
 import React from 'react'
 

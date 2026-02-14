@@ -1,9 +1,9 @@
+'use client'
 /**
  * DisbursementDialog
  * 新增出納單對話框
  */
 
-'use client'
 
 import { FormDialog } from '@/components/dialog'
 import { Button } from '@/components/ui/button'

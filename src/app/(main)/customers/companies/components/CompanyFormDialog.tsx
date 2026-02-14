@@ -1,8 +1,8 @@
+'use client'
 /**
  * 企業客戶表單對話框（新增/編輯）
  */
 
-'use client'
 
 import { useState, useEffect } from 'react'
 import { FormDialog } from '@/components/dialog'

@@ -1,8 +1,8 @@
+'use client'
 /**
  * QuotationTerms - 注意事項
  */
 
-'use client'
 
 import React from 'react'
 import { formatDateTW } from '@/lib/utils/format-date'

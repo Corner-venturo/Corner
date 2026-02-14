@@ -1,8 +1,8 @@
+'use client'
 /**
  * ConfirmationsList - 確認單列表組件（使用 EnhancedTable）
  */
 
-'use client'
 
 import React, { useMemo } from 'react'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'

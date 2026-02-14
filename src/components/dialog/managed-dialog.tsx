@@ -1,3 +1,4 @@
+'use client'
 /**
  * ManagedDialog - 帶狀態管理的 Dialog 組件
  *
@@ -30,7 +31,6 @@
  * ```
  */
 
-'use client'
 
 import { useState, useCallback, useRef, useEffect, ReactNode } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'

@@ -1,9 +1,9 @@
+'use client'
 /**
  * TodoCard - 卡片式待辦事項組件
  * 支援共享待辦的顏色區分
  */
 
-'use client'
 
 import React from 'react'
 import { Star, Calendar, Users, CheckCircle, Clock } from 'lucide-react'

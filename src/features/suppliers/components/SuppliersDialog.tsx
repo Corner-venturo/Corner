@@ -1,8 +1,8 @@
+'use client'
 /**
  * SuppliersDialog - 供應商對話框（僅基本資訊）
  */
 
-'use client'
 
 import React from 'react'
 import { FormDialog } from '@/components/dialog'

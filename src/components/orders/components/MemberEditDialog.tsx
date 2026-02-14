@@ -1,3 +1,4 @@
+'use client'
 /**
  * MemberEditDialog - 成員編輯/驗證對話框
  * 
@@ -10,7 +11,6 @@
  * 2025-06-27: 改用統一的 ImageEditor 元件
  */
 
-'use client'
 
 import React, { useState, useCallback } from 'react'
 import { AlertTriangle, Pencil, X, RefreshCw } from 'lucide-react'

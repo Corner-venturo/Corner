@@ -1,8 +1,8 @@
+'use client'
 /**
  * PrintableQuickQuote - 快速報價單列印版（使用 iframe 列印）
  */
 
-'use client'
 
 import { getTodayString } from '@/lib/utils/format-date'
 import { logger } from '@/lib/utils/logger'

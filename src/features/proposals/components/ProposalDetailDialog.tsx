@@ -1,9 +1,9 @@
+'use client'
 /**
  * ProposalDetailDialog - 提案詳細資訊對話框
  * 用於在旅遊團頁面顯示提案詳情
  */
 
-'use client'
 
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'

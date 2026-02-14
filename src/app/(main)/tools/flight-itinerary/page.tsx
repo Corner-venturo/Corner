@@ -1,9 +1,9 @@
+'use client'
 /**
  * 機票行程單生成工具
  * 用於將 Trip.com 等訂票憑證轉換為 Corner 風格
  */
 
-'use client'
 
 import React, { useState } from 'react'
 import { CornerFlightItinerary } from '@/features/itinerary/components/CornerFlightItinerary'

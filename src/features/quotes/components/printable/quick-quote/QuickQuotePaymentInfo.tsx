@@ -1,8 +1,8 @@
+'use client'
 /**
  * QuickQuotePaymentInfo - 付款資訊區
  */
 
-'use client'
 
 import React from 'react'
 import { MORANDI_COLORS } from '../shared/print-styles'

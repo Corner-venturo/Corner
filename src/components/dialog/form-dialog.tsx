@@ -1,3 +1,4 @@
+'use client'
 /**
  * FormDialog - 通用表單對話框組件
  *
@@ -24,7 +25,6 @@
  * ```
  */
 
-'use client'
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'

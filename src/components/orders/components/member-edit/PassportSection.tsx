@@ -1,3 +1,4 @@
+'use client'
 /**
  * PassportSection - 護照圖片編輯區塊
  * 
@@ -5,7 +6,6 @@
  * 2025-06-27: 改用 i18n 多語系
  */
 
-'use client'
 
 import React, { useState } from 'react'
 import { useTranslations } from 'next-intl'

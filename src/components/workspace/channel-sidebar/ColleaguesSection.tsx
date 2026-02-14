@@ -1,9 +1,9 @@
+'use client'
 /**
  * 同事列表區塊
  * 顯示兩個辦公室的員工（不含機器人）
  */
 
-'use client'
 
 import { useState, useEffect, useMemo } from 'react'
 import { ChevronDown, ChevronRight, User, Building2 } from 'lucide-react'

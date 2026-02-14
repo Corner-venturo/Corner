@@ -1,9 +1,9 @@
+'use client'
 /**
  * AddAdminDialog - 新增管理員對話框
  * 為現有公司新增管理員帳號
  */
 
-'use client'
 
 import { useState, useCallback, useEffect } from 'react'
 import {

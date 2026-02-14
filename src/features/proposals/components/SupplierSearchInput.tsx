@@ -1,3 +1,4 @@
+'use client'
 /**
  * SupplierSearchInput - 供應商搜尋/新建組件
  *
@@ -7,7 +8,6 @@
  * 3. 沒有時可新建供應商
  */
 
-'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
 import { Input } from '@/components/ui/input'

@@ -1,8 +1,8 @@
+'use client'
 /**
  * Editor Toolbar - formatting controls for rich text editor
  */
 
-'use client'
 
 import { Button } from '@/components/ui/button'
 import {

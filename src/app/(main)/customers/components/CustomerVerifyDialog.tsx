@@ -1,3 +1,4 @@
+'use client'
 /**
  * 顧客資料驗證對話框
  * 功能：護照圖片檢視、編輯、OCR 辨識、資料比對
@@ -5,7 +6,6 @@
  * 2025-06-27: 改用統一的 ImageEditor 元件
  * 2025-06-27: 改用 i18n 多語系
  */
-'use client'
 
 import { useState, useCallback, useEffect } from 'react'
 import { useTranslations } from 'next-intl'

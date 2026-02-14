@@ -1,3 +1,4 @@
+'use client'
 /**
  * 顧客管理頁面（重構版）
  *
@@ -9,7 +10,6 @@
  * - ResetPasswordDialog: 重置密碼
  */
 
-'use client'
 
 import { useState, useMemo, useCallback } from 'react'
 import { Search, X, Plus, AlertTriangle, Edit, Trash2, Users } from 'lucide-react'

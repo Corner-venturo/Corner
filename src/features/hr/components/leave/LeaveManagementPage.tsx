@@ -1,9 +1,9 @@
+'use client'
 /**
  * 請假管理頁面
  * 整合假別設定、請假申請、假別餘額
  */
 
-'use client'
 
 import React, { useState, useEffect } from 'react'
 import {

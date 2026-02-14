@@ -1,8 +1,8 @@
+'use client'
 /**
  * QuotationInfo - 報價單基本資訊區
  */
 
-'use client'
 
 import React from 'react'
 import { formatDateTW } from '@/lib/utils/format-date'

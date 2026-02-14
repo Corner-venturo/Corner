@@ -1,8 +1,8 @@
+'use client'
 /**
  * SelectTourDialog - 選擇團體建立合約
  */
 
-'use client'
 
 import React, { useState, useMemo } from 'react'
 import {

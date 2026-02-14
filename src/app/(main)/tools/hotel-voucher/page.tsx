@@ -1,9 +1,9 @@
+'use client'
 /**
  * 入住憑證生成工具
  * 用於將 Trip.com 等訂房憑證轉換為 Corner 風格
  */
 
-'use client'
 
 import React, { useState } from 'react'
 import { CornerHotelVoucher } from '@/features/accommodation/components/CornerHotelVoucher'

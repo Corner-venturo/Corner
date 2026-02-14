@@ -1,3 +1,4 @@
+'use client'
 /**
  * CreateDisbursementDialog
  * 新增出納單對話框
@@ -8,7 +9,6 @@
  * - 下方：建立出納單按鈕
  */
 
-'use client'
 
 import { useCallback } from 'react'
 import {

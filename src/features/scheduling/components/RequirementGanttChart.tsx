@@ -1,3 +1,4 @@
+'use client'
 /**
  * RequirementGanttChart - 需求驅動的甘特圖
  *
@@ -5,7 +6,6 @@
  * 右側：可展開資源庫存面板（車輛/領隊）
  */
 
-'use client'
 
 import React, { useMemo, useState } from 'react'
 import { format, eachDayOfInterval, isSameDay, isWeekend, isWithinInterval } from 'date-fns'

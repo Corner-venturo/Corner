@@ -1,10 +1,10 @@
+'use client'
 /**
  * PrintableWrapper - 共用列印包裝元件
  *
  * 統一快速報價單和團體報價單的列印結構
  */
 
-'use client'
 
 import React, { useState, useEffect, ReactNode } from 'react'
 import { createPortal } from 'react-dom'

@@ -1,9 +1,9 @@
+'use client'
 /**
  * 科目明細帳 (Account Ledger Report)
  * 顯示單一會計科目的所有交易明細，包含期初餘額和期末餘額
  */
 
-'use client'
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { FileText, Download, Calendar, Search } from 'lucide-react'

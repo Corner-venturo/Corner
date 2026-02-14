@@ -1,9 +1,9 @@
+'use client'
 /**
  * 顧客進階搜尋對話框
  * 整合舊專案 cornerERP 的進階搜尋功能 + Venturo 的 VIP 篩選
  */
 
-'use client'
 
 import { useState } from 'react'
 import {

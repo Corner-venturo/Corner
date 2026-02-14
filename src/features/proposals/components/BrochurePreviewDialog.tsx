@@ -1,8 +1,8 @@
+'use client'
 /**
  * BrochurePreviewDialog - 手冊預覽懸浮視窗
  */
 
-'use client'
 
 import React, { useEffect, useState, useMemo } from 'react'
 import {

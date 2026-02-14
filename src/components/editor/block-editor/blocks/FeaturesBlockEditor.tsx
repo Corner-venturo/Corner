@@ -1,10 +1,10 @@
+'use client'
 /**
  * 行程特色區塊編輯器
  *
  * 編輯行程特色列表
  */
 
-'use client'
 
 import { useCallback } from 'react'
 import { Input } from '@/components/ui/input'

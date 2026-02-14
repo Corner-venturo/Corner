@@ -1,8 +1,8 @@
+'use client'
 /**
  * QuickQuoteCustomerInfo - 快速報價單客戶資訊區
  */
 
-'use client'
 
 import { getTodayString } from '@/lib/utils/format-date'
 import React from 'react'

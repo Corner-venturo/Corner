@@ -1,9 +1,9 @@
+'use client'
 /**
  * Corner 風格入住憑證組件
  * 用於生成住宿憑證 PDF
  */
 
-'use client'
 
 import React from 'react'
 

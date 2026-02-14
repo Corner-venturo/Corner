@@ -1,8 +1,8 @@
+'use client'
 /**
  * TourActionButtons - Action buttons for tour operations
  */
 
-'use client'
 
 import { useCallback } from 'react'
 import { useRouter } from 'next/navigation'

@@ -1,9 +1,9 @@
+'use client'
 /**
  * QuickQuoteSection - 團體報價單內嵌的快速報價單區塊
  * 讓同一份報價單可以同時存團體成本計算和快速報價單明細
  */
 
-'use client'
 
 import { QUICK_QUOTE_LABELS } from '../constants/labels'
 

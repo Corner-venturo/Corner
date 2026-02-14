@@ -1,9 +1,9 @@
+'use client'
 /**
  * DisbursementItemList
  * 請款單列表區塊（搜尋、篩選、列表）
  */
 
-'use client'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'

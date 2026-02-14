@@ -1,3 +1,4 @@
+'use client'
 /**
  * 收款管理頁面（重構版）
  *
@@ -9,7 +10,6 @@
  * 5. Realtime 即時同步
  */
 
-'use client'
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useMemo, useCallback } from 'react'

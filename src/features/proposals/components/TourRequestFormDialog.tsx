@@ -1,3 +1,4 @@
+'use client'
 /**
  * TourRequestFormDialog - 正式需求單
  *
@@ -7,7 +8,6 @@
  * 3. 開新視窗列印（避免 Dialog z-index 問題）
  */
 
-'use client'
 
 import { PROPOSAL_FORM_LABELS } from '../constants/labels'
 

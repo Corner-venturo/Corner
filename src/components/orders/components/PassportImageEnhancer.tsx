@@ -1,9 +1,9 @@
+'use client'
 /**
  * PassportImageEnhancer - 護照圖片增強組件
  * 專注於銳利化功能，提升 OCR 辨識率
  */
 
-'use client'
 
 import React, { useState, useCallback } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'

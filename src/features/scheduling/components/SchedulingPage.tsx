@@ -1,9 +1,9 @@
+'use client'
 /**
  * SchedulingPage - 資源調度主頁面
  * 甘特圖式日曆，顯示車輛和領隊的調度情況
  */
 
-'use client'
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'

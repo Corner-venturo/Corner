@@ -1,3 +1,4 @@
+'use client'
 /**
  * SupplierResponseDialog - 供應商回覆需求 Dialog
  *
@@ -7,7 +8,6 @@
  * 3. 填寫報價和備註
  */
 
-'use client'
 
 import React, { useState, useCallback, useEffect } from 'react'
 import {

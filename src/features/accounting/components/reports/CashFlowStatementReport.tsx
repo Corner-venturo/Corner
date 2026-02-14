@@ -1,9 +1,9 @@
+'use client'
 /**
  * 現金流量表 (Cash Flow Statement Report)
  * 顯示現金流入流出
  */
 
-'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { Banknote, Download, Calendar, Search, ArrowUpRight, ArrowDownRight, TrendingUp, TrendingDown } from 'lucide-react'

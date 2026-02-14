@@ -1,9 +1,9 @@
+'use client'
 /**
  * MemberPassportInfo - 成員護照資訊欄位
  * 包含：護照號碼、護照效期
  */
 
-'use client'
 
 import React from 'react'
 import { cn } from '@/lib/utils'

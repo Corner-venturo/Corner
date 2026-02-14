@@ -1,8 +1,8 @@
+'use client'
 /**
  * 顧客詳情對話框
  * 顯示顧客基本資料（左邊護照照片，右邊資料）
  */
-'use client'
 
 import { Check, AlertTriangle, Mail, Phone, X, ImageOff } from 'lucide-react'
 import Image from 'next/image'

@@ -1,8 +1,8 @@
+'use client'
 /**
  * DailyScheduleEditor - 簡易模式每日行程編輯器
  */
 
-'use client'
 
 import { Input } from '@/components/ui/input'
 import type { DailyScheduleItem } from './types'

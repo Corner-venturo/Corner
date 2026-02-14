@@ -1,8 +1,8 @@
+'use client'
 /**
  * TourChannelOperations - Channel creation and tour unlock operations
  */
 
-'use client'
 
 import { useCallback } from 'react'
 import { Tour } from '@/stores/types'

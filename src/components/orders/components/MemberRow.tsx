@@ -1,3 +1,4 @@
+'use client'
 /**
  * MemberRow - 成員行元件
  * 從 OrderMembersExpandable.tsx 拆分出來
@@ -8,7 +9,6 @@
  * - 支援團體模式額外欄位
  */
 
-'use client'
 
 import React, { useState, useCallback } from 'react'
 import { Check, GripVertical } from 'lucide-react'

@@ -1,8 +1,8 @@
+'use client'
 /**
  * TimelineEditor - 時間軸模式編輯器
  */
 
-'use client'
 
 import { Plus, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'

@@ -1,9 +1,9 @@
+'use client'
 /**
  * AddWorkspaceDialog - 新增公司對話框
  * 包含建立第一個管理員帳號
  */
 
-'use client'
 
 import { useState, useCallback } from 'react'
 import {

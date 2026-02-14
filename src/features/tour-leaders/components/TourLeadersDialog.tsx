@@ -1,8 +1,8 @@
+'use client'
 /**
  * TourLeadersDialog - 領隊新增/編輯對話框
  */
 
-'use client'
 
 import React, { useRef, useState } from 'react'
 import { FormDialog } from '@/components/dialog'

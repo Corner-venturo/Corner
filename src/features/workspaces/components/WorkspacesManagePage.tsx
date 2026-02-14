@@ -1,9 +1,9 @@
+'use client'
 /**
  * WorkspacesManagePage - 公司管理頁面
  * 僅限 super_admin 存取
  */
 
-'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'

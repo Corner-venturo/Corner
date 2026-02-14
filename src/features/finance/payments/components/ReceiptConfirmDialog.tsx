@@ -1,9 +1,9 @@
+'use client'
 /**
  * Receipt Confirm Dialog
  * 收款單確認對話框（與新增介面相同風格）
  */
 
-'use client'
 
 import { RECEIPT_CONFIRM_LABELS } from '../../constants/labels'
 

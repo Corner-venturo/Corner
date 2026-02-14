@@ -1,8 +1,8 @@
+'use client'
 /**
  * QuotesList - Displays quotes in a table format
  */
 
-'use client'
 
 import React, { useMemo } from 'react'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'

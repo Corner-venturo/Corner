@@ -1,9 +1,9 @@
+'use client'
 /**
  * 行程表列印頁面（簡易版）
  * 適用於非 TP/TC 的公司，提供簡潔的 A4 列印格式
  */
 
-'use client'
 
 import { PRINT_LABELS } from '../constants/labels'
 

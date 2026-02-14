@@ -1,10 +1,10 @@
+'use client'
 /**
  * 封面區塊編輯器
  *
  * 編輯封面相關資訊：標題、副標題、封面圖片等
  */
 
-'use client'
 
 import { useCallback } from 'react'
 import { Input } from '@/components/ui/input'

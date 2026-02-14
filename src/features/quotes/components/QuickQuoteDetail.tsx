@@ -1,8 +1,8 @@
+'use client'
 /**
  * QuickQuoteDetail - 快速報價單詳細頁面
  */
 
-'use client'
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'

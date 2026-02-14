@@ -1,8 +1,8 @@
+'use client'
 /**
  * PrintControls - 列印控制按鈕組件（共用）
  */
 
-'use client'
 
 import React from 'react'
 import { Button } from '@/components/ui/button'

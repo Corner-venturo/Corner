@@ -1,3 +1,4 @@
+'use client'
 /**
  * 新增顧客對話框
  * 功能：手動輸入 + 護照 OCR 上傳
@@ -6,7 +7,6 @@
  * - 自動追蹤 dirty 狀態
  * - 關閉前確認（如有未保存的修改）
  */
-'use client'
 
 import { useState, useCallback, useEffect } from 'react'
 import { Edit, Upload, FileImage, Trash2, Plus, X, ChevronDown, ChevronRight } from 'lucide-react'

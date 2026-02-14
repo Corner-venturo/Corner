@@ -1,3 +1,4 @@
+'use client'
 /**
  * 企業客戶管理頁面
  *
@@ -9,7 +10,6 @@
  * 5. 付款條件設定
  */
 
-'use client'
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useCallback } from 'react'

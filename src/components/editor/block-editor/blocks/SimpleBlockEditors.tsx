@@ -1,10 +1,10 @@
+'use client'
 /**
  * 簡化版區塊編輯器
  *
  * 包含較少使用的區塊編輯器
  */
 
-'use client'
 
 import { useCallback } from 'react'
 import { Input } from '@/components/ui/input'

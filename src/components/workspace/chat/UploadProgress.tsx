@@ -1,5 +1,6 @@
-import { CHAT_LABELS } from './constants/labels'
 'use client'
+
+import { CHAT_LABELS } from './constants/labels'
 
 interface UploadProgressProps {
   progress: number

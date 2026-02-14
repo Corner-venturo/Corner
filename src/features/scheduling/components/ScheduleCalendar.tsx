@@ -1,8 +1,8 @@
+'use client'
 /**
  * ScheduleCalendar - 甘特圖式調度日曆
  */
 
-'use client'
 
 import React, { useMemo } from 'react'
 import { format as formatDate, eachDayOfInterval, isWithinInterval, isSameDay, isWeekend } from 'date-fns'

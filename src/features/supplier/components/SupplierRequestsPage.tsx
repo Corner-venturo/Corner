@@ -1,10 +1,10 @@
+'use client'
 /**
  * SupplierRequestsPage - 供應商需求收件匣
  *
  * 顯示所有發送給此供應商的需求單
  */
 
-'use client'
 
 import React, { useState, useCallback } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'

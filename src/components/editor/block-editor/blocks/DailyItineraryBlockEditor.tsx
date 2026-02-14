@@ -1,10 +1,10 @@
+'use client'
 /**
  * 每日行程區塊編輯器
  *
  * 編輯每日行程列表（簡化版）
  */
 
-'use client'
 
 import { useCallback, useState } from 'react'
 import { Input } from '@/components/ui/input'

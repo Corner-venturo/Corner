@@ -1,8 +1,8 @@
+'use client'
 /**
  * PrintableQuickQuote - 快速報價單列印版
  */
 
-'use client'
 
 import React from 'react'
 import { Quote, QuickQuoteItem } from '@/types/quote.types'

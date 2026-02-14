@@ -1,8 +1,8 @@
+'use client'
 /**
  * SuppliersList - 供應商列表（含類別顯示）
  */
 
-'use client'
 
 import React from 'react'
 import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'

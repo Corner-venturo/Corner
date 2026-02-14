@@ -1,8 +1,8 @@
+'use client'
 /**
  * VehicleScheduleDialog - 車輛調度新增/編輯對話框
  */
 
-'use client'
 
 import React from 'react'
 import { FormDialog } from '@/components/dialog'

@@ -1,8 +1,8 @@
+'use client'
 /**
  * FlightSection - 航班搜尋區塊
  */
 
-'use client'
 
 import { Plane, Search, Loader2, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'

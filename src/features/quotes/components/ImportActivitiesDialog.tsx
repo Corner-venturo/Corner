@@ -1,9 +1,9 @@
+'use client'
 /**
  * ImportActivitiesDialog - 從行程表匯入景點對話框
  * 可勾選要匯入的景點
  */
 
-'use client'
 
 import React, { useState, useMemo, useEffect } from 'react'
 import {

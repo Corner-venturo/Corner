@@ -1,8 +1,8 @@
+'use client'
 /**
  * FleetVehicleList - 車輛列表
  */
 
-'use client'
 
 import React from 'react'
 import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'

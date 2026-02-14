@@ -1,9 +1,9 @@
+'use client'
 /**
  * MemberTableHeader - 成員表格標題列
  * 支援拖拉調整欄位寬度
  */
 
-'use client'
 
 import React, { useCallback, useRef } from 'react'
 import type { ColumnVisibility } from '../OrderMembersExpandable'

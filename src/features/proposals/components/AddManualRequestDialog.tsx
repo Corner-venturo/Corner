@@ -1,10 +1,10 @@
+'use client'
 /**
  * AddManualRequestDialog - 手動新增需求
  *
  * 用於在需求確認單中手動追加需求項目
  */
 
-'use client'
 
 import { PROPOSAL_FORM_LABELS } from '../constants/labels'
 

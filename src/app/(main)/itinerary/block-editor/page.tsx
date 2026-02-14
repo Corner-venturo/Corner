@@ -1,3 +1,4 @@
+'use client'
 /**
  * 區塊編輯器版行程表（新架構）
  *
@@ -5,7 +6,6 @@
  * 可與原有 /itinerary/new 頁面並存
  */
 
-'use client'
 
 import { BLOCK_EDITOR_LABELS } from '../constants/labels'
 

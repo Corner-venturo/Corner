@@ -1,8 +1,8 @@
+'use client'
 /**
  * PrintFooter - 列印頁尾組件（共用）
  */
 
-'use client'
 
 import React from 'react'
 import { COMPANY } from '@/lib/constants/company'

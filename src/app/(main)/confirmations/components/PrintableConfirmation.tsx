@@ -1,9 +1,9 @@
+'use client'
 /**
  * PrintableConfirmation - 確認單列印版（機票/住宿）
  * 參考 PrintableQuotation 的設計風格，支援 A4 列印
  */
 
-'use client'
 
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useEffect } from 'react'

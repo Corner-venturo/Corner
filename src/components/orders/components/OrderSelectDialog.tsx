@@ -1,9 +1,9 @@
+'use client'
 /**
  * OrderSelectDialog - 訂單選擇對話框
  * 團體模式新增成員時選擇訂單
  */
 
-'use client'
 
 import React, { useState } from 'react'
 import {

@@ -1,8 +1,8 @@
+'use client'
 /**
  * Canvas Editor - main rich text editor component
  */
 
-'use client'
 
 import { useCanvasEditor } from './useCanvasEditor'
 import { EditorToolbar } from './EditorToolbar'

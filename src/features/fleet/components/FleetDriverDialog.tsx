@@ -1,8 +1,8 @@
+'use client'
 /**
  * FleetDriverDialog - 司機新增/編輯對話框
  */
 
-'use client'
 
 import { DRIVER_DIALOG_LABELS } from '../constants/labels'
 

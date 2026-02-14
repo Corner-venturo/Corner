@@ -1,9 +1,9 @@
+'use client'
 /**
  * 畫布區域組件
  * 包含畫布容器、滾動容器、雙頁預覽、遮罩編輯模式指示器
  */
 
-'use client'
 
 import { forwardRef } from 'react'
 import * as fabric from 'fabric'

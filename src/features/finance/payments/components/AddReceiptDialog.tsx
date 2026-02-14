@@ -1,9 +1,9 @@
+'use client'
 /**
  * Add Receipt Dialog (Table-based Input)
  * 新增收款單對話框（表格式輸入，參考請款管理風格）
  */
 
-'use client'
 
 import { logger } from '@/lib/utils/logger'
 import { getTodayString } from '@/lib/utils/format-date'

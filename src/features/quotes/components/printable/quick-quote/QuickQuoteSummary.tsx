@@ -1,8 +1,8 @@
+'use client'
 /**
  * QuickQuoteSummary - 金額統計摘要
  */
 
-'use client'
 
 import React from 'react'
 import { MORANDI_COLORS } from '../shared/print-styles'

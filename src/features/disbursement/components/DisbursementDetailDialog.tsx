@@ -1,9 +1,9 @@
+'use client'
 /**
  * DisbursementDetailDialog
  * 出納單詳情對話框
  */
 
-'use client'
 
 import { useMemo, useState } from 'react'
 import {

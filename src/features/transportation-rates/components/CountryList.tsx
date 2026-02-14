@@ -1,8 +1,8 @@
+'use client'
 /**
  * CountryList - 國家列表（按國家分組顯示車資統計）
  */
 
-'use client'
 
 import React, { useMemo } from 'react'
 import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'

@@ -1,9 +1,9 @@
+'use client'
 /**
  * MemberInfoForm - 成員基本資訊表單
  * 從 MemberEditDialog.tsx 拆分
  */
 
-'use client'
 
 import React from 'react'
 import type { EditFormData } from '../MemberEditDialog'

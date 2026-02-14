@@ -1,8 +1,8 @@
+'use client'
 /**
  * 薪資管理頁面
  */
 
-'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
 import {

@@ -1,9 +1,9 @@
+'use client'
 /**
  * ExportDialog - 匯出成員對話框
  * 從 OrderMembersExpandable.tsx 拆分出來
  */
 
-'use client'
 
 import React from 'react'
 import { Printer, X, FileSpreadsheet } from 'lucide-react'

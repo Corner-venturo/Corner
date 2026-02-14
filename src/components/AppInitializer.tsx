@@ -1,9 +1,9 @@
+'use client'
 /**
  * 應用初始化腳本
  * 在應用啟動時自動初始化並確保 Auth 同步
  */
 
-'use client'
 
 import { logger } from '@/lib/utils/logger'
 import { useEffect } from 'react'

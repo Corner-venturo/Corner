@@ -1,10 +1,10 @@
+'use client'
 /**
  * 航班區塊編輯器
  *
  * 編輯去程和回程航班資訊
  */
 
-'use client'
 
 import { useCallback } from 'react'
 import { Input } from '@/components/ui/input'

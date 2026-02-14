@@ -1,10 +1,10 @@
+'use client'
 /**
  * CompanyAssetsPage - 公司資源管理頁面
  * 
  * 改用樹狀資料夾結構（參考 TourFilesTree）
  */
 
-'use client'
 
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useCallback } from 'react'

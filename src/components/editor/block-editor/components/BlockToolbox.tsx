@@ -1,10 +1,10 @@
+'use client'
 /**
  * 區塊工具箱
  *
  * 顯示可用的區塊列表，用於新增區塊
  */
 
-'use client'
 
 import { useMemo } from 'react'
 import {

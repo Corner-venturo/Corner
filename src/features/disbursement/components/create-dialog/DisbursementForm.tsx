@@ -1,9 +1,9 @@
+'use client'
 /**
  * DisbursementForm
  * 出納單表單區塊（出帳日期、出納單號、狀態篩選）
  */
 
-'use client'
 
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'

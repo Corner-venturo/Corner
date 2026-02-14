@@ -1,8 +1,8 @@
+'use client'
 /**
  * 出勤紀錄管理頁面
  */
 
-'use client'
 
 import React, { useState, useEffect } from 'react'
 import {

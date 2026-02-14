@@ -1,10 +1,10 @@
+'use client'
 /**
  * SupplierFinancePage - 供應商財務報表
  *
  * 顯示營收統計、請款記錄
  */
 
-'use client'
 
 import React, { useState, useEffect, useMemo } from 'react'
 import { logger } from '@/lib/utils/logger'

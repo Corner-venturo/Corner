@@ -1,8 +1,8 @@
+'use client'
 /**
  * VersionDropdown - 版本選擇下拉選單
  */
 
-'use client'
 
 import { History, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'

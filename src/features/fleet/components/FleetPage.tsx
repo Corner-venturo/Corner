@@ -1,8 +1,8 @@
+'use client'
 /**
  * FleetPage - 車隊管理頁面（含車輛、司機、維護記錄）
  */
 
-'use client'
 
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useCallback } from 'react'

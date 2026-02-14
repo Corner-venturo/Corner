@@ -1,9 +1,9 @@
+'use client'
 /**
  * 行事曆設定 Dialog
  * 控制要顯示哪些類型的事件
  */
 
-'use client'
 
 import { Settings } from 'lucide-react'
 import {

@@ -1,9 +1,9 @@
+'use client'
 /**
  * MemberActions - 成員操作按鈕
  * 包含：警告、編輯、刪除按鈕
  */
 
-'use client'
 
 import React from 'react'
 import { AlertTriangle, Pencil, Trash2 } from 'lucide-react'

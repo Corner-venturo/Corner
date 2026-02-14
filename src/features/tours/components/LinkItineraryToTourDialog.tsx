@@ -1,9 +1,9 @@
+'use client'
 /**
  * LinkItineraryToTourDialog - 旅遊團設計對話框
  * 功能：選擇設計手冊或網頁行程表
  */
 
-'use client'
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'

@@ -1,3 +1,4 @@
+'use client'
 /**
  * LinkDocumentsToTourDialog - 快速報價單管理對話框
  *
@@ -5,7 +6,6 @@
  * 此對話框現在只用於管理快速報價單（可建立多份比價）
  */
 
-'use client'
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'

@@ -1,8 +1,8 @@
+'use client'
 /**
  * QuotationPricingTable - 團費報價表
  */
 
-'use client'
 
 import React from 'react'
 import { MORANDI_COLORS, TABLE_STYLES } from '../shared/print-styles'

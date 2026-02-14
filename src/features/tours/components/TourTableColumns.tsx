@@ -1,8 +1,8 @@
+'use client'
 /**
  * TourTableColumns - Table column definitions for tours list
  */
 
-'use client'
 
 import { useMemo } from 'react'
 import Link from 'next/link'

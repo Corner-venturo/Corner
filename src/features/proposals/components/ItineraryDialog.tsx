@@ -1,3 +1,4 @@
+'use client'
 /**
  * ItineraryDialog - 行程編輯器
  *
@@ -6,7 +7,6 @@
  * - 表格式編輯（點擊儲存格直接編輯，無格線）
  */
 
-'use client'
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 import {

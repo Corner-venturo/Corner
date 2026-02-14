@@ -1,3 +1,4 @@
+'use client'
 /**
  * DisbursementPage
  * 出納單管理主頁面
@@ -8,7 +9,6 @@
  * - 出納單包含多張請款單
  */
 
-'use client'
 
 import { useCallback, useState, useMemo } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'

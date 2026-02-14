@@ -1,9 +1,9 @@
+'use client'
 /**
  * ToursPage - Main tours list page component (Refactored)
  * 🔧 TOUR-01 重構：提案相關邏輯抽取到 useProposalOperations hook
  */
 
-'use client'
 
 import React, { useCallback, useEffect, useState, useMemo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'

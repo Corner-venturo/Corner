@@ -1,9 +1,9 @@
+'use client'
 /**
  * CustomerMatchDialog - 顧客匹配對話框
  * 當輸入姓名或身分證號時，自動搜尋現有顧客
  */
 
-'use client'
 
 import React from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'

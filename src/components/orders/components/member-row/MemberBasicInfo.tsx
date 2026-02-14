@@ -1,9 +1,9 @@
+'use client'
 /**
  * MemberBasicInfo - 成員基本資訊欄位
  * 包含：中文姓名、出生年月日、性別、身分證號
  */
 
-'use client'
 
 import React, { useState } from 'react'
 import { Eye } from 'lucide-react'

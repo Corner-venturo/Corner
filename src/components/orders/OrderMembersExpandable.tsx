@@ -1,3 +1,4 @@
+'use client'
 /**
  * OrderMembersExpandable - 訂單成員管理主組件（完全重構版）
  *
@@ -8,7 +9,6 @@
  * 行數：< 300 行
  */
 
-'use client'
 
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { Plus, Printer, Hotel, Bus, Coins, Settings, Pencil, Plane, RefreshCw } from 'lucide-react'

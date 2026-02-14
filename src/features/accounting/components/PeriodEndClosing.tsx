@@ -1,9 +1,9 @@
+'use client'
 /**
  * 期末結轉頁面
  * 將損益科目餘額結轉至保留盈餘
  */
 
-'use client'
 
 import React, { useState, useEffect } from 'react'
 import {

@@ -1,9 +1,9 @@
+'use client'
 /**
  * 損益表 (Income Statement Report)
  * 顯示收入與費用，計算本期損益
  */
 
-'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { TrendingUp, Download, Calendar, Search, ArrowUp, ArrowDown, Minus } from 'lucide-react'

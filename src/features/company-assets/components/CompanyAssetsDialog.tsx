@@ -1,8 +1,8 @@
+'use client'
 /**
  * CompanyAssetsDialog - 公司資源對話框
  */
 
-'use client'
 
 import React from 'react'
 import { FormDialog } from '@/components/dialog'

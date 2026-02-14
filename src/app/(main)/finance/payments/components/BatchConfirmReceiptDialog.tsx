@@ -1,3 +1,4 @@
+'use client'
 /**
  * 批量確認收款品項對話框
  *
@@ -8,7 +9,6 @@
  * 4. 每筆獨立處理，失敗不影響其他
  */
 
-'use client'
 
 import { useState, useMemo, useCallback } from 'react'
 import {

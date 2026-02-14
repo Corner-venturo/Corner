@@ -1,3 +1,4 @@
+'use client'
 /**
  * AddMemberDialog - 新增成員對話框
  * 從 OrderMembersExpandable.tsx 拆分出來
@@ -5,7 +6,6 @@
  * 整合 PassportUploadZone 以支援圖片增強功能
  */
 
-'use client'
 
 import React from 'react'
 import { Plus } from 'lucide-react'

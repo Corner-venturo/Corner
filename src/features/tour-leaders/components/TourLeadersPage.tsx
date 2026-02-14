@@ -1,8 +1,8 @@
+'use client'
 /**
  * TourLeadersPage - 領隊資料管理頁面
  */
 
-'use client'
 
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useCallback } from 'react'

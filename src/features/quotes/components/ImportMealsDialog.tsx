@@ -1,9 +1,9 @@
+'use client'
 /**
  * ImportMealsDialog - 從行程表匯入餐飲對話框
  * 可勾選要匯入的餐點（含早餐選項）
  */
 
-'use client'
 
 import React, { useState, useMemo, useEffect } from 'react'
 import {

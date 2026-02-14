@@ -1,8 +1,8 @@
+'use client'
 /**
  * QuickQuoteDialog - 快速報價單表單（簡單收款用）
  */
 
-'use client'
 
 import { QUICK_QUOTE_LABELS } from '../constants/labels'
 

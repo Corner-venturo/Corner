@@ -1,8 +1,8 @@
+'use client'
 /**
  * FleetVehicleDialog - 車輛新增/編輯對話框
  */
 
-'use client'
 
 import { VEHICLE_DIALOG_LABELS } from '../constants/labels'
 

@@ -1,8 +1,8 @@
+'use client'
 /**
  * PrintableQuotation - 團體報價單列印版
  */
 
-'use client'
 
 import React from 'react'
 import { ParticipantCounts, SellingPrices } from '../../../types'

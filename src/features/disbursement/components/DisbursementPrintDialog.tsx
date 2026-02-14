@@ -1,3 +1,4 @@
+'use client'
 /**
  * DisbursementPrintDialog
  * 出納單列印預覽對話框
@@ -8,7 +9,6 @@
  * - 使用 iframe 列印確保穩定
  */
 
-'use client'
 
 import { useCallback, useRef, useState, useEffect } from 'react'
 import {

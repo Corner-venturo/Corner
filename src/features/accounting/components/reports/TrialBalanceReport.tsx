@@ -1,9 +1,9 @@
+'use client'
 /**
  * 試算表 (Trial Balance Report)
  * 驗證借貸平衡，列出所有科目餘額
  */
 
-'use client'
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { Scale, Download, Calendar, Search, CheckCircle, AlertCircle } from 'lucide-react'

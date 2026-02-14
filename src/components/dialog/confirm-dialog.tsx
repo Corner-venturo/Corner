@@ -1,9 +1,9 @@
+'use client'
 /**
  * ConfirmDialog - 統一的確認對話框組件
  * 用於刪除、警告、確認等操作
  */
 
-'use client'
 
 import React from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'

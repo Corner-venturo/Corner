@@ -1,7 +1,7 @@
+'use client'
 /**
  * QR Code 元素
  */
-'use client'
 
 import { QRCodeSVG } from 'qrcode.react'
 import type { Theme } from '../types'

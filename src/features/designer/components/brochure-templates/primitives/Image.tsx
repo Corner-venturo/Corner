@@ -1,7 +1,7 @@
+'use client'
 /**
  * 圖片元素
  */
-'use client'
 
 import NextImage from 'next/image'
 import type { Theme } from '../types'

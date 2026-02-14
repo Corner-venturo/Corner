@@ -1,8 +1,8 @@
+'use client'
 /**
  * 重置密碼對話框
  * 管理員重置顧客會員密碼
  */
-'use client'
 
 import { useState } from 'react'
 import { Key, Check, X } from 'lucide-react'

@@ -1,9 +1,9 @@
+'use client'
 /**
  * 機器人區塊
  * VENTURO 機器人 = 系統通知 + Logan AI 對話
  */
 
-'use client'
 
 import { useMemo, useState, useEffect } from 'react'
 import { Bot, Sparkles } from 'lucide-react'

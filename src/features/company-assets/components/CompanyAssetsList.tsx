@@ -1,8 +1,8 @@
+'use client'
 /**
  * CompanyAssetsList - 公司資源列表
  */
 
-'use client'
 
 import React from 'react'
 import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'

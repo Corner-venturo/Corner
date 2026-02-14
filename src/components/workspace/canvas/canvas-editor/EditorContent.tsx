@@ -1,8 +1,8 @@
+'use client'
 /**
  * Editor Content - rich text editing area with drag & drop support
  */
 
-'use client'
 
 import { EditorContent as TiptapEditorContent } from '@tiptap/react'
 import { Editor } from '@tiptap/react'

@@ -1,9 +1,9 @@
+'use client'
 /**
  * DisbursementList
  * 出納單列表組件
  */
 
-'use client'
 
 import { useMemo, useState } from 'react'
 import { EnhancedTable } from '@/components/ui/enhanced-table'

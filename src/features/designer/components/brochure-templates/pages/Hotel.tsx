@@ -1,7 +1,7 @@
+'use client'
 /**
  * 飯店介紹頁
  */
-'use client'
 
 import { Page } from '../primitives/Page'
 import { Text } from '../primitives/Text'

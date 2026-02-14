@@ -1,9 +1,9 @@
+'use client'
 /**
  * 總帳報表 (General Ledger Report)
  * 顯示每個會計科目的所有交易明細
  */
 
-'use client'
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { BookOpen, Download, Calendar, Filter, Search } from 'lucide-react'

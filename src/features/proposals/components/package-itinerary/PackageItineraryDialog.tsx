@@ -1,9 +1,9 @@
+'use client'
 /**
  * PackageItineraryDialog - 提案套件行程表對話框
  * 功能：建立新行程表 / 查看已關聯行程表
  */
 
-'use client'
 
 import { FileText, Loader2, Save, AlertCircle, Eye, Wand2, FilePlus, Clock } from 'lucide-react'
 import {

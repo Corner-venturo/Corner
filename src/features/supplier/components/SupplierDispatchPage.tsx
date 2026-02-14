@@ -1,10 +1,10 @@
+'use client'
 /**
  * SupplierDispatchPage - 供應商派單管理
  *
  * 顯示已確認的需求，可派給司機
  */
 
-'use client'
 
 import React, { useState, useEffect } from 'react'
 import { logger } from '@/lib/utils/logger'

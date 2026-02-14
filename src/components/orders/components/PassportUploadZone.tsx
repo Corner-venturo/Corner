@@ -1,3 +1,4 @@
+'use client'
 /**
  * PassportUploadZone - 護照上傳區域組件
  * 從 AddMemberDialog 拆分出來
@@ -9,7 +10,6 @@
  * - 批次辨識按鈕
  */
 
-'use client'
 
 import React, { useState, useCallback } from 'react'
 import { Upload, X, Sparkles } from 'lucide-react'

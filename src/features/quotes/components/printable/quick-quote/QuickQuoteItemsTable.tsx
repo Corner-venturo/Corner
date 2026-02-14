@@ -1,8 +1,8 @@
+'use client'
 /**
  * QuickQuoteItemsTable - 收費明細表
  */
 
-'use client'
 
 import React from 'react'
 import { QuickQuoteItem } from '@/types/quote.types'

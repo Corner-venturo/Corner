@@ -1,10 +1,10 @@
+'use client'
 /**
  * 區塊畫布
  *
  * 渲染所有區塊並處理選取和操作
  */
 
-'use client'
 
 import { useCallback } from 'react'
 import { BlockWrapper } from './BlockWrapper'

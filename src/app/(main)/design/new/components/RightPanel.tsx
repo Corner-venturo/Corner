@@ -1,9 +1,9 @@
+'use client'
 /**
  * 右側面板組件
  * 包含元素屬性和模板數據兩個 Tab
  */
 
-'use client'
 
 import * as fabric from 'fabric'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'

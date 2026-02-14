@@ -1,9 +1,9 @@
+'use client'
 /**
  * Designer Header 組件
  * 包含返回按鈕、標題、面板切換、縮放控制、{DESIGNER_LABELS.SAVE}按鈕
  */
 
-'use client'
 
 import { useRouter } from 'next/navigation'
 import {

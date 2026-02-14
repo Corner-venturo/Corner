@@ -1,8 +1,8 @@
+'use client'
 /**
  * ItineraryPreview - 簡易行程表預覽
  */
 
-'use client'
 
 import { Eye, Edit2, Printer } from 'lucide-react'
 import { Button } from '@/components/ui/button'

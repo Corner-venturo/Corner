@@ -1,9 +1,9 @@
+'use client'
 /**
  * Designer 對話框群組
  * 包含封面圖片、每日封面圖片、遮罩填充、區塊元件庫等對話框
  */
 
-'use client'
 
 import * as fabric from 'fabric'
 import { ImagePickerDialog } from '@/components/ui/image-uploader'

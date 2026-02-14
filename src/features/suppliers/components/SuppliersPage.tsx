@@ -1,8 +1,8 @@
+'use client'
 /**
  * SuppliersPage - 供應商管理頁面（僅基本資訊）
  */
 
-'use client'
 
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useCallback } from 'react'

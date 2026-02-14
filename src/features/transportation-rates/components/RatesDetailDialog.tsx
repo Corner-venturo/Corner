@@ -1,8 +1,8 @@
+'use client'
 /**
  * RatesDetailDialog - 國家車資詳細表格懸浮視窗
  */
 
-'use client'
 
 import { logger } from '@/lib/utils/logger'
 import React, { useState } from 'react'

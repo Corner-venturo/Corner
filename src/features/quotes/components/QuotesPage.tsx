@@ -1,9 +1,9 @@
+'use client'
 /**
  * QuotesPage - 報價單管理（以團為主）
  * 顯示旅遊團列表，點擊開啟報價單管理懸浮視窗
  */
 
-'use client'
 
 import React, { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'

@@ -1,8 +1,8 @@
+'use client'
 /**
  * AiGenerateDialog - AI 排行程設定對話框
  */
 
-'use client'
 
 import { Sparkles, Loader2, X } from 'lucide-react'
 import {

@@ -1,8 +1,8 @@
+'use client'
 /**
  * EditWorkspaceDialog - 編輯公司設定對話框
  */
 
-'use client'
 
 import { useState, useCallback, useEffect } from 'react'
 import {

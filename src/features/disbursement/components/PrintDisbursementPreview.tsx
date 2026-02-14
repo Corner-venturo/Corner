@@ -1,3 +1,4 @@
+'use client'
 /**
  * PrintDisbursementPreview
  * 出納單列印預覽組件
@@ -10,7 +11,6 @@
  * - 每組最多 5 筆，超過自動拆分（避免跨頁問題）
  */
 
-'use client'
 
 import { PRINT_LABELS } from '../constants/labels'
 

@@ -1,10 +1,10 @@
+'use client'
 /**
  * LeaderAvailabilityDialog - 領隊檔期管理對話框
  *
  * 用於管理單一領隊的可用檔期
  */
 
-'use client'
 
 import React, { useState, useCallback, useMemo } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DIALOG_SIZES } from '@/components/ui/dialog'

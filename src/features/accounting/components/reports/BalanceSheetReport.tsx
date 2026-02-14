@@ -1,9 +1,9 @@
+'use client'
 /**
  * 資產負債表 (Balance Sheet Report)
  * 顯示特定時點的財務狀況
  */
 
-'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { Wallet, Download, Calendar, Search, Building, CreditCard, PiggyBank } from 'lucide-react'
