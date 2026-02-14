@@ -173,7 +173,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
         {showSavedMessage && (
           <div className="bg-status-success-bg border border-status-success rounded-lg p-3 flex items-center gap-2 text-status-success">
             <Check size={16} />
-            <span className="text-sm font-medium">✓ 已自動儲存</span>
+            <span className="text-sm font-medium">{COMP_HR_LABELS.AUTO_SAVED}</span>
           </div>
         )}
 
@@ -337,7 +337,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
                         </div>
                         <p className="text-sm font-medium text-morandi-primary truncate">
                           {permission.label}
-                          {isDefault && <span className="text-xs ml-1">(預設)</span>}
+                          {isDefault && <span className="text-xs ml-1">{COMP_HR_LABELS.DEFAULT_TAG}</span>}
                         </p>
                       </div>
                     )

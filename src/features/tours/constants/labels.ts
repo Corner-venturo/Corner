@@ -687,6 +687,8 @@ export const TOUR_PNR_TOOL_DIALOG_LABELS = {
   LABEL_2736: '票價',
   LABEL_7910: '票號',
   LABEL_475: '兒童',
+  CHILD_TAG: '(兒童)',
+  INFANT_TAG: '(+嬰兒)',
 };
 
 // TourItineraryTab 模組的 UI 標籤

@@ -515,8 +515,8 @@ export function TourPnrToolDialog({
                 {passengerMatches.filter(m => !m.memberId).map(m => (
                   <li key={m.pnrIndex} className="font-mono">
                     {m.pnrName}
-                    {m.passengerType === 'CHD' && <span className="ml-2 text-blue-600">(兒童)</span>}
-                    {m.infant && <span className="ml-2 text-pink-600">(+嬰兒)</span>}
+                    {m.passengerType === 'CHD' && <span className="ml-2 text-blue-600">{TOUR_PNR_TOOL_DIALOG_LABELS.CHILD_TAG}</span>}
+                    {m.infant && <span className="ml-2 text-pink-600">{TOUR_PNR_TOOL_DIALOG_LABELS.INFANT_TAG}</span>}
                   </li>
                 ))}
               </ul>

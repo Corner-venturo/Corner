@@ -66,7 +66,7 @@ export default function PermissionsManagementPage() {
 
           <div className="pt-4 border-t">
             <p className="text-xs text-muted-foreground">
-              {LABELS.REFERENCE_DOC}<code className="text-morandi-gold">CLAUDE.md - RLS 規範</code>
+              {LABELS.REFERENCE_DOC}<code className="text-morandi-gold">{LABELS.RLS_SPEC_DOC}</code>
             </p>
           </div>
         </CardContent>

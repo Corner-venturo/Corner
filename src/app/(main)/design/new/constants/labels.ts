@@ -29,5 +29,6 @@ export const DESIGNER_LABELS = {
   // page
   DEFAULT_FILENAME: '手冊',
   LOADING_DESIGN: '載入設計中...',
+  LOADING_DESIGN_TOOL: '載入設計工具中...',
   RELOAD: '重新載入',
 }

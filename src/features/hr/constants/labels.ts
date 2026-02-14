@@ -294,4 +294,8 @@ export const COMP_HR_LABELS = {
   LABEL_7322: '所有權限',
   ADD_223: '進階：新增額外功能權限（選填）',
   LABEL_8504: '如需賦予該員工角色以外的特殊權限，可在此勾選。一般情況下不需要調整。',
+  AUTO_SAVED: '✓ 已自動儲存',
+  DEFAULT_TAG: '(預設)',
+  PASSWORD_MATCH: '✓ 密碼確認一致',
+  PASSWORD_MISMATCH: '✗ 密碼確認不一致',
 };

@@ -129,6 +129,7 @@ export const LABELS = {
   DATA_ISOLATION: '資料隔離（前端 filter）',
   ROLE_LABELS: '角色標籤（admin, tour_leader 等）',
   REFERENCE_DOC: '參考文檔：',
+  RLS_SPEC_DOC: 'CLAUDE.md - RLS 規範',
   
   // System Settings
   SYSTEM_MAINTENANCE: '系統維護',
