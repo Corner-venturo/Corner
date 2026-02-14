@@ -129,7 +129,7 @@ function TourCard({ tour }: { tour: TourData }) {
           </div>
           <div className="flex items-center gap-2 text-xs text-morandi-secondary">
             <Calendar size={12} />
-            <span>{formatDateDisplay(tour.departure_date)} 出發</span>
+            <span>{formatDateDisplay(tour.departure_date)}{COMP_WORKSPACE_LABELS.DEPARTURE_SUFFIX}</span>
           </div>
         </div>
 
@@ -137,7 +137,7 @@ function TourCard({ tour }: { tour: TourData }) {
         <div className="flex items-center gap-3 mt-2 text-sm">
           <div className="flex items-center gap-1">
             <Users size={14} className="text-morandi-secondary" />
-            <span className="text-morandi-primary font-medium">{stats.total}人</span>
+            <span className="text-morandi-primary font-medium">{stats.total}{COMP_WORKSPACE_LABELS.PERSON_SUFFIX}</span>
           </div>
           {stats.ticketed > 0 && (
             <div className="flex items-center gap-1 text-morandi-green">
@@ -308,10 +308,10 @@ export function TicketStatusCard({ tours, summary, generatedAt }: TicketStatusCa
         <div className="flex items-center gap-3 text-xs text-morandi-secondary pt-1 border-t border-morandi-container/30">
           <span>{COMP_WORKSPACE_LABELS.LABEL_5332} {tours.length} 個團</span>
           {summary.needs_ticketing > 0 && (
-            <span className="text-amber-600">{summary.needs_ticketing} 待開票</span>
+            <span className="text-amber-600">{summary.needs_ticketing} {COMP_WORKSPACE_LABELS.待開票}</span>
           )}
           {summary.no_record > 0 && (
-            <span className="text-morandi-red">{summary.no_record} 無紀錄</span>
+            <span className="text-morandi-red">{summary.no_record} {COMP_WORKSPACE_LABELS.無紀錄}</span>
           )}
         </div>
       )}

@@ -345,4 +345,6 @@ export const COMP_WORKSPACE_LABELS = {
   PROCESSING_3053: '沒有需要處理的開票資料',
   LABEL_6681: '開票狀態提醒',
   LABEL_5332: '共',
+  DEPARTURE_SUFFIX: ' 出發',
+  PERSON_SUFFIX: '人',
 };
