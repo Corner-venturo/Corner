@@ -135,5 +135,19 @@ export const LABELS = {
   CHECKED_DETAIL: '託運行李詳情',
   PERSONAL_ITEM_DETAIL: '隨身物品詳情',
   ADD_BAGGAGE_DETAIL: '新增行李詳情',
-  AIRLINE_CONTACT_INFO: '航空公司聯絡資訊'
+  AIRLINE_CONTACT_INFO: '航空公司聯絡資訊',
+
+  // ImportPNRDialog
+  IMPORT_PNR_TITLE: '匯入 PNR 確認單',
+  IMPORT_PNR_DESC: '貼上機票確認單的 HTML 或文字內容，系統會自動解析並填入表單',
+  PNR_CONTENT_LABEL: 'PNR 內容',
+  PARSING: '解析中...',
+  PARSE_PNR: '解析 PNR',
+  PARSE_SUCCESS_TITLE: '解析成功',
+  RE_INPUT: '重新輸入',
+  COMPUTER_CODE: '電腦代號：',
+  PASSENGER_NAME_LABEL_COLON: '旅客姓名：',
+  FLIGHT_INFO_LABEL: '航班資訊：',
+  TICKET_NUMBER_LABEL: '機票號碼：',
+  IMPORT_TO_CONFIRMATION: '匯入到確認單',
 } as const

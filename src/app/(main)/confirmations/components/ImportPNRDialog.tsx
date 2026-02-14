@@ -73,10 +73,10 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5 text-morandi-sky" />
-            匯入 PNR 確認單
+            {LABELS.IMPORT_PNR_TITLE}
           </DialogTitle>
           <DialogDescription>
-            貼上機票確認單的 HTML 或文字內容，系統會自動解析並填入表單
+            {LABELS.IMPORT_PNR_DESC}
           </DialogDescription>
         </DialogHeader>
 
@@ -86,7 +86,7 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
               {/* 輸入區 */}
               <div>
                 <label className="block text-sm font-medium text-morandi-primary mb-2">
-                  PNR 內容
+                  {LABELS.PNR_CONTENT_LABEL}
                 </label>
                 <Textarea
                   placeholder={`貼上完整的 HTML 或文字內容，例如：
@@ -106,7 +106,7 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
               <div className="flex gap-2 justify-end">
                 <Button variant="outline" onClick={handleClose} className="gap-2">
                   <X size={16} />
-                  取消
+                  {LABELS.CANCEL}
                 </Button>
                 <Button
                   onClick={handleParse}
@@ -114,7 +114,7 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
                   className="bg-morandi-sky hover:bg-morandi-sky/90 gap-2"
                 >
                   <Upload size={16} />
-                  {isParsing ? '解析中...' : '解析 PNR'}
+                  {isParsing ? LABELS.PARSING : LABELS.PARSE_PNR}
                 </Button>
               </div>
             </>
@@ -125,7 +125,7 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-morandi-success" />
-                    <h3 className="text-sm font-semibold text-morandi-primary">解析成功</h3>
+                    <h3 className="text-sm font-semibold text-morandi-primary">{LABELS.PARSE_SUCCESS_TITLE}</h3>
                   </div>
                   <button
                     onClick={() => {
@@ -134,7 +134,7 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
                     }}
                     className="text-sm text-morandi-secondary hover:text-morandi-primary"
                   >
-                    重新輸入
+                    {LABELS.RE_INPUT}
                   </button>
                 </div>
 
@@ -142,7 +142,7 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
                   {/* 電腦代號 */}
                   {parsedData.recordLocator && (
                     <div className="bg-card p-3 rounded border border-border">
-                      <span className="font-semibold text-morandi-primary">電腦代號：</span>
+                      <span className="font-semibold text-morandi-primary">{LABELS.COMPUTER_CODE}</span>
                       <span className="text-morandi-secondary">{parsedData.recordLocator}</span>
                     </div>
                   )}
@@ -150,7 +150,7 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
                   {/* 旅客姓名 */}
                   {parsedData.passengerNames.length > 0 && (
                     <div className="bg-card p-3 rounded border border-border">
-                      <span className="font-semibold text-morandi-primary">旅客姓名：</span>
+                      <span className="font-semibold text-morandi-primary">{LABELS.PASSENGER_NAME_LABEL_COLON}</span>
                       <div className="mt-1 space-y-1">
                         {parsedData.passengerNames.map((name, idx) => (
                           <div key={idx} className="text-morandi-secondary">
@@ -164,7 +164,7 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
                   {/* 航班資訊 */}
                   {parsedData.segments.length > 0 && (
                     <div className="bg-card p-3 rounded border border-border">
-                      <span className="font-semibold text-morandi-primary block mb-2">航班資訊：</span>
+                      <span className="font-semibold text-morandi-primary block mb-2">{LABELS.FLIGHT_INFO_LABEL}</span>
                       <div className="space-y-2">
                         {parsedData.segments.map((seg, idx) => (
                           <div key={idx} className="text-morandi-secondary pl-2 border-l-2 border-morandi-sky">
@@ -183,7 +183,7 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
                   {/* 機票號碼 */}
                   {parsedData.ticketNumbers.length > 0 && (
                     <div className="bg-card p-3 rounded border border-border">
-                      <span className="font-semibold text-morandi-primary">機票號碼：</span>
+                      <span className="font-semibold text-morandi-primary">{LABELS.TICKET_NUMBER_LABEL}</span>
                       <div className="mt-1 space-y-1">
                         {parsedData.ticketNumbers.map((ticket, idx) => (
                           <div key={idx} className="text-morandi-secondary">
@@ -200,14 +200,14 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
               <div className="flex gap-2 justify-end">
                 <Button variant="outline" onClick={handleClose} className="gap-2">
                   <X size={16} />
-                  取消
+                  {LABELS.CANCEL}
                 </Button>
                 <Button
                   onClick={handleImport}
                   className="bg-morandi-gold hover:bg-morandi-gold-hover gap-2"
                 >
                   <Upload size={16} />
-                  匯入到確認單
+                  {LABELS.IMPORT_TO_CONFIRMATION}
                 </Button>
               </div>
             </>
