@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { logger } from '@/lib/utils/logger'
 import {
   Dialog,
   DialogContent,
@@ -293,7 +294,7 @@ export function VoucherFormDialog({
       onOpenChange(false)
 
     } catch (error) {
-      console.error('儲存傳票失敗:', error)
+      logger.error('儲存傳票失敗:', error)
       toast.error(error instanceof Error ? error.message : '儲存傳票失敗')
     } finally {
       setIsSubmitting(false)

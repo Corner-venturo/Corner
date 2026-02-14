@@ -5,6 +5,7 @@
 
 
 import React, { useRef, useState } from 'react'
+import { logger } from '@/lib/utils/logger'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -51,7 +52,7 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
       })
       onFormFieldChange('photo', result.publicUrl)
     } catch (error) {
-      console.error('Failed to upload photo:', error)
+      logger.error('Failed to upload photo:', error)
     } finally {
       setIsUploadingPhoto(false)
       if (photoInputRef.current) photoInputRef.current.value = ''

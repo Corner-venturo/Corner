@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
+import { logger } from '@/lib/utils/logger'
 import { TourFormData, MeetingPoint } from '../types'
 import { Plus, X, Upload, User, Loader2, Search } from 'lucide-react'
 import { uploadFileToStorage } from '@/services/storage'
@@ -88,7 +89,7 @@ export function LeaderMeetingSection({
         setShowDropdown(data.length > 0)
       }
     } catch (err) {
-      console.error('Search leaders error:', err)
+      logger.error('Search leaders error:', err)
     } finally {
       setIsSearching(false)
     }
@@ -151,7 +152,7 @@ export function LeaderMeetingSection({
       })
       updateNestedField('leader', 'photo', result.publicUrl)
     } catch (error) {
-      console.error('Failed to upload leader photo:', error)
+      logger.error('Failed to upload leader photo:', error)
     } finally {
       setIsUploadingPhoto(false)
       // 清空 input 以允許重複上傳相同檔案
