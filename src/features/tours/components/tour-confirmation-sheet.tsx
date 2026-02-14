@@ -32,7 +32,7 @@ import { useTourRequests } from '@/stores/tour-request-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { useToast } from '@/components/ui/use-toast'
 import { QuickRequestFromItemDialog } from '@/features/finance/requests/components/QuickRequestFromItemDialog'
-import { useRequirementsData, type QuoteItem, type CategoryKey, CATEGORIES } from '@/components/requirements/hooks/useRequirementsData'
+import { useRequirementsData, type QuoteItem, type CategoryKey, CATEGORIES } from '@/features/confirmations/components/hooks/useRequirementsData'
 import { COMP_TOURS_LABELS } from '../constants/labels'
 
 interface TourConfirmationSheetProps {

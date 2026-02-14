@@ -24,7 +24,7 @@ import { ArchiveReasonDialog } from './ArchiveReasonDialog'
 import { LinkItineraryToTourDialog } from './LinkItineraryToTourDialog'
 import { LinkDocumentsToTourDialog } from './LinkDocumentsToTourDialog'
 import { TourItineraryDialog } from './TourItineraryDialog'
-import { ContractDialog } from '@/components/contracts/ContractDialog'
+import { ContractDialog } from '@/features/contracts/components/ContractDialog'
 import { TourClosingDialog } from './TourClosingDialog'
 // TourControlDialogWrapper 已移除，功能整合到團確單
 import { TourRequirementsDialog } from './TourRequirementsDialog'

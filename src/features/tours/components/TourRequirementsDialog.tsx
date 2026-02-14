@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { RequirementsList } from '@/components/requirements'
+import { RequirementsList } from '@/features/confirmations/components'
 import { TourRequestFormDialog } from '@/features/proposals/components/TourRequestFormDialog'
 import type { Tour } from '@/stores/types'
 

@@ -37,7 +37,7 @@ import {
   type LeaveRequest,
   type LeaveRequestStatus,
 } from '../../hooks/useLeaveRequests'
-import { LEAVE_PAGE_LABELS as L } from '../../constants/labels'
+import { LEAVE_PAGE_LABELS as L } from '@/features/hr/constants/labels'
 
 // 狀態標籤
 const STATUS_LABELS: Record<LeaveRequestStatus, string> = {

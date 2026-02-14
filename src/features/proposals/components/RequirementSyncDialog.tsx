@@ -20,7 +20,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { ClipboardList, X } from 'lucide-react'
 import { TourRequestFormDialog } from './TourRequestFormDialog'
-import { RequirementsList } from '@/components/requirements'
+import { RequirementsList } from '@/features/confirmations/components'
 import { supabase } from '@/lib/supabase/client'
 import { useToast } from '@/components/ui/use-toast'
 import { logger } from '@/lib/utils/logger'

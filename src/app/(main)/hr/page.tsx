@@ -16,9 +16,9 @@ import {
   invalidatePaymentRequests,
 } from '@/data'
 import { Employee } from '@/stores/types'
-import { EmployeeExpandedView } from '@/components/hr/employee-expanded-view'
-import { AddEmployeeForm } from '@/components/hr/add-employee'
-import { SalaryPaymentDialog, SalaryPaymentData } from '@/components/hr/salary-payment-dialog'
+import { EmployeeExpandedView } from '@/features/hr/components/employee-expanded-view'
+import { AddEmployeeForm } from '@/features/hr/components/add-employee'
+import { SalaryPaymentDialog, SalaryPaymentData } from '@/features/hr/components/salary-payment-dialog'
 import { Users, Edit2, Trash2, UserX, DollarSign, Bot } from 'lucide-react'
 import { getRoleConfig, type UserRole } from '@/lib/rbac-config'
 import { TableColumn } from '@/components/ui/enhanced-table'

@@ -13,7 +13,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { toast } from 'sonner'
-import { TreeView, type TreeItem } from '@/components/files'
+import { TreeView, type TreeItem } from '@/features/files/components'
 import { useRouter } from 'next/navigation'
 import { COMP_TOURS_LABELS } from '../constants/labels'
 

@@ -6,7 +6,7 @@
  * 使用共用的 RequirementsList 組件
  */
 
-import { RequirementsList } from '@/components/requirements'
+import { RequirementsList } from '@/features/confirmations/components'
 import type { Tour } from '@/stores/types'
 import type { ProposalPackage } from '@/types/proposal.types'
 

@@ -8,7 +8,7 @@ import { AddReceiptDialog } from '@/features/finance/payments'
 import dynamic from 'next/dynamic'
 
 const AddRequestDialog = dynamic(() => import('@/features/finance/requests/components/AddRequestDialog').then(m => m.AddRequestDialog), { ssr: false })
-import { InvoiceDialog } from '@/components/finance/invoice-dialog'
+import { InvoiceDialog } from '@/features/finance/components/invoice-dialog'
 import type { Order as OrderType } from '@/types/order.types'
 import { logger } from '@/lib/utils/logger'
 import { COMP_TOURS_LABELS, TOUR_ORDERS_LABELS } from '../constants/labels'

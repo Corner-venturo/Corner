@@ -358,3 +358,7 @@ export const RECEIPT_CONFIRM_LABELS = {
   CONFIRM_9972: '確認異常金額',
   CLOSE: '關閉',
 }
+export const FINANCE_LABELS = {
+  LABEL_953: '開立代轉發票',
+  CANCEL: '取消',
+}

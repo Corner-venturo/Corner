@@ -5,7 +5,7 @@ import { getTodayString } from '@/lib/utils/format-date'
 import { useState } from 'react'
 import { Plus, Building2, Calendar, CalendarDays, CalendarClock, Cake } from 'lucide-react'
 import { CALENDAR_LABELS } from '@/features/calendar/constants/labels'
-import { CalendarSettingsDialog } from '@/components/calendar/calendar-settings-dialog'
+import { CalendarSettingsDialog } from '@/features/calendar/components/calendar-settings-dialog'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import {

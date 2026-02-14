@@ -36,7 +36,7 @@ import {
 } from '../../hooks/useAttendanceRecords'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
-import { ATTENDANCE_PAGE_LABELS as L } from '../../constants/labels'
+import { ATTENDANCE_PAGE_LABELS as L } from '@/features/hr/constants/labels'
 
 interface Employee {
   id: string

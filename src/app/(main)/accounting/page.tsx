@@ -16,9 +16,9 @@ import {
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
-import { AddAccountDialog } from '@/components/accounting/add-account-dialog'
-import { AddTransactionDialog } from '@/components/accounting/add-transaction-dialog'
-import { AccountsManagementDialog } from '@/components/accounting/accounts-management-dialog'
+import { AddAccountDialog } from '@/features/erp-accounting/components/add-account-dialog'
+import { AddTransactionDialog } from '@/features/erp-accounting/components/add-transaction-dialog'
+import { AccountsManagementDialog } from '@/features/erp-accounting/components/accounts-management-dialog'
 import {
   Card,
   CardContent,

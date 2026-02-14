@@ -32,7 +32,7 @@ import {
   PAYROLL_PERIOD_STATUS_LABELS,
   PAYROLL_PERIOD_STATUS_COLORS,
 } from '../../hooks/usePayroll'
-import { PAYROLL_PAGE_LABELS as L } from '../../constants/labels'
+import { PAYROLL_PAGE_LABELS as L } from '@/features/hr/constants/labels'
 
 export function PayrollManagementPage() {
   const {
