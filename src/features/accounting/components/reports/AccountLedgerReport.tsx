@@ -17,6 +17,7 @@ import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
 import { formatDate } from '@/lib/utils/format-date'
 import { logger } from '@/lib/utils/logger'
+import { ACCOUNTING_REPORT_LABELS } from '../../constants/labels'
 
 interface AccountOption {
   id: string
@@ -212,11 +213,11 @@ export function AccountLedgerReport() {
   const handleExport = () => {
     if (!selectedAccount) return
 
-    const headers = ['日期', '傳票編號', '摘要', '借方', '貸方', '餘額']
+    const headers = [ACCOUNTING_REPORT_LABELS.GL_COL_DATE, ACCOUNTING_REPORT_LABELS.GL_COL_VOUCHER_NO, ACCOUNTING_REPORT_LABELS.GL_COL_SUMMARY, ACCOUNTING_REPORT_LABELS.GL_COL_DEBIT, ACCOUNTING_REPORT_LABELS.GL_COL_CREDIT, ACCOUNTING_REPORT_LABELS.GL_COL_BALANCE]
     
     // 期初餘額行
     const rows: string[][] = [
-      ['', '', '期初餘額', '', '', openingBalance.toString()],
+      ['', '', ACCOUNTING_REPORT_LABELS.AL_OPENING_BALANCE, '', '', openingBalance.toString()],
     ]
 
     // 分錄行
@@ -235,7 +236,7 @@ export function AccountLedgerReport() {
     rows.push([
       '',
       '',
-      '期末餘額',
+      ACCOUNTING_REPORT_LABELS.AL_CLOSING_BALANCE,
       totals.debit.toString(),
       totals.credit.toString(),
       totals.closingBalance.toString(),
@@ -260,13 +261,13 @@ export function AccountLedgerReport() {
   const columns: Column<LedgerEntry>[] = [
     {
       key: 'date',
-      label: '日期',
+      label: ACCOUNTING_REPORT_LABELS.GL_COL_DATE,
       width: '120px',
       render: (_, row) => <DateCell date={row.date} />,
     },
     {
       key: 'voucher_no',
-      label: '傳票編號',
+      label: ACCOUNTING_REPORT_LABELS.GL_COL_VOUCHER_NO,
       width: '140px',
       render: (_, row) => (
         <span className="font-mono text-morandi-gold">{row.voucher_no}</span>
@@ -274,14 +275,14 @@ export function AccountLedgerReport() {
     },
     {
       key: 'description',
-      label: '摘要',
+      label: ACCOUNTING_REPORT_LABELS.GL_COL_SUMMARY,
       render: (_, row) => (
         <span className="text-morandi-secondary">{row.description || '-'}</span>
       ),
     },
     {
       key: 'debit_amount',
-      label: '借方',
+      label: ACCOUNTING_REPORT_LABELS.GL_COL_DEBIT,
       width: '120px',
       align: 'right',
       render: (_, row) => (
@@ -290,7 +291,7 @@ export function AccountLedgerReport() {
     },
     {
       key: 'credit_amount',
-      label: '貸方',
+      label: ACCOUNTING_REPORT_LABELS.GL_COL_CREDIT,
       width: '120px',
       align: 'right',
       render: (_, row) => (
@@ -299,7 +300,7 @@ export function AccountLedgerReport() {
     },
     {
       key: 'balance',
-      label: '餘額',
+      label: ACCOUNTING_REPORT_LABELS.GL_COL_BALANCE,
       width: '140px',
       align: 'right',
       render: (_, row) => (
@@ -314,13 +315,13 @@ export function AccountLedgerReport() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="科目明細帳"
+        title={ACCOUNTING_REPORT_LABELS.AL_TITLE}
         icon={FileText}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '會計', href: '/erp-accounting' },
-          { label: '報表', href: '/erp-accounting/reports' },
-          { label: '科目明細帳', href: '/erp-accounting/reports/account-ledger' },
+          { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_ACCOUNTING, href: '/erp-accounting' },
+          { label: ACCOUNTING_REPORT_LABELS.AL_BREADCRUMB_REPORTS, href: '/erp-accounting/reports' },
+          { label: ACCOUNTING_REPORT_LABELS.AL_TITLE, href: '/erp-accounting/reports/account-ledger' },
         ]}
         actions={
           <Button
@@ -330,7 +331,7 @@ export function AccountLedgerReport() {
             className="gap-2"
           >
             <Download size={16} />
-            匯出 CSV
+            {ACCOUNTING_REPORT_LABELS.EXPORT_CSV}
           </Button>
         }
       />
@@ -340,13 +341,13 @@ export function AccountLedgerReport() {
         <div className="flex flex-wrap items-end gap-4">
           {/* 科目選擇（必選） */}
           <div className="flex flex-col gap-1 min-w-[300px]">
-            <label className="text-sm text-morandi-primary">選擇科目 *</label>
+            <label className="text-sm text-morandi-primary">{ACCOUNTING_REPORT_LABELS.AL_SELECT_ACCOUNT}</label>
             <Combobox
               value={selectedAccountId}
               onChange={setSelectedAccountId}
               options={accountOptions}
-              placeholder={accountsLoading ? '載入中...' : '請選擇科目'}
-              emptyMessage="找不到科目"
+              placeholder={accountsLoading ? ACCOUNTING_REPORT_LABELS.GL_ACCOUNT_LOADING : ACCOUNTING_REPORT_LABELS.AL_SELECT_ACCOUNT_PLACEHOLDER}
+              emptyMessage={ACCOUNTING_REPORT_LABELS.GL_ACCOUNT_NOT_FOUND}
               className="flex-1"
             />
           </div>
@@ -358,13 +359,13 @@ export function AccountLedgerReport() {
               <DatePicker
                 value={startDate}
                 onChange={setStartDate}
-                placeholder="開始日期"
+                placeholder={ACCOUNTING_REPORT_LABELS.IS_START_DATE}
               />
-              <span className="text-morandi-secondary">至</span>
+              <span className="text-morandi-secondary">{ACCOUNTING_REPORT_LABELS.IS_TO}</span>
               <DatePicker
                 value={endDate}
                 onChange={setEndDate}
-                placeholder="結束日期"
+                placeholder={ACCOUNTING_REPORT_LABELS.IS_END_DATE}
               />
             </div>
           </div>
@@ -375,7 +376,7 @@ export function AccountLedgerReport() {
             className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
             <Search size={16} />
-            查詢
+            {ACCOUNTING_REPORT_LABELS.QUERY}
           </Button>
         </div>
       </div>
@@ -395,14 +396,14 @@ export function AccountLedgerReport() {
             <div className="mb-4 p-4 bg-morandi-container/30 rounded-lg border border-border">
               <div className="flex items-center gap-4">
                 <div>
-                  <span className="text-sm text-morandi-secondary">科目</span>
+                  <span className="text-sm text-morandi-secondary">{ACCOUNTING_REPORT_LABELS.AL_ACCOUNT_LABEL}</span>
                   <div className="font-medium text-morandi-primary">
                     <span className="font-mono">{selectedAccount.code}</span>
                     <span className="ml-2">{selectedAccount.name}</span>
                   </div>
                 </div>
                 <div className="ml-auto text-right">
-                  <span className="text-sm text-morandi-secondary">期初餘額</span>
+                  <span className="text-sm text-morandi-secondary">{ACCOUNTING_REPORT_LABELS.AL_OPENING_BALANCE}</span>
                   <div className="font-mono font-medium">
                     <CurrencyCell 
                       amount={openingBalance} 
@@ -423,22 +424,22 @@ export function AccountLedgerReport() {
             {/* 合計列 */}
             <div className="mt-4 p-4 bg-morandi-container/30 rounded-lg border border-border">
               <div className="flex justify-between items-center">
-                <span className="font-medium text-morandi-primary">期間合計</span>
+                <span className="font-medium text-morandi-primary">{ACCOUNTING_REPORT_LABELS.AL_PERIOD_TOTAL}</span>
                 <div className="flex gap-8">
                   <div className="text-right">
-                    <span className="text-sm text-morandi-secondary block">借方合計</span>
+                    <span className="text-sm text-morandi-secondary block">{ACCOUNTING_REPORT_LABELS.GL_DEBIT_TOTAL}</span>
                     <span className="font-mono font-medium text-morandi-primary">
                       NT$ {totals.debit.toLocaleString()}
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-sm text-morandi-secondary block">貸方合計</span>
+                    <span className="text-sm text-morandi-secondary block">{ACCOUNTING_REPORT_LABELS.GL_CREDIT_TOTAL}</span>
                     <span className="font-mono font-medium text-morandi-primary">
                       NT$ {totals.credit.toLocaleString()}
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-sm text-morandi-secondary block">期末餘額</span>
+                    <span className="text-sm text-morandi-secondary block">{ACCOUNTING_REPORT_LABELS.AL_CLOSING_BALANCE}</span>
                     <span className={`font-mono font-medium ${totals.closingBalance >= 0 ? 'text-morandi-primary' : 'text-morandi-red'}`}>
                       NT$ {totals.closingBalance.toLocaleString()}
                     </span>
@@ -451,7 +452,7 @@ export function AccountLedgerReport() {
           <div className="flex flex-col items-center justify-center h-full text-center">
             <FileText size={48} className="text-morandi-muted mb-4" />
             <p className="text-morandi-secondary">
-              {selectedAccountId ? '請點擊查詢按鈕' : '請選擇科目並點擊查詢'}
+              {selectedAccountId ? ACCOUNTING_REPORT_LABELS.AL_EMPTY_WITH_ACCOUNT : ACCOUNTING_REPORT_LABELS.AL_EMPTY}
             </p>
           </div>
         ) : null}

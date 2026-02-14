@@ -14,6 +14,7 @@ import { useAccountingReports, type IncomeStatementResult } from '../../hooks/us
 import { formatDate } from '@/lib/utils/format-date'
 import { formatCurrency } from '@/lib/utils/format-currency'
 import { logger } from '@/lib/utils/logger'
+import { ACCOUNTING_REPORT_LABELS } from '../../constants/labels'
 
 function formatPercent(value: number): string {
   return `${value.toFixed(1)}%`
@@ -59,38 +60,38 @@ export function IncomeStatementReport() {
     const rows: string[][] = []
 
     // 收入
-    rows.push(['一、營業收入', '', ''])
+    rows.push([ACCOUNTING_REPORT_LABELS.IS_REVENUE_SECTION, '', ''])
     data.revenue.forEach(e => {
       rows.push([`  ${e.account_code} ${e.account_name}`, e.amount.toString(), formatPercent(e.percentage)])
     })
-    rows.push(['營業收入合計', data.total_revenue.toString(), '100%'])
+    rows.push([ACCOUNTING_REPORT_LABELS.IS_REVENUE_TOTAL, data.total_revenue.toString(), '100%'])
     rows.push(['', '', ''])
 
     // 成本
-    rows.push(['二、營業成本', '', ''])
+    rows.push([ACCOUNTING_REPORT_LABELS.IS_COST_SECTION, '', ''])
     data.cost.forEach(e => {
       rows.push([`  ${e.account_code} ${e.account_name}`, e.amount.toString(), formatPercent(e.percentage)])
     })
-    rows.push(['營業成本合計', data.total_cost.toString(), formatPercent((data.total_cost / data.total_revenue) * 100)])
+    rows.push([ACCOUNTING_REPORT_LABELS.IS_COST_TOTAL, data.total_cost.toString(), formatPercent((data.total_cost / data.total_revenue) * 100)])
     rows.push(['', '', ''])
 
     // 毛利
-    rows.push(['三、營業毛利', data.gross_profit.toString(), formatPercent((data.gross_profit / data.total_revenue) * 100)])
+    rows.push([ACCOUNTING_REPORT_LABELS.IS_GROSS_PROFIT, data.gross_profit.toString(), formatPercent((data.gross_profit / data.total_revenue) * 100)])
     rows.push(['', '', ''])
 
     // 費用
-    rows.push(['四、營業費用', '', ''])
+    rows.push([ACCOUNTING_REPORT_LABELS.IS_EXPENSE_SECTION, '', ''])
     data.expense.forEach(e => {
       rows.push([`  ${e.account_code} ${e.account_name}`, e.amount.toString(), formatPercent(e.percentage)])
     })
-    rows.push(['營業費用合計', data.total_expense.toString(), formatPercent((data.total_expense / data.total_revenue) * 100)])
+    rows.push([ACCOUNTING_REPORT_LABELS.IS_EXPENSE_TOTAL, data.total_expense.toString(), formatPercent((data.total_expense / data.total_revenue) * 100)])
     rows.push(['', '', ''])
 
     // 淨利
-    rows.push(['五、營業淨利', data.operating_income.toString(), formatPercent((data.operating_income / data.total_revenue) * 100)])
+    rows.push([ACCOUNTING_REPORT_LABELS.IS_OPERATING_INCOME, data.operating_income.toString(), formatPercent((data.operating_income / data.total_revenue) * 100)])
 
     const csvContent = [
-      ['項目', '金額', '佔收入比例'].join(','),
+      [ACCOUNTING_REPORT_LABELS.IS_CSV_ITEM, ACCOUNTING_REPORT_LABELS.IS_CSV_AMOUNT, ACCOUNTING_REPORT_LABELS.IS_CSV_RATIO].join(','),
       ...rows.map(row => row.map(cell => `"${cell}"`).join(',')),
     ].join('\n')
 
@@ -104,12 +105,12 @@ export function IncomeStatementReport() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="損益表"
+        title={ACCOUNTING_REPORT_LABELS.IS_TITLE}
         icon={TrendingUp}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '會計', href: '/erp-accounting' },
-          { label: '損益表', href: '/erp-accounting/reports/income-statement' },
+          { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_ACCOUNTING, href: '/erp-accounting' },
+          { label: ACCOUNTING_REPORT_LABELS.IS_TITLE, href: '/erp-accounting/reports/income-statement' },
         ]}
         actions={
           <Button
@@ -119,7 +120,7 @@ export function IncomeStatementReport() {
             className="gap-2"
           >
             <Download size={16} />
-            匯出 CSV
+            {ACCOUNTING_REPORT_LABELS.EXPORT_CSV}
           </Button>
         }
       />
@@ -133,20 +134,20 @@ export function IncomeStatementReport() {
               <DatePicker
                 value={startDate}
                 onChange={setStartDate}
-                placeholder="開始日期"
+                placeholder={ACCOUNTING_REPORT_LABELS.IS_START_DATE}
               />
-              <span className="text-morandi-secondary">至</span>
+              <span className="text-morandi-secondary">{ACCOUNTING_REPORT_LABELS.IS_TO}</span>
               <DatePicker
                 value={endDate}
                 onChange={setEndDate}
-                placeholder="結束日期"
+                placeholder={ACCOUNTING_REPORT_LABELS.IS_END_DATE}
               />
             </div>
           </div>
 
           <Button onClick={handleSearch} disabled={loading} className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white">
             <Search size={16} />
-            查詢
+            {ACCOUNTING_REPORT_LABELS.QUERY}
           </Button>
         </div>
       </div>
@@ -167,7 +168,7 @@ export function IncomeStatementReport() {
               <div className="bg-card p-4 rounded-lg border border-border">
                 <div className="flex items-center gap-2 text-morandi-secondary mb-2">
                   <ArrowUp size={16} className="text-morandi-green" />
-                  <span>營業收入</span>
+                  <span>{ACCOUNTING_REPORT_LABELS.IS_REVENUE_LABEL}</span>
                 </div>
                 <div className="text-2xl font-bold text-morandi-green">
                   {formatCurrency(data.total_revenue)}
@@ -177,7 +178,7 @@ export function IncomeStatementReport() {
               <div className="bg-card p-4 rounded-lg border border-border">
                 <div className="flex items-center gap-2 text-morandi-secondary mb-2">
                   <ArrowDown size={16} className="text-morandi-red" />
-                  <span>總支出</span>
+                  <span>{ACCOUNTING_REPORT_LABELS.IS_TOTAL_EXPENDITURE}</span>
                 </div>
                 <div className="text-2xl font-bold text-morandi-red">
                   {formatCurrency(data.total_cost + data.total_expense)}
@@ -187,7 +188,7 @@ export function IncomeStatementReport() {
               <div className="bg-card p-4 rounded-lg border border-border">
                 <div className="flex items-center gap-2 text-morandi-secondary mb-2">
                   <Minus size={16} className={data.operating_income >= 0 ? 'text-morandi-green' : 'text-morandi-red'} />
-                  <span>營業淨利</span>
+                  <span>{ACCOUNTING_REPORT_LABELS.IS_OPERATING_INCOME}</span>
                 </div>
                 <div className={`text-2xl font-bold ${data.operating_income >= 0 ? 'text-morandi-green' : 'text-morandi-red'}`}>
                   {formatCurrency(data.operating_income)}
@@ -200,7 +201,7 @@ export function IncomeStatementReport() {
               {/* 一、營業收入 */}
               <div className="border-b border-border">
                 <div className="p-4 bg-morandi-container/30">
-                  <h3 className="font-medium text-morandi-primary">一、營業收入</h3>
+                  <h3 className="font-medium text-morandi-primary">{ACCOUNTING_REPORT_LABELS.IS_REVENUE_SECTION}</h3>
                 </div>
                 <div className="divide-y divide-border">
                   {data.revenue.map(item => (
@@ -217,7 +218,7 @@ export function IncomeStatementReport() {
                   ))}
                 </div>
                 <div className="p-4 bg-green-50 flex items-center justify-between font-medium">
-                  <span>營業收入合計</span>
+                  <span>{ACCOUNTING_REPORT_LABELS.IS_REVENUE_TOTAL}</span>
                   <span className="font-mono text-morandi-green">{formatCurrency(data.total_revenue)}</span>
                 </div>
               </div>
@@ -225,7 +226,7 @@ export function IncomeStatementReport() {
               {/* 二、營業成本 */}
               <div className="border-b border-border">
                 <div className="p-4 bg-morandi-container/30">
-                  <h3 className="font-medium text-morandi-primary">二、營業成本</h3>
+                  <h3 className="font-medium text-morandi-primary">{ACCOUNTING_REPORT_LABELS.IS_COST_SECTION}</h3>
                 </div>
                 <div className="divide-y divide-border">
                   {data.cost.map(item => (
@@ -242,7 +243,7 @@ export function IncomeStatementReport() {
                   ))}
                 </div>
                 <div className="p-4 bg-orange-50 flex items-center justify-between font-medium">
-                  <span>營業成本合計</span>
+                  <span>{ACCOUNTING_REPORT_LABELS.IS_COST_TOTAL}</span>
                   <span className="font-mono text-orange-600">{formatCurrency(data.total_cost)}</span>
                 </div>
               </div>
@@ -250,7 +251,7 @@ export function IncomeStatementReport() {
               {/* 三、營業毛利 */}
               <div className="p-4 bg-blue-50 border-b border-border">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-medium text-blue-800">三、營業毛利</h3>
+                  <h3 className="font-medium text-blue-800">{ACCOUNTING_REPORT_LABELS.IS_GROSS_PROFIT}</h3>
                   <div className="flex items-center gap-4">
                     <span className="font-mono font-bold text-blue-800">{formatCurrency(data.gross_profit)}</span>
                     <span className="text-sm text-blue-600 w-16 text-right">
@@ -263,7 +264,7 @@ export function IncomeStatementReport() {
               {/* 四、營業費用 */}
               <div className="border-b border-border">
                 <div className="p-4 bg-morandi-container/30">
-                  <h3 className="font-medium text-morandi-primary">四、營業費用</h3>
+                  <h3 className="font-medium text-morandi-primary">{ACCOUNTING_REPORT_LABELS.IS_EXPENSE_SECTION}</h3>
                 </div>
                 <div className="divide-y divide-border">
                   {data.expense.map(item => (
@@ -280,7 +281,7 @@ export function IncomeStatementReport() {
                   ))}
                 </div>
                 <div className="p-4 bg-red-50 flex items-center justify-between font-medium">
-                  <span>營業費用合計</span>
+                  <span>{ACCOUNTING_REPORT_LABELS.IS_EXPENSE_TOTAL}</span>
                   <span className="font-mono text-morandi-red">{formatCurrency(data.total_expense)}</span>
                 </div>
               </div>
@@ -289,7 +290,7 @@ export function IncomeStatementReport() {
               <div className={`p-6 ${data.operating_income >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
                 <div className="flex items-center justify-between">
                   <h3 className={`text-lg font-bold ${data.operating_income >= 0 ? 'text-green-800' : 'text-red-800'}`}>
-                    五、營業淨利（淨損）
+                    {ACCOUNTING_REPORT_LABELS.IS_OPERATING_INCOME_LOSS}
                   </h3>
                   <div className="flex items-center gap-4">
                     <span className={`font-mono text-2xl font-bold ${data.operating_income >= 0 ? 'text-green-800' : 'text-red-800'}`}>
@@ -306,7 +307,7 @@ export function IncomeStatementReport() {
         ) : !loading ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <TrendingUp size={48} className="text-morandi-muted mb-4" />
-            <p className="text-morandi-secondary">請選擇日期範圍並點擊查詢</p>
+            <p className="text-morandi-secondary">{ACCOUNTING_REPORT_LABELS.IS_EMPTY}</p>
           </div>
         ) : null}
       </div>

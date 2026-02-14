@@ -55,9 +55,16 @@ export const ACCOUNTING_REPORT_LABELS = {
   GL_DIFFERENCE: '差額',
 
   // Account Ledger
-  AL_TITLE: '明細帳',
-  AL_SELECT_ACCOUNT: '選擇科目',
-  AL_EMPTY: '請選擇科目和日期範圍後點擊查詢',
+  AL_TITLE: '科目明細帳',
+  AL_SELECT_ACCOUNT: '選擇科目 *',
+  AL_EMPTY: '請選擇科目並點擊查詢',
+  AL_EMPTY_WITH_ACCOUNT: '請點擊查詢按鈕',
+  AL_BREADCRUMB_REPORTS: '報表',
+  AL_SELECT_ACCOUNT_PLACEHOLDER: '請選擇科目',
+  AL_OPENING_BALANCE: '期初餘額',
+  AL_CLOSING_BALANCE: '期末餘額',
+  AL_PERIOD_TOTAL: '期間合計',
+  AL_ACCOUNT_LABEL: '科目',
 
   // Balance Sheet
   BS_TITLE: '資產負債表',
@@ -88,6 +95,23 @@ export const ACCOUNTING_REPORT_LABELS = {
   IS_TOTAL_COST: '成本合計',
   IS_NET_INCOME: '本期損益',
   IS_EMPTY: '請選擇日期範圍並點擊查詢',
+  IS_REVENUE_SECTION: '一、營業收入',
+  IS_COST_SECTION: '二、營業成本',
+  IS_GROSS_PROFIT: '三、營業毛利',
+  IS_EXPENSE_SECTION: '四、營業費用',
+  IS_OPERATING_INCOME: '五、營業淨利',
+  IS_OPERATING_INCOME_LOSS: '五、營業淨利（淨損）',
+  IS_REVENUE_TOTAL: '營業收入合計',
+  IS_COST_TOTAL: '營業成本合計',
+  IS_EXPENSE_TOTAL: '營業費用合計',
+  IS_REVENUE_LABEL: '營業收入',
+  IS_TOTAL_EXPENDITURE: '總支出',
+  IS_CSV_ITEM: '項目',
+  IS_CSV_AMOUNT: '金額',
+  IS_CSV_RATIO: '佔收入比例',
+  IS_START_DATE: '開始日期',
+  IS_TO: '至',
+  IS_END_DATE: '結束日期',
 
   // Cash Flow Statement
   CF_TITLE: '現金流量表',
