@@ -528,9 +528,9 @@ export default function CustomerGroupsPage() {
       <FormDialog
         open={addMemberDialogOpen}
         onOpenChange={setAddMemberDialogOpen}
-        title={`新增成員到「${selectedGroup?.name || ''}」`}
+        title={`${CG_LABELS.ADD_MEMBER_PREFIX}${selectedGroup?.name || ''}${CG_LABELS.ADD_MEMBER_SUFFIX}`}
         onSubmit={handleAddMember}
-        submitLabel="新增"
+        submitLabel={CG_LABELS.ADD}
         maxWidth="md"
       >
         <div className="space-y-4">

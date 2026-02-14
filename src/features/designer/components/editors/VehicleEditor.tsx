@@ -33,8 +33,8 @@ import { DESIGNER_LABELS } from './constants/labels'
  * 分組類型選項
  */
 const GROUP_TYPE_OPTIONS: { value: GroupType; label: string; icon: typeof Bus }[] = [
-  { value: 'vehicle', label: '分車', icon: Bus },
-  { value: 'table', label: '分桌', icon: Users },
+  { value: 'vehicle', label: DESIGNER_LABELS.TAB_VEHICLE, icon: Bus },
+  { value: 'table', label: DESIGNER_LABELS.TAB_TABLE, icon: Users },
 ]
 
 interface VehicleEditorProps {
@@ -102,7 +102,7 @@ export function VehicleEditor({
     const newVehicle: VehicleData = {
       id: `vehicle-${Date.now()}`,
       groupType: type,
-      vehicleName: isNewTable ? `${sameTypeCount + 1}桌` : `${sameTypeCount + 1}號車`,
+      vehicleName: isNewTable ? `${sameTypeCount + 1}${DESIGNER_LABELS.TABLE_SUFFIX}` : `${sameTypeCount + 1}${DESIGNER_LABELS.VEHICLE_SUFFIX}`,
       vehicleType: '',
       capacity: isNewTable ? 10 : 43,
       driverName: '',
@@ -248,8 +248,8 @@ export function VehicleEditor({
                   const newVehicle: VehicleData = {
                     id: `vehicle-${Date.now()}`,
                     groupType: opt.value,
-                    vehicleName: opt.value === 'table' ? '1桌' : '1號車',
-                    vehicleType: opt.value === 'table' ? '10人桌' : '43人座大巴',
+                    vehicleName: opt.value === 'table' ? `1${DESIGNER_LABELS.TABLE_SUFFIX}` : `1${DESIGNER_LABELS.VEHICLE_SUFFIX}`,
+                    vehicleType: opt.value === 'table' ? DESIGNER_LABELS.DEFAULT_TABLE_TYPE : DESIGNER_LABELS.DEFAULT_VEHICLE_TYPE,
                     capacity: opt.value === 'table' ? 10 : 43,
                     driverName: '',
                     driverPhone: '',
@@ -375,7 +375,7 @@ export function VehicleEditor({
                 <Input
                   value={vehicle.vehicleName || ''}
                   onChange={(e) => updateVehicleField(vehicleIdx, 'vehicleName', e.target.value)}
-                  placeholder={`${vehicleNumber}號車`}
+                  placeholder={`${vehicleNumber}${DESIGNER_LABELS.VEHICLE_SUFFIX}`}
                   className="h-7 text-xs font-medium flex-1"
                 />
                 <span className="text-[10px] text-morandi-secondary whitespace-nowrap">{memberCount} 人</span>
@@ -439,7 +439,7 @@ export function VehicleEditor({
                 <Input
                   value={vehicle.vehicleName || ''}
                   onChange={(e) => updateVehicleField(vehicleIdx, 'vehicleName', e.target.value)}
-                  placeholder={`${tableNumber}桌`}
+                  placeholder={`${tableNumber}${DESIGNER_LABELS.TABLE_SUFFIX}`}
                   className="h-7 text-xs font-medium flex-1"
                 />
                 <span className="text-[10px] text-morandi-secondary whitespace-nowrap">{memberCount} 人</span>
@@ -451,7 +451,7 @@ export function VehicleEditor({
                 <div className="p-2 space-y-2 border-t border-border/30">
                   <div className="flex gap-2">
                     <Input value={vehicle.vehicleType || ''} onChange={(e) => updateVehicleField(vehicleIdx, 'vehicleType', e.target.value)} placeholder={DESIGNER_LABELS.LABEL_4403} className="h-7 text-xs flex-1" />
-                    <Input value={vehicle.notes || ''} onChange={(e) => updateVehicleField(vehicleIdx, 'notes', e.target.value)} placeholder="備註" className="h-7 text-xs flex-1" />
+                    <Input value={vehicle.notes || ''} onChange={(e) => updateVehicleField(vehicleIdx, 'notes', e.target.value)} placeholder={DESIGNER_LABELS.PLACEHOLDER_NOTES} className="h-7 text-xs flex-1" />
                   </div>
                   {vehicle.members?.map((member, memberIdx) => (
                     <div key={member.id} className="flex items-center gap-1.5 p-1.5 rounded bg-morandi-container/10">

@@ -83,4 +83,13 @@ export const DESIGNER_LABELS = {
   IMPORT_HINT: '請點擊上方按鈕從行程帶入飯店',
   NO_HOTEL_DATA: '尚無飯店資料，請手動新增',
   UNNAMED_HOTEL: '未命名飯店',
+  TAB_VEHICLE: '分車',
+  TAB_TABLE: '分桌',
+  VEHICLE_SUFFIX: '號車',
+  TABLE_SUFFIX: '桌',
+  DEFAULT_VEHICLE_TYPE: '43人座大巴',
+  DEFAULT_TABLE_TYPE: '10人桌',
+  PLACEHOLDER_NOTES: '備註',
+  PLACEHOLDER_NAME: '姓名',
+  PLACEHOLDER_NAME_LIST: '輸入姓名或貼上名單...',
 }

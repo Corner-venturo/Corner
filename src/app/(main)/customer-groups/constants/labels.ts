@@ -13,4 +13,7 @@ export const LABELS = {
   EDIT_6630: '編輯客戶群組',
   SEARCH_1890: '搜尋並選擇客戶...',
   NOT_FOUND_6103: '所有客戶都已加入此群組，或目前沒有可用的客戶。',
+  ADD_MEMBER_PREFIX: '新增成員到「',
+  ADD_MEMBER_SUFFIX: '」',
+  ADD: '新增',
 }

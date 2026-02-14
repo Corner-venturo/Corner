@@ -170,7 +170,7 @@ export function HotelEditor({
                 <Hotel size={12} className="text-morandi-gold shrink-0" />
                 <span className="flex-1 truncate">{h.name}</span>
                 <span className="text-morandi-muted text-[10px]">
-                  {h.nights > 1 ? `${h.nights}晚` : ''} {h.days}
+                  {h.nights > 1 ? `${h.nights}${DESIGNER_LABELS.NIGHTS_SUFFIX}` : ''} {h.days}
                 </span>
               </li>
             ))}
@@ -190,7 +190,7 @@ export function HotelEditor({
       {extractedHotels.length > 0 && hotels.length > 0 && (
         <div className="flex items-center justify-between text-[10px]">
           <span className="text-morandi-secondary">
-            已選擇 <span className="font-medium text-morandi-gold">{enabledCount}</span> / {hotels.length} 間飯店介紹
+            {DESIGNER_LABELS.SELECTED_COUNT_PREFIX}<span className="font-medium text-morandi-gold">{enabledCount}</span>{DESIGNER_LABELS.SELECTED_COUNT_MID}{hotels.length}{DESIGNER_LABELS.SELECTED_COUNT_SUFFIX}
           </span>
           <button
             type="button"
@@ -210,7 +210,7 @@ export function HotelEditor({
       <div className="space-y-2">
         {hotels.length === 0 ? (
           <div className="p-3 text-center text-xs text-morandi-muted border border-dashed border-border rounded">
-            {extractedHotels.length > 0 ? '請點擊上方按鈕從行程帶入飯店' : '尚無飯店資料，請手動新增'}
+            {extractedHotels.length > 0 ? DESIGNER_LABELS.IMPORT_HINT : DESIGNER_LABELS.NO_HOTEL_DATA}
           </div>
         ) : (
           hotels.map((hotel, idx) => (
@@ -253,7 +253,7 @@ export function HotelEditor({
                   onClick={() => setExpandedIndex(expandedIndex === idx ? null : idx)}
                 >
                   <Hotel size={12} className="inline mr-1.5" />
-                  {hotel.nameZh || '未命名飯店'}
+                  {hotel.nameZh || DESIGNER_LABELS.UNNAMED_HOTEL}
                 </button>
 
                 {/* 目前顯示標記 */}
