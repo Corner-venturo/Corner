@@ -16,6 +16,7 @@ import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { CurrencyCell, DateCell } from '@/components/table-cells'
 import { AlertCircle, Calendar, TrendingUp, TrendingDown, Loader2 } from 'lucide-react'
 import { useUnclosedTours, UnclosedTourData } from '@/features/finance/reports/hooks/useUnclosedTours'
+import { UNCLOSED_TOURS_LABELS } from '../../constants/labels'
 
 // 統計卡片
 function StatCard({
@@ -178,7 +179,7 @@ export default function UnclosedToursReportPage() {
           <AlertCircle size={20} className="text-morandi-gold flex-shrink-0 mt-0.5" />
           <div>
             <p className="text-sm text-morandi-primary">
-              此報表顯示<strong>回程日 + 7 天已過</strong>但尚未執行結案的團體。
+              {UNCLOSED_TOURS_LABELS.DESCRIPTION}
               建議儘快完成結案作業以確保財務數據準確。
             </p>
           </div>

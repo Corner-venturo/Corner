@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { useRequestTable } from '@/features/finance/requests/hooks/useRequestTable'
 import { PaymentRequest } from '@/stores/types'
+import { REQUESTS_PAGE_LABELS } from '../constants/labels'
 
 // Dynamic imports for dialogs (reduce initial bundle)
 const AddRequestDialog = dynamic(
@@ -24,7 +25,7 @@ const RequestDetailDialog = dynamic(
       <Dialog open>
         <DialogContent level={1} className="bg-transparent border-none shadow-none flex items-center justify-center">
           <VisuallyHidden>
-            <DialogTitle>載入中</DialogTitle>
+            <DialogTitle>{REQUESTS_PAGE_LABELS.LOADING}</DialogTitle>
           </VisuallyHidden>
           <Loader2 className="animate-spin text-white" size={32} />
         </DialogContent>

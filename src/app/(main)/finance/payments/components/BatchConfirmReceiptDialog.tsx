@@ -38,6 +38,7 @@ import { RECEIPT_TYPE_LABELS, ReceiptType } from '@/types/receipt.types'
 import { CurrencyCell } from '@/components/table-cells'
 import type { DbReceiptItem } from '@/types/receipt.types'
 import { logger } from '@/lib/utils/logger'
+import { BATCH_CONFIRM_LABELS } from '../../constants/labels'
 
 interface BatchConfirmReceiptDialogProps {
   open: boolean
@@ -308,8 +309,8 @@ export function BatchConfirmReceiptDialog({
             <div className="flex-1 flex items-center justify-center text-morandi-secondary">
               <div className="text-center">
                 <CheckCircle className="h-12 w-12 mx-auto mb-4 text-morandi-green" />
-                <p className="text-lg font-medium">沒有待確認的收款品項</p>
-                <p className="text-sm mt-1">所有收款品項都已確認完成</p>
+                <p className="text-lg font-medium">{BATCH_CONFIRM_LABELS.NO_PENDING_ITEMS}</p>
+                <p className="text-sm mt-1">{BATCH_CONFIRM_LABELS.ALL_CONFIRMED}</p>
               </div>
             </div>
           ) : (

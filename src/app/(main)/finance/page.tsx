@@ -1,5 +1,7 @@
 'use client'
 
+import { FINANCE_PAGE_LABELS } from './constants/labels'
+
 import React, { useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
@@ -142,7 +144,7 @@ export default function FinancePage() {
     return (
        <div className="h-full flex flex-col items-center justify-center">
         <Loader2 className="w-12 h-12 animate-spin text-morandi-gold" />
-        <p className="mt-4 text-morandi-secondary">正在載入財務資料...</p>
+        <p className="mt-4 text-morandi-secondary">{FINANCE_PAGE_LABELS.LOADING_DATA}</p>
       </div>
     )
   }
@@ -158,7 +160,7 @@ export default function FinancePage() {
                       <Card className="p-4 bg-morandi-green/10 shadow-sm hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm text-morandi-secondary mb-1">總收入</p>
+                            <p className="text-sm text-morandi-secondary mb-1">{FINANCE_PAGE_LABELS.TOTAL_INCOME}</p>
                             <div className="text-2xl font-bold">
                               <CurrencyCell amount={totalReceivable} variant="income" />
                             </div>
@@ -170,7 +172,7 @@ export default function FinancePage() {
                       <Card className="p-4 bg-morandi-red/10 shadow-sm hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm text-morandi-secondary mb-1">總支出</p>
+                            <p className="text-sm text-morandi-secondary mb-1">{FINANCE_PAGE_LABELS.TOTAL_EXPENSE}</p>
                             <div className="text-2xl font-bold">
                               <CurrencyCell amount={totalPayable} variant="expense" />
                             </div>
@@ -182,7 +184,7 @@ export default function FinancePage() {
                       <Card className="p-4 bg-morandi-primary/10 shadow-sm hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm text-morandi-secondary mb-1">淨利潤</p>
+                            <p className="text-sm text-morandi-secondary mb-1">{FINANCE_PAGE_LABELS.NET_PROFIT}</p>
                             <div className="text-2xl font-bold">
                               <CurrencyCell amount={netProfit} variant={netProfit >= 0 ? 'default' : 'expense'} />
                             </div>
@@ -194,7 +196,7 @@ export default function FinancePage() {
                       <Card className="p-4 bg-morandi-gold/10 shadow-sm hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm text-morandi-secondary mb-1">待確認款項</p>
+                            <p className="text-sm text-morandi-secondary mb-1">{FINANCE_PAGE_LABELS.PENDING_ITEMS}</p>
                             <div className="text-2xl font-bold text-morandi-gold">
                               <CurrencyCell amount={pendingPayments} />
                             </div>
@@ -230,7 +232,7 @@ export default function FinancePage() {
 
           {/* 交易紀錄 */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-morandi-primary">交易紀錄</h3>
+            <h3 className="text-lg font-semibold text-morandi-primary">{FINANCE_PAGE_LABELS.TRANSACTION_RECORDS}</h3>
             <EnhancedTable columns={transactionColumns as TableColumn[]} data={transactions} />
             
             {/* Pagination Controls */}

@@ -18,6 +18,7 @@ import type { ReceiptItem } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
 import { isFeatureAvailable } from '@/lib/feature-restrictions'
 import { ReceiptType, RECEIPT_TYPE_OPTIONS } from '@/types/receipt.types'
+import { PAYMENT_ITEM_LABELS } from '../../constants/labels'
 
 const BANK_ACCOUNTS = [
   { value: '國泰', label: '國泰銀行' },
@@ -52,7 +53,7 @@ export function PaymentItemForm({
   return (
     <div className="border border-border rounded-lg p-4">
       <div className="flex items-center justify-between mb-4">
-        <h4 className="font-medium">收款項目 {index + 1}</h4>
+        <h4 className="font-medium">{PAYMENT_ITEM_LABELS.ITEM_TITLE} {index + 1}</h4>
         {canRemove && (
           <Button
             variant="outline"
@@ -68,7 +69,7 @@ export function PaymentItemForm({
       {/* 第一排：基本欄位 */}
       <div className="grid grid-cols-12 gap-3 mb-3">
         <div className="col-span-2">
-          <label className="text-sm font-medium text-morandi-primary mb-2 block">收款方式 *</label>
+          <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.PAYMENT_METHOD}</label>
           <Select
             value={item.receipt_type.toString()}
             onValueChange={value => onUpdate(item.id, { receipt_type: Number(value) })}
@@ -87,7 +88,7 @@ export function PaymentItemForm({
         </div>
 
         <div className="col-span-2">
-          <label className="text-sm font-medium text-morandi-primary mb-2 block">金額 *</label>
+          <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.AMOUNT}</label>
           <Input
             type="number"
             value={item.amount || ''}
@@ -97,7 +98,7 @@ export function PaymentItemForm({
         </div>
 
         <div className="col-span-2">
-          <label className="text-sm font-medium text-morandi-primary mb-2 block">交易日期 *</label>
+          <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.TRANSACTION_DATE}</label>
           <DateInput
             value={item.transaction_date}
             onChange={value => onUpdate(item.id, { transaction_date: value })}
@@ -105,7 +106,7 @@ export function PaymentItemForm({
         </div>
 
         <div className="col-span-3">
-          <label className="text-sm font-medium text-morandi-primary mb-2 block">付款人姓名</label>
+          <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.PAYER_NAME}</label>
           <Input
             value={item.receipt_account || ''}
             onChange={e => onUpdate(item.id, { receipt_account: e.target.value })}
@@ -113,7 +114,7 @@ export function PaymentItemForm({
         </div>
 
         <div className="col-span-3">
-          <label className="text-sm font-medium text-morandi-primary mb-2 block">備註</label>
+          <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.REMARKS}</label>
           <Input
             value={item.notes || ''}
             onChange={e => onUpdate(item.id, { notes: e.target.value })}
@@ -162,7 +163,7 @@ export function PaymentItemForm({
       {item.receipt_type === ReceiptType.CASH && (
         <div className="grid grid-cols-12 gap-3 pt-3 border-t">
           <div className="col-span-4">
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">經手人</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.HANDLER}</label>
             <Input
               value={item.handler_name || ''}
               onChange={e => onUpdate(item.id, { handler_name: e.target.value })}
@@ -197,7 +198,7 @@ export function PaymentItemForm({
           </div>
 
           <div className="col-span-4">
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">手續費</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.HANDLING_FEE}</label>
             <Input
               type="number"
               value={item.fees || ''}
@@ -226,7 +227,7 @@ export function PaymentItemForm({
           </div>
 
           <div className="col-span-3">
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">授權碼</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.AUTH_CODE}</label>
             <Input
               value={item.auth_code || ''}
               onChange={e => onUpdate(item.id, { auth_code: e.target.value })}

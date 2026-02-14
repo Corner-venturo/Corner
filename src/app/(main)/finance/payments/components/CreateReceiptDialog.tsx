@@ -21,6 +21,7 @@ import { useToursSlim } from '@/data'
 import { CurrencyCell } from '@/components/table-cells'
 import type { ReceiptItem, Order } from '@/stores'
 import { ReceiptType } from '@/types/receipt.types'
+import { CREATE_RECEIPT_LABELS } from '../../constants/labels'
 
 interface CreateReceiptDialogProps {
   isOpen: boolean
@@ -110,13 +111,13 @@ export function CreateReceiptDialog({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent level={1} className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">新增收款單</DialogTitle>
+          <DialogTitle className="text-xl font-semibold">{CREATE_RECEIPT_LABELS.TITLE}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
           {/* 基本資訊 */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">基本資訊</h3>
+            <h3 className="text-lg font-semibold mb-4">{CREATE_RECEIPT_LABELS.BASIC_INFO}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* 選擇團體 */}
               <div>
@@ -191,7 +192,7 @@ export function CreateReceiptDialog({
           {/* 收款項目 */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">收款項目</h3>
+              <h3 className="text-lg font-semibold">{CREATE_RECEIPT_LABELS.PAYMENT_ITEMS}</h3>
               <Button onClick={addPaymentItem} variant="outline" size="sm">
                 <Plus size={16} className="mr-2" />
                 新增項目
@@ -215,7 +216,7 @@ export function CreateReceiptDialog({
           {/* 摘要 */}
           <div className="bg-morandi-container/20 p-4 rounded-lg">
             <div className="flex items-center justify-between">
-              <span className="text-lg font-semibold">總收款金額</span>
+              <span className="text-lg font-semibold">{CREATE_RECEIPT_LABELS.TOTAL_AMOUNT}</span>
               <CurrencyCell amount={totalAmount} className="text-2xl font-bold text-morandi-gold" />
             </div>
           </div>

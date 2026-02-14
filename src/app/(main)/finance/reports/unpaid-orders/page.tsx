@@ -10,6 +10,7 @@ import { CurrencyCell, DateCell } from '@/components/table-cells'
 import { useAuthStore } from '@/stores/auth-store'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
+import { UNPAID_ORDERS_LABELS } from '../../constants/labels'
 
 interface UnpaidOrder {
   id: string
@@ -141,8 +142,8 @@ export default function UnpaidOrdersPage() {
         if (row.days_since_departure > 0) {
           return <Badge variant="destructive">{row.days_since_departure} 天</Badge>
         }
-        if (row.days_since_departure === 0) return <span className="text-muted-foreground">今天</span>
-        return <span className="text-muted-foreground">尚未出發</span>
+        if (row.days_since_departure === 0) return <span className="text-muted-foreground">{UNPAID_ORDERS_LABELS.TODAY}</span>
+        return <span className="text-muted-foreground">{UNPAID_ORDERS_LABELS.NOT_DEPARTED}</span>
       },
     },
   ]
@@ -167,11 +168,11 @@ export default function UnpaidOrdersPage() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">全部</SelectItem>
-              <SelectItem value="overdue">已出發未收</SelectItem>
-              <SelectItem value="unpaid">完全未付</SelectItem>
-              <SelectItem value="partial">部分付款</SelectItem>
-              <SelectItem value="pending_deposit">待收訂金</SelectItem>
+              <SelectItem value="all">{UNPAID_ORDERS_LABELS.ALL}</SelectItem>
+              <SelectItem value="overdue">{UNPAID_ORDERS_LABELS.OVERDUE}</SelectItem>
+              <SelectItem value="unpaid">{UNPAID_ORDERS_LABELS.UNPAID}</SelectItem>
+              <SelectItem value="partial">{UNPAID_ORDERS_LABELS.PARTIAL}</SelectItem>
+              <SelectItem value="pending_deposit">{UNPAID_ORDERS_LABELS.PENDING_DEPOSIT}</SelectItem>
             </SelectContent>
           </Select>
         </div>

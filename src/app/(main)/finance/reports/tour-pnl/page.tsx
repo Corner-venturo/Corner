@@ -10,6 +10,7 @@ import { CurrencyCell, DateCell } from '@/components/table-cells'
 import { useAuthStore } from '@/stores/auth-store'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
+import { TOUR_PNL_LABELS } from '../../constants/labels'
 
 interface TourPnL {
   id: string
@@ -165,11 +166,11 @@ export default function TourPnLPage() {
       headerActions={
         <div className="flex items-center gap-3 flex-wrap">
           <div className="flex gap-2 text-sm">
-            <span className="text-muted-foreground">收入</span>
+            <span className="text-muted-foreground">{TOUR_PNL_LABELS.INCOME}</span>
             <span className="font-semibold">NT${summary.totalRevenue.toLocaleString()}</span>
-            <span className="text-muted-foreground ml-2">成本</span>
+            <span className="text-muted-foreground ml-2">{TOUR_PNL_LABELS.COST}</span>
             <span className="font-semibold">NT${summary.totalCost.toLocaleString()}</span>
-            <span className="text-muted-foreground ml-2">毛利</span>
+            <span className="text-muted-foreground ml-2">{TOUR_PNL_LABELS.GROSS_PROFIT}</span>
             <span className={`font-semibold ${summary.totalProfit < 0 ? 'text-status-danger' : 'text-status-success'}`}>
               NT${summary.totalProfit.toLocaleString()} ({summary.avgMargin}%)
             </span>
@@ -189,11 +190,11 @@ export default function TourPnLPage() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">全部狀態</SelectItem>
-              <SelectItem value="confirmed">已確認</SelectItem>
-              <SelectItem value="operating">出團中</SelectItem>
-              <SelectItem value="completed">已完成</SelectItem>
-              <SelectItem value="closed">已結案</SelectItem>
+              <SelectItem value="all">{TOUR_PNL_LABELS.ALL_STATUS}</SelectItem>
+              <SelectItem value="confirmed">{TOUR_PNL_LABELS.CONFIRMED}</SelectItem>
+              <SelectItem value="operating">{TOUR_PNL_LABELS.OPERATING}</SelectItem>
+              <SelectItem value="completed">{TOUR_PNL_LABELS.COMPLETED}</SelectItem>
+              <SelectItem value="closed">{TOUR_PNL_LABELS.CLOSED}</SelectItem>
             </SelectContent>
           </Select>
         </div>

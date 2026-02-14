@@ -20,6 +20,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useTravelInvoiceStore } from '@/stores/travel-invoice-store'
 import { alert } from '@/lib/ui/alert-dialog'
+import { TRAVEL_INVOICE_LABELS, TRAVEL_INVOICE_DETAIL_LABELS } from '../../constants/labels'
 
 export default function InvoiceDetailPage() {
   const params = useParams()
@@ -88,7 +89,7 @@ export default function InvoiceDetailPage() {
         />
         <ContentContainer>
           <div className="text-center py-12">
-            <p className="text-morandi-secondary">載入中...</p>
+            <p className="text-morandi-secondary">{TRAVEL_INVOICE_LABELS.LOADING}</p>
           </div>
         </ContentContainer>
       </div>
@@ -149,21 +150,21 @@ export default function InvoiceDetailPage() {
           {/* 基本資訊 */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">基本資訊</CardTitle>
+              <CardTitle className="text-base">{TRAVEL_INVOICE_LABELS.BASIC_INFO}</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div>
-                <p className="text-sm text-morandi-secondary">發票號碼</p>
+                <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.INVOICE_NUMBER}</p>
                 <p className="font-medium text-morandi-primary">
                   {currentInvoice.invoice_number || '尚未取得'}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-morandi-secondary">開立日期</p>
+                <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.ISSUE_DATE}</p>
                 <p className="font-medium text-morandi-primary">{currentInvoice.invoice_date}</p>
               </div>
               <div>
-                <p className="text-sm text-morandi-secondary">課稅別</p>
+                <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.TAX_TYPE}</p>
                 <p className="font-medium text-morandi-primary">
                   {currentInvoice.tax_type === 'dutiable'
                     ? '應稅'
@@ -173,7 +174,7 @@ export default function InvoiceDetailPage() {
                 </p>
               </div>
               <div>
-                <p className="text-sm text-morandi-secondary">總金額</p>
+                <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.TOTAL_AMOUNT}</p>
                 <p className="font-medium text-lg text-morandi-gold">
                   <CurrencyCell amount={currentInvoice.total_amount} className="font-medium text-lg text-morandi-gold" />
                 </p>
@@ -184,17 +185,17 @@ export default function InvoiceDetailPage() {
           {/* 買受人資訊 */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">買受人資訊</CardTitle>
+              <CardTitle className="text-base">{TRAVEL_INVOICE_LABELS.BUYER_INFO}</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-6">
               <div>
-                <p className="text-sm text-morandi-secondary">名稱</p>
+                <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.NAME}</p>
                 <p className="font-medium text-morandi-primary">
                   {currentInvoice.buyerInfo.buyerName || '-'}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-morandi-secondary">統一編號</p>
+                <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.TAX_ID}</p>
                 <p className="font-medium text-morandi-primary">
                   {currentInvoice.buyerInfo.buyerUBN || '-'}
                 </p>
@@ -206,7 +207,7 @@ export default function InvoiceDetailPage() {
                 </p>
               </div>
               <div>
-                <p className="text-sm text-morandi-secondary">手機</p>
+                <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.MOBILE}</p>
                 <p className="font-medium text-morandi-primary">
                   {currentInvoice.buyerInfo.buyerMobile || '-'}
                 </p>
@@ -217,7 +218,7 @@ export default function InvoiceDetailPage() {
           {/* 商品明細 */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">商品明細</CardTitle>
+              <CardTitle className="text-base">{TRAVEL_INVOICE_DETAIL_LABELS.PRODUCT_DETAILS}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="border border-border/60 rounded-lg overflow-hidden">
@@ -269,17 +270,17 @@ export default function InvoiceDetailPage() {
           {currentInvoice.status === 'issued' && currentInvoice.randomNum && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">發票資訊</CardTitle>
+                <CardTitle className="text-base">{TRAVEL_INVOICE_DETAIL_LABELS.INVOICE_INFO}</CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-2 gap-6">
                 <div>
-                  <p className="text-sm text-morandi-secondary">隨機碼</p>
+                  <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_DETAIL_LABELS.RANDOM_CODE}</p>
                   <p className="font-medium font-mono text-morandi-primary">
                     {currentInvoice.randomNum}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-morandi-secondary">條碼</p>
+                  <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_DETAIL_LABELS.BARCODE}</p>
                   <p className="font-medium font-mono text-sm text-morandi-primary">
                     {currentInvoice.barcode || '-'}
                   </p>
@@ -292,11 +293,11 @@ export default function InvoiceDetailPage() {
           {currentInvoice.status === 'voided' && (
             <Card className="border-status-danger/30">
               <CardHeader>
-                <CardTitle className="text-base text-status-danger">作廢資訊</CardTitle>
+                <CardTitle className="text-base text-status-danger">{TRAVEL_INVOICE_DETAIL_LABELS.VOID_INFO}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div>
-                  <p className="text-sm text-morandi-secondary">作廢時間</p>
+                  <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_DETAIL_LABELS.VOID_TIME}</p>
                   <p className="font-medium text-morandi-primary">
                     {currentInvoice.voidDate
                       ? <DateCell date={currentInvoice.voidDate} format="time" showIcon={false} className="font-medium text-morandi-primary" />
@@ -304,7 +305,7 @@ export default function InvoiceDetailPage() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-morandi-secondary">作廢原因</p>
+                  <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_DETAIL_LABELS.VOID_REASON}</p>
                   <p className="font-medium text-morandi-primary">
                     {currentInvoice.voidReason || '-'}
                   </p>
@@ -319,11 +320,11 @@ export default function InvoiceDetailPage() {
       <Dialog open={showVoidDialog} onOpenChange={setShowVoidDialog}>
         <DialogContent level={1} className="max-w-md">
           <DialogHeader>
-            <DialogTitle>作廢發票</DialogTitle>
+            <DialogTitle>{TRAVEL_INVOICE_DETAIL_LABELS.VOID_INVOICE}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="voidReason">作廢原因 *</Label>
+              <Label htmlFor="voidReason">{TRAVEL_INVOICE_DETAIL_LABELS.VOID_REASON_REQUIRED}</Label>
               <Input
                 id="voidReason"
                 value={voidReason}
