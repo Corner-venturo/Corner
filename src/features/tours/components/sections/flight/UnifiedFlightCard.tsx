@@ -398,7 +398,7 @@ function ArtFlightCard({
               {airportCode}
             </div>
             <div
-              className="text-sm mt-2 transition-colors duration-300 group-hover:text-gray-300"
+              className="text-sm mt-2 transition-colors duration-300 group-hover:text-morandi-secondary"
               style={{
                 fontFamily: 'monospace',
                 color: theme.colors.muted,
@@ -438,7 +438,7 @@ function ArtFlightCard({
                 || 'NRT'}
             </div>
             <div
-              className="text-sm mt-2 transition-colors duration-300 group-hover:text-gray-300"
+              className="text-sm mt-2 transition-colors duration-300 group-hover:text-morandi-secondary"
               style={{
                 fontFamily: 'monospace',
                 color: theme.colors.muted,
