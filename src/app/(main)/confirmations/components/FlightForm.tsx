@@ -2,7 +2,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
-import { LABELS } from '../constants/labels'
+import { LABELS , FLIGHT_FORM_LABELS } from '../constants/labels'
 import type { ConfirmationFormData, FlightData } from '@/types/confirmation.types'
 
 interface FlightFormProps {
@@ -33,7 +33,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
     updateData({
       passengers: [
         ...(data.passengers || []),
-        { nameEn: '', nameZh: '', cabin: '經濟艙', ticketNumber: '', bookingCode: '' },
+        { nameEn: '', nameZh: '', cabin: FLIGHT_FORM_LABELS.DEFAULT_CABIN, ticketNumber: '', bookingCode: '' },
       ],
     })
   }
@@ -125,7 +125,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                     passengers[index] = { ...passengers[index], nameZh: e.target.value }
                     updateData({ passengers })
                   }}
-                  placeholder="宋紹慶"
+                  placeholder={FLIGHT_FORM_LABELS.ZH_NAME_PLACEHOLDER}
                 />
               </div>
             </div>
@@ -188,7 +188,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                   segments[index] = { ...segments[index], route: e.target.value }
                   updateData({ segments })
                 }}
-                placeholder="台北 - 上海"
+                placeholder={FLIGHT_FORM_LABELS.ROUTE_PLACEHOLDER}
               />
             </div>
             <div className="grid grid-cols-2 gap-2">
@@ -201,11 +201,11 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                     segments[index] = { ...segments[index], departureDate: date }
                     updateData({ segments })
                   }}
-                  placeholder="選擇日期"
+                  placeholder={FLIGHT_FORM_LABELS.SELECT_DATE_PLACEHOLDER}
                 />
               </div>
               <div>
-                <Label>出發時間</Label>
+                <Label>{FLIGHT_FORM_LABELS.DEPARTURE_TIME}</Label>
                 <Input
                   type="time"
                   value={segment.departureTime}
@@ -219,7 +219,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <Label>出發機場</Label>
+                <Label>{FLIGHT_FORM_LABELS.DEPARTURE_AIRPORT}</Label>
                 <Input
                   value={segment.departureAirport}
                   onChange={e => {
@@ -227,11 +227,11 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                     segments[index] = { ...segments[index], departureAirport: e.target.value }
                     updateData({ segments })
                   }}
-                  placeholder="台灣桃園國際機場 T2"
+                  placeholder={FLIGHT_FORM_LABELS.DEPARTURE_AIRPORT_PLACEHOLDER}
                 />
               </div>
               <div>
-                <Label>抵達機場</Label>
+                <Label>{FLIGHT_FORM_LABELS.ARRIVAL_AIRPORT}</Label>
                 <Input
                   value={segment.arrivalAirport}
                   onChange={e => {
@@ -239,13 +239,13 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                     segments[index] = { ...segments[index], arrivalAirport: e.target.value }
                     updateData({ segments })
                   }}
-                  placeholder="浦東國際機場 T2"
+                  placeholder={FLIGHT_FORM_LABELS.ARRIVAL_AIRPORT_PLACEHOLDER}
                 />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <Label>航空公司</Label>
+                <Label>{FLIGHT_FORM_LABELS.AIRLINE}</Label>
                 <Input
                   value={segment.airline}
                   onChange={e => {
@@ -253,11 +253,11 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                     segments[index] = { ...segments[index], airline: e.target.value }
                     updateData({ segments })
                   }}
-                  placeholder="中國南方航空股份有限公司"
+                  placeholder={FLIGHT_FORM_LABELS.AIRLINE_PLACEHOLDER}
                 />
               </div>
               <div>
-                <Label>航班號</Label>
+                <Label>{FLIGHT_FORM_LABELS.FLIGHT_NUMBER}</Label>
                 <Input
                   value={segment.flightNumber}
                   onChange={e => {
@@ -272,17 +272,17 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
           </div>
         ))}
         <Button type="button" variant="outline" size="sm" onClick={addSegment}>
-          + 新增航班
+          {FLIGHT_FORM_LABELS.ADD_FLIGHT}
         </Button>
       </div>
 
       {/* 行李額度 */}
       <div className="space-y-4 p-4 bg-muted rounded-md">
-        <h3 className="font-semibold text-morandi-primary">行李額度</h3>
+        <h3 className="font-semibold text-morandi-primary">{FLIGHT_FORM_LABELS.BAGGAGE_ALLOWANCE}</h3>
         {(data.baggage || []).map((bag, index) => (
           <div key={index} className="space-y-2 p-3 bg-card rounded border">
             <div>
-              <Label>旅客姓名</Label>
+              <Label>{FLIGHT_FORM_LABELS.PASSENGER_NAME}</Label>
               <Input
                 value={bag.passengerName}
                 onChange={e => {
@@ -290,12 +290,12 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                   baggage[index] = { ...baggage[index], passengerName: e.target.value }
                   updateData({ baggage })
                 }}
-                placeholder="SUNG SHAOCHING (成人)"
+                placeholder={FLIGHT_FORM_LABELS.PASSENGER_NAME_PLACEHOLDER}
               />
             </div>
             <div className="grid grid-cols-3 gap-2">
               <div>
-                <Label>個人物品</Label>
+                <Label>{FLIGHT_FORM_LABELS.PERSONAL_ITEM}</Label>
                 <Input
                   value={bag.personalItem}
                   onChange={e => {
@@ -303,11 +303,11 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                     baggage[index] = { ...baggage[index], personalItem: e.target.value }
                     updateData({ baggage })
                   }}
-                  placeholder="每人 1 件"
+                  placeholder={FLIGHT_FORM_LABELS.PERSONAL_ITEM_PLACEHOLDER}
                 />
               </div>
               <div>
-                <Label>手提行李</Label>
+                <Label>{FLIGHT_FORM_LABELS.CARRY_ON}</Label>
                 <Input
                   value={bag.carryOn}
                   onChange={e => {
@@ -315,11 +315,11 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                     baggage[index] = { ...baggage[index], carryOn: e.target.value }
                     updateData({ baggage })
                   }}
-                  placeholder="每人 1 件，每件 8 公斤"
+                  placeholder={FLIGHT_FORM_LABELS.CARRY_ON_PLACEHOLDER}
                 />
               </div>
               <div>
-                <Label>託運行李</Label>
+                <Label>{FLIGHT_FORM_LABELS.CHECKED_BAGGAGE}</Label>
                 <Input
                   value={bag.checked}
                   onChange={e => {
@@ -327,23 +327,23 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                     baggage[index] = { ...baggage[index], checked: e.target.value }
                     updateData({ baggage })
                   }}
-                  placeholder="每人 1 件，每件 23 公斤"
+                  placeholder={FLIGHT_FORM_LABELS.CHECKED_BAGGAGE_PLACEHOLDER}
                 />
               </div>
             </div>
           </div>
         ))}
         <Button type="button" variant="outline" size="sm" onClick={addBaggage}>
-          + 新增行李額度
+          {FLIGHT_FORM_LABELS.ADD_BAGGAGE}
         </Button>
       </div>
 
       {/* 重要資訊 */}
       <div className="space-y-4 p-4 bg-muted rounded-md">
-        <h3 className="font-semibold text-morandi-primary">重要資訊</h3>
+        <h3 className="font-semibold text-morandi-primary">{FLIGHT_FORM_LABELS.IMPORTANT_INFO}</h3>
         {(data.importantNotes || []).map((note, index) => (
           <div key={index} className="space-y-2">
-            <Label>注意事項 #{index + 1}</Label>
+            <Label>{FLIGHT_FORM_LABELS.NOTE_LABEL} #{index + 1}</Label>
             <Input
               value={note}
               onChange={e => {
@@ -351,22 +351,22 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                 importantNotes[index] = e.target.value
                 updateData({ importantNotes })
               }}
-              placeholder="在機場的各項登機手續中，乘客須出示購買機票時使用的個人身分證明文件..."
+              placeholder={FLIGHT_FORM_LABELS.NOTE_PLACEHOLDER}
             />
           </div>
         ))}
         <Button type="button" variant="outline" size="sm" onClick={addImportantNote}>
-          + 新增注意事項
+          {FLIGHT_FORM_LABELS.ADD_NOTE}
         </Button>
       </div>
 
       {/* 行李詳細資訊 */}
       <div className="space-y-4 p-4 bg-muted rounded-md">
-        <h3 className="font-semibold text-morandi-primary">行李詳細資訊</h3>
+        <h3 className="font-semibold text-morandi-primary">{FLIGHT_FORM_LABELS.BAGGAGE_DETAIL_TITLE}</h3>
         {(data.baggageDetails || []).map((detail, index) => (
           <div key={index} className="space-y-2 p-3 bg-card rounded border">
             <div>
-              <Label>航段</Label>
+              <Label>{FLIGHT_FORM_LABELS.SEGMENT_LABEL}</Label>
               <Input
                 value={detail.route}
                 onChange={e => {
@@ -374,12 +374,12 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                   baggageDetails[index] = { ...baggageDetails[index], route: e.target.value }
                   updateData({ baggageDetails })
                 }}
-                placeholder="台北 - 上海"
+                placeholder={FLIGHT_FORM_LABELS.SEGMENT_PLACEHOLDER}
               />
             </div>
             <div className="space-y-2">
               <div>
-                <Label>手提行李詳情</Label>
+                <Label>{FLIGHT_FORM_LABELS.CARRY_ON_DETAIL}</Label>
                 <Input
                   value={detail.carryOnDetail}
                   onChange={e => {
@@ -390,11 +390,11 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                     }
                     updateData({ baggageDetails })
                   }}
-                  placeholder="每人 1 件，每件 8 公斤 每件尺寸上限 55x40x20 公分"
+                  placeholder={FLIGHT_FORM_LABELS.CARRY_ON_DETAIL_PLACEHOLDER}
                 />
               </div>
               <div>
-                <Label>託運行李詳情</Label>
+                <Label>{FLIGHT_FORM_LABELS.CHECKED_DETAIL}</Label>
                 <Input
                   value={detail.checkedDetail}
                   onChange={e => {
@@ -405,11 +405,11 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                     }
                     updateData({ baggageDetails })
                   }}
-                  placeholder="每人 1 件，每件 23 公斤 每件尺寸 (長+寬+高) 上限 158 公分"
+                  placeholder={FLIGHT_FORM_LABELS.CHECKED_DETAIL_PLACEHOLDER}
                 />
               </div>
               <div>
-                <Label>個人物品詳情</Label>
+                <Label>{FLIGHT_FORM_LABELS.PERSONAL_ITEM_DETAIL}</Label>
                 <Input
                   value={detail.personalItemDetail}
                   onChange={e => {
@@ -420,14 +420,14 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
                     }
                     updateData({ baggageDetails })
                   }}
-                  placeholder="每人 1 件 請聯繫航空公司以進一步了解行李政策 必須置於您前面座位的下方。"
+                  placeholder={FLIGHT_FORM_LABELS.PERSONAL_ITEM_DETAIL_PLACEHOLDER}
                 />
               </div>
             </div>
           </div>
         ))}
         <Button type="button" variant="outline" size="sm" onClick={addBaggageDetail}>
-          + 新增行李詳細資訊
+          {FLIGHT_FORM_LABELS.ADD_BAGGAGE_DETAIL}
         </Button>
       </div>
     </div>

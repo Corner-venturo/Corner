@@ -4,7 +4,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import type { ConfirmationFormData, AccommodationData } from '@/types/confirmation.types'
-import { LABELS } from '../constants/labels'
+import { LABELS, ACCOMMODATION_FORM_LABELS } from '../constants/labels'
 
 interface AccommodationFormProps {
   formData: ConfirmationFormData
@@ -95,7 +95,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
             id="hotelName"
             value={data.hotelName || ''}
             onChange={e => updateField('hotelName', e.target.value)}
-            placeholder="凡裡FUN LIST飯店（上海顓橋萬達店）"
+            placeholder={ACCOMMODATION_FORM_LABELS.HOTEL_NAME_PLACEHOLDER}
           />
         </div>
 
@@ -105,7 +105,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
             id="hotelAddress"
             value={data.hotelAddress || ''}
             onChange={e => updateField('hotelAddress', e.target.value)}
-            placeholder="上海, 閔行區, 顓興東路1398號"
+            placeholder={ACCOMMODATION_FORM_LABELS.ADDRESS_PLACEHOLDER}
           />
         </div>
 
@@ -148,7 +148,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
               id="checkInTime"
               value={data.checkInTime || ''}
               onChange={e => updateField('checkInTime', e.target.value)}
-              placeholder="14:00後"
+              placeholder={ACCOMMODATION_FORM_LABELS.CHECK_IN_TIME_PLACEHOLDER}
             />
           </div>
         </div>
@@ -168,7 +168,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
               id="checkOutTime"
               value={data.checkOutTime || ''}
               onChange={e => updateField('checkOutTime', e.target.value)}
-              placeholder="12:00前"
+              placeholder={ACCOMMODATION_FORM_LABELS.CHECK_OUT_TIME_PLACEHOLDER}
             />
           </div>
         </div>
@@ -205,7 +205,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
             id="roomType"
             value={data.roomType || ''}
             onChange={e => updateField('roomType', e.target.value)}
-            placeholder="凡趣大床房（全屋智能+手機投屏+零壓床品+65吋電視）"
+            placeholder={ACCOMMODATION_FORM_LABELS.ROOM_TYPE_PLACEHOLDER}
           />
         </div>
 
@@ -225,7 +225,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
             id="guestCapacity"
             value={data.guestCapacity || ''}
             onChange={e => updateField('guestCapacity', e.target.value)}
-            placeholder="此房型可容納最多 2 位旅客，其中最多 2 位成人"
+            placeholder={ACCOMMODATION_FORM_LABELS.GUEST_CAPACITY_PLACEHOLDER}
           />
         </div>
       </div>
@@ -245,7 +245,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
             <Input
               value={meal.description}
               onChange={e => updateMeal(index, 'description', e.target.value)}
-              placeholder="每房 1 客早餐"
+              placeholder={ACCOMMODATION_FORM_LABELS.MEAL_PLACEHOLDER}
               className="flex-1"
             />
             <Button type="button" variant="outline" size="sm" onClick={() => removeMeal(index)}>
@@ -265,7 +265,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
           id="importantNotes"
           value={data.importantNotes || ''}
           onChange={e => updateField('importantNotes', e.target.value)}
-          placeholder="特殊規定、注意事項..."
+          placeholder={ACCOMMODATION_FORM_LABELS.NOTES_PLACEHOLDER}
           rows={4}
         />
       </div>

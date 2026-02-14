@@ -1,5 +1,6 @@
 import React from 'react'
 import type { ConfirmationFormData, FlightData } from '@/types/confirmation.types'
+import { FLIGHT_PREVIEW_LABELS } from '../constants/labels'
 
 interface FlightPreviewProps {
   formData: ConfirmationFormData
@@ -15,14 +16,14 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
       <div className="flex justify-between items-start pb-3 border-b" style={{ borderColor: '#e5e7eb' }}>
         <div>
           <div className="font-medium" style={{ color: '#374151' }}>
-            電腦代號: {formData.booking_number || '尚未填寫'}
+            {FLIGHT_PREVIEW_LABELS.COMPUTER_CODE}: {formData.booking_number || FLIGHT_PREVIEW_LABELS.NOT_FILLED}
           </div>
         </div>
       </div>
 
       {/* 免責聲明 */}
       <div className="text-center text-xs italic py-2 bg-status-warning-bg rounded" style={{ color: '#92400E' }}>
-        **** 此文件資訊僅供參考, 實際資訊以航空公司及相關旅遊供應商為準 ****
+        {FLIGHT_PREVIEW_LABELS.DISCLAIMER}
       </div>
 
       {/* 旅客姓名 */}
@@ -30,7 +31,7 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
         <div>
           {data.passengers.map((passenger, idx) => (
             <div key={idx} className="mb-1" style={{ color: '#374151' }}>
-              旅客姓名:{String(idx + 1).padStart(2, '0')}. {passenger.nameEn}
+              {FLIGHT_PREVIEW_LABELS.PASSENGER_NAME}:{String(idx + 1).padStart(2, '0')}. {passenger.nameEn}
             </div>
           ))}
         </div>
@@ -41,9 +42,9 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
         <div>
           <div className="border-t border-b py-2" style={{ borderColor: '#d4af37', borderStyle: 'dashed' }}>
             <div className="grid grid-cols-12 gap-2 font-medium" style={{ color: '#333333' }}>
-              <div className="col-span-2 text-center">日 期</div>
-              <div className="col-span-6">時 間  航 班</div>
-              <div className="col-span-4">其 他 訊 息</div>
+              <div className="col-span-2 text-center">{FLIGHT_PREVIEW_LABELS.DATE_HEADER}</div>
+              <div className="col-span-6">{FLIGHT_PREVIEW_LABELS.TIME_FLIGHT_HEADER}</div>
+              <div className="col-span-4">{FLIGHT_PREVIEW_LABELS.OTHER_INFO_HEADER}</div>
             </div>
           </div>
 
@@ -56,7 +57,7 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
                   {segment.airline}({segment.flightNumber})
                 </div>
                 <div className="col-span-4 text-right" style={{ color: '#6B7280' }}>
-                  /直飛
+                  /{FLIGHT_PREVIEW_LABELS.DIRECT_FLIGHT}
                 </div>
               </div>
 
@@ -66,10 +67,10 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
                   {segment.departureDate}
                 </div>
                 <div className="col-span-6" style={{ color: '#374151' }}>
-                  {segment.departureTime} 出發: {segment.departureAirport}
+                  {segment.departureTime} {FLIGHT_PREVIEW_LABELS.DEPARTURE_PREFIX}: {segment.departureAirport}
                 </div>
                 <div className="col-span-4" style={{ color: '#6B7280' }}>
-                  {segment.departureTerminal ? `航站${segment.departureTerminal} ` : ''}/{data.passengers?.[0]?.cabin || '經濟'} /OK
+                  {segment.departureTerminal ? `${FLIGHT_PREVIEW_LABELS.TERMINAL}${segment.departureTerminal} ` : ''}/{data.passengers?.[0]?.cabin || FLIGHT_PREVIEW_LABELS.DEFAULT_CABIN} /OK
                 </div>
               </div>
 
@@ -82,10 +83,10 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
               >
                 <div className="col-span-2"></div>
                 <div className="col-span-6" style={{ color: '#374151' }}>
-                  {segment.arrivalTime} 抵達: {segment.arrivalAirport}
+                  {segment.arrivalTime} {FLIGHT_PREVIEW_LABELS.ARRIVAL_PREFIX}: {segment.arrivalAirport}
                 </div>
                 <div className="col-span-4" style={{ color: '#6B7280' }}>
-                  {segment.arrivalTerminal ? `航站${segment.arrivalTerminal} ` : ''}/餐點
+                  {segment.arrivalTerminal ? `${FLIGHT_PREVIEW_LABELS.TERMINAL}${segment.arrivalTerminal} ` : ''}/{FLIGHT_PREVIEW_LABELS.MEAL}
                 </div>
               </div>
             </div>
@@ -101,7 +102,7 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
           {data.passengers.map((passenger, idx) => (
             passenger.ticketNumber && (
               <div key={idx} style={{ color: '#374151' }}>
-                機票號碼: {passenger.ticketNumber} - {passenger.nameEn}
+                {FLIGHT_PREVIEW_LABELS.TICKET_NUMBER}: {passenger.ticketNumber} - {passenger.nameEn}
               </div>
             )
           ))}
@@ -112,7 +113,7 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
       {extendedData.airlineContacts && extendedData.airlineContacts.length > 0 && (
         <div>
           <div className="font-medium mb-1" style={{ color: '#374151' }}>
-            航空公司確認電話:
+            {FLIGHT_PREVIEW_LABELS.AIRLINE_CONTACT}:
           </div>
           <div className="space-y-1 pl-4" style={{ color: '#6B7280' }}>
             {extendedData.airlineContacts.map((contact, idx) => (
@@ -126,7 +127,7 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
       {data.importantNotes && data.importantNotes.length > 0 && (
         <div className="mt-4 p-3 bg-status-warning-bg rounded border border-status-warning/30">
           <div className="font-semibold mb-2" style={{ color: '#92400E' }}>
-            ⚠️ 重要資訊
+            ⚠️ {FLIGHT_PREVIEW_LABELS.IMPORTANT_INFO}
           </div>
           <div className="space-y-1" style={{ color: '#78350F' }}>
             {data.importantNotes.map((note, idx) => (
