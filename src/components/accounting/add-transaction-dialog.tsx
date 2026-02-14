@@ -192,7 +192,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
       <FormDialog
         open={isOpen}
         onOpenChange={open => !open && handleClose()}
-        title={`選擇${transactionType === 'expense' ? '支出' : '收入'}分類`}
+        title={`${ACCOUNTING_LABELS.SELECT_CATEGORY_PREFIX}${transactionType === 'expense' ? ACCOUNTING_LABELS.EXPENSE_CATEGORY : ACCOUNTING_LABELS.INCOME_CATEGORY}${ACCOUNTING_LABELS.CATEGORY_SUFFIX}`}
         onCancel={handleClose}
         maxWidth="md"
       >

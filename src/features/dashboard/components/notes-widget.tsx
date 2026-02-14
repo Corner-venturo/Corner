@@ -165,7 +165,7 @@ export function NotesWidget() {
           />
           <p className="text-xs text-morandi-secondary/90 mt-2.5 font-medium flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-status-success animate-pulse"></span>
-            自動儲存 • 雙擊分頁名稱可重新命名
+            {DASHBOARD_LABELS.NOTES_AUTO_SAVE_HINT}
           </p>
         </div>
       </div>

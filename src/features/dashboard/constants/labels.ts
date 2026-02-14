@@ -129,7 +129,13 @@ export const DASHBOARD_LABELS = {
   error: '錯誤',
   success: '成功',
   cancel: '取消',
-  confirm: '確認'
+  confirm: '確認',
+
+  // currency-widget
+  EXCHANGE_RATE_PREFIX: '匯率 (1 ',
+  EXCHANGE_RATE_SUFFIX: ' = ? TWD)',
+  CUSTOM_RATE: '已自訂匯率',
+  DEFAULT_RATE_PREFIX: '預設匯率: ',
 }
 
 export const FLIGHT_WIDGET_LABELS = {

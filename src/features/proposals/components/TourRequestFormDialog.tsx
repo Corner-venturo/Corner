@@ -264,7 +264,7 @@ export function TourRequestFormDialog({
       <!DOCTYPE html>
       <html>
       <head>
-        <title>${categoryName}需求單</title>
+        <title>${categoryName}${TOUR_REQUEST_FORM_DIALOG_LABELS.需求單}</title>
         <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
           body {

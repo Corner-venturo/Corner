@@ -315,7 +315,7 @@ TK TL20JAN/1200`}
                       )}
                     >
                       <Clock className="w-3 h-3" />
-                      {getDaysRemaining(parsedPNR.ticketingDeadline)}天
+                      {getDaysRemaining(parsedPNR.ticketingDeadline)}{DASHBOARD_LABELS.DAYS_SUFFIX}
                     </div>
                   )}
                   {isExpanded ? (
@@ -377,7 +377,7 @@ TK TL20JAN/1200`}
                       <div className="flex items-center gap-2 mb-2">
                         <Users className="w-3.5 h-3.5 text-morandi-secondary" />
                         <span className="text-xs font-semibold text-morandi-primary">
-                          旅客 ({parsedPNR.passengers.length})
+                          {DASHBOARD_LABELS.PASSENGERS_PREFIX}{parsedPNR.passengers.length}{DASHBOARD_LABELS.PASSENGERS_SUFFIX}
                           {parsedPNR.passengers.some(p => p.infant) && (
                             <span className="ml-1 text-morandi-secondary">
                               {DASHBOARD_LABELS.INFANT_COUNT_PREFIX}{parsedPNR.passengers.filter(p => p.infant).length}{DASHBOARD_LABELS.INFANT_COUNT_SUFFIX}
@@ -393,7 +393,7 @@ TK TL20JAN/1200`}
                               <span className="text-morandi-primary font-medium">{pax.name}</span>
                               {pax.type === 'CHD' && (
                                 <span className="px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 text-[10px] font-medium">
-                                  兒童 {pax.birthDate}
+                                  {DASHBOARD_LABELS.CHILD} {pax.birthDate}
                                 </span>
                               )}
                             </div>

@@ -34,4 +34,8 @@ export const ACCOUNTING_LABELS = {
   SELECT_5234: '選擇日期',
   REMARKS: '備註',
   LABEL_3027: '輸入備註（選填）',
+  SELECT_CATEGORY_PREFIX: '選擇',
+  EXPENSE_CATEGORY: '支出',
+  INCOME_CATEGORY: '收入',
+  CATEGORY_SUFFIX: '分類',
 }

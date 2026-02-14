@@ -242,7 +242,7 @@ export function CurrencyWidget() {
           <div className="rounded-xl bg-card/70 p-3.5 shadow-md border border-border/40 space-y-2.5">
             <div className="flex items-center justify-between">
               <label className="text-xs font-semibold text-morandi-primary">
-                匯率 (1 {selectedCurrency} = ? TWD)
+                {DASHBOARD_LABELS.EXCHANGE_RATE_PREFIX}{selectedCurrency}{DASHBOARD_LABELS.EXCHANGE_RATE_SUFFIX}
               </label>
               <button
                 onClick={() => {
@@ -268,7 +268,7 @@ export function CurrencyWidget() {
             <div className="flex items-center gap-1.5 text-xs text-morandi-secondary/90 bg-card/40 px-2.5 py-1.5 rounded-lg">
               <TrendingUp className="w-3.5 h-3.5 text-morandi-gold" />
               <span className="font-medium">
-                {useCustomRate ? '已自訂匯率' : `預設匯率: ${DEFAULT_RATES[selectedCurrency].rate}`}
+                {useCustomRate ? DASHBOARD_LABELS.CUSTOM_RATE : `${DASHBOARD_LABELS.DEFAULT_RATE_PREFIX}${DEFAULT_RATES[selectedCurrency].rate}`}
               </span>
             </div>
           </div>
