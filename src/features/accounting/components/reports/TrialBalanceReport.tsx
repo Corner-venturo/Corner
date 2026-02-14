@@ -5,7 +5,7 @@
 
 'use client'
 
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { Scale, Download, Calendar, Search, CheckCircle, AlertCircle } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
@@ -33,11 +33,11 @@ export function TrialBalanceReport() {
   const [entries, setEntries] = useState<TrialBalanceEntry[]>([])
 
   // 查詢報表
-  const handleSearch = async () => {
+  const handleSearch = useCallback(async () => {
     if (!endDate) return
     const data = await fetchTrialBalance(endDate)
     setEntries(data)
-  }
+  }, [endDate, fetchTrialBalance])
 
   // 初次載入時查詢
   useEffect(() => {

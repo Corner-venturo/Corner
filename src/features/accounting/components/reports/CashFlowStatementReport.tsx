@@ -5,7 +5,7 @@
 
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Banknote, Download, Calendar, Search, ArrowUpRight, ArrowDownRight, TrendingUp, TrendingDown } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
@@ -29,11 +29,11 @@ export function CashFlowStatementReport() {
   const [data, setData] = useState<CashFlowResult | null>(null)
 
   // 查詢報表
-  const handleSearch = async () => {
+  const handleSearch = useCallback(async () => {
     if (!startDate || !endDate) return
     const result = await fetchCashFlowStatement(startDate, endDate)
     setData(result)
-  }
+  }, [startDate, endDate, fetchCashFlowStatement])
 
   // 初次載入時查詢
   useEffect(() => {

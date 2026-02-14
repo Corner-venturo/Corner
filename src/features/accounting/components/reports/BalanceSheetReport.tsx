@@ -5,7 +5,7 @@
 
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Wallet, Download, Calendar, Search, Building, CreditCard, PiggyBank } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
@@ -25,11 +25,11 @@ export function BalanceSheetReport() {
   const [data, setData] = useState<BalanceSheetResult | null>(null)
 
   // 查詢報表
-  const handleSearch = async () => {
+  const handleSearch = useCallback(async () => {
     if (!asOfDate) return
     const result = await fetchBalanceSheet(asOfDate)
     setData(result)
-  }
+  }, [asOfDate, fetchBalanceSheet])
 
   // 初次載入時查詢
   useEffect(() => {

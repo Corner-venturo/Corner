@@ -5,7 +5,7 @@
 
 'use client'
 
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { BookOpen, Download, Calendar, Filter, Search } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
@@ -74,11 +74,11 @@ export function GeneralLedgerReport() {
   }, [accounts])
 
   // 查詢報表
-  const handleSearch = async () => {
+  const handleSearch = useCallback(async () => {
     if (!startDate || !endDate) return
     const data = await fetchGeneralLedger(startDate, endDate, selectedAccountId || undefined)
     setEntries(data)
-  }
+  }, [startDate, endDate, selectedAccountId, fetchGeneralLedger])
 
   // 初次載入時查詢
   useEffect(() => {
