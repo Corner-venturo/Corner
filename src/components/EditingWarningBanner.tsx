@@ -2,6 +2,7 @@
 
 import { AlertTriangle, Users } from 'lucide-react'
 import { useEditingPresence } from '@/hooks/useEditingPresence'
+import { COMPONENT_LABELS } from './constants/labels'
 
 interface EditingWarningBannerProps {
   resourceType: string
@@ -16,7 +17,7 @@ interface EditingWarningBannerProps {
 export function EditingWarningBanner({
   resourceType,
   resourceId,
-  resourceName = '此頁面',
+  resourceName = COMPONENT_LABELS.DEFAULT_RESOURCE_NAME,
 }: EditingWarningBannerProps) {
   const { otherEditors, isOtherEditing, currentEditors } = useEditingPresence({
     resourceType,
@@ -35,15 +36,15 @@ export function EditingWarningBanner({
       <AlertTriangle className="w-5 h-5 text-morandi-gold flex-shrink-0 mt-0.5" />
       <div className="flex-1">
         <p className="text-sm font-medium text-morandi-gold">
-          {editorNames} 正在編輯{resourceName}
+          {editorNames} {COMPONENT_LABELS.EDITING_SUFFIX}{resourceName}
         </p>
         <p className="text-xs text-status-warning mt-1">
-          同時編輯可能導致資料衝突，建議等對方編輯完成後再進行修改。
+          {COMPONENT_LABELS.EDITING_CONFLICT_WARNING}
         </p>
       </div>
       <div className="flex items-center gap-1 text-xs text-status-warning">
         <Users className="w-4 h-4" />
-        <span>{currentEditors.length} 人在線</span>
+        <span>{currentEditors.length} {COMPONENT_LABELS.ONLINE_SUFFIX}</span>
       </div>
     </div>
   )

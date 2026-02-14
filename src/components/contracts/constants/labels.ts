@@ -59,4 +59,8 @@ export const COMP_CONTRACTS_LABELS = {
   集合地點_例如_桃園國際機場第一航廈: '集合地點（例如：桃園國際機場第一航廈）',
   人: '人',
   旅客資訊_甲方: '旅客資訊（甲方）',
+  SELECT_TOUR_TITLE: '選擇團體建立合約',
+  ALL_TOURS_HAVE_CONTRACTS: '所有團體都已建立合約',
+  CANCEL: '取消',
+  CONFIRM_SELECT: '確認選擇',
 };

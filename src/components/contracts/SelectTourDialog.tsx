@@ -82,14 +82,14 @@ export const SelectTourDialog: React.FC<SelectTourDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={open => !open && handleClose()}>
       <DialogContent level={1} className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>選擇團體建立合約</DialogTitle>
+          <DialogTitle>{COMP_CONTRACTS_LABELS.SELECT_TOUR_TITLE}</DialogTitle>
         </DialogHeader>
 
         {/* 使用 Combobox 選擇旅遊團 */}
         <div className="py-4">
           {tours.length === 0 ? (
             <div className="text-center py-8 text-morandi-secondary">
-              所有團體都已建立合約
+              {COMP_CONTRACTS_LABELS.ALL_TOURS_HAVE_CONTRACTS}
             </div>
           ) : (
             <Combobox<Tour>
@@ -110,7 +110,7 @@ export const SelectTourDialog: React.FC<SelectTourDialogProps> = ({
         <DialogFooter>
           <Button variant="outline" onClick={handleClose} className="gap-2">
             <X size={16} />
-            取消
+            {COMP_CONTRACTS_LABELS.CANCEL}
           </Button>
           <Button
             onClick={handleConfirm}
@@ -118,7 +118,7 @@ export const SelectTourDialog: React.FC<SelectTourDialogProps> = ({
             className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
             <Check size={16} />
-            確認選擇
+            {COMP_CONTRACTS_LABELS.CONFIRM_SELECT}
           </Button>
         </DialogFooter>
       </DialogContent>
