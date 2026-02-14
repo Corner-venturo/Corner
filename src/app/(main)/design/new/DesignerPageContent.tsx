@@ -33,7 +33,7 @@ import { useBrochureEditorV2 } from '@/features/designer/hooks/useBrochureEditor
 import { useMaskEditMode } from '@/features/designer/hooks/useMaskEditMode'
 import { LoadingOverlay, SavingIndicator } from '@/features/designer/components/LoadingOverlay'
 import { ElementLibrary } from '@/features/designer/components/ElementLibrary'
-import { EditorToolbar } from '@/features/designer/components/EditorToolbar'
+import { DesignerToolbar } from '@/features/designer/components/DesignerToolbar'
 import { LayerPanel } from '@/features/designer/components/LayerPanel'
 import { TemplateSelector } from '@/features/designer/components/TemplateSelector'
 import { PageListSidebar } from '@/features/designer/components/PageListSidebar'
@@ -797,7 +797,7 @@ export default function DesignerPageContent() {
       />
 
       {/* Toolbar */}
-      <EditorToolbar
+      <DesignerToolbar
         selectedElementId={selectedObjectIds[0] || null}
         selectedElement={selectedObject as unknown as CanvasElement}
         selectedCount={selectedObjectIds.length}

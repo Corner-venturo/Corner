@@ -31,19 +31,19 @@ import { Editor } from '@tiptap/react'
 import { cn } from '@/lib/utils'
 import { CANVAS_EDITOR_LABELS } from './constants/labels'
 
-interface EditorToolbarProps {
+interface CanvasToolbarProps {
   editor: Editor
   onSetLink: () => void
   onAddImage: () => void
   onUploadImage: () => void
 }
 
-export function EditorToolbar({
+export function CanvasToolbar({
   editor,
   onSetLink,
   onAddImage,
   onUploadImage,
-}: EditorToolbarProps) {
+}: CanvasToolbarProps) {
   return (
     <div className="border-b border-border bg-morandi-container/5 px-4 py-2 flex items-center gap-1 flex-wrap">
       {/* Undo/Redo */}

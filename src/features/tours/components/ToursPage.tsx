@@ -18,7 +18,7 @@ import type { Tour } from '@/stores/types'
 import { useToursForm } from '../hooks/useToursForm'
 import { TourFilters } from './TourFilters'
 import { TourTable } from './TourTable'
-import { TourForm } from './TourForm'
+import { TourFormShell } from './TourFormShell'
 import { DeleteConfirmDialog } from './DeleteConfirmDialog'
 import { ArchiveReasonDialog } from './ArchiveReasonDialog'
 import { LinkItineraryToTourDialog } from './LinkItineraryToTourDialog'
@@ -347,7 +347,7 @@ export const ToursPage: React.FC = () => {
       </div>
 
       {/* TourForm only for create mode */}
-      <TourForm
+      <TourFormShell
         isOpen={dialogState.isOpen && dialogState.type === 'create'}
         onClose={() => {
           resetForm()

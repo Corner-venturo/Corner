@@ -15,7 +15,7 @@ import {
 } from './tour-form'
 import { TOUR_FORM } from '../constants'
 
-interface TourFormProps {
+interface TourFormShellProps {
   isOpen: boolean
   onClose: () => void
   mode: 'create' | 'edit'
@@ -30,7 +30,7 @@ interface TourFormProps {
   isFromProposal?: boolean
 }
 
-export function TourForm({
+export function TourFormShell({
   isOpen,
   onClose,
   mode,
@@ -42,7 +42,7 @@ export function TourForm({
   formError,
   onSubmit,
   isFromProposal,
-}: TourFormProps) {
+}: TourFormShellProps) {
   // 使用自定義 hook 處理航班查詢邏輯
   const {
     loadingOutbound,

@@ -5,7 +5,7 @@
 
 
 import { useCanvasEditor } from './useCanvasEditor'
-import { EditorToolbar } from './EditorToolbar'
+import { CanvasToolbar } from './CanvasToolbar'
 import { EditorContent } from './EditorContent'
 import { CanvasEditorProps } from '../shared/types'
 
@@ -41,7 +41,7 @@ export function CanvasEditor({ channelId, canvasId }: CanvasEditorProps) {
       />
 
       {/* Toolbar */}
-      <EditorToolbar
+      <CanvasToolbar
         editor={editor}
         onSetLink={setLink}
         onAddImage={addImage}

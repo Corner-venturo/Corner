@@ -4,7 +4,7 @@
  * Designer 組件導出
  */
 
-export { EditorToolbar } from './EditorToolbar'
+export { DesignerToolbar } from './DesignerToolbar'
 export { ContextMenu } from './ContextMenu'
 export { FontPicker, FontWeightPicker, TextAlignPicker } from './FontPicker'
 export { ImageFilters, FilterPresets, adjustmentsToCSS, FILTER_PRESETS } from './ImageFilters'

@@ -65,7 +65,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import type { CanvasElement } from './types'
 
-interface EditorToolbarProps {
+interface DesignerToolbarProps {
   selectedElementId: string | null
   selectedElement?: CanvasElement | null
   selectedCount: number
@@ -106,7 +106,7 @@ interface EditorToolbarProps {
   onFlipVertical?: () => void
 }
 
-export function EditorToolbar({
+export function DesignerToolbar({
   selectedElementId,
   selectedElement,
   selectedCount,
@@ -139,7 +139,7 @@ export function EditorToolbar({
   onDistributeV,
   onFlipHorizontal,
   onFlipVertical,
-}: EditorToolbarProps) {
+}: DesignerToolbarProps) {
   const hasSelection = !!selectedElementId
   const hasMultiSelection = selectedCount > 1
   const isLocked = selectedElement?.locked ?? false

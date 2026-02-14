@@ -1,7 +1,7 @@
 export { ToursPage } from './ToursPage'
 export { TourOverviewTab } from './TourOverviewTab'
 export { TourOperationsAddButton } from './TourOperationsAddButton'
-export { TourForm } from './TourForm'
+export { TourFormShell } from './TourFormShell'
 export { DeleteConfirmDialog } from './DeleteConfirmDialog'
 
 // Tour Lifecycle V2.0
