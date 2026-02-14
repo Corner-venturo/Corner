@@ -101,7 +101,7 @@ export function HotelConfirmationSection({
     if (!req) return { status: 'pending', label: HOTEL_CONFIRMATION_SECTION_LABELS.待確認, color: 'bg-morandi-gold/20 text-morandi-gold' }
     if (req.status === 'confirmed') return { status: 'confirmed', label: CONFIRMATION_HEADER_LABELS.已確認, color: 'bg-morandi-green/20 text-morandi-green' }
     if (req.status === 'replied') return { status: 'replied', label: HOTEL_CONFIRMATION_SECTION_LABELS.已回覆, color: 'bg-morandi-container text-morandi-primary' }
-    return { status: 'pending', label: '待確認', color: 'bg-morandi-gold/20 text-morandi-gold' }
+    return { status: 'pending', label: HOTEL_CONFIRMATION_SECTION_LABELS.待確認, color: 'bg-morandi-gold/20 text-morandi-gold' }
   }
 
   return (
@@ -109,7 +109,7 @@ export function HotelConfirmationSection({
       <div className="flex items-center justify-between px-4 py-2 bg-morandi-primary text-white">
         <div className="flex items-center gap-2">
           <span className="font-medium">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.CONFIRM_2803}</span>
-          <span className="text-white/80 text-sm">({nightlyAccommodations.length} 晚)</span>
+          <span className="text-white/80 text-sm">{HOTEL_CONFIRMATION_SECTION_LABELS.NIGHTS_PREFIX}{nightlyAccommodations.length}{HOTEL_CONFIRMATION_SECTION_LABELS.NIGHTS_SUFFIX}</span>
         </div>
       </div>
       <table className="w-full text-sm">
@@ -131,7 +131,7 @@ export function HotelConfirmationSection({
                 <td className="px-3 py-2">
                   <span className="font-medium">{night.hotelName}</span>
                   {night.isSameAsPrevious && (
-                    <span className="ml-2 text-xs text-morandi-secondary">(續住)</span>
+                    <span className="ml-2 text-xs text-morandi-secondary">{HOTEL_CONFIRMATION_SECTION_LABELS.CONTINUED_STAY}</span>
                   )}
                 </td>
                 <td className="px-3 py-2 text-morandi-secondary">{roomTypes}</td>

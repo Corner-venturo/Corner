@@ -152,7 +152,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                 <div className="p-3 space-y-3">
                   <div className="grid grid-cols-3 gap-2">
                     <div>
-                      <label className="block text-xs text-morandi-primary mb-1">Day 標籤</label>
+                      <label className="block text-xs text-morandi-primary mb-1">{COMP_EDITOR_LABELS.DAY_LABEL}</label>
                       <Input
                         value={day.dayLabel || ''}
                         onChange={e => updateDay(index, 'dayLabel', e.target.value)}

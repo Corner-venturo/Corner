@@ -309,7 +309,7 @@ export default function WeekReviewDialog({ open, onOpenChange, selectedWeek }: W
                   <div>
                     <h4 className="text-sm font-semibold text-morandi-primary">{TIMEBOX_LABELS.COPYING_928}</h4>
                     <p className="text-xs text-morandi-secondary mt-1">
-                      上週有 {lastWeekScheduledBoxes.length} 個排程，要複製到本週嗎？
+                      {TIMEBOX_LABELS.LAST_WEEK_COPY_PREFIX}{lastWeekScheduledBoxes.length}{TIMEBOX_LABELS.LAST_WEEK_COPY_SUFFIX}
                     </p>
                   </div>
                   <Button
@@ -339,7 +339,7 @@ export default function WeekReviewDialog({ open, onOpenChange, selectedWeek }: W
                   <div>
                     <h4 className="text-sm font-semibold text-morandi-primary">{TIMEBOX_LABELS.COPYING_8464}</h4>
                     <p className="text-xs text-morandi-secondary mt-1">
-                      本週有 {currentScheduledBoxes.length} 個排程
+                      {TIMEBOX_LABELS.THIS_WEEK_COUNT_PREFIX}{currentScheduledBoxes.length}{TIMEBOX_LABELS.THIS_WEEK_COUNT_SUFFIX}
                       {nextWeekScheduledBoxes.length > 0 && (
                         <span className="text-morandi-red">（{WEEK_REVIEW_DIALOG_LABELS.下週已有排程.replace('{count}', nextWeekScheduledBoxes.length.toString())}）</span>
                       )}
@@ -352,11 +352,11 @@ export default function WeekReviewDialog({ open, onOpenChange, selectedWeek }: W
                     className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
                   >
                     {isCopying ? (
-                      <>複製中...</>
+                      <>{TIMEBOX_LABELS.COPYING_342}</>
                     ) : (
                       <>
                         <Copy className="h-4 w-4" />
-                        複製到下週
+                        {TIMEBOX_LABELS.COPYING_8464}
                       </>
                     )}
                   </Button>

@@ -110,7 +110,7 @@ export function HotelEditor({
   const addHotel = () => {
     const newHotel: HotelData = {
       id: `hotel-${Date.now()}`,
-      nameZh: '新飯店',
+      nameZh: DESIGNER_LABELS.NEW_HOTEL,
       nameEn: '',
       location: '',
       description: '',

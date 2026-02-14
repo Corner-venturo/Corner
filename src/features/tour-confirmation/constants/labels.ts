@@ -192,6 +192,9 @@ export const HOTEL_CONFIRMATION_SECTION_LABELS = {
   未指定: '未指定',
   待確認: '待確認',
   已回覆: '已回覆',
+  NIGHTS_SUFFIX: ' 晚)',
+  NIGHTS_PREFIX: '(',
+  CONTINUED_STAY: '(續住)',
 };
 
 

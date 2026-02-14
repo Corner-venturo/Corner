@@ -32,7 +32,7 @@ export function ChapterList({ currentChapter, onChapterSelect }: ChapterListProp
 
   return (
     <div className="space-y-2">
-      <h3 className="text-lg font-medium text-morandi-primary mb-4">15 個魔法章節</h3>
+      <h3 className="text-lg font-medium text-morandi-primary mb-4">{MANIFESTATION_LABELS.MAGIC_CHAPTERS}</h3>
 
       <div className="space-y-2">
         {chapters.map(chapter => {

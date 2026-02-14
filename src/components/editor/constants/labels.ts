@@ -613,4 +613,5 @@ export const COMP_EDITOR_LABELS = {
   LABEL_5706: '出發時間',
   STAR_SUFFIX: '星',
   SHIFT_ENTER_HINT: 'Shift+Enter 換行',
+  DAY_LABEL: 'Day 標籤',
 };

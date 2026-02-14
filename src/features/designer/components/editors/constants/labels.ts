@@ -75,4 +75,12 @@ export const DESIGNER_LABELS = {
   LABEL_4403: '桌型（選填）',
   ADD_4177: '新增桌',
   PERSON_SUFFIX: ' 人',
+  NEW_HOTEL: '新飯店',
+  NIGHTS_SUFFIX: '晚',
+  SELECTED_COUNT_PREFIX: '已選擇 ',
+  SELECTED_COUNT_MID: ' / ',
+  SELECTED_COUNT_SUFFIX: ' 間飯店介紹',
+  IMPORT_HINT: '請點擊上方按鈕從行程帶入飯店',
+  NO_HOTEL_DATA: '尚無飯店資料，請手動新增',
+  UNNAMED_HOTEL: '未命名飯店',
 }

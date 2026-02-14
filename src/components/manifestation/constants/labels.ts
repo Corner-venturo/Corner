@@ -34,4 +34,5 @@ export const MANIFESTATION_LABELS = {
   LABEL_3743: '願望之牆',
   LABEL_4687: '每一個願望，都值得被看見和祝福',
   LABEL_7872: '為這個願望祝福',
+  MAGIC_CHAPTERS: '15 個魔法章節',
 }

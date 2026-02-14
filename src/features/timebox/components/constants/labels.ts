@@ -55,4 +55,8 @@ export const TIMEBOX_LABELS = {
   SAVING_9813: '儲存回顧',
 
   TIME: '時間',
+  LAST_WEEK_COPY_PREFIX: '上週有 ',
+  LAST_WEEK_COPY_SUFFIX: ' 個排程，要複製到本週嗎？',
+  THIS_WEEK_COUNT_PREFIX: '本週有 ',
+  THIS_WEEK_COUNT_SUFFIX: ' 個排程',
 }
