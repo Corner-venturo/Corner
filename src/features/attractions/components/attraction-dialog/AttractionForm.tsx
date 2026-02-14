@@ -31,7 +31,7 @@ export function AttractionForm({
       <div className="grid grid-cols-2 gap-4">
         {/* 中文名稱 */}
         <div>
-          <label className="text-sm font-medium">中文名稱 *</label>
+          <label className="text-sm font-medium">{ATTRACTION_FORM_LABELS.ZH_NAME}</label>
           <Input
             value={formData.name}
             onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
@@ -42,7 +42,7 @@ export function AttractionForm({
 
         {/* 英文名稱 */}
         <div>
-          <label className="text-sm font-medium">英文名稱</label>
+          <label className="text-sm font-medium">{ATTRACTION_FORM_LABELS.EN_NAME}</label>
           <Input
             value={formData.english_name}
             onChange={e => setFormData(prev => ({ ...prev, english_name: e.target.value }))}
@@ -53,7 +53,7 @@ export function AttractionForm({
 
       {/* 描述 */}
       <div>
-        <label className="text-sm font-medium">描述</label>
+        <label className="text-sm font-medium">{ATTRACTION_FORM_LABELS.DESCRIPTION_LABEL}</label>
         <textarea
           value={formData.description}
           onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
@@ -65,7 +65,7 @@ export function AttractionForm({
       {/* 地點選擇 */}
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <label className="text-sm font-medium">國家 *</label>
+          <label className="text-sm font-medium">{ATTRACTION_FORM_LABELS.COUNTRY}</label>
           <Select
             value={formData.country_id}
             onValueChange={value =>
@@ -92,7 +92,7 @@ export function AttractionForm({
 
         {availableRegions.length > 0 && (
           <div>
-            <label className="text-sm font-medium">地區（選填）</label>
+            <label className="text-sm font-medium">{ATTRACTION_FORM_LABELS.REGION}</label>
             <Select
               value={formData.region_id}
               onValueChange={value =>
@@ -118,7 +118,7 @@ export function AttractionForm({
         )}
 
         <div>
-          <label className="text-sm font-medium">城市（選填）</label>
+          <label className="text-sm font-medium">{ATTRACTION_FORM_LABELS.CITY_SELECT}</label>
           <Select
             value={formData.city_id || '_none_'}
             onValueChange={value => setFormData(prev => ({ ...prev, city_id: value === '_none_' ? '' : value }))}
@@ -127,7 +127,7 @@ export function AttractionForm({
               <SelectValue placeholder={ATTRACTION_FORM_LABELS.不指定} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="_none_">不指定</SelectItem>
+              <SelectItem value="_none_">{ATTRACTION_FORM_LABELS.NOT_SPECIFIED}</SelectItem>
               {availableCities.map((c) => (
                 <SelectItem key={c.id} value={c.id}>
                   {c.name}
@@ -141,7 +141,7 @@ export function AttractionForm({
       {/* 類別與標籤 */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium">類別</label>
+          <label className="text-sm font-medium">{ATTRACTION_FORM_LABELS.CATEGORY}</label>
           <Select
             value={formData.category}
             onValueChange={value => setFormData(prev => ({ ...prev, category: value }))}
@@ -160,7 +160,7 @@ export function AttractionForm({
         </div>
 
         <div>
-          <label className="text-sm font-medium">標籤（逗號分隔）</label>
+          <label className="text-sm font-medium">{ATTRACTION_FORM_LABELS.TAGS}</label>
           <Input
             value={formData.tags}
             onChange={e => setFormData(prev => ({ ...prev, tags: e.target.value }))}
@@ -171,7 +171,7 @@ export function AttractionForm({
 
       {/* 建議停留時間 */}
       <div>
-        <label className="text-sm font-medium">建議停留時間（分鐘）</label>
+        <label className="text-sm font-medium">{ATTRACTION_FORM_LABELS.DURATION}</label>
         <Input
           type="number"
           value={formData.duration_minutes}
@@ -185,7 +185,7 @@ export function AttractionForm({
       {/* 聯絡資訊 */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium">電話</label>
+          <label className="text-sm font-medium">{ATTRACTION_FORM_LABELS.PHONE}</label>
           <Input
             value={formData.phone}
             onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
@@ -194,7 +194,7 @@ export function AttractionForm({
         </div>
 
         <div>
-          <label className="text-sm font-medium">官網</label>
+          <label className="text-sm font-medium">{ATTRACTION_FORM_LABELS.WEBSITE}</label>
           <Input
             value={formData.website}
             onChange={e => setFormData(prev => ({ ...prev, website: e.target.value }))}
@@ -205,7 +205,7 @@ export function AttractionForm({
 
       {/* 地址 */}
       <div>
-        <label className="text-sm font-medium">地址</label>
+        <label className="text-sm font-medium">{ATTRACTION_FORM_LABELS.ADDRESS}</label>
         <Input
           value={formData.address}
           onChange={e => setFormData(prev => ({ ...prev, address: e.target.value }))}
@@ -215,7 +215,7 @@ export function AttractionForm({
 
       {/* 備註 */}
       <div>
-        <label className="text-sm font-medium">內部備註</label>
+        <label className="text-sm font-medium">{ATTRACTION_FORM_LABELS.INTERNAL_NOTES}</label>
         <textarea
           value={formData.notes}
           onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
@@ -230,7 +230,7 @@ export function AttractionForm({
           checked={formData.is_active}
           onCheckedChange={checked => setFormData(prev => ({ ...prev, is_active: checked as boolean }))}
         />
-        <label className="text-sm">啟用此景點</label>
+        <label className="text-sm">{ATTRACTION_FORM_LABELS.ENABLE_ATTRACTION}</label>
       </div>
     </>
   )

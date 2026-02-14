@@ -1,5 +1,7 @@
 'use client'
 
+import { FLIGHT_WIDGET_LABELS } from '../constants/labels'
+
 import { getTodayString } from '@/lib/utils/format-date'
 
 import { useState, useEffect, useTransition } from 'react'
@@ -377,7 +379,7 @@ export function FlightWidget() {
               <div className="bg-card/50 rounded-lg p-3 space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex-1">
-                    <p className="text-xs text-morandi-secondary mb-1">出發</p>
+                    <p className="text-xs text-morandi-secondary mb-1">{FLIGHT_WIDGET_LABELS.DEPARTURE}</p>
                     <p className="font-bold text-base text-morandi-primary">
                       {flightData.departure.iata}
                     </p>
@@ -392,7 +394,7 @@ export function FlightWidget() {
                     )}
                   </div>
                   <div className="flex-1 text-right">
-                    <p className="text-xs text-morandi-secondary mb-1">抵達</p>
+                    <p className="text-xs text-morandi-secondary mb-1">{FLIGHT_WIDGET_LABELS.ARRIVAL}</p>
                     <p className="font-bold text-base text-morandi-primary">
                       {flightData.arrival.iata}
                     </p>
@@ -408,7 +410,7 @@ export function FlightWidget() {
                 <div className="bg-card/50 rounded-lg p-2.5">
                   <div className="flex items-center gap-1.5 mb-1">
                     <PlaneTakeoff className="w-3 h-3 text-morandi-secondary" />
-                    <p className="text-xs text-morandi-secondary">起飛</p>
+                    <p className="text-xs text-morandi-secondary">{FLIGHT_WIDGET_LABELS.TAKEOFF}</p>
                   </div>
                   <p className="font-semibold text-sm text-morandi-primary">
                     {flightData.departure.time}
@@ -423,7 +425,7 @@ export function FlightWidget() {
                 <div className="bg-card/50 rounded-lg p-2.5">
                   <div className="flex items-center gap-1.5 mb-1">
                     <PlaneLanding className="w-3 h-3 text-morandi-secondary" />
-                    <p className="text-xs text-morandi-secondary">降落</p>
+                    <p className="text-xs text-morandi-secondary">{FLIGHT_WIDGET_LABELS.LANDING}</p>
                   </div>
                   <p className="font-semibold text-sm text-morandi-primary">
                     {flightData.arrival.time}
@@ -439,7 +441,7 @@ export function FlightWidget() {
               {/* 機型 */}
               {flightData.aircraft && (
                 <div className="bg-card/50 rounded-lg p-2.5">
-                  <p className="text-xs text-morandi-secondary mb-1">機型</p>
+                  <p className="text-xs text-morandi-secondary mb-1">{FLIGHT_WIDGET_LABELS.AIRCRAFT}</p>
                   <p className="font-semibold text-sm text-morandi-primary">
                     {flightData.aircraft}
                   </p>
@@ -474,12 +476,12 @@ export function FlightWidget() {
             <table className="w-full text-sm">
               <thead className="bg-muted sticky top-0">
                 <tr>
-                  <th className="px-3 py-3 text-left font-semibold text-morandi-primary">時間</th>
-                  <th className="px-3 py-3 text-left font-semibold text-morandi-primary">航班</th>
-                  <th className="px-3 py-3 text-center font-semibold text-morandi-primary">出發</th>
+                  <th className="px-3 py-3 text-left font-semibold text-morandi-primary">{FLIGHT_WIDGET_LABELS.TIME}</th>
+                  <th className="px-3 py-3 text-left font-semibold text-morandi-primary">{FLIGHT_WIDGET_LABELS.FLIGHT}</th>
+                  <th className="px-3 py-3 text-center font-semibold text-morandi-primary">{FLIGHT_WIDGET_LABELS.DEPARTURE}</th>
                   <th className="px-2 py-3 text-center font-semibold text-morandi-secondary w-8"></th>
-                  <th className="px-3 py-3 text-center font-semibold text-morandi-primary">抵達</th>
-                  <th className="px-3 py-3 text-left font-semibold text-morandi-primary">航廈</th>
+                  <th className="px-3 py-3 text-center font-semibold text-morandi-primary">{FLIGHT_WIDGET_LABELS.ARRIVAL}</th>
+                  <th className="px-3 py-3 text-left font-semibold text-morandi-primary">{FLIGHT_WIDGET_LABELS.TERMINAL}</th>
                   <th className="px-3 py-3 text-left font-semibold text-morandi-primary">狀態</th>
                 </tr>
               </thead>

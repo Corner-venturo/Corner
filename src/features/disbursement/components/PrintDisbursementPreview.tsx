@@ -12,6 +12,8 @@
 
 'use client'
 
+import { PRINT_LABELS } from '../constants/labels'
+
 import React, { forwardRef, useMemo } from 'react'
 import type { DisbursementOrder, PaymentRequest, PaymentRequestItem } from '@/stores/types'
 import { formatDate } from '@/lib/utils'
@@ -266,12 +268,12 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
               </colgroup>
               <thead>
                 <tr style={{ borderBottom: `2px solid ${COLORS.brown}` }}>
-                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>付款對象</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>請款編號</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>團名</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>項目說明</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>金額</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>小計</th>
+                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.PAYEE}</th>
+                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.REQUEST_NO}</th>
+                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.TOUR_NAME}</th>
+                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.ITEM_DESC}</th>
+                  <th style={{ padding: '10px 8px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.AMOUNT}</th>
+                  <th style={{ padding: '10px 8px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.SUBTOTAL}</th>
                 </tr>
               </thead>
               <tbody>
@@ -302,7 +304,7 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
             </table>
             {/* 團體小計 */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: '8px', marginBottom: '24px', borderTop: `1px solid ${COLORS.gold}` }}>
-              <span style={{ fontSize: '12px', color: COLORS.gray, marginRight: '16px' }}>團體小計</span>
+              <span style={{ fontSize: '12px', color: COLORS.gray, marginRight: '16px' }}>{PRINT_LABELS.TOUR_SUBTOTAL}</span>
               <span style={{ fontSize: '13px', fontWeight: 600, color: COLORS.brown }}>NT$ {tourTotal.toLocaleString()}</span>
             </div>
           </>
@@ -336,12 +338,12 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
               </colgroup>
               <thead>
                 <tr style={{ borderBottom: `2px solid ${COLORS.brown}` }}>
-                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>付款對象</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>請款編號</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>類型</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>項目說明</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>金額</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>小計</th>
+                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.PAYEE}</th>
+                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.REQUEST_NO}</th>
+                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.TYPE}</th>
+                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.ITEM_DESC}</th>
+                  <th style={{ padding: '10px 8px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.AMOUNT}</th>
+                  <th style={{ padding: '10px 8px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.SUBTOTAL}</th>
                 </tr>
               </thead>
               <tbody>

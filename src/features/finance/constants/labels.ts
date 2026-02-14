@@ -156,6 +156,16 @@ export const ISSUE_INVOICE_DIALOG_LABELS = {
   開立失敗: '開立失敗',
   輸入發票金額: '輸入發票金額',
   開立發票: '開立發票',
+  ORDER_INFO: '訂單資訊',
+  ORDER_NUMBER_LABEL: '訂單編號：',
+  CONTACT_LABEL: '聯絡人：',
+  LOADING: '載入中...',
+  RECEIVED: '已收款',
+  INVOICED: '已開發票',
+  AVAILABLE: '可開金額',
+  INVOICE_AMOUNT: '發票金額 *',
+  EXCEEDS_AVAILABLE: '金額超過可開金額',
+  PRODUCT_NAME: '品名',
 };
 
 // 請款單 (AddRequestDialog / RequestDetailDialog)
@@ -248,3 +258,18 @@ export const BATCH_RECEIPT_FORM_LABELS = {
   還有金額未分配: '還有金額未分配',
 };
 
+
+
+
+export const RECEIPT_CONFIRM_LABELS = {
+  TITLE: '收款單詳情',
+  TOUR_NAME: '團名：',
+  ORDER: '訂單：',
+  STATUS: '狀態：',
+  PAYMENT_METHOD: '收款方式',
+  TRANSACTION_DATE: '交易日期',
+  PAYER: '付款人',
+  REMARKS: '備註',
+  RECEIVABLE: '應收金額',
+  CONFIRM: '確認',
+}

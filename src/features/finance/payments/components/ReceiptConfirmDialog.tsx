@@ -5,6 +5,8 @@
 
 'use client'
 
+import { RECEIPT_CONFIRM_LABELS } from '../../constants/labels'
+
 import { useState } from 'react'
 import { Check, X, AlertCircle, Trash2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -150,7 +152,7 @@ export function ReceiptConfirmDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent level={2} className="max-w-[800px] flex flex-col">
         <DialogHeader>
-          <DialogTitle>收款單詳情</DialogTitle>
+          <DialogTitle>{RECEIPT_CONFIRM_LABELS.TITLE}</DialogTitle>
           <p className="text-sm text-muted-foreground">
             {receipt.receipt_number}
           </p>
@@ -159,15 +161,15 @@ export function ReceiptConfirmDialog({
         {/* 基本資訊 */}
         <div className="flex gap-6 text-sm">
           <div>
-            <span className="text-muted-foreground">團名：</span>
+            <span className="text-muted-foreground">{RECEIPT_CONFIRM_LABELS.TOUR_NAME}</span>
             <span className="font-medium">{receipt.tour_name || '-'}</span>
           </div>
           <div>
-            <span className="text-muted-foreground">訂單：</span>
+            <span className="text-muted-foreground">{RECEIPT_CONFIRM_LABELS.ORDER}</span>
             <span className="font-medium">{receipt.order_number || '-'}</span>
           </div>
           <div>
-            <span className="text-muted-foreground">狀態：</span>
+            <span className="text-muted-foreground">{RECEIPT_CONFIRM_LABELS.STATUS}</span>
             <span className={cn(
               'font-medium',
               isConfirmed ? 'text-morandi-green' : 'text-morandi-gold'
@@ -182,13 +184,13 @@ export function ReceiptConfirmDialog({
           <table className="w-full border-collapse">
             <thead>
               <tr className="text-xs text-morandi-primary font-medium bg-morandi-container/50">
-                <th className="text-left py-2.5 px-3 border-b border-r border-border" style={{ width: '100px' }}>收款方式</th>
-                <th className="text-left py-2.5 px-3 border-b border-r border-border" style={{ width: '120px' }}>交易日期</th>
-                <th className="text-left py-2.5 px-3 border-b border-r border-border">付款人</th>
-                <th className="text-left py-2.5 px-3 border-b border-r border-border">備註</th>
-                <th className="text-right py-2.5 px-3 border-b border-r border-border" style={{ width: '120px' }}>應收金額</th>
+                <th className="text-left py-2.5 px-3 border-b border-r border-border" style={{ width: '100px' }}>{RECEIPT_CONFIRM_LABELS.PAYMENT_METHOD}</th>
+                <th className="text-left py-2.5 px-3 border-b border-r border-border" style={{ width: '120px' }}>{RECEIPT_CONFIRM_LABELS.TRANSACTION_DATE}</th>
+                <th className="text-left py-2.5 px-3 border-b border-r border-border">{RECEIPT_CONFIRM_LABELS.PAYER}</th>
+                <th className="text-left py-2.5 px-3 border-b border-r border-border">{RECEIPT_CONFIRM_LABELS.REMARKS}</th>
+                <th className="text-right py-2.5 px-3 border-b border-r border-border" style={{ width: '120px' }}>{RECEIPT_CONFIRM_LABELS.RECEIVABLE}</th>
                 {!isConfirmed && (
-                  <th className="text-center py-2.5 px-3 border-b border-border" style={{ width: '100px' }}>確認</th>
+                  <th className="text-center py-2.5 px-3 border-b border-border" style={{ width: '100px' }}>{RECEIPT_CONFIRM_LABELS.CONFIRM}</th>
                 )}
                 {isConfirmed && (
                   <th className="text-right py-2.5 px-3 border-b border-border" style={{ width: '120px' }}>實收金額</th>

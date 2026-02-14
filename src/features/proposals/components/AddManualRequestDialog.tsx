@@ -6,6 +6,8 @@
 
 'use client'
 
+import { PROPOSAL_FORM_LABELS } from '../constants/labels'
+
 import React, { useState, useCallback } from 'react'
 import {
   Dialog,
@@ -299,7 +301,7 @@ export function AddManualRequestDialog({
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent level={3} className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle>手動新增需求</DialogTitle>
+          <DialogTitle>{PROPOSAL_FORM_LABELS.ADD_MANUAL}</DialogTitle>
         </DialogHeader>
 
         <div className="grid grid-cols-2 gap-x-6 gap-y-4 py-4">
@@ -307,7 +309,7 @@ export function AddManualRequestDialog({
           <div className="space-y-4">
             {/* 需求類別 */}
             <div className="space-y-2">
-              <Label required>需求類別</Label>
+              <Label required>{PROPOSAL_FORM_LABELS.CATEGORY}</Label>
               <Select
                 value={formData.category}
                 onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
@@ -327,7 +329,7 @@ export function AddManualRequestDialog({
 
             {/* 項目說明 */}
             <div className="space-y-2">
-              <Label required>項目說明</Label>
+              <Label required>{PROPOSAL_FORM_LABELS.ITEM_DESC}</Label>
               <Input
                 value={formData.title}
                 onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
@@ -337,7 +339,7 @@ export function AddManualRequestDialog({
 
             {/* 供應商 */}
             <div className="space-y-2">
-              <Label>供應商/廠商名稱</Label>
+              <Label>{PROPOSAL_FORM_LABELS.SUPPLIER_NAME}</Label>
               <Input
                 value={formData.supplierName}
                 onChange={(e) => setFormData(prev => ({ ...prev, supplierName: e.target.value }))}
@@ -348,7 +350,7 @@ export function AddManualRequestDialog({
             {/* 跨公司需求：指定供應商 Workspace */}
             {(formData.category === 'transport' || formData.category === 'guide') && (
               <div className="space-y-2">
-                <Label>發送給供應商</Label>
+                <Label>{PROPOSAL_FORM_LABELS.SEND_TO_SUPPLIER}</Label>
                 <Select
                   value={formData.recipientWorkspaceId}
                   onValueChange={(value) => setFormData(prev => ({ ...prev, recipientWorkspaceId: value === 'none' ? '' : value }))}
@@ -357,7 +359,7 @@ export function AddManualRequestDialog({
                     <SelectValue placeholder={loadingWorkspaces ? ADD_MANUAL_REQUEST_DIALOG_LABELS.載入中 : ADD_MANUAL_REQUEST_DIALOG_LABELS.選擇供應商_選填} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">不發送（內部處理）</SelectItem>
+                    <SelectItem value="none">{PROPOSAL_FORM_LABELS.NO_SEND}</SelectItem>
                     {supplierWorkspaces.map((ws) => (
                       <SelectItem key={ws.id} value={ws.id}>
                         {ws.name}
@@ -376,10 +378,10 @@ export function AddManualRequestDialog({
             {/* 交通專用欄位：司機、車號、手機 */}
             {formData.category === 'transport' && (
               <div className="space-y-3 p-3 bg-morandi-container/20 rounded-lg">
-                <p className="text-xs text-morandi-secondary font-medium">車輛資訊（供應商回覆後填寫）</p>
+                <p className="text-xs text-morandi-secondary font-medium">{PROPOSAL_FORM_LABELS.VEHICLE_INFO}</p>
                 <div className="grid grid-cols-3 gap-2">
                   <div className="space-y-1">
-                    <Label className="text-xs">司機</Label>
+                    <Label className="text-xs">{PROPOSAL_FORM_LABELS.DRIVER}</Label>
                     <Input
                       value={formData.driverName}
                       onChange={(e) => setFormData(prev => ({ ...prev, driverName: e.target.value }))}
@@ -388,7 +390,7 @@ export function AddManualRequestDialog({
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs">車號</Label>
+                    <Label className="text-xs">{PROPOSAL_FORM_LABELS.PLATE}</Label>
                     <Input
                       value={formData.plateNumber}
                       onChange={(e) => setFormData(prev => ({ ...prev, plateNumber: e.target.value }))}
@@ -397,7 +399,7 @@ export function AddManualRequestDialog({
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs">手機</Label>
+                    <Label className="text-xs">{PROPOSAL_FORM_LABELS.MOBILE}</Label>
                     <Input
                       value={formData.driverPhone}
                       onChange={(e) => setFormData(prev => ({ ...prev, driverPhone: e.target.value }))}

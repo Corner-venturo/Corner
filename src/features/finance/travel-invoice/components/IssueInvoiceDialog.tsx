@@ -163,38 +163,38 @@ export function IssueInvoiceDialog({
           {/* 訂單資訊 */}
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">訂單資訊</CardTitle>
+              <CardTitle className="text-sm">{ISSUE_INVOICE_DIALOG_LABELS.ORDER_INFO}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-morandi-secondary">訂單編號：</span>
+                  <span className="text-morandi-secondary">{ISSUE_INVOICE_DIALOG_LABELS.ORDER_NUMBER_LABEL}</span>
                   <span className="font-medium">{orderNumber}</span>
                 </div>
                 <div>
-                  <span className="text-morandi-secondary">聯絡人：</span>
+                  <span className="text-morandi-secondary">{ISSUE_INVOICE_DIALOG_LABELS.CONTACT_LABEL}</span>
                   <span className="font-medium">{contactPerson}</span>
                 </div>
               </div>
 
               {loadingSummary ? (
-                <p className="text-sm text-morandi-secondary mt-3">載入中...</p>
+                <p className="text-sm text-morandi-secondary mt-3">{ISSUE_INVOICE_DIALOG_LABELS.LOADING}</p>
               ) : summary ? (
                 <div className="grid grid-cols-3 gap-4 mt-3 pt-3 border-t">
                   <div>
-                    <p className="text-xs text-morandi-secondary">已收款</p>
+                    <p className="text-xs text-morandi-secondary">{ISSUE_INVOICE_DIALOG_LABELS.RECEIVED}</p>
                     <p className="font-medium">
                       <CurrencyCell amount={summary.paid_amount} />
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-morandi-secondary">已開發票</p>
+                    <p className="text-xs text-morandi-secondary">{ISSUE_INVOICE_DIALOG_LABELS.INVOICED}</p>
                     <p className="font-medium">
                       <CurrencyCell amount={summary.invoiced_amount} />
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-morandi-secondary">可開金額</p>
+                    <p className="text-xs text-morandi-secondary">{ISSUE_INVOICE_DIALOG_LABELS.AVAILABLE}</p>
                     <p className="font-medium text-morandi-gold">
                       <CurrencyCell amount={summary.invoiceable_amount} />
                     </p>
@@ -207,7 +207,7 @@ export function IssueInvoiceDialog({
           {/* 發票資訊 */}
           <div className="space-y-3">
             <div>
-              <Label>發票金額 *</Label>
+              <Label>{ISSUE_INVOICE_DIALOG_LABELS.INVOICE_AMOUNT}</Label>
               <Input
                 type="number"
                 value={amount}
@@ -216,12 +216,12 @@ export function IssueInvoiceDialog({
                 max={summary?.invoiceable_amount}
               />
               {summary && amount > summary.invoiceable_amount && (
-                <p className="text-xs text-morandi-red mt-1">金額超過可開金額</p>
+                <p className="text-xs text-morandi-red mt-1">{ISSUE_INVOICE_DIALOG_LABELS.EXCEEDS_AVAILABLE}</p>
               )}
             </div>
 
             <div>
-              <Label>品名</Label>
+              <Label>{ISSUE_INVOICE_DIALOG_LABELS.PRODUCT_NAME}</Label>
               <Input
                 value={itemName}
                 onChange={e => setItemName(e.target.value)}

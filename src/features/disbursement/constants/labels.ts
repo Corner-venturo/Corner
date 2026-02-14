@@ -94,3 +94,15 @@ export const DISBURSEMENT_LABELS = {
   確定要從此出納單移除: '確定要從此出納單移除「',
   嗎: '」嗎？',
 };
+
+
+export const PRINT_LABELS = {
+  PAYEE: '付款對象',
+  REQUEST_NO: '請款編號',
+  TOUR_NAME: '團名',
+  ITEM_DESC: '項目說明',
+  AMOUNT: '金額',
+  SUBTOTAL: '小計',
+  TOUR_SUBTOTAL: '團體小計',
+  TYPE: '類型',
+}

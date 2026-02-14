@@ -9,6 +9,8 @@
 
 'use client'
 
+import { PROPOSAL_FORM_LABELS } from '../constants/labels'
+
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import {
@@ -546,12 +548,12 @@ export function TourRequestFormDialog({
                 </h3>
                 <div className="space-y-1 text-sm">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-morandi-secondary whitespace-nowrap">公司：</span>
+                    <span className="text-morandi-secondary whitespace-nowrap">{PROPOSAL_FORM_LABELS.COMPANY}</span>
                     <span className="text-morandi-primary">{companyInfo.name}</span>
                   </div>
                   <div className="grid grid-cols-2 gap-x-4">
                     <div className="flex items-baseline">
-                      <span className="text-morandi-secondary whitespace-nowrap">電話：</span>
+                      <span className="text-morandi-secondary whitespace-nowrap">{PROPOSAL_FORM_LABELS.PHONE}</span>
                       <input
                         value={companyInfo.phone}
                         onChange={(e) => setCompanyInfo(prev => ({ ...prev, phone: e.target.value }))}
@@ -559,7 +561,7 @@ export function TourRequestFormDialog({
                       />
                     </div>
                     <div className="flex items-baseline">
-                      <span className="text-morandi-secondary whitespace-nowrap">傳真：</span>
+                      <span className="text-morandi-secondary whitespace-nowrap">{PROPOSAL_FORM_LABELS.FAX}</span>
                       <input
                         value={companyInfo.fax}
                         onChange={(e) => setCompanyInfo(prev => ({ ...prev, fax: e.target.value }))}
@@ -569,7 +571,7 @@ export function TourRequestFormDialog({
                   </div>
                   <div className="grid grid-cols-2 gap-x-4">
                     <div className="flex items-baseline">
-                      <span className="text-morandi-secondary whitespace-nowrap">業務：</span>
+                      <span className="text-morandi-secondary whitespace-nowrap">{PROPOSAL_FORM_LABELS.SALES}</span>
                       <select
                         value={companyInfo.sales}
                         onChange={(e) => setCompanyInfo(prev => ({ ...prev, sales: e.target.value }))}
@@ -583,7 +585,7 @@ export function TourRequestFormDialog({
                       </select>
                     </div>
                     <div className="flex items-baseline">
-                      <span className="text-morandi-secondary whitespace-nowrap">助理：</span>
+                      <span className="text-morandi-secondary whitespace-nowrap">{PROPOSAL_FORM_LABELS.ASSISTANT}</span>
                       <select
                         value={companyInfo.assistant}
                         onChange={(e) => setCompanyInfo(prev => ({ ...prev, assistant: e.target.value }))}
@@ -607,7 +609,7 @@ export function TourRequestFormDialog({
                 </h3>
                 <div className="space-y-1 text-sm">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-morandi-secondary whitespace-nowrap">廠商：</span>
+                    <span className="text-morandi-secondary whitespace-nowrap">{PROPOSAL_FORM_LABELS.SUPPLIER}</span>
                     <SupplierSearchInput
                       value={supplierInfo.name}
                       onChange={(val) => setSupplierInfo(prev => ({ ...prev, name: val, id: '' }))}
@@ -618,7 +620,7 @@ export function TourRequestFormDialog({
                   </div>
                   <div className="grid grid-cols-2 gap-x-4">
                     <div className="flex items-baseline">
-                      <span className="text-morandi-secondary whitespace-nowrap">城市：</span>
+                      <span className="text-morandi-secondary whitespace-nowrap">{PROPOSAL_FORM_LABELS.CITY}</span>
                       <input
                         value={cityInfo.customCity}
                         onChange={(e) => setCityInfo(prev => ({ ...prev, customCity: e.target.value }))}
@@ -626,7 +628,7 @@ export function TourRequestFormDialog({
                       />
                     </div>
                     <div className="flex items-baseline">
-                      <span className="text-morandi-secondary whitespace-nowrap">聯絡人：</span>
+                      <span className="text-morandi-secondary whitespace-nowrap">{PROPOSAL_FORM_LABELS.CONTACT}</span>
                       <input
                         value={supplierInfo.contactPerson}
                         onChange={(e) => setSupplierInfo(prev => ({ ...prev, contactPerson: e.target.value }))}
@@ -636,7 +638,7 @@ export function TourRequestFormDialog({
                   </div>
                   <div className="grid grid-cols-2 gap-x-4">
                     <div className="flex items-baseline">
-                      <span className="text-morandi-secondary whitespace-nowrap">電話：</span>
+                      <span className="text-morandi-secondary whitespace-nowrap">{PROPOSAL_FORM_LABELS.PHONE}</span>
                       <input
                         value={supplierInfo.phone}
                         onChange={(e) => setSupplierInfo(prev => ({ ...prev, phone: e.target.value }))}
@@ -644,7 +646,7 @@ export function TourRequestFormDialog({
                       />
                     </div>
                     <div className="flex items-baseline">
-                      <span className="text-morandi-secondary whitespace-nowrap">傳真：</span>
+                      <span className="text-morandi-secondary whitespace-nowrap">{PROPOSAL_FORM_LABELS.FAX}</span>
                       <input
                         value={supplierInfo.fax}
                         onChange={(e) => setSupplierInfo(prev => ({ ...prev, fax: e.target.value }))}

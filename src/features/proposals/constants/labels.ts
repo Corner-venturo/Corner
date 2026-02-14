@@ -199,3 +199,25 @@ export const VERSION_DROPDOWN_LABELS = {
   版本: (v: number) => `版本 ${v}`,
 };
 
+
+
+export const PROPOSAL_FORM_LABELS = {
+  COMPANY: '公司：',
+  PHONE: '電話：',
+  FAX: '傳真：',
+  SALES: '業務：',
+  ASSISTANT: '助理：',
+  SUPPLIER: '廠商：',
+  CITY: '城市：',
+  CONTACT: '聯絡人：',
+  ADD_MANUAL: '手動新增需求',
+  CATEGORY: '需求類別',
+  ITEM_DESC: '項目說明',
+  SUPPLIER_NAME: '供應商/廠商名稱',
+  SEND_TO_SUPPLIER: '發送給供應商',
+  NO_SEND: '不發送（內部處理）',
+  VEHICLE_INFO: '車輛資訊（供應商回覆後填寫）',
+  DRIVER: '司機',
+  PLATE: '車號',
+  MOBILE: '手機',
+}

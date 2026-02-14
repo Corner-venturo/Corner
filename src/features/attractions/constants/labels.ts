@@ -57,6 +57,22 @@ export const ATTRACTION_FORM_LABELS = {
   例如_文化_神社_歷史: '例如: 文化,神社,歷史',
   完整地址: '完整地址...',
   內部使用備註: '內部使用備註...',
+
+  ZH_NAME: '中文名稱 *',
+  EN_NAME: '英文名稱',
+  DESCRIPTION_LABEL: '描述',
+  COUNTRY: '國家 *',
+  REGION: '地區（選填）',
+  CITY_SELECT: '城市（選填）',
+  NOT_SPECIFIED: '不指定',
+  CATEGORY: '類別',
+  TAGS: '標籤（逗號分隔）',
+  DURATION: '建議停留時間（分鐘）',
+  PHONE: '電話',
+  WEBSITE: '官網',
+  ADDRESS: '地址',
+  INTERNAL_NOTES: '內部備註',
+  ENABLE_ATTRACTION: '啟用此景點',
 };
 
 export const ATTRACTION_IMAGE_UPLOAD_LABELS = {

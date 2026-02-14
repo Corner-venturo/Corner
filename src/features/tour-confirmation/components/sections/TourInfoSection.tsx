@@ -9,6 +9,7 @@ import type { TourConfirmationSheet } from '@/types/tour-confirmation-sheet.type
 import type { Database } from '@/lib/supabase/types'
 import { formatFlightDate } from '../../constants/currency'
 import type { TourOrder, AgeGroups } from '../../hooks/useTourSheetData'
+import { TOUR_INFO_LABELS } from '../../constants/labels'
 
 type TourRequestRow = Database['public']['Tables']['tour_requests']['Row']
 
@@ -54,30 +55,30 @@ export function TourInfoSection({
         <tbody>
           {/* 團名 / 團號 */}
           <tr className="border-b border-border">
-            <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium w-[100px]">團名</td>
+            <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium w-[100px]">{TOUR_INFO_LABELS.TOUR_NAME}</td>
             <td className="px-4 py-2 w-[40%]">{tour.name || '-'}</td>
-            <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium w-[100px]">團號</td>
+            <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium w-[100px]">{TOUR_INFO_LABELS.TOUR_CODE}</td>
             <td className="px-4 py-2">{tour.code || '-'}</td>
           </tr>
 
           {/* 出團日期 / 隨團領隊 */}
           <tr className="border-b border-border">
-            <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">出團日期</td>
+            <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">{TOUR_INFO_LABELS.DEPARTURE_DATE}</td>
             <td className="px-4 py-2 w-[40%]">
               {tour.departure_date && tour.return_date
                 ? `${tour.departure_date} ~ ${tour.return_date}`
                 : tour.departure_date || '-'}
             </td>
-            <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium w-[100px]">隨團領隊</td>
+            <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium w-[100px]">{TOUR_INFO_LABELS.TOUR_LEADER}</td>
             <td className="px-4 py-2">{sheet?.tour_leader_name || '-'}</td>
           </tr>
 
           {/* 聯絡人 + 去程航班 */}
           <tr className="border-b border-border">
-            <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">聯絡人</td>
+            <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">{TOUR_INFO_LABELS.CONTACT}</td>
             <td className="px-4 py-2">{primaryContact?.contact_person || '-'}</td>
             <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium w-[60px]">
-              <span className="text-morandi-green">去程</span>
+              <span className="text-morandi-green">{TOUR_INFO_LABELS.OUTBOUND}</span>
             </td>
             <td className="px-4 py-2">
               {outboundFlight?.flightNumber
@@ -88,10 +89,10 @@ export function TourInfoSection({
 
           {/* 聯絡電話 + 回程航班 */}
           <tr className="border-b border-border">
-            <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">聯絡電話</td>
+            <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">{TOUR_INFO_LABELS.CONTACT_PHONE}</td>
             <td className="px-4 py-2">{primaryContact?.contact_phone || '-'}</td>
             <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">
-              <span className="text-morandi-gold">回程</span>
+              <span className="text-morandi-gold">{TOUR_INFO_LABELS.RETURN}</span>
             </td>
             <td className="px-4 py-2">
               {returnFlightData?.flightNumber
@@ -102,7 +103,7 @@ export function TourInfoSection({
 
           {/* 人數配置 */}
           <tr className="border-b border-border">
-            <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">團體人數</td>
+            <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">{TOUR_INFO_LABELS.GROUP_SIZE}</td>
             <td className="px-4 py-2" colSpan={3}>
               <div className="flex items-center gap-6">
                 <span className="font-medium">{ageGroups.total} 人</span>

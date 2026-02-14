@@ -131,3 +131,14 @@ export const DASHBOARD_LABELS = {
   cancel: '取消',
   confirm: '確認'
 }
+
+export const FLIGHT_WIDGET_LABELS = {
+  DEPARTURE: '出發',
+  ARRIVAL: '抵達',
+  TAKEOFF: '起飛',
+  LANDING: '降落',
+  AIRCRAFT: '機型',
+  TIME: '時間',
+  FLIGHT: '航班',
+  TERMINAL: '航廈',
+}

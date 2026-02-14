@@ -165,3 +165,28 @@ export const HOTEL_CONFIRMATION_SECTION_LABELS = {
   已回覆: '已回覆',
 };
 
+
+
+export const TOUR_INFO_LABELS = {
+  TOUR_NAME: '團名',
+  TOUR_CODE: '團號',
+  DEPARTURE_DATE: '出團日期',
+  TOUR_LEADER: '隨團領隊',
+  CONTACT: '聯絡人',
+  OUTBOUND: '去程',
+  CONTACT_PHONE: '聯絡電話',
+  RETURN: '回程',
+  GROUP_SIZE: '團體人數',
+  GENERAL_PREFIX: '一般：',
+}
+
+export const CONFIRM_HEADER_LABELS = {
+  TOUR_CODE: '團號',
+  TOUR_NAME: '團名',
+  DEPARTURE_RETURN: '出發/回程',
+  LEADER: '領隊',
+  SALES: '業務',
+  ASSISTANT: '助理',
+  HEADCOUNT: '人數',
+  FLIGHT: '航班',
+}
