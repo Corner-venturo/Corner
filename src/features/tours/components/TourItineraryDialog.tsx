@@ -1,3 +1,4 @@
+/* eslint-disable venturo/no-custom-modal -- Loading overlay, not a dialog */
 /**
  * TourItineraryDialog - 旅遊團行程表對話框
  * 統一入口：直接開啟 PackageItineraryDialog（與提案版本一致）

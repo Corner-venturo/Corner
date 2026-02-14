@@ -44,6 +44,7 @@ export function LoadingOverlay({
   const Icon = config.icon
 
   return (
+    // eslint-disable-next-line venturo/no-custom-modal -- Loading overlay, not a dialog
     <div className="fixed inset-0 z-[9500] bg-background/80 backdrop-blur-sm flex items-center justify-center">
       <div className="bg-card rounded-xl shadow-lg border border-border p-8 w-[400px] max-w-[90vw]">
         {/* Logo/Title */}
