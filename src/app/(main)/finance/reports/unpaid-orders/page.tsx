@@ -140,7 +140,7 @@ export default function UnpaidOrdersPage() {
       align: 'center',
       render: (_value, row) => {
         if (row.days_since_departure > 0) {
-          return <Badge variant="destructive">{row.days_since_departure} 天</Badge>
+          return <Badge variant="destructive">{row.days_since_departure}{UNPAID_ORDERS_LABELS.DAYS_SUFFIX}</Badge>
         }
         if (row.days_since_departure === 0) return <span className="text-muted-foreground">{UNPAID_ORDERS_LABELS.TODAY}</span>
         return <span className="text-muted-foreground">{UNPAID_ORDERS_LABELS.NOT_DEPARTED}</span>
@@ -160,7 +160,7 @@ export default function UnpaidOrdersPage() {
       headerActions={
         <div className="flex items-center gap-3">
           <div className="text-sm text-muted-foreground">
-            未收總額：<span className="font-semibold text-foreground">NT${totalRemaining.toLocaleString()}</span>
+            {UNPAID_ORDERS_LABELS.TOTAL_REMAINING_PREFIX}<span className="font-semibold text-foreground">NT${totalRemaining.toLocaleString()}</span>
             （{filtered.length} 筆）
           </div>
           <Select value={filter} onValueChange={setFilter}>

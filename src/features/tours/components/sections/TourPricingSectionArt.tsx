@@ -149,7 +149,7 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                         >
                           {formatPrice(typeof tier.pricePerPerson === 'number' ? tier.pricePerPerson : Number(tier.pricePerPerson || tier.price) || 0)}
                         </span>
-                        <span className="text-sm text-morandi-secondary">TWD / 人</span>
+                        <span className="text-sm text-morandi-secondary">{TOURS_LABELS.TWD_PER_PERSON}</span>
                       </div>
                     </div>
 

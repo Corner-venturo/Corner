@@ -66,7 +66,7 @@ export function DisbursementItemList({
           {DISBURSEMENT_LABELS.LABEL_623}
           {selectedRequestIds.length > 0 && (
             <span className="ml-2 text-morandi-gold">
-              （已選 {selectedRequestIds.length} 筆，共 NT$ {selectedAmount.toLocaleString()}）
+              {DISBURSEMENT_LABELS.SELECTED_PAREN_PREFIX}{selectedRequestIds.length}{DISBURSEMENT_LABELS.SELECTED_PAREN_MID}{selectedAmount.toLocaleString()}{DISBURSEMENT_LABELS.SELECTED_PAREN_SUFFIX}
             </span>
           )}
         </h3>

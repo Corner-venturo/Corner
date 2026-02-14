@@ -74,4 +74,7 @@ export const TOURS_LABELS = {
   LABEL_63: '取消與退費政策',
   LABEL_6529: '本行程適用「國外旅遊定型化契約書」之規定：',
   COLLAPSE: '收起',
+  TWD_PER_PERSON: 'TWD / 人',
+  LEADER_NAME_TBD: '領隊姓名待定',
+  MEETING_POINT_TBD: '集合地點待定',
 }

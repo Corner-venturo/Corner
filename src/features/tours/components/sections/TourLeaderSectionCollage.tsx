@@ -107,7 +107,7 @@ export function TourLeaderSectionCollage({ data, viewMode }: TourLeaderSectionCo
               </div>
 
               <div className="text-center" style={{ fontFamily: "'Gloria Hallelujah', cursive" }}>
-                <div className="text-xl">{data.leader?.name || '領隊姓名待定'}</div>
+                <div className="text-xl">{data.leader?.name || TOURS_LABELS.LEADER_NAME_TBD}</div>
               </div>
               <div className="text-center text-xs text-morandi-secondary" style={{ fontFamily: "'Space Mono', monospace" }}>
                 {data.leader?.title || 'YOUR GUIDE'}
@@ -154,7 +154,7 @@ export function TourLeaderSectionCollage({ data, viewMode }: TourLeaderSectionCo
                   </svg>
                 </div>
                 <div className="text-xs leading-relaxed" style={{ fontFamily: "'Space Mono', monospace" }}>
-                  <strong>{data.meetingInfo?.location || '集合地點待定'}</strong>
+                  <strong>{data.meetingInfo?.location || TOURS_LABELS.MEETING_POINT_TBD}</strong>
                 </div>
               </div>
 

@@ -110,7 +110,7 @@ export function DisbursementPrintDialog({
       <html>
       <head>
         <meta charset="utf-8">
-        <title>出納單 - ${order?.order_number}</title>
+        <title>${DISBURSEMENT_LABELS.DISBURSEMENT_TITLE} - ${order?.order_number}</title>
         <style>
           @page {
             size: A4 portrait;
@@ -191,7 +191,7 @@ export function DisbursementPrintDialog({
         <DialogHeader className="flex-shrink-0 px-6 py-4 border-b bg-morandi-background">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-lg">
-              列印預覽 - {order.order_number}
+              {DISBURSEMENT_LABELS.PRINT_PREVIEW} - {order.order_number}
             </DialogTitle>
             <div className="flex items-center gap-2 no-print">
               <Button

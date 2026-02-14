@@ -166,6 +166,8 @@ export const UNPAID_ORDERS_LABELS = {
   PENDING_DEPOSIT: '待收訂金',
 
   LABEL_1474: '未收款報表',
+  DAYS_SUFFIX: ' 天',
+  TOTAL_REMAINING_PREFIX: '未收總額：',
 }
 
 export const REQUESTS_PAGE_LABELS = {

@@ -193,7 +193,7 @@ export function useHistoryColumns({ onPrintPDF }: UseHistoryColumnsProps) {
       {
         key: 'payment_request_ids',
         label: DISBURSEMENT_LABELS.請款單數,
-        render: (value: unknown) => <div className="text-center">{(value as string[]).length} 筆</div>,
+        render: (value: unknown) => <div className="text-center">{(value as string[]).length}{DISBURSEMENT_LABELS.筆}</div>,
       },
       {
         key: 'status',

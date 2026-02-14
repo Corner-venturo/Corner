@@ -423,14 +423,14 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
             color: COLORS.lightGray,
             margin: '0 0 8px 0',
           }}>
-            ─ 如果可以，讓我們一起探索世界的每個角落 ─
+            {DISBURSEMENT_LABELS.COMPANY_SLOGAN}
           </p>
           <p style={{
             fontSize: '10px',
             color: COLORS.lightGray,
             margin: 0,
           }}>
-            角落旅行社股份有限公司 © {new Date().getFullYear()}
+            {DISBURSEMENT_LABELS.COMPANY_FULL_NAME} © {new Date().getFullYear()}
           </p>
         </div>
       </div>

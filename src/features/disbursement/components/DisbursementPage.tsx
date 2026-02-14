@@ -234,11 +234,11 @@ export function DisbursementPage() {
         <div className="flex items-center gap-6 text-sm">
           <div className="text-right">
             <span className="text-morandi-muted">{DISBURSEMENT_LABELS.待出帳}</span>
-            <span className="ml-2 font-semibold text-morandi-gold">{pendingRequests.length} 筆</span>
+            <span className="ml-2 font-semibold text-morandi-gold">{pendingRequests.length}{DISBURSEMENT_LABELS.筆}</span>
           </div>
           <div className="text-right">
             <span className="text-morandi-muted">{DISBURSEMENT_LABELS.LABEL_4658}</span>
-            <span className="ml-2 font-semibold text-morandi-primary">{thisMonthOrders.length} 筆</span>
+            <span className="ml-2 font-semibold text-morandi-primary">{thisMonthOrders.length}{DISBURSEMENT_LABELS.筆}</span>
           </div>
           <div className="text-right flex items-center gap-2">
             <span className="text-morandi-muted">{DISBURSEMENT_LABELS.LABEL_1688}</span>
