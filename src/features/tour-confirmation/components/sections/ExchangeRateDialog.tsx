@@ -3,6 +3,7 @@
  */
 
 import React from 'react'
+import { X, Check } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -53,16 +54,18 @@ export function ExchangeRateDialog({
               onChange={(e) => onExchangeRateInputChange(e.target.value)}
             />
             <p className="text-xs text-morandi-secondary">
-              例：日圓約 0.22，泰銖約 0.9，韓元約 0.024
+              {EXCHANGE_RATE_DIALOG_LABELS.EXAMPLE_HINT}
             </p>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            取消
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="gap-2">
+            <X size={16} />
+            {EXCHANGE_RATE_DIALOG_LABELS.CANCEL}
           </Button>
-          <Button onClick={onSave}>
-            確認
+          <Button onClick={onSave} className="gap-2">
+            <Check size={16} />
+            {EXCHANGE_RATE_DIALOG_LABELS.CONFIRM}
           </Button>
         </DialogFooter>
       </DialogContent>

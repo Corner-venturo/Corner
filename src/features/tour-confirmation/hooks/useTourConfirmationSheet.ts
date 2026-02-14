@@ -130,7 +130,6 @@ export function useTourConfirmationSheet({ tourId }: UseTourConfirmationSheetPro
 
     setSaving(true)
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const updatePayload: Record<string, unknown> = {
         ...updates,
         updated_at: new Date().toISOString(),

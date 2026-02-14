@@ -154,6 +154,9 @@ export const DAILY_ITINERARY_SECTION_LABELS = {
 
 export const EXCHANGE_RATE_DIALOG_LABELS = {
   例如_0_22_日圓_或_0_9_泰銖: '例如：0.22（日圓）或 0.9（泰銖）',
+  EXAMPLE_HINT: '例：日圓約 0.22，泰銖約 0.9，韓元約 0.024',
+  CANCEL: '取消',
+  CONFIRM: '確認',
 };
 
 export const HOTEL_CONFIRMATION_SECTION_LABELS = {
