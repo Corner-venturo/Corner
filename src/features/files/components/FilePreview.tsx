@@ -29,6 +29,7 @@ import {
   getFileIcon,
   FILE_CATEGORY_INFO,
 } from '@/types/file-system.types'
+import { LABELS } from '../constants/labels'
 
 // 檔案圖示對應
 const FILE_ICONS: Record<string, React.ElementType> = {
@@ -60,7 +61,7 @@ export function FilePreview({ onBack }: FilePreviewProps) {
   if (!file) {
     return (
       <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
-        選取檔案以預覽
+        {LABELS.selectFileToPreview}
       </div>
     )
   }
@@ -77,7 +78,7 @@ export function FilePreview({ onBack }: FilePreviewProps) {
         {/* 標題 */}
         <div className="p-3 border-b border-border flex items-center justify-between">
           <span className="text-sm font-medium">
-            已選取 {selectedFiles.length} 個檔案
+            {LABELS.selectedFiles(selectedFiles.length)}
           </span>
           {onBack && (
             <Button variant="ghost" size="icon" className="h-7 w-7 lg:hidden" onClick={onBack}>
@@ -90,11 +91,11 @@ export function FilePreview({ onBack }: FilePreviewProps) {
         <div className="p-3 space-y-2">
           <Button variant="outline" size="sm" className="w-full justify-start">
             <Download className="w-4 h-4 mr-2" />
-            下載所選檔案
+            {LABELS.batchDownload}
           </Button>
           <Button variant="outline" size="sm" className="w-full justify-start">
             <FolderInput className="w-4 h-4 mr-2" />
-            移動到...
+            {LABELS.moveTo}
           </Button>
           <Button
             variant="outline"
@@ -102,13 +103,13 @@ export function FilePreview({ onBack }: FilePreviewProps) {
             className="w-full justify-start text-destructive hover:text-destructive"
           >
             <Trash2 className="w-4 h-4 mr-2" />
-            刪除所選
+            {LABELS.delete}
           </Button>
         </div>
 
         {/* 統計 */}
         <div className="p-3 border-t border-border text-sm text-muted-foreground">
-          <p>總大小：{formatFileSize(totalSize)}</p>
+          <p>{LABELS.totalSize(formatFileSize(totalSize))}</p>
         </div>
       </div>
     )
@@ -188,7 +189,7 @@ export function FilePreview({ onBack }: FilePreviewProps) {
               {imageLoading ? (
                 <div className="animate-pulse flex flex-col items-center gap-2">
                   <Image className="w-12 h-12 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">載入中...</span>
+                  <span className="text-xs text-muted-foreground">{LABELS.loading}</span>
                 </div>
               ) : imageUrl ? (
                 <img src={imageUrl} alt={file.filename} className="max-w-full max-h-full object-contain" />
@@ -202,7 +203,7 @@ export function FilePreview({ onBack }: FilePreviewProps) {
                 className="w-16 h-16"
                 style={{ color: categoryInfo.color }}
               />
-              <p className="mt-2 text-sm text-muted-foreground">{file.extension?.toUpperCase() || '檔案'}</p>
+              <p className="mt-2 text-sm text-muted-foreground">{file.extension?.toUpperCase() || LABELS.fileLabel}</p>
             </div>
           )}
         </div>
@@ -211,11 +212,11 @@ export function FilePreview({ onBack }: FilePreviewProps) {
         <div className="px-4 flex gap-2">
           <Button variant="outline" size="sm" className="flex-1" onClick={handleDownload}>
             <Download className="w-4 h-4 mr-1" />
-            下載
+            {LABELS.download}
           </Button>
           <Button variant="outline" size="sm" className="flex-1">
             <ExternalLink className="w-4 h-4 mr-1" />
-            開啟
+            {LABELS.openInNewTab}
           </Button>
         </div>
 
@@ -224,7 +225,7 @@ export function FilePreview({ onBack }: FilePreviewProps) {
           {/* 分類 */}
           <div className="flex items-center gap-2">
             <Tag className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">分類</span>
+            <span className="text-sm text-muted-foreground">{LABELS.categoryLabel}</span>
             <Badge
               variant="secondary"
               style={{
@@ -239,21 +240,21 @@ export function FilePreview({ onBack }: FilePreviewProps) {
           {/* 大小 */}
           <div className="flex items-center gap-2">
             <HardDrive className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">大小</span>
+            <span className="text-sm text-muted-foreground">{LABELS.sizeLabel}</span>
             <span className="text-sm">{formatFileSize(file.size_bytes)}</span>
           </div>
 
           {/* 類型 */}
           <div className="flex items-center gap-2">
             <File className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">類型</span>
+            <span className="text-sm text-muted-foreground">{LABELS.typeLabel}</span>
             <span className="text-sm">{file.content_type || '-'}</span>
           </div>
 
           {/* 建立日期 */}
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">建立日期</span>
+            <span className="text-sm text-muted-foreground">{LABELS.createdDate}</span>
             <span className="text-sm">
               {new Date(file.created_at).toLocaleString('zh-TW')}
             </span>
@@ -262,7 +263,7 @@ export function FilePreview({ onBack }: FilePreviewProps) {
           {/* 下載次數 */}
           <div className="flex items-center gap-2">
             <Eye className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">下載次數</span>
+            <span className="text-sm text-muted-foreground">{LABELS.downloadCount}</span>
             <span className="text-sm">{file.download_count}</span>
           </div>
 
@@ -271,7 +272,7 @@ export function FilePreview({ onBack }: FilePreviewProps) {
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Tag className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">標籤</span>
+                <span className="text-sm text-muted-foreground">{LABELS.tagsLabel}</span>
               </div>
               <div className="flex flex-wrap gap-1">
                 {file.tags.map((tag, index) => (
@@ -286,7 +287,7 @@ export function FilePreview({ onBack }: FilePreviewProps) {
           {/* 描述 */}
           {file.description && (
             <div>
-              <p className="text-sm text-muted-foreground mb-1">描述</p>
+              <p className="text-sm text-muted-foreground mb-1">{LABELS.description}</p>
               <p className="text-sm">{file.description}</p>
             </div>
           )}
@@ -294,7 +295,7 @@ export function FilePreview({ onBack }: FilePreviewProps) {
           {/* 備註 */}
           {file.notes && (
             <div>
-              <p className="text-sm text-muted-foreground mb-1">備註</p>
+              <p className="text-sm text-muted-foreground mb-1">{LABELS.notes}</p>
               <p className="text-sm">{file.notes}</p>
             </div>
           )}
@@ -310,7 +311,7 @@ export function FilePreview({ onBack }: FilePreviewProps) {
           onClick={handleDelete}
         >
           <Trash2 className="w-4 h-4 mr-1" />
-          刪除檔案
+          {LABELS.deleteFile}
         </Button>
       </div>
     </div>

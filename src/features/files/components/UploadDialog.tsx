@@ -26,6 +26,7 @@ import {
   FILE_CATEGORY_INFO,
   type FileCategory,
 } from '@/types/file-system.types'
+import { LABELS } from '../constants/labels'
 
 interface UploadDialogProps {
   open: boolean
@@ -164,7 +165,7 @@ export function UploadDialog({ open, onClose }: UploadDialogProps) {
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-xl" level={1}>
         <DialogHeader>
-          <DialogTitle>上傳檔案</DialogTitle>
+          <DialogTitle>{LABELS.uploadFiles}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -181,9 +182,9 @@ export function UploadDialog({ open, onClose }: UploadDialogProps) {
             onClick={() => document.getElementById('file-input')?.click()}
           >
             <Upload className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
-            <p className="text-sm font-medium">拖放檔案到這裡</p>
+            <p className="text-sm font-medium">{LABELS.dragDropHere}</p>
             <p className="text-xs text-muted-foreground mt-1">
-              或點擊選擇檔案
+              {LABELS.orClickToSelect}
             </p>
             <input
               id="file-input"
@@ -197,7 +198,7 @@ export function UploadDialog({ open, onClose }: UploadDialogProps) {
           {/* 目標資料夾 */}
           {currentFolder && (
             <div className="text-sm text-muted-foreground">
-              上傳至：<span className="text-foreground">{currentFolder.name}</span>
+              {LABELS.uploadTo}<span className="text-foreground">{currentFolder.name}</span>
             </div>
           )}
 
@@ -270,11 +271,11 @@ export function UploadDialog({ open, onClose }: UploadDialogProps) {
           {/* 操作按鈕 */}
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={handleClose} disabled={uploading}>
-              {allDone ? '關閉' : '取消'}
+              {allDone ? LABELS.close : LABELS.cancel}
             </Button>
             {!allDone && pendingFiles.length > 0 && (
               <Button onClick={handleUpload} disabled={uploading}>
-                {uploading ? '上傳中...' : `上傳 ${pendingFiles.filter((f) => f.status === 'pending').length} 個檔案`}
+                {uploading ? LABELS.uploading : LABELS.uploadCount(pendingFiles.filter((f) => f.status === 'pending').length)}
               </Button>
             )}
           </div>

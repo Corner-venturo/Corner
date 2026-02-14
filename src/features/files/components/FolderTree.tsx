@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import type { FolderTreeNode } from '@/types/file-system.types'
+import { LABELS } from '../constants/labels'
 
 interface FolderNodeProps {
   node: FolderTreeNode
@@ -99,10 +100,10 @@ function FolderNode({ node, level = 0 }: FolderNodeProps) {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem>新增子資料夾</DropdownMenuItem>
-              <DropdownMenuItem>重新命名</DropdownMenuItem>
+              <DropdownMenuItem>{LABELS.newSubfolder}</DropdownMenuItem>
+              <DropdownMenuItem>{LABELS.rename}</DropdownMenuItem>
               {!node.is_system && (
-                <DropdownMenuItem className="text-destructive">刪除</DropdownMenuItem>
+                <DropdownMenuItem className="text-destructive">{LABELS.deleteFolder}</DropdownMenuItem>
               )}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -138,7 +139,7 @@ export function FolderTree() {
     <div className="h-full flex flex-col">
       {/* 標題 */}
       <div className="p-3 border-b border-border flex items-center justify-between">
-        <h2 className="font-medium text-sm">檔案總管</h2>
+        <h2 className="font-medium text-sm">{LABELS.fileManager}</h2>
         <Button
           variant="ghost"
           size="icon"
@@ -162,17 +163,17 @@ export function FolderTree() {
             onClick={handleAllFilesClick}
           >
             <HardDrive className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm">所有檔案</span>
+            <span className="text-sm">{LABELS.allFiles}</span>
           </div>
 
           {/* 資料夾列表 */}
           {loadingFolders ? (
             <div className="py-8 text-center text-sm text-muted-foreground">
-              載入中...
+              {LABELS.loadingEllipsis}
             </div>
           ) : folderTree.length === 0 ? (
             <div className="py-8 text-center text-sm text-muted-foreground">
-              尚無資料夾
+              {LABELS.noFolders}
             </div>
           ) : (
             <div className="mt-2">

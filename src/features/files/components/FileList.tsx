@@ -45,6 +45,7 @@ import {
   type VenturoFile,
   type FileCategory,
 } from '@/types/file-system.types'
+import { LABELS } from '../constants/labels'
 
 // 檔案圖示對應
 const FILE_ICONS: Record<string, React.ElementType> = {
@@ -275,7 +276,7 @@ export function FileList() {
         <div className="relative w-48">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="搜尋檔案..."
+            placeholder={LABELS.searchFiles}
             className="pl-8 h-8 text-sm"
             value={filter.search || ''}
             onChange={(e) => setFilter({ ...filter, search: e.target.value })}
@@ -289,10 +290,10 @@ export function FileList() {
         >
           <SelectTrigger className="w-28 h-8 text-sm">
             <Filter className="w-3.5 h-3.5 mr-1" />
-            <SelectValue placeholder="分類" />
+            <SelectValue placeholder={LABELS.category} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">全部</SelectItem>
+            <SelectItem value="all">{LABELS.categoryAll}</SelectItem>
             {Object.entries(FILE_CATEGORY_INFO).map(([key, info]) => (
               <SelectItem key={key} value={key}>
                 {info.label}
@@ -330,7 +331,7 @@ export function FileList() {
           onClick={() => setUploadDialogOpen(true)}
         >
           <Upload className="w-4 h-4 mr-1" />
-          上傳
+          {LABELS.upload}
         </Button>
       </div>
 
@@ -338,12 +339,12 @@ export function FileList() {
       <ScrollArea className="flex-1">
         {loadingFiles ? (
           <div className="py-12 text-center text-muted-foreground">
-            載入中...
+            {LABELS.loading}
           </div>
         ) : files.length === 0 ? (
           <div className="py-12 text-center text-muted-foreground">
             <File className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>此資料夾沒有檔案</p>
+            <p>{LABELS.noFilesInFolder}</p>
             <Button
               variant="outline"
               size="sm"
@@ -351,7 +352,7 @@ export function FileList() {
               onClick={() => setUploadDialogOpen(true)}
             >
               <Upload className="w-4 h-4 mr-1" />
-              上傳檔案
+              {LABELS.uploadFile}
             </Button>
           </div>
         ) : viewMode === 'grid' ? (
@@ -388,8 +389,8 @@ export function FileList() {
         <div className="px-3 py-2 border-t border-border text-xs text-muted-foreground flex items-center justify-between">
           <span>
             {selectedFileIds.size > 0
-              ? `已選取 ${selectedFileIds.size} 個檔案`
-              : `共 ${files.length} 個檔案`}
+              ? LABELS.selectedFiles(selectedFileIds.size)
+              : LABELS.totalFiles(files.length)}
           </span>
           <span>
             {formatFileSize(
