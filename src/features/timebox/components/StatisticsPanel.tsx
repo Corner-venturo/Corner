@@ -1,5 +1,7 @@
 'use client'
 
+import { STATS_LABELS } from '../constants/labels'
+
 import { memo, useMemo } from 'react'
 import { useAuthStore } from '@/stores/auth-store'
 import {
@@ -101,21 +103,21 @@ function StatisticsPanel({ variant = 'panel', selectedWeek = new Date() }: Stati
     return (
       <div className="hidden lg:flex items-center gap-4">
         <div className="rounded-xl border border-border/60 bg-card px-4 py-3 shadow-sm">
-          <p className="text-xs font-medium text-morandi-secondary">本週完成率</p>
+          <p className="text-xs font-medium text-morandi-secondary">{STATS_LABELS.WEEKLY_COMPLETION}</p>
           <p className="text-xl font-semibold text-morandi-primary">
             {Math.round(stats.completionRate * 100)}%
           </p>
         </div>
 
         <div className="rounded-xl border border-border/60 bg-card px-4 py-3 shadow-sm">
-          <p className="text-xs font-medium text-morandi-secondary">運動時間</p>
+          <p className="text-xs font-medium text-morandi-secondary">{STATS_LABELS.EXERCISE_TIME}</p>
           <p className="text-xl font-semibold text-morandi-primary">
             {formatTime(stats.totalWorkoutTime)}
           </p>
         </div>
 
         <div className="rounded-xl border border-border/60 bg-card px-4 py-3 shadow-sm">
-          <p className="text-xs font-medium text-morandi-secondary">完成項目</p>
+          <p className="text-xs font-medium text-morandi-secondary">{STATS_LABELS.COMPLETED_ITEMS}</p>
           <p className="text-sm font-semibold text-morandi-primary">
             運動 {stats.completedByType.workout} / 保養 {stats.completedByType.reminder} / 其他 {stats.completedByType.basic}
           </p>
@@ -123,7 +125,7 @@ function StatisticsPanel({ variant = 'panel', selectedWeek = new Date() }: Stati
 
         {hasWorkoutStats && (
           <div className="rounded-xl border border-border/60 bg-card px-4 py-3 shadow-sm">
-            <p className="text-xs font-medium text-morandi-secondary">訓練量</p>
+            <p className="text-xs font-medium text-morandi-secondary">{STATS_LABELS.TRAINING_VOLUME}</p>
             <p className="text-sm font-semibold text-morandi-primary">
               {stats.totalWorkoutVolume.toLocaleString()} kg · {stats.totalWorkoutSessions} 次
             </p>
@@ -139,7 +141,7 @@ function StatisticsPanel({ variant = 'panel', selectedWeek = new Date() }: Stati
         <div className="morandi-card p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs sm:text-sm font-medium text-morandi-secondary">本週完成率</p>
+              <p className="text-xs sm:text-sm font-medium text-morandi-secondary">{STATS_LABELS.WEEKLY_COMPLETION}</p>
               <p className="text-lg sm:text-2xl font-bold text-morandi-primary">
                 {Math.round(stats.completionRate * 100)}%
               </p>
@@ -155,7 +157,7 @@ function StatisticsPanel({ variant = 'panel', selectedWeek = new Date() }: Stati
         <div className="morandi-card p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs sm:text-sm font-medium text-morandi-secondary">運動時間</p>
+              <p className="text-xs sm:text-sm font-medium text-morandi-secondary">{STATS_LABELS.EXERCISE_TIME}</p>
               <p className="text-lg sm:text-2xl font-bold text-morandi-primary">
                 <span className="hidden sm:inline">{formatTime(stats.totalWorkoutTime)}</span>
                 <span className="sm:hidden">{Math.floor(stats.totalWorkoutTime / 60)}h</span>
@@ -171,18 +173,18 @@ function StatisticsPanel({ variant = 'panel', selectedWeek = new Date() }: Stati
 
         <div className="morandi-card p-4">
           <div>
-            <p className="text-xs sm:text-sm font-medium text-morandi-secondary mb-2">完成項目</p>
+            <p className="text-xs sm:text-sm font-medium text-morandi-secondary mb-2">{STATS_LABELS.COMPLETED_ITEMS}</p>
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs sm:text-sm">
-                <span className="text-morandi-secondary">運動</span>
+                <span className="text-morandi-secondary">{STATS_LABELS.EXERCISE}</span>
                 <span className="font-medium text-morandi-primary">{stats.completedByType.workout} 次</span>
               </div>
               <div className="flex justify-between text-xs sm:text-sm">
-                <span className="text-morandi-secondary">保養</span>
+                <span className="text-morandi-secondary">{STATS_LABELS.MAINTENANCE}</span>
                 <span className="font-medium text-morandi-primary">{stats.completedByType.reminder} 次</span>
               </div>
               <div className="flex justify-between text-xs sm:text-sm">
-                <span className="text-morandi-secondary">其他</span>
+                <span className="text-morandi-secondary">{STATS_LABELS.OTHER}</span>
                 <span className="font-medium text-morandi-primary">{stats.completedByType.basic} 次</span>
               </div>
             </div>
@@ -192,18 +194,18 @@ function StatisticsPanel({ variant = 'panel', selectedWeek = new Date() }: Stati
         {hasWorkoutStats && (
           <div className="morandi-card p-4">
             <div>
-              <p className="text-xs sm:text-sm font-medium text-morandi-secondary mb-2">重訓統計</p>
+              <p className="text-xs sm:text-sm font-medium text-morandi-secondary mb-2">{STATS_LABELS.WEIGHT_STATS}</p>
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-morandi-secondary">本週訓練量</span>
+                  <span className="text-morandi-secondary">{STATS_LABELS.WEEKLY_VOLUME}</span>
                   <span className="font-medium text-morandi-primary">{stats.totalWorkoutVolume.toLocaleString()} kg</span>
                 </div>
                 <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-morandi-secondary">訓練次數</span>
+                  <span className="text-morandi-secondary">{STATS_LABELS.TRAINING_COUNT}</span>
                   <span className="font-medium text-morandi-primary">{stats.totalWorkoutSessions} 次</span>
                 </div>
                 <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-morandi-secondary">平均每次</span>
+                  <span className="text-morandi-secondary">{STATS_LABELS.AVG_PER_SESSION}</span>
                   <span className="font-medium text-morandi-primary">
                     {Math.round(stats.totalWorkoutVolume / (stats.totalWorkoutSessions || 1)).toLocaleString()} kg
                   </span>

@@ -1,5 +1,7 @@
 'use client'
 
+import { TOOLBAR_LABELS } from '../constants/labels'
+
 /**
  * 編輯器工具列組件
  *
@@ -177,7 +179,7 @@ export function EditorToolbar({
                 <Type size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>新增文字</TooltipContent>
+            <TooltipContent>{TOOLBAR_LABELS.ADD_TEXT}</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -186,7 +188,7 @@ export function EditorToolbar({
                 <Image size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>新增圖片</TooltipContent>
+            <TooltipContent>{TOOLBAR_LABELS.ADD_IMAGE}</TooltipContent>
           </Tooltip>
 
           <DropdownMenu>
@@ -198,7 +200,7 @@ export function EditorToolbar({
                   </Button>
                 </DropdownMenuTrigger>
               </TooltipTrigger>
-              <TooltipContent>新增形狀</TooltipContent>
+              <TooltipContent>{TOOLBAR_LABELS.ADD_SHAPE}</TooltipContent>
             </Tooltip>
             <DropdownMenuContent align="start">
               <DropdownMenuItem onClick={onAddRectangle}>
@@ -236,7 +238,7 @@ export function EditorToolbar({
                 <Copy size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>複製 (Ctrl+C)</TooltipContent>
+            <TooltipContent>{TOOLBAR_LABELS.COPY}</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -245,7 +247,7 @@ export function EditorToolbar({
                 <Scissors size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>剪下 (Ctrl+X)</TooltipContent>
+            <TooltipContent>{TOOLBAR_LABELS.CUT}</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -254,7 +256,7 @@ export function EditorToolbar({
                 <Clipboard size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>貼上 (Ctrl+V)</TooltipContent>
+            <TooltipContent>{TOOLBAR_LABELS.PASTE}</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -263,7 +265,7 @@ export function EditorToolbar({
                 <Trash2 size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>刪除 (Delete)</TooltipContent>
+            <TooltipContent>{TOOLBAR_LABELS.DELETE}</TooltipContent>
           </Tooltip>
         </div>
 
@@ -277,7 +279,7 @@ export function EditorToolbar({
                 <Group size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>群組 (Ctrl+G)</TooltipContent>
+            <TooltipContent>{TOOLBAR_LABELS.GROUP}</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -286,7 +288,7 @@ export function EditorToolbar({
                 <Ungroup size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>取消群組 (Ctrl+Shift+G)</TooltipContent>
+            <TooltipContent>{TOOLBAR_LABELS.UNGROUP}</TooltipContent>
           </Tooltip>
         </div>
 
@@ -300,7 +302,7 @@ export function EditorToolbar({
                 <FlipHorizontal size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>水平翻轉</TooltipContent>
+            <TooltipContent>{TOOLBAR_LABELS.FLIP_H}</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -309,7 +311,7 @@ export function EditorToolbar({
                 <FlipVertical size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>垂直翻轉</TooltipContent>
+            <TooltipContent>{TOOLBAR_LABELS.FLIP_V}</TooltipContent>
           </Tooltip>
         </div>
 
@@ -323,11 +325,11 @@ export function EditorToolbar({
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" disabled={!hasSelection} className="h-8 px-2 gap-1">
                     <Layers size={16} />
-                    <span className="text-xs hidden sm:inline">圖層</span>
+                    <span className="text-xs hidden sm:inline">{TOOLBAR_LABELS.LAYERS}</span>
                   </Button>
                 </DropdownMenuTrigger>
               </TooltipTrigger>
-              <TooltipContent>圖層管理</TooltipContent>
+              <TooltipContent>{TOOLBAR_LABELS.LAYER_MANAGEMENT}</TooltipContent>
             </Tooltip>
             <DropdownMenuContent align="start">
               <DropdownMenuItem onClick={onBringToFront}>
@@ -374,7 +376,7 @@ export function EditorToolbar({
                 <AlignLeft size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>靠左對齊</TooltipContent>
+            <TooltipContent>{TOOLBAR_LABELS.ALIGN_LEFT}</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -383,7 +385,7 @@ export function EditorToolbar({
                 <AlignCenter size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>水平置中</TooltipContent>
+            <TooltipContent>{TOOLBAR_LABELS.ALIGN_CENTER_H}</TooltipContent>
           </Tooltip>
 
           <Tooltip>

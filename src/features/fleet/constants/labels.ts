@@ -82,3 +82,38 @@ export const FLEET_LABELS = {
   description: '說明',
   contact: '聯絡人'
 }
+
+export const VEHICLE_DIALOG_LABELS = {
+  BASIC_INFO: '基本資訊',
+  VEHICLE_NAME: '車輛名稱',
+  VEHICLE_STATUS: '車輛狀態',
+  VEHICLE_SPECS: '車輛規格',
+  VEHICLE_TYPE: '車型',
+  SEATS: '座位數',
+  BRAND: '品牌',
+  MODEL: '型號',
+  MANUFACTURE_YEAR: '出廠年份',
+  VIN: '車身號碼 (VIN)',
+  CURRENT_MILEAGE: '目前里程',
+  IMPORTANT_DATES: '重要日期',
+  REGISTRATION_DATE: '領牌日期',
+  INSPECTION_EXPIRY: '驗車到期日',
+  INSURANCE_EXPIRY: '保險到期日',
+}
+
+export const DRIVER_DIALOG_LABELS = {
+  BASIC_INFO: '基本資訊',
+  PHONE: '電話',
+  ID_NUMBER: '身分證字號',
+  STATUS: '狀態',
+  LICENSE_INFO: '駕照資訊',
+  LICENSE_TYPE: '駕照類型',
+  LICENSE_NUMBER: '駕照號碼',
+  LICENSE_EXPIRY: '駕照到期日',
+  PRO_LICENSE: '職業駕照（大客車）',
+  PRO_LICENSE_NUMBER: '職業駕照號碼',
+  PRO_LICENSE_EXPIRY: '職業駕照到期日',
+  HEALTH_CHECK: '健康檢查',
+  HEALTH_CHECK_EXPIRY: '體檢到期日',
+  REMARKS: '備註',
+}

@@ -257,3 +257,27 @@ export const QUICK_QUOTE_VERSION_PANEL_LABELS = {
   版本名稱: '版本名稱',
 };
 
+
+
+export const QUICK_QUOTE_LABELS = {
+  TITLE: '快速報價單',
+  ADD_TITLE: '新增快速報價單',
+  CUSTOMER_NAME: '客戶名稱',
+  CUSTOMER_NAME_REQUIRED: '客戶名稱 *',
+  PHONE: '聯絡電話',
+  GROUP_NUMBER: '團體編號',
+  ADDRESS: '通訊地址',
+  HANDLER: '承辦業務',
+  ISSUE_DATE: '開單日期',
+  FEE_DETAILS: '收費明細',
+  FEE_DETAILS_TABLE: '收費明細表',
+  SUMMARY: '摘要',
+  QUANTITY: '數量',
+  COST: '成本',
+  UNIT_PRICE: '單價',
+  AMOUNT: '金額',
+  PROFIT: '利潤',
+  REMARKS: '備註',
+  RECEIVABLE: '應收金額',
+  RECEIVED: '已收金額',
+}

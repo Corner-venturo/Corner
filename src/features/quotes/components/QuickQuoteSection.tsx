@@ -5,6 +5,8 @@
 
 'use client'
 
+import { QUICK_QUOTE_LABELS } from '../constants/labels'
+
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -107,7 +109,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
           ) : (
             <ChevronRight className="h-5 w-5 text-morandi-secondary" />
           )}
-          <h3 className="text-base font-semibold text-morandi-primary">快速報價單</h3>
+          <h3 className="text-base font-semibold text-morandi-primary">{QUICK_QUOTE_LABELS.TITLE}</h3>
           {items.length > 0 && (
             <span className="text-sm text-morandi-secondary flex items-center gap-1">
               ({items.length} 項目，<CurrencyCell amount={totalAmount} className="inline" />)
@@ -135,7 +137,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
           {/* 客戶資訊 */}
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="text-xs font-medium text-morandi-primary">客戶名稱</label>
+              <label className="text-xs font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.CUSTOMER_NAME}</label>
               <Input
                 value={customerInfo.customer_name}
                 onChange={e => setField('customer_name', e.target.value)}
@@ -145,7 +147,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-morandi-primary">聯絡電話</label>
+              <label className="text-xs font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.PHONE}</label>
               <Input
                 value={customerInfo.contact_phone}
                 onChange={e => setField('contact_phone', e.target.value)}
@@ -155,7 +157,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-morandi-primary">團體編號</label>
+              <label className="text-xs font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.GROUP_NUMBER}</label>
               <Input
                 value={customerInfo.tour_code}
                 onChange={e => setField('tour_code', e.target.value)}
@@ -165,7 +167,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-morandi-primary">通訊地址</label>
+              <label className="text-xs font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.ADDRESS}</label>
               <Input
                 value={customerInfo.contact_address}
                 onChange={e => setField('contact_address', e.target.value)}
@@ -175,7 +177,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-morandi-primary">承辦業務</label>
+              <label className="text-xs font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.HANDLER}</label>
               <Input
                 value={customerInfo.handler_name}
                 onChange={e => setField('handler_name', e.target.value)}
@@ -185,7 +187,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-morandi-primary">開單日期</label>
+              <label className="text-xs font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.ISSUE_DATE}</label>
               <DatePicker
                 value={customerInfo.issue_date}
                 onChange={(date) => setField('issue_date', date || '')}
@@ -199,7 +201,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
           {/* 收費明細表 */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-medium text-morandi-primary">收費明細</label>
+              <label className="text-xs font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.FEE_DETAILS}</label>
               {!isReadOnly && (
                 <Button onClick={addItem} size="sm" variant="outline" className="h-7 text-xs gap-1">
                   <Plus className="h-3 w-3" />
@@ -211,13 +213,13 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
               <table className="w-full text-sm">
                 <thead className="bg-morandi-container/20">
                   <tr>
-                    <th className="px-2 py-1.5 text-left text-xs font-medium">摘要</th>
-                    <th className="px-2 py-1.5 text-center text-xs font-medium w-16">數量</th>
-                    {!isReadOnly && <th className="px-2 py-1.5 text-center text-xs font-medium w-20">成本</th>}
-                    <th className="px-2 py-1.5 text-center text-xs font-medium w-24">單價</th>
-                    <th className="px-2 py-1.5 text-center text-xs font-medium w-24">金額</th>
-                    {!isReadOnly && <th className="px-2 py-1.5 text-center text-xs font-medium w-20">利潤</th>}
-                    <th className="px-2 py-1.5 text-left text-xs font-medium w-24">備註</th>
+                    <th className="px-2 py-1.5 text-left text-xs font-medium">{QUICK_QUOTE_LABELS.SUMMARY}</th>
+                    <th className="px-2 py-1.5 text-center text-xs font-medium w-16">{QUICK_QUOTE_LABELS.QUANTITY}</th>
+                    {!isReadOnly && <th className="px-2 py-1.5 text-center text-xs font-medium w-20">{QUICK_QUOTE_LABELS.COST}</th>}
+                    <th className="px-2 py-1.5 text-center text-xs font-medium w-24">{QUICK_QUOTE_LABELS.UNIT_PRICE}</th>
+                    <th className="px-2 py-1.5 text-center text-xs font-medium w-24">{QUICK_QUOTE_LABELS.AMOUNT}</th>
+                    {!isReadOnly && <th className="px-2 py-1.5 text-center text-xs font-medium w-20">{QUICK_QUOTE_LABELS.PROFIT}</th>}
+                    <th className="px-2 py-1.5 text-left text-xs font-medium w-24">{QUICK_QUOTE_LABELS.REMARKS}</th>
                     {!isReadOnly && <th className="px-2 py-1.5 w-10"></th>}
                   </tr>
                 </thead>

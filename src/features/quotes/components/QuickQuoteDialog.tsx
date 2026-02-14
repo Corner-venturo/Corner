@@ -4,6 +4,8 @@
 
 'use client'
 
+import { QUICK_QUOTE_LABELS } from '../constants/labels'
+
 import React, { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -125,13 +127,13 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent level={1} className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>新增快速報價單</DialogTitle>
+          <DialogTitle>{QUICK_QUOTE_LABELS.ADD_TITLE}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* 客戶資訊 */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">客戶名稱 *</label>
+              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.CUSTOMER_NAME_REQUIRED}</label>
               <Input
                 value={formData.customer_name}
                 onChange={e => setFormField('customer_name', e.target.value)}
@@ -141,7 +143,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">聯絡電話</label>
+              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.PHONE}</label>
               <Input
                 value={formData.contact_phone}
                 onChange={e => setFormField('contact_phone', e.target.value)}
@@ -150,7 +152,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">通訊地址</label>
+              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.ADDRESS}</label>
               <Input
                 value={formData.contact_address}
                 onChange={e => setFormField('contact_address', e.target.value)}
@@ -159,7 +161,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">團體編號</label>
+              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.GROUP_NUMBER}</label>
               <Input
                 value={formData.tour_code}
                 onChange={e => setFormField('tour_code', e.target.value)}
@@ -168,7 +170,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">承辦業務</label>
+              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.HANDLER}</label>
               <Input
                 value={formData.handler_name}
                 onChange={e => setFormField('handler_name', e.target.value)}
@@ -177,7 +179,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">開單日期</label>
+              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.ISSUE_DATE}</label>
               <DatePicker
                 value={formData.issue_date}
                 onChange={(date) => setFormField('issue_date', date || '')}
@@ -190,7 +192,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
           {/* 收費明細表 */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-morandi-primary">收費明細表</label>
+              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.FEE_DETAILS_TABLE}</label>
               <Button type="button" size="sm" onClick={addItem} variant="outline" className="gap-1">
                 <Plus size={16} />
                 新增項目
@@ -200,11 +202,11 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               <table className="w-full text-sm">
                 <thead className="bg-morandi-container/20">
                   <tr>
-                    <th className="px-3 py-2 text-left">摘要</th>
-                    <th className="px-3 py-2 text-center w-20">數量</th>
-                    <th className="px-3 py-2 text-center w-28">單價</th>
-                    <th className="px-3 py-2 text-center w-28">金額</th>
-                    <th className="px-3 py-2 text-left w-32">備註</th>
+                    <th className="px-3 py-2 text-left">{QUICK_QUOTE_LABELS.SUMMARY}</th>
+                    <th className="px-3 py-2 text-center w-20">{QUICK_QUOTE_LABELS.QUANTITY}</th>
+                    <th className="px-3 py-2 text-center w-28">{QUICK_QUOTE_LABELS.UNIT_PRICE}</th>
+                    <th className="px-3 py-2 text-center w-28">{QUICK_QUOTE_LABELS.AMOUNT}</th>
+                    <th className="px-3 py-2 text-left w-32">{QUICK_QUOTE_LABELS.REMARKS}</th>
                     <th className="px-3 py-2 text-center w-16"></th>
                   </tr>
                 </thead>
@@ -302,11 +304,11 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
           {/* 金額統計 */}
           <div className="grid grid-cols-3 gap-4 bg-morandi-container/10 p-4 rounded-md">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">應收金額</label>
+              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.RECEIVABLE}</label>
               <CurrencyCell amount={totalAmount} className="mt-1 text-lg font-bold" />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">已收金額</label>
+              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.RECEIVED}</label>
               <Input
                 type="text" inputMode="decimal"
                 value={formData.received_amount}

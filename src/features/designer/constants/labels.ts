@@ -152,3 +152,21 @@ export function getObjectType(type: string): string {
       return DESIGNER_LABELS.元素
   }
 }
+
+export const TOOLBAR_LABELS = {
+  ADD_TEXT: '新增文字',
+  ADD_IMAGE: '新增圖片',
+  ADD_SHAPE: '新增形狀',
+  COPY: '複製 (Ctrl+C)',
+  CUT: '剪下 (Ctrl+X)',
+  PASTE: '貼上 (Ctrl+V)',
+  DELETE: '刪除 (Delete)',
+  GROUP: '群組 (Ctrl+G)',
+  UNGROUP: '取消群組 (Ctrl+Shift+G)',
+  FLIP_H: '水平翻轉',
+  FLIP_V: '垂直翻轉',
+  LAYERS: '圖層',
+  LAYER_MANAGEMENT: '圖層管理',
+  ALIGN_LEFT: '靠左對齊',
+  ALIGN_CENTER_H: '水平置中',
+}

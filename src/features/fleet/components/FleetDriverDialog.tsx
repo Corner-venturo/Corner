@@ -4,6 +4,8 @@
 
 'use client'
 
+import { DRIVER_DIALOG_LABELS } from '../constants/labels'
+
 import React from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
@@ -51,7 +53,7 @@ export const FleetDriverDialog: React.FC<FleetDriverDialogProps> = ({
       <div className="space-y-6">
         {/* 基本資訊 */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">基本資訊</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{DRIVER_DIALOG_LABELS.BASIC_INFO}</h4>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="text-sm font-medium text-morandi-primary">
@@ -65,7 +67,7 @@ export const FleetDriverDialog: React.FC<FleetDriverDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">電話</label>
+              <label className="text-sm font-medium text-morandi-primary">{DRIVER_DIALOG_LABELS.PHONE}</label>
               <Input
                 value={formData.phone}
                 onChange={e => onFormFieldChange('phone', e.target.value)}
@@ -74,7 +76,7 @@ export const FleetDriverDialog: React.FC<FleetDriverDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">身分證字號</label>
+              <label className="text-sm font-medium text-morandi-primary">{DRIVER_DIALOG_LABELS.ID_NUMBER}</label>
               <Input
                 value={formData.id_number}
                 onChange={e => onFormFieldChange('id_number', e.target.value.toUpperCase())}
@@ -83,7 +85,7 @@ export const FleetDriverDialog: React.FC<FleetDriverDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">狀態</label>
+              <label className="text-sm font-medium text-morandi-primary">{DRIVER_DIALOG_LABELS.STATUS}</label>
               <Select
                 value={formData.status}
                 onValueChange={value => onFormFieldChange('status', value as DriverStatus)}
@@ -105,10 +107,10 @@ export const FleetDriverDialog: React.FC<FleetDriverDialogProps> = ({
 
         {/* 駕照資訊 */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">駕照資訊</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{DRIVER_DIALOG_LABELS.LICENSE_INFO}</h4>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">駕照類型</label>
+              <label className="text-sm font-medium text-morandi-primary">{DRIVER_DIALOG_LABELS.LICENSE_TYPE}</label>
               <Select
                 value={formData.license_type}
                 onValueChange={value => onFormFieldChange('license_type', value as LicenseType)}
@@ -126,7 +128,7 @@ export const FleetDriverDialog: React.FC<FleetDriverDialogProps> = ({
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">駕照號碼</label>
+              <label className="text-sm font-medium text-morandi-primary">{DRIVER_DIALOG_LABELS.LICENSE_NUMBER}</label>
               <Input
                 value={formData.license_number}
                 onChange={e => onFormFieldChange('license_number', e.target.value)}
@@ -135,7 +137,7 @@ export const FleetDriverDialog: React.FC<FleetDriverDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">駕照到期日</label>
+              <label className="text-sm font-medium text-morandi-primary">{DRIVER_DIALOG_LABELS.LICENSE_EXPIRY}</label>
               <Input
                 type="date"
                 value={formData.license_expiry_date}
@@ -148,10 +150,10 @@ export const FleetDriverDialog: React.FC<FleetDriverDialogProps> = ({
 
         {/* 職業駕照（大客車） */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">職業駕照（大客車）</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{DRIVER_DIALOG_LABELS.PRO_LICENSE}</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">職業駕照號碼</label>
+              <label className="text-sm font-medium text-morandi-primary">{DRIVER_DIALOG_LABELS.PRO_LICENSE_NUMBER}</label>
               <Input
                 value={formData.professional_license_number}
                 onChange={e => onFormFieldChange('professional_license_number', e.target.value)}
@@ -160,7 +162,7 @@ export const FleetDriverDialog: React.FC<FleetDriverDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">職業駕照到期日</label>
+              <label className="text-sm font-medium text-morandi-primary">{DRIVER_DIALOG_LABELS.PRO_LICENSE_EXPIRY}</label>
               <Input
                 type="date"
                 value={formData.professional_license_expiry}
@@ -173,10 +175,10 @@ export const FleetDriverDialog: React.FC<FleetDriverDialogProps> = ({
 
         {/* 健康檢查 */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">健康檢查</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{DRIVER_DIALOG_LABELS.HEALTH_CHECK}</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">體檢到期日</label>
+              <label className="text-sm font-medium text-morandi-primary">{DRIVER_DIALOG_LABELS.HEALTH_CHECK_EXPIRY}</label>
               <Input
                 type="date"
                 value={formData.health_check_expiry}
@@ -189,7 +191,7 @@ export const FleetDriverDialog: React.FC<FleetDriverDialogProps> = ({
 
         {/* 備註 */}
         <div>
-          <label className="text-sm font-medium text-morandi-primary">備註</label>
+          <label className="text-sm font-medium text-morandi-primary">{DRIVER_DIALOG_LABELS.REMARKS}</label>
           <Textarea
             value={formData.notes}
             onChange={e => onFormFieldChange('notes', e.target.value)}
