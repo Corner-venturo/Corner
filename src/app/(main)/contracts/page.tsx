@@ -14,6 +14,7 @@ import { ContractDialog } from '@/components/contracts/ContractDialog'
 import { ContractViewDialog } from '@/components/contracts/ContractViewDialog'
 import { EnvelopeDialog } from '@/components/contracts/EnvelopeDialog'
 import { SelectTourDialog } from '@/components/contracts/SelectTourDialog'
+import { CONTRACTS_LABELS } from './constants/labels'
 
 export default function ContractsPage() {
   const router = useRouter()
@@ -88,38 +89,38 @@ export default function ContractsPage() {
     () => [
       {
         key: 'code',
-        label: '團號',
+        label: CONTRACTS_LABELS.COL_CODE,
         sortable: true,
       },
       {
         key: 'name',
-        label: '團名',
+        label: CONTRACTS_LABELS.COL_NAME,
         sortable: true,
       },
       {
         key: 'departure_date',
-        label: '出發時間',
+        label: CONTRACTS_LABELS.COL_DEPARTURE,
         sortable: true,
         render: (_, tour) => <DateCell date={tour.departure_date} showIcon={false} />,
       },
       {
         key: 'participants',
-        label: '人數',
-        render: (_, tour) => <NumberCell value={tour.current_participants || 0} suffix="人" />,
+        label: CONTRACTS_LABELS.COL_PARTICIPANTS,
+        render: (_, tour) => <NumberCell value={tour.current_participants || 0} suffix={CONTRACTS_LABELS.PARTICIPANTS_UNIT} />,
       },
       {
         key: 'contract_status',
-        label: '狀態',
+        label: CONTRACTS_LABELS.COL_STATUS,
         sortable: true,
         render: (_, tour) => {
-          let status = '建立完成'
+          let status = CONTRACTS_LABELS.STATUS_CREATED
           let colorClass = 'text-morandi-primary/80 bg-morandi-container px-2 py-1 rounded'
 
           if (tour.contract_completed) {
-            status = '已完成'
+            status = CONTRACTS_LABELS.STATUS_COMPLETED
             colorClass = 'text-morandi-gold bg-morandi-gold/10 px-2 py-1 rounded'
           } else if (tour.contract_archived_date) {
-            status = '已歸檔'
+            status = CONTRACTS_LABELS.STATUS_ARCHIVED
             colorClass = 'text-morandi-secondary bg-morandi-secondary/10 px-2 py-1 rounded'
           }
 
@@ -178,22 +179,22 @@ export default function ContractsPage() {
         actions={[
           {
             icon: Eye,
-            label: '查看合約',
+            label: CONTRACTS_LABELS.ACTION_VIEW,
             onClick: () => setViewDialog({ isOpen: true, tour }),
           },
           {
             icon: Edit2,
-            label: '編輯',
+            label: CONTRACTS_LABELS.ACTION_EDIT,
             onClick: () => setContractDialog({ isOpen: true, tour, mode: 'edit' }),
           },
           {
             icon: Mail,
-            label: '列印信封',
+            label: CONTRACTS_LABELS.ACTION_PRINT_ENVELOPE,
             onClick: () => setEnvelopeDialog({ isOpen: true, tour }),
           },
           {
             icon: Trash2,
-            label: '刪除',
+            label: CONTRACTS_LABELS.ACTION_DELETE,
             onClick: () => handleDeleteContract(tour),
             variant: 'danger',
           },
@@ -216,21 +217,21 @@ export default function ContractsPage() {
   return (
     <>
       <ListPageLayout
-        title="合約管理"
+        title={CONTRACTS_LABELS.PAGE_TITLE}
         icon={FileSignature}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '合約管理', href: '/contracts' },
+          { label: CONTRACTS_LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: CONTRACTS_LABELS.BREADCRUMB_CONTRACTS, href: '/contracts' },
         ]}
         data={contractTours}
         columns={columns}
         searchFields={['name', 'code', 'status']}
-        searchPlaceholder="搜尋合約..."
+        searchPlaceholder={CONTRACTS_LABELS.SEARCH_PLACEHOLDER}
         onRowClick={handleRowClick}
         renderActions={renderActions}
         bordered={true}
         onAdd={() => setSelectTourDialog(true)}
-        addLabel="新增合約"
+        addLabel={CONTRACTS_LABELS.ADD_CONTRACT}
       />
 
       {/* View dialog */}

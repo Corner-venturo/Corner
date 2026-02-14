@@ -7,12 +7,13 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
 import { Input } from '@/components/ui/input'
+import { ERP_ACCOUNTING_LABELS } from './constants/labels'
 
 const accountingTabs = [
-  { href: '/erp-accounting/vouchers', label: '傳票', icon: FileText },
-  { href: '/erp-accounting/reports', label: '報表', icon: BarChart3 },
-  { href: '/erp-accounting/settings/accounts', label: '科目設定', icon: Settings },
-  { href: '/erp-accounting/period-closing', label: '期末結帳', icon: Lock },
+  { href: '/erp-accounting/vouchers', label: ERP_ACCOUNTING_LABELS.TAB_VOUCHERS, icon: FileText },
+  { href: '/erp-accounting/reports', label: ERP_ACCOUNTING_LABELS.TAB_REPORTS, icon: BarChart3 },
+  { href: '/erp-accounting/settings/accounts', label: ERP_ACCOUNTING_LABELS.TAB_ACCOUNT_SETTINGS, icon: Settings },
+  { href: '/erp-accounting/period-closing', label: ERP_ACCOUNTING_LABELS.TAB_PERIOD_CLOSING, icon: Lock },
 ]
 
 export default function ERPAccountingLayout({
@@ -36,12 +37,12 @@ export default function ERPAccountingLayout({
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="會計系統"
+        title={ERP_ACCOUNTING_LABELS.PAGE_TITLE}
         icon={FileText}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '財務管理', href: '/finance' },
-          { label: '會計系統', href: '/erp-accounting' },
+          { label: ERP_ACCOUNTING_LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: ERP_ACCOUNTING_LABELS.BREADCRUMB_FINANCE, href: '/finance' },
+          { label: ERP_ACCOUNTING_LABELS.BREADCRUMB_ACCOUNTING, href: '/erp-accounting' },
         ]}
       >
         {/* 搜尋按鈕 */}
@@ -49,7 +50,7 @@ export default function ERPAccountingLayout({
           {searchOpen ? (
             <div className="relative">
               <Input
-                placeholder="搜尋..."
+                placeholder={ERP_ACCOUNTING_LABELS.SEARCH_PLACEHOLDER}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onBlur={() => {
@@ -63,7 +64,7 @@ export default function ERPAccountingLayout({
             <button
               onClick={() => setSearchOpen(true)}
               className="p-2 hover:bg-morandi-container rounded-lg transition-colors"
-              title="搜尋"
+              title={ERP_ACCOUNTING_LABELS.SEARCH_TITLE}
             >
               <Search size={18} className="text-morandi-secondary" />
             </button>

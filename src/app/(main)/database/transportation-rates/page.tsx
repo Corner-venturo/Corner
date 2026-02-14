@@ -13,6 +13,7 @@ import { supabase } from '@/lib/supabase/client'
 import { TransportationRate } from '@/types/transportation-rates.types'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
+import { TRANSPORTATION_RATES_LABELS } from './constants/labels'
 
 const fetchRates = async (): Promise<TransportationRate[]> => {
   const { data, error } = await supabase
@@ -71,12 +72,12 @@ export default function TransportationRatesPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="車資管理"
+        title={TRANSPORTATION_RATES_LABELS.PAGE_TITLE}
         icon={Bus}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '資料庫管理', href: '/database' },
-          { label: '車資管理', href: '/database/transportation-rates' },
+          { label: TRANSPORTATION_RATES_LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: TRANSPORTATION_RATES_LABELS.BREADCRUMB_DATABASE, href: '/database' },
+          { label: TRANSPORTATION_RATES_LABELS.BREADCRUMB_RATES, href: '/database/transportation-rates' },
         ]}
         actions={
           <Button
@@ -85,7 +86,7 @@ export default function TransportationRatesPage() {
             size="sm"
           >
             <Plus size={16} />
-            新增國家
+            {TRANSPORTATION_RATES_LABELS.ADD_COUNTRY}
           </Button>
         }
       />
@@ -98,15 +99,15 @@ export default function TransportationRatesPage() {
       <Dialog open={isAddingNewCountry} onOpenChange={setIsAddingNewCountry}>
         <DialogContent level={1} className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>新增國家</DialogTitle>
+            <DialogTitle>{TRANSPORTATION_RATES_LABELS.ADD_COUNTRY_DIALOG_TITLE}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
               <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                國家名稱
+                {TRANSPORTATION_RATES_LABELS.COUNTRY_NAME_LABEL}
               </label>
               <Input
-                placeholder="例如：越南、泰國"
+                placeholder={TRANSPORTATION_RATES_LABELS.COUNTRY_NAME_PLACEHOLDER}
                 value={newCountryName}
                 onChange={(e) => setNewCountryName(e.target.value)}
                 onKeyDown={(e) => {
@@ -125,10 +126,10 @@ export default function TransportationRatesPage() {
                   setNewCountryName('')
                 }}
               >
-                取消
+                {TRANSPORTATION_RATES_LABELS.CANCEL}
               </Button>
               <Button onClick={handleAddNewCountry}>
-                新增國家
+                {TRANSPORTATION_RATES_LABELS.ADD_COUNTRY}
               </Button>
             </div>
           </div>

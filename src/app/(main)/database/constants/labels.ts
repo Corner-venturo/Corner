@@ -1,37 +1,32 @@
-export const LABELS = {
-  // 页面标题和导航
-  DATABASE: '資料庫',
-  ARCHIVE_MANAGEMENT: '歸檔管理',
-  ATTRACTIONS: '景點',
-  COMPANY_ASSETS: '公司資產',
-  FLEET: '車隊',
-  SUPPLIERS: '供應商',
-  TOUR_LEADERS: '領隊',
-  TRANSPORTATION_RATES: '交通運價',
-  WORKSPACES: '工作空間',
-  
-  // 按钮文字
-  ADD: '新增',
-  EDIT: '編輯',
-  DELETE: '刪除',
-  SAVE: '儲存',
-  CANCEL: '取消',
-  SEARCH: '搜尋',
-  FILTER: '篩選',
-  EXPORT: '匯出',
-  IMPORT: '匯入',
-  
-  // 状态和消息
-  LOADING: '載入中...',
-  NO_DATA: '暫無資料',
-  CONFIRM_DELETE: '確認刪除',
-  DELETE_SUCCESS: '刪除成功',
-  SAVE_SUCCESS: '儲存成功',
-  
-  // 表单标签
-  NAME: '名稱',
-  DESCRIPTION: '描述',
-  STATUS: '狀態',
-  CREATED_DATE: '建立日期',
-  UPDATED_DATE: '更新日期',
-} as const
+export const DATABASE_LABELS = {
+  PAGE_TITLE: '資料庫管理',
+  BATCH_IMPORT: '批次匯入',
+  STATS_TITLE: '資料庫統計',
+  STATS_DESC: '管理報價系統的所有資料內容，確保資料一致性和準確性',
+  TOTAL_ITEMS: '總項目數',
+  COVERAGE: '覆蓋地區',
+  LAST_UPDATED: '上次更新',
+  ITEMS: '項目',
+  ENTER_MANAGEMENT: '進入管理',
+  QUICK_ACTIONS: '快速操作',
+  MANAGE_REGIONS: '管理地區',
+  MANAGE_REGIONS_DESC: '國家、區域、主要城市設定',
+  ADD_RATES: '新增車資',
+  ADD_RATES_DESC: '更新各國車資參考報價',
+  ADD_ATTRACTIONS: '新增景點',
+  ADD_ATTRACTIONS_DESC: '快速添加新的旅遊景點',
+
+  // Module titles and descriptions
+  MODULE_TRAVEL: '旅遊資料庫',
+  MODULE_TRAVEL_DESC: '國家、區域、城市、景點統一管理',
+  MODULE_TRANSPORT: '車資管理',
+  MODULE_TRANSPORT_DESC: '管理各國車資參考報價',
+  MODULE_SUPPLIERS: '供應商管理',
+  MODULE_SUPPLIERS_DESC: '管理合作供應商和價格清單',
+  MODULE_ASSETS: '公司資源管理',
+  MODULE_ASSETS_DESC: '管理公司 Logo、大小章、插圖等資源',
+  MODULE_ARCHIVE: '封存資料管理',
+  MODULE_ARCHIVE_DESC: '管理已封存的旅遊團、行程表，可還原或永久刪除',
+  MODULE_WORKSPACES: '公司管理',
+  MODULE_WORKSPACES_DESC: '管理公司帳號、新增公司與管理員',
+}
