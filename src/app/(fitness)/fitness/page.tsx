@@ -17,6 +17,7 @@ import { Card } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import { formatDateCompactPadded } from '@/lib/utils/format-date'
+import { FITNESS_LABELS } from './constants/labels'
 
 interface WorkoutSet {
   setNumber: number
@@ -124,7 +125,7 @@ export default function FitnessPage() {
         <div>
           <h2 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
             <ClipboardList className="w-4 h-4" />
-            選擇訓練部位
+            {FITNESS_LABELS.SELECT_MUSCLE_GROUP}
           </h2>
           <div className="grid grid-cols-3 gap-2">
             {MUSCLE_GROUPS.map(group => (
@@ -151,7 +152,7 @@ export default function FitnessPage() {
         {workoutExercises.length > 0 && (
           <div>
             <h2 className="text-sm font-medium text-muted-foreground mb-3">
-              ━━━ 今日訓練 ━━━
+              {FITNESS_LABELS.TODAY_WORKOUT}
             </h2>
 
             <div className="space-y-4">
@@ -182,10 +183,10 @@ export default function FitnessPage() {
                   {/* 組數表格 */}
                   <div className="space-y-2">
                     <div className="grid grid-cols-4 gap-2 text-xs text-muted-foreground font-medium">
-                      <div className="text-center">組數</div>
-                      <div className="text-center">重量</div>
-                      <div className="text-center">次數</div>
-                      <div className="text-center">完成</div>
+                      <div className="text-center">{FITNESS_LABELS.COL_SET}</div>
+                      <div className="text-center">{FITNESS_LABELS.COL_WEIGHT}</div>
+                      <div className="text-center">{FITNESS_LABELS.COL_REPS}</div>
+                      <div className="text-center">{FITNESS_LABELS.COL_DONE}</div>
                     </div>
 
                     {exercise.sets.map((set, setIndex) => (
@@ -245,7 +246,7 @@ export default function FitnessPage() {
                     onClick={() => addSet(exerciseIndex)}
                     className="w-full mt-3 py-2 text-sm"
                   >
-                    + 新增組數
+                    {FITNESS_LABELS.ADD_SET}
                   </Button>
                 </Card>
               ))}
@@ -260,7 +261,7 @@ export default function FitnessPage() {
           className="w-full py-3 text-sm flex items-center justify-center gap-2"
         >
           <Plus className="w-4 h-4" />
-          新增動作
+          {FITNESS_LABELS.ADD_EXERCISE}
         </Button>
 
         {/* 訓練統計 */}
@@ -268,23 +269,23 @@ export default function FitnessPage() {
           <Card className="p-4">
             <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
-              訓練統計
+              {FITNESS_LABELS.WORKOUT_STATS}
             </h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">總容量</span>
+                <span className="text-muted-foreground">{FITNESS_LABELS.TOTAL_VOLUME}</span>
                 <span className="font-bold text-foreground">
                   {calculateTotalVolume().toLocaleString()} kg
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">完成組數</span>
+                <span className="text-muted-foreground">{FITNESS_LABELS.COMPLETED_SETS}</span>
                 <span className="font-medium text-foreground">
                   {workoutExercises.reduce(
                     (total, ex) => total + ex.sets.filter(s => s.completed).length,
                     0
                   )}{' '}
-                  組
+                  {FITNESS_LABELS.SETS_UNIT}
                 </span>
               </div>
             </div>
@@ -299,7 +300,7 @@ export default function FitnessPage() {
             className="w-full shadow-md active:scale-95 transition-all font-medium flex items-center justify-center gap-2"
           >
             <Save className="w-5 h-5" />
-            完成訓練
+            {FITNESS_LABELS.FINISH_WORKOUT}
           </Button>
         )}
       </div>
@@ -312,7 +313,7 @@ export default function FitnessPage() {
         <DialogContent level={1} className="max-w-lg max-h-[80vh] overflow-hidden p-0 rounded-t-3xl sm:rounded-xl">
           <div className="sticky top-0 bg-background/95 backdrop-blur-sm border-b border-border px-4 py-4">
             <DialogHeader className="flex-row items-center justify-between">
-              <DialogTitle className="text-lg font-bold text-foreground">選擇訓練動作</DialogTitle>
+              <DialogTitle className="text-lg font-bold text-foreground">{FITNESS_LABELS.PICK_EXERCISE_TITLE}</DialogTitle>
             </DialogHeader>
 
             {/* 部位篩選 */}
@@ -323,7 +324,7 @@ export default function FitnessPage() {
                 size="sm"
                 className="rounded-full text-xs whitespace-nowrap"
               >
-                全部
+                {FITNESS_LABELS.FILTER_ALL}
               </Button>
               {MUSCLE_GROUPS.map(group => (
                 <Button

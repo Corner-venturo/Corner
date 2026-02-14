@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Dumbbell, History, BarChart3, Settings } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
+import { FITNESS_LABELS } from '../constants/labels'
 
 interface FitnessLayoutProps {
   children: React.ReactNode
@@ -33,17 +34,17 @@ export function FitnessLayout({ children, activeTab = 'workout' }: FitnessLayout
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-4">🏋️</div>
-          <div className="text-morandi-secondary">載入中...</div>
+          <div className="text-morandi-secondary">{FITNESS_LABELS.LOADING}</div>
         </div>
       </div>
     )
   }
 
   const tabs = [
-    { id: 'workout', name: '訓練', icon: Dumbbell, path: '/fitness' },
-    { id: 'history', name: '歷史', icon: History, path: '/fitness/history' },
-    { id: 'stats', name: '統計', icon: BarChart3, path: '/fitness/stats' },
-    { id: 'settings', name: '設定', icon: Settings, path: '/fitness/settings' },
+    { id: 'workout', name: FITNESS_LABELS.TAB_WORKOUT, icon: Dumbbell, path: '/fitness' },
+    { id: 'history', name: FITNESS_LABELS.TAB_HISTORY, icon: History, path: '/fitness/history' },
+    { id: 'stats', name: FITNESS_LABELS.TAB_STATS, icon: BarChart3, path: '/fitness/stats' },
+    { id: 'settings', name: FITNESS_LABELS.TAB_SETTINGS, icon: Settings, path: '/fitness/settings' },
   ]
 
   return (

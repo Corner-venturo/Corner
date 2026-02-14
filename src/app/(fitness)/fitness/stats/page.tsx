@@ -2,6 +2,7 @@
 
 import { BarChart3, TrendingUp, Trophy } from 'lucide-react'
 import { FitnessLayout } from '../components/FitnessLayout'
+import { FITNESS_LABELS } from '../constants/labels'
 
 export default function FitnessStatsPage() {
   // [Feature] 訓練統計功能待整合 fitness_records 資料表
@@ -10,7 +11,7 @@ export default function FitnessStatsPage() {
     <FitnessLayout activeTab="stats">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-[#FFFFFF] border-b border-[#E8E4E0] px-4 py-4">
-        <h1 className="text-xl font-bold text-[#333333]">訓練統計</h1>
+        <h1 className="text-xl font-bold text-[#333333]">{FITNESS_LABELS.STATS_TITLE}</h1>
       </div>
 
       <div className="px-4 pt-6">
@@ -20,23 +21,23 @@ export default function FitnessStatsPage() {
             <BarChart3 className="w-10 h-10 text-[#B8A99A]" />
           </div>
           <h3 className="text-lg font-medium text-[#333333] mb-2">
-            尚無統計數據
+            {FITNESS_LABELS.STATS_EMPTY_TITLE}
           </h3>
           <p className="text-sm text-[#8C8C8C] mb-6">
-            累積更多訓練記錄後，這裡會顯示你的進步曲線
+            {FITNESS_LABELS.STATS_EMPTY_DESC}
           </p>
           <div className="text-xs text-[#8C8C8C] space-y-1">
             <div className="flex items-center gap-2 justify-center">
               <BarChart3 className="w-3.5 h-3.5" />
-              訓練容量趨勢
+              {FITNESS_LABELS.STATS_VOLUME_TREND}
             </div>
             <div className="flex items-center gap-2 justify-center">
               <TrendingUp className="w-3.5 h-3.5" />
-              訓練頻率分析
+              {FITNESS_LABELS.STATS_FREQUENCY}
             </div>
             <div className="flex items-center gap-2 justify-center">
               <Trophy className="w-3.5 h-3.5" />
-              個人紀錄 (PR)
+              {FITNESS_LABELS.STATS_PR}
             </div>
           </div>
         </div>

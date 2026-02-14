@@ -2,6 +2,7 @@
 
 import { Calendar } from 'lucide-react'
 import { FitnessLayout } from '../components/FitnessLayout'
+import { FITNESS_LABELS } from '../constants/labels'
 
 export default function FitnessHistoryPage() {
   // [Feature] 訓練歷史功能待整合 fitness_records 資料表
@@ -10,7 +11,7 @@ export default function FitnessHistoryPage() {
     <FitnessLayout activeTab="history">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-[#FFFFFF] border-b border-[#E8E4E0] px-4 py-4">
-        <h1 className="text-xl font-bold text-[#333333]">訓練歷史</h1>
+        <h1 className="text-xl font-bold text-[#333333]">{FITNESS_LABELS.HISTORY_TITLE}</h1>
       </div>
 
       <div className="px-4 pt-6">
@@ -20,13 +21,13 @@ export default function FitnessHistoryPage() {
             <Calendar className="w-10 h-10 text-[#B8A99A]" />
           </div>
           <h3 className="text-lg font-medium text-[#333333] mb-2">
-            尚無訓練記錄
+            {FITNESS_LABELS.HISTORY_EMPTY_TITLE}
           </h3>
           <p className="text-sm text-[#8C8C8C] mb-6">
-            完成第一次訓練後，這裡會顯示你的訓練歷史
+            {FITNESS_LABELS.HISTORY_EMPTY_DESC}
           </p>
           <div className="text-xs text-[#8C8C8C]">
-            提示：訓練記錄會自動儲存到雲端
+            {FITNESS_LABELS.HISTORY_EMPTY_HINT}
           </div>
         </div>
       </div>
