@@ -231,16 +231,16 @@ export function PnrMatchDialog({
     const suggestedCount = results.filter(r => r.suggestedCustomers.length > 0).length
 
     if (noneCount === 0 && partialCount === 0) {
-      toast.success(`全部配對成功！共 ${results.length} 位旅客`)
+      toast.success(`${COMP_ORDERS_LABELS.全部配對成功}${results.length}${COMP_ORDERS_LABELS.位旅客}`)
     } else if (suggestedCount > 0) {
-      toast.info(`配對完成：${exactCount} 完全符合, ${partialCount} 部分符合, ${noneCount} 未配對。找到 ${suggestedCount} 位可能的客戶建議`)
+      toast.info(`${COMP_ORDERS_LABELS.配對完成}${exactCount} ${COMP_ORDERS_LABELS.完全符合}, ${partialCount} ${COMP_ORDERS_LABELS.部分符合}, ${noneCount} ${COMP_ORDERS_LABELS.未配對}${COMP_ORDERS_LABELS.找到}${suggestedCount}${COMP_ORDERS_LABELS.位可能的客戶建議}`)
     } else {
-      toast.info(`配對完成：${exactCount} 完全符合, ${partialCount} 部分符合, ${noneCount} 未配對`)
+      toast.info(`${COMP_ORDERS_LABELS.配對完成}${exactCount} ${COMP_ORDERS_LABELS.完全符合}, ${partialCount} ${COMP_ORDERS_LABELS.部分符合}, ${noneCount} ${COMP_ORDERS_LABELS.未配對}`)
     }
 
     // 顯示票價解析結果（僅機票訂單明細格式）
     if (parsed.fareData && parsed.sourceFormat === 'ticket_order_detail') {
-      toast.success(`已解析機票金額：${parsed.fareData.totalFare.toLocaleString()} 元/人`)
+      toast.success(`${COMP_ORDERS_LABELS.已解析機票金額}${parsed.fareData.totalFare.toLocaleString()}${COMP_ORDERS_LABELS.元_人}`)
     } else if (parsed.sourceFormat === 'ticket_order_detail' && !parsed.fareData) {
       toast.warning(COMP_ORDERS_LABELS.機票訂單明細格式但未能解析金額_請檢查格式)
     }
@@ -359,7 +359,7 @@ export function PnrMatchDialog({
       if (isTourMode) {
         const missingOrders = selectedCustomers.filter(r => !selectedOrderIds[r.pnrPassenger])
         if (missingOrders.length > 0) {
-          toast.error(`請為 ${missingOrders.length} 位旅客選擇所屬訂單`)
+          toast.error(`${COMP_ORDERS_LABELS.請為}${missingOrders.length}${COMP_ORDERS_LABELS.位旅客選擇所屬訂單}`)
           return
         }
       } else if (!orderId) {
@@ -560,9 +560,9 @@ export function PnrMatchDialog({
       // 顯示結果
       // 注意：不更新 tours 的團體航班，PNR 是個人機票資訊，跟團體航班是分開的
       const messages: string[] = []
-      if (updatedCount > 0) messages.push(`${updatedCount} 位團員已更新 PNR`)
-      if (createdCount > 0) messages.push(`${createdCount} 位新成員已建立`)
-      toast.success(`${messages.join('，')}。訂位代號: ${recordLocator}`)
+      if (updatedCount > 0) messages.push(`${updatedCount}${COMP_ORDERS_LABELS.位團員已更新PNR}`)
+      if (createdCount > 0) messages.push(`${createdCount}${COMP_ORDERS_LABELS.位新成員已建立}`)
+      toast.success(`${messages.join('，')}${COMP_ORDERS_LABELS.訂位代號} ${recordLocator}`)
 
       onSuccess?.()
       handleClose()
@@ -612,7 +612,7 @@ export function PnrMatchDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Plane size={20} className="text-morandi-gold" />
-            PNR 配對
+            {COMP_ORDERS_LABELS.PNR_配對}
           </DialogTitle>
         </DialogHeader>
 
@@ -620,18 +620,12 @@ export function PnrMatchDialog({
           {/* 輸入區域 */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-morandi-primary">
-              貼上 PNR 電報
+              {COMP_ORDERS_LABELS.貼上_PNR_電報}
             </label>
             <Textarea
               value={rawPnr}
               onChange={(e) => setRawPnr(e.target.value)}
-              placeholder={`貼上 Amadeus PNR 電報...
-
-範例：
-RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
-1.CHEN/YIHSUAN  2.HSIEH/CHIAJEN MR
-3  BR 116 Q 15JAN 4 TPECTS HK2  0930 1405
-...`}
+              placeholder={COMP_ORDERS_LABELS.貼上_PNR_電報_placeholder}
               className="min-h-[120px] font-mono text-xs"
             />
             <div className="flex gap-2">
@@ -641,7 +635,7 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
               </Button>
               {parsedPnr && (
                 <span className="text-sm text-morandi-secondary self-center">
-                  訂位代號: <strong>{parsedPnr.recordLocator || COMP_ORDERS_LABELS.未識別}</strong>
+                  {COMP_ORDERS_LABELS.訂位代號} <strong>{parsedPnr.recordLocator || COMP_ORDERS_LABELS.未識別}</strong>
                 </span>
               )}
             </div>
@@ -649,7 +643,7 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
             {members.length === 0 && (
               <p className="text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded-lg">
                 <AlertCircle size={12} className="inline mr-1" />
-                此團尚無團員名單，系統將從客戶資料庫搜尋相似護照拼音，供您選擇後建立成員。
+                {COMP_ORDERS_LABELS.無團員提示}
               </p>
             )}
           </div>
@@ -659,24 +653,24 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
             <div className="space-y-3">
               {/* 統計 */}
               <div className="flex items-center gap-4 p-3 bg-morandi-container/30 rounded-lg flex-wrap">
-                <span className="text-sm font-medium">配對結果：</span>
+                <span className="text-sm font-medium">{COMP_ORDERS_LABELS.配對結果}</span>
                 <span className="flex items-center gap-1 text-sm text-green-600">
-                  <Check size={14} /> {stats.exact} 完全符合
+                  <Check size={14} /> {stats.exact} {COMP_ORDERS_LABELS.完全符合}
                 </span>
                 <span className="flex items-center gap-1 text-sm text-amber-600">
-                  <AlertCircle size={14} /> {stats.partial} 部分符合
+                  <AlertCircle size={14} /> {stats.partial} {COMP_ORDERS_LABELS.部分符合}
                 </span>
                 <span className="flex items-center gap-1 text-sm text-red-600">
-                  <X size={14} /> {stats.none} 未配對
+                  <X size={14} /> {stats.none} {COMP_ORDERS_LABELS.未配對}
                 </span>
                 {stats.withSuggestions > 0 && (
                   <span className="flex items-center gap-1 text-sm text-blue-600">
-                    <Users size={14} /> {stats.withSuggestions} 位有建議客戶
+                    <Users size={14} /> {stats.withSuggestions} {COMP_ORDERS_LABELS.位有建議客戶}
                   </span>
                 )}
                 {stats.selectedCustomers > 0 && (
                   <span className="flex items-center gap-1 text-sm text-purple-600">
-                    <UserPlus size={14} /> {stats.selectedCustomers} 位已選擇客戶
+                    <UserPlus size={14} /> {stats.selectedCustomers} {COMP_ORDERS_LABELS.位已選擇客戶}
                   </span>
                 )}
               </div>
@@ -685,26 +679,26 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
               {stats.withSuggestions > 0 && (orderId || isTourMode) && (
                 <div className="p-2 bg-blue-50 rounded-lg text-xs text-blue-700">
                   <Users size={12} className="inline mr-1" />
-                  系統已從客戶資料庫找到相似護照拼音的客戶，您可以在「建議客戶」欄選擇後自動建立成員。
+                  {COMP_ORDERS_LABELS.建議客戶說明}
                   {isTourMode && COMP_ORDERS_LABELS.請同時選擇每位旅客所屬的訂單}
                 </div>
               )}
               {stats.withSuggestions > 0 && !orderId && !isTourMode && (
                 <div className="p-2 bg-amber-50 rounded-lg text-xs text-amber-700">
                   <AlertCircle size={12} className="inline mr-1" />
-                  找到建議客戶，但因未指定訂單，無法建立新成員。請先選擇要新增成員的訂單。
+                  {COMP_ORDERS_LABELS.建議客戶無訂單說明}
                 </div>
               )}
 
               {/* 團體模式：快速設定所有人的訂單 */}
               {isTourMode && stats.withSuggestions > 0 && (
                 <div className="flex items-center gap-2 p-2 bg-morandi-container/20 rounded-lg">
-                  <span className="text-xs text-morandi-secondary">快速設定所有人訂單：</span>
+                  <span className="text-xs text-morandi-secondary">{COMP_ORDERS_LABELS.快速設定所有人訂單}</span>
                   <select
                     onChange={(e) => handleSetAllOrders(e.target.value)}
                     className="text-xs border rounded px-2 py-1"
                   >
-                    <option value="">-- 請選擇 --</option>
+                    <option value="">{COMP_ORDERS_LABELS.請選擇}</option>
                     {orders.map((o) => (
                       <option key={o.id} value={o.id}>
                         {o.order_number} - {o.contact_person || COMP_ORDERS_LABELS.無聯絡人}
@@ -719,14 +713,14 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
                 <table className="w-full text-sm">
                   <thead className="bg-morandi-container/40">
                     <tr>
-                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">PNR 旅客</th>
-                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">配對狀態</th>
-                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">團員（護照拼音）</th>
-                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">中文姓名</th>
-                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">手動選擇</th>
-                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">建議客戶</th>
+                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">{COMP_ORDERS_LABELS.PNR_旅客}</th>
+                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">{COMP_ORDERS_LABELS.配對狀態}</th>
+                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">{COMP_ORDERS_LABELS.團員護照拼音}</th>
+                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">{COMP_ORDERS_LABELS.中文姓名}</th>
+                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">{COMP_ORDERS_LABELS.手動選擇}</th>
+                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">{COMP_ORDERS_LABELS.建議客戶}</th>
                       {isTourMode && (
-                        <th className="px-3 py-2 text-left font-medium whitespace-nowrap">選擇訂單</th>
+                        <th className="px-3 py-2 text-left font-medium whitespace-nowrap">{COMP_ORDERS_LABELS.選擇訂單}</th>
                       )}
                     </tr>
                   </thead>
@@ -745,19 +739,19 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
                         <td className="px-3 py-2 whitespace-nowrap">
                           {result.selectedCustomerId ? (
                             <span className="flex items-center gap-1 text-purple-600">
-                              <UserPlus size={14} /> 已選客戶
+                              <UserPlus size={14} /> {COMP_ORDERS_LABELS.已選客戶}
                             </span>
                           ) : result.confidence === 'exact' ? (
                             <span className="flex items-center gap-1 text-green-600">
-                              <Check size={14} /> 完全符合
+                              <Check size={14} /> {COMP_ORDERS_LABELS.完全符合}
                             </span>
                           ) : result.confidence === 'partial' ? (
                             <span className="flex items-center gap-1 text-amber-600">
-                              <AlertCircle size={14} /> 部分符合
+                              <AlertCircle size={14} /> {COMP_ORDERS_LABELS.部分符合}
                             </span>
                           ) : (
                             <span className="flex items-center gap-1 text-red-600">
-                              <X size={14} /> 未配對
+                              <X size={14} /> {COMP_ORDERS_LABELS.未配對}
                             </span>
                           )}
                         </td>
@@ -778,8 +772,8 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
                             className="text-xs border rounded px-2 py-1 w-full max-w-[150px]"
                             disabled={!!result.selectedCustomerId}
                           >
-                            <option value="">-- 自動配對 --</option>
-                            <option value="__NONE__">❌ 取消配對</option>
+                            <option value="">{COMP_ORDERS_LABELS.自動配對}</option>
+                            <option value="__NONE__">{COMP_ORDERS_LABELS.取消配對}</option>
                             {members.map((m) => (
                               <option key={m.id} value={m.id}>
                                 {m.chinese_name || m.passport_name}
@@ -798,7 +792,7 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
                               )}
                               disabled={!!result.matchedMember && !result.selectedCustomerId}
                             >
-                              <option value="">-- 選擇客戶 --</option>
+                              <option value="">{COMP_ORDERS_LABELS.選擇客戶}</option>
                               {result.suggestedCustomers.map((c) => (
                                 <option key={c.id} value={c.id}>
                                   {c.name} ({c.passport_name}) {c.score}%
@@ -806,7 +800,7 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
                               ))}
                             </select>
                           ) : (
-                            <span className="text-xs text-morandi-muted">無建議</span>
+                            <span className="text-xs text-morandi-muted">{COMP_ORDERS_LABELS.無建議}</span>
                           )}
                         </td>
                         {isTourMode && (
@@ -819,7 +813,7 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
                                 selectedOrderIds[result.pnrPassenger] && "border-blue-400 bg-blue-50"
                               )}
                             >
-                              <option value="">-- 選擇訂單 --</option>
+                              <option value="">{COMP_ORDERS_LABELS.選擇訂單_placeholder}</option>
                               {orders.map((o) => (
                                 <option key={o.id} value={o.id}>
                                   {o.order_number} - {o.contact_person || COMP_ORDERS_LABELS.無聯絡人}
@@ -838,7 +832,7 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
               {unmatchedMembers.length > 0 && (
                 <div className="p-3 bg-amber-50 rounded-lg">
                   <p className="text-sm font-medium text-amber-700 mb-2">
-                    未在 PNR 中的團員 ({unmatchedMembers.length} 人)：
+                    {COMP_ORDERS_LABELS.未在PNR中的團員} ({unmatchedMembers.length} {COMP_ORDERS_LABELS.人})：
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {unmatchedMembers.map((m) => (
@@ -856,14 +850,14 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
               {/* 航班資訊 */}
               {parsedPnr && parsedPnr.segments.length > 0 && (
                 <div className="p-3 bg-blue-50 rounded-lg">
-                  <p className="text-sm font-medium text-blue-700 mb-2">航班資訊：</p>
+                  <p className="text-sm font-medium text-blue-700 mb-2">{COMP_ORDERS_LABELS.航班資訊}</p>
                   <div className="space-y-1">
                     {parsedPnr.segments.map((seg, i) => (
                       <div key={i} className="text-xs font-mono text-blue-600">
                         <span>{seg.airline}{seg.flightNumber} {seg.origin}→{seg.destination} {seg.departureDate} {seg.departureTime}</span>
                         {seg.via && seg.via.length > 0 && (
                           <span className="ml-2 text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded">
-                            經停: {seg.via.map(v => `${v.city}${v.duration ? ` (${v.duration})` : ''}`).join(', ')}
+                            {COMP_ORDERS_LABELS.經停} {seg.via.map(v => `${v.city}${v.duration ? ` (${v.duration})` : ''}`).join(', ')}
                           </span>
                         )}
                       </div>
@@ -878,7 +872,7 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
         <DialogFooter className="gap-2">
           <Button variant="outline" className="gap-1" onClick={handleClose}>
             <X size={16} />
-            取消
+            {COMP_ORDERS_LABELS.取消}
           </Button>
           <Button
             onClick={handleSave}
@@ -886,7 +880,7 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
             className="bg-morandi-gold hover:bg-morandi-gold-hover"
           >
             <Save size={16} className="mr-1" />
-            {isSaving ? COMP_ORDERS_LABELS.儲存中 : `儲存配對 (${savableCount} 人)`}
+            {isSaving ? COMP_ORDERS_LABELS.儲存中 : `${COMP_ORDERS_LABELS.儲存配對} (${savableCount} ${COMP_ORDERS_LABELS.人})`}
           </Button>
         </DialogFooter>
       </DialogContent>
