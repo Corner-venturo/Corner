@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { LABELS } from '../constants/labels'
 import { AccommodationForm } from './AccommodationForm'
 import { FlightForm } from './FlightForm'
 import type { ConfirmationFormData, ConfirmationType } from '@/types/confirmation.types'
@@ -18,7 +19,7 @@ export function EditorContainer({
     <div className="w-1/2 bg-card border-r border-border flex flex-col">
       {/* 標題列 */}
       <div className="h-14 bg-morandi-gold text-white px-6 flex items-center justify-between border-b border-border">
-        <h2 className="text-lg font-semibold">編輯確認單</h2>
+        <h2 className="text-lg font-semibold">{LABELS.EDIT_CONFIRMATION}</h2>
 
         {/* 類型切換 */}
         <div className="flex gap-2">
@@ -32,7 +33,7 @@ export function EditorContainer({
                 : 'text-white border-white hover:bg-morandi-gold-dark'
             }
           >
-            住宿確認單
+            {LABELS.ACCOMMODATION_CONFIRMATION_TITLE}
           </Button>
           <Button
             size="sm"
@@ -44,7 +45,7 @@ export function EditorContainer({
                 : 'text-white border-white hover:bg-morandi-gold-dark'
             }
           >
-            機票確認單
+            {LABELS.FLIGHT_CONFIRMATION_TITLE}
           </Button>
         </div>
       </div>

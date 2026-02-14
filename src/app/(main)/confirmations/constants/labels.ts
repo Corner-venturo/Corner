@@ -1,5 +1,6 @@
 export const LABELS = {
   // 页面标题和导航
+  LIVE_PREVIEW: '即時預覽',
   EDIT_CONFIRMATION: '編輯確認單',
   CONFIRMATIONS_MANAGEMENT: '確認單管理',
   HOME: '首頁',

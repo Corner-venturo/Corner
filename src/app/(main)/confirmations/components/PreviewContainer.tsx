@@ -1,3 +1,4 @@
+import { LABELS } from '../constants/labels'
 import { AccommodationPreview } from './AccommodationPreview'
 import { FlightPreview } from './FlightPreview'
 import type { ConfirmationFormData } from '@/types/confirmation.types'
@@ -12,9 +13,9 @@ export function PreviewContainer({ formData }: PreviewContainerProps) {
       {/* 標題列 */}
       <div className="h-14 bg-card border-b px-6 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <h2 className="text-lg font-semibold text-morandi-primary">即時預覽</h2>
+          <h2 className="text-lg font-semibold text-morandi-primary">{LABELS.LIVE_PREVIEW}</h2>
           <span className="text-sm text-morandi-secondary">
-            {formData.type === 'accommodation' ? '住宿確認單' : '機票確認單'}
+            {formData.type === 'accommodation' ? LABELS.ACCOMMODATION_CONFIRMATION_TITLE : LABELS.FLIGHT_CONFIRMATION_TITLE}
           </span>
         </div>
       </div>
