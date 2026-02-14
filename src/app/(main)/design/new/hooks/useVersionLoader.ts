@@ -190,12 +190,12 @@ export function useVersionLoader({
         loadCanvasData(currentPageData.fabricData).then(() => {
           setLoadingStage('idle', 100)
           initPageHistory(currentPageData.id)
-        })
+        }).catch(err => logger.error('[useVersionLoader] loadCanvasData', err))
       } else if (restoredPages[savedPageIndex]) {
         loadCanvasPage(restoredPages[savedPageIndex]).then(() => {
           setLoadingStage('idle', 100)
           initPageHistory(restoredPages[savedPageIndex].id)
-        })
+        }).catch(err => logger.error('[useVersionLoader] loadCanvasPage', err))
       } else {
         setLoadingStage('idle', 100)
       }
@@ -203,7 +203,7 @@ export function useVersionLoader({
       loadCanvasData(versionData).then(() => {
         setLoadingStage('idle', 100)
         initPageHistory('legacy-page')
-      })
+      }).catch(err => logger.error('[useVersionLoader] loadCanvasData legacy', err))
     }
   }, [isCanvasReady, currentVersion, loadCanvasData, loadCanvasPage, setLoadingStage, initPageHistory])
 
@@ -218,7 +218,7 @@ export function useVersionLoader({
     if (firstPage) {
       loadCanvasPage(firstPage).then(() => {
         initPageHistory(firstPage.id)
-      })
+      }).catch(err => logger.error('[useVersionLoader] loadCanvasPage initial', err))
     }
   }, [isCanvasReady, generatedPages, currentVersion, loadCanvasPage, initPageHistory])
 }

@@ -180,33 +180,37 @@ export function useAttractionForm({ attraction, initialFormData, open }: UseAttr
       e.preventDefault()
       setIsDragOver(false)
 
-      let imageUrl = ''
-      const html = e.dataTransfer?.getData('text/html') || ''
-      if (html) {
-        const match = html.match(/<img[^>]+src="([^"]+)"/)
-        if (match && match[1]) {
-          imageUrl = match[1]
+      try {
+        let imageUrl = ''
+        const html = e.dataTransfer?.getData('text/html') || ''
+        if (html) {
+          const match = html.match(/<img[^>]+src="([^"]+)"/)
+          if (match && match[1]) {
+            imageUrl = match[1]
+          }
         }
-      }
 
-      if (!imageUrl) {
-        const uriList = e.dataTransfer?.getData('text/uri-list') || ''
-        if (uriList) {
-          imageUrl = uriList.split('\n')[0]
+        if (!imageUrl) {
+          const uriList = e.dataTransfer?.getData('text/uri-list') || ''
+          if (uriList) {
+            imageUrl = uriList.split('\n')[0]
+          }
         }
-      }
 
-      const files = e.dataTransfer?.files
-      if (files && files.length > 0) {
-        const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'))
-        if (imageFiles.length > 0) {
-          await uploadFiles(imageFiles)
-          return
+        const files = e.dataTransfer?.files
+        if (files && files.length > 0) {
+          const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'))
+          if (imageFiles.length > 0) {
+            await uploadFiles(imageFiles)
+            return
+          }
         }
-      }
 
-      if (imageUrl) {
-        await fetchAndUploadImage(imageUrl)
+        if (imageUrl) {
+          await fetchAndUploadImage(imageUrl)
+        }
+      } catch (err) {
+        logger.error('[useAttractionForm] handleGlobalDrop', err)
       }
     }
 
