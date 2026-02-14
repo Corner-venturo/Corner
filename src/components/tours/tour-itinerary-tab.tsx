@@ -24,6 +24,10 @@ import { syncItineraryToQuote } from '@/lib/utils/itinerary-quote-sync'
 import type { Tour, Itinerary } from '@/stores/types'
 import type { FlightInfo } from '@/types/flight.types'
 import { COMP_TOURS_LABELS, TOUR_ITINERARY_TAB_LABELS } from './constants/labels'
+import {
+  getPreviewDailyData as computePreviewData,
+  generatePrintHtml,
+} from '@/features/proposals/components/package-itinerary/format-itinerary'
 
 // 每日行程項目
 interface DailyScheduleItem {
@@ -219,36 +223,18 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
     return ''
   }, [dailySchedule])
 
-  // 產生預覽資料
+  // 產生預覽資料（使用共用工具，需轉換型別）
   const getPreviewDailyData = useCallback(() => {
-    return dailySchedule.map((day, idx) => {
-      let dateLabel = ''
-      if (tour.departure_date) {
-        const date = new Date(tour.departure_date)
-        date.setDate(date.getDate() + idx)
-        const weekdays = ['日', '一', '二', '三', '四', '五', '六']
-        dateLabel = `${date.getMonth() + 1}/${date.getDate()} (${weekdays[date.getDay()]})`
-      }
-      const isFirst = idx === 0
-      const isLast = idx === dailySchedule.length - 1
-      const defaultTitle = isFirst ? COMP_TOURS_LABELS.抵達目的地 : isLast ? COMP_TOURS_LABELS.返回台灣 : `${TOUR_ITINERARY_TAB_LABELS.第(day.day)} 天行程`
-      const dayTitle = day.route?.trim() || defaultTitle
-      const breakfast = day.hotelBreakfast ? COMP_TOURS_LABELS.飯店早餐 : day.meals.breakfast
-      const lunch = day.lunchSelf ? COMP_TOURS_LABELS.敬請自理 : day.meals.lunch
-      const dinner = day.dinnerSelf ? COMP_TOURS_LABELS.敬請自理 : day.meals.dinner
-      let accommodation = day.accommodation || ''
-      if (day.sameAsPrevious && idx > 0) {
-        accommodation = getPreviousAccommodation(idx) || COMP_TOURS_LABELS.續住
-      }
-      return {
-        dayLabel: `Day ${day.day}`,
-        date: dateLabel,
-        title: dayTitle,
-        meals: { breakfast, lunch, dinner },
-        accommodation: isLast ? '' : accommodation,
-      }
-    })
-  }, [dailySchedule, tour.departure_date, getPreviousAccommodation])
+    // 轉換為共用格式（補上缺少的欄位）
+    const scheduleForPreview = dailySchedule.map(day => ({
+      ...day,
+      sameAsPrevious: day.sameAsPrevious || false,
+      hotelBreakfast: day.hotelBreakfast || false,
+      lunchSelf: day.lunchSelf || false,
+      dinnerSelf: day.dinnerSelf || false,
+    }))
+    return computePreviewData(scheduleForPreview, tour.departure_date || null)
+  }, [dailySchedule, tour.departure_date])
 
   // 儲存行程表
   const handleSave = async () => {
@@ -361,81 +347,16 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
     if (!printWindow) return
 
     const dailyData = getPreviewDailyData()
-    const companyName = currentUser?.workspace_code || '旅行社'
-    const destination = tour.location || ''
-
-    const printContent = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>${title || TOUR_ITINERARY_TAB_LABELS.行程表}</title>
-        <style>
-          @page { size: A4; margin: 10mm; }
-          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
-          .header { border-bottom: 2px solid #c9aa7c; padding-bottom: 16px; margin-bottom: 24px; }
-          .title { font-size: 24px; font-weight: bold; color: #3a3633; margin-bottom: 4px; }
-          .company { text-align: right; color: #c9aa7c; font-weight: 600; }
-          .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; font-size: 14px; }
-          .info-label { color: #8b8680; }
-          table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px; }
-          th { background: #c9aa7c; color: white; padding: 8px; text-align: left; border: 1px solid #c9aa7c; }
-          td { padding: 8px; border: 1px solid #e8e5e0; }
-          tr:nth-child(even) { background: #f6f4f1; }
-          .day-label { font-weight: 600; color: #c9aa7c; }
-          .day-date { font-size: 11px; color: #8b8680; }
-          .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid #e8e5e0; text-align: center; font-size: 12px; color: #8b8680; }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <div style="display: flex; justify-content: space-between;">
-            <div class="title">${title || TOUR_ITINERARY_TAB_LABELS.行程表}</div>
-            <div class="company">${companyName}</div>
-          </div>
-          <div class="info-grid">
-            <div><span class="info-label">${TOUR_ITINERARY_TAB_LABELS.目的地_冒號}</span>${destination}</div>
-            <div><span class="info-label">${TOUR_ITINERARY_TAB_LABELS.出發日期}：</span>${tour.departure_date || '-'}</div>
-            <div><span class="info-label">${TOUR_ITINERARY_TAB_LABELS.行程天數_冒號}</span>${dailyData.length} ${TOUR_ITINERARY_TAB_LABELS.天}</div>
-          </div>
-          ${!isDomestic && (outboundFlight || returnFlight) ? `
-          <div class="info-grid" style="margin-top: 8px;">
-            ${outboundFlight ? `<div><span class="info-label">${TOUR_ITINERARY_TAB_LABELS.去程航班_冒號}</span>${outboundFlight.airline} ${outboundFlight.flightNumber} (${outboundFlight.departureAirport} ${outboundFlight.departureTime} → ${outboundFlight.arrivalAirport} ${outboundFlight.arrivalTime})</div>` : ''}
-            ${returnFlight ? `<div><span class="info-label">${TOUR_ITINERARY_TAB_LABELS.回程航班_冒號}</span>${returnFlight.airline} ${returnFlight.flightNumber} (${returnFlight.departureAirport} ${returnFlight.departureTime} → ${returnFlight.arrivalAirport} ${returnFlight.arrivalTime})</div>` : ''}
-          </div>` : ''}
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th style="width: 80px;">日期</th>
-              <th>行程內容</th>
-              <th style="width: 70px; text-align: center;">早餐</th>
-              <th style="width: 70px; text-align: center;">午餐</th>
-              <th style="width: 70px; text-align: center;">晚餐</th>
-              <th style="width: 120px;">住宿</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${dailyData.map((day) => `
-              <tr>
-                <td>
-                  <div class="day-label">${day.dayLabel}</div>
-                  <div class="day-date">${day.date}</div>
-                </td>
-                <td>${day.title}</td>
-                <td style="text-align: center; font-size: 12px;">${day.meals.breakfast || '-'}</td>
-                <td style="text-align: center; font-size: 12px;">${day.meals.lunch || '-'}</td>
-                <td style="text-align: center; font-size: 12px;">${day.meals.dinner || '-'}</td>
-                <td style="font-size: 12px;">${day.accommodation || '-'}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-        <div class="footer">
-          ${TOUR_ITINERARY_TAB_LABELS.本行程表由_公司_提供_列印日期.replace('{company}', companyName).replace('{date}', new Date().toLocaleDateString('zh-TW'))}
-        </div>
-      </body>
-      </html>
-    `
+    const printContent = generatePrintHtml({
+      title: title || TOUR_ITINERARY_TAB_LABELS.行程表,
+      companyName: currentUser?.workspace_code || '旅行社',
+      destination: tour.location || '',
+      startDate: tour.departure_date || null,
+      isDomestic,
+      outboundFlight,
+      returnFlight,
+      dailyData,
+    })
 
     printWindow.document.write(printContent)
     printWindow.document.close()
