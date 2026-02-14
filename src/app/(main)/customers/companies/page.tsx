@@ -12,7 +12,7 @@
 'use client'
 
 import { logger } from '@/lib/utils/logger'
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
@@ -25,6 +25,7 @@ import { CompanyDetailDialog } from './components/CompanyDetailDialog'
 import type { CreateCompanyData } from '@/types/company.types'
 import { alert, confirm } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'
+import { COMPANY_LABELS as L } from './constants/labels'
 
 export default function CompaniesPage() {
   const { items: companies } = useCompanies()
@@ -36,70 +37,61 @@ export default function CompaniesPage() {
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
 
-  // 查看企業詳情
-  const handleViewDetail = (company: Company) => {
+  const handleViewDetail = useCallback((company: Company) => {
     setSelectedCompany(company)
     setIsDetailOpen(true)
-  }
+  }, [])
 
-  // 更新企業客戶（從詳情對話框）
-  const handleUpdateFromDetail = async (data: CreateCompanyData) => {
+  const handleUpdateFromDetail = useCallback(async (data: CreateCompanyData) => {
     if (!selectedCompany) return
 
     try {
       await updateCompany(selectedCompany.id, data)
-      // 更新 selectedCompany 以反映變更
       setSelectedCompany({ ...selectedCompany, ...data } as Company)
-      await alert('企業客戶更新成功', 'success')
+      await alert(L.UPDATE_SUCCESS, 'success')
     } catch (error) {
-      logger.error('更新企業客戶失敗:', error)
-      await alert('更新企業客戶失敗', 'error')
+      logger.error('Failed to update company:', error)
+      await alert(L.UPDATE_FAILED, 'error')
     }
-  }
+  }, [selectedCompany])
 
-  // 新增企業客戶
-  const handleCreate = async (data: CreateCompanyData) => {
+  const handleCreate = useCallback(async (data: CreateCompanyData) => {
     try {
       await createCompany(data as Parameters<typeof createCompany>[0])
       setIsDialogOpen(false)
-      await alert('企業客戶新增成功', 'success')
+      await alert(L.CREATE_SUCCESS, 'success')
     } catch (error) {
-      logger.error('新增企業客戶失敗:', error)
-      await alert('新增企業客戶失敗', 'error')
+      logger.error('Failed to create company:', error)
+      await alert(L.CREATE_FAILED, 'error')
     }
-  }
+  }, [])
 
-  // 編輯企業客戶
-  const handleEdit = async (data: CreateCompanyData) => {
+  const handleEdit = useCallback(async (data: CreateCompanyData) => {
     if (!editingCompany) return
 
     try {
       await updateCompany(editingCompany.id, data)
       setEditingCompany(undefined)
       setIsDialogOpen(false)
-      await alert('企業客戶更新成功', 'success')
+      await alert(L.UPDATE_SUCCESS, 'success')
     } catch (error) {
-      logger.error('更新企業客戶失敗:', error)
-      await alert('更新企業客戶失敗', 'error')
+      logger.error('Failed to update company:', error)
+      await alert(L.UPDATE_FAILED, 'error')
     }
-  }
+  }, [editingCompany])
 
-  // 開啟新增對話框
-  const handleOpenCreateDialog = () => {
+  const handleOpenCreateDialog = useCallback(() => {
     setEditingCompany(undefined)
     setIsDialogOpen(true)
-  }
+  }, [])
 
-  // 開啟編輯對話框
-  const handleOpenEditDialog = (company: Company) => {
+  const handleOpenEditDialog = useCallback((company: Company) => {
     setEditingCompany(company)
     setIsDialogOpen(true)
-  }
+  }, [])
 
-  // 刪除企業客戶
-  const handleDeleteCompany = async (company: Company) => {
+  const handleDeleteCompany = useCallback(async (company: Company) => {
     try {
-      // 檢查是否有關聯的聯絡人
       const { data: contacts, error: contactsError } = await supabase
         .from('company_contacts')
         .select('id, name')
@@ -107,53 +99,38 @@ export default function CompaniesPage() {
         .limit(5)
 
       if (contactsError) {
-        logger.error('檢查聯絡人時發生錯誤:', contactsError)
+        logger.error('Error checking contacts:', contactsError)
       }
 
-      // 如果有關聯的聯絡人，提示用戶
+      let confirmMsg: string
       if (contacts && contacts.length > 0) {
         const contactNames = contacts.map(c => c.name).join('、')
-        const contactInfo = contacts.length > 5 
-          ? `${contactNames}... 等 ${contacts.length} 位聯絡人`
+        const contactInfo = contacts.length > 5
+          ? L.CONTACTS_OVERFLOW(contactNames, contacts.length)
           : contactNames
-
-        const confirmed = await confirm(
-          `此企業有 ${contacts.length} 位關聯的聯絡人（${contactInfo}），刪除企業將同時刪除這些聯絡人。\n\n確定要刪除企業「${company.company_name}」嗎？`,
-          {
-            title: '刪除企業客戶',
-            type: 'warning',
-            confirmText: '確定刪除',
-            cancelText: '取消',
-          }
-        )
-
-        if (!confirmed) return
+        confirmMsg = L.DELETE_WITH_CONTACTS(contacts.length, contactInfo, company.company_name)
       } else {
-        // 沒有關聯的聯絡人，直接確認刪除
-        const confirmed = await confirm(
-          `確定要刪除企業「${company.company_name}」嗎？`,
-          {
-            title: '刪除企業客戶',
-            type: 'warning',
-            confirmText: '確定刪除',
-            cancelText: '取消',
-          }
-        )
-
-        if (!confirmed) return
+        confirmMsg = L.DELETE_SIMPLE(company.company_name)
       }
 
-      // 執行刪除
-      await deleteCompany(company.id)
-      await alert('企業客戶刪除成功', 'success')
-    } catch (error) {
-      logger.error('刪除企業客戶失敗:', error)
-      await alert('刪除企業客戶失敗', 'error')
-    }
-  }
+      const confirmed = await confirm(confirmMsg, {
+        title: L.DELETE_TITLE,
+        type: 'warning',
+        confirmText: L.DELETE_CONFIRM,
+        cancelText: L.DELETE_CANCEL,
+      })
 
-  // 表格欄位
-  const columns = useCompanyColumns({ 
+      if (!confirmed) return
+
+      await deleteCompany(company.id)
+      await alert(L.DELETE_SUCCESS, 'success')
+    } catch (error) {
+      logger.error('Failed to delete company:', error)
+      await alert(L.DELETE_FAILED, 'error')
+    }
+  }, [])
+
+  const columns = useCompanyColumns({
     onView: handleViewDetail,
     onEdit: handleOpenEditDialog,
     onDelete: handleDeleteCompany,
@@ -162,14 +139,14 @@ export default function CompaniesPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="企業客戶管理"
+        title={L.PAGE_TITLE}
         actions={
           <Button
             onClick={handleOpenCreateDialog}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
             <Plus size={16} className="mr-2" />
-            新增企業
+            {L.ADD_COMPANY}
           </Button>
         }
       />
@@ -181,11 +158,10 @@ export default function CompaniesPage() {
           columns={columns}
           defaultSort={{ key: 'created_at', direction: 'desc' }}
           searchable
-          searchPlaceholder="搜尋企業名稱、統編或聯絡資訊..."
+          searchPlaceholder={L.SEARCH_PLACEHOLDER}
         />
       </div>
 
-      {/* 新增/編輯企業對話框 */}
       <CompanyFormDialog
         isOpen={isDialogOpen}
         onClose={() => {
@@ -197,7 +173,6 @@ export default function CompaniesPage() {
         company={editingCompany}
       />
 
-      {/* 企業詳情 Dialog */}
       <CompanyDetailDialog
         company={selectedCompany}
         open={isDetailOpen}
