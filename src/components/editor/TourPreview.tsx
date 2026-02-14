@@ -1,6 +1,6 @@
 'use client'
 
-import TourPage from '@/components/TourPage'
+import TourPage from '@/features/tours/components/TourPage'
 import type { TourPreviewProps } from '@/features/tours'
 
 export function TourPreview({ data, viewMode = 'desktop' }: TourPreviewProps) {

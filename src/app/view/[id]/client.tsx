@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import TourPage from '@/components/TourPage'
+import TourPage from '@/features/tours/components/TourPage'
 import { Loader2 } from 'lucide-react'
 import { logger } from '@/lib/utils/logger'
 import { PUBLIC_VIEW_LABELS } from './constants/labels'
