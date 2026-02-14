@@ -18,6 +18,7 @@ import {
 } from '@/data'
 import type { Supplier } from '@/types/supplier.types'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { LABELS } from '../constants/labels'
 
 export const SuppliersPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -64,7 +65,7 @@ export const SuppliersPage: React.FC = () => {
 
   const handleDelete = useCallback(async (supplier: Supplier) => {
     const confirmed = await confirm(`確定要刪除供應商「${supplier.name}」嗎？`, {
-      title: '刪除供應商',
+      title: LABELS.deleteSupplier,
       type: 'warning',
     })
     if (!confirmed) return
@@ -129,19 +130,19 @@ export const SuppliersPage: React.FC = () => {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="供應商管理"
+        title={LABELS.supplierManagement}
         icon={Building2}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '資料庫管理', href: '/database' },
-          { label: '供應商管理', href: '/database/suppliers' },
+          { label: LABELS.home, href: '/' },
+          { label: LABELS.databaseManagement, href: '/database' },
+          { label: LABELS.supplierManagement, href: '/database/suppliers' },
         ]}
         showSearch
         searchTerm={searchQuery}
         onSearchChange={setSearchQuery}
-        searchPlaceholder="搜尋供應商名稱或銀行資訊..."
+        searchPlaceholder={LABELS.searchPlaceholder}
         onAdd={handleOpenAddDialog}
-        addLabel="新增供應商"
+        addLabel={LABELS.addSupplier}
       />
 
       <div className="flex-1 overflow-auto">

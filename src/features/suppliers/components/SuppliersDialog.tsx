@@ -8,6 +8,7 @@ import React from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { LABELS } from '../constants/labels'
 
 type SupplierFormData = {
   name: string
@@ -40,10 +41,10 @@ export const SuppliersDialog: React.FC<SuppliersDialogProps> = ({
     <FormDialog
       open={isOpen}
       onOpenChange={open => !open && onClose()}
-      title={isEditMode ? '編輯供應商' : '新增供應商'}
-      subtitle={isEditMode ? '修改供應商資訊' : '請填寫供應商基本資訊'}
+      title={isEditMode ? LABELS.editSupplier : LABELS.addSupplier}
+      subtitle={isEditMode ? LABELS.editSubtitle : LABELS.addSubtitle}
       onSubmit={onSubmit}
-      submitLabel={isEditMode ? '儲存變更' : '新增供應商'}
+      submitLabel={isEditMode ? LABELS.saveChanges : LABELS.addSupplier}
       submitDisabled={!formData.name || !formData.bank_name || !formData.bank_account}
       maxWidth="lg"
     >
@@ -51,12 +52,12 @@ export const SuppliersDialog: React.FC<SuppliersDialogProps> = ({
         {/* 供應商名稱 */}
         <div>
           <label className="text-sm font-medium text-morandi-primary">
-            供應商名稱 <span className="text-morandi-red">*</span>
+            {LABELS.supplierName} <span className="text-morandi-red">*</span>
           </label>
           <Input
             value={formData.name}
             onChange={e => onFormFieldChange('name', e.target.value)}
-            placeholder="輸入供應商名稱"
+            placeholder={LABELS.supplierNamePlaceholder}
             className="mt-1"
           />
         </div>
@@ -65,24 +66,24 @@ export const SuppliersDialog: React.FC<SuppliersDialogProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="text-sm font-medium text-morandi-primary">
-              銀行名稱 <span className="text-morandi-red">*</span>
+              {LABELS.bankName} <span className="text-morandi-red">*</span>
             </label>
             <Input
               value={formData.bank_name}
               onChange={e => onFormFieldChange('bank_name', e.target.value)}
-              placeholder="例如：國泰世華銀行"
+              placeholder={LABELS.bankNamePlaceholder}
               className="mt-1"
             />
           </div>
 
           <div>
             <label className="text-sm font-medium text-morandi-primary">
-              銀行帳號 <span className="text-morandi-red">*</span>
+              {LABELS.bankAccount} <span className="text-morandi-red">*</span>
             </label>
             <Input
               value={formData.bank_account}
               onChange={e => onFormFieldChange('bank_account', e.target.value)}
-              placeholder="請輸入完整帳號"
+              placeholder={LABELS.bankAccountPlaceholder}
               className="mt-1"
             />
           </div>
@@ -90,11 +91,11 @@ export const SuppliersDialog: React.FC<SuppliersDialogProps> = ({
 
         {/* 備註 */}
         <div>
-          <label className="text-sm font-medium text-morandi-primary">備註</label>
+          <label className="text-sm font-medium text-morandi-primary">{LABELS.notes}</label>
           <Textarea
             value={formData.notes}
             onChange={e => onFormFieldChange('notes', e.target.value)}
-            placeholder="供應商備註資訊（選填）"
+            placeholder={LABELS.notesPlaceholder}
             rows={3}
             className="mt-1"
           />

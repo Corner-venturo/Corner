@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Pencil, Trash2 } from 'lucide-react'
 import { Supplier } from '../types'
+import { LABELS } from '../constants/labels'
 
 interface SuppliersListProps {
   suppliers: Supplier[]
@@ -40,19 +41,19 @@ export const SuppliersList: React.FC<SuppliersListProps> = ({
   const columns: TableColumn[] = [
     {
       key: 'code',
-      label: '供應商編號',
+      label: LABELS.supplierCode,
       sortable: true,
       render: (value) => <span className="font-mono text-sm text-morandi-secondary">{String(value || '-')}</span>,
     },
     {
       key: 'name',
-      label: '供應商名稱',
+      label: LABELS.supplierName,
       sortable: true,
       render: (value) => <span className="font-medium text-morandi-primary">{String(value || '')}</span>,
     },
     {
       key: 'type',
-      label: '類型',
+      label: LABELS.type,
       sortable: true,
       render: (value) => {
         const label = TYPE_LABELS[String(value)] || String(value)
@@ -65,19 +66,19 @@ export const SuppliersList: React.FC<SuppliersListProps> = ({
     },
     {
       key: 'bank_name',
-      label: '銀行名稱',
+      label: LABELS.bankName,
       sortable: true,
       render: (value) => <span className="text-morandi-primary">{String(value || '-')}</span>,
     },
     {
       key: 'bank_account',
-      label: '銀行帳號',
+      label: LABELS.bankAccount,
       sortable: true,
       render: (value) => <span className="text-morandi-secondary">{String(value || '-')}</span>,
     },
     {
       key: 'notes',
-      label: '備註',
+      label: LABELS.notes,
       sortable: false,
       render: (value) => <span className="text-sm text-morandi-muted">{String(value || '-')}</span>,
     },
@@ -102,7 +103,7 @@ export const SuppliersList: React.FC<SuppliersListProps> = ({
                   onEdit(supplier)
                 }}
                 className="text-morandi-blue hover:bg-morandi-blue/10"
-                title="編輯"
+                title={LABELS.edit}
               >
                 <Pencil size={16} />
               </Button>
@@ -116,7 +117,7 @@ export const SuppliersList: React.FC<SuppliersListProps> = ({
                   onDelete(supplier)
                 }}
                 className="text-morandi-red hover:bg-morandi-red/10"
-                title="刪除"
+                title={LABELS.delete}
               >
                 <Trash2 size={16} />
               </Button>
