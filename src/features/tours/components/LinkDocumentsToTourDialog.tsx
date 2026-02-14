@@ -286,7 +286,7 @@ export function LinkDocumentsToTourDialog({
 
   const handleDeleteQuote = async (e: React.MouseEvent, quote: Quote) => {
     e.stopPropagation()
-    if (!confirm(`確定要刪除「${quote.name}」嗎？此操作無法復原。`)) return
+    if (!confirm(`${TOURS_LABELS.CONFIRM_DELETE_PREFIX}${quote.name}${TOURS_LABELS.CONFIRM_DELETE_SUFFIX}`)) return
     try {
       setIsDeletingQuote(true)
       await deleteQuote(quote.id)
@@ -328,7 +328,7 @@ export function LinkDocumentsToTourDialog({
       const newPackageData = {
         id: crypto.randomUUID(),
         proposal_id: null, // 獨立 package，不屬於任何提案
-        version_name: tour.name || '行程版本',
+        version_name: tour.name || TOURS_LABELS.ITINERARY_VERSION,
         version_number: 1,
         days,
         start_date: tour.departure_date || null,
@@ -443,7 +443,7 @@ export function LinkDocumentsToTourDialog({
             <DialogHeader className="flex-shrink-0">
               <DialogTitle>{TOURS_LABELS.LABEL_7445}</DialogTitle>
               <DialogDescription>
-                為「{tour.name}」建立多份快速報價單比價
+                {TOURS_LABELS.QUICK_QUOTE_COMPARE_PREFIX}{tour.name}{TOURS_LABELS.QUICK_QUOTE_COMPARE_SUFFIX}
               </DialogDescription>
             </DialogHeader>
 
@@ -453,7 +453,7 @@ export function LinkDocumentsToTourDialog({
                 <div className="flex items-center justify-between pb-2 border-b border-morandi-container/50 flex-shrink-0">
                   <div className="flex items-center gap-2">
                     <Calculator className="w-4 h-4 text-morandi-primary" />
-                    <span className="font-medium text-sm text-morandi-primary">快速報價單</span>
+                    <span className="font-medium text-sm text-morandi-primary">{TOURS_LABELS.QUICK_QUOTE}</span>
                   </div>
                   <button
                     onClick={handleCreateQuickQuote}
@@ -480,12 +480,12 @@ export function LinkDocumentsToTourDialog({
                           className="flex-1 min-w-0 text-left"
                         >
                           <div className="text-morandi-primary truncate">
-                            {stripHtml(quote.name) || '未命名'}
+                            {stripHtml(quote.name) || TOURS_LABELS.UNNAMED}
                           </div>
                           <div className="text-morandi-gold font-medium text-[10px]">
                             {quote.total_amount
                               ? `$${quote.total_amount.toLocaleString()}`
-                              : '尚未報價'}
+                              : TOURS_LABELS.NOT_QUOTED}
                           </div>
                         </button>
                         <div className="flex items-center gap-1 shrink-0">

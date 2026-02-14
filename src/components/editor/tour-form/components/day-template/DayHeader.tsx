@@ -37,7 +37,7 @@ export function DayHeader({ dayIndex, currentStyle, onStyleChange, onSave, onClo
             {dayIndex + 1}
           </div>
           <div>
-            <h2 className="font-bold text-lg text-foreground">Day {dayIndex + 1} 預覽編輯</h2>
+            <h2 className="font-bold text-lg text-foreground">Day {dayIndex + 1} {COMP_EDITOR_LABELS.EDIT_302}</h2>
             <p className="text-sm text-morandi-secondary">{COMP_EDITOR_LABELS.EDIT_7600}</p>
           </div>
         </div>

@@ -611,4 +611,6 @@ export const COMP_EDITOR_LABELS = {
   LABEL_8457: '航班號碼',
   LABEL_6415: '日期 (月/日)',
   LABEL_5706: '出發時間',
+  STAR_SUFFIX: '星',
+  SHIFT_ENTER_HINT: 'Shift+Enter 換行',
 };

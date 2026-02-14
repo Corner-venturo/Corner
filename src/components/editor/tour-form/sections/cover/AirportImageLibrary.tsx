@@ -122,7 +122,7 @@ export function AirportImageLibrary({
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <label className="block text-sm font-medium text-morandi-primary">
-          封面圖片 <span className="text-morandi-secondary font-normal">({airportCode})</span>
+          {COMP_EDITOR_LABELS.封面圖片} <span className="text-morandi-secondary font-normal">({airportCode})</span>
         </label>
         <Button
           type="button"

@@ -166,7 +166,7 @@ export function DayCard({
                 onChange={e => updateDailyItinerary(dayIndex, 'isAlternative', e.target.checked)}
                 className="h-4 w-4 text-morandi-gold focus:ring-morandi-gold border-morandi-container rounded"
               />
-              <span className="text-sm text-morandi-primary">建議方案</span>
+              <span className="text-sm text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_1234}</span>
             </label>
           )}
           {dayIndex === data.dailyItinerary.length - 1 && (
@@ -194,7 +194,7 @@ export function DayCard({
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-1">
               {COMP_EDITOR_LABELS.LABEL_1304}
-              <span className="text-xs text-morandi-secondary ml-2">Shift+Enter 換行</span>
+              <span className="text-xs text-morandi-secondary ml-2">{COMP_EDITOR_LABELS.SHIFT_ENTER_HINT}</span>
             </label>
             <textarea
               value={day.highlight || ''}

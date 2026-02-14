@@ -261,7 +261,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
                   <div className="text-morandi-secondary">{QUOTE_CONFIRMATION_SECTION_LABELS.LABEL_1799}</div>
                   <div className={cn('font-medium flex items-center gap-1', isTokenExpired && 'text-status-danger')}>
                     <DateCell date={confirmationTokenExpiresAt} format="time" showIcon={false} />
-                    {isTokenExpired && <span>(已過期)</span>}
+                    {isTokenExpired && <span>{QUOTE_CONFIRMATION_SECTION_LABELS.EXPIRED}</span>}
                   </div>
                 </div>
                 <DropdownMenuSeparator />
@@ -276,7 +276,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
                   className={cn('gap-2', isLoading && 'opacity-50 cursor-not-allowed')}
                 >
                   <Send size={14} />
-                  {confirmationStatus === 'pending' ? '重新發送連結' : '發送確認連結'}
+                  {confirmationStatus === 'pending' ? QUOTE_CONFIRMATION_SECTION_LABELS.重新發送連結 : QUOTE_CONFIRMATION_SECTION_LABELS.發送確認連結}
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
@@ -331,7 +331,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <UserCheck size={20} className="text-morandi-gold" />
-              業務手動確認
+              {QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRM_9516}
             </DialogTitle>
             <DialogDescription>
               {QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRM_4324}
@@ -380,7 +380,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <History size={20} className="text-morandi-gold" />
-              確認歷史記錄
+              {QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRM_495}
             </DialogTitle>
           </DialogHeader>
 
@@ -413,14 +413,14 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
                     </div>
                     {log.confirmed_by_name && (
                       <div className="text-morandi-secondary">
-                        {log.confirmed_by_type === 'customer' ? '客戶' : '業務'}：
+                        {log.confirmed_by_type === 'customer' ? QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRMED_BY_CUSTOMER : QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRMED_BY_STAFF}{QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRMED_BY_SUFFIX}
                         {log.confirmed_by_name}
                         {log.confirmed_by_email && ` (${log.confirmed_by_email})`}
                       </div>
                     )}
                     {log.notes && (
                       <div className="text-morandi-secondary mt-1">
-                        備註：{log.notes}
+                        {QUOTE_CONFIRMATION_SECTION_LABELS.NOTES_PREFIX}{log.notes}
                       </div>
                     )}
                   </div>

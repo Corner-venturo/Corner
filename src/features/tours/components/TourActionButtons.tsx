@@ -173,7 +173,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
             title={TOURS_LABELS.EDIT}
           >
             <Edit2 size={14} />
-            <span>編輯</span>
+            <span>{TOURS_LABELS.EDIT}</span>
           </button>
 
           {/* 建立工作空間頻道 */}

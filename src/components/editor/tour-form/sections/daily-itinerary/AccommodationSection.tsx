@@ -137,10 +137,10 @@ export function AccommodationSection({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="5">5星</SelectItem>
-              <SelectItem value="4">4星</SelectItem>
-              <SelectItem value="3">3星</SelectItem>
-              <SelectItem value="2">2星</SelectItem>
+              <SelectItem value="5">5{COMP_EDITOR_LABELS.STAR_SUFFIX}</SelectItem>
+              <SelectItem value="4">4{COMP_EDITOR_LABELS.STAR_SUFFIX}</SelectItem>
+              <SelectItem value="3">3{COMP_EDITOR_LABELS.STAR_SUFFIX}</SelectItem>
+              <SelectItem value="2">2{COMP_EDITOR_LABELS.STAR_SUFFIX}</SelectItem>
               <SelectItem value="1">1星</SelectItem>
               <SelectItem value="0">{COMP_EDITOR_LABELS.LABEL_6456}</SelectItem>
             </SelectContent>

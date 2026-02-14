@@ -339,14 +339,14 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
             <div className="flex items-center gap-1.5">
               <Button
                 onClick={() => {
-                  const tierLabel = `檻次報價 - ${tier.participant_count} 人`
+                  const tierLabel = `${SELLING_PRICE_SECTION_LABELS.TIER_QUOTE_PREFIX}${tier.participant_count}${SELLING_PRICE_SECTION_LABELS.TIER_QUOTE_SUFFIX}`
                   handleGenerateQuotation(tier.participant_counts, tier.selling_prices, tierLabel)
                 }}
                 size="sm"
                 className="h-6 px-2 text-xs bg-morandi-secondary hover:bg-morandi-secondary/90 text-white"
                 type="button"
               >
-                列印
+                {SELLING_PRICE_SECTION_LABELS.PRINT}
               </Button>
               {!isReadOnly && (
                 <button
@@ -362,10 +362,10 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
           <table className="w-full text-sm">
             <thead className="border-b border-border/60">
               <tr>
-                <th className="text-left py-2 px-4 text-xs font-medium text-morandi-secondary">身份</th>
-                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">成本</th>
-                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">售價</th>
-                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">利潤</th>
+                <th className="text-left py-2 px-4 text-xs font-medium text-morandi-secondary">{SELLING_PRICE_SECTION_LABELS.LABEL_8725}</th>
+                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">{SELLING_PRICE_SECTION_LABELS.LABEL_7178}</th>
+                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">{SELLING_PRICE_SECTION_LABELS.LABEL_561}</th>
+                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">{SELLING_PRICE_SECTION_LABELS.LABEL_7705}</th>
               </tr>
             </thead>
             <tbody>

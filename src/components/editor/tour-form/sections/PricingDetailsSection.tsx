@@ -153,7 +153,7 @@ export function PricingDetailsSection({
       const newItems = [...pricingDetails.included_items]
       newItems[insuranceIndex] = {
         ...newItems[insuranceIndex],
-        text: `旅遊責任險 ${amount} 萬元`,
+        text: `${COMP_EDITOR_LABELS.旅遊責任險} ${amount} ${COMP_EDITOR_LABELS.LABEL_646}`,
       }
       updatePricingDetails({ included_items: newItems, insurance_amount: amount })
     }
@@ -212,9 +212,9 @@ export function PricingDetailsSection({
                   <SelectValue placeholder={COMP_EDITOR_LABELS.選擇保險金額} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="250">250 萬元</SelectItem>
-                  <SelectItem value="300">300 萬元</SelectItem>
-                  <SelectItem value="500">500 萬元</SelectItem>
+                  <SelectItem value="250">250 {COMP_EDITOR_LABELS.LABEL_646}</SelectItem>
+                  <SelectItem value="300">300 {COMP_EDITOR_LABELS.LABEL_646}</SelectItem>
+                  <SelectItem value="500">500 {COMP_EDITOR_LABELS.LABEL_646}</SelectItem>
                   <SelectItem value="custom">{COMP_EDITOR_LABELS.LABEL_2157}</SelectItem>
                 </SelectContent>
               </Select>

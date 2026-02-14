@@ -166,7 +166,7 @@ export default function DatabaseManagementPage() {
               {loadedTabs.has('attractions') && (
                 <Suspense
                   fallback={
-                    <div className="flex items-center justify-center h-full">載入中...</div>
+                    <div className="flex items-center justify-center h-full">{DATABASE_MANAGEMENT_PAGE_LABELS.LOADING_6912}</div>
                   }
                 >
                   <AttractionsTab
@@ -188,7 +188,7 @@ export default function DatabaseManagementPage() {
               {loadedTabs.has('michelin') && (
                 <Suspense
                   fallback={
-                    <div className="flex items-center justify-center h-full">載入中...</div>
+                    <div className="flex items-center justify-center h-full">{DATABASE_MANAGEMENT_PAGE_LABELS.LOADING_6912}</div>
                   }
                 >
                   <MichelinRestaurantsTab selectedCountry={selectedCountry} />
@@ -200,7 +200,7 @@ export default function DatabaseManagementPage() {
               {loadedTabs.has('experiences') && (
                 <Suspense
                   fallback={
-                    <div className="flex items-center justify-center h-full">載入中...</div>
+                    <div className="flex items-center justify-center h-full">{DATABASE_MANAGEMENT_PAGE_LABELS.LOADING_6912}</div>
                   }
                 >
                   <PremiumExperiencesTab selectedCountry={selectedCountry} />

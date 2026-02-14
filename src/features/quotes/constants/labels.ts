@@ -222,6 +222,11 @@ export const QUOTE_CONFIRMATION_SECTION_LABELS = {
   CONFIRM_1899: '確認後將記錄您的姓名和確認時間，作為稽核依據。',
   CANCEL: '取消',
   EMPTY_1207: '尚無確認記錄',
+  EXPIRED: '(已過期)',
+  NOTES_PREFIX: '備註：',
+  CONFIRMED_BY_CUSTOMER: '客戶',
+  CONFIRMED_BY_STAFF: '業務',
+  CONFIRMED_BY_SUFFIX: '：',
 };
 
 export const QUOTE_DETAIL_EMBED_LABELS = {
@@ -345,6 +350,8 @@ export const SELLING_PRICE_SECTION_LABELS = {
   LABEL_7178: '成本',
   LABEL_561: '售價',
   LABEL_7705: '利潤',
+  TIER_QUOTE_PREFIX: '檻次報價 - ',
+  TIER_QUOTE_SUFFIX: ' 人',
 };
 
 export const SYNC_TO_ITINERARY_DIALOG_LABELS = {
