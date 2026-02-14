@@ -10,7 +10,7 @@ import {
   isLastMainDay,
   getDayImages,
 } from './hooks/useDayCalculations'
-import { ImageGalleryModal } from './components/ImageGalleryModal'
+import { ImageGalleryModal } from './modals/ImageGalleryModal'
 import { MobileDaySection } from './components/MobileDaySection'
 import { DaySection } from './components/DaySection'
 import type { TourPageData } from '@/features/tours/types/tour-display.types'
@@ -116,6 +116,7 @@ export function TourItinerarySectionArt({
       {/* Image Gallery Modal */}
       {imageGallery && (
         <ImageGalleryModal
+          variant="art"
           imageGallery={imageGallery}
           onClose={closeImageGallery}
           onPrev={goToPreviousImage}
