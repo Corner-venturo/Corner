@@ -18,6 +18,7 @@ import { toast } from 'sonner'
 import type { FastMoveProduct, Esim } from '@/types/esim.types'
 import type { Order } from '@/types'
 import { alert } from '@/lib/ui/alert-dialog'
+import { LABELS } from '../constants/labels'
 
 // 產品地區選項
 const PRODUCT_REGIONS = [
@@ -380,7 +381,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
     <FormDialog
       open={open}
       onOpenChange={open => !open && handleClose()}
-      title="批次新增網卡"
+      title={LABELS.batchCreateTitle}
       onSubmit={handleSubmit}
       onCancel={handleClose}
       submitLabel="批次新增網卡"
@@ -393,13 +394,13 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="text-sm font-medium text-morandi-primary">
-              選擇團號 <span className="text-xs text-morandi-secondary">(自動選擇網卡專用團)</span>
+              {LABELS.selectTourCode} <span className="text-xs text-morandi-secondary">{LABELS.autoSelectEsimTour}</span>
             </label>
             <Combobox
               value={selectedTourId}
               onChange={handleTourChange}
               options={tourOptions}
-              placeholder="選擇團號..."
+              placeholder={LABELS.selectTourCodePlaceholder}
               className="mt-1"
               showSearchIcon
               showClearButton
@@ -407,14 +408,14 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
           </div>
           <div>
             <label className="text-sm font-medium text-morandi-primary">
-              訂單編號{' '}
-              <span className="text-xs text-morandi-secondary">(選填，未選擇將自動建立)</span>
+              {LABELS.orderNumberLabel}{' '}
+              <span className="text-xs text-morandi-secondary">{LABELS.orderAutoCreate}</span>
             </label>
             <Combobox
               value={orderNumber}
               onChange={setOrderNumber}
               options={orderOptions}
-              placeholder={selectedTourId ? '請選擇訂單或留空自動建立' : '請先選擇團號'}
+              placeholder={LABELS.orderPlaceholder(!!selectedTourId)}
               disabled={!selectedTourId}
               className="mt-1"
               showSearchIcon
@@ -425,20 +426,20 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium text-morandi-primary">聯絡人</label>
+            <label className="text-sm font-medium text-morandi-primary">{LABELS.contactPerson}</label>
             <Input
               value={contactPerson}
               onChange={e => setContactPerson(e.target.value)}
-              placeholder="請輸入聯絡人"
+              placeholder={LABELS.contactPersonPlaceholder}
               className="mt-1"
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-morandi-primary">聯絡電話</label>
+            <label className="text-sm font-medium text-morandi-primary">{LABELS.contactPhone}</label>
             <Input
               value={contactPhone}
               onChange={e => setContactPhone(e.target.value)}
-              placeholder="請輸入聯絡電話"
+              placeholder={LABELS.contactPhonePlaceholder}
               className="mt-1"
             />
           </div>
@@ -461,7 +462,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
                 onValueChange={value => updateEsimItem(item.id, 'product_region', value)}
               >
                 <SelectTrigger className="w-full h-10">
-                  <SelectValue placeholder="產品地區" />
+                  <SelectValue placeholder={LABELS.productRegion} />
                 </SelectTrigger>
                 <SelectContent>
                   {PRODUCT_REGIONS.map(region => (
@@ -490,7 +491,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
                 const product = products.find(pr => pr.product_id === p.value)
                 return !item.product_region || product?.product_region === item.product_region
               })}
-              placeholder="選擇產品..."
+              placeholder={LABELS.selectProduct}
               disabled={!item.product_region || products.length === 0}
               showSearchIcon
             />
@@ -515,13 +516,13 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
               type="email"
               value={item.email}
               onChange={e => updateEsimItem(item.id, 'email', e.target.value)}
-              placeholder="接收信箱"
+              placeholder={LABELS.receiveEmail}
             />
 
             <Input
               value={item.note}
               onChange={e => updateEsimItem(item.id, 'note', e.target.value)}
-              placeholder="備註"
+              placeholder={LABELS.notePlaceholder}
             />
 
             <Button

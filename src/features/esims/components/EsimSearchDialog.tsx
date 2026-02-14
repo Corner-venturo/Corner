@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { RotateCcw, Search } from 'lucide-react'
+import { LABELS } from '../constants/labels'
 import { ESIM_STATUSES } from '@/types/esim.types'
 import type { EsimSearchFilters, EsimStatus } from '@/types/esim.types'
 
@@ -44,79 +45,79 @@ export function EsimSearchDialog({ open, onOpenChange, onSearch }: EsimSearchDia
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent level={1} className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>詳細搜尋</DialogTitle>
+          <DialogTitle>{LABELS.detailedSearch}</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="esim_number">網卡單號</Label>
+            <Label htmlFor="esim_number">{LABELS.esimNumber}</Label>
             <Input
               id="esim_number"
               value={filters.esim_number || ''}
               onChange={e => setFilters({ ...filters, esim_number: e.target.value })}
-              placeholder="輸入網卡單號"
+              placeholder={LABELS.esimNumberPlaceholder}
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="group_code">團號</Label>
+            <Label htmlFor="group_code">{LABELS.tourCode}</Label>
             <Input
               id="group_code"
               value={filters.group_code || ''}
               onChange={e => setFilters({ ...filters, group_code: e.target.value })}
-              placeholder="輸入團號"
+              placeholder={LABELS.tourCodePlaceholder}
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="order_number">訂單編號</Label>
+            <Label htmlFor="order_number">{LABELS.orderNumberLabel}</Label>
             <Input
               id="order_number"
               value={filters.order_number || ''}
               onChange={e => setFilters({ ...filters, order_number: e.target.value })}
-              placeholder="輸入訂單編號"
+              placeholder={LABELS.orderNumberPlaceholder}
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="supplier_order_number">供應商訂單編號</Label>
+            <Label htmlFor="supplier_order_number">{LABELS.supplierOrderNumber}</Label>
             <Input
               id="supplier_order_number"
               value={filters.supplier_order_number || ''}
               onChange={e => setFilters({ ...filters, supplier_order_number: e.target.value })}
-              placeholder="輸入供應商訂單編號"
+              placeholder={LABELS.supplierOrderNumberPlaceholder}
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="product_id">商品ID</Label>
+            <Label htmlFor="product_id">{LABELS.productId}</Label>
             <Input
               id="product_id"
               value={filters.product_id || ''}
               onChange={e => setFilters({ ...filters, product_id: e.target.value })}
-              placeholder="輸入商品ID"
+              placeholder={LABELS.productIdPlaceholder}
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="email">信箱</Label>
+            <Label htmlFor="email">{LABELS.email}</Label>
             <Input
               id="email"
               type="email"
               value={filters.email || ''}
               onChange={e => setFilters({ ...filters, email: e.target.value })}
-              placeholder="輸入信箱"
+              placeholder={LABELS.emailPlaceholder}
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="status">狀態</Label>
+            <Label htmlFor="status">{LABELS.status}</Label>
             <Select
               value={filters.status?.toString()}
               onValueChange={value => setFilters({ ...filters, status: Number(value) as EsimStatus })}
             >
               <SelectTrigger id="status">
-                <SelectValue placeholder="選擇狀態" />
+                <SelectValue placeholder={LABELS.statusPlaceholder} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value={ESIM_STATUSES.UNCONFIRMED.toString()}>待確認</SelectItem>
@@ -130,11 +131,11 @@ export function EsimSearchDialog({ open, onOpenChange, onSearch }: EsimSearchDia
         <DialogFooter>
           <Button variant="outline" onClick={handleReset} className="gap-2">
             <RotateCcw size={16} />
-            重置
+            {LABELS.reset}
           </Button>
           <Button onClick={handleSearch} className="gap-2">
             <Search size={16} />
-            搜尋
+            {LABELS.search}
           </Button>
         </DialogFooter>
       </DialogContent>
