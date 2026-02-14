@@ -1,38 +1,38 @@
 'use server'
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { getServerAuth } from '@/lib/auth/server-auth'
+import { successResponse, ApiError } from '@/lib/api/response'
 import { logger } from '@/lib/utils/logger'
 
 /**
  * GET /api/traveler-chat
  * 取得工作空間的所有團對話列表
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const auth = await getServerAuth()
     if (!auth.success) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return ApiError.unauthorized()
     }
 
     const { workspaceId } = auth.data
     const supabase = getSupabaseAdminClient()
 
-    // 使用 RPC 函數取得團對話列表
     const { data, error } = await supabase.rpc('get_tour_conversations', {
       p_workspace_id: workspaceId,
     })
 
     if (error) {
       logger.error('Error fetching tour conversations:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      return ApiError.database(error.message)
     }
 
-    return NextResponse.json({ conversations: data || [] })
+    return successResponse({ conversations: data || [] })
   } catch (error) {
     logger.error('Error in GET /api/traveler-chat:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return ApiError.internal()
   }
 }
 
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
   try {
     const auth = await getServerAuth()
     if (!auth.success) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return ApiError.unauthorized()
     }
 
     const body = await request.json()
@@ -53,7 +53,6 @@ export async function POST(request: NextRequest) {
 
     switch (action) {
       case 'toggle': {
-        // 開啟/關閉團對話
         const { tourId, isOpen, sendWelcome = true } = body
 
         const { error } = await supabase.rpc('toggle_tour_conversation', {
@@ -64,14 +63,13 @@ export async function POST(request: NextRequest) {
 
         if (error) {
           logger.error('Error toggling conversation:', error)
-          return NextResponse.json({ error: error.message }, { status: 500 })
+          return ApiError.database(error.message)
         }
 
-        return NextResponse.json({ success: true })
+        return successResponse({ success: true })
       }
 
       case 'send_message': {
-        // 員工發送訊息
         const { conversationId, content, type = 'text', attachments = [] } = body
 
         const { data, error } = await supabase.rpc('send_tour_message', {
@@ -83,14 +81,13 @@ export async function POST(request: NextRequest) {
 
         if (error) {
           logger.error('Error sending message:', error)
-          return NextResponse.json({ error: error.message }, { status: 500 })
+          return ApiError.database(error.message)
         }
 
-        return NextResponse.json({ success: true, messageId: data })
+        return successResponse({ success: true, messageId: data })
       }
 
       case 'add_employee': {
-        // 將員工加入團對話
         const { tourId, employeeId, role = 'member' } = body
 
         const { error } = await supabase.rpc('add_employee_to_tour_conversation', {
@@ -101,14 +98,13 @@ export async function POST(request: NextRequest) {
 
         if (error) {
           logger.error('Error adding employee:', error)
-          return NextResponse.json({ error: error.message }, { status: 500 })
+          return ApiError.database(error.message)
         }
 
-        return NextResponse.json({ success: true })
+        return successResponse({ success: true })
       }
 
       case 'mark_read': {
-        // 標記已讀
         const { conversationId } = body
 
         const { error } = await supabase.rpc('mark_conversation_read', {
@@ -117,17 +113,17 @@ export async function POST(request: NextRequest) {
 
         if (error) {
           logger.error('Error marking read:', error)
-          return NextResponse.json({ error: error.message }, { status: 500 })
+          return ApiError.database(error.message)
         }
 
-        return NextResponse.json({ success: true })
+        return successResponse({ success: true })
       }
 
       default:
-        return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
+        return ApiError.validation('Invalid action')
     }
   } catch (error) {
     logger.error('Error in POST /api/traveler-chat:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return ApiError.internal()
   }
 }

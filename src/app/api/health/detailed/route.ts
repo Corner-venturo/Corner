@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { ApiError } from '@/lib/api/response'
 
 /**
  * Detailed Health Check API
@@ -15,7 +16,7 @@ export async function GET() {
   const supabaseAuth = await createSupabaseServerClient()
   const { data: { session } } = await supabaseAuth.auth.getSession()
   if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return ApiError.unauthorized()
   }
 
   const startTime = Date.now()

@@ -1,8 +1,9 @@
 'use server'
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { getServerAuth } from '@/lib/auth/server-auth'
+import { successResponse, ApiError } from '@/lib/api/response'
 import { logger } from '@/lib/utils/logger'
 
 interface RouteParams {
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const auth = await getServerAuth()
     if (!auth.success) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return ApiError.unauthorized()
     }
 
     const { conversationId } = await params
@@ -76,12 +77,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     if (convResult.error) {
       logger.error('Error fetching conversation:', convResult.error)
-      return NextResponse.json({ error: convResult.error.message }, { status: 500 })
+      return ApiError.database(convResult.error.message)
     }
 
     if (msgResult.error) {
       logger.error('Error fetching messages:', msgResult.error)
-      return NextResponse.json({ error: msgResult.error.message }, { status: 500 })
+      return ApiError.database(msgResult.error.message)
     }
 
     if (memberResult.error) {
@@ -124,15 +125,15 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       avatar_url: e.avatar_url,
     }))
 
-    return NextResponse.json({
+    return successResponse({
       conversation,
-      messages: (messages || []).reverse(), // 按時間正序
+      messages: (messages || []).reverse(),
       members: members || [],
       travelers,
       employees,
     })
   } catch (error) {
     logger.error('Error in GET /api/traveler-chat/[conversationId]:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return ApiError.internal()
   }
 }
