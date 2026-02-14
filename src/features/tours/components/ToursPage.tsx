@@ -28,7 +28,7 @@ import { ContractDialog } from '@/components/contracts/ContractDialog'
 import { TourClosingDialog } from './TourClosingDialog'
 // TourControlDialogWrapper 已移除，功能整合到團確單
 import { TourRequirementsDialog } from './TourRequirementsDialog'
-import { TourEditDialog } from '@/components/tours/tour-edit-dialog'
+import { TourEditDialog } from '@/features/tours/components/tour-edit-dialog'
 import { ProposalsTableContent } from '@/features/proposals/components/ProposalsTableContent'
 import { convertToTour } from '@/services/proposal.service'
 import { alert } from '@/lib/ui/alert-dialog'

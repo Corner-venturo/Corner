@@ -44,7 +44,7 @@ import { updateMember } from '@/data/entities/members'
 import { logger } from '@/lib/utils/logger'
 import { useOcrRecognition } from '@/hooks'
 import { useCustomers, useTour } from '@/data'
-import { TourAssignmentManager } from '@/components/tours/TourAssignmentManager'
+import { TourAssignmentManager } from '@/features/tours/components/TourAssignmentManager'
 import {
   useOrderMembersData,
   useRoomVehicleAssignments,
@@ -66,7 +66,7 @@ import {
 } from './'
 import dynamic from 'next/dynamic'
 
-const TourPrintDialog = dynamic(() => import('@/components/tours/TourPrintDialog').then(m => m.TourPrintDialog), { ssr: false })
+const TourPrintDialog = dynamic(() => import('@/features/tours/components/TourPrintDialog').then(m => m.TourPrintDialog), { ssr: false })
 import type { OrderMember, OrderMembersExpandableProps, CustomCostField } from '../types/order-member.types'
 import type { EditFormData } from './MemberEditDialog'
 import { COMP_ORDERS_LABELS } from '../constants/labels'

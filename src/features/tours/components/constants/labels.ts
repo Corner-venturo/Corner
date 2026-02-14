@@ -32,4 +32,8 @@ export const TOURS_LABELS = {
   QUICK_QUOTE: '快速報價單',
   UNNAMED: '未命名',
   NOT_QUOTED: '尚未報價',
+  LABEL_5100: '已收款',
+  CONFIRM_7150: '待確認',
+  TOTAL_2951: '總收款',
+  LABEL_1728: '待收款',
 }

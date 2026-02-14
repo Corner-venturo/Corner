@@ -10,7 +10,7 @@ import { Loader2, MapPin, MessageSquare } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { useTourDetails } from '@/features/tours/hooks/useTours-advanced'
 import { useWorkspaceChannels } from '@/stores/workspace-store'
-import { TOUR_TABS, TourTabContent } from '@/components/tours/TourTabs'
+import { TOUR_TABS, TourTabContent } from '@/features/tours/components/TourTabs'
 import { CODE_LABELS } from './constants/labels'
 
 const fetchTourIdByCode = async (code: string): Promise<string | null> => {
