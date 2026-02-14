@@ -9,6 +9,7 @@ import { useEmployeesSlim } from '@/data'
 import { updateOrder } from '@/data'
 import type { Order, Employee } from '@/stores/types'
 import type { SyncableEntity } from '@/types'
+import { X } from 'lucide-react'
 import { logger } from '@/lib/utils/logger'
 import { COMP_ORDERS_LABELS } from './constants/labels'
 
@@ -189,7 +190,9 @@ export function OrderEditDialog({
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
+              className="gap-2"
             >
+              <X size={16} />
               取消
             </Button>
             <Button

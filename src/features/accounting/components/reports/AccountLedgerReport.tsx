@@ -340,7 +340,7 @@ export function AccountLedgerReport() {
         <div className="flex flex-wrap items-end gap-4">
           {/* 科目選擇（必選） */}
           <div className="flex flex-col gap-1 min-w-[300px]">
-            <label className="text-sm text-morandi-secondary">選擇科目 *</label>
+            <label className="text-sm text-morandi-primary">選擇科目 *</label>
             <Combobox
               value={selectedAccountId}
               onChange={setSelectedAccountId}

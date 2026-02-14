@@ -742,7 +742,6 @@ export function useRoomVehicleAssignments({
       loadRoomAssignments()
       loadVehicleAssignments()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tourId])
 
   return {
