@@ -1,6 +1,14 @@
 import type { Metadata } from 'next'
+import { Noto_Sans_TC } from 'next/font/google'
 import { getLocale, getMessages } from 'next-intl/server'
 import './globals.css'
+
+const notoSansTC = Noto_Sans_TC({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  display: 'swap',
+  variable: '--font-noto-sans-tc',
+})
 import { ThemeProvider } from '@/components/layout/theme-provider'
 import { ErrorLogger } from '@/components/ErrorLogger'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
@@ -29,8 +37,12 @@ export default async function RootLayout({
   const messages = await getMessages()
 
   return (
-    <html lang={locale}>
-      <body className="antialiased">
+    <html lang={locale} className={notoSansTC.variable}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
+      <body className="antialiased font-sans">
         <ErrorLogger />
         <GlobalDialogs />
         <Toaster position="top-right" richColors closeButton />

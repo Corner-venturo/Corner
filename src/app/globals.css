@@ -1,6 +1,7 @@
 /* Google Fonts - 載入於 runtime 避免 build 時網路問題 */
 /* 中文字體 - 黑體/宋體 */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@300;400;500;700&family=Zen+Old+Mincho:wght@400;500;700&display=swap');
+/* Noto Sans TC 已改用 next/font 載入（見 layout.tsx） */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;700&family=Zen+Old+Mincho:wght@400;500;700&display=swap');
 /* 中文字體 - 手寫/書法 */
 @import url('https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&family=Ma+Shan+Zheng&family=Liu+Jian+Mao+Cao&family=Long+Cang&family=Zhi+Mang+Xing&display=swap');
 /* 日文字體 */
@@ -942,7 +943,7 @@
   --color-status-neutral: var(--status-neutral);
   --color-status-neutral-bg: var(--status-neutral-bg);
 
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-noto-sans-tc), var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
