@@ -198,7 +198,7 @@ export function TourItinerarySectionLuxury({
                           className={`font-medium ${isMobile ? 'text-base' : 'text-lg'}`}
                           style={{ color: day.isAlternative ? '#fff' : LUXURY.secondary }}
                         >
-                          {day.locationLabel || data.city || '探索'}
+                          {day.locationLabel || data.city || TOURS_LABELS.EXPLORE}
                         </div>
                       </div>
                     </div>
@@ -217,7 +217,7 @@ export function TourItinerarySectionLuxury({
                             fontFamily: "'Noto Sans TC', sans-serif"
                           }}
                         >
-                          {day.title || `第 ${index + 1} 天行程`}
+                          {day.title || `${TOURS_LABELS.DAY_ITINERARY_PREFIX}${index + 1}${TOURS_LABELS.DAY_ITINERARY_SUFFIX}`}
                         </h3>
                         {day.isAlternative && (
                           <span
@@ -288,7 +288,7 @@ export function TourItinerarySectionLuxury({
                               >
                                 <img
                                   src={allImages[0].url}
-                                  alt={allImages[0].title || '行程圖片'}
+                                  alt={allImages[0].title || TOURS_LABELS.ITINERARY_IMAGE}
                                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105"
                                 />
                                 <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/20 transition-colors" />
@@ -405,7 +405,7 @@ export function TourItinerarySectionLuxury({
                                   className="text-xs flex items-center gap-1"
                                   style={{ color: LUXURY.secondary }}
                                 >
-                                  點擊查看詳情 <ArrowRight className="w-3 h-3" />
+                                  {TOURS_LABELS.CLICK_DETAIL} <ArrowRight className="w-3 h-3" />
                                 </span>
                               </div>
                             </>
@@ -418,7 +418,7 @@ export function TourItinerarySectionLuxury({
                               style={{ color: LUXURY.secondary }}
                               onClick={() => openImageGallery(allImages, 3)}
                             >
-                              <span>查看更多 +{allImages.length - 3}</span>
+                              <span>{TOURS_LABELS.VIEW_MORE_PREFIX}{allImages.length - 3}</span>
                               <ArrowRight className="w-4 h-4" />
                             </button>
                           )}

@@ -109,7 +109,7 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
             <div className="relative aspect-[16/9] w-full">
               <img
                 src={getImageUrl(validImages[0])}
-                alt={`${title} 圖片 1`}
+                alt={`${title}${TOURS_LABELS.IMAGE_ALT_SUFFIX}1`}
                 className="h-full w-full object-cover"
                 style={{ objectPosition: getImagePosition(validImages[0]) }}
               />
@@ -167,14 +167,14 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
                 <div className="relative aspect-[16/9] w-full">
                   <img
                     src={getImageUrl(image)}
-                    alt={`${title} 圖片 ${index + 1}`}
+                    alt={`${title}${TOURS_LABELS.IMAGE_ALT_SUFFIX}${index + 1}`}
                     className="h-full w-full object-cover"
                     style={{ objectPosition: getImagePosition(image) }}
                   />
                   {allTourImages.length >= 4 && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/20 transition-colors group">
                       <div className="px-4 py-2 bg-black/60 text-white text-sm rounded-full opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
-                        點擊查看照片牆
+                        {TOURS_LABELS.CLICK_PHOTO_WALL}
                       </div>
                     </div>
                   )}
@@ -194,7 +194,7 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
                 scrollToIndex(currentIndex - 1)
               }}
               className="absolute left-0 top-1/2 flex h-8 w-8 sm:h-10 sm:w-10 -translate-y-1/2 items-center justify-center rounded-full bg-card/90 text-morandi-primary shadow-lg ring-1 ring-black/5 transition hover:bg-card z-10"
-              aria-label="上一張圖片"
+              aria-label={TOURS_LABELS.PREV_IMAGE}
             >
               <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
@@ -205,7 +205,7 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
                 scrollToIndex(currentIndex + 1)
               }}
               className="absolute right-0 top-1/2 flex h-8 w-8 sm:h-10 sm:w-10 -translate-y-1/2 items-center justify-center rounded-full bg-card/90 text-morandi-primary shadow-lg ring-1 ring-black/5 transition hover:bg-card z-10"
-              aria-label="下一張圖片"
+              aria-label={TOURS_LABELS.NEXT_IMAGE}
             >
               <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
@@ -227,7 +227,7 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
                   'h-2.5 rounded-full border border-morandi-primary/30 transition-all duration-300',
                   currentIndex === index ? 'w-6 bg-morandi-primary/90' : 'w-2.5 bg-card/60'
                 )}
-                aria-label={`切換至第 ${index + 1} 張圖片`}
+                aria-label={`${TOURS_LABELS.SWITCH_IMAGE_PREFIX}${index + 1}${TOURS_LABELS.SWITCH_IMAGE_SUFFIX}`}
               />
             ))}
           </div>

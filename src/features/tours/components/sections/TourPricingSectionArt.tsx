@@ -134,10 +134,10 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                       className="text-2xl font-light mb-2"
                       style={{ fontFamily: "'Zen Old Mincho', serif", color: colors.ink }}
                     >
-                      {tier.name || tier.label || '方案'}
+                      {tier.name || tier.label || TOURS_LABELS.DEFAULT_PLAN}
                     </h3>
                     <p className="text-sm text-morandi-secondary mb-8" style={{ fontFamily: "'Italiana', serif" }}>
-                      {tier.description || '專屬行程體驗'}
+                      {tier.description || TOURS_LABELS.DEFAULT_PLAN_DESC}
                     </p>
 
                     {/* 價格 */}

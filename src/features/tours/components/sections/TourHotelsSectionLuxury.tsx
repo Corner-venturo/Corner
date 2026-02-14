@@ -130,7 +130,7 @@ function SingleHotelLayout({ hotel }: { hotel: HotelInfo }) {
         {currentImage ? (
           <img
             src={currentImage}
-            alt={hotel.name || '飯店'}
+            alt={hotel.name || TOURS_LABELS.HOTEL}
             className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
           />
         ) : (
@@ -151,14 +151,14 @@ function SingleHotelLayout({ hotel }: { hotel: HotelInfo }) {
             <button
               onClick={goToPrev}
               className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
-              aria-label="上一張"
+              aria-label={TOURS_LABELS.PREV}
             >
               <ChevronLeft className="w-6 h-6 text-white" />
             </button>
             <button
               onClick={goToNext}
               className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
-              aria-label="下一張"
+              aria-label={TOURS_LABELS.NEXT}
             >
               <ChevronRight className="w-6 h-6 text-white" />
             </button>
@@ -177,7 +177,7 @@ function SingleHotelLayout({ hotel }: { hotel: HotelInfo }) {
                       ? 'bg-card w-6'
                       : 'bg-card/50 hover:bg-card/80'
                   }`}
-                  aria-label={`切換到第 ${idx + 1} 張圖片`}
+                  aria-label={`${TOURS_LABELS.SWITCH_TO_PREFIX}${idx + 1}${TOURS_LABELS.SWITCH_TO_SUFFIX}`}
                 />
               ))}
             </div>
@@ -201,7 +201,7 @@ function SingleHotelLayout({ hotel }: { hotel: HotelInfo }) {
               fontFamily: "'Noto Serif TC', serif"
             }}
           >
-            {hotel.name || '精選飯店'}
+            {hotel.name || TOURS_LABELS.SELECTED_HOTEL}
           </h3>
 
           {/* 分隔線 */}
@@ -226,7 +226,7 @@ function SingleHotelLayout({ hotel }: { hotel: HotelInfo }) {
             className="text-xs"
             style={{ color: LUXURY.muted }}
           >
-            共 {allImages.length} 張照片，滑動或點擊切換
+            {TOURS_LABELS.PHOTO_COUNT_PREFIX}{allImages.length}{TOURS_LABELS.PHOTO_COUNT_SUFFIX}
           </p>
         )}
       </div>
@@ -280,7 +280,7 @@ function HotelCard({
         {currentImage ? (
           <img
             src={currentImage}
-            alt={hotel.name || '飯店'}
+            alt={hotel.name || TOURS_LABELS.HOTEL}
             className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
           />
         ) : (
@@ -288,7 +288,7 @@ function HotelCard({
             className="w-full h-full flex items-center justify-center"
             style={{ backgroundColor: LUXURY.text }}
           >
-            <span className="text-white/50 text-sm">暫無圖片</span>
+            <span className="text-white/50 text-sm">{TOURS_LABELS.NO_IMAGE}</span>
           </div>
         )}
 
@@ -302,7 +302,7 @@ function HotelCard({
             <button
               onClick={goToPrev}
               className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
-              aria-label="上一張"
+              aria-label={TOURS_LABELS.PREV}
             >
               <ChevronLeft className="w-5 h-5 text-white" />
             </button>
@@ -311,7 +311,7 @@ function HotelCard({
             <button
               onClick={goToNext}
               className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
-              aria-label="下一張"
+              aria-label={TOURS_LABELS.NEXT}
             >
               <ChevronRight className="w-5 h-5 text-white" />
             </button>
@@ -330,7 +330,7 @@ function HotelCard({
                       ? 'bg-card w-4'
                       : 'bg-card/50 hover:bg-card/80'
                   }`}
-                  aria-label={`切換到第 ${idx + 1} 張圖片`}
+                  aria-label={`${TOURS_LABELS.SWITCH_TO_PREFIX}${idx + 1}${TOURS_LABELS.SWITCH_TO_SUFFIX}`}
                 />
               ))}
             </div>
@@ -347,7 +347,7 @@ function HotelCard({
             fontFamily: "'Noto Serif TC', serif"
           }}
         >
-          {hotel.name || '精選飯店'}
+          {hotel.name || TOURS_LABELS.SELECTED_HOTEL}
         </h3>
 
         {/* 分隔線 */}
