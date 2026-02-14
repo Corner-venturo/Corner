@@ -52,18 +52,18 @@ export function ApiSettings() {
   }
 
   const maskValue = (value: string) => {
-    if (!value) return '未設定'
+    if (!value) return API_SETTINGS_LABELS.NOT_SET
     if (value.length <= 8) return '••••••••'
     return value.slice(0, 4) + '••••••••' + value.slice(-4)
   }
 
   const categoryLabels: Record<string, string> = {
-    database: 'Supabase 資料庫',
-    ocr: 'OCR 辨識服務',
-    ai: 'AI 服務',
-    flight: '航班查詢服務',
-    payment: '金流服務',
-    other: '其他設定',
+    database: API_SETTINGS_LABELS.CATEGORY_DATABASE,
+    ocr: API_SETTINGS_LABELS.CATEGORY_OCR,
+    ai: API_SETTINGS_LABELS.CATEGORY_AI,
+    flight: API_SETTINGS_LABELS.CATEGORY_FLIGHT,
+    payment: API_SETTINGS_LABELS.CATEGORY_PAYMENT,
+    other: API_SETTINGS_LABELS.CATEGORY_OTHER,
   }
 
   const categoryIcons: Record<string, string> = {
@@ -89,7 +89,7 @@ export function ApiSettings() {
       <section className="bg-card rounded-lg border border-border p-6">
         <div className="flex items-center gap-3 mb-4">
           <Key className="h-5 w-5 text-morandi-gold" />
-          <h2 className="text-lg font-semibold text-morandi-primary">API 設定</h2>
+          <h2 className="text-lg font-semibold text-morandi-primary">{API_SETTINGS_LABELS.TITLE}</h2>
         </div>
         <div className="text-sm text-morandi-secondary">{API_SETTINGS_LABELS.LOADING}</div>
       </section>
@@ -101,7 +101,7 @@ export function ApiSettings() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <Key className="h-5 w-5 text-morandi-gold" />
-          <h2 className="text-lg font-semibold text-morandi-primary">API 設定</h2>
+          <h2 className="text-lg font-semibold text-morandi-primary">{API_SETTINGS_LABELS.TITLE}</h2>
         </div>
         <div className="flex items-center gap-2 text-xs text-status-warning bg-status-warning-bg px-3 py-1.5 rounded-lg">
           <AlertTriangle size={14} />
@@ -159,7 +159,7 @@ export function ApiSettings() {
                               size="sm"
                               className="h-7 w-7 p-0"
                               onClick={() => toggleShowKey(config.envKey)}
-                              title={showKeys[config.envKey] ? '隱藏' : '顯示'}
+                              title={showKeys[config.envKey] ? API_SETTINGS_LABELS.HIDE : API_SETTINGS_LABELS.SHOW}
                             >
                               {showKeys[config.envKey] ? (
                                 <EyeOff size={14} />
@@ -201,7 +201,7 @@ export function ApiSettings() {
                           rel="noopener noreferrer"
                           className="text-xs text-morandi-gold hover:underline flex items-center gap-1"
                         >
-                          管理後台 <ExternalLink size={10} />
+                          {API_SETTINGS_LABELS.ADMIN_CONSOLE} <ExternalLink size={10} />
                         </a>
                       )}
                       {config.docsUrl && (
@@ -211,7 +211,7 @@ export function ApiSettings() {
                           rel="noopener noreferrer"
                           className="text-xs text-morandi-secondary hover:underline flex items-center gap-1"
                         >
-                          文件 <ExternalLink size={10} />
+                          {API_SETTINGS_LABELS.DOCS} <ExternalLink size={10} />
                         </a>
                       )}
                     </div>
@@ -227,7 +227,7 @@ export function ApiSettings() {
       <div className="mt-6 p-4 bg-status-info-bg rounded-lg border border-status-info/30">
         <h4 className="text-sm font-medium text-morandi-primary mb-2">{API_SETTINGS_LABELS.SETUP_GUIDE}</h4>
         <p className="text-xs text-morandi-secondary mb-2">
-          在專案根目錄建立或編輯 <code className="bg-morandi-container px-1 rounded">.env.local</code> {API_SETTINGS_LABELS.LABEL_4474}
+          {API_SETTINGS_LABELS.ENV_FILE_PREFIX} <code className="bg-morandi-container px-1 rounded">.env.local</code> {API_SETTINGS_LABELS.LABEL_4474}
         </p>
         <pre className="text-xs bg-morandi-container p-3 rounded overflow-x-auto">
 {`# Supabase

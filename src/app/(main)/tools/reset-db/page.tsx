@@ -114,7 +114,7 @@ export default function ResetDBPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Database className="w-6 h-6" />
-            IndexedDB 重置工具
+            {RESET_DB_LABELS.TITLE}
           </CardTitle>
           <CardDescription>
             {RESET_DB_LABELS.LABEL_4817}
@@ -134,7 +134,7 @@ export default function ResetDBPage() {
                   <li>{RESET_DB_LABELS.LABEL_2869}</li>
                 </ol>
                 <p className="mt-3 text-status-warning font-semibold">
-                  ⚠️ 注意：所有未同步到 Supabase 的資料將會遺失！
+                  {RESET_DB_LABELS.WARNING_DATA_LOSS}
                 </p>
               </div>
             </div>
@@ -146,14 +146,14 @@ export default function ResetDBPage() {
             <div className="space-y-1 text-sm">
               <div>
                 1. <code className="bg-card px-2 py-1 rounded border">VenturoOfflineDB</code>
-                <span className="text-status-success ml-2">✓ 當前使用</span>
+                <span className="text-status-success ml-2">{RESET_DB_LABELS.CURRENT_USE}</span>
               </div>
               <div>
                 2. <code className="bg-card px-2 py-1 rounded border">venturo-db</code>
-                <span className="text-morandi-secondary ml-2">(舊資料庫)</span>
+                <span className="text-morandi-secondary ml-2">{RESET_DB_LABELS.OLD_DB}</span>
               </div>
               <div className="mt-2 text-morandi-secondary">
-                重建後版本：<code className="bg-card px-2 py-1 rounded border">v6 (46 個表格)</code>
+                {RESET_DB_LABELS.REBUILD_VERSION}<code className="bg-card px-2 py-1 rounded border">{RESET_DB_LABELS.REBUILD_VERSION_VALUE}</code>
               </div>
             </div>
           </div>
@@ -194,7 +194,7 @@ export default function ResetDBPage() {
                 disabled={status === 'deleting'}
               >
                 <Trash2 className="w-4 h-4 mr-2" />
-                {status === 'deleting' ? '清空中...' : '清空 IndexedDB'}
+                {status === 'deleting' ? RESET_DB_LABELS.CLEARING : RESET_DB_LABELS.CLEAR_INDEXEDDB}
               </Button>
             )}
           </div>

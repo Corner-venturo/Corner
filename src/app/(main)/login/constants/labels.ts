@@ -8,4 +8,5 @@ export const LABELS = {
   LABEL_6929: '例：E001',
   LABEL_772: '輸入密碼',
   LABEL_3877: '記住我（30 天內免重新登入）',
+  TITLE: 'Venturo 系統登入',
 }

@@ -89,7 +89,7 @@ export function WorkspaceSwitcher() {
 
       {/* 提示訊息 */}
       <div className="mt-6 p-4 bg-morandi-container/20 rounded-lg text-xs text-morandi-muted">
-        <p>💡 切換後，所有列表（旅遊團、訂單、客戶等）都會只顯示該辦公室的資料</p>
+        <p>{WORKSPACE_SWITCHER_LABELS.SWITCH_HINT}</p>
       </div>
     </Card>
   )

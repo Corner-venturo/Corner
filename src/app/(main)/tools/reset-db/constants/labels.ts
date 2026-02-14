@@ -15,4 +15,12 @@ export const RESET_DB_LABELS = {
   LABEL_995: '但如果舊表格的索引結構已經改變，就會出現不一致。',
   LABEL_3533: '解決方案：',
   LABEL_9350: '確保所有 46 個表格結構都正確。',
+  TITLE: 'IndexedDB 重置工具',
+  WARNING_DATA_LOSS: '⚠️ 注意：所有未同步到 Supabase 的資料將會遺失！',
+  CURRENT_USE: '✓ 當前使用',
+  OLD_DB: '(舊資料庫)',
+  REBUILD_VERSION: '重建後版本：',
+  REBUILD_VERSION_VALUE: 'v6 (46 個表格)',
+  CLEARING: '清空中...',
+  CLEAR_INDEXEDDB: '清空 IndexedDB',
 }

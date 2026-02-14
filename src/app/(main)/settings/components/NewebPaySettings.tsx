@@ -156,7 +156,7 @@ export function NewebPaySettings() {
               {showSecrets.hashKey ? <EyeOff size={16} /> : <Eye size={16} />}
             </Button>
           </div>
-          <p className="text-xs text-morandi-secondary">32 字元，在藍新後台「API 串接資訊」可查看</p>
+          <p className="text-xs text-morandi-secondary">{NEWEBPAY_LABELS.HASHKEY_HINT}</p>
         </div>
 
         {/* HashIV */}
@@ -180,7 +180,7 @@ export function NewebPaySettings() {
               {showSecrets.hashIV ? <EyeOff size={16} /> : <Eye size={16} />}
             </Button>
           </div>
-          <p className="text-xs text-morandi-secondary">16 字元，在藍新後台「API 串接資訊」可查看</p>
+          <p className="text-xs text-morandi-secondary">{NEWEBPAY_LABELS.HASHIV_HINT}</p>
         </div>
 
         {/* 環境切換 */}
@@ -191,8 +191,8 @@ export function NewebPaySettings() {
             </Label>
             <p className="text-xs text-morandi-secondary mt-1">
               {config.isProduction
-                ? '目前使用正式環境 (api.travelinvoice.com.tw)'
-                : '目前使用測試環境 (capi.travelinvoice.com.tw)'}
+                ? NEWEBPAY_LABELS.ENV_PRODUCTION
+                : NEWEBPAY_LABELS.ENV_TEST}
             </p>
           </div>
           <Switch
@@ -221,7 +221,7 @@ export function NewebPaySettings() {
           {!message && <div />}
           <Button onClick={handleSave} disabled={saving} className="gap-2">
             <Save size={16} />
-            {saving ? '儲存中...' : '儲存設定'}
+            {saving ? NEWEBPAY_LABELS.SAVING : NEWEBPAY_LABELS.SAVE}
           </Button>
         </div>
       </div>
@@ -231,7 +231,7 @@ export function NewebPaySettings() {
         <h4 className="text-sm font-medium text-morandi-primary mb-2">{NEWEBPAY_LABELS.SETUP_GUIDE}</h4>
         <ul className="text-xs text-morandi-secondary space-y-1 list-disc list-inside">
           <li>{NEWEBPAY_LABELS.GUIDE_1}</li>
-          <li>HashKey 和 HashIV 是加密用金鑰，請妥善保管</li>
+          <li>{NEWEBPAY_LABELS.GUIDE_2}</li>
           <li>{NEWEBPAY_LABELS.GUIDE_3}</li>
           <li>{NEWEBPAY_LABELS.GUIDE_4}</li>
         </ul>

@@ -19,37 +19,39 @@ interface FeatureOption {
   icon?: string
 }
 
+const L = PREFERRED_FEATURES_LABELS
+
 const AVAILABLE_FEATURES: FeatureOption[] = [
   // 核心功能
-  { id: 'calendar', label: '行事曆', description: '個人及團隊行程管理', category: '核心功能' },
-  { id: 'workspace', label: '工作空間', description: '工作空間資訊與設定', category: '核心功能' },
-  { id: 'todos', label: '待辦事項', description: '個人待辦清單', category: '核心功能' },
+  { id: 'calendar', label: L.FEATURE_CALENDAR, description: L.DESC_CALENDAR, category: L.CAT_CORE },
+  { id: 'workspace', label: L.FEATURE_WORKSPACE, description: L.DESC_WORKSPACE, category: L.CAT_CORE },
+  { id: 'todos', label: L.FEATURE_TODOS, description: L.DESC_TODOS, category: L.CAT_CORE },
 
   // 業務功能
-  { id: 'tours', label: '旅遊團', description: '旅遊團管理與行程規劃', category: '業務功能' },
-  { id: 'orders', label: '訂單', description: '客戶訂單管理', category: '業務功能' },
-  { id: 'quotes', label: '報價單', description: '報價單製作與管理', category: '業務功能' },
-  { id: 'customers', label: '顧客管理', description: '客戶資料維護', category: '業務功能' },
-  { id: 'business', label: '行程管理', description: '旅遊行程規劃', category: '業務功能' },
-  { id: 'confirmations', label: '確認單管理', description: '確認單製作與管理', category: '業務功能' },
-  { id: 'contracts', label: '合約管理', description: '合約簽署與管理', category: '業務功能' },
-  { id: 'visas', label: '簽證管理', description: '簽證申請追蹤', category: '業務功能' },
+  { id: 'tours', label: L.FEATURE_TOURS, description: L.DESC_TOURS, category: L.CAT_BUSINESS },
+  { id: 'orders', label: L.FEATURE_ORDERS, description: L.DESC_ORDERS, category: L.CAT_BUSINESS },
+  { id: 'quotes', label: L.FEATURE_QUOTES, description: L.DESC_QUOTES, category: L.CAT_BUSINESS },
+  { id: 'customers', label: L.FEATURE_CUSTOMERS, description: L.DESC_CUSTOMERS, category: L.CAT_BUSINESS },
+  { id: 'business', label: L.FEATURE_BUSINESS, description: L.DESC_BUSINESS, category: L.CAT_BUSINESS },
+  { id: 'confirmations', label: L.FEATURE_CONFIRMATIONS, description: L.DESC_CONFIRMATIONS, category: L.CAT_BUSINESS },
+  { id: 'contracts', label: L.FEATURE_CONTRACTS, description: L.DESC_CONTRACTS, category: L.CAT_BUSINESS },
+  { id: 'visas', label: L.FEATURE_VISAS, description: L.DESC_VISAS, category: L.CAT_BUSINESS },
 
   // 財務功能
-  { id: 'finance', label: '財務系統', description: '財務管理總覽', category: '財務功能' },
-  { id: 'payments', label: '收款管理', description: '客戶付款追蹤', category: '財務功能' },
-  { id: 'requests', label: '請款管理', description: '內部請款作業', category: '財務功能' },
-  { id: 'disbursement', label: '出納管理', description: '款項支付管理', category: '財務功能' },
-  { id: 'accounting', label: '記帳', description: '會計記帳作業', category: '財務功能' },
-  { id: 'vouchers', label: '會計傳票', description: '會計憑證管理', category: '財務功能' },
-  { id: 'reports', label: '報表管理', description: '財務報表產生', category: '財務功能' },
+  { id: 'finance', label: L.FEATURE_FINANCE, description: L.DESC_FINANCE, category: L.CAT_FINANCE },
+  { id: 'payments', label: L.FEATURE_PAYMENTS, description: L.DESC_PAYMENTS, category: L.CAT_FINANCE },
+  { id: 'requests', label: L.FEATURE_REQUESTS, description: L.DESC_REQUESTS, category: L.CAT_FINANCE },
+  { id: 'disbursement', label: L.FEATURE_DISBURSEMENT, description: L.DESC_DISBURSEMENT, category: L.CAT_FINANCE },
+  { id: 'accounting', label: L.FEATURE_ACCOUNTING, description: L.DESC_ACCOUNTING, category: L.CAT_FINANCE },
+  { id: 'vouchers', label: L.FEATURE_VOUCHERS, description: L.DESC_VOUCHERS, category: L.CAT_FINANCE },
+  { id: 'reports', label: L.FEATURE_REPORTS, description: L.DESC_REPORTS, category: L.CAT_FINANCE },
 
   // 資料管理
-  { id: 'database', label: '資料管理', description: '系統資料維護', category: '資料管理' },
+  { id: 'database', label: L.FEATURE_DATABASE, description: L.DESC_DATABASE, category: L.CAT_DATA },
 
   // 管理功能
-  { id: 'hr', label: '人資管理', description: '員工管理與權限設定', category: '管理功能' },
-  { id: 'settings', label: '系統設定', description: '個人與系統設定', category: '管理功能' },
+  { id: 'hr', label: L.FEATURE_HR, description: L.DESC_HR, category: L.CAT_MANAGEMENT },
+  { id: 'settings', label: L.FEATURE_SETTINGS, description: L.DESC_SETTINGS, category: L.CAT_MANAGEMENT },
 ]
 
 export function PreferredFeaturesSettings() {
@@ -277,7 +279,7 @@ export function PreferredFeaturesSettings() {
             {PREFERRED_FEATURES_LABELS.LABEL_1762}
           </Button>
           <span className="text-xs text-morandi-secondary">
-            已選擇 {selectedFeatures.length} 個功能
+            {L.SELECTED_COUNT_PREFIX}{selectedFeatures.length}{L.SELECTED_COUNT_SUFFIX}
           </span>
         </div>
 
@@ -318,7 +320,7 @@ export function PreferredFeaturesSettings() {
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-morandi-primary text-sm mb-0.5">
                           {feature.label}
-                          {!canSelect && <span className="text-xs ml-1 text-morandi-secondary">(無權限)</span>}
+                          {!canSelect && <span className="text-xs ml-1 text-morandi-secondary">{L.NO_PERMISSION}</span>}
                         </p>
                         <p className="text-xs text-morandi-secondary line-clamp-2">
                           {feature.description}

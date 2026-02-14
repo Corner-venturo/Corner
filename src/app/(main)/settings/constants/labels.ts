@@ -169,10 +169,23 @@ export const API_SETTINGS_LABELS = {
   LOADING: '載入中...',
   API_KEY_WARNING: '請勿將 API Key 分享給非授權人員',
   SETUP_GUIDE: '設定方式',
+  TITLE: 'API 設定',
 
   SETTINGS_4369: '未設定',
+  NOT_SET: '未設定',
   COPY: '複製',
   LABEL_4474: '檔案：',
+  HIDE: '隱藏',
+  SHOW: '顯示',
+  ADMIN_CONSOLE: '管理後台',
+  DOCS: '文件',
+  CATEGORY_DATABASE: 'Supabase 資料庫',
+  CATEGORY_OCR: 'OCR 辨識服務',
+  CATEGORY_AI: 'AI 服務',
+  CATEGORY_FLIGHT: '航班查詢服務',
+  CATEGORY_PAYMENT: '金流服務',
+  CATEGORY_OTHER: '其他設定',
+  ENV_FILE_PREFIX: '在專案根目錄建立或編輯',
 }
 
 export const DEVTOOLS_LABELS = {
@@ -223,6 +236,13 @@ export const NEWEBPAY_LABELS = {
   LABEL_6384: '輸入 32 字元的 HashKey',
   LABEL_1330: '輸入 16 字元的 HashIV',
   LABEL_2112: '正式環境',
+  HASHKEY_HINT: '32 字元，在藍新後台「API 串接資訊」可查看',
+  HASHIV_HINT: '16 字元，在藍新後台「API 串接資訊」可查看',
+  ENV_PRODUCTION: '目前使用正式環境 (api.travelinvoice.com.tw)',
+  ENV_TEST: '目前使用測試環境 (capi.travelinvoice.com.tw)',
+  SAVING: '儲存中...',
+  SAVE: '儲存設定',
+  GUIDE_2: 'HashKey 和 HashIV 是加密用金鑰，請妥善保管',
 }
 
 export const OTHER_SETTINGS_LABELS = {
@@ -263,6 +283,64 @@ export const PREFERRED_FEATURES_LABELS = {
   SETTINGS_6020: '常用功能設定',
   SELECT_5572: '選擇你常用的功能，側邊欄將只顯示這些項目，讓介面更簡潔',
   LABEL_1762: '恢復角色預設',
+
+  // Feature labels
+  FEATURE_CALENDAR: '行事曆',
+  FEATURE_WORKSPACE: '工作空間',
+  FEATURE_TODOS: '待辦事項',
+  FEATURE_TOURS: '旅遊團',
+  FEATURE_ORDERS: '訂單',
+  FEATURE_QUOTES: '報價單',
+  FEATURE_CUSTOMERS: '顧客管理',
+  FEATURE_BUSINESS: '行程管理',
+  FEATURE_CONFIRMATIONS: '確認單管理',
+  FEATURE_CONTRACTS: '合約管理',
+  FEATURE_VISAS: '簽證管理',
+  FEATURE_FINANCE: '財務系統',
+  FEATURE_PAYMENTS: '收款管理',
+  FEATURE_REQUESTS: '請款管理',
+  FEATURE_DISBURSEMENT: '出納管理',
+  FEATURE_ACCOUNTING: '記帳',
+  FEATURE_VOUCHERS: '會計傳票',
+  FEATURE_REPORTS: '報表管理',
+  FEATURE_DATABASE: '資料管理',
+  FEATURE_HR: '人資管理',
+  FEATURE_SETTINGS: '系統設定',
+
+  // Feature descriptions
+  DESC_CALENDAR: '個人及團隊行程管理',
+  DESC_WORKSPACE: '工作空間資訊與設定',
+  DESC_TODOS: '個人待辦清單',
+  DESC_TOURS: '旅遊團管理與行程規劃',
+  DESC_ORDERS: '客戶訂單管理',
+  DESC_QUOTES: '報價單製作與管理',
+  DESC_CUSTOMERS: '客戶資料維護',
+  DESC_BUSINESS: '旅遊行程規劃',
+  DESC_CONFIRMATIONS: '確認單製作與管理',
+  DESC_CONTRACTS: '合約簽署與管理',
+  DESC_VISAS: '簽證申請追蹤',
+  DESC_FINANCE: '財務管理總覽',
+  DESC_PAYMENTS: '客戶付款追蹤',
+  DESC_REQUESTS: '內部請款作業',
+  DESC_DISBURSEMENT: '款項支付管理',
+  DESC_ACCOUNTING: '會計記帳作業',
+  DESC_VOUCHERS: '會計憑證管理',
+  DESC_REPORTS: '財務報表產生',
+  DESC_DATABASE: '系統資料維護',
+  DESC_HR: '員工管理與權限設定',
+  DESC_SETTINGS: '個人與系統設定',
+
+  // Categories
+  CAT_CORE: '核心功能',
+  CAT_BUSINESS: '業務功能',
+  CAT_FINANCE: '財務功能',
+  CAT_DATA: '資料管理',
+  CAT_MANAGEMENT: '管理功能',
+
+  // Inline JSX
+  SELECTED_COUNT_PREFIX: '已選擇 ',
+  SELECTED_COUNT_SUFFIX: ' 個功能',
+  NO_PERMISSION: '(無權限)',
 }
 
 export const WORKSPACE_SWITCHER_LABELS = {
@@ -270,6 +348,7 @@ export const WORKSPACE_SWITCHER_LABELS = {
   VIEW_ALL: '查看全部辦公室',
 
   LABEL_795: '切換查看特定辦公室的資料，或查看所有辦公室的資料',
+  SWITCH_HINT: '💡 切換後，所有列表（旅遊團、訂單、客戶等）都會只顯示該辦公室的資料',
 }
 
 export const MODULES_PAGE_LABELS = {
