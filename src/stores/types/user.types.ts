@@ -14,7 +14,7 @@ export interface User {
   email?: string // personal_info.email 的便捷存取
   personal_info: {
     national_id: string
-    birthday: string
+    birth_date: string
     phone: string | string[] // 支援單一電話或多個電話
     email: string
     address: string

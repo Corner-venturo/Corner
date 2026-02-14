@@ -55,13 +55,13 @@ export function getGenderFromIdNumber(idNumber: string): 'M' | 'F' | '' {
 
 // 根據生日和回團日期計算年齡
 export function calculateAge(
-  birthday: string,
+  birth_date_str: string,
   departure_date: string,
   return_date?: string
 ): number {
-  if (!birthday || !departure_date) return 0
+  if (!birth_date_str || !departure_date) return 0
 
-  const birth_date = new Date(birthday)
+  const birth_date = new Date(birth_date_str)
   // 優先使用回團日期，如果沒有則使用出發日期
   const referenceDate = return_date ? new Date(return_date) : new Date(departure_date)
 

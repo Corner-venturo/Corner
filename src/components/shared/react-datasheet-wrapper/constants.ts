@@ -6,7 +6,7 @@ export const PROTECTED_FIELD_KEYS = [
   'index',
   'name',
   'nameEn',
-  'birthday',
+  'birth_date',
   'age',
   'gender',
   'idNumber',

@@ -69,7 +69,7 @@ export function MemberInfoCard({ open, member, onClose }: MemberInfoCardProps) {
           </div>
           <div>
             <span className="font-medium text-morandi-secondary">{MEMBERS_LABELS.LABEL_94}</span>
-            <span>{member.birthday || member.birth_date || '-'}</span>
+            <span>{member.birth_date || member.birth_date || '-'}</span>
           </div>
           <div>
             <span className="font-medium text-morandi-secondary">{MEMBERS_LABELS.LABEL_8424}</span>

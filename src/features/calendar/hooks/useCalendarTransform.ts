@@ -204,10 +204,10 @@ export function useCalendarTransform(calendarEvents: CalendarEvent[]) {
 
     return (members || [])
       .map(member => {
-        if (!member?.birthday) return null
+        if (!member?.birth_date) return null
 
         // 計算今年的生日日期
-        const birthdayThisYear = `${currentYear}-${member.birthday.slice(5)}`
+        const birthdayThisYear = `${currentYear}-${member.birth_date.slice(5)}`
 
         return {
           id: `member-birthday-${member.id}`,

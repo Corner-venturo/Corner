@@ -132,7 +132,7 @@ export function CustomerDetailDialog({
                   <div className="font-mono text-morandi-primary mt-1">{customer.national_id || '-'}</div>
                 </div>
                 <div>
-                  <label className="text-xs text-morandi-muted">{L.label_birthday}</label>
+                  <label className="text-xs text-morandi-muted">{L.label_birth_date}</label>
                   <div className="mt-1">
                     <DateCell
                       date={customer.birth_date}

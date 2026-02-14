@@ -150,8 +150,8 @@ export function usePassportUpload({
       )
       const existingNameBirthMap = new Map(
         existingMembers
-          .filter((m) => m.name && m.birthday)
-          .map((m) => [`${m.name}|${m.birthday}`, m.id])
+          .filter((m) => m.name && m.birth_date)
+          .map((m) => [`${m.name}|${m.birth_date}`, m.id])
       )
 
       const { invalidateCustomers } = await import('@/data')
@@ -199,7 +199,7 @@ export function usePassportUpload({
               name_en: item.customer.passport_name || item.customer.english_name || '',
               passport_number,
               passport_expiry: item.customer.passport_expiry || null,
-              birthday: birth_date,
+              birth_date: birth_date,
               id_number: national_id,
               gender: item.customer.sex === '男' ? 'M' : item.customer.sex === '女' ? 'F' : null,
             },
@@ -227,7 +227,7 @@ export function usePassportUpload({
           name_en: item.customer.passport_name || item.customer.english_name || '',
           passport_number,
           passport_expiry: item.customer.passport_expiry || null,
-          birthday: birth_date,
+          birth_date: birth_date,
           id_number: national_id,
           gender: (item.customer.sex === '男'
             ? 'M'

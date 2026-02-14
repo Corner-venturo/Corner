@@ -82,7 +82,7 @@ export function useMemberView({ order_id, departure_date, member_count }: UseMem
         order_id,
         name: '',
         name_en: '',
-        birthday: '',
+        birth_date: '',
         passport_number: '',
         passport_expiry: '',
         id_number: '',
@@ -203,7 +203,7 @@ export function useMemberView({ order_id, departure_date, member_count }: UseMem
         passport_number: customer.passport_number || pendingMemberData.passport_number,
         passport_expiry: customer.passport_expiry || pendingMemberData.passport_expiry,
         id_number: customer.national_id || pendingMemberData.id_number,
-        birthday: customer.birth_date || pendingMemberData.birthday,
+        birth_date: customer.birth_date || pendingMemberData.birth_date,
         gender: customerGender || pendingMemberData.gender,
         customer_id: customer.id,
       }
@@ -234,8 +234,8 @@ export function useMemberView({ order_id, departure_date, member_count }: UseMem
           }
         }
         // 從生日計算年齡
-        else if (processed.birthday) {
-          const age = calculateAge(String(processed.birthday), departure_date)
+        else if (processed.birth_date) {
+          const age = calculateAge(String(processed.birth_date), departure_date)
           if (age !== null && 'age' in processed) {
             (processed as EditingMember & { age: number }).age = age
           }
@@ -311,7 +311,7 @@ export function useMemberView({ order_id, departure_date, member_count }: UseMem
       order_id,
       name: '',
       name_en: '',
-      birthday: '',
+      birth_date: '',
       passport_number: '',
       passport_expiry: '',
       id_number: '',

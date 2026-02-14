@@ -6,7 +6,7 @@ export interface BasicInfoFormData {
   english_name: string
   personal_info: {
     national_id: string
-    birthday: string
+    birth_date: string
     phone: string[]
     email: string
     address: string

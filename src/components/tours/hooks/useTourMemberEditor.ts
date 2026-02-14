@@ -14,7 +14,7 @@ export interface EditingMember {
   order_id: string
   name: string
   nameEn: string
-  birthday: string
+  birth_date: string
   passportNumber: string
   passportExpiry: string
   idNumber: string
@@ -67,7 +67,7 @@ export function useTourMemberEditor(
   const editableFields: (keyof EditingMember)[] = [
     'name',
     'nameEn',
-    'birthday',
+    'birth_date',
     'gender',
     'idNumber',
     'passportNumber',
@@ -199,7 +199,7 @@ export function useTourMemberEditor(
         order_id: firstOrder.id,
         name: '',
         nameEn: '',
-        birthday: '',
+        birth_date: '',
         passportNumber: '',
         passportExpiry: '',
         idNumber: '',
@@ -242,8 +242,8 @@ export function useTourMemberEditor(
       if (!member.gender) {
         member.gender = getGenderFromIdNumber(value)
       }
-    } else if (field === 'birthday') {
-      member.birthday = value
+    } else if (field === 'birth_date') {
+      member.birth_date = value
       member.age = calculateAge(value, tour.departure_date, tour.return_date)
     } else if (field === 'gender') {
       if (value === COMP_TOURS_LABELS.男 || value.toLowerCase() === 'm' || value === '1') {

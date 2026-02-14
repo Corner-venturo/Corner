@@ -79,11 +79,11 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
       <div>
         <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_8658}</label>
         <DatePicker
-          value={formData.personal_info.birthday}
+          value={formData.personal_info.birth_date}
           onChange={date =>
             setFormData({
               ...formData,
-              personal_info: { ...formData.personal_info, birthday: date },
+              personal_info: { ...formData.personal_info, birth_date: date },
             })
           }
           placeholder={COMP_HR_LABELS.選擇日期}

@@ -13,7 +13,7 @@ export function useBasicInfoForm(employee: Employee, setIsEditing: (editing: boo
     english_name: employee.english_name || '',
     personal_info: {
       national_id: employee.personal_info?.national_id || '',
-      birthday: employee.personal_info?.birthday || '',
+      birth_date: employee.personal_info?.birth_date || '',
       phone: Array.isArray(employee.personal_info?.phone)
         ? employee.personal_info.phone
         : employee.personal_info?.phone
@@ -68,7 +68,7 @@ export function useBasicInfoForm(employee: Employee, setIsEditing: (editing: boo
       english_name: employee.english_name || '',
       personal_info: {
         national_id: employee.personal_info?.national_id || '',
-        birthday: employee.personal_info?.birthday || '',
+        birth_date: employee.personal_info?.birth_date || '',
         phone: Array.isArray(employee.personal_info?.phone)
           ? employee.personal_info.phone
           : employee.personal_info?.phone

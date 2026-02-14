@@ -96,18 +96,18 @@ export function PersonalInfoSection({
           </label>
           {isEditing ? (
             <DatePicker
-              value={formData.personal_info.birthday}
+              value={formData.personal_info.birth_date}
               onChange={date =>
                 setFormData({
                   ...formData,
-                  personal_info: { ...formData.personal_info, birthday: date },
+                  personal_info: { ...formData.personal_info, birth_date: date },
                 })
               }
               placeholder={COMP_HR_LABELS.選擇日期}
             />
           ) : (
             <div className="py-2">
-              <DateCell date={employee.personal_info.birthday} showIcon={false} />
+              <DateCell date={employee.personal_info.birth_date} showIcon={false} />
             </div>
           )}
         </div>

@@ -227,7 +227,7 @@ export default function CustomersPage() {
       },
       {
         key: 'birth_date',
-        label: L.col_birthday,
+        label: L.col_birth_date,
         sortable: false,
         render: (_value, customer: Customer) => (
           <DateCell

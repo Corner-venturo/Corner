@@ -24,7 +24,7 @@ export function useEmployeeForm(onSubmit: () => void) {
     roles: [],
     personal_info: {
       national_id: '',
-      birthday: '',
+      birth_date: '',
       phone: [''],
       email: '',
       address: '',
@@ -115,7 +115,7 @@ export function useEmployeeForm(onSubmit: () => void) {
         roles: formData.roles as ('admin' | 'employee' | 'user' | 'tour_leader' | 'sales' | 'accountant' | 'assistant' | 'super_admin')[],
         personal_info: {
           national_id: formData.personal_info.national_id,
-          birthday: formData.personal_info.birthday,
+          birth_date: formData.personal_info.birth_date,
           phone: formData.personal_info.phone.filter(p => p.trim() !== ''),
           email: formData.personal_info.email,
           address: formData.personal_info.address,

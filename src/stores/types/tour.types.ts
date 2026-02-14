@@ -42,8 +42,8 @@ export interface Member {
   passport_name: string | null // 護照拼音
   name?: string // 向下相容
   name_en?: string // 向下相容（拼音）
-  birthday: string | null // YYYY-MM-DD（DB 欄位名）
-  birth_date?: string // 向下相容（order_members 表使用此欄位）
+  birth_date: string | null // YYYY-MM-DD
+
   passport_number: string | null
   passport_expiry: string | null // YYYY-MM-DD
   id_number: string | null // 身分證字號

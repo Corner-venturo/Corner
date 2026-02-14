@@ -20,7 +20,7 @@ export const FIELD_MAP: Record<string, string> = {
 export const FIELD_COORDINATES: Record<string, string> = {
   C1: 'name', // 姓名
   D1: 'nameEn', // 英文姓名
-  E1: 'birthday', // 生日
+  E1: 'birth_date', // 生日
   F1: 'age', // 年齡
   G1: 'gender', // 性別
   H1: 'idNumber', // 身分證字號
@@ -207,7 +207,7 @@ function evaluateExpression(expression: string): number | string {
 interface Member {
   name?: string
   nameEn?: string
-  birthday?: string
+  birth_date?: string
   age?: number
   gender?: string
   idNumber?: string
@@ -244,7 +244,7 @@ export function getMemberContext(
   return {
     name: member.name || '',
     nameEn: member.nameEn || '',
-    birthday: member.birthday || '',
+    birth_date: member.birth_date || '',
     age: member.age || 0,
     gender: member.gender || '',
     idNumber: member.idNumber || '',
