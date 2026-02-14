@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { AddOrderForm, type OrderFormData } from '@/components/orders/add-order-form'
+import { AddOrderForm, type OrderFormData } from '@/features/orders/components/add-order-form'
 import { TOUR_ORDER_SECTION } from '../../constants'
 
 interface TourOrderSectionProps {

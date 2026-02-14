@@ -8,7 +8,7 @@ import { useToursListSlim } from '@/hooks/useListSlim'
 import { useEmployeesSlim } from '@/data'
 import type { Employee } from '@/stores/types'
 import type { SyncableEntity } from '@/types'
-import { COMP_ORDERS_LABELS } from './constants/labels'
+import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 // 型別守衛：檢查 Employee 是否包含同步欄位
 type EmployeeWithSync = Employee & Partial<SyncableEntity>

@@ -53,7 +53,7 @@ import {
   useMemberEditDialog,
   usePassportUpload,
   useColumnWidths,
-} from './hooks'
+} from '../hooks'
 import {
   MemberRow,
   AddMemberDialog,
@@ -63,14 +63,14 @@ import {
   CustomCostFieldsSection,
   MemberTableHeader,
   PnrMatchDialog,
-} from './components'
+} from './'
 import dynamic from 'next/dynamic'
 
 const TourPrintDialog = dynamic(() => import('@/components/tours/TourPrintDialog').then(m => m.TourPrintDialog), { ssr: false })
-import type { OrderMember, OrderMembersExpandableProps, CustomCostField } from './order-member.types'
-import type { EditFormData } from './components/MemberEditDialog'
-import { COMP_ORDERS_LABELS } from './constants/labels'
-import { computeRowSpans } from './utils'
+import type { OrderMember, OrderMembersExpandableProps, CustomCostField } from '../types/order-member.types'
+import type { EditFormData } from './MemberEditDialog'
+import { COMP_ORDERS_LABELS } from '../constants/labels'
+import { computeRowSpans } from '../utils'
 
 // 可切換顯示的欄位定義
 export interface ColumnVisibility {

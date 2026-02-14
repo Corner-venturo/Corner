@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
 import type { Customer } from '@/types/customer.types'
-import type { OrderMember } from '@/components/orders/order-member.types'
+import type { OrderMember } from '@/features/orders/types/order-member.types'
 import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 export type MatchType = 'name' | 'id_number'

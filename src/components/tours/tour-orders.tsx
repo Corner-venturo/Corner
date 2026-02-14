@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Tour, Order } from '@/stores/types'
 import { supabase } from '@/lib/supabase/client'
-import { SimpleOrderTable } from '@/components/orders/simple-order-table'
+import { SimpleOrderTable } from '@/features/orders/components/simple-order-table'
 import { AddReceiptDialog } from '@/features/finance/payments'
 import dynamic from 'next/dynamic'
 

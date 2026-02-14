@@ -9,8 +9,8 @@ import React from 'react'
 import { cn } from '@/lib/utils'
 import { formatPassportExpiryWithStatus } from '@/lib/utils/passport-expiry'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
-import type { OrderMember } from '../../order-member.types'
-import type { ColumnVisibility } from '../../OrderMembersExpandable'
+import type { OrderMember } from '../../types/order-member.types'
+import type { ColumnVisibility } from '../OrderMembersExpandable'
 import { COMP_ORDERS_LABELS } from '../../constants/labels'
 
 interface MemberPassportInfoProps {

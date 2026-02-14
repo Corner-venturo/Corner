@@ -6,7 +6,7 @@ import { prepareContractData, ContractData } from '@/lib/contract-utils'
 import { alert, alertSuccess, alertError } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
-import type { OrderMember } from '@/components/orders/order-member.types'
+import type { OrderMember } from '@/features/orders/types/order-member.types'
 import { COMP_CONTRACTS_LABELS } from '../constants/labels'
 
 interface UseContractFormProps {

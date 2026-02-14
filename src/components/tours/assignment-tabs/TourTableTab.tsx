@@ -20,7 +20,7 @@ import { toast } from 'sonner'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
-import type { OrderMember } from '@/components/orders/order-member.types'
+import type { OrderMember } from '@/features/orders/types/order-member.types'
 import { COMP_TOURS_LABELS } from '../constants/labels'
 
 type MemberBasic = Pick<OrderMember, 'id' | 'chinese_name' | 'passport_name'>

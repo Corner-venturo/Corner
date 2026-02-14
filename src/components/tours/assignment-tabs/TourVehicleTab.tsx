@@ -21,7 +21,7 @@ import { VEHICLE_TYPES } from '@/types/room-vehicle.types'
 import type { TourVehicleStatus } from '@/types/room-vehicle.types'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
-import type { OrderMember } from '@/components/orders/order-member.types'
+import type { OrderMember } from '@/features/orders/types/order-member.types'
 import { COMP_TOURS_LABELS } from '../constants/labels'
 
 type MemberBasic = Pick<OrderMember, 'id' | 'chinese_name' | 'passport_name'>

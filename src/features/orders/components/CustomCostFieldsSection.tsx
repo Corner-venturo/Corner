@@ -10,7 +10,7 @@ import { Coins, Plus, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import type { CustomCostField } from '../order-member.types'
+import type { CustomCostField } from '../types/order-member.types'
 import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 interface CustomCostFieldsSectionProps {

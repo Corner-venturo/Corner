@@ -11,7 +11,7 @@
 import { useState, useCallback } from 'react'
 import { logger } from '@/lib/utils/logger'
 import { alert } from '@/lib/ui/alert-dialog'
-import type { ProcessedFile } from '../../order-member.types'
+import type { ProcessedFile } from '../../types/order-member.types'
 import { COMP_ORDERS_LABELS } from '../../constants/labels'
 
 interface UsePassportFilesReturn {

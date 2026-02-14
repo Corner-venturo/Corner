@@ -21,7 +21,7 @@ import { PassportSection } from './member-edit/PassportSection'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
-import type { OrderMember } from '../order-member.types'
+import type { OrderMember } from '../types/order-member.types'
 import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 type EditMode = 'edit' | 'verify'

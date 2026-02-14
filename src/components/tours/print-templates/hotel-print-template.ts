@@ -1,5 +1,5 @@
 import type { Tour } from '@/stores/types'
-import type { OrderMember } from '@/components/orders/order-member.types'
+import type { OrderMember } from '@/features/orders/types/order-member.types'
 import { TOUR_PRINT_DIALOG_LABELS } from '../constants/labels'
 
 interface HotelPrintOptions {

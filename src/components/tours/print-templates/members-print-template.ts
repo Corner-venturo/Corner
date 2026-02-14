@@ -1,5 +1,5 @@
 import type { Tour } from '@/stores/types'
-import type { OrderMember, ExportColumnsConfig } from '@/components/orders/order-member.types'
+import type { OrderMember, ExportColumnsConfig } from '@/features/orders/types/order-member.types'
 import { COLUMN_LABELS } from '../tour-print-constants'
 
 interface MembersPrintOptions {

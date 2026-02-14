@@ -13,7 +13,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { supabase } from '@/lib/supabase/client'
 import { useReferenceData } from '@/lib/pnr'
 import type { Tour } from '@/stores/types'
-import type { OrderMember, ExportColumnsConfig } from '@/components/orders/order-member.types'
+import type { OrderMember, ExportColumnsConfig } from '@/features/orders/types/order-member.types'
 import type { PNR } from '@/types/pnr.types'
 import {
   COLUMN_LABELS,

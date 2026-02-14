@@ -11,7 +11,7 @@ import type { Order, Employee } from '@/stores/types'
 import type { SyncableEntity } from '@/types'
 import { X } from 'lucide-react'
 import { logger } from '@/lib/utils/logger'
-import { COMP_ORDERS_LABELS } from './constants/labels'
+import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 // 型別守衛：檢查 Employee 是否包含同步欄位
 type EmployeeWithSync = Employee & Partial<SyncableEntity>

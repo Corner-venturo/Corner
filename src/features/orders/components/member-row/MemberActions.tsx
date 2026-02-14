@@ -7,7 +7,7 @@
 
 import React from 'react'
 import { AlertTriangle, Pencil, Trash2 } from 'lucide-react'
-import type { OrderMember } from '../../order-member.types'
+import type { OrderMember } from '../../types/order-member.types'
 import { COMP_ORDERS_LABELS } from '../../constants/labels'
 
 interface MemberActionsProps {

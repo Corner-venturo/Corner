@@ -6,7 +6,7 @@
 
 
 import React, { useCallback, useRef } from 'react'
-import type { ColumnVisibility } from '../OrderMembersExpandable'
+import type { ColumnVisibility } from './OrderMembersExpandable'
 import type { HotelColumn } from '../hooks/useRoomVehicleAssignments'
 import { MEMBER_TABLE_HEADER_LABELS as L } from '../constants/labels'
 

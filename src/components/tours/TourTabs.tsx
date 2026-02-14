@@ -35,7 +35,7 @@ const TourOrders = dynamic(
 )
 
 const OrderMembersExpandable = dynamic(
-  () => import('@/components/orders/OrderMembersExpandable').then(m => m.OrderMembersExpandable),
+  () => import('@/features/orders/components/OrderMembersExpandable').then(m => m.OrderMembersExpandable),
   { loading: () => <TabLoading /> }
 )
 

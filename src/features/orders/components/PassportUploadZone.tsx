@@ -14,7 +14,7 @@
 import React, { useState, useCallback } from 'react'
 import { Upload, X, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import type { ProcessedFile } from '../order-member.types'
+import type { ProcessedFile } from '../types/order-member.types'
 import { PassportImageEnhancer } from './PassportImageEnhancer'
 import { COMP_ORDERS_LABELS } from '../constants/labels'
 

@@ -5,7 +5,7 @@ import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
 import { useCustomersSlim, updateCustomer, createCustomer } from '@/data'
 import { alert } from '@/lib/ui/alert-dialog'
-import type { OrderMember } from '@/components/orders/order-member.types'
+import type { OrderMember } from '@/features/orders/types/order-member.types'
 import { COMP_ORDERS_LABELS } from '../constants/labels'
 // 2025-06-27: 移除 useImageEditor 依賴 (改用統一的 ImageEditor 元件)
 

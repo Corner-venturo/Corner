@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { alert } from '@/lib/ui/alert-dialog'
-import type { OrderMember } from '@/components/orders/order-member.types'
+import type { OrderMember } from '@/features/orders/types/order-member.types'
 
 export type ExportColumns = Record<string, boolean>
 

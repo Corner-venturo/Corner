@@ -10,7 +10,7 @@
 import { useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
-import type { ProcessedFile } from '../../order-member.types'
+import type { ProcessedFile } from '../../types/order-member.types'
 import { COMP_ORDERS_LABELS } from '../../constants/labels'
 
 interface OcrCustomerData {

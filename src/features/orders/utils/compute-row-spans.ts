@@ -2,7 +2,7 @@
  * 計算分房/分車欄位的合併行數（rowSpan）
  */
 
-import type { OrderMember } from '../order-member.types'
+import type { OrderMember } from '../types/order-member.types'
 
 interface HotelColumn {
   id: string

@@ -1,5 +1,5 @@
 import type { Tour } from '@/stores/types'
-import type { OrderMember } from '@/components/orders/order-member.types'
+import type { OrderMember } from '@/features/orders/types/order-member.types'
 import type { PNR, PNRSegment } from '@/types/pnr.types'
 import { CLASS_NAMES, STATUS_NAMES } from '../tour-print-constants'
 import { TOUR_PRINT_DIALOG_LABELS } from '../constants/labels'

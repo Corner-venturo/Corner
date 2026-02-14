@@ -2,7 +2,7 @@
  * TourPrintDialog 常數定義
  */
 
-import type { ExportColumnsConfig } from '@/components/orders/order-member.types'
+import type { ExportColumnsConfig } from '@/features/orders/types/order-member.types'
 import { COMP_TOURS_LABELS } from './constants/labels'
 
 // 成員名單欄位標籤

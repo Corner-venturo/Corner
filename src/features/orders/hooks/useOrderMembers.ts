@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { confirm } from '@/lib/ui/alert-dialog'
-import type { OrderMember, CustomCostField } from '../order-member.types'
+import type { OrderMember, CustomCostField } from '../types/order-member.types'
 import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 interface UseOrderMembersParams {

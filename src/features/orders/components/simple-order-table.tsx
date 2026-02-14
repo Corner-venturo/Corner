@@ -9,8 +9,8 @@ import { User, Trash2, FileText, Pencil } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Order, Tour } from '@/stores/types'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
-import { OrderMembersExpandable } from '@/components/orders/OrderMembersExpandable'
-import { COMP_ORDERS_LABELS } from './constants/labels'
+import { OrderMembersExpandable } from '@/features/orders/components/OrderMembersExpandable'
+import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 interface SimpleOrderTableProps {
   orders: Order[]

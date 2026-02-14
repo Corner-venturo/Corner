@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Hotel, Bus, UtensilsCrossed } from 'lucide-react'
 import { logger } from '@/lib/utils/logger'
-import type { OrderMember } from '@/components/orders/order-member.types'
+import type { OrderMember } from '@/features/orders/types/order-member.types'
 
 // 只需要 OrderMember 的部分欄位
 type MemberBasic = Pick<OrderMember, 'id' | 'chinese_name' | 'passport_name'>

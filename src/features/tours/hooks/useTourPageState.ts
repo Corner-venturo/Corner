@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo, useEffect } from 'react'
 import { Tour } from '@/stores/types'
 import { City } from '@/stores/region-store'
 import { NewTourData, TourExtraFields, DeleteConfirmState } from '../types'
-import { OrderFormData } from '@/components/orders/add-order-form'
+import { OrderFormData } from '@/features/orders/components/add-order-form'
 
 // localStorage key for status tab memory
 const STATUS_TAB_KEY = 'venturo-tours-status-tab'

@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { PassportUploadZone } from './PassportUploadZone'
-import type { ProcessedFile } from '../order-member.types'
+import type { ProcessedFile } from '../types/order-member.types'
 import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 interface AddMemberDialogProps {

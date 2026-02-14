@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { AlertCircle, X } from 'lucide-react'
 import { NewTourData } from '../types'
-import type { OrderFormData } from '@/components/orders/add-order-form'
+import type { OrderFormData } from '@/features/orders/components/add-order-form'
 import { useTourForm } from '../hooks/useTourForm'
 import {
   TourBasicInfo,

@@ -8,8 +8,8 @@
 import React, { useState } from 'react'
 import { Eye } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { OrderMember } from '../../order-member.types'
-import type { ColumnVisibility } from '../../OrderMembersExpandable'
+import type { OrderMember } from '../../types/order-member.types'
+import type { ColumnVisibility } from '../OrderMembersExpandable'
 import { COMP_ORDERS_LABELS } from '../../constants/labels'
 
 interface MemberBasicInfoProps {

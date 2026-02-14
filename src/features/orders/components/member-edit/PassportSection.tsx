@@ -15,7 +15,7 @@ import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { toast } from 'sonner'
 import { syncPassportImageToMembers } from '@/lib/utils/sync-passport-image'
-import type { OrderMember } from '../../order-member.types'
+import type { OrderMember } from '../../types/order-member.types'
 
 // 從 URL 提取檔名並刪除舊照片
 async function deleteOldPassportImage(oldUrl: string | null | undefined): Promise<void> {

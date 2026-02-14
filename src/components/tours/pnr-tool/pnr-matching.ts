@@ -2,7 +2,7 @@
  * PNR 旅客比對工具
  */
 
-import type { OrderMember } from '@/components/orders/order-member.types'
+import type { OrderMember } from '@/features/orders/types/order-member.types'
 import type { ParsedPNR, EnhancedSSR } from '@/lib/pnr-parser'
 import { SSRCategory } from '@/lib/pnr-parser'
 

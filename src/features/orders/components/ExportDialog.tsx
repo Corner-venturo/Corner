@@ -9,7 +9,7 @@ import React from 'react'
 import { Printer, X, FileSpreadsheet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import type { OrderMember, ExportColumnsConfig } from '../order-member.types'
+import type { OrderMember, ExportColumnsConfig } from '../types/order-member.types'
 import { ORDERS_LABELS } from './constants/labels'
 
 interface ExportDialogProps {
