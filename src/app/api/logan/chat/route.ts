@@ -3,28 +3,25 @@
  * POST /api/logan/chat
  */
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { chatWithLogan, teachLogan, isLoganAvailable, type MemoryCategory } from '@/lib/logan'
 import { getServerAuth } from '@/lib/auth/server-auth'
 import { logger } from '@/lib/utils/logger'
+import { ApiError, successResponse } from '@/lib/api/response'
+
+// TODO: withAuth 無法直接適用，因為此 route 需要 getServerAuth (workspaceId, employeeId)
 
 export async function POST(request: NextRequest) {
   // 全局 AI 開關
   if (process.env.NEXT_PUBLIC_DISABLE_AI === 'true') {
-    return NextResponse.json(
-      { success: false, error: 'AI 功能已停用' },
-      { status: 503 }
-    )
+    return ApiError.internal('AI 功能已停用')
   }
 
   try {
     // 驗證身份
     const auth = await getServerAuth()
     if (!auth.success) {
-      return NextResponse.json(
-        { success: false, error: auth.error.error },
-        { status: 401 }
-      )
+      return ApiError.unauthorized(auth.error.error)
     }
 
     const { workspaceId, employeeId } = auth.data
@@ -35,23 +32,17 @@ export async function POST(request: NextRequest) {
     switch (action) {
       case 'chat': {
         if (!message || typeof message !== 'string') {
-          return NextResponse.json(
-            { success: false, error: '請提供訊息內容' },
-            { status: 400 }
-          )
+          return ApiError.validation('請提供訊息內容')
         }
 
         const result = await chatWithLogan(workspaceId, employeeId, message)
-        return NextResponse.json(result)
+        return successResponse(result)
       }
 
       case 'teach': {
         const { title, content, category, tags, importance } = body
         if (!title || !content) {
-          return NextResponse.json(
-            { success: false, error: '請提供標題和內容' },
-            { status: 400 }
-          )
+          return ApiError.validation('請提供標題和內容')
         }
 
         const result = await teachLogan(workspaceId, employeeId, {
@@ -61,29 +52,22 @@ export async function POST(request: NextRequest) {
           tags,
           importance,
         })
-        return NextResponse.json(result)
+        return successResponse(result)
       }
 
       default:
-        return NextResponse.json(
-          { success: false, error: '未知的操作' },
-          { status: 400 }
-        )
+        return ApiError.validation('未知的操作')
     }
   } catch (error) {
     logger.error('Logan API error:', error)
-    return NextResponse.json(
-      { success: false, error: '伺服器錯誤' },
-      { status: 500 }
-    )
+    return ApiError.internal('伺服器錯誤')
   }
 }
 
 export async function GET() {
-  // 全局 AI 開關 - 設定 NEXT_PUBLIC_DISABLE_AI=true 可完全禁用 AI
+  // 全局 AI 開關
   if (process.env.NEXT_PUBLIC_DISABLE_AI === 'true') {
-    return NextResponse.json({
-      success: true,
+    return successResponse({
       available: false,
       disabled: true,
       model: null,
@@ -92,14 +76,12 @@ export async function GET() {
 
   try {
     const available = await isLoganAvailable()
-    return NextResponse.json({
-      success: true,
+    return successResponse({
       available,
       model: process.env.OLLAMA_MODEL || 'qwen2.5:7b',
     })
   } catch (error) {
-    return NextResponse.json({
-      success: false,
+    return successResponse({
       available: false,
       error: '無法檢查 Logan 狀態',
     })

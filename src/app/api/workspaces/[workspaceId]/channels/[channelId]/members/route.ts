@@ -1,7 +1,9 @@
 import { logger } from '@/lib/utils/logger'
-import { NextResponse } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { getServerAuth } from '@/lib/auth/server-auth'
+import { ApiError, successResponse } from '@/lib/api/response'
+
+// TODO: withAuth 無法直接適用，因為此 route 需要 getServerAuth (workspaceId) + admin client
 
 type RouteParams = {
   params: Promise<{
@@ -11,21 +13,19 @@ type RouteParams = {
 }
 
 export async function GET(_request: Request, { params }: RouteParams) {
-  // 認證檢查
   const auth = await getServerAuth()
   if (!auth.success) {
-    return NextResponse.json({ error: '請先登入' }, { status: 401 })
+    return ApiError.unauthorized()
   }
 
   const { workspaceId, channelId } = await params
 
   if (!workspaceId || !channelId) {
-    return NextResponse.json({ error: 'workspaceId and channelId are required' }, { status: 400 })
+    return ApiError.validation('workspaceId and channelId are required')
   }
 
-  // workspace 驗證：只能存取自己的 workspace
   if (auth.data.workspaceId !== workspaceId) {
-    return NextResponse.json({ error: '無權存取此 workspace' }, { status: 403 })
+    return ApiError.forbidden('無權存取此 workspace')
   }
 
   try {
@@ -58,7 +58,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
 
     if (error) {
       logger.error('Failed to load channel members:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      return ApiError.database(error.message)
     }
 
      
@@ -84,41 +84,38 @@ export async function GET(_request: Request, { params }: RouteParams) {
         : null,
     }))
 
-    return NextResponse.json({ members })
+    return successResponse({ members })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to load channel members' }, { status: 500 })
+    return ApiError.internal('Failed to load channel members')
   }
 }
 
 export async function POST(request: Request, { params }: RouteParams) {
-  // 認證檢查
   const auth = await getServerAuth()
   if (!auth.success) {
-    return NextResponse.json({ error: '請先登入' }, { status: 401 })
+    return ApiError.unauthorized()
   }
 
   const { workspaceId, channelId } = await params
 
   if (!workspaceId || !channelId) {
-    return NextResponse.json({ error: 'workspaceId and channelId are required' }, { status: 400 })
+    return ApiError.validation('workspaceId and channelId are required')
   }
 
-  // workspace 驗證
   if (auth.data.workspaceId !== workspaceId) {
-    return NextResponse.json({ error: '無權存取此 workspace' }, { status: 403 })
+    return ApiError.forbidden('無權存取此 workspace')
   }
 
   const body = await request.json().catch(() => ({}))
   const { employeeIds, role = 'member' } = body
 
   if (!employeeIds || !Array.isArray(employeeIds) || employeeIds.length === 0) {
-    return NextResponse.json({ error: 'employeeIds array is required' }, { status: 400 })
+    return ApiError.validation('employeeIds array is required')
   }
 
   try {
     const supabase = getSupabaseAdminClient()
 
-    // 準備批次插入的資料（使用 upsert 防止重複）
     const membersToInsert = employeeIds.map(employeeId => ({
       workspace_id: workspaceId,
       channel_id: channelId,
@@ -127,7 +124,6 @@ export async function POST(request: Request, { params }: RouteParams) {
       status: 'active',
     }))
 
-    // 🔥 先檢查是否已存在，避免 upsert 衝突
     const { data: existingMembers } = await supabase
       .from('channel_members')
       .select('employee_id')
@@ -139,46 +135,42 @@ export async function POST(request: Request, { params }: RouteParams) {
     const newMembers = membersToInsert.filter(m => !existingEmployeeIds.has(m.employee_id))
 
     if (newMembers.length === 0) {
-      // 全部都已存在
-      return NextResponse.json({ members: [], count: 0, message: 'All members already exist' })
+      return successResponse({ members: [], count: 0, message: 'All members already exist' })
     }
 
-    // 只插入新成員
     const { data, error } = await supabase.from('channel_members').insert(newMembers).select()
 
     if (error) {
       logger.error('Failed to add channel members:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      return ApiError.database(error.message)
     }
 
-    return NextResponse.json({ members: data || [], count: data?.length || 0 })
+    return successResponse({ members: data || [], count: data?.length || 0 })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to add channel members' }, { status: 500 })
+    return ApiError.internal('Failed to add channel members')
   }
 }
 
 export async function DELETE(request: Request, { params }: RouteParams) {
-  // 認證檢查
   const auth = await getServerAuth()
   if (!auth.success) {
-    return NextResponse.json({ error: '請先登入' }, { status: 401 })
+    return ApiError.unauthorized()
   }
 
   const { workspaceId, channelId } = await params
 
   if (!workspaceId || !channelId) {
-    return NextResponse.json({ error: 'workspaceId and channelId are required' }, { status: 400 })
+    return ApiError.validation('workspaceId and channelId are required')
   }
 
-  // workspace 驗證
   if (auth.data.workspaceId !== workspaceId) {
-    return NextResponse.json({ error: '無權存取此 workspace' }, { status: 403 })
+    return ApiError.forbidden('無權存取此 workspace')
   }
 
   const { memberId } = await request.json().catch(() => ({ memberId: undefined }))
 
   if (!memberId) {
-    return NextResponse.json({ error: 'memberId is required' }, { status: 400 })
+    return ApiError.missingField('memberId')
   }
 
   try {
@@ -193,11 +185,11 @@ export async function DELETE(request: Request, { params }: RouteParams) {
 
     if (error) {
       logger.error('Failed to remove channel member:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      return ApiError.database(error.message)
     }
 
-    return NextResponse.json({ success: true })
+    return successResponse(null)
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to remove channel member' }, { status: 500 })
+    return ApiError.internal('Failed to remove channel member')
   }
 }

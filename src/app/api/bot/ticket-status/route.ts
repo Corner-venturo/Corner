@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
+import { ApiError, successResponse } from '@/lib/api/response'
 import { format, addDays } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 import { parseLocalDate } from '@/lib/utils/format-date'
@@ -147,12 +148,12 @@ function validateBotSecret(request: NextRequest): NextResponse | null {
   const BOT_API_SECRET = process.env.BOT_API_SECRET
   if (!BOT_API_SECRET) {
     if (process.env.NODE_ENV === 'production') {
-      return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 })
+      return ApiError.internal('Server misconfigured')
     }
   } else {
     const authHeader = request.headers.get('x-bot-secret')
     if (authHeader !== BOT_API_SECRET) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return ApiError.unauthorized('Unauthorized')
     }
   }
   return null
@@ -189,7 +190,7 @@ export async function GET(request: NextRequest) {
 
     if (toursError) {
       logger.error('查詢旅遊團失敗:', toursError)
-      return NextResponse.json({ success: false, message: '查詢失敗' }, { status: 500 })
+      return ApiError.database('查詢失敗')
     }
 
     if (!tours || tours.length === 0) {
@@ -211,7 +212,7 @@ export async function GET(request: NextRequest) {
 
     if (ordersError) {
       logger.error('查詢訂單失敗:', ordersError)
-      return NextResponse.json({ success: false, message: '查詢訂單失敗' }, { status: 500 })
+      return ApiError.database('查詢訂單失敗')
     }
 
     if (!orders || orders.length === 0) {
@@ -231,7 +232,7 @@ export async function GET(request: NextRequest) {
 
     if (membersError) {
       logger.error('查詢成員失敗:', membersError)
-      return NextResponse.json({ success: false, message: '查詢成員失敗' }, { status: 500 })
+      return ApiError.database('查詢成員失敗')
     }
 
     // 組織資料
@@ -337,7 +338,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     logger.error('開票狀態查詢錯誤:', error)
-    return NextResponse.json({ success: false, message: '伺服器錯誤' }, { status: 500 })
+    return ApiError.internal('伺服器錯誤')
   }
 }
 
@@ -653,7 +654,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     logger.error('開票狀態通知錯誤:', error)
-    return NextResponse.json({ success: false, message: '伺服器錯誤' }, { status: 500 })
+    return ApiError.internal('伺服器錯誤')
   }
 }
 
@@ -674,20 +675,20 @@ export async function PATCH(request: NextRequest) {
     } else if (order_id) {
       query = query.eq('order_id', order_id)
     } else {
-      return NextResponse.json({ success: false, message: '需要指定 member_ids 或 order_id' }, { status: 400 })
+      return ApiError.validation('需要指定 member_ids 或 order_id')
     }
 
     const { error } = await query
 
     if (error) {
       logger.error('更新機票自理狀態失敗:', error)
-      return NextResponse.json({ success: false, message: '更新失敗' }, { status: 500 })
+      return ApiError.database('更新失敗')
     }
 
-    return NextResponse.json({ success: true, message: '已更新' })
+    return successResponse({ message: '已更新' })
 
   } catch (error) {
     logger.error('更新機票自理狀態錯誤:', error)
-    return NextResponse.json({ success: false, message: '伺服器錯誤' }, { status: 500 })
+    return ApiError.internal('伺服器錯誤')
   }
 }

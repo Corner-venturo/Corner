@@ -8,9 +8,10 @@
  * - 寫入 ai_memories 讓 Logan 學習
  */
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
+import { ApiError, successResponse } from '@/lib/api/response'
 import { subDays } from 'date-fns'
 
 const CRON_SECRET = process.env.CRON_SECRET
@@ -29,7 +30,7 @@ export async function GET(_request: NextRequest) {
   // 驗證 cron secret
   const authHeader = _request.headers.get('authorization')
   if (CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return ApiError.unauthorized('Unauthorized')
   }
 
   try {
@@ -45,10 +46,7 @@ export async function GET(_request: NextRequest) {
       .limit(1)
 
     if (!workspaces?.length) {
-      return NextResponse.json({
-        success: false,
-        message: '找不到 workspace',
-      }, { status: 500 })
+      return ApiError.internal('找不到 workspace')
     }
 
     const workspaceId = workspaces[0].id
@@ -164,11 +162,7 @@ export async function GET(_request: NextRequest) {
 
       if (insertError) {
         logger.error('寫入 ai_memories 失敗:', insertError)
-        return NextResponse.json({
-          success: false,
-          message: '寫入記憶失敗',
-          error: insertError.message,
-        }, { status: 500 })
+        return ApiError.database('寫入記憶失敗')
       }
     }
 
@@ -188,10 +182,9 @@ export async function GET(_request: NextRequest) {
 
     logger.info('Logan 知識同步完成', result)
 
-    return NextResponse.json({
-      success: true,
+    return successResponse({
       message: `已同步 ${result.total} 筆新知識給 Logan`,
-      data: result,
+      ...result,
     })
 
   } catch (error) {
@@ -209,10 +202,7 @@ export async function GET(_request: NextRequest) {
       // 忽略記錄失敗
     }
 
-    return NextResponse.json({
-      success: false,
-      message: 'Internal error',
-    }, { status: 500 })
+    return ApiError.internal('Internal error')
   }
 }
 

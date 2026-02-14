@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
+import { ApiError, successResponse } from '@/lib/api/response'
 
 const CRON_SECRET = process.env.CRON_SECRET
 
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
   // 驗證 cron secret
   const authHeader = request.headers.get('authorization')
   if (CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return ApiError.unauthorized('Unauthorized')
   }
 
   try {
@@ -50,10 +51,9 @@ export async function GET(request: NextRequest) {
 
     logger.info('開票狀態檢查完成', result.data)
 
-    return NextResponse.json({
-      success: true,
+    return successResponse({
       message: 'Ticket status check completed',
-      data: result.data,
+      ...result.data,
     })
 
   } catch (error) {
@@ -71,6 +71,6 @@ export async function GET(request: NextRequest) {
       // 忽略記錄失敗
     }
 
-    return NextResponse.json({ success: false, message: 'Internal error' }, { status: 500 })
+    return ApiError.internal('Internal error')
   }
 }

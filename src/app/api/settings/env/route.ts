@@ -1,7 +1,6 @@
-import { NextResponse } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { getServerAuth } from '@/lib/auth/server-auth'
-import { errorResponse } from '@/lib/api/response'
+import { ApiError, successResponse } from '@/lib/api/response'
 
 /**
  * API 設定資訊端點
@@ -57,7 +56,7 @@ export async function GET() {
   // 🔒 安全檢查：需要登入
   const auth = await getServerAuth()
   if (!auth.success) {
-    return errorResponse('請先登入', 401)
+    return ApiError.unauthorized('請先登入')
   }
 
   // [Planned] 管理員權限檢查 - 待 RBAC 模組完成後啟用
@@ -182,5 +181,5 @@ export async function GET() {
     },
   ]
 
-  return NextResponse.json({ configs })
+  return successResponse({ configs })
 }

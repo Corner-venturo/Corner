@@ -3,9 +3,10 @@
  * 用於發送系統通知到指定用戶
  */
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
+import { ApiError, successResponse } from '@/lib/api/response'
 
 // 系統機器人 ID
 const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
@@ -22,12 +23,12 @@ export async function POST(request: NextRequest) {
   const BOT_API_SECRET = process.env.BOT_API_SECRET
   if (!BOT_API_SECRET) {
     if (process.env.NODE_ENV === 'production') {
-      return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 })
+      return ApiError.internal('Server misconfigured')
     }
   } else {
     const authHeader = request.headers.get('x-bot-secret')
     if (authHeader !== BOT_API_SECRET) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return ApiError.unauthorized('Unauthorized')
     }
   }
 
@@ -36,10 +37,7 @@ export async function POST(request: NextRequest) {
     const { recipient_id, message, type = 'info', metadata } = body
 
     if (!recipient_id || !message) {
-      return NextResponse.json(
-        { success: false, message: '缺少必要參數' },
-        { status: 400 }
-      )
+      return ApiError.validation('缺少必要參數')
     }
 
     const supabase = getSupabaseAdminClient()
@@ -65,10 +63,7 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (!recipientData?.workspace_id) {
-        return NextResponse.json(
-          { success: false, message: '找不到接收者' },
-          { status: 404 }
-        )
+        return ApiError.notFound('接收者')
       }
 
       // 建立新的 DM 頻道
@@ -87,10 +82,7 @@ export async function POST(request: NextRequest) {
 
       if (createError || !newChannel) {
         logger.error('建立機器人 DM 頻道失敗:', createError)
-        return NextResponse.json(
-          { success: false, message: '建立通知頻道失敗' },
-          { status: 500 }
-        )
+        return ApiError.database('建立通知頻道失敗')
       }
 
       // 加入頻道成員
@@ -122,10 +114,7 @@ export async function POST(request: NextRequest) {
 
     if (messageError) {
       logger.error('發送機器人訊息失敗:', messageError)
-      return NextResponse.json(
-        { success: false, message: '發送訊息失敗' },
-        { status: 500 }
-      )
+      return ApiError.database('發送訊息失敗')
     }
 
     logger.info('機器人通知已發送', {
@@ -135,19 +124,13 @@ export async function POST(request: NextRequest) {
       type,
     })
 
-    return NextResponse.json({
-      success: true,
+    return successResponse({
       message: '通知已發送',
-      data: {
-        channel_id: channelId,
-        message_id: messageData.id,
-      },
+      channel_id: channelId,
+      message_id: messageData.id,
     })
   } catch (error) {
     logger.error('機器人通知 API 錯誤:', error)
-    return NextResponse.json(
-      { success: false, message: '伺服器錯誤' },
-      { status: 500 }
-    )
+    return ApiError.internal('伺服器錯誤')
   }
 }
