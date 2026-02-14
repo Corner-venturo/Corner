@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { TourItinerarySelector } from './TourItinerarySelector'
 import { useDesigns } from '../hooks/useDesigns'
 import { DESIGN_TYPE_CONFIG, DESIGN_CATEGORY_CONFIG, type DesignType, type DesignCategory } from '../types'
+import { LABELS } from '../constants/labels'
 
 // 按分類分組設計類型
 const DESIGN_TYPES_BY_CATEGORY: Record<DesignCategory, DesignType[]> = {
@@ -79,7 +80,7 @@ export function CreateDesignDialog({
         tour_name: tourName,
         itinerary_id: itineraryId || undefined,
         itinerary_name: itineraryName || undefined,
-        name: `${tourCode || tourName || '新設計'} - ${DESIGN_TYPE_CONFIG[designType].label}`,
+        name: `${tourCode || tourName || LABELS.newDesign} - ${DESIGN_TYPE_CONFIG[designType].label}`,
       })
 
       toast.success('設計已建立')
@@ -97,14 +98,14 @@ export function CreateDesignDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent level={1} className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>新增設計</DialogTitle>
+          <DialogTitle>{LABELS.addDesign}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
           {/* 設計類型選擇 */}
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-3 block">
-              設計類型
+              {LABELS.designType}
             </label>
             <div className="space-y-4">
               {(Object.keys(DESIGN_TYPES_BY_CATEGORY) as DesignCategory[]).map((category) => (
@@ -147,7 +148,7 @@ export function CreateDesignDialog({
           {/* 團/行程選擇 */}
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-3 block">
-              關聯資料
+              {LABELS.relatedData}
             </label>
             <TourItinerarySelector
               selectedTourId={tourId}
@@ -169,7 +170,7 @@ export function CreateDesignDialog({
         <div className="flex justify-end gap-3 pt-4 border-t border-border">
           <Button variant="outline" onClick={handleClose} className="gap-2">
             <X size={16} />
-            取消
+            {LABELS.cancel}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -177,7 +178,7 @@ export function CreateDesignDialog({
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
             <Plus size={16} />
-            {isSubmitting ? '建立中...' : '建立設計'}
+            {isSubmitting ? LABELS.creating : LABELS.createDesign}
           </Button>
         </div>
       </DialogContent>

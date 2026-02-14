@@ -10,6 +10,7 @@ import { useDesigns } from '../hooks/useDesigns'
 import { type Design } from '../types'
 import { toast } from 'sonner'
 import { confirm } from '@/lib/ui/alert-dialog'
+import { LABELS } from '../constants/labels'
 import { logger } from '@/lib/utils/logger'
 
 /**
@@ -41,7 +42,7 @@ export function DesignPage() {
   // 處理刪除
   const handleDelete = useCallback(async (design: Design) => {
     const confirmed = await confirm(
-      `確定要刪除「${design.name}」嗎？此操作無法復原。`,
+      LABELS.deleteConfirm(design.name),
       'warning'
     )
     if (!confirmed) return
@@ -58,11 +59,11 @@ export function DesignPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="設計"
+        title={LABELS.design}
         icon={Palette}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '設計', href: '/design' },
+          { label: LABELS.home, href: '/' },
+          { label: LABELS.design, href: '/design' },
         ]}
         actions={
           <Button
@@ -70,7 +71,7 @@ export function DesignPage() {
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
             <Plus size={16} />
-            新增設計
+            {LABELS.addDesign}
           </Button>
         }
       />

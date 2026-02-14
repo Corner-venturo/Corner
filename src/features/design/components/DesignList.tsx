@@ -13,6 +13,7 @@ import {
 import { useDesigns } from '../hooks/useDesigns'
 import { DESIGN_TYPE_CONFIG, type Design, type DesignType } from '../types'
 import { cn } from '@/lib/utils'
+import { LABELS } from '../constants/labels'
 
 interface DesignListProps {
   onEdit?: (design: Design) => void
@@ -28,17 +29,17 @@ export function DesignList({ onEdit, onDelete }: DesignListProps) {
   const columns: TableColumn<Design>[] = [
     {
       key: 'tour',
-      label: '團名',
+      label: LABELS.tourName,
       width: '250',
       render: (_, row) => (
         <span className="text-sm text-morandi-primary">
-          {row.tour_name || '(無團名)'}
+          {row.tour_name || `(${LABELS.noTourName})`}
         </span>
       ),
     },
     {
       key: 'design_type',
-      label: '設計類型',
+      label: LABELS.designType,
       width: '120',
       render: (_, row) => {
         const config = DESIGN_TYPE_CONFIG[row.design_type as DesignType]
@@ -51,7 +52,7 @@ export function DesignList({ onEdit, onDelete }: DesignListProps) {
     },
     {
       key: 'status',
-      label: '狀態',
+      label: LABELS.status,
       width: '80',
       render: (_, row) => (
         <span
@@ -62,13 +63,13 @@ export function DesignList({ onEdit, onDelete }: DesignListProps) {
               : 'bg-morandi-muted/10 text-morandi-secondary'
           )}
         >
-          {row.status === 'completed' ? '已完成' : '草稿'}
+          {row.status === 'completed' ? LABELS.completed : LABELS.draft}
         </span>
       ),
     },
     {
       key: 'created_at',
-      label: '建立日期',
+      label: LABELS.createdDate,
       width: '120',
       render: (_, row) => <DateCell date={row.created_at} />,
     },
@@ -91,14 +92,14 @@ export function DesignList({ onEdit, onDelete }: DesignListProps) {
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => onEdit?.(row)}>
               <Edit2 size={14} className="mr-2" />
-              編輯
+              {LABELS.edit}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => onDelete?.(row)}
               className="text-morandi-red"
             >
               <Trash2 size={14} className="mr-2" />
-              刪除
+              {LABELS.delete}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -109,7 +110,7 @@ export function DesignList({ onEdit, onDelete }: DesignListProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64 text-morandi-secondary">
-        載入中...
+        {LABELS.loading}
       </div>
     )
   }
@@ -117,7 +118,7 @@ export function DesignList({ onEdit, onDelete }: DesignListProps) {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-morandi-red">
-        <p>載入失敗</p>
+        <p>{LABELS.loadFailed}</p>
         <p className="text-sm mt-2">{error instanceof Error ? error.message : String(error)}</p>
       </div>
     )
@@ -127,8 +128,8 @@ export function DesignList({ onEdit, onDelete }: DesignListProps) {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
         <FileText size={48} className="mb-4 opacity-30" />
-        <p>尚無設計</p>
-        <p className="text-sm">點擊右上角「新增設計」開始</p>
+        <p>{LABELS.noDesigns}</p>
+        <p className="text-sm">{LABELS.noDesignsHint1}「{LABELS.noDesignsHint2}」{LABELS.noDesignsHint3}</p>
       </div>
     )
   }

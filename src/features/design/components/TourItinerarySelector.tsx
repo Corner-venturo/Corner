@@ -11,6 +11,7 @@ import {
 import { supabase } from '@/lib/supabase/client'
 import { useWorkspaceId } from '@/lib/workspace-context'
 import type { Tour, Itinerary } from '@/stores/types'
+import { LABELS } from '../constants/labels'
 
 interface TourItinerarySelectorProps {
   selectedTourId: string
@@ -92,7 +93,7 @@ export function TourItinerarySelector({
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
         <label className="text-sm font-medium text-morandi-primary">
-          選擇旅遊團
+          {LABELS.selectTour}
         </label>
         <Select
           value={selectedTourId}
@@ -100,12 +101,12 @@ export function TourItinerarySelector({
           disabled={loadingTours}
         >
           <SelectTrigger className="mt-1">
-            <SelectValue placeholder={loadingTours ? '載入中...' : '請選擇旅遊團'} />
+            <SelectValue placeholder={loadingTours ? LABELS.loading : LABELS.selectTour} />
           </SelectTrigger>
           <SelectContent>
             {tours.map((tour) => (
               <SelectItem key={tour.id} value={tour.id}>
-                {tour.code ? `${tour.code} - ${tour.name || ''}` : tour.name || '(無名稱)'}
+                {tour.code ? `${tour.code} - ${tour.name || ''}` : tour.name || `(${LABELS.noName})`}
               </SelectItem>
             ))}
           </SelectContent>
@@ -113,7 +114,7 @@ export function TourItinerarySelector({
       </div>
       <div>
         <label className="text-sm font-medium text-morandi-primary">
-          選擇行程（可選）
+          {LABELS.selectItinerary}
         </label>
         <Select
           value={selectedItineraryId}
@@ -124,19 +125,19 @@ export function TourItinerarySelector({
             <SelectValue
               placeholder={
                 !selectedTourId
-                  ? '請先選擇旅遊團'
+                  ? LABELS.selectTourFirst
                   : loadingItineraries
-                    ? '載入中...'
+                    ? LABELS.loading
                     : itineraries.length === 0
-                      ? '此團沒有行程'
-                      : '選擇行程...'
+                      ? LABELS.noItinerary
+                      : `${LABELS.selectItinerary}...`
               }
             />
           </SelectTrigger>
           <SelectContent>
             {itineraries.map((itinerary) => (
               <SelectItem key={itinerary.id} value={itinerary.id}>
-                {itinerary.title || '(無名稱)'}
+                {itinerary.title || `(${LABELS.noName})`}
               </SelectItem>
             ))}
           </SelectContent>
