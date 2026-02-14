@@ -15,17 +15,8 @@ import {
   Snowflake,
 } from 'lucide-react'
 
-export interface ImageAdjustments {
-  exposure: number
-  contrast: number
-  highlights: number
-  shadows: number
-  saturation: number
-  temperature: number
-  tint: number
-  clarity: number
-  vignette: number
-}
+import type { ImageAdjustments } from '@/features/designer/components/types'
+export type { ImageAdjustments }
 
 export interface ImageEditorSettings {
   /** 縮放倍率 */

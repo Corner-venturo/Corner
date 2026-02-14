@@ -52,7 +52,8 @@ export interface ChangeTrackItem {
 }
 
 // 分類 key
-export type CategoryKey = 'transport' | 'meal' | 'accommodation' | 'activity' | 'other'
+import type { CategoryKey } from '../requirements-list.types'
+export type { CategoryKey }
 
 // 分類配置
 export const CATEGORIES: { key: CategoryKey; label: string; quoteCategoryId: string }[] = [

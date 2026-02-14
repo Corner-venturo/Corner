@@ -7,12 +7,8 @@ import { useState, useCallback } from 'react'
 import type { Itinerary, ItineraryVersionRecord } from '@/stores/types'
 
 // 簡化版活動類型（只包含時間軸需要的欄位）
-export interface SimpleActivity {
-  id: string
-  title: string
-  startTime?: string  // 格式 "0900"
-  endTime?: string    // 格式 "1030"
-}
+import type { SimpleActivity } from '../components/package-itinerary/types'
+export type { SimpleActivity }
 
 // 每日行程資料結構
 export interface DaySchedule {

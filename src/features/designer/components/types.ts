@@ -103,11 +103,8 @@ export interface ImageAdjustments {
 /**
  * 圖片位置設定
  */
-export interface ImagePositionSettings {
-  x: number      // 水平位置 0-100 (百分比，50 = 置中)
-  y: number      // 垂直位置 0-100 (百分比，50 = 置中)
-  scale: number  // 縮放比例 1-3 (1 = 原始大小)
-}
+import type { ImagePositionSettings } from '@/components/ui/image-position-editor'
+export type { ImagePositionSettings }
 
 /**
  * 預設圖片調整值

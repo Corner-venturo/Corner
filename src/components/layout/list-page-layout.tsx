@@ -7,13 +7,8 @@ import { useDataFiltering } from '@/hooks'
 import type { LucideIcon } from 'lucide-react'
 import { COMP_LAYOUT_LABELS } from './constants/labels'
 
-/**
- * 麵包屑項目
- */
-export interface BreadcrumbItem {
-  label: string
-  href: string
-}
+import type { BreadcrumbItem } from '@/hooks/useBreadcrumb'
+export type { BreadcrumbItem }
 
 /**
  * Tab 項目

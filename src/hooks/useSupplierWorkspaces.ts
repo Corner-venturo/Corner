@@ -10,7 +10,8 @@ import useSWR from 'swr'
 import { supabase } from '@/lib/supabase/client'
 import type { Database } from '@/lib/supabase/types'
 
-export type WorkspaceType = 'travel_agency' | 'vehicle_supplier' | 'guide_supplier'
+import type { WorkspaceType } from '@/features/workspaces/types'
+export type { WorkspaceType }
 
 export type SupplierWorkspace = Database['public']['Tables']['workspaces']['Row'] & {
   type: WorkspaceType

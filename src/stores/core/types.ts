@@ -8,9 +8,10 @@ import type { Database } from '@/lib/supabase/types'
 
 /**
  * Supabase 表格名稱類型（用於 .from() 方法）
- * 這是一個輔助類型，確保表格名稱在編譯時是有效的
+ * 從 typed-client 統一匯出
  */
-export type SupabaseTableName = keyof Database['public']['Tables']
+export type { SupabaseTableName } from '@/lib/supabase/typed-client'
+import type { SupabaseTableName } from '@/lib/supabase/typed-client'
 
 /**
  * 建立資料的輸入型別
