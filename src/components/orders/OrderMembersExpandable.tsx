@@ -70,6 +70,7 @@ const TourPrintDialog = dynamic(() => import('@/components/tours/TourPrintDialog
 import type { OrderMember, OrderMembersExpandableProps, CustomCostField } from './order-member.types'
 import type { EditFormData } from './components/MemberEditDialog'
 import { COMP_ORDERS_LABELS } from './constants/labels'
+import { computeRowSpans } from './utils'
 
 // 可切換顯示的欄位定義
 export interface ColumnVisibility {
@@ -526,91 +527,13 @@ export function OrderMembersExpandable({
   }, [membersData.members, roomVehicle.showRoomColumn, roomVehicle.roomSortKeys])
 
   // 計算分房/分車欄位的合併行數（rowSpan）
-  const rowSpans = useMemo(() => {
-    const roomSpans: Record<string, number> = {}
-    const vehicleSpans: Record<string, number> = {}
-    const roomSpansByHotel: Record<string, Record<string, number>> = {}
-    
-    // 計算每個飯店的分房合併
-    roomVehicle.hotelColumns.forEach(hotel => {
-      const hotelAssignments = roomVehicle.roomAssignmentsByHotel[hotel.id] || {}
-      roomSpansByHotel[hotel.id] = {}
-      
-      let i = 0
-      while (i < sortedMembers.length) {
-        const currentRoom = hotelAssignments[sortedMembers[i].id]
-        if (!currentRoom) {
-          roomSpansByHotel[hotel.id][sortedMembers[i].id] = 1
-          i++
-          continue
-        }
-        
-        // 計算連續相同房間的成員數
-        let count = 1
-        while (i + count < sortedMembers.length && 
-               hotelAssignments[sortedMembers[i + count].id] === currentRoom) {
-          count++
-        }
-        
-        // 第一個成員設定 rowSpan，其他設為 0
-        roomSpansByHotel[hotel.id][sortedMembers[i].id] = count
-        for (let j = 1; j < count; j++) {
-          roomSpansByHotel[hotel.id][sortedMembers[i + j].id] = 0
-        }
-        i += count
-      }
-    })
-    
-    // 舊的單欄位模式合併（fallback）
-    let i = 0
-    while (i < sortedMembers.length) {
-      const currentRoom = roomVehicle.roomAssignments[sortedMembers[i].id]
-      if (!currentRoom) {
-        roomSpans[sortedMembers[i].id] = 1
-        i++
-        continue
-      }
-      
-      // 計算連續相同房間的成員數
-      let count = 1
-      while (i + count < sortedMembers.length && 
-             roomVehicle.roomAssignments[sortedMembers[i + count].id] === currentRoom) {
-        count++
-      }
-      
-      // 第一個成員設定 rowSpan，其他設為 0
-      roomSpans[sortedMembers[i].id] = count
-      for (let j = 1; j < count; j++) {
-        roomSpans[sortedMembers[i + j].id] = 0
-      }
-      i += count
-    }
-    
-    // 計算分車合併（同樣邏輯）
-    i = 0
-    while (i < sortedMembers.length) {
-      const currentVehicle = roomVehicle.vehicleAssignments[sortedMembers[i].id]
-      if (!currentVehicle) {
-        vehicleSpans[sortedMembers[i].id] = 1
-        i++
-        continue
-      }
-      
-      let count = 1
-      while (i + count < sortedMembers.length && 
-             roomVehicle.vehicleAssignments[sortedMembers[i + count].id] === currentVehicle) {
-        count++
-      }
-      
-      vehicleSpans[sortedMembers[i].id] = count
-      for (let j = 1; j < count; j++) {
-        vehicleSpans[sortedMembers[i + j].id] = 0
-      }
-      i += count
-    }
-    
-    return { roomSpans, vehicleSpans, roomSpansByHotel }
-  }, [sortedMembers, roomVehicle.roomAssignments, roomVehicle.vehicleAssignments, roomVehicle.hotelColumns, roomVehicle.roomAssignmentsByHotel])
+  const rowSpans = useMemo(() => computeRowSpans({
+    sortedMembers,
+    roomAssignments: roomVehicle.roomAssignments,
+    vehicleAssignments: roomVehicle.vehicleAssignments,
+    hotelColumns: roomVehicle.hotelColumns,
+    roomAssignmentsByHotel: roomVehicle.roomAssignmentsByHotel,
+  }), [sortedMembers, roomVehicle.roomAssignments, roomVehicle.vehicleAssignments, roomVehicle.hotelColumns, roomVehicle.roomAssignmentsByHotel])
 
   return (
     <div className={`flex flex-col h-full overflow-hidden ${embedded ? '' : 'border border-border rounded-xl bg-card'}`}>
