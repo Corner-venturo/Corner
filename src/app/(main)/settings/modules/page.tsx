@@ -35,6 +35,7 @@ import { confirm } from '@/lib/ui/alert-dialog'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import type { Workspace } from '@/types/models.types'
+import { MODULES_PAGE_LABELS } from '../constants/labels'
 
 const MODULE_INFO = {
   accounting: {
@@ -252,7 +253,7 @@ export default function ModulesManagementPage() {
                   <CardContent className="pt-4 space-y-4">
                     {/* 狀態 */}
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-[#8C8C8C]">狀態</span>
+                      <span className="text-sm font-medium text-[#8C8C8C]">{MODULES_PAGE_LABELS.STATUS}</span>
                       {status.enabled && !status.expired ? (
                         <Badge className="bg-status-success-bg text-status-success border-status-success/30">
                           <CheckCircle2 className="h-3 w-3 mr-1" />
@@ -274,7 +275,7 @@ export default function ModulesManagementPage() {
                     {/* 到期日 */}
                     {status.enabled && status.expiresAt && (
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-[#8C8C8C]">到期日</span>
+                        <span className="text-[#8C8C8C]">{MODULES_PAGE_LABELS.EXPIRY_DATE}</span>
                         <DateCell
                           date={status.expiresAt}
                           showIcon={true}
@@ -288,7 +289,7 @@ export default function ModulesManagementPage() {
 
                     {/* 功能列表 */}
                     <div className="space-y-2">
-                      <div className="text-sm font-medium text-[#8C8C8C]">功能特性</div>
+                      <div className="text-sm font-medium text-[#8C8C8C]">{MODULES_PAGE_LABELS.FEATURES}</div>
                       <ul className="space-y-1.5">
                         {info.features.map((feature, index) => (
                           <li key={index} className="flex items-start gap-2 text-sm text-[#8C8C8C]">
@@ -332,12 +333,12 @@ export default function ModulesManagementPage() {
               <div className="flex items-start gap-3">
                 <AlertCircle className="h-5 w-5 text-status-info mt-0.5" />
                 <div className="flex-1">
-                  <div className="font-semibold text-morandi-primary mb-1">模組說明</div>
+                  <div className="font-semibold text-morandi-primary mb-1">{MODULES_PAGE_LABELS.MODULE_DESC_TITLE}</div>
                   <ul className="text-sm text-morandi-secondary space-y-1 list-disc list-inside">
-                    <li>模組需要啟用後才能使用相關功能</li>
-                    <li>可設定到期日，過期後會自動停用</li>
-                    <li>停用模組不會刪除已建立的資料，重新啟用後可繼續使用</li>
-                    <li>每個工作空間可獨立管理模組授權</li>
+                    <li>{MODULES_PAGE_LABELS.DESC_1}</li>
+                    <li>{MODULES_PAGE_LABELS.DESC_2}</li>
+                    <li>{MODULES_PAGE_LABELS.DESC_3}</li>
+                    <li>{MODULES_PAGE_LABELS.DESC_4}</li>
                   </ul>
                 </div>
               </div>
@@ -360,19 +361,19 @@ export default function ModulesManagementPage() {
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="expires">授權到期日（選填）</Label>
+              <Label htmlFor="expires">{MODULES_PAGE_LABELS.EXPIRY_LABEL}</Label>
               <DatePicker
                 value={expiresDate}
                 onChange={date => setExpiresDate(date)}
                 placeholder="選擇日期"
                 minDate={new Date()}
               />
-              <p className="text-sm text-[#8C8C8C]">留空表示永久授權</p>
+              <p className="text-sm text-[#8C8C8C]">{MODULES_PAGE_LABELS.EXPIRY_HINT}</p>
             </div>
 
             {selectedModule && (
               <div className="bg-[#F9F8F6] border border-[#E8E4E0] rounded-lg p-4">
-                <div className="text-sm font-medium text-[#8C8C8C] mb-2">包含功能</div>
+                <div className="text-sm font-medium text-[#8C8C8C] mb-2">{MODULES_PAGE_LABELS.INCLUDED_FEATURES}</div>
                 <ul className="space-y-1.5">
                   {MODULE_INFO[selectedModule].features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-2 text-sm text-[#8C8C8C]">

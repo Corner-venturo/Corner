@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Key, Eye, EyeOff, Copy, Check, ExternalLink, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { logger } from '@/lib/utils/logger'
+import { API_SETTINGS_LABELS } from '../constants/labels'
 
 interface ApiConfig {
   name: string
@@ -90,7 +91,7 @@ export function ApiSettings() {
           <Key className="h-5 w-5 text-morandi-gold" />
           <h2 className="text-lg font-semibold text-morandi-primary">API 設定</h2>
         </div>
-        <div className="text-sm text-morandi-secondary">載入中...</div>
+        <div className="text-sm text-morandi-secondary">{API_SETTINGS_LABELS.LOADING}</div>
       </section>
     )
   }
@@ -104,7 +105,7 @@ export function ApiSettings() {
         </div>
         <div className="flex items-center gap-2 text-xs text-status-warning bg-status-warning-bg px-3 py-1.5 rounded-lg">
           <AlertTriangle size={14} />
-          <span>請勿將 API Key 分享給非授權人員</span>
+          <span>{API_SETTINGS_LABELS.API_KEY_WARNING}</span>
         </div>
       </div>
 
@@ -224,7 +225,7 @@ export function ApiSettings() {
 
       {/* .env.local 說明 */}
       <div className="mt-6 p-4 bg-status-info-bg rounded-lg border border-status-info/30">
-        <h4 className="text-sm font-medium text-morandi-primary mb-2">設定方式</h4>
+        <h4 className="text-sm font-medium text-morandi-primary mb-2">{API_SETTINGS_LABELS.SETUP_GUIDE}</h4>
         <p className="text-xs text-morandi-secondary mb-2">
           在專案根目錄建立或編輯 <code className="bg-morandi-container px-1 rounded">.env.local</code> 檔案：
         </p>

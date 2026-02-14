@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { logger } from '@/lib/utils/logger'
 import type { User } from '@/stores/types'
+import { PREFERRED_FEATURES_LABELS } from '../constants/labels'
 
 // 定義所有可選功能
 interface FeatureOption {
@@ -231,18 +232,18 @@ export function PreferredFeaturesSettings() {
             {isSaving && (
               <div className="flex items-center gap-2 px-3 py-1.5 bg-status-info-bg border border-status-info/30 rounded-lg text-status-info">
                 <Loader2 size={14} className="animate-spin" />
-                <span className="text-sm font-medium">儲存中...</span>
+                <span className="text-sm font-medium">{PREFERRED_FEATURES_LABELS.SAVING}</span>
               </div>
             )}
             {showSavedMessage && !isSaving && (
               <div className="flex items-center gap-2 px-3 py-1.5 bg-status-success-bg border border-status-success/30 rounded-lg text-status-success">
                 <Check size={14} />
-                <span className="text-sm font-medium">已儲存</span>
+                <span className="text-sm font-medium">{PREFERRED_FEATURES_LABELS.SAVED}</span>
               </div>
             )}
             {hasUnsavedChanges && !isSaving && !showSavedMessage && (
               <div className="flex items-center gap-2 px-3 py-1.5 bg-status-warning-bg border border-status-warning/30 rounded-lg text-status-warning">
-                <span className="text-sm font-medium">變更待儲存...</span>
+                <span className="text-sm font-medium">{PREFERRED_FEATURES_LABELS.PENDING_SAVE}</span>
               </div>
             )}
           </div>
@@ -254,12 +255,12 @@ export function PreferredFeaturesSettings() {
         <div className="bg-status-info-bg border border-status-info/30 rounded-lg p-4 flex items-start gap-3">
           <Info size={18} className="text-status-info mt-0.5 flex-shrink-0" />
           <div className="text-sm text-morandi-primary">
-            <p className="font-medium mb-1">說明</p>
+            <p className="font-medium mb-1">{PREFERRED_FEATURES_LABELS.DESCRIPTION_TITLE}</p>
             <ul className="list-disc list-inside space-y-1 text-morandi-secondary">
-              <li>選擇的功能會顯示在側邊欄，未選擇的會被隱藏</li>
-              <li>此設定不影響你的實際權限，只是個人化介面顯示</li>
-              <li>你只能選擇有權限的功能</li>
-              <li>變更會在停止操作後自動儲存</li>
+              <li>{PREFERRED_FEATURES_LABELS.DESC_1}</li>
+              <li>{PREFERRED_FEATURES_LABELS.DESC_2}</li>
+              <li>{PREFERRED_FEATURES_LABELS.DESC_3}</li>
+              <li>{PREFERRED_FEATURES_LABELS.DESC_4}</li>
             </ul>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { Building2, Eye, Check } from 'lucide-react'
 import { useWorkspaceChannels } from '@/stores/workspace'
 import { useAuthStore } from '@/stores/auth-store'
 import { useState, useEffect } from 'react'
+import { WORKSPACE_SWITCHER_LABELS } from '../constants/labels'
 
 export function WorkspaceSwitcher() {
   const { workspaces, loadWorkspaces } = useWorkspaceChannels()
@@ -48,7 +49,7 @@ export function WorkspaceSwitcher() {
     <Card className="rounded-xl shadow-lg border border-border p-8">
       <div className="flex items-center gap-3 mb-6">
         <Building2 className="h-6 w-6 text-morandi-blue" />
-        <h2 className="text-xl font-semibold">工作空間切換</h2>
+        <h2 className="text-xl font-semibold">{WORKSPACE_SWITCHER_LABELS.TITLE}</h2>
       </div>
 
       <p className="text-sm text-morandi-secondary mb-6">
@@ -64,7 +65,7 @@ export function WorkspaceSwitcher() {
         >
           <div className="flex items-center gap-2">
             <Eye className="h-4 w-4" />
-            <span>查看全部辦公室</span>
+            <span>{WORKSPACE_SWITCHER_LABELS.VIEW_ALL}</span>
           </div>
           {currentWorkspace === null && <Check className="h-4 w-4" />}
         </Button>

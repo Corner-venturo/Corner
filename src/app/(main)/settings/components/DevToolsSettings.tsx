@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Terminal, Copy, Check, ChevronDown, ChevronUp } from 'lucide-react'
+import { DEVTOOLS_LABELS } from '../constants/labels'
 
 // 環境設定指令 - 給 Claude Code 用
 // ⚠️ 注意：真實的 API Key 請存放在 .env.local，不要硬編碼在程式碼中
@@ -65,7 +66,7 @@ export function DevToolsSettings() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <Terminal className="h-6 w-6 text-morandi-gold" />
-          <h2 className="text-xl font-semibold">開發者工具</h2>
+          <h2 className="text-xl font-semibold">{DEVTOOLS_LABELS.TITLE}</h2>
         </div>
         <Button
           variant="ghost"
@@ -90,7 +91,7 @@ export function DevToolsSettings() {
         <div className="p-4 border border-border rounded-lg bg-card">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <h3 className="font-medium mb-1">一鍵設定 .env.local</h3>
+              <h3 className="font-medium mb-1">{DEVTOOLS_LABELS.ONE_CLICK_ENV}</h3>
               <p className="text-sm text-morandi-secondary">
                 複製後貼給 Claude Code，自動建立完整環境設定
               </p>
@@ -163,11 +164,11 @@ export function DevToolsSettings() {
                 使用方式：
               </h4>
               <ol className="text-sm text-morandi-secondary dark:text-morandi-muted space-y-1 list-decimal list-inside">
-                <li>點擊「複製指令」按鈕</li>
-                <li>開啟 Claude Code 終端機</li>
-                <li>貼上複製的內容</li>
+                <li>{DEVTOOLS_LABELS.STEP_COPY}</li>
+                <li>{DEVTOOLS_LABELS.STEP_OPEN_TERMINAL}</li>
+                <li>{DEVTOOLS_LABELS.STEP_PASTE}</li>
                 <li>Claude Code 會自動建立 .env.local 檔案</li>
-                <li>重啟開發伺服器：<code className="bg-morandi-container dark:bg-morandi-container/30 px-1 rounded">npm run dev</code></li>
+                <li>{DEVTOOLS_LABELS.STEP_RESTART}<code className="bg-morandi-container dark:bg-morandi-container/30 px-1 rounded">npm run dev</code></li>
               </ol>
             </div>
           </div>

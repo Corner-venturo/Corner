@@ -165,3 +165,86 @@ export const LABELS = {
   THEME_TIP_TITLE: '提示：',
   THEME_TIP_DESC: '主題設定會立即生效並自動儲存。不同主題適合不同的使用場景和個人喜好。',
 }
+export const API_SETTINGS_LABELS = {
+  LOADING: '載入中...',
+  API_KEY_WARNING: '請勿將 API Key 分享給非授權人員',
+  SETUP_GUIDE: '設定方式',
+}
+
+export const DEVTOOLS_LABELS = {
+  TITLE: '開發者工具',
+  ONE_CLICK_ENV: '一鍵設定 .env.local',
+  STEP_COPY: '點擊「複製指令」按鈕',
+  STEP_OPEN_TERMINAL: '開啟 Claude Code 終端機',
+  STEP_PASTE: '貼上複製的內容',
+  STEP_RESTART: '重啟開發伺服器：',
+}
+
+export const MODULE_MANAGEMENT_LABELS = {
+  TITLE: '系統模組管理',
+  AUTH_MANAGEMENT: '模組授權管理',
+}
+
+export const NEWEBPAY_LABELS = {
+  TITLE: '藍新金流設定',
+  LOADING: '載入中...',
+  SUBTITLE: '旅行業代收轉付電子收據',
+  MERCHANT_ID: '商店代號 (MerchantID)',
+  MERCHANT_ID_HINT: '在藍新後台「商店管理」可查看',
+  SETUP_GUIDE: '設定說明',
+  GUIDE_1: '請先在藍新金流申請「旅行業代收轉付電子收據」服務',
+  GUIDE_3: '測試環境可使用測試商店代號進行開發測試',
+  GUIDE_4: '正式上線前請切換到正式環境並使用正式商店資訊',
+}
+
+export const OTHER_SETTINGS_LABELS = {
+  TITLE: '其他設定',
+  LANGUAGE_SETTING: '語言設定',
+  LANGUAGE_VALUE: '繁體中文（預設）',
+  NOTIFICATION_SETTING: '通知設定',
+  NOTIFICATION_VALUE: '系統通知：開啟',
+  BACKUP_SETTING: '資料備份',
+  BACKUP_VALUE: '自動備份：每日凌晨 2:00',
+}
+
+export const PERMISSION_LABELS = {
+  TITLE: '權限管理',
+  BRANCH_MANAGEMENT: '分公司管理',
+  MANAGE_BRANCHES: '管理分公司',
+  CROSS_BRANCH_PERMISSION: '跨分公司權限',
+  PERM_1: '授權特定員工跨分公司查看資料',
+  PERM_2: '設定不同權限等級（查看、編輯、刪除、財務）',
+  PERM_3: '設定權限過期時間（可選）',
+  PERM_4: '隨時撤銷權限',
+  PERMISSION_SETTINGS: '權限設定',
+}
+
+export const PREFERRED_FEATURES_LABELS = {
+  SAVING: '儲存中...',
+  SAVED: '已儲存',
+  PENDING_SAVE: '變更待儲存...',
+  DESCRIPTION_TITLE: '說明',
+  DESC_1: '選擇的功能會顯示在側邊欄，未選擇的會被隱藏',
+  DESC_2: '此設定不影響你的實際權限，只是個人化介面顯示',
+  DESC_3: '你只能選擇有權限的功能',
+  DESC_4: '變更會在停止操作後自動儲存',
+}
+
+export const WORKSPACE_SWITCHER_LABELS = {
+  TITLE: '工作空間切換',
+  VIEW_ALL: '查看全部辦公室',
+}
+
+export const MODULES_PAGE_LABELS = {
+  STATUS: '狀態',
+  EXPIRY_DATE: '到期日',
+  FEATURES: '功能特性',
+  MODULE_DESC_TITLE: '模組說明',
+  DESC_1: '模組需要啟用後才能使用相關功能',
+  DESC_2: '可設定到期日，過期後會自動停用',
+  DESC_3: '停用模組不會刪除已建立的資料，重新啟用後可繼續使用',
+  DESC_4: '每個工作空間可獨立管理模組授權',
+  EXPIRY_LABEL: '授權到期日（選填）',
+  EXPIRY_HINT: '留空表示永久授權',
+  INCLUDED_FEATURES: '包含功能',
+}

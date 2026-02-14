@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import type { Json } from '@/lib/supabase/types'
+import { NEWEBPAY_LABELS } from '../constants/labels'
 
 interface NewebPayConfig {
   merchantId: string
@@ -102,9 +103,9 @@ export function NewebPaySettings() {
       <section className="bg-card rounded-lg border border-border p-6">
         <div className="flex items-center gap-3 mb-4">
           <CreditCard className="h-5 w-5 text-morandi-gold" />
-          <h2 className="text-lg font-semibold text-morandi-primary">藍新金流設定</h2>
+          <h2 className="text-lg font-semibold text-morandi-primary">{NEWEBPAY_LABELS.TITLE}</h2>
         </div>
-        <div className="text-sm text-morandi-secondary">載入中...</div>
+        <div className="text-sm text-morandi-secondary">{NEWEBPAY_LABELS.LOADING}</div>
       </section>
     )
   }
@@ -117,21 +118,21 @@ export function NewebPaySettings() {
           <h2 className="text-lg font-semibold text-morandi-primary">藍新金流設定</h2>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-morandi-secondary">旅行業代收轉付電子收據</span>
+          <span className="text-xs text-morandi-secondary">{NEWEBPAY_LABELS.SUBTITLE}</span>
         </div>
       </div>
 
       <div className="space-y-4">
         {/* 商店代號 */}
         <div className="space-y-2">
-          <Label htmlFor="merchantId">商店代號 (MerchantID)</Label>
+          <Label htmlFor="merchantId">{NEWEBPAY_LABELS.MERCHANT_ID}</Label>
           <Input
             id="merchantId"
             value={config.merchantId}
             onChange={e => setConfig({ ...config, merchantId: e.target.value })}
             placeholder="輸入藍新商店代號"
           />
-          <p className="text-xs text-morandi-secondary">在藍新後台「商店管理」可查看</p>
+          <p className="text-xs text-morandi-secondary">{NEWEBPAY_LABELS.MERCHANT_ID_HINT}</p>
         </div>
 
         {/* HashKey */}
@@ -227,12 +228,12 @@ export function NewebPaySettings() {
 
       {/* 說明 */}
       <div className="mt-6 p-4 bg-status-info-bg rounded-lg border border-status-info/30">
-        <h4 className="text-sm font-medium text-morandi-primary mb-2">設定說明</h4>
+        <h4 className="text-sm font-medium text-morandi-primary mb-2">{NEWEBPAY_LABELS.SETUP_GUIDE}</h4>
         <ul className="text-xs text-morandi-secondary space-y-1 list-disc list-inside">
-          <li>請先在藍新金流申請「旅行業代收轉付電子收據」服務</li>
+          <li>{NEWEBPAY_LABELS.GUIDE_1}</li>
           <li>HashKey 和 HashIV 是加密用金鑰，請妥善保管</li>
-          <li>測試環境可使用測試商店代號進行開發測試</li>
-          <li>正式上線前請切換到正式環境並使用正式商店資訊</li>
+          <li>{NEWEBPAY_LABELS.GUIDE_3}</li>
+          <li>{NEWEBPAY_LABELS.GUIDE_4}</li>
         </ul>
       </div>
     </section>
