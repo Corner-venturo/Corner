@@ -84,10 +84,8 @@ fix-types-to-snake.js
 .env.local
 .env*.local
 
-# Claude Code sensitive files
-.claude/SUPABASE_CREDENTIALS.md
-.claude/*_CREDENTIALS.md
-.claude/*_PASSWORD*.md
+# Claude Code — 整個目錄都不追蹤
+.claude/
 
 # Backup and temporary directories
 Corner/
@@ -96,3 +94,4 @@ temp/
 
 # Playwright auth state
 tests/e2e/.auth/
+SUPABASE_CREDENTIALS_BACKUP.md
