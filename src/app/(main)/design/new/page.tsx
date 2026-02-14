@@ -66,6 +66,7 @@ import {
   DesignerDialogs,
   createBlockInsertHandler,
 } from './components'
+import { DESIGNER_LABELS } from './constants/labels'
 
 // ============================================
 // 主頁面
@@ -555,7 +556,7 @@ export default function DesignerPage() {
 
     try {
       const blob = await generateBrochurePDF(generatedPages, {
-        filename: `${storeDocument?.name || '手冊'}.pdf`,
+        filename: `${storeDocument?.name || DESIGNER_LABELS.DEFAULT_FILENAME}.pdf`,
         onProgress: (current, total) => {
           logger.log(`[PDF Export] Progress: ${current}/${total}`)
         },
@@ -567,7 +568,7 @@ export default function DesignerPage() {
       if (!printWindow) {
         const a = document.createElement('a')
         a.href = url
-        a.download = `${storeDocument?.name || '手冊'}.pdf`
+        a.download = `${storeDocument?.name || DESIGNER_LABELS.DEFAULT_FILENAME}.pdf`
         a.click()
       }
     } catch (err) {
@@ -697,7 +698,7 @@ export default function DesignerPage() {
         >
           <div className="text-center">
             <div className="w-8 h-8 border-2 border-morandi-gold border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-morandi-secondary">載入設計中...</p>
+            <p className="text-morandi-secondary">{DESIGNER_LABELS.LOADING_DESIGN}</p>
           </div>
         </div>
       )
@@ -744,7 +745,7 @@ export default function DesignerPage() {
       >
         <div className="text-center">
           <p className="text-morandi-red mb-4">{error}</p>
-          <Button onClick={() => window.location.reload()}>重新載入</Button>
+          <Button onClick={() => window.location.reload()}>{DESIGNER_LABELS.RELOAD}</Button>
         </div>
       </div>
     )

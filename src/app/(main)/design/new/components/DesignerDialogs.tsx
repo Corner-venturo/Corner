@@ -11,6 +11,7 @@ import { ImageEditor, type ImageEditorSettings } from '@/components/ui/image-edi
 import { ImageMaskFillDialog } from '@/features/designer/components/ImageMaskFill'
 import { BlockLibrary } from '@/features/designer/components/BlockLibrary'
 import type { CanvasElement, TextElement, ShapeElement, ImageElement } from '@/features/designer/components/types'
+import { DESIGNER_LABELS } from '../constants/labels'
 
 interface DesignerDialogsProps {
   // 封面圖片
@@ -87,8 +88,8 @@ export function DesignerDialogs({
       <ImagePickerDialog
         open={showCoverUpload}
         onOpenChange={setShowCoverUpload}
-        title="選擇封面圖片"
-        description="上傳圖片或從 Unsplash 搜尋免費圖片，之後可調整顯示位置。"
+        title={DESIGNER_LABELS.COVER_IMAGE_TITLE}
+        description={DESIGNER_LABELS.COVER_IMAGE_DESC}
         value={coverImage}
         onSelect={onCoverImageSelect}
         bucket="city-backgrounds"
@@ -113,8 +114,8 @@ export function DesignerDialogs({
       <ImagePickerDialog
         open={showDailyCoverUpload}
         onOpenChange={setShowDailyCoverUpload}
-        title="選擇當日封面圖片"
-        description="上傳圖片或從 Unsplash 搜尋免費圖片，作為當日行程的封面。"
+        title={DESIGNER_LABELS.DAY_COVER_TITLE}
+        description={DESIGNER_LABELS.DAY_COVER_DESC}
         value={dailyCoverImage}
         onSelect={onDailyCoverImageSelect}
         bucket="city-backgrounds"

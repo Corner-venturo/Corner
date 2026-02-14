@@ -11,6 +11,7 @@ import { PropertiesPanel } from '@/features/designer/components/PropertiesPanel'
 import { TemplateDataPanel } from '@/features/designer/components/TemplateDataPanel'
 import type { CanvasElement } from '@/features/designer/components/types'
 import type { ImageEditorSettings } from '@/components/ui/image-editor'
+import { DESIGNER_LABELS } from '../constants/labels'
 
 interface RightPanelProps {
   canvas: fabric.Canvas | null
@@ -47,8 +48,8 @@ export function RightPanel({
     <div className="w-64 h-full bg-white border-l border-border flex flex-col">
       <Tabs defaultValue={selectedObject ? 'properties' : 'template'} className="flex-1 min-h-0 flex flex-col">
         <TabsList className="grid grid-cols-2 mx-2 mt-2">
-          <TabsTrigger value="properties" className="text-xs">元素屬性</TabsTrigger>
-          <TabsTrigger value="template" className="text-xs">模板數據</TabsTrigger>
+          <TabsTrigger value="properties" className="text-xs">{DESIGNER_LABELS.TAB_PROPERTIES}</TabsTrigger>
+          <TabsTrigger value="template" className="text-xs">{DESIGNER_LABELS.TAB_TEMPLATE_DATA}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="properties" className="flex-1 min-h-0 overflow-hidden m-0">

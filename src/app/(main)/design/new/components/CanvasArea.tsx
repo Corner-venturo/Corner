@@ -13,6 +13,7 @@ import { CanvasWithRulers } from '@/features/designer/components/CanvasWithRuler
 import { DualPagePreview } from '@/features/designer/components/DualPagePreview'
 import type { CanvasPage } from '@/features/designer/components/types'
 import type { DesignType } from '@/features/designer/components/DesignTypeSelector'
+import { DESIGNER_LABELS } from '../constants/labels'
 
 interface CanvasAreaProps {
   selectedDesignType: DesignType
@@ -117,8 +118,8 @@ export const CanvasArea = forwardRef<HTMLDivElement, CanvasAreaProps>(
         {/* Mask Edit Mode Indicator */}
         {isEditingMask && (
           <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-morandi-gold text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm">
-            <span className="font-medium">遮罩編輯模式</span>
-            <span className="ml-2 opacity-80">拖曳移動圖片 · 滾輪縮放 · Esc 退出</span>
+            <span className="font-medium">{DESIGNER_LABELS.MASK_EDIT_MODE}</span>
+            <span className="ml-2 opacity-80">{DESIGNER_LABELS.MASK_EDIT_HINT}</span>
           </div>
         )}
 
@@ -131,7 +132,7 @@ export const CanvasArea = forwardRef<HTMLDivElement, CanvasAreaProps>(
             className="gap-1 bg-white"
           >
             <Upload size={14} />
-            上傳圖片
+            {DESIGNER_LABELS.UPLOAD_IMAGE}
           </Button>
         </div>
 
@@ -140,7 +141,7 @@ export const CanvasArea = forwardRef<HTMLDivElement, CanvasAreaProps>(
           {selectedDesignType?.category === 'print' ? (
             <>
               {selectedDesignType?.id === 'brochure-a5' ? '148 × 210 mm (A5)' : '210 × 297 mm (A4)'}
-              <span className="text-xs ml-1 opacity-60">含出血</span>
+              <span className="text-xs ml-1 opacity-60">{DESIGNER_LABELS.WITH_BLEED}</span>
             </>
           ) : (
             `${canvasWidth} × ${canvasHeight} px`

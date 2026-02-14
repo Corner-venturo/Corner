@@ -1,6 +1,6 @@
 /**
  * Designer Header 組件
- * 包含返回按鈕、標題、面板切換、縮放控制、儲存按鈕
+ * 包含返回按鈕、標題、面板切換、縮放控制、{DESIGNER_LABELS.SAVE}按鈕
  */
 
 'use client'
@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/button'
 import { UnsavedIndicator } from '@/features/designer/components/LoadingOverlay'
 import { cn } from '@/lib/utils'
 import type { DesignType } from '@/features/designer/components/DesignTypeSelector'
+import { DESIGNER_LABELS } from '../constants/labels'
 
 interface DesignerHeaderProps {
   selectedDesignType: DesignType
@@ -79,7 +80,7 @@ export function DesignerHeader({
 
   return (
     <header className="h-[72px] bg-card border-b border-border px-4 flex items-center gap-3 shrink-0">
-      {/* 返回按鈕 - 回到設計列表 */}
+      {/* {DESIGNER_LABELS.BACK}按鈕 - 回到設計列表 */}
       <Button
         variant="ghost"
         size="sm"
@@ -87,7 +88,7 @@ export function DesignerHeader({
         className="gap-2"
       >
         <ArrowLeft size={16} />
-        返回
+        {DESIGNER_LABELS.BACK}
       </Button>
 
       <div className="w-px h-6 bg-border" />
@@ -109,7 +110,7 @@ export function DesignerHeader({
         size="sm"
         onClick={() => setShowPageList(!showPageList)}
         className={cn(!showPageList && 'text-morandi-muted')}
-        title="頁面列表"
+        title={DESIGNER_LABELS.PAGE_LIST_TITLE}
       >
         <LayoutList size={16} />
       </Button>
@@ -118,7 +119,7 @@ export function DesignerHeader({
         size="sm"
         onClick={() => setShowLeftPanel(!showLeftPanel)}
         className={cn(!showLeftPanel && 'text-morandi-muted')}
-        title="元素庫"
+        title={DESIGNER_LABELS.ELEMENT_LIB_TITLE}
       >
         <PanelLeftClose size={16} />
       </Button>
@@ -126,7 +127,7 @@ export function DesignerHeader({
         variant="ghost"
         size="sm"
         onClick={() => setShowBlockLibrary(true)}
-        title="插入區塊"
+        title={DESIGNER_LABELS.INSERT_BLOCK_TITLE}
       >
         <LayoutGrid size={16} />
       </Button>
@@ -135,7 +136,7 @@ export function DesignerHeader({
         size="sm"
         onClick={() => setShowRightPanel(!showRightPanel)}
         className={cn(!showRightPanel && 'text-morandi-muted')}
-        title="屬性面板"
+        title={DESIGNER_LABELS.PROPERTIES_TITLE}
       >
         <PanelRightClose size={16} />
       </Button>
@@ -144,7 +145,7 @@ export function DesignerHeader({
         size="sm"
         onClick={() => setShowLayerPanel(!showLayerPanel)}
         className={cn(!showLayerPanel && 'text-morandi-muted')}
-        title="圖層面板"
+        title={DESIGNER_LABELS.LAYERS_TITLE}
       >
         <Layers size={16} />
       </Button>
@@ -156,7 +157,7 @@ export function DesignerHeader({
           size="sm"
           onClick={() => setIsDualPageMode(!isDualPageMode)}
           className={cn(isDualPageMode && 'bg-morandi-gold/10 text-morandi-gold')}
-          title="雙頁預覽模式"
+          title={DESIGNER_LABELS.SPREAD_PREVIEW_TITLE}
         >
           <Columns2 size={16} />
         </Button>
@@ -188,7 +189,7 @@ export function DesignerHeader({
           className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
         >
           <Save size={14} />
-          儲存
+          {DESIGNER_LABELS.SAVE}
         </Button>
 
         <Button
@@ -199,7 +200,7 @@ export function DesignerHeader({
           className="gap-1"
         >
           <FileDown size={14} />
-          列印/匯出
+          {DESIGNER_LABELS.EXPORT_PDF}
         </Button>
       </div>
     </header>
