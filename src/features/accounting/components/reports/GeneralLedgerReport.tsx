@@ -18,6 +18,7 @@ import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
 import { formatDate } from '@/lib/utils/format-date'
 import { logger } from '@/lib/utils/logger'
+import { ACCOUNTING_REPORT_LABELS } from '../../constants/labels'
 interface AccountOption {
   id: string
   code: string
@@ -96,7 +97,7 @@ export function GeneralLedgerReport() {
   const handleExport = () => {
     if (entries.length === 0) return
 
-    const headers = ['日期', '傳票編號', '科目代碼', '科目名稱', '摘要', '借方', '貸方', '餘額']
+    const headers = [ACCOUNTING_REPORT_LABELS.GL_COL_DATE, ACCOUNTING_REPORT_LABELS.GL_COL_VOUCHER_NO, ACCOUNTING_REPORT_LABELS.GL_COL_ACCOUNT_CODE, ACCOUNTING_REPORT_LABELS.GL_COL_ACCOUNT_NAME, ACCOUNTING_REPORT_LABELS.GL_COL_SUMMARY, ACCOUNTING_REPORT_LABELS.GL_COL_DEBIT, ACCOUNTING_REPORT_LABELS.GL_COL_CREDIT, ACCOUNTING_REPORT_LABELS.GL_COL_BALANCE]
     const rows = entries.map(e => [
       e.date,
       e.voucher_no,
@@ -135,13 +136,13 @@ export function GeneralLedgerReport() {
   const columns: Column<GeneralLedgerEntry>[] = [
     {
       key: 'date',
-      label: '日期',
+      label: ACCOUNTING_REPORT_LABELS.GL_COL_DATE,
       width: '120px',
       render: (_, row) => <DateCell date={row.date} />,
     },
     {
       key: 'voucher_no',
-      label: '傳票編號',
+      label: ACCOUNTING_REPORT_LABELS.GL_COL_VOUCHER_NO,
       width: '140px',
       render: (_, row) => (
         <span className="font-mono text-morandi-gold">{row.voucher_no}</span>
@@ -149,7 +150,7 @@ export function GeneralLedgerReport() {
     },
     {
       key: 'account',
-      label: '科目',
+      label: ACCOUNTING_REPORT_LABELS.GL_COL_ACCOUNT,
       width: '180px',
       render: (_, row) => (
         <div>
@@ -160,14 +161,14 @@ export function GeneralLedgerReport() {
     },
     {
       key: 'description',
-      label: '摘要',
+      label: ACCOUNTING_REPORT_LABELS.GL_COL_SUMMARY,
       render: (_, row) => (
         <span className="text-morandi-secondary">{row.description || '-'}</span>
       ),
     },
     {
       key: 'debit_amount',
-      label: '借方',
+      label: ACCOUNTING_REPORT_LABELS.GL_COL_DEBIT,
       width: '120px',
       align: 'right',
       render: (_, row) => (
@@ -176,7 +177,7 @@ export function GeneralLedgerReport() {
     },
     {
       key: 'credit_amount',
-      label: '貸方',
+      label: ACCOUNTING_REPORT_LABELS.GL_COL_CREDIT,
       width: '120px',
       align: 'right',
       render: (_, row) => (
@@ -185,7 +186,7 @@ export function GeneralLedgerReport() {
     },
     {
       key: 'balance',
-      label: '餘額',
+      label: ACCOUNTING_REPORT_LABELS.GL_COL_BALANCE,
       width: '140px',
       align: 'right',
       render: (_, row) => (
@@ -200,12 +201,12 @@ export function GeneralLedgerReport() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="總帳報表"
+        title={ACCOUNTING_REPORT_LABELS.GL_TITLE}
         icon={BookOpen}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '會計', href: '/erp-accounting' },
-          { label: '總帳報表', href: '/erp-accounting/reports/general-ledger' },
+          { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_ACCOUNTING, href: '/erp-accounting' },
+          { label: ACCOUNTING_REPORT_LABELS.GL_TITLE, href: '/erp-accounting/reports/general-ledger' },
         ]}
         actions={
           <Button
@@ -215,7 +216,7 @@ export function GeneralLedgerReport() {
             className="gap-2"
           >
             <Download size={16} />
-            匯出 CSV
+            {ACCOUNTING_REPORT_LABELS.EXPORT_CSV}
           </Button>
         }
       />
@@ -229,13 +230,13 @@ export function GeneralLedgerReport() {
               <DatePicker
                 value={startDate}
                 onChange={setStartDate}
-                placeholder="開始日期"
+                placeholder={ACCOUNTING_REPORT_LABELS.GL_START_DATE_PLACEHOLDER}
               />
-              <span className="text-morandi-secondary">至</span>
+              <span className="text-morandi-secondary">{ACCOUNTING_REPORT_LABELS.GL_TO}</span>
               <DatePicker
                 value={endDate}
                 onChange={setEndDate}
-                placeholder="結束日期"
+                placeholder={ACCOUNTING_REPORT_LABELS.GL_END_DATE_PLACEHOLDER}
               />
             </div>
           </div>
@@ -246,8 +247,8 @@ export function GeneralLedgerReport() {
               value={selectedAccountId}
               onChange={setSelectedAccountId}
               options={accountOptions}
-              placeholder={accountsLoading ? '載入中...' : '選擇科目（可選）'}
-              emptyMessage="找不到科目"
+              placeholder={accountsLoading ? ACCOUNTING_REPORT_LABELS.GL_ACCOUNT_LOADING : ACCOUNTING_REPORT_LABELS.GL_SELECT_ACCOUNT_PLACEHOLDER}
+              emptyMessage={ACCOUNTING_REPORT_LABELS.GL_ACCOUNT_NOT_FOUND}
               showClearButton
               className="flex-1"
             />
@@ -255,7 +256,7 @@ export function GeneralLedgerReport() {
 
           <Button onClick={handleSearch} disabled={loading} className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white">
             <Search size={16} />
-            查詢
+            {ACCOUNTING_REPORT_LABELS.QUERY}
           </Button>
         </div>
       </div>
@@ -280,22 +281,22 @@ export function GeneralLedgerReport() {
             {/* 合計列 */}
             <div className="mt-4 p-4 bg-morandi-container/30 rounded-lg border border-border">
               <div className="flex justify-between items-center">
-                <span className="font-medium text-morandi-primary">合計</span>
+                <span className="font-medium text-morandi-primary">{ACCOUNTING_REPORT_LABELS.TOTAL}</span>
                 <div className="flex gap-8">
                   <div className="text-right">
-                    <span className="text-sm text-morandi-secondary block">借方合計</span>
+                    <span className="text-sm text-morandi-secondary block">{ACCOUNTING_REPORT_LABELS.GL_DEBIT_TOTAL}</span>
                     <span className="font-mono font-medium text-morandi-primary">
                       NT$ {totals.debit.toLocaleString()}
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-sm text-morandi-secondary block">貸方合計</span>
+                    <span className="text-sm text-morandi-secondary block">{ACCOUNTING_REPORT_LABELS.GL_CREDIT_TOTAL}</span>
                     <span className="font-mono font-medium text-morandi-primary">
                       NT$ {totals.credit.toLocaleString()}
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-sm text-morandi-secondary block">差額</span>
+                    <span className="text-sm text-morandi-secondary block">{ACCOUNTING_REPORT_LABELS.GL_DIFFERENCE}</span>
                     <span className={`font-mono font-medium ${totals.debit === totals.credit ? 'text-morandi-green' : 'text-morandi-red'}`}>
                       NT$ {Math.abs(totals.debit - totals.credit).toLocaleString()}
                     </span>
@@ -307,7 +308,7 @@ export function GeneralLedgerReport() {
         ) : !loading ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <BookOpen size={48} className="text-morandi-muted mb-4" />
-            <p className="text-morandi-secondary">請選擇日期範圍並點擊查詢</p>
+            <p className="text-morandi-secondary">{ACCOUNTING_REPORT_LABELS.GL_EMPTY}</p>
           </div>
         ) : null}
       </div>

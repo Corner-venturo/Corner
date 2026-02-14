@@ -30,7 +30,7 @@ export const ACCOUNTING_REPORT_LABELS = {
   TB_EMPTY: '請選擇截止日期並點擊查詢',
 
   // General Ledger
-  GL_TITLE: '總帳',
+  GL_TITLE: '總帳報表',
   GL_COL_DATE: '日期',
   GL_COL_VOUCHER: '傳票號',
   GL_COL_SUMMARY: '摘要',
@@ -40,6 +40,19 @@ export const ACCOUNTING_REPORT_LABELS = {
   GL_START_DATE: '開始日期',
   GL_EMPTY: '請選擇日期範圍並點擊查詢',
   GL_OPENING_BALANCE: '期初餘額',
+  GL_COL_VOUCHER_NO: '傳票編號',
+  GL_COL_ACCOUNT_CODE: '科目代碼',
+  GL_COL_ACCOUNT_NAME: '科目名稱',
+  GL_COL_ACCOUNT: '科目',
+  GL_TO: '至',
+  GL_START_DATE_PLACEHOLDER: '開始日期',
+  GL_END_DATE_PLACEHOLDER: '結束日期',
+  GL_SELECT_ACCOUNT_PLACEHOLDER: '選擇科目（可選）',
+  GL_ACCOUNT_LOADING: '載入中...',
+  GL_ACCOUNT_NOT_FOUND: '找不到科目',
+  GL_DEBIT_TOTAL: '借方合計',
+  GL_CREDIT_TOTAL: '貸方合計',
+  GL_DIFFERENCE: '差額',
 
   // Account Ledger
   AL_TITLE: '明細帳',
@@ -52,7 +65,18 @@ export const ACCOUNTING_REPORT_LABELS = {
   BS_LIABILITIES: '負債',
   BS_TOTAL_ASSETS: '資產合計',
   BS_TOTAL_LIABILITIES: '負債合計',
-  BS_EMPTY: '請選擇截止日期並點擊查詢',
+  BS_EMPTY: '請選擇報表日期並點擊查詢',
+  BS_REPORT_DATE: '報表日期',
+  BS_TOTAL_ASSETS_AMOUNT: '資產總額',
+  BS_TOTAL_LIABILITIES_AMOUNT: '負債總額',
+  BS_NET_ASSETS: '淨資產（權益）',
+  BS_EQUITY: '權益（資產-負債）',
+  BS_EQUITY_DISPLAY: '權益（資產 - 負債）',
+  BS_NO_ASSET_BALANCE: '無資產科目餘額',
+  BS_NO_LIABILITY_BALANCE: '無負債科目餘額',
+  BS_NET_ASSETS_SHORT: '淨資產',
+  BS_CSV_ITEM: '項目',
+  BS_CSV_AMOUNT: '金額',
 
   // Income Statement
   IS_TITLE: '損益表',
