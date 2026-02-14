@@ -156,4 +156,7 @@ export const FLIGHT_WIDGET_LABELS = {
   QUERYING_754: '查詢',
   STATUS: '狀態',
   LABEL_6009: '預計',
+  AIRPORT_FLIGHTS_SUFFIX: ' 機場出發航班',
+  FLIGHT_COUNT_PREFIX: ' · 共 ',
+  FLIGHT_COUNT_SUFFIX: ' 班航班',
 }

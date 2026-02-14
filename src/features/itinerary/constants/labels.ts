@@ -70,4 +70,8 @@ export const ITINERARY_LABELS = {
   GENERATING_146: '景點描述（可點擊 AI 按鈕自動生成）',
   LABEL_4014: '景點介紹',
   GENERATING_7535: '詳細描述（可點擊 AI 按鈕自動生成）',
+  GEMINI_AI_TITLE: 'Gemini AI 智慧助手',
+  PRICE_LABEL_HINT: '價格 (不含NT$和起)',
+  AI_GENERATE_DESC: 'AI 生成描述',
+  AI_GENERATE_IMAGE: 'AI 生成圖片',
 };

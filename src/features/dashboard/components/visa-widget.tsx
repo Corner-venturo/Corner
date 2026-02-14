@@ -318,7 +318,7 @@ export function VisaWidget() {
                 </div>
                 <div className="text-morandi-secondary">→</div>
                 <div className="text-center">
-                  <p className="text-xs text-morandi-secondary mb-1">目的地</p>
+                  <p className="text-xs text-morandi-secondary mb-1">{DASHBOARD_LABELS.DESTINATION}</p>
                   <p className="font-bold text-base text-morandi-primary">
                     {result.destinationName}
                   </p>
@@ -365,7 +365,7 @@ export function VisaWidget() {
               {/* 提示 */}
               <div className="bg-status-warning-bg rounded-lg p-3 border border-status-warning/30">
                 <p className="text-xs text-morandi-primary">
-                  ⚠️ 此資訊僅供參考，實際簽證要求請以目的地國家官方公告為準
+                  {DASHBOARD_LABELS.VISA_DISCLAIMER}
                 </p>
               </div>
             </div>

@@ -74,4 +74,5 @@ export const DESIGNER_LABELS = {
   LABEL_1736: '桌次',
   LABEL_4403: '桌型（選填）',
   ADD_4177: '新增桌',
+  PERSON_SUFFIX: ' 人',
 }

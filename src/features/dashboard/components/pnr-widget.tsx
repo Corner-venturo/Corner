@@ -188,7 +188,7 @@ export function PNRWidget() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">
-                PNR 解析器
+                {DASHBOARD_LABELS.PNR_PARSER}
               </p>
               <p className="text-xs text-morandi-secondary/90 mt-1 leading-relaxed">
                 {DASHBOARD_LABELS.LABEL_6626}
@@ -207,7 +207,7 @@ export function PNRWidget() {
             <div className="flex items-center justify-between mb-2">
               <label className="text-xs font-semibold text-morandi-primary flex items-center gap-1.5">
                 <FileText className="w-3.5 h-3.5" />
-                PNR 電報
+                {DASHBOARD_LABELS.PNR_TELEGRAM}
               </label>
               <div className="flex gap-1.5">
                 <button
@@ -289,7 +289,7 @@ TK TL20JAN/1200`}
               >
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-lg text-morandi-primary">
-                    {parsedPNR.recordLocator || '(無訂位代號)'}
+                    {parsedPNR.recordLocator || DASHBOARD_LABELS.NO_RECORD_LOCATOR}
                   </span>
                   {parsedPNR.recordLocator && (
                     <button
@@ -365,7 +365,7 @@ TK TL20JAN/1200`}
                           )}
                         />
                         {isUrgent(parsedPNR.ticketingDeadline) && (
-                          <span className="ml-2 text-xs">(緊急！)</span>
+                          <span className="ml-2 text-xs">{DASHBOARD_LABELS.URGENT}</span>
                         )}
                       </div>
                     </div>
@@ -380,7 +380,7 @@ TK TL20JAN/1200`}
                           旅客 ({parsedPNR.passengers.length})
                           {parsedPNR.passengers.some(p => p.infant) && (
                             <span className="ml-1 text-morandi-secondary">
-                              +{parsedPNR.passengers.filter(p => p.infant).length} 嬰兒
+                              {DASHBOARD_LABELS.INFANT_COUNT_PREFIX}{parsedPNR.passengers.filter(p => p.infant).length}{DASHBOARD_LABELS.INFANT_COUNT_SUFFIX}
                             </span>
                           )}
                         </span>

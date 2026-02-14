@@ -194,7 +194,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
       <div className="bg-gradient-to-r from-status-info-bg to-purple-50 border border-purple-600/30 rounded-lg p-4">
         <div className="flex items-center gap-2 text-status-info font-medium mb-2">
           <Sparkles size={18} />
-          <span>Gemini AI 智慧助手</span>
+          <span>{ITINERARY_LABELS.GEMINI_AI_TITLE}</span>
         </div>
         <p className="text-sm text-status-info">
           點擊 <Sparkles size={14} className="inline" /> {ITINERARY_LABELS.GENERATING_7626}
@@ -296,7 +296,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-xs font-medium text-morandi-primary mb-1">價格 (不含NT$和起)</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">{ITINERARY_LABELS.PRICE_LABEL_HINT}</label>
               <InputIME
                 value={data.price}
                 onChange={value => updateField('price', value)}
@@ -643,7 +643,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                     size="sm"
                     variant="ghost"
                     className="h-6 px-2 text-status-info hover:text-status-info hover:bg-muted"
-                    title="AI 生成描述"
+                    title={ITINERARY_LABELS.AI_GENERATE_DESC}
                   >
                     {generatingSightDesc === idx ? (
                       <Loader2 size={12} className="animate-spin" />
@@ -657,7 +657,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                     size="sm"
                     variant="ghost"
                     className="h-6 px-2 text-purple-600 hover:text-purple-600 hover:bg-purple-50"
-                    title="AI 生成圖片"
+                    title={ITINERARY_LABELS.AI_GENERATE_IMAGE}
                   >
                     {generatingImage === `sight-${idx}` ? (
                       <Loader2 size={12} className="animate-spin" />

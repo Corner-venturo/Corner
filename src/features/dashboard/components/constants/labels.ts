@@ -72,4 +72,29 @@ export const DASHBOARD_LABELS = {
   SETTINGS_4196: '小工具設定',
   SELECT_1019: '選擇要顯示的小工具',
   LABEL_5024: '勾選你想在首頁顯示的小工具',
+
+  // visa-widget
+  DESTINATION: '目的地',
+  VISA_DISCLAIMER: '⚠️ 此資訊僅供參考，實際簽證要求請以目的地國家官方公告為準',
+
+  // pnr-widget
+  URGENT: '(緊急！)',
+  INFANT_COUNT_PREFIX: '+',
+  INFANT_COUNT_SUFFIX: ' 嬰兒',
+  PNR_PARSER: 'PNR 解析器',
+  PNR_TELEGRAM: 'PNR 電報',
+  NO_RECORD_LOCATOR: '(無訂位代號)',
+  DAYS_SUFFIX: '天',
+  PASSENGERS_PREFIX: '旅客 (',
+  PASSENGERS_SUFFIX: ')',
+  CHILD: '兒童',
+
+  // notes-widget
+  NOTES_AUTO_SAVE_HINT: '自動儲存 • 雙擊分頁名稱可重新命名',
+
+  // currency-widget
+  EXCHANGE_RATE_LABEL: '匯率 (1 ',
+  EXCHANGE_RATE_SUFFIX: ' = ? TWD)',
+  CUSTOM_RATE: '已自訂匯率',
+  DEFAULT_RATE_PREFIX: '預設匯率: ',
 }

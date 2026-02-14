@@ -335,9 +335,9 @@ export function VehicleEditor({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1">1 人</SelectItem>
-                <SelectItem value="2">2 人</SelectItem>
-                <SelectItem value="3">3 人</SelectItem>
+                <SelectItem value="1">1{DESIGNER_LABELS.PERSON_SUFFIX}</SelectItem>
+                <SelectItem value="2">2{DESIGNER_LABELS.PERSON_SUFFIX}</SelectItem>
+                <SelectItem value="3">3{DESIGNER_LABELS.PERSON_SUFFIX}</SelectItem>
               </SelectContent>
             </Select>
           </div>

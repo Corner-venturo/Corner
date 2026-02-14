@@ -463,10 +463,10 @@ export function FlightWidget() {
               </div>
               <div>
                 <span className="text-lg font-semibold text-morandi-primary">
-                  {COMMON_AIRPORTS.find(a => a.code === airportCode)?.name || airportCode} 機場出發航班
+                  {COMMON_AIRPORTS.find(a => a.code === airportCode)?.name || airportCode}{FLIGHT_WIDGET_LABELS.AIRPORT_FLIGHTS_SUFFIX}
                 </span>
                 <p className="text-sm text-morandi-secondary font-normal mt-0.5">
-                  {queryDate} · 共 {airportFlights.length} 班航班
+                  {queryDate}{FLIGHT_WIDGET_LABELS.FLIGHT_COUNT_PREFIX}{airportFlights.length}{FLIGHT_WIDGET_LABELS.FLIGHT_COUNT_SUFFIX}
                 </p>
               </div>
             </DialogTitle>
