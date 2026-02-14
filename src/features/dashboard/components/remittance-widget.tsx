@@ -170,7 +170,7 @@ export function RemittanceWidget() {
                 </label>
                 <Select value={to} onValueChange={setTo}>
                   <SelectTrigger className="w-full px-2 py-2 text-xs font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm">
-                    <SelectValue placeholder="選擇國家" />
+                    <SelectValue placeholder={DASHBOARD_LABELS.SELECT_8015} />
                   </SelectTrigger>
                   <SelectContent>
                     {COUNTRIES.map(country => (

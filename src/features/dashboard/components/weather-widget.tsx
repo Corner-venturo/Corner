@@ -146,7 +146,7 @@ export function WeatherWidget() {
                 <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />{DASHBOARD_LABELS.SELECT_240}</label>
                 <Select value={selectedCity.name} onValueChange={handleCityChange}>
                   <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm">
-                    <SelectValue placeholder="選擇城市" />
+                    <SelectValue placeholder={DASHBOARD_LABELS.SELECT_240} />
                   </SelectTrigger>
                   <SelectContent>
                     {CITIES.map(city => (
@@ -164,7 +164,7 @@ export function WeatherWidget() {
                   onChange={(date) => handleDateChange(date)}
                   minDate={minDate}
                   maxDate={maxDate}
-                  placeholder="選擇日期"
+                  placeholder={DASHBOARD_LABELS.SELECT_5234}
                   className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm"
                 />
               </div>

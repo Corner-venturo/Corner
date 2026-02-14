@@ -303,7 +303,7 @@ export function PricingDetailsSection({
                 className="h-7 text-xs"
               >
                 <Plus className="h-3 w-3 mr-1" />
-                新增
+                {COMP_EDITOR_LABELS.新增}
               </Button>
             </div>
             <div className="space-y-2">

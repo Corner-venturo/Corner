@@ -342,7 +342,7 @@ function GuideLine({
       onMouseDown={handleMouseDown}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
-      title="拖曳移動"
+      title={DESIGNER_LABELS.LABEL_4070}
     >
       {/* 實際的線條 */}
       <div
@@ -380,7 +380,7 @@ function GuideLine({
           left: '50%',
           transform: 'translateX(-50%)',
         }}
-        title="刪除參考線"
+        title={DESIGNER_LABELS.DELETE_3163}
       >
         ×
       </button>

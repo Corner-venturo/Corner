@@ -260,7 +260,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-morandi-primary">
               <Plus className="h-5 w-5 text-morandi-gold" />
-              新增車輛
+              {COMP_TOURS_LABELS.ADD_5339}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">

@@ -182,7 +182,7 @@ export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionPro
                   <GripVertical className="h-4 w-4 text-morandi-muted/60" />
                 </div>
                 <div className="flex-1">
-                  <Label className="text-xs text-morandi-primary">第 {index + 1} 項</Label>
+                  <Label className="text-xs text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_104} {index + 1} 項</Label>
                   <Textarea
                     value={policy}
                     onChange={(e) => updateCancellationPolicy(index, e.target.value)}

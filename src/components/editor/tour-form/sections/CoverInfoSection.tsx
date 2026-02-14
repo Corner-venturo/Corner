@@ -165,7 +165,7 @@ export function CoverInfoSection({
                   >
                     <Settings2 size={14} className="text-white" />
                   </div>
-                  封面設定
+                  {COMP_EDITOR_LABELS.SETTINGS_9115}
                 </DialogTitle>
               </DialogHeader>
 

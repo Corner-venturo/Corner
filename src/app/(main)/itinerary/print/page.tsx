@@ -86,7 +86,7 @@ function ItineraryPrintContent() {
       <div className="print:hidden sticky top-0 z-10 bg-card border-b border-border px-4 py-3 flex items-center justify-between">
         <Button variant="ghost" onClick={handleBack} className="gap-2">
           <ArrowLeft size={16} />
-          返回
+          {PRINT_LABELS.BACK}
         </Button>
         <Button onClick={handlePrint} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
           <Printer size={16} />

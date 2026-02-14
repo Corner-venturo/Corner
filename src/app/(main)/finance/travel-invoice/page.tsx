@@ -206,7 +206,7 @@ export default function TravelInvoicePage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="代轉發票管理"
+        title={TRAVEL_INVOICE_LABELS.MANAGE_1246}
         icon={FileText}
         showSearch={true}
         searchTerm={searchTerm}

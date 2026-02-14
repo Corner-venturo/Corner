@@ -134,7 +134,7 @@ export function MemberCard({
             {member.checked_in ? (
               <>
                 <CheckCircle size={16} />
-                <span>已報到</span>
+                <span>{CARDS_LABELS.LABEL_3499}</span>
               </>
             ) : (
               <>

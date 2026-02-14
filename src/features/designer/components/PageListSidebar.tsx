@@ -552,7 +552,7 @@ export function PageListSidebar({
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1"
             >
               <Check size={14} />
-              新增頁面
+              {DESIGNER_LABELS.ADD_1813}
             </Button>
           </DialogFooter>
         </DialogContent>

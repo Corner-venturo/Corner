@@ -71,7 +71,7 @@ export default function BoxSelector({ boxes, onSelect, onClose, timeInterval }: 
           {/* 箱子選擇 */}
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
-              選擇箱子
+              {TIMEBOX_LABELS.SELECT_4577}
             </label>
             {boxes.length === 0 ? (
               <div className="text-center text-morandi-secondary py-4">

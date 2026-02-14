@@ -232,7 +232,7 @@ export function CountriesSection({
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-morandi-primary mb-1">
-                    國家
+                    {COMP_EDITOR_LABELS.LABEL_5040}
                   </label>
                   <Combobox
                     value={country.country_id}
@@ -246,7 +246,7 @@ export function CountriesSection({
 
                 <div>
                   <label className="block text-xs font-medium text-morandi-primary mb-1">
-                    主要城市（選填）
+                    {COMP_EDITOR_LABELS.LABEL_5566}
                   </label>
                   <Combobox
                     value={country.main_city_id || ''}

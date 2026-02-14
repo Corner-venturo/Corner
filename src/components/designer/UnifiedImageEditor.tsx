@@ -298,7 +298,7 @@ export function UnifiedImageEditor({
               >
                 <img
                   src={previewImageSrc}
-                  alt="預覽"
+                  alt={DESIGNER_LABELS.PREVIEW}
                   className="w-full h-full object-cover"
                 />
               </div>

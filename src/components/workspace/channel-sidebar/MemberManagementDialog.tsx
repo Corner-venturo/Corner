@@ -100,7 +100,7 @@ export function ChannelDeleteDialog({
             className="gap-1 text-morandi-secondary hover:text-morandi-primary"
           >
             <X size={16} />
-            取消
+            {COMP_WORKSPACE_LABELS.CANCEL}
           </Button>
           <Button
             variant="destructive"

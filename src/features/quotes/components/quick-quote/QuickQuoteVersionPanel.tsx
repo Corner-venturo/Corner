@@ -88,7 +88,7 @@ export const QuickQuoteVersionPanel: React.FC<QuickQuoteVersionPanelProps> = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-72" align="end">
           <div className="px-2 py-1.5 text-sm font-medium text-morandi-primary border-b border-border">
-            版本歷史
+            {QUICK_QUOTE_VERSION_PANEL_LABELS.LABEL_3328}
           </div>
           {versions && versions.length > 0 ? (
             <>

@@ -44,7 +44,7 @@ export function FlightInfo({
     return (
       <div>
         <Text theme={theme} variant="caption" color="accent" style={{ fontWeight: 600, marginBottom: '2mm' }}>
-          航班資訊 FLIGHT
+          {BLOCKS_LABELS.LABEL_1719}
         </Text>
         {flights.map((flight, i) => (
           <div

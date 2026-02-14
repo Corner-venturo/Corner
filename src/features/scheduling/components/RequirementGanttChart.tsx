@@ -621,7 +621,7 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
                       </div>
                       {selectedRowId && (
                         <div className="mt-1 text-xs text-morandi-green">
-                          點擊分配
+                          {SCHEDULING_LABELS.LABEL_1593}
                         </div>
                       )}
                     </div>

@@ -334,7 +334,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
                   isReadOnly && 'cursor-not-allowed opacity-60'
                 )}
               />
-              <span className="text-sm font-medium text-morandi-primary">人</span>
+              <span className="text-sm font-medium text-morandi-primary">{SELLING_PRICE_SECTION_LABELS.LABEL_2543}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Button

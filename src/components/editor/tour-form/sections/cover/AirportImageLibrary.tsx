@@ -246,7 +246,7 @@ export function AirportImageLibrary({
           >
             <div className="flex flex-col items-center gap-0.5 text-morandi-secondary">
               <Search size={18} />
-              <span className="text-[10px]">搜尋圖片</span>
+              <span className="text-[10px]">{COMP_EDITOR_LABELS.SEARCH_4460}</span>
             </div>
           </Button>
         </div>

@@ -145,7 +145,7 @@ export function VirtualizedTable<T extends RowData = RowData>({
         ))}
         {actions && (
           <div className="py-3 px-4 text-sm font-semibold text-morandi-primary" style={{ width: '100px' }}>
-            操作
+            {ENHANCED_TABLE_LABELS.ACTIONS}
           </div>
         )}
       </div>

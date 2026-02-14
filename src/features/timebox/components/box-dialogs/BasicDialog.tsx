@@ -190,7 +190,7 @@ export default function BasicDialog({ scheduledBox, box, onClose }: BasicDialogP
                     <button
                       onClick={() => setIsEditing(true)}
                       className="text-morandi-gold hover:text-morandi-gold-hover"
-                      title="編輯時間"
+                      title={BOX_DIALOGS_LABELS.EDIT_1582}
                     >
                       <Edit2 className="h-3.5 w-3.5" />
                     </button>
@@ -243,7 +243,7 @@ export default function BasicDialog({ scheduledBox, box, onClose }: BasicDialogP
             <div className="flex space-x-2">
               <Button variant="outline" className="gap-2" onClick={onClose}>
                 <X size={16} />
-                取消
+                {BOX_DIALOGS_LABELS.CANCEL}
               </Button>
               <Button
                 variant="outline"

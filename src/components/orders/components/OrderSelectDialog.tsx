@@ -105,7 +105,7 @@ export function OrderSelectDialog({
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
             <Check size={16} />
-            選擇訂單
+            {COMP_ORDERS_LABELS.選擇訂單}
           </Button>
         </DialogFooter>
       </DialogContent>

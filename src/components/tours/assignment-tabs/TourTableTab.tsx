@@ -489,7 +489,7 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-morandi-primary">
               <Plus className="h-5 w-5 text-morandi-gold" />
-              新增桌次
+              {COMP_TOURS_LABELS.ADD_4886}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">

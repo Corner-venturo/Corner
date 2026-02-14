@@ -261,7 +261,7 @@ export function DateRangeCell({
   const endDate = new Date(end)
 
   if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-    return <span className="text-sm text-morandi-red">無效日期</span>
+    return <span className="text-sm text-morandi-red">{TABLE_CELLS_LABELS.LABEL_5349}</span>
   }
 
   const duration = calculateDuration(startDate, endDate)

@@ -349,7 +349,7 @@ export function EditableRatesTable({
               ) : orderedGroups.length === 0 && isEditMode && !isAdding ? (
                 <tr>
                   <td colSpan={hideKKDAYColumns ? 9 : 12} className="text-center py-12">
-                    <div className="text-morandi-secondary mb-2">目前沒有車資資料</div>
+                    <div className="text-morandi-secondary mb-2">{EDITABLE_RATES_TABLE_LABELS.NOT_FOUND_9408}</div>
                     <Button
                       onClick={() => {
                         setIsAdding(true)

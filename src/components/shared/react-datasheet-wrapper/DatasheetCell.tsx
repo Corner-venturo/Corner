@@ -140,7 +140,7 @@ export function DatasheetCell({
             <SelectValue placeholder={REACT_DATASHEET_WRAPPER_LABELS.LABEL_322} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="__none__">未分配</SelectItem>
+            <SelectItem value="__none__">{REACT_DATASHEET_WRAPPER_LABELS.LABEL_322}</SelectItem>
             <SelectItem value="no-bed">{REACT_DATASHEET_WRAPPER_LABELS.LABEL_9228}</SelectItem>
             {roomOptions.filter(roomOption => {
               const usage = getRoomUsage

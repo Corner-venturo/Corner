@@ -328,7 +328,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                       newOptions[idx].return.code = value
                       updateField('flightOptions', newOptions)
                     }}
-                    placeholder="航班號"
+                    placeholder={ITINERARY_LABELS.LABEL_7892}
                     className="text-xs h-7"
                   />
                   <TimeInput
@@ -338,7 +338,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                       newOptions[idx].return.time = value
                       updateField('flightOptions', newOptions)
                     }}
-                    placeholder="出發時間"
+                    placeholder={ITINERARY_LABELS.LABEL_5706}
                     className="text-xs h-7"
                   />
                   <TimeInput
@@ -348,7 +348,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                       newOptions[idx].return.arrivalTime = value
                       updateField('flightOptions', newOptions)
                     }}
-                    placeholder="抵達時間"
+                    placeholder={ITINERARY_LABELS.LABEL_749}
                     className="text-xs h-7"
                   />
                 </div>
@@ -444,7 +444,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
             className="h-7 text-xs bg-morandi-gold hover:bg-morandi-gold-hover"
           >
             <Plus size={14} className="mr-1" />
-            新增
+            {ITINERARY_LABELS.ADD}
           </Button>
         </div>
         <div className="space-y-3">
@@ -458,7 +458,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                     newSights[idx].name = value
                     updateField('sights', newSights)
                   }}
-                  placeholder="景點名稱"
+                  placeholder={ITINERARY_LABELS.LABEL_3166}
                   className="flex-1 text-xs h-7 font-semibold"
                 />
                 <Button
@@ -482,7 +482,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                   newSights[idx].nameEn = value
                   updateField('sights', newSights)
                 }}
-                placeholder="英文名稱"
+                placeholder={ITINERARY_LABELS.LABEL_3778}
                 className="w-full text-xs h-7 mb-2"
               />
               <textarea

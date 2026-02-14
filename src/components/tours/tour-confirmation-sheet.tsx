@@ -369,7 +369,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                     {hasRequest ? (
                       <span className="flex items-center gap-1 text-xs text-morandi-green">
                         <Check size={14} />
-                        已建立需求單
+                        {COMP_TOURS_LABELS.LABEL_7836}
                       </span>
                     ) : (
                       <Button
@@ -392,8 +392,8 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-morandi-container/30 text-morandi-secondary">
-                        <th className="text-left px-3 py-2 font-medium w-24">日期</th>
-                        <th className="text-left px-3 py-2 font-medium">說明</th>
+                        <th className="text-left px-3 py-2 font-medium w-24">{COMP_TOURS_LABELS.日期}</th>
+                        <th className="text-left px-3 py-2 font-medium">{COMP_TOURS_LABELS.LABEL_5591}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">

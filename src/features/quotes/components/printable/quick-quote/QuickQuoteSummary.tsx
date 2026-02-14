@@ -83,7 +83,7 @@ export const QuickQuoteSummary: React.FC<QuickQuoteSummaryProps> = ({
           }}
         >
           <span className="text-xs font-semibold" style={{ color: MORANDI_COLORS.brown }}>
-            應收金額
+            {QUICK_QUOTE_LABELS.LABEL_6261}
           </span>
           <span className="text-xl font-bold" style={{ color: MORANDI_COLORS.brown }}>
             NT$ {totalAmount.toLocaleString()}

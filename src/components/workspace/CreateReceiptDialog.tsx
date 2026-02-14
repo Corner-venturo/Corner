@@ -192,7 +192,7 @@ export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateR
             disabled={!amount || parseFloat(amount) <= 0}
           >
             <Save size={16} />
-            建立收款單
+            {COMP_WORKSPACE_LABELS.LABEL_1761}
           </button>
         </DialogFooter>
       </DialogContent>

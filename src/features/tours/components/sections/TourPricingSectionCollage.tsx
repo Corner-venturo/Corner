@@ -216,7 +216,7 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
                     className="w-full py-3 bg-[#C6FF00] text-black border-2 border-black font-bold hover:bg-card transition-colors uppercase tracking-widest"
                     style={{ fontFamily: "'Space Mono', monospace" }}
                   >
-                    選擇此方案
+                    {TOURS_LABELS.SELECT_2483}
                   </button>
                 </motion.div>
               )}

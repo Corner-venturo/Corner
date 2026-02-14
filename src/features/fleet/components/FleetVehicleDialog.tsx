@@ -225,7 +225,7 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
                 type="number"
                 value={formData.next_maintenance_km || ''}
                 onChange={e => onFormFieldChange('next_maintenance_km', e.target.value ? parseInt(e.target.value) : null)}
-                placeholder="公里數"
+                placeholder={VEHICLE_DIALOG_LABELS.LABEL_5555}
                 className="mt-1"
                 min={0}
               />

@@ -553,7 +553,7 @@ export function TemplateDataPanel({
                                 onValueChange={(v) => updateDailyItinerary(idx, 'mealIconDinner', v)}
                               >
                                 <SelectTrigger className="h-7 w-20 text-[10px]">
-                                  <SelectValue placeholder="圖標" />
+                                  <SelectValue placeholder={DESIGNER_LABELS.LABEL_272} />
                                 </SelectTrigger>
                                 <SelectContent>
                                   {MEAL_ICON_OPTIONS.map((opt) => (

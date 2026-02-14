@@ -268,7 +268,7 @@ export function useItineraryTableColumns({
                         handleClose(itinerary.id)
                       }}
                       className="p-1 text-morandi-secondary hover:text-status-success hover:bg-status-success-bg rounded transition-colors"
-                      title="結案"
+                      title={ITINERARY_LABELS.LABEL_248}
                     >
                       <CheckCircle2 size={14} />
                     </button>

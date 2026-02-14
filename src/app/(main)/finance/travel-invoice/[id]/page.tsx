@@ -100,7 +100,7 @@ export default function InvoiceDetailPage() {
     return (
       <div className="h-full flex flex-col">
         <ResponsiveHeader
-          title="發票詳情"
+          title={TRAVEL_INVOICE_DETAIL_LABELS.LABEL_6889}
           icon={FileText}
           showBackButton={true}
           onBack={() => router.push('/finance/travel-invoice')}

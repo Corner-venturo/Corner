@@ -151,7 +151,7 @@ export function ExportDialog({
           </style>
         </head>
         <body>
-          <h1>成員名單</h1>
+          <h1>{ORDERS_LABELS.LABEL_1942}</h1>
           <div class="info">
             出發日期：${departureDate || '未設定'} | 總人數：${members.length} 人
           </div>

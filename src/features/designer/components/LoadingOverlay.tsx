@@ -123,7 +123,7 @@ export function SavingIndicator({ isSaving }: { isSaving: boolean }) {
   return (
     <div className="fixed bottom-4 right-4 z-50 bg-card rounded-lg shadow-lg border border-border px-4 py-2 flex items-center gap-2">
       <Loader2 className="w-4 h-4 animate-spin text-morandi-gold" />
-      <span className="text-sm text-morandi-primary">儲存中...</span>
+      <span className="text-sm text-morandi-primary">{DESIGNER_LABELS.SAVING_4983}</span>
     </div>
   )
 }

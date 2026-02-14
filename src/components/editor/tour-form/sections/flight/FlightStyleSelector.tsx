@@ -46,7 +46,7 @@ export function FlightStyleSelector({
     <div className="bg-gradient-to-r from-muted to-morandi-container/50 p-4 rounded-lg border border-border">
       <div className="flex items-center gap-2 mb-3">
         <Plane className="w-4 h-4 text-morandi-secondary" />
-        <span className="text-sm font-medium text-morandi-primary">航班卡片風格</span>
+        <span className="text-sm font-medium text-morandi-primary">{FLIGHT_LABELS.LABEL_1803}</span>
       </div>
       <div className="grid grid-cols-3 gap-2">
         {options.map((option) => {

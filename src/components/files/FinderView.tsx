@@ -545,7 +545,7 @@ export function FinderView({
                   onClick={() => fileInputRef.current?.click()}
                 >
                   <Upload size={14} className="mr-2" />
-                  上傳檔案
+                  {FILES_LABELS.UPLOADING_209}
                 </Button>
               )}
             </div>
@@ -604,7 +604,7 @@ export function FinderView({
                 onClick={() => onDelete(Array.from(selectedIds))}
               >
                 <Trash2 size={14} className="mr-1" />
-                刪除
+                {FILES_LABELS.DELETE}
               </Button>
             )}
           </div>

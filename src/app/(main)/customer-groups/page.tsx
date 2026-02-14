@@ -494,12 +494,12 @@ export default function CustomerGroupsPage() {
             <Input
               value={formData.name}
               onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder="例如：王家旅遊團"
+              placeholder={CG_LABELS.EXAMPLE_933}
             />
           </div>
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              群組類型
+              {CG_LABELS.LABEL_5116}
             </label>
             <Combobox
               value={formData.type}
@@ -510,7 +510,7 @@ export default function CustomerGroupsPage() {
                 value,
                 label,
               }))}
-              placeholder="選擇類型..."
+              placeholder={CG_LABELS.SELECT_7211}
             />
           </div>
           <div>
@@ -518,7 +518,7 @@ export default function CustomerGroupsPage() {
             <Input
               value={formData.notes}
               onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-              placeholder="選填"
+              placeholder={CG_LABELS.OPTIONAL}
             />
           </div>
         </div>

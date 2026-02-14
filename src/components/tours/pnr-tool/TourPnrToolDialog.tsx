@@ -711,7 +711,7 @@ export function TourPnrToolDialog({
                         </th>
                         <th className="px-3 py-2 text-left font-medium text-morandi-secondary">
                           <Utensils size={14} className="inline mr-1" />
-                          餐食
+                          {TOUR_PNR_TOOL_DIALOG_LABELS.餐食}
                         </th>
                         <th className="px-3 py-2 text-left font-medium text-morandi-secondary">{TOUR_PNR_TOOL_DIALOG_LABELS.LABEL_2736}</th>
                         <th className="px-3 py-2 text-left font-medium text-morandi-secondary">{TOUR_PNR_TOOL_DIALOG_LABELS.LABEL_7910}</th>

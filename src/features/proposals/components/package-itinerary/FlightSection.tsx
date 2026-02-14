@@ -192,7 +192,7 @@ export function FlightSection({
           </div>
         ) : returnSegments.length > 0 ? (
           <div className="space-y-2">
-            <p className="text-xs text-morandi-secondary">此航班有多個航段，請選擇：</p>
+            <p className="text-xs text-morandi-secondary">{TOUR_REQUEST_FORM_DIALOG_LABELS.PLEASE_SELECT_4482}</p>
             <div className="space-y-1">
               {returnSegments.map((seg, i) => (
                 <button
@@ -217,7 +217,7 @@ export function FlightSection({
               onClick={onClearReturnSegments}
               className="text-xs text-morandi-secondary hover:text-morandi-primary"
             >
-              取消
+              {TOUR_REQUEST_FORM_DIALOG_LABELS.CANCEL}
             </button>
           </div>
         ) : (

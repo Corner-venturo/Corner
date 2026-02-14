@@ -241,7 +241,7 @@ export function PaymentItemForm({
               type="number"
               value={item.fees || ''}
               onChange={e => onUpdate(item.id, { fees: Number(e.target.value) })}
-              placeholder="選填，如有手續費"
+              placeholder={PAYMENT_ITEM_LABELS.LABEL_1988}
             />
           </div>
         </div>
