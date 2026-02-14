@@ -10,8 +10,8 @@ import { Printer, X, Plane, Hotel, Users, Check, Loader2, FileSpreadsheet } from
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { supabase } from '@/lib/supabase/client'
 import { useReferenceData } from '@/lib/pnr'
+import { fetchTourPnrs, fetchPnrsByLocators } from '@/features/tours/services/tour_dependency.service'
 import type { Tour } from '@/stores/types'
 import type { OrderMember, ExportColumnsConfig } from '@/features/orders/types/order-member.types'
 import type { PNR } from '@/types/pnr.types'
@@ -92,15 +92,15 @@ export function TourPrintDialog({ isOpen, tour, members, onClose }: TourPrintDia
 
       const fetchPnrs = async () => {
         const results: PNR[] = []
-        const { data: tourPnrs } = await supabase.from('pnrs').select('*').eq('tour_id', tour.id)
-        if (tourPnrs) results.push(...(tourPnrs as unknown as PNR[]))
+        const tourPnrs = await fetchTourPnrs(tour.id)
+        if (tourPnrs.length > 0) results.push(...(tourPnrs as unknown as PNR[]))
 
         if (memberPnrCodes.length > 0) {
           const existingLocators = new Set(results.map((p) => p.record_locator))
           const missingCodes = memberPnrCodes.filter((c) => !existingLocators.has(c))
           if (missingCodes.length > 0) {
-            const { data: memberPnrs } = await supabase.from('pnrs').select('*').in('record_locator', missingCodes)
-            if (memberPnrs) results.push(...(memberPnrs as unknown as PNR[]))
+            const memberPnrs = await fetchPnrsByLocators(missingCodes)
+            if (memberPnrs.length > 0) results.push(...(memberPnrs as unknown as PNR[]))
           }
         }
 

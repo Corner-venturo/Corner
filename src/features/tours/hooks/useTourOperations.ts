@@ -9,8 +9,14 @@ import { NewTourData } from '../types'
 import { OrderFormData } from '@/features/orders/components/add-order-form'
 import type { CreateInput, UpdateInput } from '@/stores/core/types'
 import { useCountries, useCities, updateCountry, updateCity, updateQuote } from '@/data'
-import { supabase } from '@/lib/supabase/client'
 import { createOrder } from '@/data/entities/orders'
+import {
+  checkTourDependencies,
+  checkTourPaidOrders,
+  deleteTourEmptyOrders,
+  unlinkTourQuotes,
+  unlinkTourItineraries,
+} from '@/features/tours/services/tour_dependency.service'
 
 interface TourActions {
   create: (data: CreateInput<Tour>) => Promise<Tour>
@@ -238,72 +244,31 @@ export function useTourOperations(params: UseTourOperationsParams) {
 
       try {
         // 檢查是否有關聯資料（團員、收款單、請款單、PNR 不能刪）
-        // 訂單可以連帶刪除，但如果有團員就不行
-        const checks = await Promise.all([
-          supabase.from('order_members').select('id', { count: 'exact', head: true }).eq('tour_id', tour.id),
-          supabase.from('receipt_orders').select('id', { count: 'exact', head: true }).eq('tour_id', tour.id),
-          supabase.from('payment_requests').select('id', { count: 'exact', head: true }).eq('tour_id', tour.id),
-          supabase.from('pnrs').select('id', { count: 'exact', head: true }).eq('tour_id', tour.id),
-        ])
+        const { blockers, hasBlockers } = await checkTourDependencies(tour.id)
 
-        const [members, receipts, payments, pnrs] = checks
-        const blockers: string[] = []
-
-        if (members.count && members.count > 0) blockers.push(`${members.count} 位團員`)
-        if (receipts.count && receipts.count > 0) blockers.push(`${receipts.count} 筆收款單`)
-        if (payments.count && payments.count > 0) blockers.push(`${payments.count} 筆請款單`)
-        if (pnrs.count && pnrs.count > 0) blockers.push(`${pnrs.count} 筆 PNR`)
-
-        if (blockers.length > 0) {
+        if (hasBlockers) {
           const errorMsg = `無法刪除：此旅遊團有 ${blockers.join('、')}，請先刪除相關資料`
           logger.warn(`刪除旅遊團 ${tour.code} 失敗：${errorMsg}`)
           return { success: false, error: errorMsg }
         }
 
         // 檢查是否有已付款訂單
-        const { data: paidOrders } = await supabase
-          .from('orders')
-          .select('id, payment_status')
-          .eq('tour_id', tour.id)
-          .neq('payment_status', 'unpaid')
-
-        if (paidOrders && paidOrders.length > 0) {
-          return { success: false, error: `此團有 ${paidOrders.length} 筆已付款訂單，無法刪除` }
+        const { hasPaidOrders, count: paidCount } = await checkTourPaidOrders(tour.id)
+        if (hasPaidOrders) {
+          return { success: false, error: `此團有 ${paidCount} 筆已付款訂單，無法刪除` }
         }
 
         // 刪除關聯的訂單（沒有團員的空訂單可以刪）
-        await supabase.from('orders').delete().eq('tour_id', tour.id)
+        await deleteTourEmptyOrders(tour.id)
 
-        // 斷開關聯的報價單（不刪除，只是解除連結）
-        const { data: linkedQuotes } = await supabase
-          .from('quotes')
-          .select('id')
-          .eq('tour_id', tour.id)
-
-        if (linkedQuotes && linkedQuotes.length > 0) {
-          await supabase
-            .from('quotes')
-            .update({ tour_id: null, status: 'proposed', updated_at: new Date().toISOString() })
-            .eq('tour_id', tour.id)
-        }
-
-        // 斷開關聯的行程表（不刪除，只是解除連結）
-        const { data: linkedItineraries } = await supabase
-          .from('itineraries')
-          .select('id')
-          .eq('tour_id', tour.id)
-
-        if (linkedItineraries && linkedItineraries.length > 0) {
-          await supabase
-            .from('itineraries')
-            .update({ tour_id: null, tour_code: null, status: '提案', updated_at: new Date().toISOString() })
-            .eq('tour_id', tour.id)
-        }
+        // 斷開關聯的報價單和行程表
+        const linkedQuotesCount = await unlinkTourQuotes(tour.id)
+        const linkedItinerariesCount = await unlinkTourItineraries(tour.id)
 
         // 刪除旅遊團
         await actions.delete(tour.id)
 
-        logger.info(`已刪除旅遊團 ${tour.code}，斷開 ${linkedQuotes?.length || 0} 個報價單和 ${linkedItineraries?.length || 0} 個行程表的連結`)
+        logger.info(`已刪除旅遊團 ${tour.code}，斷開 ${linkedQuotesCount} 個報價單和 ${linkedItinerariesCount} 個行程表的連結`)
         return { success: true }
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : '刪除旅遊團失敗'
@@ -320,39 +285,9 @@ export function useTourOperations(params: UseTourOperationsParams) {
       try {
         // 封存時斷開連結，解除封存不需要
         if (!tour.archived) {
-          // 1. 🔧 優化：直接查詢並斷開關聯的報價單
-          const { data: linkedQuotes } = await supabase
-            .from('quotes')
-            .select('id')
-            .eq('tour_id', tour.id)
-
-          if (linkedQuotes && linkedQuotes.length > 0) {
-            const { error: quoteError } = await supabase
-              .from('quotes')
-              .update({ tour_id: null, status: 'proposed', updated_at: new Date().toISOString() })
-              .eq('tour_id', tour.id)
-            if (quoteError) {
-              logger.warn('斷開報價單失敗:', quoteError.message)
-            }
-          }
-
-          // 2. 🔧 優化：直接查詢並斷開關聯的行程表
-          const { data: linkedItineraries } = await supabase
-            .from('itineraries')
-            .select('id')
-            .eq('tour_id', tour.id)
-
-          if (linkedItineraries && linkedItineraries.length > 0) {
-            const { error: itinError } = await supabase
-              .from('itineraries')
-              .update({ tour_id: null, tour_code: null, status: '提案', updated_at: new Date().toISOString() })
-              .eq('tour_id', tour.id)
-            if (itinError) {
-              logger.warn('斷開行程表失敗:', itinError.message)
-            }
-          }
-
-          logger.info(`封存旅遊團 ${tour.code}，斷開 ${linkedQuotes?.length || 0} 個報價單和 ${linkedItineraries?.length || 0} 個行程表的連結`)
+          const linkedQuotesCount = await unlinkTourQuotes(tour.id)
+          const linkedItinerariesCount = await unlinkTourItineraries(tour.id)
+          logger.info(`封存旅遊團 ${tour.code}，斷開 ${linkedQuotesCount} 個報價單和 ${linkedItinerariesCount} 個行程表的連結`)
         }
 
         // 封存時記錄原因，解除封存時清除原因

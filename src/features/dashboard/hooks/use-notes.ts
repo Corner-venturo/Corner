@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import type { NoteTab } from '../types'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
+import { deleteUserNotes, insertNotes } from '@/features/dashboard/services/dashboard.service'
 
 const STORAGE_KEY = 'homepage-notes-tabs'
 const DEFAULT_TABS: NoteTab[] = [{ id: '1', name: '筆記', content: '' }]
@@ -78,7 +79,7 @@ export function useNotes() {
       if (user?.id) {
         try {
           // 先刪除所有現有筆記（簡單的同步策略）
-          await supabase.from('notes').delete().eq('user_id', user.id)
+          await deleteUserNotes(user.id)
 
           // 插入所有新筆記
           const notesToInsert = newTabs.map((tab, index) => ({
@@ -90,11 +91,7 @@ export function useNotes() {
             tab_order: index,
           }))
 
-          const { error } = await supabase.from('notes').insert(notesToInsert)
-
-          if (error) {
-            // Failed to save to Supabase but localStorage is synced
-          }
+          await insertNotes(notesToInsert)
         } catch (error) {
           // Error saving notes to Supabase
         }

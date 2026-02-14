@@ -2,6 +2,8 @@
  * 幣值轉換相關常數和工具函數
  */
 
+import { formatMoney } from '@/lib/utils/format-currency'
+
 // 機場代碼 / 城市 / 國家 對應幣別
 export const DESTINATION_CURRENCY_MAP: Record<string, string> = {
   // 日本
@@ -107,11 +109,11 @@ export function getCurrencySymbol(code: string | null | undefined): string {
 }
 
 /**
- * 格式化金額
+ * 格式化金額（無貨幣符號，純數字）
  */
 export function formatCurrency(value: number | null | undefined): string {
   if (value == null) return '-'
-  return new Intl.NumberFormat('zh-TW').format(value)
+  return formatMoney(value) || '0'
 }
 
 /**

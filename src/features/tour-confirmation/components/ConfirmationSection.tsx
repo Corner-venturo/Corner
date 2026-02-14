@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import type { TourConfirmationItem, ConfirmationItemCategory } from '@/types/tour-confirmation-sheet.types'
 import { CONFIRMATION_SECTION_LABELS } from '../constants/labels';
 import { formatDateCompactPadded } from '@/lib/utils/format-date'
+import { formatMoney } from '@/lib/utils/format-currency'
 
 interface ColumnConfig {
   key: string
@@ -47,11 +48,7 @@ export function ConfirmationSection({
 }: ConfirmationSectionProps) {
   const formatCurrency = (value: number | null | undefined) => {
     if (value == null) return '-'
-    return new Intl.NumberFormat('zh-TW', {
-      style: 'decimal',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value)
+    return formatMoney(value) || '0'
   }
 
   const formatDate = (dateStr: string | null | undefined) => {

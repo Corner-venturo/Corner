@@ -8,6 +8,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react'
 import { logger } from '@/lib/utils/logger'
+import { formatCurrency } from '@/lib/utils/format-currency'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -156,15 +157,6 @@ export function SupplierFinancePage() {
 
     loadData()
   }, [user?.workspace_id, dateRange])
-
-  // 格式化金額
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('zh-TW', {
-      style: 'currency',
-      currency: 'TWD',
-      minimumFractionDigits: 0,
-    }).format(amount)
-  }
 
   return (
     <div className="space-y-6">

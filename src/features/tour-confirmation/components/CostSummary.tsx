@@ -8,6 +8,7 @@
 
 import { Bus, Utensils, Hotel, Ticket, FileText, Calculator } from 'lucide-react'
 import type { CostSummary as CostSummaryType } from '@/types/tour-confirmation-sheet.types'
+import { formatMoney } from '@/lib/utils/format-currency'
 import { COST_SUMMARY_LABELS } from '../constants/labels';
 
 interface CostSummaryCardProps {
@@ -15,13 +16,7 @@ interface CostSummaryCardProps {
 }
 
 export function CostSummaryCard({ summary }: CostSummaryCardProps) {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('zh-TW', {
-      style: 'decimal',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value)
-  }
+  const formatCurrency = (value: number) => formatMoney(value) || '0'
 
   const categories = [
     { key: 'transport', label: COST_SUMMARY_LABELS.交通, icon: Bus, color: 'text-blue-500' },

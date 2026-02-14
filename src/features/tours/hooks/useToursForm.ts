@@ -4,9 +4,9 @@ import { useCallback, useState, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useTourPageState } from './useTourPageState'
 import { useEmployeesSlim } from '@/data'
-import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import type { Proposal, ProposalPackage } from '@/types/proposal.types'
+import { fetchProposalConvertData } from '@/features/tours/services/tour_dependency.service'
 
 // 判斷是否為台灣（支援多種寫法）
 const isTaiwanCountry = (country: string | undefined | null): boolean => {
@@ -121,18 +121,10 @@ export function useToursForm({ state, openDialog }: UseToursFormParams): UseTour
       navigationProcessedRef.current = true
       try {
         // 取得提案、套件和行程表資料
-        const [proposalRes, packageRes, itineraryRes] = await Promise.all([
-          supabase.from('proposals').select('*').eq('id', fromProposal).single(),
-          supabase.from('proposal_packages').select('*').eq('id', packageId).single(),
-          // 查詢關聯的行程表（取最新的一筆）
-          supabase.from('itineraries').select('outbound_flight, return_flight').eq('proposal_package_id', packageId).order('created_at', { ascending: false }).limit(1).maybeSingle(),
-        ])
+        const convertData = await fetchProposalConvertData(fromProposal, packageId)
 
-        if (proposalRes.error) throw proposalRes.error
-        if (packageRes.error) throw packageRes.error
-
-        const proposal = proposalRes.data as Proposal
-        const pkg = packageRes.data as ProposalPackage
+        const proposal = convertData.proposal as Proposal
+        const pkg = convertData.package as ProposalPackage
 
         // 儲存轉開團資料
         setProposalConvertData({ proposal, package: pkg })
@@ -144,8 +136,9 @@ export function useToursForm({ state, openDialog }: UseToursFormParams): UseTour
 
         // 解析行程表的航班資訊
         type FlightData = { airline?: string; flightNumber?: string; departureTime?: string; arrivalTime?: string } | null
-        const outboundFlight = itineraryRes.data?.outbound_flight as FlightData
-        const returnFlight = itineraryRes.data?.return_flight as FlightData
+        const itineraryData = convertData.itinerary as { outbound_flight?: FlightData; return_flight?: FlightData } | null
+        const outboundFlight = itineraryData?.outbound_flight as FlightData
+        const returnFlight = itineraryData?.return_flight as FlightData
 
         // 預填表單資料（包含航班）
         const isTaiwan = isTaiwanCountry(pkg.country_id)
@@ -184,7 +177,7 @@ export function useToursForm({ state, openDialog }: UseToursFormParams): UseTour
         // 開啟建立對話框
         openDialog('create')
 
-        logger.info('從提案轉開團', { proposalId: fromProposal, packageId, hasItinerary: !!itineraryRes.data })
+        logger.info('從提案轉開團', { proposalId: fromProposal, packageId, hasItinerary: !!itineraryData })
       } catch (error) {
         logger.error('載入提案資料失敗', error)
         // 清除 URL 參數

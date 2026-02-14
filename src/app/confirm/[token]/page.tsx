@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { logger } from '@/lib/utils/logger'
 import { formatDateChinese } from '@/lib/utils/format-date'
+import { formatCurrency } from '@/lib/utils/format-currency'
 import { QUOTE_CONFIRM_PAGE_LABELS } from './constants/labels'
 
 interface QuoteInfo {
@@ -114,16 +115,6 @@ export default function QuoteConfirmPage() {
       setState('ready')
       setError(QUOTE_CONFIRM_PAGE_LABELS.NETWORK_ERROR)
     }
-  }
-
-  // 格式化金額
-  function formatCurrency(amount: number | null) {
-    if (!amount) return '-'
-    return new Intl.NumberFormat('zh-TW', {
-      style: 'currency',
-      currency: 'TWD',
-      maximumFractionDigits: 0,
-    }).format(amount)
   }
 
   // 格式化日期

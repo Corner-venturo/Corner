@@ -12,6 +12,7 @@ import { supabase } from '@/lib/supabase/client'
 import { formatDate } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
 import { deleteTour as deleteTourEntity } from '@/data'
+import { checkTourDependencies, deleteTourEmptyOrders } from '@/features/tours/services/tour_dependency.service'
 import { ARCHIVE_LABELS } from './constants/labels'
 
 interface ArchivedTour {
@@ -149,22 +150,9 @@ export default function ArchiveManagementPage() {
   // 永久刪除旅遊團
   const handleDeleteTour = async (tour: ArchivedTour) => {
     // 先檢查是否有關聯資料（團員、收款單、請款單、PNR 不能刪，訂單可以連帶刪）
-    const checks = await Promise.all([
-      supabase.from('order_members').select('id', { count: 'exact', head: true }).eq('tour_id', tour.id),
-      supabase.from('receipt_orders').select('id', { count: 'exact', head: true }).eq('tour_id', tour.id),
-      supabase.from('payment_requests').select('id', { count: 'exact', head: true }).eq('tour_id', tour.id),
-      supabase.from('pnrs').select('id', { count: 'exact', head: true }).eq('tour_id', tour.id),
-    ])
+    const { blockers, hasBlockers } = await checkTourDependencies(tour.id)
 
-    const [members, receipts, payments, pnrs] = checks
-    const blockers: string[] = []
-
-    if (members.count && members.count > 0) blockers.push(`${members.count} 位團員`)
-    if (receipts.count && receipts.count > 0) blockers.push(`${receipts.count} 筆收款單`)
-    if (payments.count && payments.count > 0) blockers.push(`${payments.count} 筆請款單`)
-    if (pnrs.count && pnrs.count > 0) blockers.push(`${pnrs.count} 筆 PNR`)
-
-    if (blockers.length > 0) {
+    if (hasBlockers) {
       toast.error(`無法刪除：此旅遊團有 ${blockers.join('、')}，請先刪除相關資料`)
       return
     }
@@ -180,7 +168,7 @@ export default function ArchiveManagementPage() {
 
     try {
       // 先刪除空訂單（沒有團員的）
-      await supabase.from('orders').delete().eq('tour_id', tour.id)
+      await deleteTourEmptyOrders(tour.id)
 
       await deleteTourEntity(tour.id)
       toast.success(`已永久刪除旅遊團 ${tour.code}`)

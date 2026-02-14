@@ -21,6 +21,7 @@ import {
 } from '@/data'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
+import { formatCurrency } from '@/lib/utils/format-currency'
 import { generateTourClosingPDF } from '@/lib/pdf/tour-closing-pdf'
 import { supabase } from '@/lib/supabase/client'
 import { TOURS_LABELS } from './constants/labels'
@@ -90,16 +91,6 @@ export function TourClosingDialog({
   }, [totalRevenue, opBonusPercent])
 
   const totalBonus = salesBonus + opBonus
-
-  // 格式化金額
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('zh-TW', {
-      style: 'currency',
-      currency: 'TWD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount)
-  }
 
   // 處理結案
   const handleClose = async () => {
