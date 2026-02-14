@@ -421,7 +421,7 @@ export function OrderMembersExpandable({
       logger.info(`[同步] 完成: 更新 ${updatedCount} 位，跳過 ${skippedCount} 位`)
 
       if (updatedCount > 0) {
-        toast.success(`已同步 ${updatedCount} 位成員資料`)
+        toast.success(`${COMP_ORDERS_LABELS.已同步成員資料}${updatedCount}${COMP_ORDERS_LABELS.位成員資料}`)
         membersData.loadMembers() // 重新載入成員資料
       } else {
         toast.info(COMP_ORDERS_LABELS.顧客主檔沒有額外的護照資料可同步)
@@ -540,18 +540,18 @@ export function OrderMembersExpandable({
       {/* 區塊標題行 */}
       <div className={`flex-shrink-0 flex items-center justify-between px-4 py-2 ${embedded ? '' : 'bg-morandi-container/50 border-b border-border/60'}`}>
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-morandi-primary">團員名單</span>
-          <span className="text-sm text-morandi-secondary">({sortedMembers.length} 人)</span>
+          <span className="text-sm font-medium text-morandi-primary">{COMP_ORDERS_LABELS.團員名單}</span>
+          <span className="text-sm text-morandi-secondary">({sortedMembers.length} {COMP_ORDERS_LABELS.人})</span>
         </div>
         <div className="flex items-center gap-1">
           {/* PNR 配對按鈕：在 tour 和 order 模式都顯示 */}
           <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => setShowPnrMatchDialog(true)}>
-            <Plane size={14} className="mr-1" />PNR 配對
+            <Plane size={14} className="mr-1" />{COMP_ORDERS_LABELS.PNR_配對}
           </Button>
           {/* 分配按鈕（分房、分車、分桌）：僅在 tour 模式顯示 */}
           {mode === 'tour' && (
             <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => roomVehicle.setShowRoomManager(true)}>
-              <Hotel size={14} className="mr-1" />分配
+              <Hotel size={14} className="mr-1" />{COMP_ORDERS_LABELS.分配}
             </Button>
           )}
           <Button
@@ -576,7 +576,7 @@ export function OrderMembersExpandable({
             {isSyncingFromCustomers ? COMP_ORDERS_LABELS.同步中 : COMP_ORDERS_LABELS.從顧客同步}
           </Button>
           <Button variant="ghost" size="sm" className={`h-8 px-2 ${showIdentityColumn ? 'text-morandi-gold' : ''}`} onClick={() => setShowIdentityColumn(!showIdentityColumn)}>
-            身份
+            {COMP_ORDERS_LABELS.身份}
           </Button>
           {mode === 'tour' && (
             <Button
@@ -606,7 +606,7 @@ export function OrderMembersExpandable({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel className="text-xs">顯示欄位</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-xs">{COMP_ORDERS_LABELS.顯示欄位}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuCheckboxItem
                 checked={columnVisibility.passport_name}
@@ -723,7 +723,7 @@ export function OrderMembersExpandable({
             </DropdownMenuContent>
           </DropdownMenu>
           <Button variant="default" size="sm" className="h-8 px-3" onClick={membersData.handleAddMember}>
-            <Plus size={14} className="mr-1" />新增
+            <Plus size={14} className="mr-1" />{COMP_ORDERS_LABELS.新增}
           </Button>
         </div>
       </div>
