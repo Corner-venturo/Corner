@@ -183,6 +183,9 @@ export const EXCHANGE_RATE_DIALOG_LABELS = {
   EXAMPLE_HINT: '例：日圓約 0.22，泰銖約 0.9，韓元約 0.024',
   CANCEL: '取消',
   CONFIRM: '確認',
+  RATE_DESCRIPTION_PREFIX: '設定 ',
+  RATE_DESCRIPTION_SUFFIX: ' 對台幣的匯率，用於換算預計支出',
+  外幣: '外幣',
 };
 
 export const HOTEL_CONFIRMATION_SECTION_LABELS = {
@@ -204,6 +207,9 @@ export const TOUR_INFO_LABELS = {
   RETURN: '回程',
   GROUP_SIZE: '團體人數',
   GENERAL_PREFIX: '一般：',
+  PERSON_UNIT: ' 人',
+  UNDER_6_PREFIX: '6歲以下：',
+  OVER_65_PREFIX: '65歲以上：',
 
   LABEL_138: '交通',
   LABEL_20: '公司名稱',

@@ -76,11 +76,11 @@ export function DevToolsSettings() {
         >
           {expanded ? (
             <>
-              收起 <ChevronUp className="ml-1 h-4 w-4" />
+              {DEVTOOLS_LABELS.COLLAPSE} <ChevronUp className="ml-1 h-4 w-4" />
             </>
           ) : (
             <>
-              展開 <ChevronDown className="ml-1 h-4 w-4" />
+              {DEVTOOLS_LABELS.EXPAND} <ChevronDown className="ml-1 h-4 w-4" />
             </>
           )}
         </Button>
@@ -121,7 +121,7 @@ export function DevToolsSettings() {
         <div className="p-4 border border-border rounded-lg bg-card">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <h3 className="font-medium mb-1">Vercel 環境變數清單</h3>
+              <h3 className="font-medium mb-1">{DEVTOOLS_LABELS.VERCEL_ENV_LIST}</h3>
               <p className="text-sm text-morandi-secondary">
                 {DEVTOOLS_LABELS.SETTINGS_6471}
               </p>
@@ -135,7 +135,7 @@ export function DevToolsSettings() {
               {copiedVercel ? (
                 <span className="flex items-center gap-1 text-status-success">
                   <Check className="h-4 w-4" />
-                  已複製！
+                  {DEVTOOLS_LABELS.COPIED}
                 </span>
               ) : (
                 <span className="flex items-center gap-1">
@@ -152,7 +152,7 @@ export function DevToolsSettings() {
           <div className="space-y-4 mt-4">
             <div className="p-4 bg-foreground rounded-lg">
               <h4 className="text-sm font-medium text-morandi-muted mb-2">
-                .env.local 完整內容預覽：
+                {DEVTOOLS_LABELS.ENV_PREVIEW}
               </h4>
               <pre className="text-xs text-status-success overflow-x-auto whitespace-pre-wrap">
                 {ENV_SETUP_PROMPT}
@@ -167,7 +167,7 @@ export function DevToolsSettings() {
                 <li>{DEVTOOLS_LABELS.STEP_COPY}</li>
                 <li>{DEVTOOLS_LABELS.STEP_OPEN_TERMINAL}</li>
                 <li>{DEVTOOLS_LABELS.STEP_PASTE}</li>
-                <li>Claude Code 會自動建立 .env.local 檔案</li>
+                <li>{DEVTOOLS_LABELS.STEP_CLAUDE_AUTO}</li>
                 <li>{DEVTOOLS_LABELS.STEP_RESTART}<code className="bg-morandi-container dark:bg-morandi-container/30 px-1 rounded">npm run dev</code></li>
               </ol>
             </div>

@@ -17,11 +17,11 @@ export const QuotationInclusions: React.FC = () => {
           {QUOTATION_LABELS.LABEL_5450}
         </h4>
         <ul className="space-y-1 text-sm" style={{ color: MORANDI_COLORS.gray }}>
-          <li>• 行程表所列之交通費用</li>
-          <li>• 行程表所列之住宿費用</li>
-          <li>• 行程表所列之餐食費用</li>
-          <li>• 行程表所列之門票費用</li>
-          <li>• 專業導遊服務</li>
+          <li>• {QUOTATION_LABELS.TRANSPORTATION_COST}</li>
+          <li>• {QUOTATION_LABELS.ACCOMMODATION_COST}</li>
+          <li>• {QUOTATION_LABELS.MEAL_COST}</li>
+          <li>• {QUOTATION_LABELS.TICKET_COST}</li>
+          <li>• {QUOTATION_LABELS.GUIDE_SERVICE}</li>
           <li>• {QUOTATION_INCLUSIONS_LABELS.旅遊責任險}</li>
         </ul>
       </div>
@@ -30,11 +30,11 @@ export const QuotationInclusions: React.FC = () => {
           {QUOTATION_LABELS.LABEL_4561}
         </h4>
         <ul className="space-y-1 text-sm" style={{ color: MORANDI_COLORS.gray }}>
-          <li>• 個人護照及簽證費用</li>
-          <li>• 行程外之自費行程</li>
-          <li>• 個人消費及小費</li>
-          <li>• 行李超重費用</li>
-          <li>• 單人房差價</li>
+          <li>• {QUOTATION_LABELS.PASSPORT_VISA_COST}</li>
+          <li>• {QUOTATION_LABELS.OPTIONAL_TOUR}</li>
+          <li>• {QUOTATION_LABELS.PERSONAL_EXPENSE}</li>
+          <li>• {QUOTATION_LABELS.OVERWEIGHT_LUGGAGE}</li>
+          <li>• {QUOTATION_LABELS.SINGLE_ROOM_SUPPLEMENT}</li>
         </ul>
       </div>
     </div>

@@ -189,6 +189,12 @@ export const DEVTOOLS_LABELS = {
   SETTINGS_6471: '用於設定 Vercel 專案的環境變數',
   COPYING_4512: '複製清單',
   LABEL_2441: '使用方式：',
+  COLLAPSE: '收起',
+  EXPAND: '展開',
+  VERCEL_ENV_LIST: 'Vercel 環境變數清單',
+  COPIED: '已複製！',
+  ENV_PREVIEW: '.env.local 完整內容預覽：',
+  STEP_CLAUDE_AUTO: 'Claude Code 會自動建立 .env.local 檔案',
 }
 
 export const MODULE_MANAGEMENT_LABELS = {

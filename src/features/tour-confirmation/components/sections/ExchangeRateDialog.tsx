@@ -41,10 +41,10 @@ export function ExchangeRateDialog({
         </DialogHeader>
         <div className="space-y-4 py-4">
           <p className="text-sm text-morandi-secondary">
-            設定 {destinationCurrency || TOUR_CONFIRMATION_SHEET_PAGE_LABELS.外幣} 對台幣的匯率，用於換算預計支出
+            {EXCHANGE_RATE_DIALOG_LABELS.RATE_DESCRIPTION_PREFIX}{destinationCurrency || TOUR_CONFIRMATION_SHEET_PAGE_LABELS.外幣}{EXCHANGE_RATE_DIALOG_LABELS.RATE_DESCRIPTION_SUFFIX}
           </p>
           <div className="space-y-2">
-            <Label htmlFor="exchange-rate">1 {destinationCurrency || '外幣'} = ? TWD</Label>
+            <Label htmlFor="exchange-rate">1 {destinationCurrency || EXCHANGE_RATE_DIALOG_LABELS.外幣} = ? TWD</Label>
             <Input
               id="exchange-rate"
               type="number"

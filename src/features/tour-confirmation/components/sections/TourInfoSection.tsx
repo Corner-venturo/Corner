@@ -106,11 +106,11 @@ export function TourInfoSection({
             <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium">{TOUR_INFO_LABELS.GROUP_SIZE}</td>
             <td className="px-4 py-2" colSpan={3}>
               <div className="flex items-center gap-6">
-                <span className="font-medium">{ageGroups.total} 人</span>
+                <span className="font-medium">{ageGroups.total}{TOUR_INFO_LABELS.PERSON_UNIT}</span>
                 <span className="text-morandi-secondary">
-                  <span className="text-morandi-green">6歲以下：{ageGroups.under6}</span>
+                  <span className="text-morandi-green">{TOUR_INFO_LABELS.UNDER_6_PREFIX}{ageGroups.under6}</span>
                   <span className="mx-2">|</span>
-                  <span className="text-morandi-gold">65歲以上：{ageGroups.over65}</span>
+                  <span className="text-morandi-gold">{TOUR_INFO_LABELS.OVER_65_PREFIX}{ageGroups.over65}</span>
                   <span className="mx-2">|</span>
                   <span>{TOUR_INFO_LABELS.GENERAL_PREFIX}{ageGroups.others}</span>
                 </span>

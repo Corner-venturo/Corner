@@ -1,6 +1,17 @@
 export const QUOTATION_LABELS = {
   LABEL_5450: '費用包含',
   LABEL_4561: '費用不含',
-
   LABEL_8733: '注意事項',
+  TRANSPORTATION_COST: '行程表所列之交通費用',
+  ACCOMMODATION_COST: '行程表所列之住宿費用',
+  MEAL_COST: '行程表所列之餐食費用',
+  TICKET_COST: '行程表所列之門票費用',
+  GUIDE_SERVICE: '專業導遊服務',
+  PASSPORT_VISA_COST: '個人護照及簽證費用',
+  OPTIONAL_TOUR: '行程外之自費行程',
+  PERSONAL_EXPENSE: '個人消費及小費',
+  OVERWEIGHT_LUGGAGE: '行李超重費用',
+  SINGLE_ROOM_SUPPLEMENT: '單人房差價',
+  FINAL_PRICE_NOTE: '最終價格以確認訂單時之匯率及費用為準。',
+  PEAK_SEASON_NOTE: '如遇旺季或特殊節日，價格可能會有調整。',
 }
