@@ -103,7 +103,7 @@ export function DisbursementDetailDialog({
       // SWR 快取失效，自動重新載入
       await invalidateDisbursementOrders()
 
-      await alert(`已追加 ${selectedToAdd.length} 筆請款單`, 'success')
+      await alert(`${DISBURSEMENT_LABELS.已追加筆請款單}${selectedToAdd.length}${DISBURSEMENT_LABELS.筆請款單}`, 'success')
       setIsAddingMode(false)
       setSelectedToAdd([])
     } catch (error) {
@@ -124,7 +124,7 @@ export function DisbursementDetailDialog({
     const request = includedRequests.find(r => r.id === requestId)
     if (!request) return
 
-    const confirmed = await confirm(`確定要從此出納單移除「${request.code}」嗎？`, {
+    const confirmed = await confirm(`${DISBURSEMENT_LABELS.確定要從此出納單移除}${request.code}${DISBURSEMENT_LABELS.嗎}`, {
       title: DISBURSEMENT_LABELS.移除請款單,
       type: 'warning',
     })
@@ -201,9 +201,9 @@ export function DisbursementDetailDialog({
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div>
-              <DialogTitle className="text-xl">出納單 {order.order_number}</DialogTitle>
+              <DialogTitle className="text-xl">{DISBURSEMENT_LABELS.出納單} {order.order_number}</DialogTitle>
               <div className="text-sm text-morandi-muted mt-1 flex items-center gap-1">
-                出帳日期：<DateCell date={order.disbursement_date} showIcon={false} className="text-morandi-muted" />
+                {DISBURSEMENT_LABELS.出帳日期_label}：<DateCell date={order.disbursement_date} showIcon={false} className="text-morandi-muted" />
               </div>
             </div>
             <Badge className={cn('text-white', status.color)}>
@@ -217,12 +217,12 @@ export function DisbursementDetailDialog({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-morandi-background/50 rounded-lg">
             <InfoItem label={DISBURSEMENT_LABELS.出納單號} value={order.order_number || '-'} />
             <div>
-              <p className="text-xs text-morandi-muted mb-1">出帳日期</p>
+              <p className="text-xs text-morandi-muted mb-1">{DISBURSEMENT_LABELS.出帳日期_label}</p>
               <DateCell date={order.disbursement_date} showIcon={false} className="text-sm" />
             </div>
-            <InfoItem label={DISBURSEMENT_LABELS.請款單數} value={`${order.payment_request_ids?.length || 0} 筆`} />
+            <InfoItem label={DISBURSEMENT_LABELS.請款單數} value={`${order.payment_request_ids?.length || 0} ${DISBURSEMENT_LABELS.筆}`} />
             <div>
-              <p className="text-xs text-morandi-muted mb-1">總金額</p>
+              <p className="text-xs text-morandi-muted mb-1">{DISBURSEMENT_LABELS.總金額_label}</p>
               <CurrencyCell amount={order.amount || 0} className="font-semibold text-morandi-gold" />
             </div>
           </div>
@@ -231,7 +231,7 @@ export function DisbursementDetailDialog({
           <div>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold text-morandi-primary">
-                包含請款單 ({includedRequests.length} 筆)
+                {DISBURSEMENT_LABELS.包含請款單} ({includedRequests.length} {DISBURSEMENT_LABELS.筆})
               </h3>
               {order.status === 'pending' && !isAddingMode && availableRequests.length > 0 && (
                 <Button
@@ -241,7 +241,7 @@ export function DisbursementDetailDialog({
                   className="text-morandi-gold border-morandi-gold hover:bg-morandi-gold/10"
                 >
                   <Plus size={14} className="mr-1" />
-                  追加請款單
+                  {DISBURSEMENT_LABELS.追加請款單}
                 </Button>
               )}
             </div>
@@ -250,13 +250,13 @@ export function DisbursementDetailDialog({
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-morandi-background/50 border-b border-morandi-container/20">
-                    <th className="text-left py-2 px-3 text-morandi-muted font-medium">請款單號</th>
-                    <th className="text-left py-2 px-3 text-morandi-muted font-medium">團號</th>
-                    <th className="text-left py-2 px-3 text-morandi-muted font-medium">團名</th>
-                    <th className="text-left py-2 px-3 text-morandi-muted font-medium">請款人</th>
-                    <th className="text-right py-2 px-3 text-morandi-muted font-medium">金額</th>
+                    <th className="text-left py-2 px-3 text-morandi-muted font-medium">{DISBURSEMENT_LABELS.請款單號}</th>
+                    <th className="text-left py-2 px-3 text-morandi-muted font-medium">{DISBURSEMENT_LABELS.團號}</th>
+                    <th className="text-left py-2 px-3 text-morandi-muted font-medium">{DISBURSEMENT_LABELS.團名}</th>
+                    <th className="text-left py-2 px-3 text-morandi-muted font-medium">{DISBURSEMENT_LABELS.請款人}</th>
+                    <th className="text-right py-2 px-3 text-morandi-muted font-medium">{DISBURSEMENT_LABELS.金額}</th>
                     {order.status === 'pending' && (
-                      <th className="text-center py-2 px-3 text-morandi-muted font-medium w-16">操作</th>
+                      <th className="text-center py-2 px-3 text-morandi-muted font-medium w-16">{DISBURSEMENT_LABELS.操作}</th>
                     )}
                   </tr>
                 </thead>
@@ -264,7 +264,7 @@ export function DisbursementDetailDialog({
                   {includedRequests.length === 0 ? (
                     <tr>
                       <td colSpan={order.status === 'pending' ? 6 : 5} className="text-center py-8 text-morandi-muted">
-                        無請款單資料
+                        {DISBURSEMENT_LABELS.無請款單資料}
                       </td>
                     </tr>
                   ) : (
@@ -298,7 +298,7 @@ export function DisbursementDetailDialog({
                 <tfoot>
                   <tr className="bg-morandi-background/50">
                     <td colSpan={order.status === 'pending' ? 5 : 4} className="py-3 px-3 text-right font-semibold">
-                      合計
+                      {DISBURSEMENT_LABELS.合計}
                     </td>
                     <td className="py-3 px-3 text-right">
                       <CurrencyCell amount={order.amount || 0} className="font-bold text-morandi-gold" />
@@ -314,7 +314,7 @@ export function DisbursementDetailDialog({
             <div className="border border-morandi-gold/30 rounded-lg p-4 bg-morandi-gold/5">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-morandi-primary">
-                  選擇要追加的請款單 ({availableRequests.length} 筆可選)
+                  {DISBURSEMENT_LABELS.選擇要追加的請款單} ({availableRequests.length} {DISBURSEMENT_LABELS.筆可選}
                 </h3>
                 <Button
                   size="sm"
@@ -325,13 +325,13 @@ export function DisbursementDetailDialog({
                   }}
                 >
                   <X size={14} className="mr-1" />
-                  取消
+                  {DISBURSEMENT_LABELS.取消}
                 </Button>
               </div>
 
               {availableRequests.length === 0 ? (
                 <p className="text-sm text-morandi-muted text-center py-4">
-                  目前沒有待處理的請款單可追加
+                  {DISBURSEMENT_LABELS.目前沒有待處理的請款單可追加}
                 </p>
               ) : (
                 <>
@@ -340,9 +340,9 @@ export function DisbursementDetailDialog({
                       <thead className="sticky top-0 bg-morandi-background">
                         <tr className="border-b border-morandi-container/20">
                           <th className="w-10 py-2 px-2"></th>
-                          <th className="text-left py-2 px-2 text-morandi-muted font-medium">請款單號</th>
-                          <th className="text-left py-2 px-2 text-morandi-muted font-medium">團號</th>
-                          <th className="text-right py-2 px-2 text-morandi-muted font-medium">金額</th>
+                          <th className="text-left py-2 px-2 text-morandi-muted font-medium">{DISBURSEMENT_LABELS.請款單號}</th>
+                          <th className="text-left py-2 px-2 text-morandi-muted font-medium">{DISBURSEMENT_LABELS.團號}</th>
+                          <th className="text-right py-2 px-2 text-morandi-muted font-medium">{DISBURSEMENT_LABELS.金額}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -371,7 +371,7 @@ export function DisbursementDetailDialog({
 
                   <div className="flex items-center justify-between mt-3">
                     <p className="text-sm text-morandi-secondary flex items-center gap-1">
-                      已選擇 {selectedToAdd.length} 筆，金額：
+                      {DISBURSEMENT_LABELS.已選擇}{selectedToAdd.length}{DISBURSEMENT_LABELS.筆_金額}
                       <CurrencyCell
                         amount={selectedToAdd.reduce((sum, id) => {
                           const req = payment_requests.find(r => r.id === id)
@@ -386,7 +386,7 @@ export function DisbursementDetailDialog({
                       className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
                     >
                       <Plus size={14} className="mr-1" />
-                      追加 {selectedToAdd.length} 筆
+                      {DISBURSEMENT_LABELS.追加}{selectedToAdd.length} {DISBURSEMENT_LABELS.筆}
                     </Button>
                   </div>
                 </>
@@ -402,7 +402,7 @@ export function DisbursementDetailDialog({
               className="text-morandi-gold border-morandi-gold hover:bg-morandi-gold/10"
             >
               <FileText size={16} className="mr-2" />
-              列印 PDF
+              {DISBURSEMENT_LABELS.列印PDF}
             </Button>
 
             <div className="flex gap-2">
@@ -412,7 +412,7 @@ export function DisbursementDetailDialog({
                   className="bg-morandi-green hover:bg-morandi-green/90 text-white"
                 >
                   <Check size={16} className="mr-2" />
-                  確認出帳
+                  {DISBURSEMENT_LABELS.確認出帳}
                 </Button>
               )}
             </div>
