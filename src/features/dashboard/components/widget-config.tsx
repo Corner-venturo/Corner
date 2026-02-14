@@ -1,4 +1,3 @@
-import type { LucideIcon } from 'lucide-react'
 import {
   Calculator,
   DollarSign,
@@ -26,7 +25,7 @@ export const AVAILABLE_WIDGETS: Array<Omit<WidgetConfig, 'id'> & { id: string }>
   {
     id: 'manifestation',
     name: '顯化魔法',
-    icon: Sparkles as unknown,
+    icon: Sparkles,
     component: ManifestationWidget,
     span: 1,
     requiredPermission: 'super_admin_only',
@@ -34,56 +33,56 @@ export const AVAILABLE_WIDGETS: Array<Omit<WidgetConfig, 'id'> & { id: string }>
   {
     id: 'flight',
     name: '航班查詢',
-    icon: Plane as unknown,
+    icon: Plane,
     component: FlightWidget,
     span: 1
   },
   {
     id: 'pnr',
     name: 'PNR 解析',
-    icon: FileText as unknown,
+    icon: FileText,
     component: PNRWidget,
     span: 1
   },
   {
     id: 'weather',
     name: '天氣查詢',
-    icon: Cloud as unknown,
+    icon: Cloud,
     component: WeatherWidget,
     span: 1
   },
   {
     id: 'weather-weekly',
     name: '天氣週報',
-    icon: CloudSun as unknown,
+    icon: CloudSun,
     component: WeatherWidgetWeekly,
     span: 2,
   },
   {
     id: 'calculator',
     name: '計算機',
-    icon: Calculator as unknown,
+    icon: Calculator,
     component: CalculatorWidget,
     span: 1
   },
   {
     id: 'currency',
     name: '匯率換算',
-    icon: DollarSign as unknown,
+    icon: DollarSign,
     component: CurrencyWidget,
     span: 1
   },
   {
     id: 'timer',
     name: '計時器',
-    icon: Clock as unknown,
+    icon: Clock,
     component: TimerWidget,
     span: 1
   },
   {
     id: 'notes',
     name: '便條紙',
-    icon: Clipboard as unknown,
+    icon: Clipboard,
     component: NotesWidget,
     span: 1
   },

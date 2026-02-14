@@ -22,6 +22,7 @@ import {
   type Illustration,
 } from './core/illustration-library'
 import { DESIGNER_LABELS } from './constants/labels'
+import { sanitizeSvg } from '@/lib/utils/sanitize'
 
 interface IllustrationPickerProps {
   onSelectIllustration: (illustration: Illustration) => void
@@ -183,7 +184,7 @@ function IllustrationButton({
     >
       <div
         className="w-10 h-10"
-        dangerouslySetInnerHTML={{ __html: illustration.svg }}
+        dangerouslySetInnerHTML={{ __html: sanitizeSvg(illustration.svg) }}
       />
       <span className="text-[9px] text-morandi-secondary truncate w-full text-center mt-0.5">
         {illustration.name}

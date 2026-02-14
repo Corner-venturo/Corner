@@ -10,6 +10,7 @@ import { useEffect, useCallback, useState, useRef, useMemo } from 'react'
 import { cn } from '@/lib/utils'
 import { Bold, Italic, Underline as UnderlineIcon, Strikethrough, Palette, Highlighter } from 'lucide-react'
 import { UI_LABELS } from './constants/labels'
+import { sanitizeHtml } from '@/lib/utils/sanitize'
 
 interface RichTextInputProps {
   value: string
@@ -315,7 +316,7 @@ export function RichTextDisplay({ html, className }: { html: string; className?:
   return (
     <span
       className={className}
-      dangerouslySetInnerHTML={{ __html: html }}
+      dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }}
     />
   )
 }

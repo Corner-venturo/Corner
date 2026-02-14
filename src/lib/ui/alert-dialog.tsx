@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { UI_LABELS } from './constants/labels'
+import { sanitizeHtml } from '@/lib/utils/sanitize'
 
 type AlertType = 'info' | 'success' | 'warning' | 'error'
 
@@ -279,7 +280,7 @@ function ConfirmDialogComponent() {
         {confirm.htmlContent && (
           <div
             className="mt-2"
-            dangerouslySetInnerHTML={{ __html: confirm.htmlContent }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(confirm.htmlContent) }}
           />
         )}
         <DialogFooter className="gap-2">

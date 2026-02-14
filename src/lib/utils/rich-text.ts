@@ -1,6 +1,7 @@
 /**
  * 富文本渲染輔助函數
  */
+import { sanitizeHtml } from './sanitize'
 
 /**
  * 判斷字串是否包含 HTML 標籤
@@ -24,8 +25,9 @@ export function htmlToPlainText(html: string | null | undefined): string {
  */
 export function cleanTiptapHtml(html: string | null | undefined): string {
   if (!html) return ''
-  // 移除外層 <p> 標籤
-  return html.replace(/^<p>/, '').replace(/<\/p>$/, '')
+  // 移除外層 <p> 標籤，並消毒 HTML 防止 XSS
+  const stripped = html.replace(/^<p>/, '').replace(/<\/p>$/, '')
+  return sanitizeHtml(stripped)
 }
 
 /**
@@ -39,7 +41,7 @@ export function renderRichText(
 ): { html?: string; text?: string } {
   const content = text || defaultText || ''
   if (isHtmlString(content)) {
-    return { html: content }
+    return { html: sanitizeHtml(content) }
   }
   return { text: content }
 }

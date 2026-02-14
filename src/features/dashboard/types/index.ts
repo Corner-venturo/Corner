@@ -4,7 +4,7 @@ export type WidgetType = 'calculator' | 'currency' | 'timer' | 'notes' | 'stats'
 export interface WidgetConfig {
   id: WidgetType
   name: string
-  icon: unknown
+  icon: React.ComponentType<{ size?: number; className?: string }>
   component: React.ComponentType
   span?: number // 佔據的列數（1 或 2）
   requiredPermission?: string // 需要的權限（如 'super_admin_only'）
@@ -23,7 +23,7 @@ export interface StatConfig {
   id: StatType
   label: string
   value: string | number
-  icon: unknown
+  icon: React.ComponentType<{ size?: number; className?: string }>
   color: string
   bgColor: string
 }

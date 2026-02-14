@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { MapPin, Plane, Calendar, Utensils, Hotel, Coffee, Sun, Moon, ChevronDown, ChevronUp, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ITINERARY_LABELS } from './constants/labels'
+import { sanitizeCss } from '@/lib/utils/sanitize'
 
 // 簡化的 CSS 樣式（移除光暈和流動效果）
 const timelineStyles = ``
@@ -176,7 +177,7 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
   return (
     <div className="bg-[#FAFAF8] min-h-full font-sans">
       {/* 注入動畫樣式 */}
-      <style dangerouslySetInnerHTML={{ __html: timelineStyles }} />
+      <style dangerouslySetInnerHTML={{ __html: sanitizeCss(timelineStyles) }} />
       {/* ==================== Hero Section (優化版) ==================== */}
       <section className="relative h-[480px] overflow-hidden">
         {/* Background Image */}
