@@ -342,7 +342,7 @@ function FeatureCard({
           }}
         >
           {isExpanded ? (
-            <>收起 <ChevronDown size={14} className="rotate-180" /></>
+            <>{TOURS_LABELS.COLLAPSE} <ChevronDown size={14} className="rotate-180" /></>
           ) : (
             <>Read More <ArrowRight size={14} /></>
           )}

@@ -17,4 +17,11 @@ export const TOURS_LABELS = {
   TOTAL_6305: '獎金總計',
   LABEL_1342: '結案後將自動產生獎金請款單，狀態變更為「結案」。',
   CANCEL: '取消',
+  CLOSING_TITLE_PREFIX: '結案 - ',
+  UNIT_COUNT: ' 筆',
+  OP_BONUS: 'OP 獎金',
+  PRINTING: '生成中...',
+  PRINT_REPORT: '列印報表',
+  PROCESSING: '處理中...',
+  CONFIRM_CLOSE: '確認結案',
 }

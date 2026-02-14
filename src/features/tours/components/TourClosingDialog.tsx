@@ -206,7 +206,7 @@ export function TourClosingDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calculator size={20} className="text-morandi-gold" />
-            結案 - {tour.code}
+            {TOURS_LABELS.CLOSING_TITLE_PREFIX}{tour.code}
           </DialogTitle>
         </DialogHeader>
 
@@ -219,7 +219,7 @@ export function TourClosingDialog({
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-morandi-secondary">{TOURS_LABELS.LABEL_6293}</span>
-              <span className="font-medium">{tourOrders.length} 筆</span>
+              <span className="font-medium">{tourOrders.length}{TOURS_LABELS.UNIT_COUNT}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-morandi-secondary">{TOURS_LABELS.TOTAL_7262}</span>
@@ -261,7 +261,7 @@ export function TourClosingDialog({
 
             {/* OP 獎金 */}
             <div className="flex items-center gap-4">
-              <Label className="w-24 text-sm">OP 獎金</Label>
+              <Label className="w-24 text-sm">{TOURS_LABELS.OP_BONUS}</Label>
               <div className="flex items-center gap-2 flex-1">
                 <Input
                   type="number"
@@ -300,7 +300,7 @@ export function TourClosingDialog({
             className="gap-2"
           >
             {isPrinting ? <Loader2 size={16} className="animate-spin" /> : <Printer size={16} />}
-            {isPrinting ? '生成中...' : '列印報表'}
+            {isPrinting ? TOURS_LABELS.PRINTING : TOURS_LABELS.PRINT_REPORT}
           </Button>
           <Button
             variant="outline"
@@ -316,7 +316,7 @@ export function TourClosingDialog({
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
             <Check size={16} />
-            {isSubmitting ? '處理中...' : '確認結案'}
+            {isSubmitting ? TOURS_LABELS.PROCESSING : TOURS_LABELS.CONFIRM_CLOSE}
           </Button>
         </DialogFooter>
       </DialogContent>

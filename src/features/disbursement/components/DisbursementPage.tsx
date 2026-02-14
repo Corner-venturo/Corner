@@ -181,7 +181,7 @@ export function DisbursementPage() {
 
   // 刪除出納單
   const handleDelete = useCallback(async (order: DisbursementOrder) => {
-    const confirmed = await confirm(`確定要刪除出納單 ${order.order_number} 嗎？`, {
+    const confirmed = await confirm(`${DISBURSEMENT_LABELS.CONFIRM_DELETE_PREFIX}${order.order_number}${DISBURSEMENT_LABELS.CONFIRM_DELETE_SUFFIX}`, {
       title: DISBURSEMENT_LABELS.刪除出納單,
       type: 'warning',
     })

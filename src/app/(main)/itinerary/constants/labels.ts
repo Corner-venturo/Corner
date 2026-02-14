@@ -126,6 +126,7 @@ export const EDITOR_LABELS = {
 
   ADD_9998: '新增紙本行程表',
   PRINT: '列印',
+  A4_SIZE: 'A4 尺寸 (210mm × 297mm)',
 }
 
 export const BLOCK_EDITOR_LABELS = {

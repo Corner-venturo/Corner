@@ -225,7 +225,7 @@ function NewItineraryPageContent() {
             <div className="w-1/2 bg-muted flex flex-col print:w-full">
               <div className="h-14 bg-card border-b px-6 flex items-center justify-between print:hidden">
                 <h2 className="text-lg font-semibold text-morandi-primary">{EDITOR_LABELS.PRINT_PREVIEW}</h2>
-                <div className="text-sm text-morandi-secondary">A4 尺寸 (210mm × 297mm)</div>
+                <div className="text-sm text-morandi-secondary">{EDITOR_LABELS.A4_SIZE}</div>
               </div>
 
               <div className="flex-1 overflow-y-auto p-8 print:p-0">

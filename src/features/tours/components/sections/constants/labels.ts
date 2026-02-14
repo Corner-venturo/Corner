@@ -73,4 +73,5 @@ export const TOURS_LABELS = {
   LABEL_1779: '費用不含項目',
   LABEL_63: '取消與退費政策',
   LABEL_6529: '本行程適用「國外旅遊定型化契約書」之規定：',
+  COLLAPSE: '收起',
 }

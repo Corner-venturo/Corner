@@ -45,7 +45,7 @@ export function PendingList({
         <div className="bg-morandi-gold/10 border border-morandi-gold/20 rounded-lg p-4 mb-4">
           <div className="flex items-center justify-between">
             <span className="text-sm text-morandi-secondary flex items-center gap-1">
-              已選 {selectedRequests.length} 筆，總金額 <CurrencyCell amount={selectedAmount} />
+              {DISBURSEMENT_LABELS.SELECTED_PREFIX}{selectedRequests.length}{DISBURSEMENT_LABELS.SELECTED_MID}<CurrencyCell amount={selectedAmount} />
             </span>
             <Button
               onClick={onAddToDisbursement}
@@ -61,7 +61,7 @@ export function PendingList({
       {data.length > 0 && (
         <div className="mb-4 flex items-center justify-end">
           <div className="text-sm text-morandi-secondary flex items-center gap-1">
-            {data.length} 筆 • 下次出帳日：
+            {data.length}{DISBURSEMENT_LABELS.ITEMS_COUNT_SUFFIX}{DISBURSEMENT_LABELS.NEXT_DISBURSEMENT_PREFIX}
             <DateCell
               date={nextThursday}
               showIcon={false}
@@ -111,8 +111,8 @@ export function CurrentOrderList({
             {currentOrder.order_number}
           </h3>
           <p className="text-sm text-morandi-secondary">
-            出帳日期：{currentOrder.disbursement_date} • {(currentOrder.payment_request_ids || []).length}{' '}
-            筆請款單
+            {DISBURSEMENT_LABELS.DISBURSEMENT_DATE_PREFIX}{currentOrder.disbursement_date} • {(currentOrder.payment_request_ids || []).length}{' '}
+            {DISBURSEMENT_LABELS.PAYMENT_REQUESTS_SUFFIX}
           </p>
         </div>
         <div className="flex items-center space-x-4">
@@ -252,7 +252,7 @@ export function SupplierGroupList({ groups, searchTerm }: SupplierGroupListProps
       {/* 統計摘要 */}
       <div className="flex items-center justify-between p-4 bg-morandi-background/50 rounded-lg">
         <div className="text-sm text-morandi-secondary">
-          共 {filteredGroups.length} 個供應商
+          {DISBURSEMENT_LABELS.SUPPLIERS_PREFIX}{filteredGroups.length}{DISBURSEMENT_LABELS.SUPPLIERS_SUFFIX}
         </div>
         <CurrencyCell
           amount={totalAmount}
@@ -282,7 +282,7 @@ export function SupplierGroupList({ groups, searchTerm }: SupplierGroupListProps
                 </button>
                 <div>
                   <h3 className="font-semibold text-morandi-primary">{group.supplier_name}</h3>
-                  <p className="text-xs text-morandi-secondary">{group.items.length} 筆項目</p>
+                  <p className="text-xs text-morandi-secondary">{group.items.length}{DISBURSEMENT_LABELS.ITEMS_SUFFIX}</p>
                 </div>
               </div>
               <div className="text-right">
@@ -337,7 +337,7 @@ export function SupplierGroupList({ groups, searchTerm }: SupplierGroupListProps
                   <tfoot>
                     <tr className="bg-morandi-background/30">
                       <td colSpan={6} className="py-2 px-4 text-right font-semibold">
-                        小計
+                        {DISBURSEMENT_LABELS.SUBTOTAL}
                       </td>
                       <td className="py-2 px-4 text-right">
                         <CurrencyCell amount={group.total} className="font-bold text-morandi-gold" />
