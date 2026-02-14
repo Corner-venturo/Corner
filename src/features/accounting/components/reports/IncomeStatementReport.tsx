@@ -13,6 +13,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { useAccountingReports, type IncomeStatementResult } from '../../hooks/useAccountingReports'
 import { formatDate } from '@/lib/utils/format-date'
 import { formatCurrency } from '@/lib/utils/format-currency'
+import { logger } from '@/lib/utils/logger'
 
 function formatPercent(value: number): string {
   return `${value.toFixed(1)}%`
@@ -35,8 +36,12 @@ export function IncomeStatementReport() {
   // 查詢報表
   const handleSearch = useCallback(async () => {
     if (!startDate || !endDate) return
-    const result = await fetchIncomeStatement(startDate, endDate)
-    setData(result)
+    try {
+      const result = await fetchIncomeStatement(startDate, endDate)
+      setData(result)
+    } catch (err) {
+      logger.error('損益表查詢失敗:', err)
+    }
   }, [startDate, endDate, fetchIncomeStatement])
 
   // 初次載入時查詢

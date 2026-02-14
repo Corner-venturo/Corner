@@ -13,7 +13,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { useAccountingReports, type CashFlowResult } from '../../hooks/useAccountingReports'
 import { formatDate } from '@/lib/utils/format-date'
 import { formatCurrency } from '@/lib/utils/format-currency'
-
+import { logger } from '@/lib/utils/logger'
 export function CashFlowStatementReport() {
   const { loading, error, fetchCashFlowStatement } = useAccountingReports()
 
@@ -31,8 +31,12 @@ export function CashFlowStatementReport() {
   // 查詢報表
   const handleSearch = useCallback(async () => {
     if (!startDate || !endDate) return
-    const result = await fetchCashFlowStatement(startDate, endDate)
-    setData(result)
+    try {
+      const result = await fetchCashFlowStatement(startDate, endDate)
+      setData(result)
+    } catch (err) {
+      logger.error('現金流量表查詢失敗:', err)
+    }
   }, [startDate, endDate, fetchCashFlowStatement])
 
   // 初次載入時查詢

@@ -17,7 +17,7 @@ import { useAccountingReports, type GeneralLedgerEntry } from '../../hooks/useAc
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
 import { formatDate } from '@/lib/utils/format-date'
-
+import { logger } from '@/lib/utils/logger'
 interface AccountOption {
   id: string
   code: string
@@ -76,8 +76,12 @@ export function GeneralLedgerReport() {
   // 查詢報表
   const handleSearch = useCallback(async () => {
     if (!startDate || !endDate) return
-    const data = await fetchGeneralLedger(startDate, endDate, selectedAccountId || undefined)
-    setEntries(data)
+    try {
+      const data = await fetchGeneralLedger(startDate, endDate, selectedAccountId || undefined)
+      setEntries(data)
+    } catch (err) {
+      logger.error('總分類帳查詢失敗:', err)
+    }
   }, [startDate, endDate, selectedAccountId, fetchGeneralLedger])
 
   // 初次載入時查詢

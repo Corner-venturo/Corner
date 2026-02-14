@@ -14,7 +14,7 @@ import { EnhancedTable, type Column } from '@/components/ui/enhanced-table'
 import { CurrencyCell } from '@/components/table-cells'
 import { useAccountingReports, type TrialBalanceEntry } from '../../hooks/useAccountingReports'
 import { formatDate } from '@/lib/utils/format-date'
-
+import { logger } from '@/lib/utils/logger'
 const ACCOUNT_TYPE_LABELS: Record<string, string> = {
   asset: '資產',
   liability: '負債',
@@ -35,8 +35,12 @@ export function TrialBalanceReport() {
   // 查詢報表
   const handleSearch = useCallback(async () => {
     if (!endDate) return
-    const data = await fetchTrialBalance(endDate)
-    setEntries(data)
+    try {
+      const data = await fetchTrialBalance(endDate)
+      setEntries(data)
+    } catch (err) {
+      logger.error('試算表查詢失敗:', err)
+    }
   }, [endDate, fetchTrialBalance])
 
   // 初次載入時查詢

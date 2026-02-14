@@ -13,6 +13,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { useAccountingReports, type BalanceSheetResult } from '../../hooks/useAccountingReports'
 import { formatDate } from '@/lib/utils/format-date'
 import { formatCurrency } from '@/lib/utils/format-currency'
+import { logger } from '@/lib/utils/logger'
 import { BALANCE_SHEET_LABELS } from '@/constants/labels'
 
 export function BalanceSheetReport() {
@@ -27,8 +28,12 @@ export function BalanceSheetReport() {
   // 查詢報表
   const handleSearch = useCallback(async () => {
     if (!asOfDate) return
-    const result = await fetchBalanceSheet(asOfDate)
-    setData(result)
+    try {
+      const result = await fetchBalanceSheet(asOfDate)
+      setData(result)
+    } catch (err) {
+      logger.error('資產負債表查詢失敗:', err)
+    }
   }, [asOfDate, fetchBalanceSheet])
 
   // 初次載入時查詢
