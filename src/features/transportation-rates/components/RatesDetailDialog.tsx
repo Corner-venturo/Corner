@@ -108,7 +108,7 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
           <div className="flex items-center justify-between">
             <DialogTitle className="flex items-center gap-2">
               <Bus size={20} className="text-morandi-gold" />
-              {countryName} - 車資管理
+              {countryName} - {TRANSPORTATION_RATES_LABELS.RATES_MANAGEMENT_SUFFIX}
             </DialogTitle>
             <Button
               variant="outline"

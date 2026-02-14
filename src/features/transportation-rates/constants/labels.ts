@@ -16,4 +16,6 @@ export const TRANSPORTATION_RATES_LABELS = {
   車資筆數: '車資筆數',
   隱藏_KKDAY_欄位: '隱藏 KKDAY 欄位',
   顯示_KKDAY_欄位: '顯示 KKDAY 欄位',
+  COUNT_UNIT: '筆',
+  RATES_MANAGEMENT_SUFFIX: '車資管理',
 };

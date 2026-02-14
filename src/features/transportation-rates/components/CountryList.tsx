@@ -62,7 +62,7 @@ export const CountryList: React.FC<CountryListProps> = ({ rates, loading = false
       sortable: true,
       render: (_value, rowData) => {
         const row = rowData as CountryGroup
-        return <span className="text-morandi-secondary text-sm">{row.count} 筆</span>
+        return <span className="text-morandi-secondary text-sm">{row.count} {TRANSPORTATION_RATES_LABELS.COUNT_UNIT}</span>
       },
     },
   ]
