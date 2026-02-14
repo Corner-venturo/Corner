@@ -11,6 +11,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ImageUploader } from './index'
 import { UnsplashSearch } from './UnsplashSearch'
+import { IMAGE_UPLOADER_LABELS } from './constants/labels'
 
 export interface ImagePickerDialogProps {
   open: boolean
@@ -75,7 +76,7 @@ export function ImagePickerDialog({
           <TabsList className="grid grid-cols-2 w-full">
             <TabsTrigger value="upload" className="gap-2">
               <Upload size={14} />
-              上傳檔案
+              {IMAGE_UPLOADER_LABELS.UPLOADING_209}
             </TabsTrigger>
             <TabsTrigger value="unsplash" className="gap-2">
               <ImageIcon size={14} />
@@ -91,7 +92,7 @@ export function ImagePickerDialog({
               filePrefix={filePrefix}
               aspectRatio={aspectRatio}
               previewHeight="200px"
-              placeholder="拖曳或點擊上傳圖片"
+              placeholder={IMAGE_UPLOADER_LABELS.UPLOADING_822}
               showPositionEditor={false}
               showDeleteButton={false}
             />

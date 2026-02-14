@@ -58,14 +58,14 @@ export function ModuleManagementSettings() {
                 <h3 className="font-semibold text-lg">{MODULE_MANAGEMENT_LABELS.AUTH_MANAGEMENT}</h3>
               </div>
               <p className="text-sm text-muted-foreground">
-                管理工作空間的系統模組（會計、庫存、BI 分析等）
+                {MODULE_MANAGEMENT_LABELS.MANAGE_4601}
               </p>
             </div>
             <Button
               onClick={() => router.push('/settings/modules')}
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
             >
-              管理模組
+              {MODULE_MANAGEMENT_LABELS.MANAGE_8355}
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
@@ -74,15 +74,15 @@ export function ModuleManagementSettings() {
             <div className="text-sm text-muted-foreground space-y-2">
               <p className="flex items-start gap-2">
                 <span className="text-morandi-gold font-medium">•</span>
-                啟用/停用系統模組（會計模組、庫存模組等）
+                {MODULE_MANAGEMENT_LABELS.LABEL_1050}
               </p>
               <p className="flex items-start gap-2">
                 <span className="text-morandi-gold font-medium">•</span>
-                設定模組授權到期日
+                {MODULE_MANAGEMENT_LABELS.SETTINGS_5976}
               </p>
               <p className="flex items-start gap-2">
                 <span className="text-morandi-gold font-medium">•</span>
-                查看各模組的功能特性
+                {MODULE_MANAGEMENT_LABELS.LABEL_3126}
               </p>
             </div>
           </div>

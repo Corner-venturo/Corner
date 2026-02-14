@@ -40,17 +40,17 @@ export const QuotationInfo: React.FC<QuotationInfoProps> = ({
       )}
       <div className="grid grid-cols-2 gap-4 text-sm">
         <div className="flex">
-          <span className="font-semibold w-32">行程名稱：</span>
+          <span className="font-semibold w-32">{QUOTATION_INFO_LABELS.LABEL_6072}</span>
           <span className="flex-1 border-b border-border">
             {quoteName || QUOTATION_INFO_LABELS.精選旅遊行程}
           </span>
         </div>
         <div className="flex">
-          <span className="font-semibold w-32">總人數：</span>
+          <span className="font-semibold w-32">{QUOTATION_INFO_LABELS.TOTAL_812}</span>
           <span className="flex-1 border-b border-border">{totalParticipants} 人</span>
         </div>
         <div className="flex">
-          <span className="font-semibold w-32">有效期限：</span>
+          <span className="font-semibold w-32">{QUOTATION_INFO_LABELS.LABEL_4345}</span>
           <span className="flex-1 border-b border-border">{formatValidUntil()}</span>
         </div>
       </div>

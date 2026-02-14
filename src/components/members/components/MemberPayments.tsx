@@ -4,6 +4,7 @@ import React from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import type { Customer } from '@/types/customer.types'
+import { MEMBERS_LABELS } from './constants/labels'
 
 interface MemberPaymentsProps {
   open: boolean
@@ -40,12 +41,12 @@ export function MemberPayments({
           <table className="w-full text-sm">
             <thead className="bg-muted/50 border-y">
               <tr>
-                <th className="px-3 py-2 text-left font-medium text-muted-foreground">姓名</th>
-                <th className="px-3 py-2 text-left font-medium text-muted-foreground">英文拼音</th>
-                <th className="px-3 py-2 text-left font-medium text-muted-foreground">身分證</th>
-                <th className="px-3 py-2 text-left font-medium text-muted-foreground">護照號碼</th>
-                <th className="px-3 py-2 text-left font-medium text-muted-foreground">生日</th>
-                <th className="px-3 py-2 text-left font-medium text-muted-foreground">性別</th>
+                <th className="px-3 py-2 text-left font-medium text-muted-foreground">{MEMBERS_LABELS.LABEL_658}</th>
+                <th className="px-3 py-2 text-left font-medium text-muted-foreground">{MEMBERS_LABELS.LABEL_841}</th>
+                <th className="px-3 py-2 text-left font-medium text-muted-foreground">{MEMBERS_LABELS.LABEL_8408}</th>
+                <th className="px-3 py-2 text-left font-medium text-muted-foreground">{MEMBERS_LABELS.LABEL_5147}</th>
+                <th className="px-3 py-2 text-left font-medium text-muted-foreground">{MEMBERS_LABELS.LABEL_8658}</th>
+                <th className="px-3 py-2 text-left font-medium text-muted-foreground">{MEMBERS_LABELS.LABEL_2195}</th>
               </tr>
             </thead>
             <tbody>
@@ -73,9 +74,9 @@ export function MemberPayments({
 
         {/* 底部操作 */}
         <div className="flex justify-between items-center p-3 border-t bg-muted/30">
-          <p className="text-xs text-muted-foreground">點擊列即可選擇該顧客資料</p>
+          <p className="text-xs text-muted-foreground">{MEMBERS_LABELS.SELECT_4661}</p>
           <Button variant="ghost" size="sm" onClick={onCancel}>
-            取消，手動輸入
+            {MEMBERS_LABELS.LABEL_5836}
           </Button>
         </div>
       </DialogContent>

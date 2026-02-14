@@ -1,3 +1,4 @@
+import { CHAT_LABELS } from './constants/labels'
 'use client'
 
 interface UploadProgressProps {
@@ -10,7 +11,7 @@ export function UploadProgress({ progress }: UploadProgressProps) {
   return (
     <div className="mb-3">
       <div className="flex items-center justify-between mb-1">
-        <span className="text-xs text-morandi-secondary">上傳檔案中...</span>
+        <span className="text-xs text-morandi-secondary">{CHAT_LABELS.UPLOADING_2341}</span>
         <span className="text-xs text-morandi-secondary">{progress}%</span>
       </div>
       <div className="w-full h-1.5 bg-morandi-container/20 rounded-full overflow-hidden">

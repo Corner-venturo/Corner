@@ -110,7 +110,7 @@ export function TimelineTemplate({
               className="w-full py-3 border-2 border-dashed border-border rounded-xl text-morandi-muted hover:border-[#4a6fa5] hover:text-[#4a6fa5] transition-colors flex items-center justify-center gap-2"
             >
               <Plus size={18} />
-              <span>新增行程點</span>
+              <span>{COMP_EDITOR_LABELS.ADD_8581}</span>
             </button>
           </div>
         </div>
@@ -119,7 +119,7 @@ export function TimelineTemplate({
         <div className="mt-6 pt-4 border-t border-border/50 grid grid-cols-3 gap-4">
           <div>
             <div className="text-xs text-[#4a6fa5] font-medium mb-1 flex items-center gap-1">
-              <Utensils size={12} /> 午餐
+              <Utensils size={12} /> {COMP_EDITOR_LABELS.午餐}
             </div>
             <EditableText
               value={editingDay.meals?.lunch || ''}
@@ -133,7 +133,7 @@ export function TimelineTemplate({
           </div>
           <div>
             <div className="text-xs text-[#4a6fa5] font-medium mb-1 flex items-center gap-1">
-              <Utensils size={12} /> 晚餐
+              <Utensils size={12} /> {COMP_EDITOR_LABELS.晚餐}
             </div>
             <EditableText
               value={editingDay.meals?.dinner || ''}
@@ -147,7 +147,7 @@ export function TimelineTemplate({
           </div>
           <div>
             <div className="text-xs text-[#4a6fa5] font-medium mb-1 flex items-center gap-1">
-              <Building2 size={12} /> 住宿
+              <Building2 size={12} /> {COMP_EDITOR_LABELS.住宿}
             </div>
             <EditableText
               value={editingDay.accommodation || ''}

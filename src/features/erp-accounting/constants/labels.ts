@@ -206,4 +206,8 @@ export const SUCCESS_MESSAGES = {
 
 export const CALCULATION_MESSAGES = {
   imbalanceAmount: (amount: number) => `${amount.toLocaleString()}`,
+
+  LABEL_4298: '傳票摘要說明...',
+  SELECT_3: '選擇科目',
+  LABEL_5591: '說明',
 }

@@ -10,6 +10,7 @@ import { NewDocumentDialog } from '@/features/office/components/NewDocumentDialo
 import { useOfficeDocument } from '@/features/office/hooks/useOfficeDocument'
 import { useState } from 'react'
 import type { Database } from '@/lib/supabase/types'
+import { OFFICE_LABELS } from './constants/labels'
 
 type OfficeDocument = Database['public']['Tables']['office_documents']['Row']
 type DocumentType = 'spreadsheet' | 'document' | 'slides'
@@ -119,7 +120,7 @@ export default function OfficePage() {
   return (
     <>
       <ListPageLayout
-        title="文件管理"
+        title={OFFICE_LABELS.MANAGE_2189}
         data={documents}
         columns={columns}
         searchable
@@ -132,7 +133,7 @@ export default function OfficePage() {
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-colors"
           >
             <Plus className="w-4 h-4 mr-2" />
-            新增
+            {OFFICE_LABELS.ADD}
           </button>
         }
       />

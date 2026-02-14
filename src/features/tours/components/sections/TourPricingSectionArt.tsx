@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import type { TourPageData } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 interface TourPricingSectionArtProps {
   data: TourPageData
@@ -76,7 +77,7 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                 className="text-5xl lg:text-7xl font-light mb-6"
                 style={{ fontFamily: "'Zen Old Mincho', serif", color: colors.ink }}
               >
-                費用結構
+                {TOURS_LABELS.LABEL_2235}
               </h2>
               <div className="w-24 h-1" style={{ backgroundColor: colors.clay }} />
             </div>
@@ -123,7 +124,7 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                           className="text-xs px-2 py-1 text-white"
                           style={{ backgroundColor: colors.clay }}
                         >
-                          推薦
+                          {TOURS_LABELS.LABEL_1795}
                         </span>
                       )}
                     </div>
@@ -184,7 +185,7 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                         e.currentTarget.style.color = colors.ink
                       }}
                     >
-                      選擇方案
+                      {TOURS_LABELS.SELECT_6093}
                     </button>
                   </div>
                 </motion.div>
@@ -315,7 +316,7 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                   className="text-xl font-light"
                   style={{ fontFamily: "'Zen Old Mincho', serif", color: colors.ink }}
                 >
-                  注意事項與取消政策
+                  {TOURS_LABELS.LABEL_8093}
                 </h4>
               </div>
 

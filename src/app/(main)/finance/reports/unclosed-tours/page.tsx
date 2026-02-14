@@ -164,7 +164,7 @@ export default function UnclosedToursReportPage() {
   return (
     <div className="space-y-6">
       <ResponsiveHeader
-        title="未結案團體報表"
+        title={UNCLOSED_TOURS_LABELS.LABEL_996}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '財務', href: '/finance' },
@@ -190,13 +190,13 @@ export default function UnclosedToursReportPage() {
       <ContentContainer>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
-            title="未結案團體數"
+            title={UNCLOSED_TOURS_LABELS.LABEL_9947}
             value={stats.count}
             icon={Calendar}
             iconColor="text-morandi-red"
           />
           <StatCard
-            title="總收入"
+            title={UNCLOSED_TOURS_LABELS.TOTAL_7262}
             value={stats.totalRevenue}
             icon={TrendingUp}
             iconColor="text-morandi-green"
@@ -204,7 +204,7 @@ export default function UnclosedToursReportPage() {
             variant="income"
           />
           <StatCard
-            title="總支出"
+            title={UNCLOSED_TOURS_LABELS.TOTAL_582}
             value={stats.totalCost}
             icon={TrendingDown}
             iconColor="text-morandi-red"
@@ -212,7 +212,7 @@ export default function UnclosedToursReportPage() {
             variant="expense"
           />
           <StatCard
-            title="總利潤"
+            title={UNCLOSED_TOURS_LABELS.TOTAL_8800}
             value={stats.netProfit}
             icon={TrendingUp}
             iconColor={stats.netProfit >= 0 ? 'text-morandi-green' : 'text-morandi-red'}
@@ -225,7 +225,7 @@ export default function UnclosedToursReportPage() {
       {/* 團體列表 */}
       <ContentContainer>
         <h3 className="text-lg font-semibold text-morandi-primary mb-4">
-          未結案團體列表
+          {UNCLOSED_TOURS_LABELS.LABEL_332}
         </h3>
         <EnhancedTable
           columns={columns}

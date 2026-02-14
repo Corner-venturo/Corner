@@ -6,6 +6,7 @@ import { Calendar as CalendarIcon } from 'lucide-react'
 import { format, parse, isValid } from 'date-fns'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
+import { UI_LABELS } from './constants/labels'
 
 interface SimpleDateInputProps {
   value: string // YYYY-MM-DD 格式
@@ -140,7 +141,7 @@ export function SimpleDateInput({
               type="button"
               onClick={() => onChange('')}
               className="text-morandi-secondary/60 hover:text-morandi-red transition-colors"
-              title="清除日期"
+              title={UI_LABELS.LABEL_6342}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="18" y1="6" x2="6" y2="18" />
@@ -201,7 +202,7 @@ export function SimpleDateInput({
             <button
               type="button"
               className="text-morandi-secondary/60 hover:text-morandi-primary transition-colors"
-              title="選擇日期"
+              title={UI_LABELS.SELECT_5234}
             >
               <CalendarIcon className="h-4 w-4" />
             </button>

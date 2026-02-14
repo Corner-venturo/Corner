@@ -43,7 +43,7 @@ export function CostSummaryCard({ summary }: CostSummaryCardProps) {
         <div className="w-8 h-8 rounded-lg bg-morandi-gold flex items-center justify-center">
           <Calculator size={16} className="text-white" />
         </div>
-        <h3 className="font-medium text-morandi-primary">費用總計</h3>
+        <h3 className="font-medium text-morandi-primary">{COST_SUMMARY_LABELS.TOTAL_336}</h3>
       </div>
 
       {/* 分類統計 */}
@@ -51,10 +51,10 @@ export function CostSummaryCard({ summary }: CostSummaryCardProps) {
         <table className="w-full">
           <thead>
             <tr className="text-xs text-morandi-secondary">
-              <th className="text-left pb-2 font-medium">分類</th>
-              <th className="text-right pb-2 font-medium">預計支出</th>
-              <th className="text-right pb-2 font-medium">實際支出</th>
-              <th className="text-right pb-2 font-medium">差額</th>
+              <th className="text-left pb-2 font-medium">{COST_SUMMARY_LABELS.LABEL_2257}</th>
+              <th className="text-right pb-2 font-medium">{COST_SUMMARY_LABELS.LABEL_1924}</th>
+              <th className="text-right pb-2 font-medium">{COST_SUMMARY_LABELS.LABEL_686}</th>
+              <th className="text-right pb-2 font-medium">{COST_SUMMARY_LABELS.LABEL_8980}</th>
             </tr>
           </thead>
           <tbody>
@@ -86,7 +86,7 @@ export function CostSummaryCard({ summary }: CostSummaryCardProps) {
           </tbody>
           <tfoot>
             <tr className="border-t-2 border-border font-medium">
-              <td className="pt-3 text-morandi-primary">總計</td>
+              <td className="pt-3 text-morandi-primary">{COST_SUMMARY_LABELS.TOTAL}</td>
               <td className="pt-3 text-right font-mono text-base">
                 {formatCurrency(summary.total.expected)}
               </td>

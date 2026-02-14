@@ -106,14 +106,14 @@ export function TravelerMessageList({
           {conversationType === 'tour_announcement' ? COMP_WORKSPACE_LABELS.團公告 : COMP_WORKSPACE_LABELS.客服對話}尚未開啟
         </h3>
         <p className="text-sm text-violet-300 text-center mb-4">
-          開啟後，旅客將可以在 APP 中看到此對話
+          {COMP_WORKSPACE_LABELS.LABEL_9993}
         </p>
         {onToggleOpen && (
           <Button
             onClick={() => onToggleOpen(true)}
             className="bg-violet-500 hover:bg-violet-600 text-white"
           >
-            開啟對話
+            {COMP_WORKSPACE_LABELS.LABEL_9473}
           </Button>
         )}
       </div>
@@ -134,8 +134,8 @@ export function TravelerMessageList({
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#1e1b2e]">
         <AlertCircle size={32} className="text-violet-400 mb-2" />
-        <p className="text-sm text-violet-300">尚無訊息</p>
-        <p className="text-xs text-violet-400/70 mt-1">發送第一則訊息給旅客吧！</p>
+        <p className="text-sm text-violet-300">{COMP_WORKSPACE_LABELS.EMPTY_2029}</p>
+        <p className="text-xs text-violet-400/70 mt-1">{COMP_WORKSPACE_LABELS.SENDING_1794}</p>
       </div>
     )
   }

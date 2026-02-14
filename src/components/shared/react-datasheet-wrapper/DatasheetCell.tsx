@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { CellData, DataSheetColumn } from './types'
 import { CORE_FIELD_KEYS, PROTECTED_FIELD_KEYS, ERROR_MESSAGES } from './constants'
+import { REACT_DATASHEET_WRAPPER_LABELS } from './constants/labels'
 
 interface DatasheetCellProps {
   cell: CellData
@@ -65,7 +66,7 @@ export function DatasheetCell({
           <div
             onMouseDown={e => onColumnResize?.(e, column.key)}
             className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize bg-morandi-gold opacity-70 hover:opacity-100 z-20 border-r border-morandi-gold"
-            title="拖曳調整欄位寬度"
+            title={REACT_DATASHEET_WRAPPER_LABELS.LABEL_2840}
           />
         )}
 
@@ -81,7 +82,7 @@ export function DatasheetCell({
                   }
                 }}
                 className="p-1 hover:bg-muted rounded"
-                title="隱藏欄位"
+                title={REACT_DATASHEET_WRAPPER_LABELS.LABEL_8676}
               >
                 <EyeOff size={12} className="text-morandi-secondary" />
               </button>
@@ -95,7 +96,7 @@ export function DatasheetCell({
                   }
                 }}
                 className="p-1 hover:bg-status-danger-bg rounded"
-                title="刪除欄位"
+                title={REACT_DATASHEET_WRAPPER_LABELS.DELETE_1820}
               >
                 <X size={12} className="text-status-danger" />
               </button>
@@ -136,11 +137,11 @@ export function DatasheetCell({
             className="w-full h-8 text-xs"
             onClick={e => e.stopPropagation()}
           >
-            <SelectValue placeholder="未分配" />
+            <SelectValue placeholder={REACT_DATASHEET_WRAPPER_LABELS.LABEL_322} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__none__">未分配</SelectItem>
-            <SelectItem value="no-bed">不佔床</SelectItem>
+            <SelectItem value="no-bed">{REACT_DATASHEET_WRAPPER_LABELS.LABEL_9228}</SelectItem>
             {roomOptions.filter(roomOption => {
               const usage = getRoomUsage
                 ? getRoomUsage(roomOption.value)

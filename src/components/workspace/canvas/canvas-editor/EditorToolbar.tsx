@@ -29,6 +29,7 @@ import {
 } from 'lucide-react'
 import { Editor } from '@tiptap/react'
 import { cn } from '@/lib/utils'
+import { CANVAS_EDITOR_LABELS } from './constants/labels'
 
 interface EditorToolbarProps {
   editor: Editor
@@ -196,12 +197,12 @@ export function EditorToolbar({
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm" className="h-8 px-2 gap-1">
             <ImageIcon size={16} />
-            <span className="text-xs">圖片</span>
+            <span className="text-xs">{CANVAS_EDITOR_LABELS.LABEL_5261}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem onClick={onUploadImage}>上傳圖片</DropdownMenuItem>
-          <DropdownMenuItem onClick={onAddImage}>圖片網址</DropdownMenuItem>
+          <DropdownMenuItem onClick={onUploadImage}>{CANVAS_EDITOR_LABELS.UPLOADING_201}</DropdownMenuItem>
+          <DropdownMenuItem onClick={onAddImage}>{CANVAS_EDITOR_LABELS.LABEL_5883}</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 

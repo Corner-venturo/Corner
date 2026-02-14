@@ -177,7 +177,7 @@ export function ContractFormFields({
                       onClick={() => setShowMemberDropdown(false)}
                       className="w-full py-1.5 text-xs font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded transition-colors"
                     >
-                      確認
+                      {CONTRACT_FORM_LABELS.CONFIRM}
                     </button>
                   </div>
                 </div>
@@ -268,7 +268,7 @@ export function ContractFormFields({
             />
           </div>
           <div>
-            <label className="text-xs text-morandi-primary block mb-1">集合地點</label>
+            <label className="text-xs text-morandi-primary block mb-1">{CONTRACT_FORM_LABELS.LABEL_863}</label>
             <Input
               type="text"
               value={contractData.gatherLocation || ''}
@@ -281,10 +281,10 @@ export function ContractFormFields({
 
       {/* 費用 */}
       <div>
-        <h3 className="text-sm font-semibold text-morandi-primary mb-3">旅遊費用</h3>
+        <h3 className="text-sm font-semibold text-morandi-primary mb-3">{CONTRACT_FORM_LABELS.LABEL_3906}</h3>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs text-morandi-primary block mb-1">總金額（新台幣）</label>
+            <label className="text-xs text-morandi-primary block mb-1">{CONTRACT_FORM_LABELS.TOTAL_6648}</label>
             <Input
               type="text"
               value={contractData.totalAmount || ''}
@@ -292,7 +292,7 @@ export function ContractFormFields({
             />
           </div>
           <div>
-            <label className="text-xs text-morandi-primary block mb-1">定金（新台幣）</label>
+            <label className="text-xs text-morandi-primary block mb-1">{CONTRACT_FORM_LABELS.LABEL_3770}</label>
             <Input
               type="text"
               value={contractData.depositAmount || ''}
@@ -304,7 +304,7 @@ export function ContractFormFields({
 
       {/* 乙方資訊 */}
       <div>
-        <h3 className="text-sm font-semibold text-morandi-primary mb-3">乙方聯絡資訊</h3>
+        <h3 className="text-sm font-semibold text-morandi-primary mb-3">{CONTRACT_FORM_LABELS.LABEL_2868}</h3>
         <div>
           <label className="text-xs text-morandi-primary block mb-1">
             電話分機（02-7751-6051 #）

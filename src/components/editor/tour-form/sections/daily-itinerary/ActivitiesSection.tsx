@@ -133,7 +133,7 @@ export function ActivitiesSection({
     <div className="space-y-2">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-morandi-primary">景點活動</label>
+          <label className="text-sm font-medium text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_2716}</label>
           {/* 視圖切換按鈕 */}
           <div className="flex items-center bg-morandi-container/50 rounded-lg p-0.5">
             <button
@@ -172,7 +172,7 @@ export function ActivitiesSection({
             variant="default"
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
-            從景點庫選擇
+            {COMP_EDITOR_LABELS.SELECT_1031}
           </Button>
           <Button
             onClick={() => addActivity(dayIndex)}

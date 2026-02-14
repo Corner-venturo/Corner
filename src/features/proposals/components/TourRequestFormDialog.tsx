@@ -309,7 +309,7 @@ export function TourRequestFormDialog({
         </div>
 
         <div class="header">
-          ${logoUrl ? `<img src="${logoUrl}" class="logo" alt="Logo" />` : '<div style="position:absolute;left:0;top:0;font-size:12px;color:#999;">角落旅行社</div>'}
+          ${logoUrl ? `<img src="${logoUrl}" class="logo" alt="Logo" />` : '<div style="position:absolute;left:0;top:0;font-size:12px;color:#999;">{PROPOSAL_FORM_LABELS.LABEL_3621}</div>'}
           <div class="title-area">
             <div class="subtitle">REQUEST FORM</div>
             <div class="title">${categoryName}${TOUR_REQUEST_FORM_DIALOG_LABELS.需求單}</div>
@@ -544,7 +544,7 @@ export function TourRequestFormDialog({
               {/* 我方資訊 */}
               <div className="space-y-2">
                 <h3 className="font-medium text-morandi-primary border-b border-border pb-1">
-                  我方資訊
+                  {PROPOSAL_FORM_LABELS.LABEL_7720}
                 </h3>
                 <div className="space-y-1 text-sm">
                   <div className="flex items-baseline gap-1">
@@ -605,7 +605,7 @@ export function TourRequestFormDialog({
               {/* 廠商資訊 */}
               <div className="space-y-2">
                 <h3 className="font-medium text-morandi-primary border-b border-border pb-1">
-                  廠商資訊
+                  {PROPOSAL_FORM_LABELS.LABEL_3340}
                 </h3>
                 <div className="space-y-1 text-sm">
                   <div className="flex items-baseline gap-1">
@@ -662,19 +662,19 @@ export function TourRequestFormDialog({
             <div className="bg-morandi-container/30 rounded-lg p-4">
               <div className="grid grid-cols-4 gap-4 text-sm">
                 <div>
-                  <span className="text-morandi-secondary">團號：</span>
+                  <span className="text-morandi-secondary">{PROPOSAL_FORM_LABELS.LABEL_3785}</span>
                   <span className="font-medium ml-1">{tourCode || tour?.code || '-'}</span>
                 </div>
                 <div>
-                  <span className="text-morandi-secondary">團名：</span>
+                  <span className="text-morandi-secondary">{PROPOSAL_FORM_LABELS.LABEL_168}</span>
                   <span className="font-medium ml-1">{tourName || tour?.name || proposal?.title || '-'}</span>
                 </div>
                 <div>
-                  <span className="text-morandi-secondary">出發日期：</span>
+                  <span className="text-morandi-secondary">{PROPOSAL_FORM_LABELS.LABEL_2816}</span>
                   <span className="font-medium ml-1">{formatDate(departureDate || tour?.departure_date || pkg?.start_date)}</span>
                 </div>
                 <div>
-                  <span className="text-morandi-secondary">人數：</span>
+                  <span className="text-morandi-secondary">{PROPOSAL_FORM_LABELS.LABEL_8361}</span>
                   <span className="font-medium ml-1">{pax || tour?.current_participants || tour?.max_participants || proposal?.group_size || '-'} 人</span>
                 </div>
               </div>
@@ -688,9 +688,9 @@ export function TourRequestFormDialog({
                     <th className="px-3 py-2 text-left font-medium w-[100px]">{columns.dateLabel}</th>
                     <th className="px-3 py-2 text-left font-medium">{columns.titleLabel}</th>
                     <th className="px-3 py-2 text-center font-medium w-[80px]">{columns.qtyLabel}</th>
-                    <th className="px-3 py-2 text-center font-medium w-[100px]">單價</th>
-                    <th className="px-3 py-2 text-left font-medium w-[150px]">備註</th>
-                    <th className="px-3 py-2 text-center font-medium w-[60px]">操作</th>
+                    <th className="px-3 py-2 text-center font-medium w-[100px]">{PROPOSAL_FORM_LABELS.LABEL_9413}</th>
+                    <th className="px-3 py-2 text-left font-medium w-[150px]">{PROPOSAL_FORM_LABELS.REMARKS}</th>
+                    <th className="px-3 py-2 text-center font-medium w-[60px]">{PROPOSAL_FORM_LABELS.ACTIONS}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -758,7 +758,7 @@ export function TourRequestFormDialog({
                   className="gap-1 text-morandi-gold hover:text-morandi-gold-hover"
                 >
                   <Plus size={14} />
-                  新增項目
+                  {PROPOSAL_FORM_LABELS.ADD_2089}
                 </Button>
               </div>
             </div>
@@ -768,7 +768,7 @@ export function TourRequestFormDialog({
           <div className="flex justify-end gap-2 pt-4 border-t border-border">
             <Button variant="outline" onClick={onClose} className="gap-2">
               <X size={16} />
-              關閉
+              {PROPOSAL_FORM_LABELS.CLOSE}
             </Button>
             {tour?.id && (
               <Button
@@ -780,7 +780,7 @@ export function TourRequestFormDialog({
                 className="gap-2 text-morandi-gold border-morandi-gold hover:bg-morandi-gold hover:text-white"
               >
                 <Receipt size={16} />
-                建立請款單
+                {PROPOSAL_FORM_LABELS.LABEL_4890}
               </Button>
             )}
             <Button
@@ -789,7 +789,7 @@ export function TourRequestFormDialog({
               className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
               {saving ? <Loader2 size={16} className="animate-spin" /> : <Printer size={16} />}
-              列印
+              {PROPOSAL_FORM_LABELS.PRINT}
             </Button>
           </div>
         </DialogContent>

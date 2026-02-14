@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
+import { DESIGNER_LABELS } from './constants/labels'
 
 interface QRCodeGeneratorProps {
   onGenerate: (dataUrl: string) => void
@@ -95,7 +96,7 @@ export function QRCodeGenerator({ onGenerate }: QRCodeGeneratorProps) {
           <span className="text-sm font-medium">QR Code 生成器</span>
         </div>
         <p className="text-[10px] text-morandi-secondary">
-          輸入網址或文字，自動生成 QR Code
+          {DESIGNER_LABELS.GENERATING_239}
         </p>
       </div>
 
@@ -125,7 +126,7 @@ export function QRCodeGenerator({ onGenerate }: QRCodeGeneratorProps) {
 
         {/* 預覽 */}
         <div className="flex flex-col items-center">
-          <p className="text-[10px] text-morandi-secondary mb-2">預覽</p>
+          <p className="text-[10px] text-morandi-secondary mb-2">{DESIGNER_LABELS.PREVIEW}</p>
           <div
             className={cn(
               'w-32 h-32 border-2 border-dashed rounded-lg flex items-center justify-center',
@@ -157,7 +158,7 @@ export function QRCodeGenerator({ onGenerate }: QRCodeGeneratorProps) {
 
       {/* 底部提示 */}
       <div className="p-2 border-t border-border text-[10px] text-morandi-secondary text-center">
-        免費生成 · 無水印
+        {DESIGNER_LABELS.GENERATING_1586}
       </div>
     </div>
   )

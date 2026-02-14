@@ -77,7 +77,7 @@ export default function TimeboxPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="箱型時間"
+        title={LABELS.LABEL_9636}
         icon={Clock}
         breadcrumb={[
           { label: '首頁', href: '/' },
@@ -158,7 +158,7 @@ export default function TimeboxPage() {
                 size="sm"
                 onClick={() => setShowManifestation(true)}
                 className="h-8 w-8 p-0 rounded-none text-morandi-secondary hover:text-morandi-gold"
-                title="每日顯化"
+                title={LABELS.LABEL_4938}
               >
                 <Sparkles className="h-4 w-4" />
               </Button>
@@ -167,7 +167,7 @@ export default function TimeboxPage() {
                 size="sm"
                 onClick={() => setShowWeekReview(true)}
                 className="h-8 w-8 p-0 rounded-none border-l border-border text-morandi-secondary hover:text-morandi-gold"
-                title="週複盤"
+                title={LABELS.LABEL_4141}
               >
                 <BookOpen className="h-4 w-4" />
               </Button>
@@ -176,7 +176,7 @@ export default function TimeboxPage() {
                 size="sm"
                 onClick={() => setShowBoxManager(true)}
                 className="h-8 w-8 p-0 rounded-none border-l border-border text-morandi-secondary hover:text-morandi-gold"
-                title="管理箱子"
+                title={LABELS.MANAGE_BOXES}
               >
                 <Settings className="h-4 w-4" />
               </Button>
@@ -217,7 +217,7 @@ export default function TimeboxPage() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-morandi-gold" />
-              顯化筆記本
+              {LABELS.LABEL_7491}
             </DialogTitle>
           </DialogHeader>
           <ManifestationNotebook />

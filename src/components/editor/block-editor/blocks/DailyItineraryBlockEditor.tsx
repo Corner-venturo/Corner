@@ -78,7 +78,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
       {/* 標題和風格 */}
       <div className="flex items-center gap-3">
         <div className="flex-1">
-          <label className="block text-xs font-medium text-morandi-primary mb-1">行程副標題</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5760}</label>
           <Input
             value={data.itinerarySubtitle || ''}
             onChange={e => onChange({ itinerarySubtitle: e.target.value })}
@@ -88,7 +88,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
         </div>
 
         <div className="w-36">
-          <label className="block text-xs font-medium text-morandi-primary mb-1">風格</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_4287}</label>
           <Select
             value={data.itineraryStyle || 'original'}
             onValueChange={(value) => onChange({ itineraryStyle: value as ItineraryStyleType })}
@@ -97,10 +97,10 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
               <SelectValue placeholder={COMP_EDITOR_LABELS.選擇} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="original">經典時間軸</SelectItem>
-              <SelectItem value="luxury">奢華質感</SelectItem>
-              <SelectItem value="art">藝術雜誌</SelectItem>
-              <SelectItem value="dreamscape">夢幻漫遊</SelectItem>
+              <SelectItem value="original">{COMP_EDITOR_LABELS.LABEL_8427}</SelectItem>
+              <SelectItem value="luxury">{COMP_EDITOR_LABELS.LABEL_4759}</SelectItem>
+              <SelectItem value="art">{COMP_EDITOR_LABELS.LABEL_5990}</SelectItem>
+              <SelectItem value="dreamscape">{COMP_EDITOR_LABELS.LABEL_7067}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -161,7 +161,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-morandi-primary mb-1">日期</label>
+                      <label className="block text-xs text-morandi-primary mb-1">{COMP_EDITOR_LABELS.DATE}</label>
                       <Input
                         value={day.date || ''}
                         onChange={e => updateDay(index, 'date', e.target.value)}
@@ -170,7 +170,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-morandi-primary mb-1">標題</label>
+                      <label className="block text-xs text-morandi-primary mb-1">{COMP_EDITOR_LABELS.TITLE}</label>
                       <Input
                         value={day.title || ''}
                         onChange={e => updateDay(index, 'title', e.target.value)}
@@ -183,7 +183,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                   <div>
                     <label className="block text-xs text-morandi-primary mb-1">
                       <MapPin size={12} className="inline mr-1" />
-                      亮點
+                      {COMP_EDITOR_LABELS.LABEL_6311}
                     </label>
                     <Input
                       value={day.highlight || ''}
@@ -197,7 +197,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                     <div>
                       <label className="block text-xs text-morandi-primary mb-1">
                         <Utensils size={12} className="inline mr-1" />
-                        早餐
+                        {COMP_EDITOR_LABELS.LABEL_1347}
                       </label>
                       <Input
                         value={day.meals?.breakfast || ''}
@@ -207,7 +207,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-morandi-primary mb-1">午餐</label>
+                      <label className="block text-xs text-morandi-primary mb-1">{COMP_EDITOR_LABELS.午餐}</label>
                       <Input
                         value={day.meals?.lunch || ''}
                         onChange={e => updateDay(index, 'meals', { ...day.meals, lunch: e.target.value })}
@@ -216,7 +216,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-morandi-primary mb-1">晚餐</label>
+                      <label className="block text-xs text-morandi-primary mb-1">{COMP_EDITOR_LABELS.晚餐}</label>
                       <Input
                         value={day.meals?.dinner || ''}
                         onChange={e => updateDay(index, 'meals', { ...day.meals, dinner: e.target.value })}
@@ -229,7 +229,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                   <div>
                     <label className="block text-xs text-morandi-primary mb-1">
                       <Building size={12} className="inline mr-1" />
-                      住宿
+                      {COMP_EDITOR_LABELS.住宿}
                     </label>
                     <Input
                       value={day.accommodation || ''}
@@ -262,7 +262,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
         onClick={addDay}
       >
         <Plus size={14} />
-        新增一天
+        {COMP_EDITOR_LABELS.ADD_3205}
       </Button>
     </div>
   )

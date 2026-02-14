@@ -447,13 +447,13 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent level={1} className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>編輯頂級體驗</DialogTitle>
+            <DialogTitle>{PREMIUM_EXPERIENCES_TAB_LABELS.EDIT_1717}</DialogTitle>
           </DialogHeader>
           {editingExperience && (
             <div className="space-y-4 py-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium">名稱</label>
+                  <label className="text-sm font-medium">{PREMIUM_EXPERIENCES_TAB_LABELS.NAME}</label>
                   <Input
                     value={editingExperience.name}
                     onChange={e =>
@@ -462,7 +462,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">英文名稱</label>
+                  <label className="text-sm font-medium">{PREMIUM_EXPERIENCES_TAB_LABELS.LABEL_3778}</label>
                   <Input
                     value={editingExperience.english_name || ''}
                     onChange={e =>
@@ -472,7 +472,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium">描述</label>
+                <label className="text-sm font-medium">{PREMIUM_EXPERIENCES_TAB_LABELS.LABEL_3951}</label>
                 <textarea
                   value={editingExperience.description || ''}
                   onChange={e =>
@@ -483,7 +483,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium">專家名稱</label>
+                  <label className="text-sm font-medium">{PREMIUM_EXPERIENCES_TAB_LABELS.LABEL_1913}</label>
                   <Input
                     value={editingExperience.expert_name || ''}
                     onChange={e =>
@@ -492,7 +492,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">專家資格</label>
+                  <label className="text-sm font-medium">{PREMIUM_EXPERIENCES_TAB_LABELS.LABEL_4473}</label>
                   <Input
                     value={editingExperience.expert_credentials || ''}
                     onChange={e =>
@@ -509,11 +509,11 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
           <DialogFooter>
             <Button variant="outline" onClick={handleCloseEdit} className="gap-2">
               <X size={16} />
-              取消
+              {PREMIUM_EXPERIENCES_TAB_LABELS.CANCEL}
             </Button>
             <Button onClick={() => editingExperience && handleUpdate(editingExperience)} className="gap-2">
               <Save size={16} />
-              儲存
+              {PREMIUM_EXPERIENCES_TAB_LABELS.SAVE}
             </Button>
           </DialogFooter>
         </DialogContent>

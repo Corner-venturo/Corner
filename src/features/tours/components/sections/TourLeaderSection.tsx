@@ -5,6 +5,7 @@ import { TourLeaderSectionArt } from './TourLeaderSectionArt'
 import { TourLeaderSectionCollage } from './TourLeaderSectionCollage'
 import { TourLeaderSectionLuxury } from './TourLeaderSectionLuxury'
 import type { TourPageData, CoverStyleType } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 /**
  * TourLeaderSection 需要的欄位
@@ -42,7 +43,7 @@ export function TourLeaderSection({ data, viewMode, coverStyle = 'original' }: T
           viewport={{ once: true }}
         >
           <SectionTitle
-            title="領隊與集合資訊"
+            title={TOURS_LABELS.LABEL_7562}
             coverStyle={coverStyle}
             className={viewMode === 'mobile' ? 'mb-6' : 'mb-12'}
           />
@@ -67,7 +68,7 @@ export function TourLeaderSection({ data, viewMode, coverStyle = 'original' }: T
                   : 'text-2xl font-bold text-morandi-primary mb-6'
               }
             >
-              領隊資訊
+              {TOURS_LABELS.LABEL_6841}
             </h3>
             <div className={viewMode === 'mobile' ? 'flex items-start gap-4' : 'flex items-start gap-6'}>
               {/* 領隊頭像 */}
@@ -86,20 +87,20 @@ export function TourLeaderSection({ data, viewMode, coverStyle = 'original' }: T
               )}
               <div className={viewMode === 'mobile' ? 'space-y-3 flex-1' : 'space-y-4 flex-1'}>
                 <div>
-                  <p className="text-xs text-morandi-secondary mb-1">領隊姓名</p>
+                  <p className="text-xs text-morandi-secondary mb-1">{TOURS_LABELS.LABEL_9854}</p>
                   <p className={viewMode === 'mobile' ? 'text-base font-semibold text-morandi-primary' : 'text-lg font-semibold text-morandi-primary'}>
                     {data.leader?.name || '待定'}
                     {data.leader?.englishName && ` ${data.leader.englishName}`}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-morandi-secondary mb-1">國內電話</p>
+                  <p className="text-xs text-morandi-secondary mb-1">{TOURS_LABELS.LABEL_4428}</p>
                   <p className={viewMode === 'mobile' ? 'text-base font-semibold text-morandi-primary' : 'text-lg font-semibold text-morandi-primary'}>
                     {data.leader?.domesticPhone || '待定'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-morandi-secondary mb-1">國外電話</p>
+                  <p className="text-xs text-morandi-secondary mb-1">{TOURS_LABELS.LABEL_2358}</p>
                   <p className={viewMode === 'mobile' ? 'text-base font-semibold text-morandi-primary' : 'text-lg font-semibold text-morandi-primary'}>
                     {data.leader?.overseasPhone || '待定'}
                   </p>
@@ -126,17 +127,17 @@ export function TourLeaderSection({ data, viewMode, coverStyle = 'original' }: T
                   : 'text-2xl font-bold text-morandi-primary mb-6'
               }
             >
-              集合資訊
+              {TOURS_LABELS.LABEL_6639}
             </h3>
             <div className={viewMode === 'mobile' ? 'space-y-3' : 'space-y-4'}>
               <div>
-                <p className="text-xs text-morandi-secondary mb-1">集合時間</p>
+                <p className="text-xs text-morandi-secondary mb-1">{TOURS_LABELS.LABEL_9036}</p>
                 <p className={viewMode === 'mobile' ? 'text-lg font-semibold text-status-info' : 'text-xl font-semibold text-status-info'}>
                   {data.meetingInfo?.time || '待定'}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-morandi-secondary mb-1">集合地點</p>
+                <p className="text-xs text-morandi-secondary mb-1">{TOURS_LABELS.LABEL_863}</p>
                 <p className={viewMode === 'mobile' ? 'text-base font-semibold text-morandi-primary' : 'text-lg font-semibold text-morandi-primary'}>
                   {data.meetingInfo?.location || '待定'}
                 </p>

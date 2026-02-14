@@ -130,13 +130,13 @@ export function WorkspaceHeader({
                 onClick={() => onFilterChange('all')}
                 className="dropdown-item-morandi"
               >
-                全部頻道
+                {COMP_WORKSPACE_LABELS.LABEL_5797}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => onFilterChange('starred')}
                 className="dropdown-item-morandi"
               >
-                已加星號
+                {COMP_WORKSPACE_LABELS.LABEL_9430}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -147,11 +147,11 @@ export function WorkspaceHeader({
             <DropdownMenuContent align="end" className="min-w-[140px]">
               <DropdownMenuItem onClick={onCreateChannel} className="dropdown-item-morandi">
                 <Plus size={14} className="mr-2" />
-                建立頻道
+                {COMP_WORKSPACE_LABELS.LABEL_3910}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onCreateGroup} className="dropdown-item-morandi">
                 <Plus size={14} className="mr-2" />
-                建立群組
+                {COMP_WORKSPACE_LABELS.LABEL_7330}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

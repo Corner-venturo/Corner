@@ -44,6 +44,7 @@ const ItineraryDialog = dynamic(() => import('@/features/proposals/components/It
 import { PackageItineraryDialog } from '@/features/proposals/components/PackageItineraryDialog'
 import { toast } from 'sonner'
 import type { Proposal } from '@/types/proposal.types'
+import { TOURS_LABELS } from './constants/labels'
 
 /**
  * 生成團號為基礎的報價單編號
@@ -440,7 +441,7 @@ export function LinkDocumentsToTourDialog({
         <Dialog open={mainDialogOpen} onOpenChange={open => !open && onClose()} modal={true}>
           <DialogContent level={1} className="max-w-md max-h-[85vh] flex flex-col overflow-hidden">
             <DialogHeader className="flex-shrink-0">
-              <DialogTitle>快速報價單</DialogTitle>
+              <DialogTitle>{TOURS_LABELS.LABEL_7445}</DialogTitle>
               <DialogDescription>
                 為「{tour.name}」建立多份快速報價單比價
               </DialogDescription>
@@ -458,7 +459,7 @@ export function LinkDocumentsToTourDialog({
                     onClick={handleCreateQuickQuote}
                     disabled={isCreatingQuickQuote}
                     className="p-1 text-morandi-primary hover:bg-morandi-primary/10 rounded transition-colors disabled:opacity-50"
-                    title="新增快速報價單"
+                    title={TOURS_LABELS.ADD_1598}
                   >
                     {isCreatingQuickQuote ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -491,7 +492,7 @@ export function LinkDocumentsToTourDialog({
                           <button
                             onClick={() => handleViewQuote(quote, true)}
                             className="p-1 text-morandi-secondary hover:text-morandi-primary rounded"
-                            title="查看"
+                            title={TOURS_LABELS.LABEL_2903}
                           >
                             <ExternalLink className="w-3 h-3" />
                           </button>
@@ -499,7 +500,7 @@ export function LinkDocumentsToTourDialog({
                             onClick={(e) => handleDeleteQuote(e, quote)}
                             disabled={isDeletingQuote}
                             className="p-1 text-morandi-red/60 hover:text-morandi-red rounded disabled:opacity-50"
-                            title="刪除"
+                            title={TOURS_LABELS.DELETE}
                           >
                             <Trash2 className="w-3 h-3" />
                           </button>
@@ -508,7 +509,7 @@ export function LinkDocumentsToTourDialog({
                     ))
                   ) : (
                     <div className="text-xs text-morandi-secondary text-center py-4">
-                      尚未建立
+                      {TOURS_LABELS.LABEL_3885}
                     </div>
                   )}
                 </div>

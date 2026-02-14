@@ -1,0 +1,14 @@
+export const ITINERARY_LABELS = {
+  LABEL_248: '結案',
+  LABEL_4206: '公司範例',
+  LABEL_555: '進行中',
+  LABEL_5485: '提案',
+  LABEL_9823: '產生分享連結',
+  COPYING_6704: '複製行程',
+  LABEL_6743: '取消公司範例',
+  LABEL_1280: '重新開啟',
+  LABEL_6187: '設為公司範例',
+  LABEL_410: '取消封存',
+  DELETE_1200: '永久刪除',
+  LABEL_1674: '封存',
+}

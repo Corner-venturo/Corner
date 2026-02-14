@@ -3,6 +3,7 @@
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { GlobalSearch } from '@/components/mobile/GlobalSearch'
+import { SEARCH_LABELS } from './constants/labels'
 
 export default function MobileSearchPage() {
   return (
@@ -16,7 +17,7 @@ export default function MobileSearchPage() {
           >
             <ArrowLeft size={20} className="text-morandi-primary" />
           </Link>
-          <h1 className="text-lg font-bold text-morandi-primary">搜尋</h1>
+          <h1 className="text-lg font-bold text-morandi-primary">{SEARCH_LABELS.SEARCH}</h1>
         </div>
       </div>
 
@@ -27,23 +28,23 @@ export default function MobileSearchPage() {
 
       {/* 搜尋提示 */}
       <div className="px-4 mt-4">
-        <h3 className="text-sm font-medium text-morandi-secondary mb-3">搜尋提示</h3>
+        <h3 className="text-sm font-medium text-morandi-secondary mb-3">{SEARCH_LABELS.SEARCH_4837}</h3>
         <div className="space-y-2 text-sm text-morandi-secondary">
           <div className="flex items-start gap-2">
             <span className="text-morandi-gold">•</span>
-            <span>輸入團號如 <span className="text-morandi-primary font-medium">CNX250128A</span> 快速找團</span>
+            <span>輸入團號如 <span className="text-morandi-primary font-medium">CNX250128A</span> {SEARCH_LABELS.LABEL_1787}</span>
           </div>
           <div className="flex items-start gap-2">
             <span className="text-morandi-gold">•</span>
-            <span>輸入成員姓名如 <span className="text-morandi-primary font-medium">王小明</span> 搜尋成員</span>
+            <span>輸入成員姓名如 <span className="text-morandi-primary font-medium">{SEARCH_LABELS.LABEL_4921}</span> {SEARCH_LABELS.SEARCH_4129}</span>
           </div>
           <div className="flex items-start gap-2">
             <span className="text-morandi-gold">•</span>
-            <span>輸入目的地如 <span className="text-morandi-primary font-medium">清邁</span> 搜尋相關團</span>
+            <span>輸入目的地如 <span className="text-morandi-primary font-medium">{SEARCH_LABELS.LABEL_7261}</span> {SEARCH_LABELS.SEARCH_9017}</span>
           </div>
           <div className="flex items-start gap-2">
             <span className="text-morandi-gold">•</span>
-            <span>輸入護照號碼快速找到成員</span>
+            <span>{SEARCH_LABELS.LABEL_1767}</span>
           </div>
         </div>
       </div>

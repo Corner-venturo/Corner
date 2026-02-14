@@ -220,7 +220,7 @@ export default function FitnessPage() {
                             )
                           }
                           className="w-full bg-background border border-input rounded-lg px-2 py-1.5 text-sm text-center text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
-                          placeholder="次"
+                          placeholder={FITNESS_LABELS.LABEL_350}
                         />
                         <Button
                           variant="ghost"

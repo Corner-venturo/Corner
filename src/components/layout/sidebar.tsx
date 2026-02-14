@@ -393,7 +393,7 @@ export function Sidebar() {
             >
               <Settings size={18} className="absolute left-5 top-1/2 -translate-y-1/2" />
               {showExpanded && (
-                <span className="ml-12 block text-left leading-9">設定</span>
+                <span className="ml-12 block text-left leading-9">{COMP_LAYOUT_LABELS.設定}</span>
               )}
             </Link>
           </li>

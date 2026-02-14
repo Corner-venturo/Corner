@@ -24,12 +24,12 @@ export function PersonalInfoSection({
 }: PersonalInfoSectionProps) {
   return (
     <div className="bg-morandi-container/10 rounded-lg p-4">
-      <h4 className="font-medium text-morandi-primary mb-3">個人資料</h4>
+      <h4 className="font-medium text-morandi-primary mb-3">{COMP_HR_LABELS.LABEL_60}</h4>
 
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">顯示名稱</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_9773}</label>
             {isEditing ? (
               <Input
                 value={formData.display_name}
@@ -40,7 +40,7 @@ export function PersonalInfoSection({
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">中文姓名</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_9768}</label>
             {isEditing ? (
               <Input
                 value={formData.chinese_name}
@@ -54,7 +54,7 @@ export function PersonalInfoSection({
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">英文姓名</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_739}</label>
             {isEditing ? (
               <Input
                 value={formData.english_name}
@@ -65,7 +65,7 @@ export function PersonalInfoSection({
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">員工編號</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_4929}</label>
             <p className="text-morandi-primary py-2 bg-morandi-container/20 px-3 rounded">
               {employee.employee_number}
             </p>
@@ -73,7 +73,7 @@ export function PersonalInfoSection({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">身分證號</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_3405}</label>
           {isEditing ? (
             <Input
               value={formData.personal_info.national_id}
@@ -92,7 +92,7 @@ export function PersonalInfoSection({
         <div>
           <label className="block text-sm font-medium text-morandi-primary mb-1 flex items-center gap-1">
             <Calendar size={14} />
-            生日
+            {COMP_HR_LABELS.LABEL_8658}
           </label>
           {isEditing ? (
             <DatePicker

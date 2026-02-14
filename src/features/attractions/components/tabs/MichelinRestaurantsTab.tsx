@@ -360,13 +360,13 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent level={1} className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>編輯米其林餐廳</DialogTitle>
+            <DialogTitle>{MICHELIN_RESTAURANTS_TAB_LABELS.EDIT_6298}</DialogTitle>
           </DialogHeader>
           {editingRestaurant && (
             <div className="space-y-4 py-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium">餐廳名稱</label>
+                  <label className="text-sm font-medium">{MICHELIN_RESTAURANTS_TAB_LABELS.餐廳名稱}</label>
                   <Input
                     value={editingRestaurant.name}
                     onChange={e =>
@@ -375,7 +375,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">英文名稱</label>
+                  <label className="text-sm font-medium">{MICHELIN_RESTAURANTS_TAB_LABELS.LABEL_3778}</label>
                   <Input
                     value={editingRestaurant.english_name || ''}
                     onChange={e =>
@@ -386,7 +386,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium">主廚名稱</label>
+                  <label className="text-sm font-medium">{MICHELIN_RESTAURANTS_TAB_LABELS.LABEL_9629}</label>
                   <Input
                     value={editingRestaurant.chef_name || ''}
                     onChange={e =>
@@ -395,7 +395,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">電話</label>
+                  <label className="text-sm font-medium">{MICHELIN_RESTAURANTS_TAB_LABELS.電話}</label>
                   <Input
                     value={editingRestaurant.phone || ''}
                     onChange={e =>
@@ -406,7 +406,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium">平均晚餐價格</label>
+                  <label className="text-sm font-medium">{MICHELIN_RESTAURANTS_TAB_LABELS.LABEL_5803}</label>
                   <Input
                     type="number"
                     value={editingRestaurant.avg_price_dinner || ''}
@@ -419,7 +419,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">貨幣</label>
+                  <label className="text-sm font-medium">{MICHELIN_RESTAURANTS_TAB_LABELS.LABEL_3529}</label>
                   <Input
                     value={editingRestaurant.currency || ''}
                     onChange={e =>
@@ -433,11 +433,11 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
           <DialogFooter>
             <Button variant="outline" onClick={handleCloseEdit} className="gap-2">
               <X size={16} />
-              取消
+              {MICHELIN_RESTAURANTS_TAB_LABELS.CANCEL}
             </Button>
             <Button onClick={() => editingRestaurant && handleUpdate(editingRestaurant)} className="gap-2">
               <Save size={16} />
-              儲存
+              {MICHELIN_RESTAURANTS_TAB_LABELS.SAVE}
             </Button>
           </DialogFooter>
         </DialogContent>

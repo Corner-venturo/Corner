@@ -9,6 +9,7 @@ import Highlight from '@tiptap/extension-highlight'
 import { useEffect, useCallback, useState, useRef, useMemo } from 'react'
 import { cn } from '@/lib/utils'
 import { Bold, Italic, Underline as UnderlineIcon, Strikethrough, Palette, Highlighter } from 'lucide-react'
+import { UI_LABELS } from './constants/labels'
 
 interface RichTextInputProps {
   value: string
@@ -174,7 +175,7 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
               'p-1.5 rounded hover:bg-muted transition-colors',
               editor.isActive('bold') && 'bg-muted'
             )}
-            title="粗體"
+            title={UI_LABELS.LABEL_3889}
           >
             <Bold size={16} />
           </button>
@@ -186,7 +187,7 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
               'p-1.5 rounded hover:bg-muted transition-colors',
               editor.isActive('italic') && 'bg-muted'
             )}
-            title="斜體"
+            title={UI_LABELS.LABEL_9678}
           >
             <Italic size={16} />
           </button>
@@ -198,7 +199,7 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
               'p-1.5 rounded hover:bg-muted transition-colors',
               editor.isActive('underline') && 'bg-muted'
             )}
-            title="底線"
+            title={UI_LABELS.LABEL_5500}
           >
             <UnderlineIcon size={16} />
           </button>
@@ -210,7 +211,7 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
               'p-1.5 rounded hover:bg-muted transition-colors',
               editor.isActive('strike') && 'bg-muted'
             )}
-            title="刪除線"
+            title={UI_LABELS.DELETE_5630}
           >
             <Strikethrough size={16} />
           </button>
@@ -226,7 +227,7 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
                 setShowHighlightPicker(false)
               }}
               className="p-1.5 rounded hover:bg-muted transition-colors"
-              title="文字顏色"
+              title={UI_LABELS.LABEL_4467}
             >
               <Palette size={16} />
             </button>
@@ -258,7 +259,7 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
                 'p-1.5 rounded hover:bg-muted transition-colors',
                 editor.isActive('highlight') && 'bg-muted'
               )}
-              title="螢光標記"
+              title={UI_LABELS.LABEL_1434}
             >
               <Highlighter size={16} />
             </button>
@@ -281,7 +282,7 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
                   onClick={removeHighlight}
                   className="text-xs text-morandi-secondary hover:text-morandi-primary mt-1"
                 >
-                  移除標記
+                  {UI_LABELS.LABEL_4248}
                 </button>
               </div>
             )}

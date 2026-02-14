@@ -13,6 +13,7 @@ import { UtensilsCrossed } from 'lucide-react'
 import { useRestaurantSelector } from './hooks/useRestaurantSelector'
 import { RestaurantSearchInput } from './restaurant/RestaurantSearchInput'
 import { RestaurantList } from './restaurant/RestaurantList'
+import { COMP_EDITOR_LABELS } from './constants/labels'
 
 // 餐廳型別
 export interface Restaurant {
@@ -162,7 +163,7 @@ export function RestaurantSelector({
         <DialogHeader className="px-6 py-4 border-b bg-gradient-to-r from-rose-50 to-transparent">
           <DialogTitle className="flex items-center gap-2 text-lg">
             <UtensilsCrossed className="text-rose-500" size={22} />
-            選擇餐廳
+            {COMP_EDITOR_LABELS.SELECT_6249}
           </DialogTitle>
         </DialogHeader>
 
@@ -212,7 +213,7 @@ export function RestaurantSelector({
 
         <DialogFooter className="px-6 py-4 border-t bg-muted/50">
           <Button variant="outline" onClick={handleCancel} className="rounded-xl">
-            取消
+            {COMP_EDITOR_LABELS.取消}
           </Button>
           <Button
             onClick={handleConfirm}

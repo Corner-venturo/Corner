@@ -35,12 +35,12 @@ export function EditChannelDialog({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent level={1} className="w-[400px]">
         <DialogHeader>
-          <DialogTitle className="text-morandi-primary">編輯頻道</DialogTitle>
+          <DialogTitle className="text-morandi-primary">{COMP_WORKSPACE_LABELS.編輯頻道}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-1">
-              頻道名稱
+              {COMP_WORKSPACE_LABELS.頻道名稱}
             </label>
             <input
               type="text"
@@ -52,7 +52,7 @@ export function EditChannelDialog({
           </div>
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-1">
-              描述（可選）
+              {COMP_WORKSPACE_LABELS.LABEL_728}
             </label>
             <textarea
               value={channelDescription}
@@ -70,7 +70,7 @@ export function EditChannelDialog({
             className="flex-1 gap-2"
           >
             <X size={16} />
-            取消
+            {COMP_WORKSPACE_LABELS.CANCEL}
           </Button>
           <Button
             onClick={onSave}
@@ -78,7 +78,7 @@ export function EditChannelDialog({
             className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
             <Save size={16} />
-            儲存
+            {COMP_WORKSPACE_LABELS.SAVE}
           </Button>
         </div>
       </DialogContent>

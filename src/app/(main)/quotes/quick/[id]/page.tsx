@@ -10,6 +10,7 @@ import { useQuote, updateQuote } from '@/data'
 import { QuickQuoteDetail } from '@/features/quotes/components'
 import { NotFoundState } from '@/components/ui/not-found-state'
 import { Loader2 } from 'lucide-react'
+import { ID_LABELS } from './constants/labels'
 
 export default function QuickQuoteDetailPage() {
   const params = useParams()
@@ -22,7 +23,7 @@ export default function QuickQuoteDetailPage() {
       <div className="flex items-center justify-center h-[50vh]">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-morandi-gold mx-auto mb-4" />
-          <p className="text-morandi-secondary">載入中...</p>
+          <p className="text-morandi-secondary">{ID_LABELS.LOADING_6912}</p>
         </div>
       </div>
     )
@@ -32,8 +33,8 @@ export default function QuickQuoteDetailPage() {
     return (
       <div className="flex items-center justify-center h-[50vh]">
         <NotFoundState
-          title="找不到該報價單"
-          description="您要找的報價單可能已被刪除或不存在"
+          title={ID_LABELS.NOT_FOUND_4550}
+          description={ID_LABELS.DELETE_642}
           backButtonLabel="返回報價單列表"
           backHref="/quotes"
         />

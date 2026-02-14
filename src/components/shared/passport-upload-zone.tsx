@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { Upload, FileImage, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { SHARED_LABELS } from './constants/labels'
 
 interface PassportUploadZoneProps {
   files: File[]
@@ -88,7 +89,7 @@ export function PassportUploadZone({
         <div className="flex flex-col items-center justify-center pt-5 pb-6">
           <Upload className={`w-8 h-8 mb-2 ${isDragging ? 'text-primary' : 'text-morandi-secondary'}`} />
           <p className="mb-1 text-sm text-morandi-secondary">
-            <span className="font-medium">點擊上傳</span> 或拖曳圖片至此
+            <span className="font-medium">{SHARED_LABELS.UPLOADING_9146}</span> {SHARED_LABELS.LABEL_5690}
           </p>
           <p className="text-xs text-morandi-secondary/70">支援 JPG, PNG（最多 {maxFiles} 張）</p>
         </div>
@@ -105,7 +106,7 @@ export function PassportUploadZone({
       {/* 已選檔案列表 */}
       {files.length > 0 && (
         <div className="mt-4 space-y-2">
-          <p className="text-sm font-medium text-morandi-primary">已選擇 {files.length} 張圖片</p>
+          <p className="text-sm font-medium text-morandi-primary">{SHARED_LABELS.SELECT_576} {files.length} 張圖片</p>
           <div className="grid grid-cols-2 gap-2">
             {files.map((file, index) => (
               <div

@@ -247,7 +247,7 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
             onClick={props.onClearFilters}
             className="px-3 py-1 text-sm text-morandi-secondary hover:text-morandi-primary border border-border rounded-md hover:bg-morandi-container/50 transition-colors mr-4"
           >
-            清除篩選
+            {COMP_LAYOUT_LABELS.FILTER_4998}
           </button>
         )}
 

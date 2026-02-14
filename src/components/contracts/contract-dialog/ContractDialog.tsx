@@ -213,13 +213,13 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                       className="w-full flex items-center justify-center gap-2 py-2 text-sm text-morandi-gold hover:bg-morandi-gold/5 rounded-lg transition-colors"
                     >
                       <Printer size={16} />
-                      列印合約
+                      {CONTRACT_DIALOG_LABELS.PRINT_8406}
                     </button>
                   </div>
                 ) : (
                   // 沒有合約
                   <div className="text-center py-8 text-sm text-morandi-secondary">
-                    尚無合約
+                    {CONTRACT_DIALOG_LABELS.EMPTY_3762}
                   </div>
                 )}
               </div>
@@ -390,17 +390,17 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                       <div className="text-sm text-morandi-primary font-medium">{tour.code}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-morandi-secondary">團名</div>
+                      <div className="text-xs text-morandi-secondary">{CONTRACT_DIALOG_LABELS.LABEL_4272}</div>
                       <div className="text-sm text-morandi-primary font-medium">{tour.name}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-morandi-secondary">出發日期</div>
+                      <div className="text-xs text-morandi-secondary">{CONTRACT_DIALOG_LABELS.LABEL_4513}</div>
                       <div className="text-sm text-morandi-primary font-medium">
                         <DateCell date={tour.departure_date} showIcon={false} />
                       </div>
                     </div>
                     <div>
-                      <div className="text-xs text-morandi-secondary">目的地</div>
+                      <div className="text-xs text-morandi-secondary">{CONTRACT_DIALOG_LABELS.LABEL_5475}</div>
                       <div className="text-sm text-morandi-primary font-medium">{tour.location}</div>
                     </div>
                   </div>
@@ -410,7 +410,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                 {tourOrders.length > 0 && (
                   <div>
                     <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                      選擇訂單（旅客資料來源）
+                      {CONTRACT_DIALOG_LABELS.SELECT_1070}
                     </label>
                     <Select value={selectedOrderId} onValueChange={setSelectedOrderId}>
                       <SelectTrigger>
@@ -430,7 +430,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                 {/* 選擇範本 */}
                 {!hasContract && (
                   <div>
-                    <label className="text-sm font-medium text-morandi-primary mb-3 block">選擇合約範本</label>
+                    <label className="text-sm font-medium text-morandi-primary mb-3 block">{CONTRACT_DIALOG_LABELS.SELECT_4327}</label>
                     <div className="grid grid-cols-3 gap-3">
                       {CONTRACT_TEMPLATES.map(template => (
                         <button
@@ -479,7 +479,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
 
                 {/* 備註 */}
                 <div>
-                  <label className="text-sm font-medium text-morandi-primary mb-2 block">備註</label>
+                  <label className="text-sm font-medium text-morandi-primary mb-2 block">{CONTRACT_DIALOG_LABELS.REMARKS}</label>
                   <textarea
                     value={contractNotes}
                     onChange={e => setContractNotes(e.target.value)}
@@ -498,11 +498,11 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                         onChange={e => setContractCompleted(e.target.checked)}
                         className="w-4 h-4 text-morandi-gold focus:ring-morandi-gold/50 rounded"
                       />
-                      <span className="text-sm text-morandi-primary">合約已完成</span>
+                      <span className="text-sm text-morandi-primary">{CONTRACT_DIALOG_LABELS.LABEL_7282}</span>
                     </label>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-morandi-primary mb-2 block">歸檔日期</label>
+                    <label className="text-sm font-medium text-morandi-primary mb-2 block">{CONTRACT_DIALOG_LABELS.LABEL_815}</label>
                     <DatePicker
                       value={archivedDate}
                       onChange={date => setArchivedDate(date)}
@@ -517,7 +517,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
             <DialogFooter className="flex-shrink-0 border-t pt-4">
               <Button variant="outline" onClick={handleBackToMain} disabled={saving} className="gap-2">
                 <X size={16} />
-                取消
+                {CONTRACT_DIALOG_LABELS.CANCEL}
               </Button>
               <Button onClick={onSave} disabled={saving || (!hasContract && !selectedTemplate)} className="gap-2">
                 <Save size={16} />
@@ -529,7 +529,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                 className="bg-morandi-gold hover:bg-morandi-gold-hover gap-2"
               >
                 <Printer size={16} />
-                列印
+                {CONTRACT_DIALOG_LABELS.PRINT}
               </Button>
             </DialogFooter>
           </>

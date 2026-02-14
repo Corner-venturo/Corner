@@ -346,7 +346,7 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
             className="gap-1"
           >
             <Plus className="h-4 w-4" />
-            從行程帶入餐食
+            {COMP_TOURS_LABELS.LABEL_869}
           </Button>
         )}
       </div>
@@ -356,7 +356,7 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
         {mealSettings.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-morandi-muted">
             <UtensilsCrossed className="h-8 w-8 mb-2" />
-            <p className="text-sm">尚未設定餐食</p>
+            <p className="text-sm">{COMP_TOURS_LABELS.SETTINGS_7076}</p>
             {mealsFromSchedule.length > 0 ? (
               <Button
                 variant="outline"
@@ -368,7 +368,7 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
                 從行程帶入 {mealsFromSchedule.length} 筆餐食
               </Button>
             ) : (
-              <p className="text-xs mt-1">請先在行程表設定餐食資訊</p>
+              <p className="text-xs mt-1">{COMP_TOURS_LABELS.SETTINGS_4545}</p>
             )}
           </div>
         ) : (
@@ -470,7 +470,7 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
                             className="w-full justify-center gap-1 text-morandi-secondary hover:text-morandi-primary"
                           >
                             <Plus className="h-4 w-4" />
-                            新增桌次
+                            {COMP_TOURS_LABELS.ADD_4886}
                           </Button>
                         </div>
                       </div>
@@ -494,7 +494,7 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label className="text-morandi-primary">每桌人數</Label>
+              <Label className="text-morandi-primary">{COMP_TOURS_LABELS.LABEL_7499}</Label>
               <div className="flex gap-2">
                 {TABLE_CAPACITY_OPTIONS.map(cap => (
                   <button
@@ -512,7 +512,7 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
                 ))}
               </div>
               <div className="flex items-center gap-2 mt-2">
-                <span className="text-xs text-morandi-muted">自訂：</span>
+                <span className="text-xs text-morandi-muted">{COMP_TOURS_LABELS.LABEL_3162}</span>
                 <Input
                   type="number"
                   min={1}
@@ -521,17 +521,17 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
                   onChange={e => setNewTableCapacity(parseInt(e.target.value) || 10)}
                   className="w-20 h-8"
                 />
-                <span className="text-xs text-morandi-muted">人</span>
+                <span className="text-xs text-morandi-muted">{COMP_TOURS_LABELS.LABEL_2543}</span>
               </div>
             </div>
             <div className="flex justify-end gap-2 pt-3 border-t border-border">
               <Button variant="outline" onClick={() => setShowAddTable(false)} className="gap-2">
                 <X size={16} />
-                取消
+                {COMP_TOURS_LABELS.取消}
               </Button>
               <Button onClick={handleAddTable} className="gap-2">
                 <Plus size={16} />
-                新增
+                {COMP_TOURS_LABELS.ADD}
               </Button>
             </div>
           </div>

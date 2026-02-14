@@ -263,7 +263,7 @@ export function CurrencyWidget() {
                 setUseCustomRate(true)
               }}
               className="w-full px-3.5 py-2.5 border border-border/60 rounded-xl font-mono text-sm font-medium bg-card/90 hover:bg-card hover:shadow-sm focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm"
-              placeholder="輸入匯率"
+              placeholder={DASHBOARD_LABELS.inputRate}
             />
             <div className="flex items-center gap-1.5 text-xs text-morandi-secondary/90 bg-card/40 px-2.5 py-1.5 rounded-lg">
               <TrendingUp className="w-3.5 h-3.5 text-morandi-gold" />

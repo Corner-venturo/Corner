@@ -25,7 +25,7 @@ export function AccommodationSection({
   if (variant === 'grid') {
     return (
       <div>
-        <div className="text-xs font-medium mb-1" style={{ color: themeColor }}>住宿</div>
+        <div className="text-xs font-medium mb-1" style={{ color: themeColor }}>{COMP_EDITOR_LABELS.住宿}</div>
         <EditableText
           value={accommodation}
           fieldKey="accommodation"
@@ -59,7 +59,7 @@ export function AccommodationSection({
   // Default inline variant
   return (
     <div className="flex-1">
-      <span className="text-morandi-muted">住宿：</span>
+      <span className="text-morandi-muted">{COMP_EDITOR_LABELS.LABEL_8648}</span>
       <EditableText
         value={accommodation}
         fieldKey="accommodation"

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Check, X, Info, ChevronDown } from 'lucide-react'
 import type { TourPageData } from '@/features/tours/types/tour-display.types'
 import type { PricingDetails } from '@/stores/types/tour.types'
+import { TOURS_LABELS } from './constants/labels'
 
 // Luxury 配色
 const LUXURY = {
@@ -69,7 +70,7 @@ export function TourPricingSectionLuxury({ data, viewMode }: TourPricingSectionL
               borderLeft: `4px solid ${LUXURY.secondary}`
             }}
           >
-            團費說明與注意事項
+            {TOURS_LABELS.LABEL_2102}
           </h2>
         </motion.div>
 
@@ -78,7 +79,7 @@ export function TourPricingSectionLuxury({ data, viewMode }: TourPricingSectionL
           {/* 費用包含 */}
           {includedItems.length > 0 && (
             <AccordionItem
-              title="費用包含項目"
+              title={TOURS_LABELS.LABEL_4285}
               isOpen={openSections.included}
               onToggle={() => toggleSection('included')}
               icon={<Check size={18} />}
@@ -103,7 +104,7 @@ export function TourPricingSectionLuxury({ data, viewMode }: TourPricingSectionL
           {/* 費用不含 */}
           {excludedItems.length > 0 && (
             <AccordionItem
-              title="費用不含項目"
+              title={TOURS_LABELS.LABEL_1779}
               isOpen={openSections.excluded}
               onToggle={() => toggleSection('excluded')}
               icon={<X size={18} />}
@@ -128,7 +129,7 @@ export function TourPricingSectionLuxury({ data, viewMode }: TourPricingSectionL
           {/* 取消與退費政策 */}
           {data.showCancellationPolicy && cancellationPolicy.length > 0 && (
             <AccordionItem
-              title="取消與退費政策"
+              title={TOURS_LABELS.LABEL_63}
               isOpen={openSections.cancellation}
               onToggle={() => toggleSection('cancellation')}
               icon={<Info size={18} />}
@@ -137,7 +138,7 @@ export function TourPricingSectionLuxury({ data, viewMode }: TourPricingSectionL
               isMobile={isMobile}
             >
               <div className="pt-6 text-sm leading-relaxed space-y-4" style={{ color: LUXURY.muted }}>
-                <p>本行程適用「國外旅遊定型化契約書」之規定：</p>
+                <p>{TOURS_LABELS.LABEL_6529}</p>
                 <ul className="list-disc pl-5 space-y-2">
                   {cancellationPolicy.map((policy, index) => (
                     <li key={index}>{policy}</li>

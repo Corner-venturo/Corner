@@ -48,7 +48,7 @@ export const QuickQuoteSummary: React.FC<QuickQuoteSummaryProps> = ({
       {/* 費用說明 - 只在編輯模式或有內容時顯示 */}
       {(isEditing || expenseDescription) && (
         <div className="bg-card border border-border rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-morandi-primary mb-4">費用說明</h2>
+          <h2 className="text-lg font-semibold text-morandi-primary mb-4">{QUICK_QUOTE_SECTION_LABELS.LABEL_9264}</h2>
           {isEditing ? (
             <textarea
               value={expenseDescription}
@@ -66,21 +66,21 @@ export const QuickQuoteSummary: React.FC<QuickQuoteSummaryProps> = ({
 
       {/* 金額統計 */}
       <div className="bg-card border border-border rounded-xl p-6">
-        <h2 className="text-lg font-semibold text-morandi-primary mb-4">金額統計</h2>
+        <h2 className="text-lg font-semibold text-morandi-primary mb-4">{QUICK_QUOTE_SECTION_LABELS.LABEL_9365}</h2>
         <div className={`grid gap-4 ${isEditing ? 'grid-cols-5' : 'grid-cols-3'}`}>
           {isEditing && (
             <div className="p-4 bg-morandi-container/10 rounded-lg">
-              <label className="text-sm font-medium text-morandi-primary">總成本</label>
+              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_SECTION_LABELS.TOTAL_2585}</label>
               <CurrencyCell amount={totalCost} className="mt-1 text-2xl font-bold" />
             </div>
           )}
           <div className="p-4 bg-morandi-container/10 rounded-lg">
-            <label className="text-sm font-medium text-morandi-primary">應收金額</label>
+            <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_SECTION_LABELS.LABEL_6261}</label>
             <CurrencyCell amount={totalAmount} className="mt-1 text-2xl font-bold" />
           </div>
           {isEditing && (
             <div className="p-4 bg-morandi-container/10 rounded-lg">
-              <label className="text-sm font-medium text-morandi-primary">總利潤</label>
+              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_SECTION_LABELS.TOTAL_8800}</label>
               <CurrencyCell
                 amount={totalProfit}
                 variant={totalProfit >= 0 ? 'income' : 'expense'}
@@ -89,7 +89,7 @@ export const QuickQuoteSummary: React.FC<QuickQuoteSummaryProps> = ({
             </div>
           )}
           <div className="p-4 bg-morandi-container/10 rounded-lg">
-            <label className="text-sm font-medium text-morandi-primary">已收金額</label>
+            <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_SECTION_LABELS.LABEL_8143}</label>
             {isEditing ? (
               <Input
                 type="text"
@@ -116,7 +116,7 @@ export const QuickQuoteSummary: React.FC<QuickQuoteSummaryProps> = ({
             )}
           </div>
           <div className="p-4 bg-morandi-container/10 rounded-lg">
-            <label className="text-sm font-medium text-morandi-primary">應收餘額</label>
+            <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_SECTION_LABELS.LABEL_2302}</label>
             <CurrencyCell
               amount={balanceAmount}
               variant={balanceAmount > 0 ? 'expense' : 'income'}

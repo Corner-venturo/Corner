@@ -236,11 +236,11 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
             {isConfirmed && confirmedAt && (
               <>
                 <div className="px-2 py-2 text-sm">
-                  <div className="text-morandi-secondary">確認時間</div>
+                  <div className="text-morandi-secondary">{QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRM_9119}</div>
                   <DateCell date={confirmedAt} format="time" showIcon={false} className="font-medium" />
                   {confirmedByName && (
                     <>
-                      <div className="text-morandi-secondary mt-1">確認者</div>
+                      <div className="text-morandi-secondary mt-1">{QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRM_1673}</div>
                       <div className="font-medium">
                         {confirmedByName}
                         <span className="text-xs text-morandi-secondary ml-1">
@@ -258,7 +258,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
             {confirmationStatus === 'pending' && confirmationTokenExpiresAt && (
               <>
                 <div className="px-2 py-2 text-sm">
-                  <div className="text-morandi-secondary">連結有效至</div>
+                  <div className="text-morandi-secondary">{QUOTE_CONFIRMATION_SECTION_LABELS.LABEL_1799}</div>
                   <div className={cn('font-medium flex items-center gap-1', isTokenExpired && 'text-status-danger')}>
                     <DateCell date={confirmationTokenExpiresAt} format="time" showIcon={false} />
                     {isTokenExpired && <span>(已過期)</span>}
@@ -284,7 +284,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
                   className={cn('gap-2', isLoading && 'opacity-50 cursor-not-allowed')}
                 >
                   <UserCheck size={14} />
-                  業務手動確認
+                  {QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRM_9516}
                 </DropdownMenuItem>
               </>
             )}
@@ -293,7 +293,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
             {confirmationUrl && confirmationStatus === 'pending' && !isTokenExpired && (
               <DropdownMenuItem onClick={handleCopyLink} className="gap-2">
                 {copied ? <Check size={14} /> : <Copy size={14} />}
-                複製確認連結
+                {QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRM_9899}
               </DropdownMenuItem>
             )}
 
@@ -304,7 +304,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
                 className="gap-2"
               >
                 <ExternalLink size={14} />
-                預覽確認頁面
+                {QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRM_133}
               </DropdownMenuItem>
             )}
 
@@ -319,7 +319,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
               className="gap-2"
             >
               <History size={14} />
-              確認歷史記錄
+              {QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRM_495}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -334,14 +334,14 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
               業務手動確認
             </DialogTitle>
             <DialogDescription>
-              確認此報價單，此操作表示業務已與客戶確認同意此報價。
+              {QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRM_4324}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div>
               <label className="text-sm font-medium text-morandi-primary block mb-1">
-                確認備註（選填）
+                {QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRM_2435}
               </label>
               <textarea
                 value={confirmNotes}
@@ -353,14 +353,14 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
             </div>
 
             <div className="text-xs text-morandi-secondary bg-morandi-container/30 p-3 rounded-lg">
-              確認後將記錄您的姓名和確認時間，作為稽核依據。
+              {QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRM_1899}
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" className="gap-2" onClick={() => setShowStaffConfirmDialog(false)}>
               <X size={16} />
-              取消
+              {QUOTE_CONFIRMATION_SECTION_LABELS.CANCEL}
             </Button>
             <Button
               onClick={handleStaffConfirm}
@@ -391,7 +391,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
               </div>
             ) : logs.length === 0 ? (
               <div className="text-center py-8 text-morandi-secondary">
-                尚無確認記錄
+                {QUOTE_CONFIRMATION_SECTION_LABELS.EMPTY_1207}
               </div>
             ) : (
               <div className="space-y-3">

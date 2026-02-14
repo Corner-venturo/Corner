@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { cn } from '@/lib/utils'
 import { MobileHeader } from '@/components/layout/mobile-header'
 import { MobileSidebar } from '@/components/layout/mobile-sidebar'
+import { WORKSPACE_LABELS } from './constants/labels'
 
 export default function WorkspacePage() {
   const { sidebarCollapsed } = useAuthStore()
@@ -51,7 +52,7 @@ export default function WorkspacePage() {
       <div className="h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-morandi-gold mx-auto"></div>
-          <p className="mt-3 text-sm text-morandi-muted">載入工作空間...</p>
+          <p className="mt-3 text-sm text-morandi-muted">{WORKSPACE_LABELS.LOADING_5447}</p>
         </div>
       </div>
     )

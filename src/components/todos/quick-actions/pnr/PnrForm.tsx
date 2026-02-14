@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Plane, CheckCircle2, XCircle, AlertTriangle, Info } from 'lucide-react'
 import type { validateAmadeusPNR } from '@/lib/pnr-parser'
+import { PNR_LABELS } from './constants/labels'
 
 interface PnrFormProps {
   rawPNR: string
@@ -32,7 +33,7 @@ export function PnrForm({
               {validation.isValid ? (
                 <span className="inline-flex items-center gap-1">
                   <CheckCircle2 size={12} />
-                  格式正確
+                  {PNR_LABELS.LABEL_5474}
                 </span>
               ) : validation.errors.length > 0 ? (
                 <span className="inline-flex items-center gap-1">

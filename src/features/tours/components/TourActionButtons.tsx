@@ -23,6 +23,7 @@ import { cn } from '@/lib/utils'
 import { Tour, Quote, User } from '@/stores/types'
 import type { Proposal } from '@/types/proposal.types'
 import { TOUR_ACTIONS } from '../constants'
+import { TOURS_LABELS } from './constants/labels'
 
 // 擴展 Tour 類型，增加提案標記
 type TourOrProposal = Tour & {
@@ -169,7 +170,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               onEditTour(tour)
             }}
             className="px-1.5 py-0.5 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-            title="編輯"
+            title={TOURS_LABELS.EDIT}
           >
             <Edit2 size={14} />
             <span>編輯</span>

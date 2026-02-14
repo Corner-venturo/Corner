@@ -11,6 +11,7 @@ import { supabase } from '@/lib/supabase/client'
 import { useTourDetails } from '@/features/tours/hooks/useTours-advanced'
 import { useWorkspaceChannels } from '@/stores/workspace-store'
 import { TOUR_TABS, TourTabContent } from '@/components/tours/TourTabs'
+import { CODE_LABELS } from './constants/labels'
 
 const fetchTourIdByCode = async (code: string): Promise<string | null> => {
   const { data, error } = await supabase
@@ -61,7 +62,7 @@ export default function TourDetailPage() {
     return (
       <div className="h-full flex flex-col">
         <ResponsiveHeader
-          title="載入中..."
+          title={CODE_LABELS.LOADING_6912}
           icon={MapPin}
           breadcrumb={[
             { label: '首頁', href: '/' },
@@ -81,7 +82,7 @@ export default function TourDetailPage() {
     return (
       <div className="h-full flex flex-col">
         <ResponsiveHeader
-          title="找不到旅遊團"
+          title={CODE_LABELS.NOT_FOUND_9865}
           icon={MapPin}
           breadcrumb={[
             { label: '首頁', href: '/' },
@@ -91,8 +92,8 @@ export default function TourDetailPage() {
         />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <p className="text-morandi-secondary mb-4">找不到團號 {code} 的旅遊團</p>
-            <Button onClick={handleBack}>返回列表</Button>
+            <p className="text-morandi-secondary mb-4">{CODE_LABELS.NOT_FOUND_2154} {code} 的旅遊團</p>
+            <Button onClick={handleBack}>{CODE_LABELS.LABEL_5810}</Button>
           </div>
         </div>
       </div>
@@ -121,7 +122,7 @@ export default function TourDetailPage() {
                 onClick={() => router.push(`/workspace?channel=${existingChannel.id}`)}
               >
                 <MessageSquare size={16} className="mr-1" />
-                頻道
+                {CODE_LABELS.LABEL_9173}
               </Button>
             )}
           </div>

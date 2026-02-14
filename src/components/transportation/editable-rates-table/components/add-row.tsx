@@ -5,6 +5,7 @@ import { Check, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { TransportationRate } from '@/types/transportation-rates.types'
+import { EDITABLE_RATES_TABLE_LABELS } from './constants/labels'
 
 interface AddRowProps {
   newRow: Partial<TransportationRate>
@@ -45,7 +46,7 @@ export function AddRow({
           </span>
         ) : (
           <Input
-            placeholder="品項（如：7座車）"
+            placeholder={EDITABLE_RATES_TABLE_LABELS.LABEL_5093}
             value={newRow.category || ''}
             onChange={e => setNewRow({ ...newRow, category: e.target.value })}
             className="h-8 text-sm"
@@ -61,7 +62,7 @@ export function AddRow({
           </span>
         ) : (
           <Input
-            placeholder="廠商名稱"
+            placeholder={EDITABLE_RATES_TABLE_LABELS.LABEL_6949}
             value={newRow.supplier || ''}
             onChange={e => setNewRow({ ...newRow, supplier: e.target.value })}
             className="h-8 text-sm"
@@ -71,7 +72,7 @@ export function AddRow({
 
       <td className="px-3 py-2 border-r border-border/40">
         <Input
-          placeholder="行程路線"
+          placeholder={EDITABLE_RATES_TABLE_LABELS.LABEL_312}
           value={newRow.route || ''}
           onChange={e => setNewRow({ ...newRow, route: e.target.value })}
           className="h-8 text-sm"
@@ -79,7 +80,7 @@ export function AddRow({
       </td>
       <td className="px-3 py-2 border-r border-border/40">
         <Input
-          placeholder="單程/往返"
+          placeholder={EDITABLE_RATES_TABLE_LABELS.LABEL_4893}
           value={newRow.trip_type || ''}
           onChange={e => setNewRow({ ...newRow, trip_type: e.target.value })}
           className="h-8 text-sm"
@@ -142,7 +143,7 @@ export function AddRow({
             className="h-7 px-2 gap-1 bg-morandi-gold/20 hover:bg-morandi-gold/30 text-morandi-gold border border-morandi-gold/30"
           >
             <Check size={14} />
-            儲存
+            {EDITABLE_RATES_TABLE_LABELS.SAVE}
           </Button>
           <Button
             onClick={onCancel}
@@ -151,7 +152,7 @@ export function AddRow({
             className="h-7 px-2 gap-1 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10"
           >
             <X size={14} />
-            取消
+            {EDITABLE_RATES_TABLE_LABELS.CANCEL}
           </Button>
         </div>
       </td>

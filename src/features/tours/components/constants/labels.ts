@@ -1,0 +1,20 @@
+export const TOURS_LABELS = {
+  LABEL_7445: '快速報價單',
+  ADD_1598: '新增快速報價單',
+  LABEL_2903: '查看',
+  DELETE: '刪除',
+  LABEL_3885: '尚未建立',
+
+  EDIT: '編輯',
+
+  LABEL_4272: '團名',
+  LABEL_6293: '訂單數',
+  TOTAL_7262: '總收入',
+  TOTAL_2585: '總成本',
+  LABEL_6713: '毛利',
+  SETTINGS_6548: '獎金設定',
+  LABEL_6960: '業務獎金',
+  TOTAL_6305: '獎金總計',
+  LABEL_1342: '結案後將自動產生獎金請款單，狀態變更為「結案」。',
+  CANCEL: '取消',
+}

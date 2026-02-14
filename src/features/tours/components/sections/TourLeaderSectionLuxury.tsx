@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { Phone, MapPin, Calendar, Clock, User } from 'lucide-react'
 import type { TourPageData } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 // Luxury 配色
 const LUXURY = {
@@ -86,7 +87,7 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
               fontFamily: "'Noto Serif TC', serif"
             }}
           >
-            領隊與集合資訊
+            {TOURS_LABELS.LABEL_7562}
           </h2>
         </motion.div>
 
@@ -168,7 +169,7 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
                         className="flex items-center gap-2 text-xs"
                         style={{ color: LUXURY.muted }}
                       >
-                        <span>國外：{leader.overseasPhone}</span>
+                        <span>{TOURS_LABELS.LABEL_5167}{leader.overseasPhone}</span>
                       </div>
                     )}
                   </div>
@@ -263,7 +264,7 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
                         className="text-xs font-bold uppercase tracking-widest mb-2"
                         style={{ color: LUXURY.muted }}
                       >
-                        其他集合點
+                        {TOURS_LABELS.LABEL_3746}
                       </p>
                       <div className="space-y-2">
                         {meetingPoints.slice(1).map((point, index) => (

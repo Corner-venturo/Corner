@@ -14,6 +14,7 @@ import { DestinationSelector } from '@/components/shared/destination-selector'
 import { createTour, createOrder, useCountries, useCities, updateCountry, updateCity, useEmployeesSlim } from '@/data'
 import { useWorkspaceId } from '@/lib/workspace-context'
 import { alert } from '@/lib/ui/alert-dialog'
+import { QUICK_ACTIONS_LABELS } from './constants/labels'
 
 interface QuickGroupProps {
   onSubmit?: () => void
@@ -188,7 +189,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
           <Input
             value={newTour.name}
             onChange={e => setNewTour(prev => ({ ...prev, name: e.target.value }))}
-            placeholder="例如：東京五日遊"
+            placeholder={QUICK_ACTIONS_LABELS.EXAMPLE_8778}
             className="border-morandi-container/30"
           />
         </div>
@@ -258,31 +259,31 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
             className="rounded"
           />
           <label htmlFor="isSpecial-quick" className="text-sm text-morandi-primary">
-            特殊團
+            {QUICK_ACTIONS_LABELS.LABEL_4558}
           </label>
         </div>
       </div>
 
       {/* 訂單資訊（選填） */}
       <div className="border-t border-morandi-container/30 pt-4 space-y-4">
-        <h4 className="text-sm font-semibold text-morandi-primary">同時新增訂單（選填）</h4>
+        <h4 className="text-sm font-semibold text-morandi-primary">{QUICK_ACTIONS_LABELS.ADD_8364}</h4>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">聯絡人</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">{QUICK_ACTIONS_LABELS.LABEL_7009}</label>
             <Input
               value={newOrder.contact_person}
               onChange={e => setNewOrder(prev => ({ ...prev, contact_person: e.target.value }))}
-              placeholder="留空則不建立訂單"
+              placeholder={QUICK_ACTIONS_LABELS.LABEL_8434}
               className="border-morandi-container/30"
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">電話</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">{QUICK_ACTIONS_LABELS.LABEL_6280}</label>
             <Input
               value={newOrder.contact_phone}
               onChange={e => setNewOrder(prev => ({ ...prev, contact_phone: e.target.value }))}
-              placeholder="聯絡電話"
+              placeholder={QUICK_ACTIONS_LABELS.LABEL_5110}
               className="border-morandi-container/30"
             />
           </div>
@@ -292,7 +293,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
           <>
             <div>
               <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                業務人員
+                {QUICK_ACTIONS_LABELS.LABEL_6419}
               </label>
               <Combobox
                 value={newOrder.sales_person}
@@ -301,7 +302,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
                   value: emp.display_name || emp.english_name || '',
                   label: emp.display_name || emp.english_name || '',
                 }))}
-                placeholder="選擇業務人員..."
+                placeholder={QUICK_ACTIONS_LABELS.SELECT_463}
                 emptyMessage="找不到員工"
                 showSearchIcon={true}
                 showClearButton={true}
@@ -310,7 +311,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-morandi-primary mb-2 block">助理</label>
+              <label className="text-sm font-medium text-morandi-primary mb-2 block">{QUICK_ACTIONS_LABELS.LABEL_7412}</label>
               <Combobox
                 value={newOrder.assistant}
                 onChange={assistant => setNewOrder(prev => ({ ...prev, assistant }))}
@@ -318,7 +319,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
                   value: emp.display_name || emp.english_name || '',
                   label: emp.display_name || emp.english_name || '',
                 }))}
-                placeholder="選擇助理..."
+                placeholder={QUICK_ACTIONS_LABELS.SELECT_8232}
                 emptyMessage="找不到員工"
                 showSearchIcon={true}
                 showClearButton={true}
@@ -331,7 +332,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
 
         <div className="bg-morandi-container/10 p-3 rounded-lg">
           <p className="text-xs text-morandi-secondary">
-            提示：如果填寫了聯絡人，將會同時建立一筆訂單。如果留空，則只建立旅遊團。
+            {QUICK_ACTIONS_LABELS.LABEL_8280}
           </p>
         </div>
       </div>

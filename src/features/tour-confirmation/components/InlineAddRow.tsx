@@ -98,7 +98,7 @@ function TransportAddRow({
               onClick={onCancelAdd}
               className="text-morandi-red hover:underline text-xs"
             >
-              取消
+              {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.取消}
             </button>
           </td>
         </>

@@ -16,6 +16,13 @@ export const CONFIRMATION_SECTION_LABELS = {
   產出需求單: '產出需求單',
   編輯: '編輯',
   刪除: '刪除',
+
+  ADD: '新增',
+  ACTIONS: '操作',
+  ADD_6529: '尚無資料，點擊「新增」開始',
+  LABEL_1075: '小計：',
+  LABEL_6009: '預計',
+  LABEL_3550: '實際',
 };
 
 export const COST_SUMMARY_LABELS = {
@@ -24,6 +31,13 @@ export const COST_SUMMARY_LABELS = {
   住宿: '住宿',
   活動: '活動',
   其他: '其他',
+
+  TOTAL_336: '費用總計',
+  LABEL_2257: '分類',
+  LABEL_1924: '預計支出',
+  LABEL_686: '實際支出',
+  LABEL_8980: '差額',
+  TOTAL: '總計',
 };
 
 export const ITEM_EDIT_DIALOG_LABELS = {
@@ -110,6 +124,18 @@ export const TOUR_CONFIRMATION_SHEET_PAGE_LABELS = {
   處理中: '處理中...',
   上傳中: '上傳中...',
   上傳: '上傳',
+
+  LABEL_2780: '每日行程',
+  LABEL_9277: '行程',
+  LABEL_5591: '說明',
+  REMARKS: '備註',
+
+  SETTINGS_1263: '設定匯率',
+
+  CONFIRM_2803: '飯店確認',
+  LABEL_5863: '飯店名稱',
+  LABEL_4541: '房型配置',
+  STATUS: '狀態',
 };
 
 export const ITEM_EDIT_DIALOG_ADDITIONAL_LABELS = {
@@ -178,6 +204,12 @@ export const TOUR_INFO_LABELS = {
   RETURN: '回程',
   GROUP_SIZE: '團體人數',
   GENERAL_PREFIX: '一般：',
+
+  LABEL_138: '交通',
+  LABEL_20: '公司名稱',
+  LABEL_665: '司機',
+  LABEL_2394: '車號',
+  LABEL_9531: '手機電話',
 }
 
 export const CONFIRM_HEADER_LABELS = {
@@ -189,4 +221,9 @@ export const CONFIRM_HEADER_LABELS = {
   ASSISTANT: '助理',
   HEADCOUNT: '人數',
   FLIGHT: '航班',
+
+  CONFIRM_2476: '出團確認表',
+  CANCEL: '取消',
+  SAVE: '儲存',
+  EDIT: '編輯',
 }

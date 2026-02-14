@@ -86,7 +86,7 @@ export function AdvanceListCard({
         {/* 分享了代墊清單 */}
         <div className="text-morandi-primary text-[15px] mb-2">
           <Receipt className="inline text-morandi-gold mr-1" size={14} />
-          分享了代墊清單
+          {COMP_WORKSPACE_LABELS.LABEL_1330}
         </div>
 
         {/* 代墊項目卡片 */}
@@ -98,7 +98,7 @@ export function AdvanceListCard({
             <span className="badge-morandi">{pendingItems.length} 筆</span>
           </div>
           <div className="text-right">
-            <div className="text-xs text-morandi-secondary">總計</div>
+            <div className="text-xs text-morandi-secondary">{COMP_WORKSPACE_LABELS.TOTAL}</div>
             <CurrencyCell amount={totalAmount} className="text-lg font-semibold text-morandi-primary" />
           </div>
         </div>
@@ -140,17 +140,17 @@ export function AdvanceListCard({
                 {item.status === 'completed' ? (
                   <div className="flex items-center gap-1 text-xs text-morandi-secondary">
                     <Check size={14} className="text-status-success" />
-                    <span>已請款</span>
+                    <span>{COMP_WORKSPACE_LABELS.LABEL_2202}</span>
                   </div>
                 ) : canProcess ? (
                   <button
                     onClick={() => onCreatePayment(item.id, item)}
                     className="btn-morandi-primary !py-1 !px-2 text-xs w-full"
                   >
-                    請款
+                    {COMP_WORKSPACE_LABELS.LABEL_4772}
                   </button>
                 ) : (
-                  <div className="text-xs text-morandi-secondary text-center">待處理</div>
+                  <div className="text-xs text-morandi-secondary text-center">{COMP_WORKSPACE_LABELS.待處理}</div>
                 )}
               </div>
             </div>
@@ -167,7 +167,7 @@ export function AdvanceListCard({
               onClick={handleBatchPayment}
               className="btn-morandi-primary !py-1.5 !px-4 text-sm"
             >
-              批次請款
+              {COMP_WORKSPACE_LABELS.LABEL_6339}
             </button>
           </div>
         )}

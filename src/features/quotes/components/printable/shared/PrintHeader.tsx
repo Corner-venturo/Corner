@@ -43,7 +43,7 @@ export const PrintHeader: React.FC<PrintHeaderProps> = ({
         </div>
       ) : (
         <div className="absolute left-0 top-0 text-xs" style={{ color: MORANDI_COLORS.lightGray }}>
-          角落旅行社
+          {PRINTABLE_QUICK_QUOTE_LABELS.LABEL_3621}
         </div>
       )}
 

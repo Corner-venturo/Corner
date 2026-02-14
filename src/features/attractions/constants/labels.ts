@@ -26,6 +26,8 @@ export const ATTRACTIONS_LIST_LABELS = {
   編輯: '編輯',
   啟用: '啟用',
   刪除: '刪除',
+
+  LABEL_7396: '缺少：',
 };
 
 export const DATABASE_MANAGEMENT_PAGE_LABELS = {
@@ -42,10 +44,16 @@ export const DATABASE_MANAGEMENT_PAGE_LABELS = {
   米其林餐廳: '米其林餐廳',
   頂級體驗: '頂級體驗',
   搜尋景點名稱: '搜尋景點名稱...',
+
+  LABEL_937: '所有國家',
+  LABEL_3573: '全部分類',
+  LOADING_6912: '載入中...',
 };
 
 export const SORTABLE_ATTRACTIONS_LIST_LABELS = {
   拖拽排序: '拖拽排序',
+
+  EMPTY_2193: '尚無景點資料',
 };
 
 export const ATTRACTION_FORM_LABELS = {
@@ -78,15 +86,32 @@ export const ATTRACTION_FORM_LABELS = {
 export const ATTRACTION_IMAGE_UPLOAD_LABELS = {
   景點圖片: '景點圖片',
   編輯圖片: '編輯圖片',
+
+  EDIT_1001: '雙擊編輯',
+  UPLOADING_115: '放開以上傳圖片',
+  UPLOADING_2247: '拖曳圖片到此處，或點擊上方按鈕上傳',
+  EDIT_4224: '雙擊圖片開啟編輯器，可調整位置、色彩、AI 美化。建議尺寸 1920x1080',
 };
 
 export const ATTRACTION_PREVIEW_LABELS = {
   未命名景點: '未命名景點',
   未設定: '未設定',
+
+  PREVIEW: '預覽',
+  LABEL_4308: '主圖片',
+  LABEL_350: '地點：',
+  LABEL_4656: '停留時間：',
+  LABEL_9379: '地址：',
+  LABEL_9704: '電話：',
+  LABEL_2203: '官網：',
+  LABEL_9893: '連結',
 };
 
 export const ATTRACTIONS_TAB_LABELS = {
   按名稱排序: '按名稱排序',
+
+  LABEL_6756: '列表檢視',
+  LABEL_3804: '拖拽排序',
 };
 
 export const MICHELIN_RESTAURANTS_TAB_LABELS = {
@@ -105,6 +130,14 @@ export const MICHELIN_RESTAURANTS_TAB_LABELS = {
   料理類型: '料理類型',
   價格: '價格',
   電話: '電話',
+
+  EDIT_6298: '編輯米其林餐廳',
+  LABEL_3778: '英文名稱',
+  LABEL_9629: '主廚名稱',
+  LABEL_5803: '平均晚餐價格',
+  LABEL_3529: '貨幣',
+  CANCEL: '取消',
+  SAVE: '儲存',
 };
 
 export const PREMIUM_EXPERIENCES_TAB_LABELS = {
@@ -125,6 +158,15 @@ export const PREMIUM_EXPERIENCES_TAB_LABELS = {
   獨特性: '獨特性',
   專家: '專家',
   人數: '人數',
+
+  EDIT_1717: '編輯頂級體驗',
+  NAME: '名稱',
+  LABEL_3778: '英文名稱',
+  LABEL_3951: '描述',
+  LABEL_1913: '專家名稱',
+  LABEL_4473: '專家資格',
+  CANCEL: '取消',
+  SAVE: '儲存',
 };
 
 export const REGIONS_TAB_LABELS = {
@@ -135,5 +177,8 @@ export const REGIONS_TAB_LABELS = {
   否: '否',
   城市: '城市',
   尚無國家資料: '尚無國家資料',
+
+  EMPTY_4173: '此國家尚無城市資料',
+  CLOSE: '關閉',
 };
 

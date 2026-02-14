@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
+import { IMAGE_UPLOADER_LABELS } from './constants/labels'
 
 const UNSPLASH_ACCESS_KEY = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY
 
@@ -106,7 +107,7 @@ export function UnsplashSearch({ onSelect, className }: UnsplashSearchProps) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="搜尋圖片（如：Japan travel, beach）"
+            placeholder={IMAGE_UPLOADER_LABELS.SEARCH_2570}
             className="pl-9 h-9"
           />
         </div>
@@ -152,14 +153,14 @@ export function UnsplashSearch({ onSelect, className }: UnsplashSearchProps) {
         ) : searched ? (
           <div className="flex flex-col items-center justify-center h-[200px] text-morandi-secondary">
             <ImageIcon size={32} className="mb-2 opacity-50" />
-            <p className="text-sm">找不到相關圖片</p>
-            <p className="text-xs">試試其他關鍵字</p>
+            <p className="text-sm">{IMAGE_UPLOADER_LABELS.NOT_FOUND_6287}</p>
+            <p className="text-xs">{IMAGE_UPLOADER_LABELS.LABEL_1002}</p>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-[200px] text-morandi-secondary">
             <ImageIcon size={32} className="mb-2 opacity-50" />
-            <p className="text-sm">輸入關鍵字搜尋免費圖片</p>
-            <p className="text-xs mt-1">圖片來源：Unsplash</p>
+            <p className="text-sm">{IMAGE_UPLOADER_LABELS.SEARCH_2291}</p>
+            <p className="text-xs mt-1">{IMAGE_UPLOADER_LABELS.LABEL_3575}</p>
           </div>
         )}
       </div>

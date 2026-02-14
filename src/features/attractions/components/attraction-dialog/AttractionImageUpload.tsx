@@ -134,7 +134,7 @@ function ImagePositionAdjuster({
       {/* 雙擊提示 */}
       <div className="absolute bottom-1 left-1 right-1 text-center opacity-0 group-hover:opacity-100 transition-opacity">
         <span className="text-[10px] text-white bg-black/50 px-1.5 py-0.5 rounded">
-          雙擊編輯
+          {ATTRACTION_IMAGE_UPLOAD_LABELS.EDIT_1001}
         </span>
       </div>
 
@@ -192,7 +192,7 @@ export function AttractionImageUpload({
 
   return (
     <div>
-      <label className="text-sm font-medium">景點圖片</label>
+      <label className="text-sm font-medium">{ATTRACTION_IMAGE_UPLOAD_LABELS.景點圖片}</label>
 
       {/* 上傳按鈕區 */}
       <div className="flex gap-2 mt-2 mb-3">
@@ -245,7 +245,7 @@ export function AttractionImageUpload({
       >
         {isDragOver && (
           <div className="flex items-center justify-center h-[120px]">
-            <div className="text-morandi-gold font-medium">放開以上傳圖片</div>
+            <div className="text-morandi-gold font-medium">{ATTRACTION_IMAGE_UPLOAD_LABELS.UPLOADING_115}</div>
           </div>
         )}
         {!isDragOver && uploadedImages.length > 0 ? (
@@ -265,12 +265,12 @@ export function AttractionImageUpload({
         ) : !isDragOver ? (
           <div className="border-2 border-dashed border-border rounded-md p-6 text-center text-morandi-muted cursor-pointer hover:border-morandi-gold/50 transition-colors">
             <Upload size={24} className="mx-auto mb-2 opacity-50" />
-            <p className="text-sm">拖曳圖片到此處，或點擊上方按鈕上傳</p>
+            <p className="text-sm">{ATTRACTION_IMAGE_UPLOAD_LABELS.UPLOADING_2247}</p>
           </div>
         ) : null}
       </div>
       <p className="text-xs text-morandi-muted mt-2">
-        雙擊圖片開啟編輯器，可調整位置、色彩、AI 美化。建議尺寸 1920x1080
+        {ATTRACTION_IMAGE_UPLOAD_LABELS.EDIT_4224}
       </p>
     </div>
   )

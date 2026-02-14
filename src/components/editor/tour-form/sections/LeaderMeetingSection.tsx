@@ -205,13 +205,13 @@ export function LeaderMeetingSection({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-morandi-gold pb-2 flex-1">
-          領隊與集合資訊
+          {COMP_EDITOR_LABELS.LABEL_7562}
         </h2>
-        <span className="text-xs text-morandi-secondary">有填寫資料時自動顯示</span>
+        <span className="text-xs text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_6139}</span>
       </div>
 
       <div className="bg-morandi-container/20 p-4 rounded-lg space-y-3">
-        <h3 className="font-bold text-morandi-secondary">領隊資訊</h3>
+        <h3 className="font-bold text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_6841}</h3>
 
         {/* 頭像上傳 */}
         <div className="flex items-start gap-4">
@@ -268,7 +268,7 @@ export function LeaderMeetingSection({
           <div className="flex-1 space-y-3">
             {/* 中文名稱 - 帶搜尋 */}
             <div className="relative" ref={dropdownRef}>
-              <label className="block text-sm font-medium text-morandi-primary mb-1">中文名稱</label>
+              <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_6347}</label>
               <div className="relative">
                 <input
                   type="text"
@@ -316,7 +316,7 @@ export function LeaderMeetingSection({
             </div>
             {/* 英文暱稱 */}
             <div>
-              <label className="block text-sm font-medium text-morandi-primary mb-1">英文暱稱</label>
+              <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_2765}</label>
               <input
                 type="text"
                 value={data.leader?.englishName || ''}
@@ -329,7 +329,7 @@ export function LeaderMeetingSection({
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">國內電話</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.國內電話}</label>
             <input
               type="text"
               value={data.leader?.domesticPhone || ''}
@@ -339,7 +339,7 @@ export function LeaderMeetingSection({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">國外電話</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_2358}</label>
             <input
               type="text"
               value={data.leader?.overseasPhone || ''}
@@ -353,20 +353,20 @@ export function LeaderMeetingSection({
 
       <div className="bg-morandi-container/20 p-4 rounded-lg space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="font-bold text-morandi-secondary">集合資訊</h3>
+          <h3 className="font-bold text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_6639}</h3>
           <button
             type="button"
             onClick={addMeetingPoint}
             className="flex items-center gap-1 px-3 py-1.5 bg-morandi-gold text-white rounded-lg hover:bg-morandi-gold-hover transition-colors text-sm"
           >
             <Plus size={16} />
-            新增集合地點
+            {COMP_EDITOR_LABELS.ADD_89}
           </button>
         </div>
 
         {meetingPoints.length === 0 && (
           <p className="text-sm text-morandi-secondary text-center py-4">
-            尚未新增集合地點，點擊「新增集合地點」按鈕開始
+            {COMP_EDITOR_LABELS.ADD_270}
           </p>
         )}
 

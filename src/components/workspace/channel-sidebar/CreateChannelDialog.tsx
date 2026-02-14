@@ -88,11 +88,11 @@ export function CreateChannelDialog({
     // eslint-disable-next-line venturo/no-custom-modal
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9100]">
       <div className="card-morandi-elevated w-96 max-h-[80vh] flex flex-col">
-        <h3 className="font-semibold mb-4 text-morandi-primary">建立頻道</h3>
+        <h3 className="font-semibold mb-4 text-morandi-primary">{COMP_WORKSPACE_LABELS.LABEL_3910}</h3>
 
         <div className="space-y-3 flex-1 overflow-y-auto">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">頻道名稱</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_WORKSPACE_LABELS.頻道名稱}</label>
             <input
               type="text"
               placeholder={COMP_WORKSPACE_LABELS.例如_專案討論}
@@ -105,7 +105,7 @@ export function CreateChannelDialog({
 
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-1">
-              頻道描述（選填）
+              {COMP_WORKSPACE_LABELS.頻道描述_選填}
             </label>
             <textarea
               placeholder={COMP_WORKSPACE_LABELS.說明這個頻道的用途}
@@ -119,7 +119,7 @@ export function CreateChannelDialog({
           {/* 頻道類型選擇 */}
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
-              頻道類型
+              {COMP_WORKSPACE_LABELS.LABEL_4886}
             </label>
             <div className="flex gap-2">
               <button
@@ -133,7 +133,7 @@ export function CreateChannelDialog({
                 )}
               >
                 <Hash size={16} />
-                <span className="text-sm">公開頻道</span>
+                <span className="text-sm">{COMP_WORKSPACE_LABELS.LABEL_1552}</span>
               </button>
               <button
                 type="button"
@@ -146,7 +146,7 @@ export function CreateChannelDialog({
                 )}
               >
                 <Lock size={16} />
-                <span className="text-sm">私密頻道</span>
+                <span className="text-sm">{COMP_WORKSPACE_LABELS.LABEL_2721}</span>
               </button>
             </div>
             <p className="text-xs text-morandi-secondary mt-1">
@@ -158,7 +158,7 @@ export function CreateChannelDialog({
           {isSuperAdmin && onChannelScopeChange && (
             <div>
               <label className="block text-sm font-medium text-morandi-primary mb-2">
-                頻道範圍
+                {COMP_WORKSPACE_LABELS.LABEL_6196}
               </label>
               <div className="flex gap-2">
                 <button
@@ -176,7 +176,7 @@ export function CreateChannelDialog({
                   )}
                 >
                   <Building2 size={16} />
-                  <span className="text-sm">分公司</span>
+                  <span className="text-sm">{COMP_WORKSPACE_LABELS.LABEL_7525}</span>
                 </button>
                 <button
                   type="button"
@@ -193,7 +193,7 @@ export function CreateChannelDialog({
                   )}
                 >
                   <Globe size={16} />
-                  <span className="text-sm">全集團</span>
+                  <span className="text-sm">{COMP_WORKSPACE_LABELS.LABEL_8650}</span>
                 </button>
               </div>
               <p className="text-xs text-morandi-secondary mt-1">
@@ -207,7 +207,7 @@ export function CreateChannelDialog({
           {/* 成員選擇 */}
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
-              邀請成員
+              {COMP_WORKSPACE_LABELS.LABEL_8349}
               {channelScope === 'company' && (
                 <span className="ml-2 text-xs text-morandi-blue">(全集團)</span>
               )}
@@ -266,7 +266,7 @@ export function CreateChannelDialog({
             onClick={onClose}
             disabled={isCreating}
           >
-            取消
+            {COMP_WORKSPACE_LABELS.CANCEL}
           </button>
           <button
             className="btn-morandi-primary !py-1.5 !px-3 text-sm"

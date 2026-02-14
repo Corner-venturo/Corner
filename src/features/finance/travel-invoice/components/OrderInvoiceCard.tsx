@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { CurrencyCell } from '@/components/table-cells'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import { TRAVEL_INVOICE_LABELS } from './constants/labels'
 
 interface OrderInvoiceCardProps {
   orderId: string
@@ -92,7 +93,7 @@ export function OrderInvoiceCard({ orderId, onIssue }: OrderInvoiceCardProps) {
     return (
       <Card>
         <CardContent className="p-6">
-          <p className="text-sm text-morandi-secondary">載入中...</p>
+          <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.LOADING_6912}</p>
         </CardContent>
       </Card>
     )
@@ -105,25 +106,25 @@ export function OrderInvoiceCard({ orderId, onIssue }: OrderInvoiceCardProps) {
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
           <FileText className="h-4 w-4" />
-          發票資訊
+          {TRAVEL_INVOICE_LABELS.LABEL_8775}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <p className="text-sm text-morandi-secondary">已收款</p>
+            <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.LABEL_5100}</p>
             <p className="font-medium">
               <CurrencyCell amount={summary.paid_amount} />
             </p>
           </div>
           <div>
-            <p className="text-sm text-morandi-secondary">已開發票</p>
+            <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.LABEL_5912}</p>
             <p className="font-medium">
               <CurrencyCell amount={summary.invoiced_amount} />
             </p>
           </div>
           <div>
-            <p className="text-sm text-morandi-secondary">可開金額</p>
+            <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.LABEL_491}</p>
             <p className="font-medium text-morandi-gold">
               <CurrencyCell amount={summary.invoiceable_amount} />
             </p>
@@ -133,7 +134,7 @@ export function OrderInvoiceCard({ orderId, onIssue }: OrderInvoiceCardProps) {
         {/* 已開發票列表 */}
         {invoices.length > 0 && (
           <div className="border-t pt-4">
-            <p className="text-sm text-morandi-secondary mb-2">已開立發票</p>
+            <p className="text-sm text-morandi-secondary mb-2">{TRAVEL_INVOICE_LABELS.LABEL_9887}</p>
             <div className="space-y-2">
               {invoices.map(inv => (
                 <div key={inv.id} className="flex justify-between text-sm">
@@ -153,7 +154,7 @@ export function OrderInvoiceCard({ orderId, onIssue }: OrderInvoiceCardProps) {
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2 w-full"
             >
               <FileText size={16} />
-              開立發票
+              {TRAVEL_INVOICE_LABELS.LABEL_9215}
             </Button>
           </div>
         )}

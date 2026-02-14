@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { User, Bed, Bus, FileText, CheckCircle, Circle, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { CARDS_LABELS } from './constants/labels'
 
 interface MemberCardProps {
   member: {
@@ -68,7 +69,7 @@ export function MemberCard({
               )}
               {member.checked_in && (
                 <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">
-                  已報到
+                  {CARDS_LABELS.LABEL_3499}
                 </span>
               )}
             </div>
@@ -96,7 +97,7 @@ export function MemberCard({
                 </div>
               )}
               {!member.room_number && !member.vehicle_name && (
-                <span className="text-morandi-muted">尚未分配</span>
+                <span className="text-morandi-muted">{CARDS_LABELS.LABEL_3641}</span>
               )}
             </div>
           </div>
@@ -116,7 +117,7 @@ export function MemberCard({
                        border-r border-border"
           >
             <FileText size={16} />
-            <span>詳情</span>
+            <span>{CARDS_LABELS.LABEL_6702}</span>
           </Link>
           <button
             onClick={(e) => {
@@ -138,7 +139,7 @@ export function MemberCard({
             ) : (
               <>
                 <Circle size={16} />
-                <span>報到</span>
+                <span>{CARDS_LABELS.LABEL_204}</span>
               </>
             )}
           </button>

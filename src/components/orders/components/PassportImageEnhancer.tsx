@@ -82,14 +82,14 @@ export function PassportImageEnhancer({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles size={18} className="text-morandi-gold" />
-            護照圖片增強
+            {COMP_ORDERS_LABELS.LABEL_5560}
           </DialogTitle>
         </DialogHeader>
 
         <div className="grid grid-cols-2 gap-4">
           {/* 預覽區域 */}
           <div className="space-y-2">
-            <p className="text-xs text-morandi-muted">預覽</p>
+            <p className="text-xs text-morandi-muted">{COMP_ORDERS_LABELS.PREVIEW}</p>
             <div className="relative aspect-[3/2] bg-morandi-container rounded-lg overflow-hidden">
               <img
                 src={previewSrc}
@@ -98,7 +98,7 @@ export function PassportImageEnhancer({
               />
               {isProcessing && (
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                  <span className="text-white text-sm">處理中...</span>
+                  <span className="text-white text-sm">{COMP_ORDERS_LABELS.處理中}</span>
                 </div>
               )}
             </div>
@@ -106,12 +106,12 @@ export function PassportImageEnhancer({
 
           {/* 調整控制 */}
           <div className="space-y-4">
-            <p className="text-xs text-morandi-muted">調整設定</p>
+            <p className="text-xs text-morandi-muted">{COMP_ORDERS_LABELS.SETTINGS_1270}</p>
 
             {/* 銳利度 - 主要功能 */}
             <div className="space-y-2 p-3 bg-morandi-gold/10 rounded-lg border border-morandi-gold/20">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-morandi-primary">銳利度</span>
+                <span className="text-sm font-medium text-morandi-primary">{COMP_ORDERS_LABELS.LABEL_1814}</span>
                 <span className="text-xs text-morandi-muted">
                   {adjustments.clarity > 0 ? `+${adjustments.clarity}` : adjustments.clarity}
                 </span>
@@ -127,14 +127,14 @@ export function PassportImageEnhancer({
                 className="w-full"
               />
               <p className="text-[10px] text-morandi-muted">
-                提高銳利度可改善模糊護照的 OCR 辨識率
+                {COMP_ORDERS_LABELS.LABEL_1423}
               </p>
             </div>
 
             {/* 對比度 */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-morandi-secondary">對比度</span>
+                <span className="text-sm text-morandi-secondary">{COMP_ORDERS_LABELS.LABEL_3794}</span>
                 <span className="text-xs text-morandi-muted">
                   {adjustments.contrast > 0 ? `+${adjustments.contrast}` : adjustments.contrast}
                 </span>
@@ -154,7 +154,7 @@ export function PassportImageEnhancer({
             {/* 曝光度 */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-morandi-secondary">曝光度</span>
+                <span className="text-sm text-morandi-secondary">{COMP_ORDERS_LABELS.LABEL_2427}</span>
                 <span className="text-xs text-morandi-muted">
                   {adjustments.exposure > 0 ? `+${adjustments.exposure}` : adjustments.exposure}
                 </span>
@@ -174,7 +174,7 @@ export function PassportImageEnhancer({
             {/* 陰影 */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-morandi-secondary">陰影</span>
+                <span className="text-sm text-morandi-secondary">{COMP_ORDERS_LABELS.LABEL_6915}</span>
                 <span className="text-xs text-morandi-muted">
                   {adjustments.shadows > 0 ? `+${adjustments.shadows}` : adjustments.shadows}
                 </span>
@@ -202,7 +202,7 @@ export function PassportImageEnhancer({
             className="gap-1.5"
           >
             <RotateCcw size={14} />
-            重設
+            {COMP_ORDERS_LABELS.RESET}
           </Button>
           <div className="flex gap-2">
             <Button
@@ -210,7 +210,7 @@ export function PassportImageEnhancer({
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              取消
+              {COMP_ORDERS_LABELS.取消}
             </Button>
             <Button
               type="button"
@@ -219,7 +219,7 @@ export function PassportImageEnhancer({
               className="gap-1.5 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
               <Check size={14} />
-              套用並儲存
+              {COMP_ORDERS_LABELS.SAVING_9589}
             </Button>
           </div>
         </div>

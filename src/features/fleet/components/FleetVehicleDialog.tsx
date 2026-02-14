@@ -58,7 +58,7 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
               <Input
                 value={formData.license_plate}
                 onChange={e => onFormFieldChange('license_plate', e.target.value.toUpperCase())}
-                placeholder="例如：ABC-1234"
+                placeholder={VEHICLE_DIALOG_LABELS.EXAMPLE_2914}
                 className="mt-1 font-mono"
               />
             </div>
@@ -67,7 +67,7 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
               <Input
                 value={formData.vehicle_name}
                 onChange={e => onFormFieldChange('vehicle_name', e.target.value)}
-                placeholder="例如：1號車、A車"
+                placeholder={VEHICLE_DIALOG_LABELS.EXAMPLE_6950}
                 className="mt-1"
               />
             </div>
@@ -120,7 +120,7 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
                 type="number"
                 value={formData.capacity}
                 onChange={e => onFormFieldChange('capacity', parseInt(e.target.value) || 0)}
-                placeholder="座位數"
+                placeholder={VEHICLE_DIALOG_LABELS.SEATS}
                 className="mt-1"
                 min={1}
                 max={100}
@@ -131,7 +131,7 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
               <Input
                 value={formData.brand}
                 onChange={e => onFormFieldChange('brand', e.target.value)}
-                placeholder="例如：Toyota"
+                placeholder={VEHICLE_DIALOG_LABELS.EXAMPLE_4883}
                 className="mt-1"
               />
             </div>
@@ -140,7 +140,7 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
               <Input
                 value={formData.model}
                 onChange={e => onFormFieldChange('model', e.target.value)}
-                placeholder="例如：Coaster"
+                placeholder={VEHICLE_DIALOG_LABELS.EXAMPLE_1982}
                 className="mt-1"
               />
             </div>
@@ -150,7 +150,7 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
                 type="number"
                 value={formData.year || ''}
                 onChange={e => onFormFieldChange('year', e.target.value ? parseInt(e.target.value) : null)}
-                placeholder="例如：2020"
+                placeholder={VEHICLE_DIALOG_LABELS.EXAMPLE_1039}
                 className="mt-1"
                 min={1990}
                 max={2030}
@@ -161,7 +161,7 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
               <Input
                 value={formData.vin}
                 onChange={e => onFormFieldChange('vin', e.target.value.toUpperCase())}
-                placeholder="車身號碼"
+                placeholder={VEHICLE_DIALOG_LABELS.LABEL_8240}
                 className="mt-1 font-mono"
               />
             </div>
@@ -171,7 +171,7 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
                 type="number"
                 value={formData.current_mileage}
                 onChange={e => onFormFieldChange('current_mileage', parseInt(e.target.value) || 0)}
-                placeholder="公里數"
+                placeholder={VEHICLE_DIALOG_LABELS.LABEL_5555}
                 className="mt-1"
                 min={0}
               />
@@ -211,7 +211,7 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">下次保養日</label>
+              <label className="text-sm font-medium text-morandi-primary">{VEHICLE_DIALOG_LABELS.LABEL_9755}</label>
               <Input
                 type="date"
                 value={formData.next_maintenance_date}
@@ -220,7 +220,7 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">下次保養里程</label>
+              <label className="text-sm font-medium text-morandi-primary">{VEHICLE_DIALOG_LABELS.LABEL_974}</label>
               <Input
                 type="number"
                 value={formData.next_maintenance_km || ''}
@@ -235,11 +235,11 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
 
         {/* 備註 */}
         <div>
-          <label className="text-sm font-medium text-morandi-primary">備註</label>
+          <label className="text-sm font-medium text-morandi-primary">{VEHICLE_DIALOG_LABELS.REMARKS}</label>
           <Textarea
             value={formData.notes}
             onChange={e => onFormFieldChange('notes', e.target.value)}
-            placeholder="其他備註資訊（選填）"
+            placeholder={VEHICLE_DIALOG_LABELS.LABEL_2669}
             rows={3}
             className="mt-1"
           />

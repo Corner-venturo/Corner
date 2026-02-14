@@ -28,6 +28,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { DOCUMENTS_LABELS } from './constants/labels'
 
 // 取得報價單顯示名稱
 function getQuoteDisplayName(quote: Quote): string {
@@ -346,7 +347,7 @@ export function DocumentVersionPicker({
           <button
             onClick={e => handlePreview(e, quote)}
             className="p-1.5 hover:bg-morandi-container rounded-lg transition-colors"
-            title="預覽"
+            title={DOCUMENTS_LABELS.PREVIEW}
           >
             <Eye size={15} className="text-morandi-secondary" />
           </button>
@@ -355,7 +356,7 @@ export function DocumentVersionPicker({
           <button
             onClick={e => handleStartRename(e, quote)}
             className="p-1.5 hover:bg-morandi-container rounded-lg transition-colors"
-            title="重新命名"
+            title={DOCUMENTS_LABELS.LABEL_725}
           >
             <Pencil size={15} className="text-morandi-secondary" />
           </button>
@@ -365,7 +366,7 @@ export function DocumentVersionPicker({
             onClick={e => handleCopy(e, quote)}
             disabled={copyingId === quote.id}
             className="p-1.5 hover:bg-morandi-container rounded-lg transition-colors"
-            title="複製為新版本"
+            title={DOCUMENTS_LABELS.COPYING_2582}
           >
             {copyingId === quote.id ? (
               <Loader2 size={15} className="animate-spin text-morandi-secondary" />
@@ -413,7 +414,7 @@ export function DocumentVersionPicker({
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-4">
             <div>
-              <span className="text-morandi-secondary">狀態：</span>
+              <span className="text-morandi-secondary">{DOCUMENTS_LABELS.LABEL_7626}</span>
               <span className={cn(
                 'ml-1 font-medium',
                 isConfirmedQuote(previewQuote) ? 'text-morandi-green' : 'text-morandi-secondary'
@@ -422,12 +423,12 @@ export function DocumentVersionPicker({
               </span>
             </div>
             <div>
-              <span className="text-morandi-secondary">人數：</span>
+              <span className="text-morandi-secondary">{DOCUMENTS_LABELS.LABEL_8361}</span>
               <span className="text-morandi-primary ml-1">{previewQuote.group_size || '-'} 人</span>
             </div>
           </div>
           <div>
-            <span className="text-morandi-secondary">總金額：</span>
+            <span className="text-morandi-secondary">{DOCUMENTS_LABELS.TOTAL_6651}</span>
             <span className="text-morandi-gold font-medium ml-1">
               {previewQuote.total_amount ? (
                 <CurrencyCell amount={previewQuote.total_amount} />
@@ -447,9 +448,9 @@ export function DocumentVersionPicker({
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border text-morandi-secondary">
-                  <th className="text-left py-1.5 font-medium">分類</th>
-                  <th className="text-left py-1.5 font-medium">項目</th>
-                  <th className="text-right py-1.5 font-medium">金額</th>
+                  <th className="text-left py-1.5 font-medium">{DOCUMENTS_LABELS.LABEL_2257}</th>
+                  <th className="text-left py-1.5 font-medium">{DOCUMENTS_LABELS.LABEL_7325}</th>
+                  <th className="text-right py-1.5 font-medium">{DOCUMENTS_LABELS.AMOUNT}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
@@ -470,7 +471,7 @@ export function DocumentVersionPicker({
               </tbody>
               <tfoot>
                 <tr className="border-t border-morandi-gold/30 bg-morandi-gold/5">
-                  <td colSpan={2} className="py-2 font-medium text-morandi-primary">總成本</td>
+                  <td colSpan={2} className="py-2 font-medium text-morandi-primary">{DOCUMENTS_LABELS.TOTAL_2585}</td>
                   <td className="py-2 text-right">
                     <CurrencyCell
                       amount={categories.reduce((sum, cat) => {
@@ -489,7 +490,7 @@ export function DocumentVersionPicker({
           </div>
         ) : (
           <div className="text-sm text-morandi-secondary text-center py-4">
-            尚無成本項目
+            {DOCUMENTS_LABELS.EMPTY_6815}
           </div>
         )}
       </div>
@@ -505,7 +506,7 @@ export function DocumentVersionPicker({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Calculator className="w-5 h-5 text-morandi-gold" />
-              <span>報價單</span>
+              <span>{DOCUMENTS_LABELS.LABEL_4601}</span>
               <span className="text-sm text-morandi-secondary font-normal">- {tour.code}</span>
             </DialogTitle>
           </DialogHeader>
@@ -517,9 +518,9 @@ export function DocumentVersionPicker({
               <div className="flex-shrink-0 px-4 py-3">
                 <div className="flex items-center gap-2">
                   <Calculator className="w-4 h-4 text-morandi-primary" />
-                  <span className="text-sm font-medium text-morandi-primary">報價單列表</span>
+                  <span className="text-sm font-medium text-morandi-primary">{DOCUMENTS_LABELS.LABEL_5683}</span>
                 </div>
-                <p className="text-xs text-morandi-secondary mt-1">完整報價單，包含分類項目與成本明細</p>
+                <p className="text-xs text-morandi-secondary mt-1">{DOCUMENTS_LABELS.LABEL_1674}</p>
               </div>
 
               {/* 分割線留白 */}
@@ -534,7 +535,7 @@ export function DocumentVersionPicker({
                   </div>
                 ) : linkedQuotes.length === 0 ? (
                   <div className="text-center py-8 text-sm text-morandi-secondary">
-                    尚無報價單
+                    {DOCUMENTS_LABELS.EMPTY_7127}
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -559,7 +560,7 @@ export function DocumentVersionPicker({
                     className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-white bg-morandi-green hover:bg-morandi-green/90 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Lock size={16} />
-                    確認出團
+                    {DOCUMENTS_LABELS.CONFIRM_2046}
                   </button>
                 ) : (
                   <div className="flex gap-2">
@@ -603,7 +604,7 @@ export function DocumentVersionPicker({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Eye className="w-5 h-5 text-morandi-gold" />
-              報價單預覽
+              {DOCUMENTS_LABELS.PREVIEW_5379}
             </DialogTitle>
           </DialogHeader>
 
@@ -617,7 +618,7 @@ export function DocumentVersionPicker({
               onClick={() => setPreviewQuote(null)}
               className="flex-1 py-2.5 text-sm font-medium text-morandi-secondary border border-border rounded-lg hover:bg-morandi-container/50 transition-colors"
             >
-              關閉
+              {DOCUMENTS_LABELS.CLOSE}
             </button>
             <button
               onClick={() => {
@@ -635,7 +636,7 @@ export function DocumentVersionPicker({
               className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded-lg transition-colors"
             >
               <ExternalLink size={16} />
-              前往編輯
+              {DOCUMENTS_LABELS.EDIT_4265}
             </button>
           </div>
         </DialogContent>

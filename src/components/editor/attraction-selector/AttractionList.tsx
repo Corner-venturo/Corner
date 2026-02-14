@@ -40,7 +40,7 @@ export function AttractionList({
     return (
       <div className="h-full flex items-center justify-center text-morandi-secondary">
         <Loader2 className="animate-spin mr-2" size={20} />
-        載入中...
+        {COMP_EDITOR_LABELS.載入中}
       </div>
     )
   }

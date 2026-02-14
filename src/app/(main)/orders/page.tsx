@@ -146,7 +146,7 @@ export default function OrdersPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="訂單管理"
+        title={LABELS.MANAGE_949}
         icon={ShoppingCart}
         breadcrumb={[
           { label: '首頁', href: '/' },

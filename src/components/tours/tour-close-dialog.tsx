@@ -297,37 +297,37 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent level={2} className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>團體結算 - {tour.name}</DialogTitle>
+          <DialogTitle>{COMP_TOURS_LABELS.LABEL_939} {tour.name}</DialogTitle>
         </DialogHeader>
 
         {calculating ? (
-          <div className="py-8 text-center text-morandi-secondary">計算中...</div>
+          <div className="py-8 text-center text-morandi-secondary">{COMP_TOURS_LABELS.CALCULATING_8065}</div>
         ) : (
           <div className="space-y-6">
             {/* 財務摘要 */}
             <div className="bg-morandi-container/20 rounded-lg p-4 space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-morandi-secondary">團費收入</span>
+                <span className="text-morandi-secondary">{COMP_TOURS_LABELS.LABEL_4089}</span>
                 <CurrencyCell amount={totalRevenue} className="font-medium" />
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-morandi-secondary">成本支出</span>
+                <span className="text-morandi-secondary">{COMP_TOURS_LABELS.LABEL_1907}</span>
                 <CurrencyCell amount={-totalCost} variant="expense" className="font-medium" />
               </div>
               <div className="border-t border-morandi-gold/20 pt-2 flex justify-between">
-                <span className="font-medium">毛利</span>
+                <span className="font-medium">{COMP_TOURS_LABELS.LABEL_6713}</span>
                 <CurrencyCell amount={grossProfit} className="font-bold text-lg" />
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-morandi-secondary">公司雜支 ({memberCount} 人 × $10)</span>
+                <span className="text-morandi-secondary">{COMP_TOURS_LABELS.LABEL_8090}{memberCount} 人 × $10)</span>
                 <CurrencyCell amount={-miscExpense} variant="expense" className="font-medium" />
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-morandi-secondary">稅金 (12%)</span>
+                <span className="text-morandi-secondary">{COMP_TOURS_LABELS.LABEL_1032}</span>
                 <CurrencyCell amount={-tax} variant="expense" className="font-medium" />
               </div>
               <div className="border-t border-morandi-gold/20 pt-2 flex justify-between">
-                <span className="font-bold">淨利潤</span>
+                <span className="font-bold">{COMP_TOURS_LABELS.淨利潤}</span>
                 <CurrencyCell amount={netProfit} variant="income" className="font-bold text-xl" />
               </div>
             </div>
@@ -335,10 +335,10 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
             {/* 業務業績 */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <Label className="text-base font-semibold">業務業績</Label>
+                <Label className="text-base font-semibold">{COMP_TOURS_LABELS.業務業績}</Label>
                 <Button variant="outline" size="sm" onClick={addSalesRecipient}>
                   <Plus size={14} className="mr-1" />
-                  新增業務
+                  {COMP_TOURS_LABELS.ADD_6980}
                 </Button>
               </div>
               <div className="space-y-2">
@@ -393,7 +393,7 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
                 <Label className="text-base font-semibold">OP 獎金</Label>
                 <Button variant="outline" size="sm" onClick={addOpRecipient}>
                   <Plus size={14} className="mr-1" />
-                  新增 OP
+                  {COMP_TOURS_LABELS.ADD_1122}
                 </Button>
               </div>
               <div className="space-y-2">
@@ -446,7 +446,7 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
             <div className="flex justify-end gap-2 pt-4">
               <Button variant="outline" className="gap-2" onClick={() => onOpenChange(false)}>
                 <X size={16} />
-                取消
+                {COMP_TOURS_LABELS.取消}
               </Button>
               <Button className="gap-2" onClick={handleCloseTour} disabled={loading}>
                 <Check size={16} />

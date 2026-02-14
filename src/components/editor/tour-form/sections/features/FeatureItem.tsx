@@ -85,20 +85,20 @@ export function FeatureItem({
           >
             <GripVertical size={18} />
           </div>
-          <span className="text-sm font-medium text-morandi-secondary">特色 {index + 1}</span>
+          <span className="text-sm font-medium text-morandi-secondary">{COMP_EDITOR_LABELS.特色} {index + 1}</span>
         </div>
         <button
           onClick={() => onRemoveFeature(index)}
           className="text-morandi-red hover:text-morandi-red/80 text-sm transition-colors"
         >
-          刪除
+          {COMP_EDITOR_LABELS.DELETE}
         </button>
       </div>
 
       {/* 標籤文字 + 顏色 */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">標籤文字</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_1694}</label>
           <input
             type="text"
             value={feature.tag || ''}
@@ -108,7 +108,7 @@ export function FeatureItem({
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">標籤顏色</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5949}</label>
           <div className="flex gap-1.5 items-center h-[42px]">
             {TAG_COLOR_OPTIONS.map(color => (
               <button
@@ -130,7 +130,7 @@ export function FeatureItem({
 
       {/* 標題 */}
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">標題</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.TITLE}</label>
         <input
           type="text"
           value={feature.title}
@@ -142,7 +142,7 @@ export function FeatureItem({
 
       {/* 描述 */}
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">描述</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_3951}</label>
         <input
           type="text"
           value={feature.description}
@@ -155,7 +155,7 @@ export function FeatureItem({
       {/* 特色圖片 */}
       <div>
         <label className="block text-sm font-medium text-morandi-primary mb-2">
-          特色圖片（可一次選擇多張，最多 4 張，可拖曳排序）
+          {COMP_EDITOR_LABELS.SELECT_4656}
         </label>
         <div className="flex flex-wrap gap-2">
           {/* 已上傳的圖片 */}

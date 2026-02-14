@@ -154,7 +154,7 @@ export function CountriesSection({
       <div className="border-b-2 border-[#B8A99A] pb-2">
         <h2 className="text-lg font-bold text-morandi-primary">🌍 旅遊國家/地區</h2>
         <p className="text-xs text-morandi-primary mt-1">
-          設定此行程會前往的國家，方便後續選擇景點
+          {COMP_EDITOR_LABELS.SELECT_1146}
         </p>
       </div>
 
@@ -162,13 +162,13 @@ export function CountriesSection({
       {primaryCountry && (
         <div className="p-4 bg-[#F9F8F6] border-2 border-[#C6B9AC] rounded-lg">
           <div className="flex items-center justify-between mb-3">
-            <label className="text-sm font-semibold text-[#333333]">主要國家</label>
-            <span className="text-xs bg-[#B8A99A] text-white px-2 py-0.5 rounded">主要</span>
+            <label className="text-sm font-semibold text-[#333333]">{COMP_EDITOR_LABELS.LABEL_2736}</label>
+            <span className="text-xs bg-[#B8A99A] text-white px-2 py-0.5 rounded">{COMP_EDITOR_LABELS.LABEL_4022}</span>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-morandi-primary mb-1">國家</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5040}</label>
               <Combobox
                 value={primaryCountry.country_id}
                 onChange={value => {
@@ -186,7 +186,7 @@ export function CountriesSection({
 
             <div>
               <label className="block text-xs font-medium text-morandi-primary mb-1">
-                主要城市（選填）
+                {COMP_EDITOR_LABELS.LABEL_5566}
               </label>
               <Combobox
                 value={primaryCountry.main_city_id || ''}
@@ -225,7 +225,7 @@ export function CountriesSection({
                   className="text-[#8C8C8C] hover:text-[#8C8C8C] text-sm flex items-center gap-1"
                 >
                   <X size={14} />
-                  刪除
+                  {COMP_EDITOR_LABELS.DELETE}
                 </button>
               </div>
 

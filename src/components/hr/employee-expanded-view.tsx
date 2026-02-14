@@ -76,7 +76,7 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
         return (
           <div className="flex items-center gap-4 text-morandi-muted">
             <span>角色：<span className="font-medium text-morandi-primary">{roleLabel}</span></span>
-            <span>權限：{permissionCount} / {SYSTEM_PERMISSIONS.length} 項功能</span>
+            <span>{COMP_HR_LABELS.LABEL_4949}{permissionCount} / {SYSTEM_PERMISSIONS.length} 項功能</span>
           </div>
         )
       default:
@@ -189,17 +189,17 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
                 <div className="flex gap-2">
                   <Button size="sm" onClick={handleSave} className="gap-1">
                     <Check size={14} />
-                    儲存
+                    {COMP_HR_LABELS.SAVE}
                   </Button>
                   <Button size="sm" variant="outline" onClick={() => setIsEditing(false)} className="gap-1">
                     <X size={14} />
-                    取消
+                    {COMP_HR_LABELS.取消}
                   </Button>
                 </div>
               ) : (
                 <Button size="sm" variant="outline" onClick={() => setIsEditing(true)} className="gap-1">
                   <Edit size={14} />
-                  編輯
+                  {COMP_HR_LABELS.EDIT}
                 </Button>
               )}
             </div>

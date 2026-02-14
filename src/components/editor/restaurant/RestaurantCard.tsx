@@ -3,6 +3,7 @@
 import React from 'react'
 import { ImageIcon, Users, Star } from 'lucide-react'
 import type { CombinedRestaurant, MichelinRestaurant } from '../RestaurantSelector'
+import { RESTAURANT_LABELS } from './constants/labels'
 
 interface RestaurantCardProps {
   restaurant: CombinedRestaurant
@@ -25,12 +26,12 @@ function getMichelinDisplay(restaurant: CombinedRestaurant) {
     )
   }
   if (michelin.bib_gourmand) {
-    return <span className="text-xs text-status-warning font-medium">必比登</span>
+    return <span className="text-xs text-status-warning font-medium">{RESTAURANT_LABELS.LABEL_7082}</span>
   }
   if (michelin.green_star) {
-    return <span className="text-xs text-status-success font-medium">綠星</span>
+    return <span className="text-xs text-status-success font-medium">{RESTAURANT_LABELS.LABEL_5569}</span>
   }
-  return <span className="text-xs text-morandi-red">米其林推薦</span>
+  return <span className="text-xs text-morandi-red">{RESTAURANT_LABELS.LABEL_4852}</span>
 }
 
 function getRestaurantImage(restaurant: CombinedRestaurant) {
@@ -107,12 +108,12 @@ export function RestaurantCard({ restaurant, isSelected, onToggle }: RestaurantC
           {restaurant.group_friendly && (
             <span className="flex items-center gap-0.5 text-status-info">
               <Users size={10} />
-              團體
+              {RESTAURANT_LABELS.LABEL_441}
             </span>
           )}
           {'private_room' in restaurant && restaurant.private_room && (
             <span className="text-purple-600">
-              包廂
+              {RESTAURANT_LABELS.LABEL_8522}
             </span>
           )}
           {restaurant.price_range && (

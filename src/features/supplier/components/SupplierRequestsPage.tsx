@@ -22,6 +22,7 @@ import {
 import { useSupplierRequests, type SupplierRequest } from '../hooks/useSupplierRequests'
 import { SupplierResponseDialog } from './SupplierResponseDialog'
 import { cn } from '@/lib/utils'
+import { SUPPLIER_LABELS } from './constants/labels'
 
 // 回覆狀態配置
 const RESPONSE_STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.ReactNode }> = {
@@ -183,7 +184,7 @@ export function SupplierRequestsPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="需求收件匣"
+        title={SUPPLIER_LABELS.LABEL_174}
         icon={ClipboardList}
         breadcrumb={[
           { label: '首頁', href: '/' },

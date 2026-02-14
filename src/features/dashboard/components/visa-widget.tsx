@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { DASHBOARD_LABELS } from './constants/labels'
 
 interface VisaResult {
   passport: string
@@ -222,10 +223,10 @@ export function VisaWidget() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">
-                簽證查詢
+                {DASHBOARD_LABELS.QUERYING_7162}
               </p>
               <p className="text-xs text-morandi-secondary/90 mt-1.5 leading-relaxed">
-                查詢簽證需求與停留期限
+                {DASHBOARD_LABELS.QUERYING_3644}
               </p>
             </div>
           </div>
@@ -236,11 +237,11 @@ export function VisaWidget() {
               <div>
                 <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5">
                   <Globe className="w-3.5 h-3.5" />
-                  護照國家
+                  {DASHBOARD_LABELS.LABEL_7074}
                 </label>
                 <Select value={passport} onValueChange={setPassport}>
                   <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm">
-                    <SelectValue placeholder="選擇國家" />
+                    <SelectValue placeholder={DASHBOARD_LABELS.SELECT_8015} />
                   </SelectTrigger>
                   <SelectContent>
                     {PASSPORT_COUNTRIES.map(country => (
@@ -255,11 +256,11 @@ export function VisaWidget() {
               <div>
                 <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5">
                   <Globe className="w-3.5 h-3.5" />
-                  目的地
+                  {DASHBOARD_LABELS.LABEL_5475}
                 </label>
                 <Select value={destination} onValueChange={setDestination}>
                   <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm">
-                    <SelectValue placeholder="選擇目的地" />
+                    <SelectValue placeholder={DASHBOARD_LABELS.SELECT_3912} />
                   </SelectTrigger>
                   <SelectContent>
                     {DESTINATIONS.map(country => (
@@ -285,12 +286,12 @@ export function VisaWidget() {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  查詢中...
+                  {DASHBOARD_LABELS.QUERYING_974}
                 </>
               ) : (
                 <>
                   <Search className="w-4 h-4" />
-                  查詢
+                  {DASHBOARD_LABELS.QUERYING_754}
                 </>
               )}
             </button>
@@ -312,7 +313,7 @@ export function VisaWidget() {
               {/* 路線資訊 */}
               <div className="flex items-center justify-center gap-3 pb-3 border-b border-morandi-container/30">
                 <div className="text-center">
-                  <p className="text-xs text-morandi-secondary mb-1">護照</p>
+                  <p className="text-xs text-morandi-secondary mb-1">{DASHBOARD_LABELS.LABEL_997}</p>
                   <p className="font-bold text-base text-morandi-primary">{result.passportName}</p>
                 </div>
                 <div className="text-morandi-secondary">→</div>
@@ -345,7 +346,7 @@ export function VisaWidget() {
                 {/* 停留期限 */}
                 {result.stayDuration && (
                   <div className="bg-card/50 rounded-lg p-3 mt-3">
-                    <p className="text-xs text-morandi-secondary mb-1">停留期限</p>
+                    <p className="text-xs text-morandi-secondary mb-1">{DASHBOARD_LABELS.LABEL_3598}</p>
                     <p className="font-semibold text-sm text-morandi-primary">
                       {result.stayDuration}
                     </p>
@@ -355,7 +356,7 @@ export function VisaWidget() {
                 {/* 備註 */}
                 {result.notes && (
                   <div className="bg-card/50 rounded-lg p-3 mt-3">
-                    <p className="text-xs text-morandi-secondary mb-1">注意事項</p>
+                    <p className="text-xs text-morandi-secondary mb-1">{DASHBOARD_LABELS.LABEL_8733}</p>
                     <p className="text-xs text-morandi-primary">{result.notes}</p>
                   </div>
                 )}

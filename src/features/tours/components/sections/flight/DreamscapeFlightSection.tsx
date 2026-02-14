@@ -15,6 +15,7 @@ import { motion } from 'framer-motion'
 import { Plane } from 'lucide-react'
 import type { FlightInfo } from '@/types/flight.types'
 import { formatDateShort } from '@/lib/utils/format-date'
+import { FLIGHT_LABELS } from './constants/labels'
 
 // Dreamscape 配色
 const DREAM = {
@@ -116,7 +117,7 @@ function FlightNode({
               {flightInfo && <span>{flightInfo}</span>}
               {flightInfo && duration && <span> · </span>}
               {duration && <span>{duration}</span>}
-              {!flightInfo && !duration && <span>航班資訊</span>}
+              {!flightInfo && !duration && <span>{FLIGHT_LABELS.LABEL_1343}</span>}
             </span>
           </motion.div>
         </>

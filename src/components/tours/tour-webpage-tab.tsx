@@ -38,6 +38,7 @@ const ItineraryPreview = dynamic(
 
 // 從 useItineraryEditor 複製的類型和初始值
 import type { LocalTourData, AutoSaveStatus } from '@/app/(main)/itinerary/new/hooks/useItineraryEditor'
+import { COMP_TOURS_LABELS } from './constants/labels'
 
 function getEmptyTourData(): LocalTourData {
   return {
@@ -441,9 +442,9 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
     return (
       <div className="flex flex-col items-center justify-center h-[600px] text-center">
         <FileText className="w-12 h-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-medium text-morandi-primary mb-2">尚未建立行程表</h3>
+        <h3 className="text-lg font-medium text-morandi-primary mb-2">{COMP_TOURS_LABELS.LABEL_4270}</h3>
         <p className="text-sm text-muted-foreground mb-6">
-          建立行程表以展示旅遊行程內容
+          {COMP_TOURS_LABELS.LABEL_4124}
         </p>
         <Button onClick={handleCreateItinerary} disabled={creating}>
           {creating ? (

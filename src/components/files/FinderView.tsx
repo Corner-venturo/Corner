@@ -39,6 +39,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { formatDistanceToNow } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
+import { FILES_LABELS } from './constants/labels'
 
 // ============================================================================
 // Types
@@ -279,14 +280,14 @@ function FinderItemCard({
           {onDownload && (
             <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDownload() }}>
               <Download size={14} className="mr-2" />
-              下載
+              {FILES_LABELS.DOWNLOAD}
             </DropdownMenuItem>
           )}
           {(onRename || onDelete) && <DropdownMenuSeparator />}
           {onRename && (
             <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onRename() }}>
               <Edit2 size={14} className="mr-2" />
-              重新命名
+              {FILES_LABELS.LABEL_725}
             </DropdownMenuItem>
           )}
           {onDelete && (
@@ -295,7 +296,7 @@ function FinderItemCard({
               onClick={(e) => { e.stopPropagation(); onDelete() }}
             >
               <Trash2 size={14} className="mr-2" />
-              刪除
+              {FILES_LABELS.DELETE}
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>
@@ -435,7 +436,7 @@ export function FinderView({
             onClick={() => onNavigate(null)}
             className="hover:text-primary font-medium"
           >
-            根目錄
+            {FILES_LABELS.LABEL_6285}
           </button>
           {currentPath.map((folder, index) => (
             <div key={folder.id} className="flex items-center gap-1">
@@ -460,20 +461,20 @@ export function FinderView({
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="gap-1">
                 <Plus size={14} />
-                新增
+                {FILES_LABELS.ADD}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               {onCreateFolder && (
                 <DropdownMenuItem onClick={() => onCreateFolder('新資料夾', currentFolderId)}>
                   <FolderPlus size={14} className="mr-2" />
-                  新增資料夾
+                  {FILES_LABELS.ADD_7926}
                 </DropdownMenuItem>
               )}
               {onUpload && (
                 <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
                   <Upload size={14} className="mr-2" />
-                  上傳檔案
+                  {FILES_LABELS.UPLOADING_209}
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>
@@ -525,7 +526,7 @@ export function FinderView({
         ) : sortedItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
             <Folder size={48} className="mb-3 opacity-50" />
-            <p>尚無資料</p>
+            <p>{FILES_LABELS.EMPTY_351}</p>
             <div className="flex gap-2 mt-4">
               {emptyStateAction && (
                 <Button

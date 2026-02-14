@@ -71,7 +71,7 @@ function ItineraryPrintContent() {
         <p className="text-morandi-secondary">{PRINT_LABELS.NOT_FOUND}</p>
         <Button variant="outline" onClick={handleBack} className="gap-2">
           <ArrowLeft size={16} />
-          返回
+          {PRINT_LABELS.BACK}
         </Button>
       </div>
     )
@@ -90,7 +90,7 @@ function ItineraryPrintContent() {
         </Button>
         <Button onClick={handlePrint} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
           <Printer size={16} />
-          列印
+          {PRINT_LABELS.PRINT}
         </Button>
       </div>
 

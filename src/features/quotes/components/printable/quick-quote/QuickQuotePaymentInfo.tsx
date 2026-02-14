@@ -7,6 +7,7 @@
 import React from 'react'
 import { MORANDI_COLORS } from '../shared/print-styles'
 import { PAYMENT_INFO_LABELS } from '@/constants/labels'
+import { QUICK_QUOTE_LABELS } from './constants/labels'
 
 export const QuickQuotePaymentInfo: React.FC = () => {
   return (
@@ -16,10 +17,10 @@ export const QuickQuotePaymentInfo: React.FC = () => {
     >
       <div>
         <h4 className="font-semibold mb-2" style={{ color: MORANDI_COLORS.brown }}>
-          匯款資訊
+          {QUICK_QUOTE_LABELS.LABEL_5832}
         </h4>
         <div className="space-y-1" style={{ color: MORANDI_COLORS.gray }}>
-          <div>戶名：角落旅行社股份有限公司</div>
+          <div>{QUICK_QUOTE_LABELS.LABEL_8910}</div>
           <div>{PAYMENT_INFO_LABELS.銀行}</div>
           <div>{PAYMENT_INFO_LABELS.分行}</div>
           <div>{PAYMENT_INFO_LABELS.帳號}</div>
@@ -27,12 +28,12 @@ export const QuickQuotePaymentInfo: React.FC = () => {
       </div>
       <div>
         <h4 className="font-semibold mb-2" style={{ color: MORANDI_COLORS.brown }}>
-          支票資訊
+          {QUICK_QUOTE_LABELS.LABEL_9304}
         </h4>
         <div className="space-y-1" style={{ color: MORANDI_COLORS.gray }}>
-          <div>抬頭：角落旅行社股份有限公司</div>
+          <div>{QUICK_QUOTE_LABELS.LABEL_5024}</div>
           <div className="font-semibold" style={{ color: '#DC2626' }}>
-            禁止背書轉讓
+            {QUICK_QUOTE_LABELS.LABEL_2697}
           </div>
           <div className="text-xs mt-2" style={{ color: MORANDI_COLORS.lightGray }}>
             （請於出發日前付清餘額）

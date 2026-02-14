@@ -81,7 +81,7 @@ export function TravelerMessageInput({
 
       {/* 提示文字 */}
       <p className="text-xs text-violet-400 mt-1.5 ml-1">
-        訊息將發送到旅客 APP，旅客可即時收到通知
+        {COMP_WORKSPACE_LABELS.SENDING_1544}
       </p>
     </div>
   )

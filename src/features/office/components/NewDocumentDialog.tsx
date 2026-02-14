@@ -68,14 +68,14 @@ export function NewDocumentDialog({ open, onOpenChange }: NewDocumentDialogProps
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent level={1} className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>新增文件</DialogTitle>
+          <DialogTitle>{OFFICE_LABELS.ADD_4696}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           {/* 文件名稱 */}
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-1.5 block">
-              文件名稱
+              {OFFICE_LABELS.LABEL_7261}
             </label>
             <input
               type="text"
@@ -89,7 +89,7 @@ export function NewDocumentDialog({ open, onOpenChange }: NewDocumentDialogProps
           {/* 文件類型選擇 */}
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              選擇類型
+              {OFFICE_LABELS.SELECT_3424}
             </label>
             <div className="space-y-2">
               {documentTypes.map((option) => (
@@ -128,14 +128,14 @@ export function NewDocumentDialog({ open, onOpenChange }: NewDocumentDialogProps
             onClick={handleClose}
             className="px-4 py-2 text-sm font-medium text-morandi-secondary hover:text-morandi-primary transition-colors"
           >
-            取消
+            {OFFICE_LABELS.CANCEL}
           </button>
           <button
             onClick={handleCreate}
             disabled={!selectedType}
             className="px-4 py-2 bg-morandi-gold hover:bg-morandi-gold-hover disabled:bg-morandi-muted text-white rounded-lg text-sm font-medium transition-colors"
           >
-            建立
+            {OFFICE_LABELS.CREATE}
           </button>
         </div>
       </DialogContent>

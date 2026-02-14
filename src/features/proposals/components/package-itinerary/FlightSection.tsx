@@ -67,13 +67,13 @@ export function FlightSection({
     <div className="space-y-3">
       <Label className="text-xs text-morandi-primary flex items-center gap-1">
         <Plane size={12} />
-        航班資訊（選填）
+        {TOUR_REQUEST_FORM_DIALOG_LABELS.LABEL_9388}
       </Label>
 
       {/* 去程航班 */}
       <div className="border border-border rounded-lg p-3 space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-morandi-secondary">去程航班</span>
+          <span className="text-xs text-morandi-secondary">{TOUR_REQUEST_FORM_DIALOG_LABELS.LABEL_7790}</span>
           {outboundFlight && (
             <button
               type="button"
@@ -103,7 +103,7 @@ export function FlightSection({
           </div>
         ) : outboundSegments.length > 0 ? (
           <div className="space-y-2">
-            <p className="text-xs text-morandi-secondary">此航班有多個航段，請選擇：</p>
+            <p className="text-xs text-morandi-secondary">{TOUR_REQUEST_FORM_DIALOG_LABELS.PLEASE_SELECT_4482}</p>
             <div className="space-y-1">
               {outboundSegments.map((seg, i) => (
                 <button
@@ -128,7 +128,7 @@ export function FlightSection({
               onClick={onClearOutboundSegments}
               className="text-xs text-morandi-secondary hover:text-morandi-primary"
             >
-              取消
+              {TOUR_REQUEST_FORM_DIALOG_LABELS.CANCEL}
             </button>
           </div>
         ) : (
@@ -162,7 +162,7 @@ export function FlightSection({
       {/* 回程航班 */}
       <div className="border border-border rounded-lg p-3 space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-morandi-secondary">回程航班</span>
+          <span className="text-xs text-morandi-secondary">{TOUR_REQUEST_FORM_DIALOG_LABELS.LABEL_2327}</span>
           {returnFlight && (
             <button
               type="button"

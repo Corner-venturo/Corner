@@ -102,18 +102,18 @@ export function EditWorkspaceDialog({ open, onOpenChange, workspace, onSuccess }
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Settings size={20} className="text-morandi-gold" />
-            公司設定
+            {WORKSPACES_LABELS.SETTINGS_5149}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="p-3 bg-morandi-container/30 rounded-lg">
-            <p className="text-sm text-morandi-secondary">公司代號：</p>
+            <p className="text-sm text-morandi-secondary">{WORKSPACES_LABELS.LABEL_5309}</p>
             <p className="font-medium text-morandi-primary">{workspace.code}</p>
           </div>
 
           <div className="space-y-2">
-            <Label required>公司名稱</Label>
+            <Label required>{WORKSPACES_LABELS.LABEL_20}</Label>
             <Input
               value={formData.name}
               onChange={(e) => handleFieldChange('name', e.target.value)}
@@ -122,7 +122,7 @@ export function EditWorkspaceDialog({ open, onOpenChange, workspace, onSuccess }
           </div>
 
           <div className="space-y-2">
-            <Label required>員工編號前綴</Label>
+            <Label required>{WORKSPACES_LABELS.LABEL_5013}</Label>
             <Input
               value={formData.employee_number_prefix}
               onChange={(e) => handleFieldChange('employee_number_prefix', e.target.value)}
@@ -136,14 +136,14 @@ export function EditWorkspaceDialog({ open, onOpenChange, workspace, onSuccess }
           </div>
 
           <div className="space-y-2">
-            <Label required>預設密碼</Label>
+            <Label required>{WORKSPACES_LABELS.LABEL_9036}</Label>
             <Input
               value={formData.default_password}
               onChange={(e) => handleFieldChange('default_password', e.target.value)}
               placeholder={WORKSPACES_LABELS.新員工的預設密碼}
             />
             <p className="text-xs text-morandi-secondary">
-              新增員工時的預設密碼，員工可自行更改
+              {WORKSPACES_LABELS.ADD_6539}
             </p>
           </div>
         </div>
@@ -151,7 +151,7 @@ export function EditWorkspaceDialog({ open, onOpenChange, workspace, onSuccess }
         <div className="flex justify-end gap-3 pt-4 border-t border-border">
           <Button variant="outline" onClick={() => onOpenChange(false)} className="gap-2">
             <X size={16} />
-            取消
+            {WORKSPACES_LABELS.CANCEL}
           </Button>
           {/* eslint-disable-next-line venturo/button-requires-icon -- 三元運算式中有圖標 */}
           <Button

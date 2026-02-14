@@ -20,6 +20,7 @@ import { GripVertical } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { CountryCode } from '../../templates/definitions/types'
 import { getMemoSettingsByCountry } from '../../templates/definitions/country-presets'
+import { DESIGNER_LABELS } from './constants/labels'
 
 // 統一項目類型（用於扁平化顯示）
 type UnifiedMemoItem = {
@@ -211,16 +212,16 @@ export function MemoEditor({
     return (
       <div className="space-y-3">
         <p className="text-xs text-morandi-secondary">
-          選擇目的地國家以載入對應的旅遊提醒內容
+          {DESIGNER_LABELS.LOADING_9662}
         </p>
         <div className="space-y-2">
-          <Label className="text-xs">選擇國家</Label>
+          <Label className="text-xs">{DESIGNER_LABELS.SELECT_8015}</Label>
           <Select
             value={currentCountryCode}
             onValueChange={(v) => handleCountryChange(v as CountryCode)}
           >
             <SelectTrigger className="h-8 text-sm">
-              <SelectValue placeholder="選擇目的地國家..." />
+              <SelectValue placeholder={DESIGNER_LABELS.SELECT_7302} />
             </SelectTrigger>
             <SelectContent>
               {countryOptions.map((opt) => (
@@ -243,13 +244,13 @@ export function MemoEditor({
     <div className="space-y-3">
       {/* 國家選擇 */}
       <div className="space-y-1.5">
-        <Label className="text-xs">目的地國家</Label>
+        <Label className="text-xs">{DESIGNER_LABELS.LABEL_2650}</Label>
         <Select
           value={currentCountryCode}
           onValueChange={(v) => handleCountryChange(v as CountryCode)}
         >
           <SelectTrigger className="h-8 text-sm">
-            <SelectValue placeholder="選擇國家..." />
+            <SelectValue placeholder={DESIGNER_LABELS.SELECT_7169} />
           </SelectTrigger>
           <SelectContent>
             {countryOptions.map((opt) => (
@@ -263,13 +264,13 @@ export function MemoEditor({
 
       {/* 頁數預估 */}
       <div className="p-2 bg-morandi-gold/10 rounded text-xs text-morandi-primary">
-        已選 <span className="font-bold">{enabledItemCount}</span> 項，
-        預計 <span className="font-bold">{totalPages}</span> 頁
+        已選 <span className="font-bold">{enabledItemCount}</span> {DESIGNER_LABELS.LABEL_2697}
+        預計 <span className="font-bold">{totalPages}</span> {DESIGNER_LABELS.LABEL_8392}
       </div>
 
       {/* 提示文字 */}
       <p className="text-[10px] text-morandi-muted">
-        拖曳調整順序，勾選即顯示。每頁最多 7 項，超過自動分頁。
+        {DESIGNER_LABELS.LABEL_177}
       </p>
 
       {/* 扁平化項目列表（一般項目 + 天氣季節 + 緊急聯絡） */}
@@ -312,17 +313,17 @@ export function MemoEditor({
 
             {/* 類型標籤（可選） */}
             {item.type === 'season' && (
-              <span className="text-[10px] text-blue-500 shrink-0">氣候</span>
+              <span className="text-[10px] text-blue-500 shrink-0">{DESIGNER_LABELS.LABEL_270}</span>
             )}
             {item.type === 'info' && (
-              <span className="text-[10px] text-amber-600 shrink-0">聯絡</span>
+              <span className="text-[10px] text-amber-600 shrink-0">{DESIGNER_LABELS.LABEL_2152}</span>
             )}
           </label>
         ))}
       </div>
 
       <p className="text-[10px] text-morandi-muted">
-        每頁最多 7 項，超過自動新增頁面。
+        {DESIGNER_LABELS.ADD_9046}
       </p>
     </div>
   )

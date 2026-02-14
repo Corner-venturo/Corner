@@ -85,7 +85,7 @@ export function RoomAssignmentCell({
           onChange={e => handleSelectRoom(e.target.value)}
           className="w-full h-6 bg-transparent border-none outline-none text-xs text-morandi-secondary cursor-pointer"
         >
-          <option value="">未分配</option>
+          <option value="">{COMP_ORDERS_LABELS.LABEL_322}</option>
           {roomOptions.map(opt => {
             const isFull = opt.assignedCount >= opt.capacity
             return (
@@ -176,7 +176,7 @@ export function RoomAssignmentCell({
                   }}
                   onBlur={() => setShowAddDropdown(false)}
                 >
-                  <option value="">選擇成員...</option>
+                  <option value="">{COMP_ORDERS_LABELS.SELECT_6914}</option>
                   {/* 這裡需要從外部傳入未分配成員列表 */}
                 </select>
               ) : (
@@ -186,7 +186,7 @@ export function RoomAssignmentCell({
                   className="flex items-center gap-1.5 text-xs text-morandi-secondary hover:text-morandi-primary transition-colors"
                 >
                   <Plus className="h-3.5 w-3.5" />
-                  新增成員
+                  {COMP_ORDERS_LABELS.新增成員}
                 </button>
               )}
             </div>
@@ -202,7 +202,7 @@ export function RoomAssignmentCell({
               }}
               className="w-full h-7 text-xs border border-border rounded px-2 bg-card"
             >
-              <option value="">取消分配</option>
+              <option value="">{COMP_ORDERS_LABELS.LABEL_3431}</option>
               {roomOptions.map(opt => {
                 const isFull = opt.assignedCount >= opt.capacity && opt.id !== currentRoomId
                 return (

@@ -230,6 +230,43 @@ export const COMP_ORDERS_LABELS = {
   顯示欄位: '顯示欄位',
   已同步成員資料: '已同步 ',
   位成員資料: ' 位成員資料',
+
+  SELECT_448: '選擇旅遊團',
+  LABEL_7009: '聯絡人',
+  LABEL_8362: '業務',
+  LABEL_7412: '助理',
+
+  ADD_3322: '新增欄位',
+  ADD_7841: '新增自訂費用欄位',
+
+  LABEL_499: '已驗證',
+  LABEL_9672: '護照拼音：',
+  LABEL_2866: '身分證：',
+  LABEL_9593: '護照號碼：',
+  LABEL_94: '生日：',
+  LABEL_9704: '電話：',
+  LABEL_8424: '性別：',
+
+  PLEASE_SELECT_2473: '請選擇要新增成員的訂單',
+
+  LABEL_5560: '護照圖片增強',
+  PREVIEW: '預覽',
+  SETTINGS_1270: '調整設定',
+  LABEL_1814: '銳利度',
+  LABEL_1423: '提高銳利度可改善模糊護照的 OCR 辨識率',
+  LABEL_3794: '對比度',
+  LABEL_2427: '曝光度',
+  LABEL_6915: '陰影',
+  RESET: '重設',
+  SAVING_9589: '套用並儲存',
+
+  LABEL_322: '未分配',
+  SELECT_6914: '選擇成員...',
+  LABEL_3431: '取消分配',
+
+  LABEL_7017: '訂單編號',
+  LABEL_8875: '旅遊團',
+  ACTIONS: '操作',
 };
 
 // MemberTableHeader 相關標籤

@@ -16,6 +16,7 @@ import {
   OSICategory
 } from '@/lib/pnr-parser'
 import type { parseAmadeusPNR } from '@/lib/pnr-parser'
+import { PNR_LABELS } from './constants/labels'
 
 interface PnrPreviewProps {
   parsedData: ReturnType<typeof parseAmadeusPNR>
@@ -39,12 +40,12 @@ export function PnrPreview({
   return (
     <div className="space-y-3 bg-morandi-container/10 p-3 rounded-lg">
       <div className="flex items-center justify-between">
-        <h6 className="text-xs font-semibold text-morandi-primary">解析結果</h6>
+        <h6 className="text-xs font-semibold text-morandi-primary">{PNR_LABELS.LABEL_4250}</h6>
         <button
           onClick={onReset}
           className="text-xs text-morandi-secondary hover:text-morandi-primary"
         >
-          重新輸入
+          {PNR_LABELS.LABEL_9198}
         </button>
       </div>
 
@@ -52,13 +53,13 @@ export function PnrPreview({
         {/* 基本資訊 */}
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <span className="font-medium text-morandi-primary">訂位代號</span>
+            <span className="font-medium text-morandi-primary">{PNR_LABELS.LABEL_9227}</span>
             <p className="text-morandi-secondary mt-0.5 font-mono">
               {parsedData.recordLocator || '無'}
             </p>
           </div>
           <div>
-            <span className="font-medium text-morandi-primary">旅客人數</span>
+            <span className="font-medium text-morandi-primary">{PNR_LABELS.LABEL_392}</span>
             <p className="text-morandi-secondary mt-0.5">
               {parsedData.passengerNames.length} 人
             </p>
@@ -66,7 +67,7 @@ export function PnrPreview({
         </div>
 
         <div>
-          <span className="font-medium text-morandi-primary">旅客姓名</span>
+          <span className="font-medium text-morandi-primary">{PNR_LABELS.LABEL_8113}</span>
           <div className="mt-1 space-y-1">
             {parsedData.passengerNames.map((name, idx) => (
               <div key={idx} className="text-morandi-secondary font-mono bg-morandi-container/10 px-2 py-1 rounded">
@@ -84,7 +85,7 @@ export function PnrPreview({
                 <AlertCircle size={14} className="text-morandi-alert" />
               )}
               <Clock size={14} className="text-morandi-primary" />
-              <span className="font-medium text-morandi-primary">出票期限</span>
+              <span className="font-medium text-morandi-primary">{PNR_LABELS.LABEL_9939}</span>
             </div>
             <p className={
               isUrgent(parsedData.ticketingDeadline)
@@ -93,7 +94,7 @@ export function PnrPreview({
             }>
               {formatDateChineseWithWeekday(parsedData.ticketingDeadline)}
               {isUrgent(parsedData.ticketingDeadline) && (
-                <span className="ml-2 text-xs bg-morandi-alert/10 text-morandi-alert px-1 py-0.5 rounded">緊急</span>
+                <span className="ml-2 text-xs bg-morandi-alert/10 text-morandi-alert px-1 py-0.5 rounded">{PNR_LABELS.LABEL_3458}</span>
               )}
             </p>
           </div>
@@ -103,7 +104,7 @@ export function PnrPreview({
         {parsedData.segments.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="font-medium text-morandi-primary">航班資訊</span>
+              <span className="font-medium text-morandi-primary">{PNR_LABELS.LABEL_1343}</span>
               <span className="text-xs text-morandi-secondary">{parsedData.segments.length} 個航段</span>
             </div>
             <div className="space-y-2">
@@ -133,14 +134,14 @@ export function PnrPreview({
         {/* SSR 特殊服務 */}
         {parsedData.specialRequests.length > 0 && showAdvanced && (
           <div>
-            <span className="font-medium text-morandi-primary block mb-2">特殊服務需求 (SSR)</span>
+            <span className="font-medium text-morandi-primary block mb-2">{PNR_LABELS.LABEL_7702}</span>
             <div className="space-y-1">
               {parsedData.specialRequests.map((ssr, idx) => (
                 <div key={idx} className="flex items-center gap-2 text-morandi-secondary bg-morandi-container/5 p-2 rounded">
                   {getSSRIcon(ssr)}
                   <span className="font-mono text-xs">{ssr.code}</span>
                   {ssr.description && <span>- {ssr.description}</span>}
-                  {ssr.segments && <span className="text-xs text-morandi-gold">航段 {ssr.segments.join(',')}</span>}
+                  {ssr.segments && <span className="text-xs text-morandi-gold">{PNR_LABELS.LABEL_3194} {ssr.segments.join(',')}</span>}
                 </div>
               ))}
             </div>
@@ -150,7 +151,7 @@ export function PnrPreview({
         {/* OSI 其他資訊 */}
         {parsedData.otherInfo.length > 0 && showAdvanced && (
           <div>
-            <span className="font-medium text-morandi-primary block mb-2">其他服務資訊 (OSI)</span>
+            <span className="font-medium text-morandi-primary block mb-2">{PNR_LABELS.LABEL_5164}</span>
             <div className="space-y-1">
               {parsedData.otherInfo.map((osi, idx) => (
                 <div key={idx} className="text-morandi-secondary bg-morandi-container/5 p-2 rounded text-xs">
@@ -184,7 +185,7 @@ export function PnrPreview({
             className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover shadow-md h-9 text-xs"
           >
             <Clock size={14} className="mr-1.5" />
-            新增期限
+            {PNR_LABELS.ADD_4933}
           </Button>
         )}
 
@@ -194,7 +195,7 @@ export function PnrPreview({
             className="flex-1 bg-morandi-success hover:bg-morandi-success/90 shadow-md h-9 text-xs"
           >
             <Calendar size={14} className="mr-1.5" />
-            新增行事曆
+            {PNR_LABELS.ADD_7463}
           </Button>
         )}
       </div>

@@ -148,7 +148,7 @@ export function SortableActivityItem({
               ) : (
                 <>
                   <ImageIcon size={20} className="text-morandi-secondary/50 mb-1" />
-                  <span className="text-[10px] text-morandi-secondary/50">點擊或拖曳</span>
+                  <span className="text-[10px] text-morandi-secondary/50">{COMP_EDITOR_LABELS.LABEL_1807}</span>
                 </>
               )}
               <input
@@ -199,7 +199,7 @@ export function SortableActivityItem({
               }`}
             >
               <Clock size={12} />
-              <span>時間軸</span>
+              <span>{COMP_EDITOR_LABELS.時間軸}</span>
               {isTimelineExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
               {(activity.startTime || activity.endTime) && !isTimelineExpanded && (
                 <span className="ml-1 text-morandi-gold">
@@ -213,7 +213,7 @@ export function SortableActivityItem({
               <div className="mt-2 p-3 bg-morandi-container/20 rounded-lg border border-morandi-container/50">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2">
-                    <label className="text-xs text-morandi-primary whitespace-nowrap">開始</label>
+                    <label className="text-xs text-morandi-primary whitespace-nowrap">{COMP_EDITOR_LABELS.LABEL_3517}</label>
                     <input
                       type="time"
                       value={activity.startTime ? `${activity.startTime.slice(0, 2)}:${activity.startTime.slice(2)}` : ''}
@@ -226,7 +226,7 @@ export function SortableActivityItem({
                   </div>
                   <span className="text-morandi-secondary">~</span>
                   <div className="flex items-center gap-2">
-                    <label className="text-xs text-morandi-primary whitespace-nowrap">結束</label>
+                    <label className="text-xs text-morandi-primary whitespace-nowrap">{COMP_EDITOR_LABELS.LABEL_7820}</label>
                     <input
                       type="time"
                       value={activity.endTime ? `${activity.endTime.slice(0, 2)}:${activity.endTime.slice(2)}` : ''}
@@ -247,7 +247,7 @@ export function SortableActivityItem({
                       }}
                       className="text-xs text-morandi-secondary hover:text-morandi-red transition-colors"
                     >
-                      清除
+                      {COMP_EDITOR_LABELS.CLEAR}
                     </button>
                   )}
                 </div>
@@ -268,7 +268,7 @@ export function SortableActivityItem({
             className="flex items-center gap-1 px-2 py-1 text-xs text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50 rounded transition-colors disabled:opacity-50"
           >
             <Upload size={12} />
-            上傳
+            {COMP_EDITOR_LABELS.UPLOAD}
           </button>
           {/* Unsplash */}
           <button

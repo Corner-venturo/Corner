@@ -3,6 +3,7 @@
 import * as React from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { UI_LABELS } from './constants/labels'
 
 export interface CalendarProps {
   mode?: 'single' | 'range'
@@ -224,7 +225,7 @@ export function Calendar({
           onClick={() => navigateMonth('prev')}
           className="-m-1.5 flex flex-none items-center justify-center p-1.5 text-morandi-secondary hover:text-morandi-primary transition-colors"
         >
-          <span className="sr-only">上個月</span>
+          <span className="sr-only">{UI_LABELS.LABEL_8387}</span>
           <ChevronLeft className="h-5 w-5" />
         </button>
         <div className="flex-auto text-base font-semibold text-center text-morandi-primary">
@@ -235,7 +236,7 @@ export function Calendar({
           onClick={() => navigateMonth('next')}
           className="-m-1.5 flex flex-none items-center justify-center p-1.5 text-morandi-secondary hover:text-morandi-primary transition-colors"
         >
-          <span className="sr-only">下個月</span>
+          <span className="sr-only">{UI_LABELS.LABEL_2562}</span>
           <ChevronRight className="h-5 w-5" />
         </button>
       </div>
@@ -320,7 +321,7 @@ export function Calendar({
           onClick={goToToday}
           className="w-full rounded-md bg-morandi-gold px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-morandi-gold-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-morandi-gold transition-colors"
         >
-          今天
+          {UI_LABELS.LABEL_6113}
         </button>
       </div>
     </div>

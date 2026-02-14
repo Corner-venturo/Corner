@@ -132,34 +132,34 @@ export const VehicleScheduleDialog: React.FC<VehicleScheduleDialogProps> = ({
               <Input
                 value={formData.tour_code}
                 onChange={e => onFormFieldChange('tour_code', e.target.value)}
-                placeholder="例如：CNX250121A"
+                placeholder={SCHEDULING_LABELS.例如團號}
                 className="mt-1 font-mono"
               />
             </div>
             <div className="md:col-span-2">
-              <label className="text-sm font-medium text-morandi-primary">行程名稱</label>
+              <label className="text-sm font-medium text-morandi-primary">{SCHEDULING_LABELS.行程名稱}</label>
               <Input
                 value={formData.tour_name}
                 onChange={e => onFormFieldChange('tour_name', e.target.value)}
-                placeholder="例如：清邁五日遊"
+                placeholder={SCHEDULING_LABELS.例如行程}
                 className="mt-1"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">聯絡人</label>
+              <label className="text-sm font-medium text-morandi-primary">{SCHEDULING_LABELS.聯絡人}</label>
               <Input
                 value={formData.contact_person}
                 onChange={e => onFormFieldChange('contact_person', e.target.value)}
-                placeholder="輸入聯絡人姓名"
+                placeholder={SCHEDULING_LABELS.輸入聯絡人姓名}
                 className="mt-1"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">聯絡電話</label>
+              <label className="text-sm font-medium text-morandi-primary">{SCHEDULING_LABELS.聯絡電話}</label>
               <Input
                 value={formData.contact_phone}
                 onChange={e => onFormFieldChange('contact_phone', e.target.value)}
-                placeholder="輸入聯絡電話"
+                placeholder={SCHEDULING_LABELS.輸入聯絡電話}
                 className="mt-1"
               />
             </div>
@@ -168,24 +168,24 @@ export const VehicleScheduleDialog: React.FC<VehicleScheduleDialogProps> = ({
 
         {/* 司機資訊 */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">司機資訊</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{SCHEDULING_LABELS.司機資訊}</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">司機姓名</label>
+              <label className="text-sm font-medium text-morandi-primary">{SCHEDULING_LABELS.司機姓名}</label>
               <Input
                 value={formData.driver_name}
                 onChange={e => onFormFieldChange('driver_name', e.target.value)}
-                placeholder="輸入司機姓名"
+                placeholder={SCHEDULING_LABELS.輸入司機姓名}
                 className="mt-1"
               />
-              <p className="text-xs text-morandi-secondary mt-1">留空則使用車輛預設司機</p>
+              <p className="text-xs text-morandi-secondary mt-1">{SCHEDULING_LABELS.留空則使用車輛預設司機}</p>
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">司機電話</label>
+              <label className="text-sm font-medium text-morandi-primary">{SCHEDULING_LABELS.司機電話}</label>
               <Input
                 value={formData.driver_phone}
                 onChange={e => onFormFieldChange('driver_phone', e.target.value)}
-                placeholder="輸入司機電話"
+                placeholder={SCHEDULING_LABELS.輸入司機電話}
                 className="mt-1"
               />
             </div>
@@ -194,11 +194,11 @@ export const VehicleScheduleDialog: React.FC<VehicleScheduleDialogProps> = ({
 
         {/* 備註 */}
         <div>
-          <label className="text-sm font-medium text-morandi-primary">備註</label>
+          <label className="text-sm font-medium text-morandi-primary">{SCHEDULING_LABELS.備註}</label>
           <Textarea
             value={formData.notes}
             onChange={e => onFormFieldChange('notes', e.target.value)}
-            placeholder="其他備註資訊（選填）"
+            placeholder={SCHEDULING_LABELS.其他備註資訊選填}
             rows={3}
             className="mt-1"
           />

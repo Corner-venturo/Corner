@@ -193,7 +193,7 @@ export function ReceiptConfirmDialog({
                   <th className="text-center py-2.5 px-3 border-b border-border" style={{ width: '100px' }}>{RECEIPT_CONFIRM_LABELS.CONFIRM}</th>
                 )}
                 {isConfirmed && (
-                  <th className="text-right py-2.5 px-3 border-b border-border" style={{ width: '120px' }}>實收金額</th>
+                  <th className="text-right py-2.5 px-3 border-b border-border" style={{ width: '120px' }}>{RECEIPT_CONFIRM_LABELS.LABEL_8417}</th>
                 )}
               </tr>
             </thead>
@@ -261,7 +261,7 @@ export function ReceiptConfirmDialog({
           <div className="bg-morandi-red/5 border border-morandi-red/20 rounded-lg p-4 mt-4">
             <div className="flex items-center gap-2 mb-3">
               <AlertCircle size={16} className="text-morandi-red" />
-              <span className="text-sm font-medium text-morandi-red">金額異常 - 請輸入實際收到金額</span>
+              <span className="text-sm font-medium text-morandi-red">{RECEIPT_CONFIRM_LABELS.PLEASE_ENTER_6193}</span>
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 flex-1">
@@ -285,7 +285,7 @@ export function ReceiptConfirmDialog({
                 className="gap-1"
               >
                 <X size={14} />
-                取消
+                {RECEIPT_CONFIRM_LABELS.CANCEL}
               </Button>
               <Button
                 size="sm"
@@ -294,7 +294,7 @@ export function ReceiptConfirmDialog({
                 className="bg-morandi-red hover:bg-morandi-red/90 text-white gap-1"
               >
                 <Check size={14} />
-                確認異常金額
+                {RECEIPT_CONFIRM_LABELS.CONFIRM_9972}
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-2">
@@ -320,7 +320,7 @@ export function ReceiptConfirmDialog({
           </div>
           <Button variant="outline" onClick={handleClose} className="gap-2">
             <X size={16} />
-            關閉
+            {RECEIPT_CONFIRM_LABELS.CLOSE}
           </Button>
         </div>
       </DialogContent>

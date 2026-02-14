@@ -115,7 +115,7 @@ export default function DatabaseManagementPage() {
                 onChange={e => setSelectedCountry(e.target.value)}
                 className="px-3 py-1 text-sm border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-morandi-primary bg-card text-morandi-primary min-w-[120px]"
               >
-                <option value="">所有國家</option>
+                <option value="">{DATABASE_MANAGEMENT_PAGE_LABELS.LABEL_937}</option>
                 {countries.map(country => (
                   <option key={country.id} value={country.id}>
                     {country.name}
@@ -129,7 +129,7 @@ export default function DatabaseManagementPage() {
                   onChange={e => setSelectedCategory(e.target.value)}
                   className="px-3 py-1 text-sm border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-morandi-primary bg-card text-morandi-primary min-w-[120px]"
                 >
-                  <option value="all">全部分類</option>
+                  <option value="all">{DATABASE_MANAGEMENT_PAGE_LABELS.LABEL_3573}</option>
                   {categoryOptions.map(option => (
                     <option key={option.value} value={option.value}>
                       {option.label}
@@ -154,7 +154,7 @@ export default function DatabaseManagementPage() {
               {loadedTabs.has('regions') && (
                 <Suspense
                   fallback={
-                    <div className="flex items-center justify-center h-full">載入中...</div>
+                    <div className="flex items-center justify-center h-full">{DATABASE_MANAGEMENT_PAGE_LABELS.LOADING_6912}</div>
                   }
                 >
                   <RegionsTab />

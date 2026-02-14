@@ -111,7 +111,7 @@ export default function LoginPage() {
           {/* 代號輸入 */}
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
-              公司
+              {LABELS.LABEL_7816}
             </label>
             <div className="relative">
               <Building2
@@ -123,7 +123,7 @@ export default function LoginPage() {
                 value={code}
                 onChange={e => setCode(e.target.value.toUpperCase())}
                 className="pl-10 uppercase"
-                placeholder="輸入公司代號"
+                placeholder={LABELS.LABEL_6892}
                 required
                 autoComplete="organization"
                 autoFocus
@@ -134,7 +134,7 @@ export default function LoginPage() {
           {/* 帳號 */}
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
-              帳號
+              {LABELS.LABEL_9987}
             </label>
             <div className="relative">
               <User
@@ -146,7 +146,7 @@ export default function LoginPage() {
                 value={username}
                 onChange={e => setUsername(e.target.value)}
                 className="pl-10"
-                placeholder="例：E001"
+                placeholder={LABELS.LABEL_6929}
                 required
                 autoComplete="username"
               />
@@ -166,7 +166,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 className="pl-10 pr-10"
-                placeholder="輸入密碼"
+                placeholder={LABELS.LABEL_772}
                 required
                 autoComplete="current-password"
               />
@@ -190,7 +190,7 @@ export default function LoginPage() {
               className="w-4 h-4 rounded border-border text-morandi-gold focus:ring-morandi-gold cursor-pointer"
             />
             <label htmlFor="rememberMe" className="text-sm text-morandi-primary cursor-pointer select-none">
-              記住我（30 天內免重新登入）
+              {LABELS.LABEL_3877}
             </label>
           </div>
 

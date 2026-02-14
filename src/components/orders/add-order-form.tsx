@@ -112,7 +112,7 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
       {/* 選擇旅遊團（如果沒有預設 tour_id） */}
       {!tourId && (
         <div>
-          <label className="text-sm font-medium text-morandi-primary">選擇旅遊團</label>
+          <label className="text-sm font-medium text-morandi-primary">{COMP_ORDERS_LABELS.SELECT_448}</label>
           <Combobox
             options={tours.map(tour => ({
               value: tour.id,
@@ -131,7 +131,7 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
 
       {/* 聯絡人 */}
       <div>
-        <label className="text-sm font-medium text-morandi-primary">聯絡人</label>
+        <label className="text-sm font-medium text-morandi-primary">{COMP_ORDERS_LABELS.LABEL_7009}</label>
         <Input
           value={formData.contact_person || ''}
           onChange={e => updateFormData?.({ ...formData, contact_person: e.target.value })}
@@ -145,7 +145,7 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="text-sm font-medium text-morandi-primary">
-            業務
+            {COMP_ORDERS_LABELS.LABEL_8362}
             {/* 如果有填聯絡人，業務為必填 */}
             {formData.contact_person?.trim() && (
               <span className="text-morandi-red ml-1">*</span>
@@ -167,7 +167,7 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
           />
         </div>
         <div>
-          <label className="text-sm font-medium text-morandi-primary">助理</label>
+          <label className="text-sm font-medium text-morandi-primary">{COMP_ORDERS_LABELS.LABEL_7412}</label>
           <Combobox
             options={assistants.map(emp => ({
               value: emp.display_name || emp.english_name,
@@ -190,7 +190,7 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
       {!isEmbedded && (
         <div className="flex justify-end space-x-2">
           <Button type="button" variant="outline" onClick={onCancel}>
-            取消
+            {COMP_ORDERS_LABELS.取消}
           </Button>
           <Button
             type="submit"

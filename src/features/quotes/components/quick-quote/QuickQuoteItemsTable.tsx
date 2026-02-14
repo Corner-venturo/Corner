@@ -417,11 +417,11 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-morandi-primary">收費明細表</h2>
+        <h2 className="text-lg font-semibold text-morandi-primary">{QUICK_QUOTE_ITEMS_TABLE_LABELS.LABEL_728}</h2>
         {isEditing && (
           <Button onClick={onAddItem} size="sm" variant="outline" className="gap-2">
             <Plus className="h-4 w-4" />
-            新增項目
+            {QUICK_QUOTE_ITEMS_TABLE_LABELS.ADD_2089}
           </Button>
         )}
       </div>
@@ -435,13 +435,13 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
             <thead>
               <tr className="border-b border-morandi-container/60">
                 {isEditing && <th className={`${headerCellClass} w-8`}></th>}
-                <th className={headerCellClass}>摘要</th>
-                <th className={`${headerCellClass} text-center w-20`}>數量</th>
-                {isEditing && <th className={`${headerCellClass} text-center w-24`}>成本</th>}
-                <th className={`${headerCellClass} text-center w-28`}>單價</th>
-                <th className={`${headerCellClass} text-center w-28`}>金額</th>
-                {isEditing && <th className={`${headerCellClass} text-center w-24`}>利潤</th>}
-                <th className={`${headerCellClass} w-32`}>備註</th>
+                <th className={headerCellClass}>{QUICK_QUOTE_ITEMS_TABLE_LABELS.LABEL_466}</th>
+                <th className={`${headerCellClass} text-center w-20`}>{QUICK_QUOTE_ITEMS_TABLE_LABELS.QUANTITY}</th>
+                {isEditing && <th className={`${headerCellClass} text-center w-24`}>{QUICK_QUOTE_ITEMS_TABLE_LABELS.LABEL_7178}</th>}
+                <th className={`${headerCellClass} text-center w-28`}>{QUICK_QUOTE_ITEMS_TABLE_LABELS.LABEL_9413}</th>
+                <th className={`${headerCellClass} text-center w-28`}>{QUICK_QUOTE_ITEMS_TABLE_LABELS.AMOUNT}</th>
+                {isEditing && <th className={`${headerCellClass} text-center w-24`}>{QUICK_QUOTE_ITEMS_TABLE_LABELS.LABEL_7705}</th>}
+                <th className={`${headerCellClass} w-32`}>{QUICK_QUOTE_ITEMS_TABLE_LABELS.REMARKS}</th>
                 {isEditing && <th className={`${headerCellClass} text-center w-12`}></th>}
               </tr>
             </thead>
@@ -474,7 +474,7 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
                     colSpan={isEditing ? 9 : 5}
                     className="px-3 py-8 text-center text-morandi-secondary border border-morandi-gold/20"
                   >
-                    尚無項目
+                    {QUICK_QUOTE_ITEMS_TABLE_LABELS.EMPTY_1514}
                     {isEditing && QUICK_QUOTE_ITEMS_TABLE_LABELS.點擊_新增項目_開始}
                   </td>
                 </tr>

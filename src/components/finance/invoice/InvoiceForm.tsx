@@ -7,6 +7,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { TravelInvoiceItem, BuyerInfo } from '@/stores/travel-invoice-store'
 import type { Order } from '@/types/order.types'
 import type { Tour } from '@/types/tour.types'
+import { INVOICE_LABELS } from './constants/labels'
 
 interface InvoiceFormProps {
   fixedOrder?: Order
@@ -73,7 +74,7 @@ export function InvoiceForm({
               {!fixedTour && (
                 <>
                   <td className="w-24 py-2 px-3 border border-border bg-muted/30 text-sm font-medium text-morandi-primary">
-                    團別
+                    {INVOICE_LABELS.LABEL_2201}
                   </td>
                   <td className="py-1 px-2 border border-border">
                     <Combobox
@@ -96,7 +97,7 @@ export function InvoiceForm({
               {!fixedOrder && (
                 <>
                   <td className="w-24 py-2 px-3 border border-border bg-muted/30 text-sm font-medium text-morandi-primary">
-                    訂單
+                    {INVOICE_LABELS.LABEL_5934}
                   </td>
                   <td className="py-1 px-2 border border-border">
                     <Combobox
@@ -119,13 +120,13 @@ export function InvoiceForm({
           {/* 開立日期 + 買受人 */}
           <tr>
             <td className="w-24 py-2 px-3 border border-border bg-muted/30 text-sm font-medium text-morandi-primary">
-              開立日期
+              {INVOICE_LABELS.LABEL_4782}
             </td>
             <td className="py-1 px-2 border border-border">
               <DatePicker
                 value={invoiceDate}
                 onChange={(date) => setInvoiceDate(date)}
-                placeholder="選擇日期"
+                placeholder={INVOICE_LABELS.SELECT_5234}
                 className="input-no-focus [&_button]:border-0 [&_button]:shadow-none [&_button]:bg-transparent"
               />
             </td>
@@ -146,7 +147,7 @@ export function InvoiceForm({
           {/* 統編 + Email */}
           <tr>
             <td className="py-2 px-3 border border-border bg-muted/30 text-sm font-medium text-morandi-primary">
-              統一編號
+              {INVOICE_LABELS.LABEL_8296}
               <span className="text-xs text-morandi-secondary ml-1">
                 {isB2B ? '(B2B)' : '(B2C)'}
               </span>
@@ -156,7 +157,7 @@ export function InvoiceForm({
                 type="text"
                 value={buyerInfo.buyerUBN || ''}
                 onChange={e => setBuyerInfo({ ...buyerInfo, buyerUBN: e.target.value })}
-                placeholder="8 碼數字"
+                placeholder={INVOICE_LABELS.LABEL_6444}
                 maxLength={8}
                 className="input-no-focus w-full h-9 px-2 bg-transparent text-sm"
               />
@@ -169,7 +170,7 @@ export function InvoiceForm({
                 type="email"
                 value={buyerInfo.buyerEmail || ''}
                 onChange={e => setBuyerInfo({ ...buyerInfo, buyerEmail: e.target.value })}
-                placeholder="電子收據信箱"
+                placeholder={INVOICE_LABELS.LABEL_7311}
                 className="input-no-focus w-full h-9 px-2 bg-transparent text-sm"
               />
             </td>
@@ -178,7 +179,7 @@ export function InvoiceForm({
           {/* 手機 + 申報狀態 */}
           <tr>
             <td className="py-2 px-3 border border-border bg-muted/30 text-sm font-medium text-morandi-primary">
-              手機
+              {INVOICE_LABELS.LABEL_7287}
             </td>
             <td className="py-1 px-2 border border-border">
               <input
@@ -190,7 +191,7 @@ export function InvoiceForm({
               />
             </td>
             <td className="py-2 px-3 border border-border bg-muted/30 text-sm font-medium text-morandi-primary">
-              申報狀態
+              {INVOICE_LABELS.LABEL_2931}
             </td>
             <td className="py-1 px-2 border border-border">
               <div className="flex items-center gap-4 h-9">
@@ -202,7 +203,7 @@ export function InvoiceForm({
                     onChange={() => setReportStatus('unreported')}
                     className="w-4 h-4 accent-morandi-gold"
                   />
-                  <span className="text-sm">未申報</span>
+                  <span className="text-sm">{INVOICE_LABELS.LABEL_5921}</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -212,7 +213,7 @@ export function InvoiceForm({
                     onChange={() => setReportStatus('reported')}
                     className="w-4 h-4 accent-morandi-gold"
                   />
-                  <span className="text-sm">已申報</span>
+                  <span className="text-sm">{INVOICE_LABELS.LABEL_7889}</span>
                 </label>
               </div>
             </td>
@@ -224,11 +225,11 @@ export function InvoiceForm({
       <table className="w-full border-collapse border border-border">
         <thead>
           <tr className="text-sm text-morandi-primary font-medium bg-muted/30">
-            <th className="text-left py-2 px-3 border border-border">品名</th>
-            <th className="text-center py-2 px-3 border border-border w-20">數量</th>
-            <th className="text-center py-2 px-3 border border-border w-24">單價</th>
-            <th className="text-center py-2 px-3 border border-border w-16">單位</th>
-            <th className="text-right py-2 px-3 border border-border w-24">金額</th>
+            <th className="text-left py-2 px-3 border border-border">{INVOICE_LABELS.LABEL_9447}</th>
+            <th className="text-center py-2 px-3 border border-border w-20">{INVOICE_LABELS.QUANTITY}</th>
+            <th className="text-center py-2 px-3 border border-border w-24">{INVOICE_LABELS.LABEL_9413}</th>
+            <th className="text-center py-2 px-3 border border-border w-16">{INVOICE_LABELS.LABEL_9062}</th>
+            <th className="text-right py-2 px-3 border border-border w-24">{INVOICE_LABELS.AMOUNT}</th>
             <th className="border border-border w-10"></th>
           </tr>
         </thead>
@@ -240,7 +241,7 @@ export function InvoiceForm({
                   type="text"
                   value={item.item_name}
                   onChange={e => updateItem(index, 'item_name', e.target.value)}
-                  placeholder="商品名稱"
+                  placeholder={INVOICE_LABELS.LABEL_6937}
                   className="input-no-focus w-full h-8 px-2 bg-transparent text-sm"
                 />
               </td>
@@ -293,7 +294,7 @@ export function InvoiceForm({
             >
               <span className="flex items-center justify-center gap-1 text-morandi-gold hover:text-morandi-gold-hover text-sm">
                 <Plus size={16} />
-                新增品項
+                {INVOICE_LABELS.ADD_8750}
               </span>
             </td>
           </tr>
@@ -305,7 +306,7 @@ export function InvoiceForm({
         <tbody>
           <tr>
             <td className="w-24 py-2 px-3 border border-border bg-muted/30 text-sm font-medium text-morandi-primary">
-              備註
+              {INVOICE_LABELS.REMARKS}
             </td>
             <td className="py-1 px-2 border border-border">
               <div className="flex items-center gap-2">
@@ -313,7 +314,7 @@ export function InvoiceForm({
                   type="text"
                   value={remark}
                   onChange={e => setRemark(e.target.value.slice(0, 50))}
-                  placeholder="備註（限 50 字）"
+                  placeholder={INVOICE_LABELS.LABEL_3060}
                   maxLength={50}
                   className="input-no-focus flex-1 h-9 px-2 bg-transparent text-sm"
                 />

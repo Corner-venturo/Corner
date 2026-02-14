@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import type { TourPageData } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 interface TourFeaturesSectionArtProps {
   data: TourPageData
@@ -68,7 +69,7 @@ export function TourFeaturesSectionArt({ data, viewMode }: TourFeaturesSectionAr
                 className="text-5xl lg:text-7xl font-light mb-6"
                 style={{ fontFamily: "'Zen Old Mincho', serif", color: colors.ink }}
               >
-                行程特色
+                {TOURS_LABELS.LABEL_6890}
               </h2>
               <div className="w-24 h-1" style={{ backgroundColor: colors.clay }} />
             </div>

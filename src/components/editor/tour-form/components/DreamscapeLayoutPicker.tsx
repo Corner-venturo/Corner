@@ -24,7 +24,7 @@ export function DreamscapeLayoutPicker({
 }: DreamscapeLayoutPickerProps) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs text-morandi-secondary">佈局：</span>
+      <span className="text-xs text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_3222}</span>
       <div className="flex items-center bg-morandi-container/30 rounded-lg p-0.5">
         {layoutOptions.map(option => (
           <button

@@ -22,6 +22,7 @@ import {
   BarChart3,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { WORKBENCH_LABELS } from './constants/labels'
 
 const CATEGORIES = [
   {
@@ -82,7 +83,7 @@ export default function MobileWorkbenchPage() {
           >
             <ArrowLeft size={20} className="text-morandi-primary" />
           </Link>
-          <h1 className="text-lg font-bold text-morandi-primary">工作台</h1>
+          <h1 className="text-lg font-bold text-morandi-primary">{WORKBENCH_LABELS.LABEL_6263}</h1>
         </div>
       </div>
 
@@ -124,7 +125,7 @@ export default function MobileWorkbenchPage() {
           className="block w-full py-3 text-center text-sm text-morandi-secondary
                      bg-morandi-container/50 rounded-xl hover:bg-morandi-container transition-colors"
         >
-          切換到桌面版
+          {WORKBENCH_LABELS.LABEL_5896}
         </Link>
       </div>
     </div>

@@ -157,7 +157,7 @@ export default function ItineraryPage() {
           <div className="flex items-center gap-2">
             <Select value={pageState.authorFilter} onValueChange={pageState.setAuthorFilter}>
               <SelectTrigger className="w-auto min-w-[100px] h-8 text-sm">
-                <SelectValue placeholder="我的行程" />
+                <SelectValue placeholder={LABELS.MY_ITINERARY} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="__mine__">{LABELS.MY_ITINERARY}</SelectItem>

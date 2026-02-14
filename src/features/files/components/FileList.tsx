@@ -200,16 +200,16 @@ function FileItem({ file, isSelected, viewMode, onSelect, onToggleStar }: FileIt
         <DropdownMenuContent align="end" className="w-40">
           <DropdownMenuItem>
             <Download className="w-4 h-4 mr-2" />
-            下載
+            {LABELS.download}
           </DropdownMenuItem>
           <DropdownMenuItem>
             <FolderInput className="w-4 h-4 mr-2" />
-            移動到...
+            {LABELS.moveTo}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem className="text-destructive">
             <Trash2 className="w-4 h-4 mr-2" />
-            刪除
+            {LABELS.deleteFolder}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -262,7 +262,7 @@ export function FileList() {
             className="text-muted-foreground hover:text-foreground cursor-pointer"
             onClick={() => useFileSystemStore.getState().selectFolder(null)}
           >
-            所有檔案
+            {LABELS.allFiles}
           </span>
           {breadcrumbs.map((name, index) => (
             <span key={index} className="flex items-center gap-1">

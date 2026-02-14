@@ -130,7 +130,7 @@ export function OrderEditDialog({
 
           {/* 聯絡人 */}
           <div>
-            <label className="text-sm font-medium text-morandi-primary">聯絡人</label>
+            <label className="text-sm font-medium text-morandi-primary">{COMP_ORDERS_LABELS.LABEL_7009}</label>
             <Input
               value={formData.contact_person}
               onChange={e => setFormData(prev => ({ ...prev, contact_person: e.target.value }))}
@@ -144,7 +144,7 @@ export function OrderEditDialog({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-morandi-primary">
-                業務
+                {COMP_ORDERS_LABELS.LABEL_8362}
                 {formData.contact_person?.trim() && (
                   <span className="text-morandi-red ml-1">*</span>
                 )}
@@ -165,7 +165,7 @@ export function OrderEditDialog({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">助理</label>
+              <label className="text-sm font-medium text-morandi-primary">{COMP_ORDERS_LABELS.LABEL_7412}</label>
               <Combobox
                 options={assistants.map(emp => ({
                   value: emp.display_name || emp.english_name,
@@ -193,7 +193,7 @@ export function OrderEditDialog({
               className="gap-2"
             >
               <X size={16} />
-              取消
+              {COMP_ORDERS_LABELS.取消}
             </Button>
             <Button
               type="submit"

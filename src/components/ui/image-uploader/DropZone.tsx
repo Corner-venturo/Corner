@@ -3,6 +3,7 @@
 import React from 'react'
 import { Loader2, ImageIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { IMAGE_UPLOADER_LABELS } from './constants/labels'
 
 export interface DropZoneProps {
   uploading: boolean
@@ -48,7 +49,7 @@ export function DropZone({
       {uploading ? (
         <>
           <Loader2 size={24} className="animate-spin text-morandi-gold" />
-          <span className="text-sm text-morandi-secondary">上傳中...</span>
+          <span className="text-sm text-morandi-secondary">{IMAGE_UPLOADER_LABELS.UPLOADING_2213}</span>
         </>
       ) : (
         <>

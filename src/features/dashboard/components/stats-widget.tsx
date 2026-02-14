@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card'
 import { BarChart3, Settings } from 'lucide-react'
 import { useStatsData, useStatsConfig, saveStatsConfig } from '../hooks/use-stats-data'
 import type { StatType } from '../types'
+import { DASHBOARD_LABELS } from './constants/labels'
 
 export function StatsWidget() {
   const allStats = useStatsData()
@@ -29,12 +30,12 @@ export function StatsWidget() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4 text-morandi-gold" />
-            <h3 className="font-semibold text-sm text-morandi-primary">統計資訊</h3>
+            <h3 className="font-semibold text-sm text-morandi-primary">{DASHBOARD_LABELS.LABEL_5967}</h3>
           </div>
           <button
             onClick={() => setIsConfigOpen(!isConfigOpen)}
             className="p-1 rounded-lg text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-gold/10 transition-all"
-            title="統計設定"
+            title={DASHBOARD_LABELS.SETTINGS_614}
           >
             <Settings className="h-3.5 w-3.5" />
           </button>
@@ -43,7 +44,7 @@ export function StatsWidget() {
         {/* 設定面板 */}
         {isConfigOpen && (
           <div className="mt-3 pt-3 border-t border-morandi-gold/20">
-            <div className="text-xs text-morandi-secondary mb-2">選擇要顯示的統計項目</div>
+            <div className="text-xs text-morandi-secondary mb-2">{DASHBOARD_LABELS.SELECT_4619}</div>
             <div className="grid grid-cols-2 gap-2">
               {allStats.map(stat => (
                 <label
@@ -68,8 +69,8 @@ export function StatsWidget() {
           <div className="h-full flex items-center justify-center">
             <div className="text-center text-morandi-muted text-sm">
               <Settings className="h-8 w-8 mx-auto mb-2 opacity-30" />
-              <p>尚未選擇任何統計項目</p>
-              <p className="text-xs mt-1">點擊右上角設定圖示選擇</p>
+              <p>{DASHBOARD_LABELS.SELECT_8666}</p>
+              <p className="text-xs mt-1">{DASHBOARD_LABELS.SELECT_413}</p>
             </div>
           </div>
         ) : (

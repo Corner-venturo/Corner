@@ -93,6 +93,21 @@ export const DISBURSEMENT_LABELS = {
   筆請款單: ' 筆請款單',
   確定要從此出納單移除: '確定要從此出納單移除「',
   嗎: '」嗎？',
+
+  LABEL_4658: '本月',
+  LABEL_1688: '本月金額',
+
+  PRINT: '列印',
+  LABEL_3604: '下載 PDF',
+  LOADING_2648: '載入資料中...',
+
+  LABEL_3745: '出帳日期 *',
+
+  LABEL_623: '請款編號列表',
+  LABEL_2377: '當日',
+  CLEAR: '清除',
+  LABEL_6208: '請款編號',
+  NOT_FOUND_1858: '沒有符合條件的請款單',
 };
 
 
@@ -105,4 +120,11 @@ export const PRINT_LABELS = {
   SUBTOTAL: '小計',
   TOUR_SUBTOTAL: '團體小計',
   TYPE: '類型',
+
+  LABEL_7295: '出納單',
+  LABEL_3396: '團體請款 TOUR EXPENSES',
+  LABEL_5030: '公司請款 COMPANY EXPENSES',
+  LABEL_5145: '公司小計',
+  LABEL_9162: '無請款項目資料',
+  TOTAL_3184: '總計 TOTAL',
 }

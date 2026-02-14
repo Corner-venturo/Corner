@@ -4,6 +4,7 @@ import React from 'react'
 import { Upload, X, Crop, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ImagePositionSettings, getImagePositionStyle } from '../image-position-editor'
+import { IMAGE_UPLOADER_LABELS } from './constants/labels'
 
 export interface ImagePreviewProps {
   value: string
@@ -51,7 +52,7 @@ export function ImagePreview({
     >
       <img
         src={value}
-        alt="預覽"
+        alt={IMAGE_UPLOADER_LABELS.PREVIEW}
         className="w-full h-full object-cover"
         style={getImagePositionStyle(position)}
       />
@@ -60,7 +61,7 @@ export function ImagePreview({
       {isDragOver && (
         <div className="absolute inset-0 bg-morandi-gold/30 flex items-center justify-center">
           <div className="bg-card/90 px-4 py-2 rounded-lg text-sm font-medium text-morandi-primary">
-            放開以更換圖片
+            {IMAGE_UPLOADER_LABELS.LABEL_2938}
           </div>
         </div>
       )}
@@ -73,7 +74,7 @@ export function ImagePreview({
           onClick={onUploadClick}
           disabled={uploading}
           className="p-2 bg-card/90 hover:bg-card rounded-full text-morandi-primary transition-colors"
-          title="更換圖片"
+          title={IMAGE_UPLOADER_LABELS.LABEL_1707}
         >
           {uploading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
         </button>
@@ -84,7 +85,7 @@ export function ImagePreview({
             type="button"
             onClick={onPositionClick}
             className="p-2 bg-card/90 hover:bg-card rounded-full text-morandi-primary transition-colors"
-            title="調整位置"
+            title={IMAGE_UPLOADER_LABELS.LABEL_9042}
           >
             <Crop size={18} />
           </button>
@@ -96,7 +97,7 @@ export function ImagePreview({
             type="button"
             onClick={onDelete}
             className="p-2 bg-card/90 hover:bg-status-danger-bg rounded-full text-status-danger transition-colors"
-            title="刪除圖片"
+            title={IMAGE_UPLOADER_LABELS.DELETE_7426}
           >
             <X size={18} />
           </button>

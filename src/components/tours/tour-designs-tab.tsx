@@ -122,8 +122,8 @@ export function TourDesignsTab({ tourId, proposalId }: TourDesignsTabProps) {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-morandi-muted">
         <Globe className="w-12 h-12 mb-4 opacity-50" />
-        <p>尚無設計</p>
-        <p className="text-sm mt-1">可從行程表建立網頁行程設計</p>
+        <p>{COMP_TOURS_LABELS.EMPTY_3090}</p>
+        <p className="text-sm mt-1">{COMP_TOURS_LABELS.LABEL_5671}</p>
       </div>
     )
   }
@@ -158,7 +158,7 @@ export function TourDesignsTab({ tourId, proposalId }: TourDesignsTabProps) {
                   <span className="font-medium text-morandi-primary">{design.title}</span>
                   {design.isSelected && (
                     <span className="text-xs px-2 py-0.5 rounded-full bg-morandi-green/20 text-morandi-green">
-                      選定版本
+                      {COMP_TOURS_LABELS.LABEL_6192}
                     </span>
                   )}
                   {design.packageName && !design.isSelected && (
@@ -174,7 +174,7 @@ export function TourDesignsTab({ tourId, proposalId }: TourDesignsTabProps) {
             </div>
             <Button variant="ghost" size="sm" className="gap-1">
               <ExternalLink className="w-4 h-4" />
-              開啟
+              {COMP_TOURS_LABELS.LABEL_1670}
             </Button>
           </div>
         ))}

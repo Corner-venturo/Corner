@@ -35,7 +35,7 @@ export function AccommodationSection({
       {isLockedByQuote && (
         <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-md text-sm text-amber-700">
           <span>🔒</span>
-          <span>住宿資訊已從報價單同步，請從報價單修改</span>
+          <span>{COMP_EDITOR_LABELS.LABEL_4457}</span>
         </div>
       )}
       
@@ -59,7 +59,7 @@ export function AccommodationSection({
             }}
           />
           <span className="text-sm text-morandi-primary">
-            續住
+            {COMP_EDITOR_LABELS.LABEL_3005}
             {data.dailyItinerary[dayIndex - 1]?.accommodation && (
               <span className="text-morandi-gold ml-1">
                 （{data.dailyItinerary[dayIndex - 1].accommodation}）
@@ -73,7 +73,7 @@ export function AccommodationSection({
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium text-morandi-primary flex items-center gap-2">
           <Building2 size={14} />
-          住宿
+          {COMP_EDITOR_LABELS.住宿}
         </label>
         {!isLockedByQuote && (
           <div className="flex gap-2">
@@ -85,7 +85,7 @@ export function AccommodationSection({
               variant="default"
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white disabled:opacity-50"
             >
-              從飯店庫選擇
+              {COMP_EDITOR_LABELS.SELECT_7853}
             </Button>
             <Button
               type="button"
@@ -113,7 +113,7 @@ export function AccommodationSection({
       {/* 住宿輸入欄位 */}
       <div className={`flex flex-wrap gap-3 ${isLocked ? 'opacity-50' : ''}`}>
         <div className="flex-1 min-w-[200px]">
-          <label className="block text-xs font-medium text-morandi-primary mb-1">住宿名稱</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5732}</label>
           <Input
             id={`accommodation-input-${dayIndex}`}
             type="text"
@@ -125,7 +125,7 @@ export function AccommodationSection({
           />
         </div>
         <div className="w-24">
-          <label className="block text-xs font-medium text-morandi-primary mb-1">星級</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5000}</label>
           <Select
             value={String(day.accommodationRating ?? 5)}
             onValueChange={val => {
@@ -142,12 +142,12 @@ export function AccommodationSection({
               <SelectItem value="3">3星</SelectItem>
               <SelectItem value="2">2星</SelectItem>
               <SelectItem value="1">1星</SelectItem>
-              <SelectItem value="0">特色旅宿</SelectItem>
+              <SelectItem value="0">{COMP_EDITOR_LABELS.LABEL_6456}</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div className="flex-1 min-w-[180px]">
-          <label className="block text-xs font-medium text-morandi-primary mb-1">飯店連結</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5538}</label>
           <Input
             type="url"
             value={day.accommodationUrl || ''}

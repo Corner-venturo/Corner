@@ -7,6 +7,7 @@ import { Page } from '../primitives/Page'
 import { Text } from '../primitives/Text'
 import { Divider } from '../primitives/Divider'
 import type { PageProps } from '../types'
+import { PAGES_LABELS } from './constants/labels'
 
 interface MemoItem {
   icon?: string
@@ -97,7 +98,7 @@ export function Memo({ theme, size, items, title = '旅遊須知', pageNumber, c
         }}
       >
         <Text theme={theme} variant="caption" color="accent" style={{ fontWeight: 600, marginBottom: '2mm' }}>
-          緊急聯絡
+          {PAGES_LABELS.LABEL_4983}
         </Text>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4mm' }}>
           {EMERGENCY_CONTACTS.map((contact, i) => (

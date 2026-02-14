@@ -156,7 +156,7 @@ export default function TourPnLPage() {
 
   return (
     <ListPageLayout
-      title="團收支總覽"
+      title={TOUR_PNL_LABELS.TOTAL_2832}
       breadcrumb={[
         { label: '首頁', href: '/' },
         { label: '財務', href: '/finance' },

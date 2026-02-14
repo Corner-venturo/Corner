@@ -4,6 +4,7 @@ import { TourForm } from '@/components/editor/TourForm'
 import type { LocalTourData, AutoSaveStatus } from '../hooks/useItineraryEditor'
 import type { TierPricing } from '@/stores/types/quote.types'
 import { logger } from '@/lib/utils/logger'
+import { NEW_LABELS } from './constants/labels'
 
 interface ItineraryEditorProps {
   tourData: LocalTourData
@@ -19,7 +20,7 @@ export function ItineraryEditor({ tourData, autoSaveStatus, isDirty, quoteTierPr
   return (
     <div className={`w-1/2 bg-card border-r border-border flex flex-col ${className || ''}`}>
       <div className="h-14 bg-morandi-gold/90 text-white px-6 flex items-center justify-between border-b border-border">
-        <h2 className="text-lg font-semibold">編輯表單</h2>
+        <h2 className="text-lg font-semibold">{NEW_LABELS.EDIT_2921}</h2>
       </div>
       <div className="flex-1 overflow-y-auto bg-card">
         <TourForm

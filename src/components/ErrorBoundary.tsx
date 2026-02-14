@@ -4,6 +4,7 @@ import React, { useCallback, useState } from 'react'
 import { AlertCircle, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { logger } from '@/lib/utils/logger'
+import { COMPONENT_LABELS } from './constants/labels'
 
 // ============================================
 // Types
@@ -43,15 +44,15 @@ function ErrorDisplay({ error, errorInfo, onRetry }: ErrorDisplayProps) {
             <AlertCircle className="w-8 h-8 text-morandi-red" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-morandi-primary">發生錯誤</h1>
-            <p className="text-morandi-secondary mt-1">很抱歉，應用程式發生了問題</p>
+            <h1 className="text-2xl font-bold text-morandi-primary">{COMPONENT_LABELS.LABEL_6301}</h1>
+            <p className="text-morandi-secondary mt-1">{COMPONENT_LABELS.LABEL_1698}</p>
           </div>
         </div>
 
         <div className="space-y-4">
           {/* Error Message */}
           <div className="p-4 bg-morandi-red/5 border border-morandi-red/20 rounded-lg">
-            <p className="text-sm font-medium text-morandi-red mb-2">錯誤訊息</p>
+            <p className="text-sm font-medium text-morandi-red mb-2">{COMPONENT_LABELS.LABEL_1425}</p>
             <code className="text-sm text-morandi-primary break-words">
               {error?.message || '未知錯誤'}
             </code>
@@ -64,7 +65,7 @@ function ErrorDisplay({ error, errorInfo, onRetry }: ErrorDisplayProps) {
                 <details className="group">
                   <summary className="cursor-pointer p-4 bg-morandi-container/40 border border-border/60 rounded-lg hover:bg-morandi-container/60 transition-colors">
                     <span className="text-sm font-medium text-morandi-primary">
-                      錯誤堆疊（開發模式）
+                      {COMPONENT_LABELS.LABEL_7533}
                     </span>
                   </summary>
                   <div className="mt-2 p-4 bg-morandi-container/20 border border-border/40 rounded-lg">
@@ -79,7 +80,7 @@ function ErrorDisplay({ error, errorInfo, onRetry }: ErrorDisplayProps) {
                 <details className="group">
                   <summary className="cursor-pointer p-4 bg-morandi-container/40 border border-border/60 rounded-lg hover:bg-morandi-container/60 transition-colors">
                     <span className="text-sm font-medium text-morandi-primary">
-                      組件堆疊（開發模式）
+                      {COMPONENT_LABELS.LABEL_82}
                     </span>
                   </summary>
                   <div className="mt-2 p-4 bg-morandi-container/20 border border-border/40 rounded-lg">
@@ -98,12 +99,12 @@ function ErrorDisplay({ error, errorInfo, onRetry }: ErrorDisplayProps) {
             className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
             <RefreshCw size={16} />
-            重新載入
+            {COMPONENT_LABELS.LOADING_8807}
           </Button>
 
           {/* Hint */}
           <p className="text-xs text-morandi-muted text-center">
-            如果問題持續發生，請聯繫系統管理員
+            {COMPONENT_LABELS.MANAGE_6909}
           </p>
         </div>
       </div>

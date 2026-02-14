@@ -144,7 +144,7 @@ export function CoverInfoSection({
           <Settings2 size={20} className="text-white" />
         </div>
         <div className="text-left flex-1">
-          <h2 className="text-base font-bold text-morandi-primary">封面設定</h2>
+          <h2 className="text-base font-bold text-morandi-primary">{COMP_EDITOR_LABELS.SETTINGS_9115}</h2>
           <p className="text-xs text-morandi-secondary">
             風格：{currentStyleOption?.label || COMP_EDITOR_LABELS.經典全屏}
             {airportCode && ` · ${airportCode}`}
@@ -203,7 +203,7 @@ export function CoverInfoSection({
                   className="w-full"
                   style={{ backgroundColor: currentStyleColor }}
                 >
-                  完成設定
+                  {COMP_EDITOR_LABELS.SETTINGS_6595}
                 </Button>
               </div>
           </div>

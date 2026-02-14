@@ -57,8 +57,8 @@ export function ImagePreviewModal({
     <Dialog open onOpenChange={onClose}>
       <DialogContent level={1} className="max-w-5xl p-0 bg-black/95 border-none">
         <VisuallyHidden>
-          <DialogTitle>圖片預覽</DialogTitle>
-          <DialogDescription>預覽每日圖片，可使用左右鍵切換</DialogDescription>
+          <DialogTitle>{COMP_EDITOR_LABELS.PREVIEW_8043}</DialogTitle>
+          <DialogDescription>{COMP_EDITOR_LABELS.PREVIEW_331}</DialogDescription>
         </VisuallyHidden>
         <div className="relative">
           {/* 關閉按鈕 */}
@@ -201,7 +201,7 @@ export function ImagePositionEditor({
       {/* 預覽區域 */}
       <div className="relative">
         <p className="text-sm text-morandi-secondary mb-2">
-          拖曳下方的定位點，或點擊預設位置
+          {COMP_EDITOR_LABELS.LABEL_7288}
         </p>
         {/* 模擬橫向裁切框 */}
         <div
@@ -261,7 +261,7 @@ export function ImagePositionEditor({
       <div className="flex justify-end gap-2 pt-2 border-t border-morandi-container">
         <Button type="button" variant="ghost" className="gap-1" onClick={onClose}>
           <X size={16} />
-          取消
+          {COMP_EDITOR_LABELS.取消}
         </Button>
         <Button
           type="button"
@@ -269,7 +269,7 @@ export function ImagePositionEditor({
           className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
         >
           <Check size={16} className="mr-1" />
-          套用
+          {COMP_EDITOR_LABELS.LABEL_4550}
         </Button>
       </div>
     </div>

@@ -128,14 +128,14 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent level={1} className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>薪資請款</DialogTitle>
-          <p className="text-sm text-morandi-secondary">為員工建立薪資請款單</p>
+          <DialogTitle>{COMP_HR_LABELS.LABEL_5426}</DialogTitle>
+          <p className="text-sm text-morandi-secondary">{COMP_HR_LABELS.LABEL_5237}</p>
         </DialogHeader>
 
         <div className="space-y-6">
           {/* Request Date */}
           <div className="border border-border rounded-lg p-4">
-            <h3 className="text-sm font-medium text-morandi-primary mb-4">請款資訊</h3>
+            <h3 className="text-sm font-medium text-morandi-primary mb-4">{COMP_HR_LABELS.LABEL_6907}</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <div className="flex items-center justify-between mb-1">
@@ -153,7 +153,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
                       className="rounded border-border"
                     />
                     <label htmlFor="isSpecialBilling" className="text-xs text-morandi-primary cursor-pointer">
-                      特殊出帳
+                      {COMP_HR_LABELS.LABEL_297}
                     </label>
                   </div>
                 </div>
@@ -182,7 +182,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
               </div>
 
               <div>
-                <label className="text-sm font-medium text-morandi-primary">備註（選填）</label>
+                <label className="text-sm font-medium text-morandi-primary">{COMP_HR_LABELS.LABEL_8278}</label>
                 <Input
                   value={note}
                   onChange={e => setNote(e.target.value)}
@@ -226,7 +226,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
                     </div>
                     {isSelected && (
                       <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-sm text-morandi-secondary whitespace-nowrap">本次金額：</span>
+                        <span className="text-sm text-morandi-secondary whitespace-nowrap">{COMP_HR_LABELS.LABEL_6620}</span>
                         <Input
                           type="number"
                           value={amount}
@@ -258,7 +258,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
           <div className="flex justify-end space-x-2 pt-4 border-t border-border">
             <Button variant="outline" className="gap-1" onClick={() => onOpenChange(false)}>
               <X size={16} />
-              取消
+              {COMP_HR_LABELS.取消}
             </Button>
             <Button
               onClick={handleSubmit}

@@ -36,7 +36,7 @@ export const PriceSummaryCard: React.FC<PriceSummaryCardProps> = ({
             className="h-7 text-xs bg-morandi-secondary hover:bg-morandi-secondary/90 text-white"
             type="button"
           >
-            產生報價單
+            {PRICE_SUMMARY_CARD_LABELS.LABEL_6394}
           </Button>
         </div>
         {!isReadOnly && (
@@ -55,15 +55,15 @@ export const PriceSummaryCard: React.FC<PriceSummaryCardProps> = ({
         <thead className="bg-morandi-container/20 border-b border-border/60">
           <tr>
             <th className="text-left py-2 px-4 text-xs font-medium text-morandi-primary border-r border-border">
-              身份
+              {PRICE_SUMMARY_CARD_LABELS.LABEL_8725}
             </th>
             <th className="text-center py-2 px-4 text-xs font-medium text-morandi-primary border-r border-border">
-              成本
+              {PRICE_SUMMARY_CARD_LABELS.LABEL_7178}
             </th>
             <th className="text-center py-2 px-4 text-xs font-medium text-morandi-primary border-r border-border">
-              售價
+              {PRICE_SUMMARY_CARD_LABELS.LABEL_561}
             </th>
-            <th className="text-center py-2 px-4 text-xs font-medium text-morandi-primary">利潤</th>
+            <th className="text-center py-2 px-4 text-xs font-medium text-morandi-primary">{PRICE_SUMMARY_CARD_LABELS.LABEL_7705}</th>
           </tr>
         </thead>
         <tbody>

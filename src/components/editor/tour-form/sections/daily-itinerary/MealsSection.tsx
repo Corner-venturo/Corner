@@ -24,14 +24,14 @@ export function MealsSection({
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium text-morandi-primary flex items-center gap-2">
           <Utensils size={14} />
-          餐食安排
+          {COMP_EDITOR_LABELS.LABEL_9126}
         </label>
       </div>
       <div className="grid grid-cols-3 gap-2">
         {/* 早餐 */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="block text-xs font-medium text-morandi-primary">早餐</label>
+            <label className="block text-xs font-medium text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_1347}</label>
             <Button
               type="button"
               onClick={() => onOpenRestaurantSelector(dayIndex, 'breakfast')}
@@ -39,7 +39,7 @@ export function MealsSection({
               variant="ghost"
               className="h-5 px-1.5 text-[10px] text-morandi-gold hover:text-morandi-gold-hover"
             >
-              餐廳庫
+              {COMP_EDITOR_LABELS.LABEL_9094}
             </Button>
           </div>
           <input
@@ -59,7 +59,7 @@ export function MealsSection({
         {/* 午餐 */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="block text-xs font-medium text-morandi-primary">午餐</label>
+            <label className="block text-xs font-medium text-morandi-primary">{COMP_EDITOR_LABELS.午餐}</label>
             <Button
               type="button"
               onClick={() => onOpenRestaurantSelector(dayIndex, 'lunch')}
@@ -84,7 +84,7 @@ export function MealsSection({
         {/* 晚餐 */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="block text-xs font-medium text-morandi-primary">晚餐</label>
+            <label className="block text-xs font-medium text-morandi-primary">{COMP_EDITOR_LABELS.晚餐}</label>
             <Button
               type="button"
               onClick={() => onOpenRestaurantSelector(dayIndex, 'dinner')}

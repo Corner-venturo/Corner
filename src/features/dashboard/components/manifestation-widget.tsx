@@ -17,6 +17,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
+import { DASHBOARD_LABELS } from './constants/labels'
 
 interface ReminderView {
   title: string
@@ -223,7 +224,7 @@ export function ManifestationWidget() {
 
             <div className="mt-3.5">
               <div className="flex items-center justify-between text-[10px] text-morandi-secondary/90 mb-2 font-semibold">
-                <span>這週顯化曲線</span>
+                <span>{DASHBOARD_LABELS.LABEL_4129}</span>
               </div>
               <div className="grid grid-cols-7 gap-1.5">
                 {week.map(({ day, label, completed }) => (
@@ -263,7 +264,7 @@ export function ManifestationWidget() {
                 className="w-full bg-morandi-gold text-white hover:bg-morandi-gold-hover shadow-md hover:shadow-lg transition-all font-semibold"
                 onClick={handleAction}
               >
-                前往顯化練習
+                {DASHBOARD_LABELS.LABEL_2181}
               </Button>
             )}
           </div>

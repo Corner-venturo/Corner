@@ -29,7 +29,7 @@ export const QuickActionMenu = forwardRef<HTMLDivElement, QuickActionMenuProps>(
       >
         <div className="px-3 py-1.5 border-b border-morandi-container/30">
           <p className="text-xs font-semibold text-morandi-secondary uppercase tracking-wider">
-            快捷操作
+            {COMP_WORKSPACE_LABELS.LABEL_8706}
           </p>
         </div>
         {actions.map((action, index) => {

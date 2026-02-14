@@ -49,7 +49,7 @@ export function CustomCostFieldsSection({
           className="ml-auto"
         >
           <Plus size={14} className="mr-1" />
-          新增欄位
+          {COMP_ORDERS_LABELS.ADD_3322}
         </Button>
       </div>
 
@@ -80,7 +80,7 @@ export function CustomCostFieldsSection({
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent level={2} className="max-w-md">
           <DialogHeader>
-            <DialogTitle>新增自訂費用欄位</DialogTitle>
+            <DialogTitle>{COMP_ORDERS_LABELS.ADD_7841}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
@@ -96,10 +96,10 @@ export function CustomCostFieldsSection({
 
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-                取消
+                {COMP_ORDERS_LABELS.取消}
               </Button>
               <Button onClick={handleAdd} disabled={!newFieldName.trim()}>
-                新增
+                {COMP_ORDERS_LABELS.新增}
               </Button>
             </div>
           </div>

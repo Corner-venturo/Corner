@@ -20,6 +20,7 @@ import {
 } from '@/lib/manifestation/reminder'
 import { logger } from '@/lib/utils/logger'
 import { MANIFESTATION_NOTEBOOK_LABELS } from '@/constants/labels'
+import { TIMEBOX_LABELS } from './constants/labels'
 
 interface ManifestationRecord {
   id: string
@@ -623,7 +624,7 @@ export default function ManifestationNotebook() {
                       {content.gratitudes && content.gratitudes.length > 0 && (
                         <div className="mb-2">
                           <span className="text-xs text-morandi-secondary flex items-center gap-1">
-                            <Heart className="w-3 h-3" /> 感恩
+                            <Heart className="w-3 h-3" /> {TIMEBOX_LABELS.LABEL_9429}
                           </span>
                           <ul className="text-sm text-morandi-primary list-disc list-inside">
                             {content.gratitudes.map((g, i) => (
@@ -636,7 +637,7 @@ export default function ManifestationNotebook() {
                       {content.magicPhrase && (
                         <div>
                           <span className="text-xs text-morandi-secondary flex items-center gap-1">
-                            <Zap className="w-3 h-3" /> 魔法語句
+                            <Zap className="w-3 h-3" /> {TIMEBOX_LABELS.LABEL_8283}
                           </span>
                           <p className="text-sm text-morandi-primary italic">&ldquo;{content.magicPhrase}&rdquo;</p>
                         </div>

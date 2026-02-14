@@ -493,16 +493,16 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
           <TabsList className="w-fit">
             <TabsTrigger value="tour" className="gap-2">
               <Users size={16} />
-              團體請款
+              {ADD_REQUEST_FORM_LABELS.LABEL_7551}
             </TabsTrigger>
             <TabsTrigger value="batch" className="gap-2">
               <Layers size={16} />
-              批量請款
+              {ADD_REQUEST_FORM_LABELS.LABEL_163}
             </TabsTrigger>
             {canCreateCompanyPayment && (
               <TabsTrigger value="company" className="gap-2">
                 <Briefcase size={16} />
-                公司請款
+                {ADD_REQUEST_FORM_LABELS.LABEL_9152}
               </TabsTrigger>
             )}
           </TabsList>
@@ -555,7 +555,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                 />
                 <label htmlFor="import-from-requests" className="flex items-center gap-2 text-sm font-medium text-morandi-primary cursor-pointer">
                   <FileInput size={16} className="text-morandi-gold" />
-                  從需求單帶入（自動列出有供應商的項目）
+                  {ADD_REQUEST_FORM_LABELS.LABEL_4300}
                 </label>
               </div>
             )}
@@ -564,7 +564,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-medium text-morandi-primary">
-                    需求單項目
+                    {ADD_REQUEST_FORM_LABELS.LABEL_6198}
                     {loadingRequestItems && <span className="ml-2 text-morandi-secondary">{ADD_REQUEST_FORM_LABELS.載入中}</span>}
                   </h3>
                   {tourRequestItems.length > 0 && (
@@ -695,7 +695,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                     {tourAllocations.length === 0 ? (
                       <tr>
                         <td colSpan={3} className="text-center py-6 text-morandi-secondary text-sm bg-card">
-                          點擊「新增旅遊團」開始分配
+                          {ADD_REQUEST_FORM_LABELS.ADD_3774}
                         </td>
                       </tr>
                     ) : (
@@ -824,7 +824,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
           <div className="flex space-x-2">
             <Button variant="outline" onClick={handleCancel} className="gap-2">
               <X size={16} />
-              取消
+              {ADD_REQUEST_FORM_LABELS.CANCEL}
             </Button>
             <Button
               onClick={handleSubmit}

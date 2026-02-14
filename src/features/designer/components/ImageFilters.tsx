@@ -10,6 +10,7 @@ import { useState } from 'react'
 import { RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
+import { DESIGNER_LABELS } from './constants/labels'
 
 // 濾鏡預設值
 const DEFAULT_ADJUSTMENTS = {
@@ -100,10 +101,10 @@ export function ImageFilters({ adjustments, onChange }: ImageFiltersProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium">圖片調整</span>
+        <span className="text-sm font-medium">{DESIGNER_LABELS.LABEL_7990}</span>
         <Button variant="ghost" size="sm" onClick={handleReset} className="h-7 px-2 gap-1">
           <RotateCcw size={12} />
-          <span className="text-xs">重設</span>
+          <span className="text-xs">{DESIGNER_LABELS.RESET}</span>
         </Button>
       </div>
 
@@ -174,7 +175,7 @@ interface FilterPresetsProps {
 export function FilterPresets({ onSelect }: FilterPresetsProps) {
   return (
     <div className="space-y-2">
-      <span className="text-sm font-medium">濾鏡預設</span>
+      <span className="text-sm font-medium">{DESIGNER_LABELS.LABEL_945}</span>
       <div className="grid grid-cols-3 gap-2">
         {FILTER_PRESETS.map((preset) => (
           <button

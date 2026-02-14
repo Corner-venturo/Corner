@@ -12,6 +12,7 @@ import { toast } from 'sonner'
 import { TableColumn } from '@/components/ui/enhanced-table'
 import { DateCell, ActionCell, CurrencyCell } from '@/components/table-cells'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { TOUR_CLOSING_LABELS } from './constants/labels'
 
 interface TourClosingReport {
   id: string
@@ -389,7 +390,7 @@ export default function TourClosingReportPage() {
 
   return (
     <ListPageLayout
-      title="結團報表"
+      title={TOUR_CLOSING_LABELS.LABEL_5942}
       icon={FileText}
       breadcrumb={[
         { label: '首頁', href: '/' },
@@ -407,7 +408,7 @@ export default function TourClosingReportPage() {
           {availableMonths.length > 0 && (
             <Select value={selectedMonth} onValueChange={setSelectedMonth}>
               <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="全部月份" />
+                <SelectValue placeholder={TOUR_CLOSING_LABELS.LABEL_2902} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">全部月份</SelectItem>
@@ -424,7 +425,7 @@ export default function TourClosingReportPage() {
             className="bg-morandi-green hover:bg-morandi-green/90 text-white"
           >
             <FileDown className="w-4 h-4 mr-2" />
-            匯出 Excel
+            {TOUR_CLOSING_LABELS.EXPORT_7131}
           </Button>
         </div>
       }

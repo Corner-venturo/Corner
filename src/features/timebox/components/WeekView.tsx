@@ -3,6 +3,7 @@
 import { useMemo, useRef, useEffect } from 'react'
 import TimeGrid from './TimeGrid'
 import { getWeekStart, weekDayNames } from '../hooks/useTimeboxData'
+import { TIMEBOX_LABELS } from './constants/labels'
 
 // 固定格子高度（像素）- 與 TimeGrid 保持一致
 const SLOT_HEIGHTS = {
@@ -59,7 +60,7 @@ export default function WeekView({ selectedWeek, timeInterval }: WeekViewProps) 
       <div className="grid grid-cols-8 border-b-2 border-morandi-gold/20 bg-card sticky top-0 z-10 rounded-t-xl">
         {/* 時間欄標題 */}
         <div className="py-2 px-1 text-xs font-medium text-morandi-secondary border-r border-border flex items-center justify-center rounded-tl-xl">
-          時間
+          {TIMEBOX_LABELS.TIME}
         </div>
 
         {/* 日期欄標題 */}

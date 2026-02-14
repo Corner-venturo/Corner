@@ -111,7 +111,7 @@ export function ConfirmationSection({
           className="bg-morandi-gold hover:bg-morandi-gold-hover gap-1"
         >
           <Plus size={14} />
-          新增
+          {CONFIRMATION_SECTION_LABELS.ADD}
         </Button>
       </div>
 
@@ -133,7 +133,7 @@ export function ConfirmationSection({
                 </th>
               ))}
               <th className="px-3 py-2 text-right text-xs font-medium text-morandi-secondary w-24">
-                操作
+                {CONFIRMATION_SECTION_LABELS.ACTIONS}
               </th>
             </tr>
           </thead>
@@ -144,7 +144,7 @@ export function ConfirmationSection({
                   colSpan={columns.length + 1}
                   className="px-4 py-8 text-center text-morandi-secondary text-sm"
                 >
-                  尚無資料，點擊「新增」開始
+                  {CONFIRMATION_SECTION_LABELS.ADD_6529}
                 </td>
               </tr>
             ) : (
@@ -224,17 +224,17 @@ export function ConfirmationSection({
                   colSpan={columns.length - 1}
                   className="px-3 py-2 text-right text-sm font-medium text-morandi-primary"
                 >
-                  小計：
+                  {CONFIRMATION_SECTION_LABELS.LABEL_1075}
                 </td>
                 <td className="px-3 py-2 text-right text-sm font-mono">
                   <div className="flex flex-col">
-                    <span className="text-morandi-secondary text-xs">預計</span>
+                    <span className="text-morandi-secondary text-xs">{CONFIRMATION_SECTION_LABELS.LABEL_6009}</span>
                     <span className="font-medium">{formatCurrency(sectionTotal.expected)}</span>
                   </div>
                 </td>
                 <td className="px-3 py-2 text-right text-sm font-mono">
                   <div className="flex flex-col">
-                    <span className="text-morandi-secondary text-xs">實際</span>
+                    <span className="text-morandi-secondary text-xs">{CONFIRMATION_SECTION_LABELS.LABEL_3550}</span>
                     <span className="font-medium">{formatCurrency(sectionTotal.actual)}</span>
                   </div>
                 </td>

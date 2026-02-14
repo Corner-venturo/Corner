@@ -4,6 +4,7 @@ import React from 'react'
 import { cn } from '@/lib/utils'
 import { useVirtualList } from '@/hooks/useVirtualList'
 import type { TableColumn, RowData } from './types'
+import { ENHANCED_TABLE_LABELS } from './constants/labels'
 
 export interface VirtualizedTableProps<T extends RowData = RowData> {
   columns: TableColumn<T>[]
@@ -90,7 +91,7 @@ export function VirtualizedTable<T extends RowData = RowData>({
           ))}
           {actions && (
             <div className="py-3 px-4 text-sm font-semibold text-morandi-primary" style={{ width: '100px' }}>
-              操作
+              {ENHANCED_TABLE_LABELS.ACTIONS}
             </div>
           )}
         </div>
@@ -111,7 +112,7 @@ export function VirtualizedTable<T extends RowData = RowData>({
                   d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
                 />
               </svg>
-              <p className="text-sm">目前沒有資料</p>
+              <p className="text-sm">{ENHANCED_TABLE_LABELS.NOT_FOUND_8580}</p>
             </div>
           )}
         </div>

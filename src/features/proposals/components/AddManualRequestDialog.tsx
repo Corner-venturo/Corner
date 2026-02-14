@@ -414,7 +414,7 @@ export function AddManualRequestDialog({
             {/* 資源選擇（餐廳/飯店/景點）*/}
             {(formData.category === 'meal' || formData.category === 'accommodation' || formData.category === 'activity') && (
               <div className="space-y-2">
-                <Label>從資料庫選擇</Label>
+                <Label>{PROPOSAL_FORM_LABELS.SELECT_396}</Label>
                 <div className="flex items-center gap-2">
                   {formData.resourceName ? (
                     <div className="flex-1 flex items-center gap-2 px-3 py-2 bg-morandi-container/30 rounded-lg">
@@ -462,7 +462,7 @@ export function AddManualRequestDialog({
             {/* 日期範圍 */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <Label>開始日期</Label>
+                <Label>{PROPOSAL_FORM_LABELS.LABEL_4743}</Label>
                 <Input
                   type="date"
                   value={formData.serviceDate}
@@ -470,7 +470,7 @@ export function AddManualRequestDialog({
                 />
               </div>
               <div className="space-y-2">
-                <Label>結束日期</Label>
+                <Label>{PROPOSAL_FORM_LABELS.LABEL_9824}</Label>
                 <Input
                   type="date"
                   value={formData.serviceDateEnd}
@@ -481,7 +481,7 @@ export function AddManualRequestDialog({
 
             {/* 數量 */}
             <div className="space-y-2">
-              <Label>數量</Label>
+              <Label>{PROPOSAL_FORM_LABELS.QUANTITY}</Label>
               <Input
                 type="number"
                 min={1}
@@ -501,7 +501,7 @@ export function AddManualRequestDialog({
 
             {/* 備註 */}
             <div className="space-y-2">
-              <Label>備註說明</Label>
+              <Label>{PROPOSAL_FORM_LABELS.LABEL_9909}</Label>
               <Textarea
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
@@ -516,7 +516,7 @@ export function AddManualRequestDialog({
         <div className="flex justify-end gap-2 pt-4 border-t border-border">
           <Button variant="outline" onClick={handleClose} className="gap-2">
             <X size={16} />
-            取消
+            {PROPOSAL_FORM_LABELS.CANCEL}
           </Button>
           {/* eslint-disable-next-line venturo/button-requires-icon -- 三元運算式中有圖標 */}
           <Button
@@ -525,7 +525,7 @@ export function AddManualRequestDialog({
             className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
             {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-            儲存
+            {PROPOSAL_FORM_LABELS.SAVE}
           </Button>
         </div>
       </DialogContent>

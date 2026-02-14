@@ -62,7 +62,7 @@ export function CustomerMatchDialog({
                       </span>
                       {customer.verification_status === 'verified' && (
                         <span className="text-xs px-2 py-0.5 bg-status-success-bg text-status-success rounded">
-                          已驗證
+                          {COMP_ORDERS_LABELS.LABEL_499}
                         </span>
                       )}
                       {customer.is_vip && (
@@ -74,37 +74,37 @@ export function CustomerMatchDialog({
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-morandi-muted">
                       {customer.passport_name && (
                         <div>
-                          <span className="text-xs text-morandi-muted">護照拼音：</span>
+                          <span className="text-xs text-morandi-muted">{COMP_ORDERS_LABELS.LABEL_9672}</span>
                           {customer.passport_name}
                         </div>
                       )}
                       {customer.national_id && (
                         <div>
-                          <span className="text-xs text-morandi-muted">身分證：</span>
+                          <span className="text-xs text-morandi-muted">{COMP_ORDERS_LABELS.LABEL_2866}</span>
                           {customer.national_id}
                         </div>
                       )}
                       {customer.passport_number && (
                         <div>
-                          <span className="text-xs text-morandi-muted">護照號碼：</span>
+                          <span className="text-xs text-morandi-muted">{COMP_ORDERS_LABELS.LABEL_9593}</span>
                           {customer.passport_number}
                         </div>
                       )}
                       {customer.birth_date && (
                         <div>
-                          <span className="text-xs text-morandi-muted">生日：</span>
+                          <span className="text-xs text-morandi-muted">{COMP_ORDERS_LABELS.LABEL_94}</span>
                           {customer.birth_date}
                         </div>
                       )}
                       {customer.phone && (
                         <div>
-                          <span className="text-xs text-morandi-muted">電話：</span>
+                          <span className="text-xs text-morandi-muted">{COMP_ORDERS_LABELS.LABEL_9704}</span>
                           {customer.phone}
                         </div>
                       )}
                       {customer.gender && (
                         <div>
-                          <span className="text-xs text-morandi-muted">性別：</span>
+                          <span className="text-xs text-morandi-muted">{COMP_ORDERS_LABELS.LABEL_8424}</span>
                           {customer.gender === 'M' ? COMP_ORDERS_LABELS.男 : customer.gender === 'F' ? COMP_ORDERS_LABELS.女 : customer.gender}
                         </div>
                       )}
@@ -119,7 +119,7 @@ export function CustomerMatchDialog({
         <div className="flex-shrink-0 flex justify-end pt-4 border-t">
           <Button variant="outline" className="gap-1" onClick={onClose}>
             <X size={16} />
-            取消
+            {COMP_ORDERS_LABELS.取消}
           </Button>
         </div>
       </DialogContent>

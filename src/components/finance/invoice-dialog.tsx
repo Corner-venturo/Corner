@@ -14,6 +14,7 @@ import type { Tour } from '@/types/tour.types'
 import { InvoiceForm } from './invoice/InvoiceForm'
 import { InvoicePreview } from './invoice/InvoicePreview'
 import { useInvoiceDialog } from './invoice/hooks/useInvoiceDialog'
+import { FINANCE_LABELS } from './constants/labels'
 
 interface InvoiceDialogProps {
   open: boolean
@@ -76,7 +77,7 @@ export function InvoiceDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText size={20} />
-            開立代轉發票
+            {FINANCE_LABELS.LABEL_953}
             {customNo && <span className="text-sm font-normal text-muted-foreground">（{customNo}）</span>}
           </DialogTitle>
         </DialogHeader>
@@ -118,7 +119,7 @@ export function InvoiceDialog({
           <div className="flex justify-center gap-4 pt-2">
             <Button variant="outline" onClick={() => onOpenChange(false)} className="min-w-[100px] gap-1">
               <X size={16} />
-              取消
+              {FINANCE_LABELS.CANCEL}
             </Button>
             <Button
               onClick={handleSubmit}

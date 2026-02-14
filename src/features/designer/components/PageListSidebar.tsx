@@ -26,6 +26,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import type { CanvasPage } from './types'
 import type { StyleSeries } from '../templates/engine'
 import type { MemoSettings, MemoItem, SeasonInfo, MemoInfoItem } from '../templates/definitions/types'
+import { DESIGNER_LABELS } from './constants/labels'
 
 // 頁面類型定義
 interface PageTypeOption {
@@ -208,7 +209,7 @@ export function PageListSidebar({
     <div className="w-48 bg-card border-r border-border flex flex-col shrink-0">
       {/* 標題 - 高度與元素庫一致 */}
       <div className="p-3 border-b border-border flex items-center justify-between h-[42px]">
-        <span className="text-sm font-medium text-morandi-primary">頁面</span>
+        <span className="text-sm font-medium text-morandi-primary">{DESIGNER_LABELS.LABEL_2099}</span>
         <Button
           variant="ghost"
           size="sm"
@@ -274,7 +275,7 @@ export function PageListSidebar({
                       onDuplicatePage(index)
                     }}
                     className="p-1 rounded hover:bg-morandi-gold/10 text-morandi-muted hover:text-morandi-gold transition-all"
-                    title="複製頁面"
+                    title={DESIGNER_LABELS.COPYING_1247}
                   >
                     <Copy size={12} />
                   </button>
@@ -287,7 +288,7 @@ export function PageListSidebar({
                       onDeletePage(index)
                     }}
                     className="p-1 rounded hover:bg-morandi-red/10 text-morandi-muted hover:text-morandi-red transition-all"
-                    title="刪除頁面"
+                    title={DESIGNER_LABELS.DELETE_6755}
                   >
                     <Trash2 size={12} />
                   </button>
@@ -302,7 +303,7 @@ export function PageListSidebar({
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent level={1} className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>新增頁面</DialogTitle>
+            <DialogTitle>{DESIGNER_LABELS.ADD_1813}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-2">
@@ -349,7 +350,7 @@ export function PageListSidebar({
       <Dialog open={showMemoDialog} onOpenChange={setShowMemoDialog}>
         <DialogContent level={1} className="max-w-lg max-h-[80vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle>選擇備忘錄內容</DialogTitle>
+            <DialogTitle>{DESIGNER_LABELS.SELECT_5731}</DialogTitle>
           </DialogHeader>
 
           {/* 頁面類型切換 */}
@@ -364,7 +365,7 @@ export function PageListSidebar({
                   : 'border-border text-morandi-secondary hover:border-morandi-gold/50'
               )}
             >
-              提醒項目
+              {DESIGNER_LABELS.LABEL_4996}
             </button>
             <button
               type="button"
@@ -376,7 +377,7 @@ export function PageListSidebar({
                   : 'border-border text-morandi-secondary hover:border-morandi-gold/50'
               )}
             >
-              天氣/緊急資訊
+              {DESIGNER_LABELS.LABEL_6184}
             </button>
           </div>
 
@@ -431,7 +432,7 @@ export function PageListSidebar({
                 ))}
                 {Object.keys(groupedMemoItems).length === 0 && (
                   <div className="text-center text-morandi-secondary py-8">
-                    沒有可用的備忘錄項目
+                    {DESIGNER_LABELS.NOT_FOUND_4490}
                   </div>
                 )}
               </>
@@ -442,7 +443,7 @@ export function PageListSidebar({
                 {memoSettings?.seasons && memoSettings.seasons.length > 0 && (
                   <div>
                     <div className="text-xs font-semibold text-morandi-secondary mb-2 uppercase tracking-wider">
-                      氣候資訊
+                      {DESIGNER_LABELS.LABEL_805}
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       {memoSettings.seasons.map((season) => {
@@ -483,7 +484,7 @@ export function PageListSidebar({
                 {memoSettings?.infoItems && memoSettings.infoItems.length > 0 && (
                   <div>
                     <div className="text-xs font-semibold text-morandi-secondary mb-2 uppercase tracking-wider">
-                      實用資訊
+                      {DESIGNER_LABELS.LABEL_7094}
                     </div>
                     <div className="space-y-1">
                       {memoSettings.infoItems.map((item) => {
@@ -521,7 +522,7 @@ export function PageListSidebar({
                 {(!memoSettings?.seasons || memoSettings.seasons.length === 0) &&
                   (!memoSettings?.infoItems || memoSettings.infoItems.length === 0) && (
                   <div className="text-center text-morandi-secondary py-8">
-                    沒有可用的天氣或緊急資訊
+                    {DESIGNER_LABELS.NOT_FOUND_2488}
                   </div>
                 )}
               </>
@@ -539,7 +540,7 @@ export function PageListSidebar({
               variant="outline"
               onClick={() => setShowMemoDialog(false)}
             >
-              取消
+              {DESIGNER_LABELS.CANCEL}
             </Button>
             <Button
               onClick={handleConfirmMemoPage}

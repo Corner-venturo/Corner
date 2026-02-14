@@ -127,7 +127,7 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
                 }`}
                 title={item.is_self_arranged ? COST_ITEM_ROW_LABELS.取消自理 : COST_ITEM_ROW_LABELS.設為自理}
               >
-                自理
+                {COST_ITEM_ROW_LABELS.LABEL_2796}
               </button>
             )}
             <button

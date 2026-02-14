@@ -120,7 +120,7 @@ export function DayCard({
           </span>
           {day.isAlternative && (
             <span className="px-2 py-0.5 bg-morandi-container text-morandi-secondary text-xs rounded-full">
-              建議方案
+              {COMP_EDITOR_LABELS.LABEL_1234}
             </span>
           )}
           <span className="text-sm text-morandi-primary truncate max-w-[300px]">
@@ -174,7 +174,7 @@ export function DayCard({
               onClick={() => removeDailyItinerary(dayIndex)}
               className="text-morandi-red hover:text-morandi-red/80 text-sm font-medium transition-colors"
             >
-              刪除此天
+              {COMP_EDITOR_LABELS.DELETE_3496}
             </button>
           )}
         </div>
@@ -193,7 +193,7 @@ export function DayCard({
           {/* 特別安排 (highlight) */}
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-1">
-              特別安排 (highlight)
+              {COMP_EDITOR_LABELS.LABEL_1304}
               <span className="text-xs text-morandi-secondary ml-2">Shift+Enter 換行</span>
             </label>
             <textarea
@@ -228,7 +228,7 @@ export function DayCard({
             <div>
               <label className="block text-sm font-medium text-morandi-primary mb-1">
                 <span className="inline-flex items-center gap-2">
-                  地點標籤
+                  {COMP_EDITOR_LABELS.LABEL_7097}
                   <span className="px-1.5 py-0.5 text-[10px] bg-morandi-secondary/20 text-morandi-secondary rounded">
                     Luxury 專用
                   </span>
@@ -264,7 +264,7 @@ export function DayCard({
 
           {/* 描述 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">描述</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_3951}</label>
             <textarea
               value={day.description || ''}
               onChange={e => updateDailyItinerary(dayIndex, 'description', e.target.value)}
@@ -313,7 +313,7 @@ export function DayCard({
               }}
               className="h-4 w-4 text-morandi-gold focus:ring-morandi-gold border-morandi-container rounded"
             />
-            <span className="text-sm font-medium text-morandi-primary">每日圖片</span>
+            <span className="text-sm font-medium text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_6290}</span>
           </label>
           {day.showDailyImages === true && (day.images?.length || 0) > 0 && (
             <span className="text-xs text-morandi-secondary">

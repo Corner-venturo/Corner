@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { MapPin, Plane, Calendar, Utensils, Hotel, Coffee, Sun, Moon, ChevronDown, ChevronUp, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ITINERARY_LABELS } from './constants/labels'
 
 // 簡化的 CSS 樣式（移除光暈和流動效果）
 const timelineStyles = ``
@@ -252,7 +253,7 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
             {/* Section Header */}
             <div className="text-center mb-12">
               <p className="text-xs text-[#c9aa7c] tracking-[0.3em] mb-2 font-medium uppercase">Highlights</p>
-              <h2 className="text-2xl md:text-3xl font-bold text-[#3a3633]">行程亮點</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-[#3a3633]">{ITINERARY_LABELS.LABEL_3969}</h2>
               <div className="w-16 h-1 bg-gradient-to-r from-transparent via-[#c9aa7c] to-transparent mx-auto mt-4" />
             </div>
 
@@ -303,7 +304,7 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
             {/* Section Header */}
             <div className="text-center mb-12">
               <p className="text-xs text-[#9fa68f] tracking-[0.3em] mb-2 font-medium uppercase">Itinerary</p>
-              <h2 className="text-2xl md:text-3xl font-bold text-[#3a3633]">每日行程</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-[#3a3633]">{ITINERARY_LABELS.LABEL_2780}</h2>
               <div className="w-16 h-1 bg-gradient-to-r from-transparent via-[#9fa68f] to-transparent mx-auto mt-4" />
             </div>
 
@@ -349,27 +350,27 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
                             <div className="bg-[#FAFAF8] rounded-xl p-4">
                               <div className="flex items-center gap-2 text-[#c9aa7c] mb-3">
                                 <Utensils size={16} />
-                                <span className="font-bold text-sm">餐食安排</span>
+                                <span className="font-bold text-sm">{ITINERARY_LABELS.LABEL_9126}</span>
                               </div>
                               <div className="space-y-2.5">
                                 <div className="flex items-center justify-between text-sm">
                                   <span className="flex items-center gap-2 text-[#8b8680]">
                                     <Coffee size={14} className="text-[#c9aa7c]/60" />
-                                    早餐
+                                    {ITINERARY_LABELS.LABEL_1347}
                                   </span>
                                   <span className="text-[#3a3633] font-medium">{day.meals.breakfast || '-'}</span>
                                 </div>
                                 <div className="flex items-center justify-between text-sm">
                                   <span className="flex items-center gap-2 text-[#8b8680]">
                                     <Sun size={14} className="text-[#c9aa7c]/60" />
-                                    午餐
+                                    {ITINERARY_LABELS.LABEL_8515}
                                   </span>
                                   <span className="text-[#3a3633] font-medium">{day.meals.lunch || '-'}</span>
                                 </div>
                                 <div className="flex items-center justify-between text-sm">
                                   <span className="flex items-center gap-2 text-[#8b8680]">
                                     <Moon size={14} className="text-[#c9aa7c]/60" />
-                                    晚餐
+                                    {ITINERARY_LABELS.LABEL_8227}
                                   </span>
                                   <span className="text-[#3a3633] font-medium">{day.meals.dinner || '-'}</span>
                                 </div>
@@ -380,7 +381,7 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
                             <div className="bg-[#FAFAF8] rounded-xl p-4">
                               <div className="flex items-center gap-2 text-[#9fa68f] mb-3">
                                 <Hotel size={16} />
-                                <span className="font-bold text-sm">住宿安排</span>
+                                <span className="font-bold text-sm">{ITINERARY_LABELS.LABEL_9617}</span>
                               </div>
                               <p className="text-[#3a3633] text-sm font-medium leading-relaxed">
                                 {day.accommodation || '溫暖的家'}
@@ -405,7 +406,7 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
             {/* Section Header */}
             <div className="text-center mb-12">
               <p className="text-xs text-[#c08374] tracking-[0.3em] mb-2 font-medium uppercase">Attractions</p>
-              <h2 className="text-2xl md:text-3xl font-bold text-[#3a3633]">景點介紹</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-[#3a3633]">{ITINERARY_LABELS.LABEL_4014}</h2>
               <div className="w-16 h-1 bg-gradient-to-r from-transparent via-[#c08374] to-transparent mx-auto mt-4" />
             </div>
 
@@ -471,12 +472,12 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
                           >
                             {isExpanded ? (
                               <>
-                                <span>收合</span>
+                                <span>{ITINERARY_LABELS.LABEL_5509}</span>
                                 <ChevronUp size={16} />
                               </>
                             ) : (
                               <>
-                                <span>閱讀更多</span>
+                                <span>{ITINERARY_LABELS.LABEL_4589}</span>
                                 <ChevronDown size={16} />
                               </>
                             )}
@@ -509,7 +510,7 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
             {/* Section Header */}
             <div className="text-center mb-12">
               <p className="text-xs text-[#8b8680] tracking-[0.3em] mb-2 font-medium uppercase">Flight Info</p>
-              <h2 className="text-2xl md:text-3xl font-bold text-[#3a3633]">參考航班</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-[#3a3633]">{ITINERARY_LABELS.LABEL_5074}</h2>
               <div className="w-16 h-1 bg-gradient-to-r from-transparent via-[#8b8680] to-transparent mx-auto mt-4" />
             </div>
 
@@ -532,7 +533,7 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
                       <div className="bg-[#FAFAF8] rounded-xl p-5">
                         <div className="flex items-center gap-2 text-[#c9aa7c] font-bold text-sm mb-5">
                           <Plane size={14} />
-                          去程航班
+                          {ITINERARY_LABELS.LABEL_7790}
                           <span className="ml-auto text-[#8b8680] font-normal">{flight.outbound.code}</span>
                         </div>
                         <div className="flex items-center justify-between">
@@ -562,7 +563,7 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
                       <div className="bg-[#FAFAF8] rounded-xl p-5">
                         <div className="flex items-center gap-2 text-[#9fa68f] font-bold text-sm mb-5">
                           <Plane size={14} className="rotate-180" />
-                          回程航班
+                          {ITINERARY_LABELS.LABEL_2327}
                           <span className="ml-auto text-[#8b8680] font-normal">{flight.return.code}</span>
                         </div>
                         <div className="flex items-center justify-between">
@@ -603,11 +604,11 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
             <span className="text-[#c9aa7c] font-bold text-lg tracking-[0.2em]">CORNER TRAVEL</span>
           </div>
           <p className="text-white/50 text-sm mb-2">
-            角落旅遊 · 探索世界的每一個角落
+            {ITINERARY_LABELS.LABEL_9031}
           </p>
           <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-[#c9aa7c]/50 to-transparent mx-auto mt-6 mb-6" />
           <p className="text-white/30 text-xs">
-            行程內容僅供參考，實際以出團說明為準
+            {ITINERARY_LABELS.LABEL_5599}
           </p>
         </div>
       </footer>

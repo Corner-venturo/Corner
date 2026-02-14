@@ -82,7 +82,7 @@ export const QuickQuoteVersionPanel: React.FC<QuickQuoteVersionPanelProps> = ({
         <DropdownMenuTrigger asChild>
           <Button variant="outline" className="gap-2">
             <History className="h-4 w-4" />
-            版本歷史
+            {QUICK_QUOTE_VERSION_PANEL_LABELS.LABEL_3328}
             <ChevronDown className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
@@ -122,7 +122,7 @@ export const QuickQuoteVersionPanel: React.FC<QuickQuoteVersionPanelProps> = ({
                           className="text-xs text-morandi-secondary"
                         />
                         {isCurrentEditing && (
-                          <div className="text-xs bg-morandi-gold text-white px-2 py-0.5 rounded">當前</div>
+                          <div className="text-xs bg-morandi-gold text-white px-2 py-0.5 rounded">{QUICK_QUOTE_VERSION_PANEL_LABELS.LABEL_6211}</div>
                         )}
                         {isEditing && hoveredVersionIndex === originalIndex && versions.length > 1 && (
                           <button
@@ -143,7 +143,7 @@ export const QuickQuoteVersionPanel: React.FC<QuickQuoteVersionPanelProps> = ({
             </>
           ) : (
             <div className="px-2 py-3 text-sm text-morandi-secondary text-center">
-              尚無版本，進入編輯模式後點擊「儲存」創建第一個版本
+              {QUICK_QUOTE_VERSION_PANEL_LABELS.EDIT_4620}
             </div>
           )}
         </DropdownMenuContent>
@@ -153,9 +153,9 @@ export const QuickQuoteVersionPanel: React.FC<QuickQuoteVersionPanelProps> = ({
       <Dialog open={isSaveVersionDialogOpen} onOpenChange={onSetSaveVersionDialogOpen}>
         <DialogContent level={1}>
           <DialogHeader>
-            <DialogTitle>另存新版本</DialogTitle>
+            <DialogTitle>{QUICK_QUOTE_VERSION_PANEL_LABELS.LABEL_6621}</DialogTitle>
             <DialogDescription>
-              請輸入版本名稱，例如：「初稿」「修訂版」「最終版」
+              {QUICK_QUOTE_VERSION_PANEL_LABELS.PLEASE_ENTER_793}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -173,7 +173,7 @@ export const QuickQuoteVersionPanel: React.FC<QuickQuoteVersionPanelProps> = ({
           <DialogFooter>
             <Button variant="outline" className="gap-2" onClick={() => onSetSaveVersionDialogOpen(false)}>
               <X size={16} />
-              取消
+              {QUICK_QUOTE_VERSION_PANEL_LABELS.CANCEL}
             </Button>
             <Button
               onClick={onSaveAsNewVersion}

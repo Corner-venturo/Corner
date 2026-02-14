@@ -16,6 +16,7 @@ import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
+import { ID_LABELS } from './constants/labels'
 
 interface MemberDetail {
   id: string
@@ -121,12 +122,12 @@ export default function MemberDetailPage() {
   if (!member) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <p className="text-morandi-secondary">找不到此成員</p>
+        <p className="text-morandi-secondary">{ID_LABELS.NOT_FOUND_5568}</p>
         <button
           onClick={() => router.back()}
           className="text-morandi-gold"
         >
-          返回
+          {ID_LABELS.BACK}
         </button>
       </div>
     )
@@ -164,17 +165,17 @@ export default function MemberDetailPage() {
         <section className="bg-card rounded-xl border border-border p-4">
           <h2 className="font-bold text-morandi-primary mb-3 flex items-center gap-2">
             <User size={18} className="text-morandi-gold" />
-            基本資料
+            {ID_LABELS.LABEL_974}
           </h2>
           <div className="grid grid-cols-2 gap-3 text-sm">
-            <InfoItem label="中文姓名" value={member.chinese_name} />
-            <InfoItem label="英文姓名" value={member.passport_name} />
-            <InfoItem label="性別" value={formatGender(member.gender)} />
-            <InfoItem label="年齡" value={member.age ? `${member.age} 歲` : null} />
-            <InfoItem label="生日" value={member.birth_date} isDate />
-            <InfoItem label="身份" value={member.identity} />
-            <InfoItem label="類型" value={formatMemberType(member.member_type)} />
-            <InfoItem label="身分證" value={member.id_number} />
+            <InfoItem label={ID_LABELS.LABEL_9768} value={member.chinese_name} />
+            <InfoItem label={ID_LABELS.LABEL_739} value={member.passport_name} />
+            <InfoItem label={ID_LABELS.LABEL_2195} value={formatGender(member.gender)} />
+            <InfoItem label={ID_LABELS.LABEL_7004} value={member.age ? `${member.age} 歲` : null} />
+            <InfoItem label={ID_LABELS.LABEL_8658} value={member.birth_date} isDate />
+            <InfoItem label={ID_LABELS.LABEL_8725} value={member.identity} />
+            <InfoItem label={ID_LABELS.TYPE} value={formatMemberType(member.member_type)} />
+            <InfoItem label={ID_LABELS.LABEL_8408} value={member.id_number} />
           </div>
         </section>
 
@@ -182,11 +183,11 @@ export default function MemberDetailPage() {
         <section className="bg-card rounded-xl border border-border p-4">
           <h2 className="font-bold text-morandi-primary mb-3 flex items-center gap-2">
             <CreditCard size={18} className="text-morandi-gold" />
-            護照資料
+            {ID_LABELS.LABEL_2477}
           </h2>
           <div className="grid grid-cols-2 gap-3 text-sm">
-            <InfoItem label="護照號碼" value={member.passport_number} className="col-span-2" />
-            <InfoItem label="護照效期" value={member.passport_expiry} isDate />
+            <InfoItem label={ID_LABELS.LABEL_5147} value={member.passport_number} className="col-span-2" />
+            <InfoItem label={ID_LABELS.LABEL_4167} value={member.passport_expiry} isDate />
             <InfoItem label="PNR" value={member.pnr} />
           </div>
         </section>
@@ -196,7 +197,7 @@ export default function MemberDetailPage() {
           <section className="bg-card rounded-xl border border-border p-4">
             <h2 className="font-bold text-morandi-primary mb-3 flex items-center gap-2">
               <Plane size={18} className="text-morandi-gold" />
-              團體資訊
+              {ID_LABELS.LABEL_5172}
             </h2>
             <Link
               href={`/m/tours/${member.tour.id}`}
@@ -218,7 +219,7 @@ export default function MemberDetailPage() {
           <section className="bg-card rounded-xl border border-border p-4">
             <h2 className="font-bold text-morandi-primary mb-3 flex items-center gap-2">
               <Building size={18} className="text-morandi-gold" />
-              住宿資訊
+              {ID_LABELS.LABEL_8617}
             </h2>
             <div className="space-y-3">
               {member.hotel_1_name && (
@@ -245,11 +246,11 @@ export default function MemberDetailPage() {
         <section className="bg-card rounded-xl border border-border p-4">
           <h2 className="font-bold text-morandi-primary mb-3 flex items-center gap-2">
             <DollarSign size={18} className="text-morandi-gold" />
-            財務資訊
+            {ID_LABELS.LABEL_2004}
           </h2>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between py-2 border-b border-border/50">
-              <span className="text-morandi-secondary">售價</span>
+              <span className="text-morandi-secondary">{ID_LABELS.LABEL_561}</span>
               <span className="font-medium text-morandi-primary">
                 {member.selling_price !== null ? <CurrencyCell amount={member.selling_price} /> : '-'}
               </span>
@@ -281,18 +282,18 @@ export default function MemberDetailPage() {
           <section className="bg-card rounded-xl border border-border p-4">
             <h2 className="font-bold text-morandi-primary mb-3 flex items-center gap-2">
               <FileText size={18} className="text-morandi-gold" />
-              特殊需求
+              {ID_LABELS.LABEL_1075}
             </h2>
             <div className="space-y-3 text-sm">
               {member.special_meal && (
                 <div>
-                  <div className="text-morandi-secondary mb-1">特殊餐食</div>
+                  <div className="text-morandi-secondary mb-1">{ID_LABELS.LABEL_6650}</div>
                   <div className="text-morandi-primary">{member.special_meal}</div>
                 </div>
               )}
               {member.remarks && (
                 <div>
-                  <div className="text-morandi-secondary mb-1">備註</div>
+                  <div className="text-morandi-secondary mb-1">{ID_LABELS.REMARKS}</div>
                   <div className="text-morandi-primary whitespace-pre-wrap">{member.remarks}</div>
                 </div>
               )}

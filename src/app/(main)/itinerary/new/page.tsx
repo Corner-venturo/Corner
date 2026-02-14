@@ -192,7 +192,7 @@ function NewItineraryPageContent() {
     return (
       <div className="h-full flex flex-col">
         <ResponsiveHeader
-          title="新增紙本行程表"
+          title={EDITOR_LABELS.ADD_9998}
           breadcrumb={[
             { label: '首頁', href: '/' },
             { label: '行程管理', href: '/itinerary' },
@@ -206,7 +206,7 @@ function NewItineraryPageContent() {
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
               <Printer size={16} className="mr-2" />
-              列印
+              {EDITOR_LABELS.PRINT}
             </Button>
           }
         />

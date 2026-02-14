@@ -270,7 +270,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <DollarSign className="h-5 w-5 text-morandi-gold" />
-            批量分配收款（一筆款分多訂單）
+            {BATCH_RECEIPT_FORM_LABELS.LABEL_6021}
           </DialogTitle>
         </DialogHeader>
 
@@ -313,11 +313,11 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
                   onClick={distributeEvenly}
                   disabled={orderAllocations.filter(a => a.order_id).length === 0 || totalAmount === 0}
                 >
-                  平均分配
+                  {BATCH_RECEIPT_FORM_LABELS.LABEL_2869}
                 </Button>
                 <Button size="sm" variant="outline" onClick={addOrderAllocation}>
                   <Plus className="h-4 w-4 mr-1" />
-                  新增訂單
+                  {BATCH_RECEIPT_FORM_LABELS.ADD_5419}
                 </Button>
               </div>
             </div>
@@ -337,7 +337,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
                   {orderAllocations.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="text-center py-6 text-morandi-secondary text-sm bg-card">
-                        點擊「新增訂單」開始分配
+                        {BATCH_RECEIPT_FORM_LABELS.ADD_8367}
                       </td>
                     </tr>
                   ) : (
@@ -434,7 +434,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
           <div className="flex space-x-2">
             <Button variant="outline" className="gap-1" onClick={() => onOpenChange(false)}>
               <X size={16} />
-              取消
+              {BATCH_RECEIPT_FORM_LABELS.CANCEL}
             </Button>
             <Button
               onClick={handleSave}
@@ -442,7 +442,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
               disabled={unallocatedAmount !== 0 || orderAllocations.filter(a => a.order_id).length === 0 || totalAmount === 0}
             >
               <Check size={16} />
-              建立批量收款單
+              {BATCH_RECEIPT_FORM_LABELS.LABEL_7330}
             </Button>
           </div>
         </div>

@@ -5,6 +5,7 @@ import { SectionTitle } from './SectionTitle'
 import { TourHotelsSectionArt } from './TourHotelsSectionArt'
 import { TourHotelsSectionCollage } from './TourHotelsSectionCollage'
 import type { TourPageData, CoverStyleType, HotelInfo } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 interface TourHotelsSectionProps {
   data: TourPageData
@@ -124,7 +125,7 @@ export function TourHotelsSection({ data, viewMode, coverStyle = 'original' }: T
           viewport={{ once: true }}
         >
           <SectionTitle
-            title="飯店資訊"
+            title={TOURS_LABELS.LABEL_8140}
             coverStyle={coverStyle}
             className="mb-12"
           />

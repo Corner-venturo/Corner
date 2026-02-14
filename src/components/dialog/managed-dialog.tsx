@@ -36,6 +36,7 @@ import { useState, useCallback, useRef, useEffect, ReactNode } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { AlertTriangle, Save, X } from 'lucide-react'
+import { DIALOG_LABELS } from './constants/labels'
 
 export interface ManagedDialogRenderProps {
   /**
@@ -321,7 +322,7 @@ export function ManagedDialog({
               {title}
               {isDirty && (
                 <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-status-warning-bg text-status-warning">
-                  未保存
+                  {DIALOG_LABELS.LABEL_5763}
                 </span>
               )}
             </DialogTitle>

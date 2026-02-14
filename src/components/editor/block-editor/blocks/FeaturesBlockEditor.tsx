@@ -43,7 +43,7 @@ export function FeaturesBlockEditor({ data, onChange }: FeaturesBlockEditorProps
     <div className="space-y-3">
       {/* 風格選擇 */}
       <div>
-        <label className="block text-xs font-medium text-morandi-primary mb-1">顯示風格</label>
+        <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_9055}</label>
         <Select
           value={data.featuresStyle || 'original'}
           onValueChange={(value) => onChange({ featuresStyle: value as FeaturesStyleType })}
@@ -52,9 +52,9 @@ export function FeaturesBlockEditor({ data, onChange }: FeaturesBlockEditorProps
             <SelectValue placeholder={COMP_EDITOR_LABELS.選擇風格} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="original">經典莫蘭迪</SelectItem>
-            <SelectItem value="luxury">奢華質感</SelectItem>
-            <SelectItem value="collage">互動拼貼</SelectItem>
+            <SelectItem value="original">{COMP_EDITOR_LABELS.LABEL_6735}</SelectItem>
+            <SelectItem value="luxury">{COMP_EDITOR_LABELS.LABEL_4759}</SelectItem>
+            <SelectItem value="collage">{COMP_EDITOR_LABELS.LABEL_6627}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -112,7 +112,7 @@ export function FeaturesBlockEditor({ data, onChange }: FeaturesBlockEditorProps
         onClick={addFeature}
       >
         <Plus size={14} />
-        新增特色
+        {COMP_EDITOR_LABELS.ADD_6408}
       </Button>
     </div>
   )

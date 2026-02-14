@@ -36,4 +36,6 @@ export const FITNESS_LABELS = {
   FINISH_WORKOUT: '完成訓練',
   PICK_EXERCISE_TITLE: '選擇訓練動作',
   FILTER_ALL: '全部',
+
+  LABEL_350: '次',
 }

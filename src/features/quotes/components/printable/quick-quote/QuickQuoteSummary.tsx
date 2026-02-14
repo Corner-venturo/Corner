@@ -6,6 +6,7 @@
 
 import React from 'react'
 import { MORANDI_COLORS } from '../shared/print-styles'
+import { QUICK_QUOTE_LABELS } from './constants/labels'
 
 interface QuickQuoteSummaryProps {
   totalAmount: number
@@ -32,7 +33,7 @@ export const QuickQuoteSummary: React.FC<QuickQuoteSummaryProps> = ({
         >
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold" style={{ color: MORANDI_COLORS.brown }}>
-              應收金額
+              {QUICK_QUOTE_LABELS.LABEL_6261}
             </span>
             <span className="text-xl font-bold" style={{ color: MORANDI_COLORS.brown }}>
               NT$ {totalAmount.toLocaleString()}
@@ -47,7 +48,7 @@ export const QuickQuoteSummary: React.FC<QuickQuoteSummaryProps> = ({
           />
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold" style={{ color: MORANDI_COLORS.brown }}>
-              已收金額
+              {QUICK_QUOTE_LABELS.LABEL_8143}
             </span>
             <span className="text-xl font-bold" style={{ color: MORANDI_COLORS.brown }}>
               NT$ {(receivedAmount || 0).toLocaleString()}
@@ -62,7 +63,7 @@ export const QuickQuoteSummary: React.FC<QuickQuoteSummaryProps> = ({
           />
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold" style={{ color: MORANDI_COLORS.brown }}>
-              應收餘額
+              {QUICK_QUOTE_LABELS.LABEL_2302}
             </span>
             <span
               className="text-xl font-bold"

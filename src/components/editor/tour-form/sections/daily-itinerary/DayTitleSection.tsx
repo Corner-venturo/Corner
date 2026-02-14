@@ -32,7 +32,7 @@ export function DayTitleSection({
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <label className="block text-sm font-medium text-morandi-primary">行程標題</label>
+        <label className="block text-sm font-medium text-morandi-primary">{COMP_EDITOR_LABELS.行程標題}</label>
         <div className="flex gap-1">
           <button
             type="button"

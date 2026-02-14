@@ -99,7 +99,7 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ListChecks size={20} />
-            批次開立發票
+            {BATCH_INVOICE_DIALOG_LABELS.LABEL_2624}
           </DialogTitle>
         </DialogHeader>
 
@@ -107,7 +107,7 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
           {/* 團別選擇 - 表格式 */}
           <div className="border rounded-lg overflow-hidden">
             <div className="grid grid-cols-12 gap-2 px-3 py-2 items-center">
-              <div className="col-span-2 text-sm text-muted-foreground">團別 *</div>
+              <div className="col-span-2 text-sm text-muted-foreground">{BATCH_INVOICE_DIALOG_LABELS.LABEL_9860}</div>
               <div className="col-span-10">
                 <Combobox
                   options={tours}
@@ -137,16 +137,16 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
                     disabled={invoiceableOrders.filter(o => o.invoiceable_amount > 0).length === 0}
                   />
                 </div>
-                <div className="col-span-4">訂單編號</div>
-                <div className="col-span-4">聯絡人</div>
-                <div className="col-span-3 text-right">可開金額</div>
+                <div className="col-span-4">{BATCH_INVOICE_DIALOG_LABELS.LABEL_7017}</div>
+                <div className="col-span-4">{BATCH_INVOICE_DIALOG_LABELS.LABEL_7009}</div>
+                <div className="col-span-3 text-right">{BATCH_INVOICE_DIALOG_LABELS.LABEL_491}</div>
               </div>
 
               {/* 表格內容 */}
               <div className="max-h-[280px] overflow-y-auto divide-y">
                 {invoiceableOrders.length === 0 ? (
                   <div className="p-4 text-center text-sm text-morandi-secondary">
-                    此團沒有可開發票的訂單
+                    {BATCH_INVOICE_DIALOG_LABELS.NOT_FOUND_8100}
                   </div>
                 ) : (
                   invoiceableOrders.map(order => (
@@ -189,10 +189,10 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
           {selectedOrderIds.length > 0 && (
             <div className="flex justify-between items-center p-4 bg-morandi-container/40 rounded-lg">
               <div>
-                已選 <span className="font-bold">{selectedOrderIds.length}</span> 筆訂單
+                已選 <span className="font-bold">{selectedOrderIds.length}</span> {BATCH_INVOICE_DIALOG_LABELS.LABEL_3592}
               </div>
               <div className="text-right">
-                <div className="text-sm text-morandi-secondary">合計可開金額</div>
+                <div className="text-sm text-morandi-secondary">{BATCH_INVOICE_DIALOG_LABELS.LABEL_3678}</div>
                 <div className="text-xl font-bold text-morandi-gold">
                   <CurrencyCell amount={totalAmount} />
                 </div>
@@ -204,11 +204,11 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
           {selectedOrderIds.length > 0 && (
             <div className="border rounded-lg overflow-hidden">
               <div className="px-3 py-2 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
-                發票資訊
+                {BATCH_INVOICE_DIALOG_LABELS.LABEL_8775}
               </div>
               <div className="divide-y">
                 <div className="grid grid-cols-12 gap-2 px-3 py-2 items-center">
-                  <div className="col-span-2 text-sm text-muted-foreground">名稱 *</div>
+                  <div className="col-span-2 text-sm text-muted-foreground">{BATCH_INVOICE_DIALOG_LABELS.LABEL_7408}</div>
                   <div className="col-span-4">
                     <Input
                       value={buyerName}
@@ -217,7 +217,7 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
                       className="h-8"
                     />
                   </div>
-                  <div className="col-span-2 text-sm text-muted-foreground text-right">統編</div>
+                  <div className="col-span-2 text-sm text-muted-foreground text-right">{BATCH_INVOICE_DIALOG_LABELS.LABEL_3729}</div>
                   <div className="col-span-4">
                     <Input
                       value={buyerUBN}
@@ -239,7 +239,7 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
                       className="h-8"
                     />
                   </div>
-                  <div className="col-span-2 text-sm text-muted-foreground text-right">日期 *</div>
+                  <div className="col-span-2 text-sm text-muted-foreground text-right">{BATCH_INVOICE_DIALOG_LABELS.LABEL_3494}</div>
                   <div className="col-span-4">
                     <DatePicker value={invoiceDate} onChange={setInvoiceDate} />
                   </div>
@@ -252,7 +252,7 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} className="gap-2">
             <X size={16} />
-            取消
+            {BATCH_INVOICE_DIALOG_LABELS.CANCEL}
           </Button>
           <Button
             onClick={handleBatchIssue}

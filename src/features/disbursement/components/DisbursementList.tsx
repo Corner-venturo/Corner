@@ -15,6 +15,7 @@ import { PaymentRequestItem } from '@/stores/types'
 import { usePendingColumns, useCurrentOrderColumns, useHistoryColumns } from './DisbursementColumns'
 import { cn } from '@/lib/utils'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
+import { DISBURSEMENT_LABELS } from './constants/labels'
 
 interface PendingListProps {
   data: PaymentRequest[]
@@ -50,7 +51,7 @@ export function PendingList({
               onClick={onAddToDisbursement}
               className="bg-morandi-gold hover:bg-morandi-gold-hover"
             >
-              加入本週出帳
+              {DISBURSEMENT_LABELS.LABEL_3476}
             </Button>
           </div>
         </div>
@@ -127,12 +128,12 @@ export function CurrentOrderList({
             className="text-morandi-gold border-morandi-gold hover:bg-morandi-gold/10"
           >
             <FileText size={16} className="mr-2" />
-            列印 PDF
+            {DISBURSEMENT_LABELS.PRINT_1814}
           </Button>
           {currentOrder.status === 'pending' && (
             <Button onClick={onConfirm} className="bg-morandi-green hover:bg-morandi-green/90 gap-2">
               <Check size={16} />
-              確認出帳
+              {DISBURSEMENT_LABELS.CONFIRM_5440}
             </Button>
           )}
         </div>
@@ -158,10 +159,10 @@ export function EmptyCurrentOrder({ onNavigate }: EmptyCurrentOrderProps) {
   return (
     <div className="text-center py-12">
       <Calendar className="h-16 w-16 text-morandi-secondary mx-auto mb-4 opacity-50" />
-      <h3 className="text-lg font-medium text-morandi-primary mb-2">本週尚無出帳計劃</h3>
-      <p className="text-morandi-secondary mb-4">請先到「待出帳」頁面勾選需要出帳的請款單</p>
+      <h3 className="text-lg font-medium text-morandi-primary mb-2">{DISBURSEMENT_LABELS.EMPTY_8471}</h3>
+      <p className="text-morandi-secondary mb-4">{DISBURSEMENT_LABELS.LABEL_2549}</p>
       <Button onClick={onNavigate} variant="outline" className="gap-2">
-        前往選擇請款單
+        {DISBURSEMENT_LABELS.SELECT_3950}
         <ArrowRight size={16} />
       </Button>
     </div>
@@ -240,8 +241,8 @@ export function SupplierGroupList({ groups, searchTerm }: SupplierGroupListProps
     return (
       <div className="text-center py-12">
         <FileText className="h-16 w-16 text-morandi-secondary mx-auto mb-4 opacity-50" />
-        <h3 className="text-lg font-medium text-morandi-primary mb-2">無符合條件的供應商</h3>
-        <p className="text-morandi-secondary">目前沒有待出帳的請款項目</p>
+        <h3 className="text-lg font-medium text-morandi-primary mb-2">{DISBURSEMENT_LABELS.LABEL_5620}</h3>
+        <p className="text-morandi-secondary">{DISBURSEMENT_LABELS.NOT_FOUND_6490}</p>
       </div>
     )
   }
@@ -298,13 +299,13 @@ export function SupplierGroupList({ groups, searchTerm }: SupplierGroupListProps
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-morandi-background/20">
-                      <th className="text-left py-2 px-4 text-morandi-muted font-medium">請款單號</th>
-                      <th className="text-left py-2 px-4 text-morandi-muted font-medium">團號</th>
-                      <th className="text-left py-2 px-4 text-morandi-muted font-medium">類別</th>
-                      <th className="text-left py-2 px-4 text-morandi-muted font-medium">說明</th>
-                      <th className="text-right py-2 px-4 text-morandi-muted font-medium">單價</th>
-                      <th className="text-right py-2 px-4 text-morandi-muted font-medium">數量</th>
-                      <th className="text-right py-2 px-4 text-morandi-muted font-medium">小計</th>
+                      <th className="text-left py-2 px-4 text-morandi-muted font-medium">{DISBURSEMENT_LABELS.LABEL_9308}</th>
+                      <th className="text-left py-2 px-4 text-morandi-muted font-medium">{DISBURSEMENT_LABELS.LABEL_9750}</th>
+                      <th className="text-left py-2 px-4 text-morandi-muted font-medium">{DISBURSEMENT_LABELS.LABEL_2946}</th>
+                      <th className="text-left py-2 px-4 text-morandi-muted font-medium">{DISBURSEMENT_LABELS.LABEL_5591}</th>
+                      <th className="text-right py-2 px-4 text-morandi-muted font-medium">{DISBURSEMENT_LABELS.LABEL_9413}</th>
+                      <th className="text-right py-2 px-4 text-morandi-muted font-medium">{DISBURSEMENT_LABELS.QUANTITY}</th>
+                      <th className="text-right py-2 px-4 text-morandi-muted font-medium">{DISBURSEMENT_LABELS.LABEL_832}</th>
                     </tr>
                   </thead>
                   <tbody>

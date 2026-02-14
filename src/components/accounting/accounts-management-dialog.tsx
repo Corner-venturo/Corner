@@ -17,6 +17,7 @@ import {
 import { cn } from '@/lib/utils'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { CurrencyCell } from '@/components/table-cells'
+import { ACCOUNTING_LABELS } from './constants/labels'
 
 interface AccountsManagementDialogProps {
   isOpen: boolean
@@ -58,13 +59,13 @@ export function AccountsManagementDialog({
     <FormDialog
       open={isOpen}
       onOpenChange={open => !open && onClose()}
-      title="帳戶管理"
+      title={ACCOUNTING_LABELS.MANAGE_6235}
       onCancel={onClose}
       maxWidth="lg"
     >
       {/* 總資產卡片 */}
       <div className="mb-6 p-4 rounded-xl bg-gradient-to-br from-[#F9F8F6] to-[#F9F8F6]">
-        <div className="text-sm text-[#8C8C8C] mb-1">總資產</div>
+        <div className="text-sm text-[#8C8C8C] mb-1">{ACCOUNTING_LABELS.TOTAL_9058}</div>
         <div className="text-3xl font-bold text-[#333333]"><CurrencyCell amount={totalBalance} /></div>
         <div className="text-xs text-[#8C8C8C] mt-2">{accounts.length} 個帳戶</div>
       </div>
@@ -73,7 +74,7 @@ export function AccountsManagementDialog({
       {accounts.length === 0 ? (
         <div className="text-center py-12">
           <Wallet size={48} className="mx-auto mb-3 text-[#8C8C8C]" />
-          <div className="text-[#8C8C8C] mb-4">還沒有帳戶</div>
+          <div className="text-[#8C8C8C] mb-4">{ACCOUNTING_LABELS.NOT_FOUND_1446}</div>
           <Button
             onClick={() => {
               onClose()
@@ -82,7 +83,7 @@ export function AccountsManagementDialog({
             className="bg-[#B8A99A] hover:bg-[#9E8C7A] text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
-            新增第一個帳戶
+            {ACCOUNTING_LABELS.ADD_3126}
           </Button>
         </div>
       ) : (
@@ -144,7 +145,7 @@ export function AccountsManagementDialog({
                     {account.type === 'credit' && account.available_credit !== undefined && (
                       <div className="mt-3">
                         <div className="flex items-center justify-between text-xs text-[#8C8C8C] mb-1">
-                          <span>可用額度</span>
+                          <span>{ACCOUNTING_LABELS.LABEL_3476}</span>
                           <span><CurrencyCell amount={account.available_credit} /></span>
                         </div>
                         <div className="h-1.5 bg-[#F9F8F6] rounded-full overflow-hidden">
@@ -189,7 +190,7 @@ export function AccountsManagementDialog({
             className="w-full border-[#E8E4E0] hover:border-[#B8A99A] hover:bg-[#F9F8F6]"
           >
             <Plus className="h-4 w-4 mr-2" />
-            新增帳戶
+            {ACCOUNTING_LABELS.ADD_236}
           </Button>
         </div>
       )}

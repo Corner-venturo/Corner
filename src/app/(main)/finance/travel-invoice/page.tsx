@@ -17,6 +17,7 @@ import { StatusCell, DateCell, CurrencyCell, ActionCell } from '@/components/tab
 import { InvoiceDialog } from '@/components/finance/invoice-dialog'
 import { TravelInvoiceDetailDialog } from './components/TravelInvoiceDetailDialog'
 import { BatchInvoiceDialog } from '@/features/finance/travel-invoice/components/BatchInvoiceDialog'
+import { TRAVEL_INVOICE_LABELS } from './constants/labels'
 
 // 狀態標籤定義
 const statusTabs = [
@@ -190,7 +191,7 @@ export default function TravelInvoicePage() {
     return (
       <div className="h-full flex flex-col">
         <ResponsiveHeader
-          title="代轉發票管理"
+          title={TRAVEL_INVOICE_LABELS.MANAGE_1246}
           icon={FileText}
         />
         <ContentContainer>
@@ -223,7 +224,7 @@ export default function TravelInvoicePage() {
             className="gap-2"
           >
             <ListChecks size={16} />
-            批次開立
+            {TRAVEL_INVOICE_LABELS.LABEL_1677}
           </Button>
         }
       />

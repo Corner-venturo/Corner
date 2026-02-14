@@ -9,6 +9,7 @@ import React, { useMemo } from 'react'
 import { Clock, MapPin, Coffee, UtensilsCrossed, Moon, Building2, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { TimelineItineraryData, TimelineDay, TimelineAttraction } from '@/types/timeline-itinerary.types'
+import { DOCUMENTS_LABELS } from './constants/labels'
 
 interface TimelineItineraryPreviewProps {
   data: TimelineItineraryData | null
@@ -126,7 +127,7 @@ export function TimelineItineraryPreview({ data, loading, className }: TimelineI
     return (
       <div className={cn('text-center py-6 text-sm text-morandi-secondary', className)}>
         <Clock className="w-8 h-8 mx-auto mb-2 text-morandi-muted" />
-        <p>尚無行程資料</p>
+        <p>{DOCUMENTS_LABELS.EMPTY_939}</p>
       </div>
     )
   }

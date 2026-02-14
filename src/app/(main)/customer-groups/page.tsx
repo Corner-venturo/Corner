@@ -374,7 +374,7 @@ export default function CustomerGroupsPage() {
                   <button
                     onClick={() => handleRemoveMember(member)}
                     className="text-morandi-muted hover:text-morandi-red transition-colors"
-                    title="移除成員"
+                    title={CG_LABELS.LABEL_2634}
                   >
                     <Trash2 size={14} />
                   </button>
@@ -403,7 +403,7 @@ export default function CustomerGroupsPage() {
   return (
     <>
       <ListPageLayout
-        title="客戶群組"
+        title={CG_LABELS.LABEL_6845}
         icon={Users}
         breadcrumb={[
           { label: '首頁', href: '/' },
@@ -434,7 +434,7 @@ export default function CustomerGroupsPage() {
       <FormDialog
         open={addDialogOpen}
         onOpenChange={setAddDialogOpen}
-        title="新增客戶群組"
+        title={CG_LABELS.ADD_9532}
         onSubmit={handleAddGroup}
         submitLabel="建立"
         maxWidth="md"
@@ -447,12 +447,12 @@ export default function CustomerGroupsPage() {
             <Input
               value={formData.name}
               onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder="例如：王家旅遊團"
+              placeholder={CG_LABELS.EXAMPLE_933}
             />
           </div>
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              群組類型
+              {CG_LABELS.LABEL_5116}
             </label>
             <Combobox
               value={formData.type}
@@ -463,7 +463,7 @@ export default function CustomerGroupsPage() {
                 value,
                 label,
               }))}
-              placeholder="選擇類型..."
+              placeholder={CG_LABELS.SELECT_7211}
             />
           </div>
           <div>
@@ -471,7 +471,7 @@ export default function CustomerGroupsPage() {
             <Input
               value={formData.notes}
               onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-              placeholder="選填"
+              placeholder={CG_LABELS.OPTIONAL}
             />
           </div>
         </div>
@@ -481,7 +481,7 @@ export default function CustomerGroupsPage() {
       <FormDialog
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
-        title="編輯客戶群組"
+        title={CG_LABELS.EDIT_6630}
         onSubmit={handleEditGroup}
         submitLabel="儲存"
         maxWidth="md"
@@ -545,14 +545,14 @@ export default function CustomerGroupsPage() {
                 value: c.id,
                 label: `${c.name}${c.phone ? ` (${c.phone})` : ''}`,
               }))}
-              placeholder="搜尋並選擇客戶..."
+              placeholder={CG_LABELS.SEARCH_1890}
               showSearchIcon={true}
               emptyMessage="找不到客戶"
             />
           </div>
           {availableCustomers.length === 0 && (
             <p className="text-sm text-morandi-secondary">
-              所有客戶都已加入此群組，或目前沒有可用的客戶。
+              {CG_LABELS.NOT_FOUND_6103}
             </p>
           )}
         </div>

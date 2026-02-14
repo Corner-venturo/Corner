@@ -111,7 +111,7 @@ export function ShareAdvanceDialog({
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent level={1} className="max-w-[800px] max-h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader className="pb-3 border-b border-morandi-gold/20">
-          <DialogTitle>記錄代墊項目</DialogTitle>
+          <DialogTitle>{COMP_WORKSPACE_LABELS.LABEL_9529}</DialogTitle>
         </DialogHeader>
 
         {/* 表格區域 */}
@@ -120,16 +120,16 @@ export function ShareAdvanceDialog({
             <thead className="sticky top-0 bg-card border-b border-morandi-gold/20">
               <tr>
                 <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary w-[30%]">
-                  品項
+                  {COMP_WORKSPACE_LABELS.LABEL_2170}
                 </th>
                 <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary w-[25%]">
-                  說明
+                  {COMP_WORKSPACE_LABELS.說明}
                 </th>
                 <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary w-[20%]">
-                  金額
+                  {COMP_WORKSPACE_LABELS.AMOUNT}
                 </th>
                 <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary w-[20%]">
-                  代墊人
+                  {COMP_WORKSPACE_LABELS.LABEL_7536}
                 </th>
                 <th className="w-[5%] py-2.5 px-4 text-xs"></th>
               </tr>
@@ -199,24 +199,24 @@ export function ShareAdvanceDialog({
             className="flex items-center gap-2 mt-3 text-sm text-morandi-gold hover:text-morandi-primary transition-colors"
           >
             <Plus size={16} />
-            <span>新增列</span>
+            <span>{COMP_WORKSPACE_LABELS.ADD_9867}</span>
           </button>
         </div>
 
         {/* 底部：總計與操作按鈕 */}
         <DialogFooter className="pt-3 border-t border-morandi-gold/20 flex-col gap-3">
           <div className="flex items-center justify-between w-full">
-            <span className="text-sm text-morandi-secondary">總計金額：</span>
+            <span className="text-sm text-morandi-secondary">{COMP_WORKSPACE_LABELS.TOTAL_7218}</span>
             <CurrencyCell amount={totalAmount} className="text-lg font-semibold text-morandi-primary" />
           </div>
           <div className="flex gap-2 justify-end w-full">
             <button className="btn-morandi-secondary !py-2 !px-4 flex items-center gap-2" onClick={onClose}>
               <X size={16} />
-              取消
+              {COMP_WORKSPACE_LABELS.CANCEL}
             </button>
             <button className="btn-morandi-primary !py-2 !px-4 flex items-center gap-2" onClick={handleShare}>
               <Check size={16} />
-              分享到頻道
+              {COMP_WORKSPACE_LABELS.LABEL_903}
             </button>
           </div>
         </DialogFooter>

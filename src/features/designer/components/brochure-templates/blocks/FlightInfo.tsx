@@ -3,6 +3,7 @@
  */
 import { Text } from '../primitives/Text'
 import type { Theme, FlightInfo as FlightInfoType } from '../types'
+import { BLOCKS_LABELS } from './constants/labels'
 
 interface FlightInfoProps {
   theme: Theme
@@ -22,7 +23,7 @@ export function FlightInfo({
     return (
       <div>
         <Text theme={theme} variant="caption" color="accent" style={{ fontWeight: 600, marginBottom: '2mm' }}>
-          航班資訊 FLIGHT
+          {BLOCKS_LABELS.LABEL_1719}
         </Text>
         {outbound && (
           <Text theme={theme} variant="caption" style={{ marginBottom: '2mm' }}>

@@ -13,6 +13,7 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
 import * as fabric from 'fabric'
 import { cn } from '@/lib/utils'
+import { DESIGNER_LABELS } from './constants/labels'
 
 // ============================================
 // Types
@@ -199,7 +200,7 @@ function Ruler({
           : { top: RULER_OFFSET }
       }
       onMouseDown={onDragStart}
-      title="拖曳創建參考線"
+      title={DESIGNER_LABELS.LABEL_9426}
     />
   )
 }
@@ -283,7 +284,7 @@ function GuideLine({
         onMouseDown={handleMouseDown}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
-        title="拖曳移動"
+        title={DESIGNER_LABELS.LABEL_4070}
       >
         {/* 實際的線條 */}
         <div
@@ -321,7 +322,7 @@ function GuideLine({
             top: '50%',
             transform: 'translateY(-50%)',
           }}
-          title="刪除參考線"
+          title={DESIGNER_LABELS.DELETE_3163}
         >
           ×
         </button>

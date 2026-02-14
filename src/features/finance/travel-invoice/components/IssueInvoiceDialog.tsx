@@ -155,7 +155,7 @@ export function IssueInvoiceDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText size={20} />
-            開立發票
+            {ISSUE_INVOICE_DIALOG_LABELS.開立發票}
           </DialogTitle>
         </DialogHeader>
 
@@ -231,7 +231,7 @@ export function IssueInvoiceDialog({
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>買受人名稱 *</Label>
+                <Label>{ISSUE_INVOICE_DIALOG_LABELS.LABEL_7283}</Label>
                 <Input
                   value={buyerName}
                   onChange={e => setBuyerName(e.target.value)}
@@ -239,7 +239,7 @@ export function IssueInvoiceDialog({
                 />
               </div>
               <div>
-                <Label>統一編號</Label>
+                <Label>{ISSUE_INVOICE_DIALOG_LABELS.LABEL_8296}</Label>
                 <Input
                   value={buyerUBN}
                   onChange={e => setBuyerUBN(e.target.value)}
@@ -260,7 +260,7 @@ export function IssueInvoiceDialog({
             </div>
 
             <div>
-              <Label>開立日期 *</Label>
+              <Label>{ISSUE_INVOICE_DIALOG_LABELS.LABEL_3957}</Label>
               <DatePicker value={invoiceDate} onChange={setInvoiceDate} />
             </div>
           </div>
@@ -269,7 +269,7 @@ export function IssueInvoiceDialog({
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} className="gap-2">
             <X size={16} />
-            取消
+            {ISSUE_INVOICE_DIALOG_LABELS.CANCEL}
           </Button>
           <Button
             onClick={handleIssue}

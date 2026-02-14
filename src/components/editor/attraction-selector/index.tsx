@@ -16,6 +16,7 @@ import { Attraction } from '@/features/attractions/types'
 import { AttractionSearchBar } from './AttractionSearchBar'
 import { AttractionList } from './AttractionList'
 import { useAttractionSearch } from './hooks/useAttractionSearch'
+import { ATTRACTION_SELECTOR_LABELS } from './constants/labels'
 
 // 使用 Next.js dynamic import 並禁用 SSR
 const AttractionsMap = dynamic(
@@ -171,7 +172,7 @@ export function AttractionSelector({
         <DialogHeader className="px-6 py-4 border-b bg-gradient-to-r from-morandi-gold/10 to-transparent">
           <DialogTitle className="flex items-center gap-2 text-lg">
             <MapPin className="text-morandi-gold" size={22} />
-            選擇景點
+            {ATTRACTION_SELECTOR_LABELS.SELECT_6272}
           </DialogTitle>
         </DialogHeader>
 
@@ -230,9 +231,9 @@ export function AttractionSelector({
               // 初始提示畫面
               <div className="flex-1 flex flex-col items-center justify-center text-morandi-secondary p-8">
                 <Map size={56} className="mb-4 opacity-30" />
-                <p className="text-lg font-medium text-morandi-primary">查看附近景點</p>
+                <p className="text-lg font-medium text-morandi-primary">{ATTRACTION_SELECTOR_LABELS.LABEL_5582}</p>
                 <p className="text-sm mt-2 text-center max-w-xs">
-                  點擊景點右側的 <Map size={14} className="inline mx-1" /> 按鈕，即可在地圖上查看該景點周圍 5 公里內的其他景點
+                  點擊景點右側的 <Map size={14} className="inline mx-1" /> {ATTRACTION_SELECTOR_LABELS.LABEL_1526}
                 </p>
               </div>
             ) : (
@@ -272,7 +273,7 @@ export function AttractionSelector({
 
         <DialogFooter className="px-6 py-3 border-t bg-muted/50">
           <Button variant="outline" onClick={handleCancel} className="rounded-xl">
-            取消
+            {ATTRACTION_SELECTOR_LABELS.CANCEL}
           </Button>
           <Button
             onClick={handleConfirm}

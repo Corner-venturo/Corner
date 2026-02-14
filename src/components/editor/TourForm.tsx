@@ -317,7 +317,7 @@ export function TourForm({ data, onChange, quoteTierPricings, hasLinkedQuote }: 
                 <Star size={20} className="text-white" />
               </div>
               <div className="text-left flex-1">
-                <h2 className="text-base font-bold text-morandi-primary">特色行程</h2>
+                <h2 className="text-base font-bold text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_9157}</h2>
                 <p className="text-xs text-morandi-secondary">
                   {data.showFeatures !== false ? COMP_EDITOR_LABELS.已啟用 : COMP_EDITOR_LABELS.未啟用}
                 </p>

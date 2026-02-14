@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { ImageIcon, X } from 'lucide-react'
 import type { EditingMember } from '../hooks/useMemberView'
+import { MEMBERS_LABELS } from './constants/labels'
 
 interface MemberInfoCardProps {
   open: boolean
@@ -44,34 +45,34 @@ export function MemberInfoCard({ open, member, onClose }: MemberInfoCardProps) {
             </div>
           ) : (
             <div className="flex items-center justify-center h-64 bg-morandi-background rounded-lg">
-              <p className="text-morandi-secondary">沒有護照照片</p>
+              <p className="text-morandi-secondary">{MEMBERS_LABELS.NOT_FOUND_7442}</p>
             </div>
           )}
         </div>
 
         <div className="grid grid-cols-2 gap-4 text-sm bg-morandi-background p-4 rounded-lg">
           <div>
-            <span className="font-medium text-morandi-secondary">姓名：</span>
+            <span className="font-medium text-morandi-secondary">{MEMBERS_LABELS.LABEL_883}</span>
             <span>{member.name || member.chinese_name}</span>
           </div>
           <div>
-            <span className="font-medium text-morandi-secondary">英文姓名：</span>
+            <span className="font-medium text-morandi-secondary">{MEMBERS_LABELS.LABEL_8345}</span>
             <span>{member.name_en || member.passport_name || '-'}</span>
           </div>
           <div>
-            <span className="font-medium text-morandi-secondary">護照號碼：</span>
+            <span className="font-medium text-morandi-secondary">{MEMBERS_LABELS.LABEL_9593}</span>
             <span>{member.passport_number || '-'}</span>
           </div>
           <div>
-            <span className="font-medium text-morandi-secondary">護照效期：</span>
+            <span className="font-medium text-morandi-secondary">{MEMBERS_LABELS.LABEL_3311}</span>
             <span>{member.passport_expiry || '-'}</span>
           </div>
           <div>
-            <span className="font-medium text-morandi-secondary">生日：</span>
+            <span className="font-medium text-morandi-secondary">{MEMBERS_LABELS.LABEL_94}</span>
             <span>{member.birthday || member.birth_date || '-'}</span>
           </div>
           <div>
-            <span className="font-medium text-morandi-secondary">性別：</span>
+            <span className="font-medium text-morandi-secondary">{MEMBERS_LABELS.LABEL_8424}</span>
             <span>
               {member.gender === 'M'
                 ? '男'

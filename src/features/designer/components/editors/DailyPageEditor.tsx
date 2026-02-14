@@ -23,6 +23,7 @@ import {
   GripVertical,
 } from 'lucide-react'
 import type { DailyDetailData, TimelineItem } from '../../templates/definitions/types'
+import { DESIGNER_LABELS } from './constants/labels'
 
 interface DailyPageEditorProps {
   templateData: Record<string, unknown> | null
@@ -141,7 +142,7 @@ export function DailyPageEditor({
       <div className="space-y-2">
         <Label className="text-xs flex items-center gap-1.5">
           <ImageIcon size={12} />
-          當日封面圖片
+          {DESIGNER_LABELS.LABEL_470}
         </Label>
         {currentDay?.coverImage ? (
           <div className="space-y-2">
@@ -161,7 +162,7 @@ export function DailyPageEditor({
                 onClick={onAdjustCoverPosition}
               >
                 <Move size={12} />
-                調整位置
+                {DESIGNER_LABELS.LABEL_9042}
               </Button>
               <Button
                 variant="outline"
@@ -170,7 +171,7 @@ export function DailyPageEditor({
                 onClick={onUploadCoverImage}
               >
                 <Upload size={12} />
-                更換
+                {DESIGNER_LABELS.LABEL_9721}
               </Button>
             </div>
           </div>
@@ -181,7 +182,7 @@ export function DailyPageEditor({
             onClick={onUploadCoverImage}
           >
             <Upload size={14} />
-            上傳當日封面
+            {DESIGNER_LABELS.UPLOADING_5969}
           </Button>
         )}
       </div>
@@ -190,12 +191,12 @@ export function DailyPageEditor({
       <div className="space-y-1.5">
         <Label className="text-xs flex items-center gap-1.5">
           <FileText size={12} />
-          當日標題
+          {DESIGNER_LABELS.LABEL_5240}
         </Label>
         <Input
           value={currentDay?.title || ''}
           onChange={(e) => updateDailyDetail('title', e.target.value)}
-          placeholder="輸入當日標題..."
+          placeholder={DESIGNER_LABELS.LABEL_2409}
           className="h-8 text-sm"
         />
       </div>
@@ -204,7 +205,7 @@ export function DailyPageEditor({
       <div className="space-y-1.5">
         <Label className="text-xs flex items-center gap-1.5">
           <Calendar size={12} />
-          日期
+          {DESIGNER_LABELS.DATE}
         </Label>
         <Input
           type="date"
@@ -219,7 +220,7 @@ export function DailyPageEditor({
         <div className="flex items-center justify-between">
           <Label className="text-xs flex items-center gap-1.5">
             <Clock size={12} />
-            時間軸
+            {DESIGNER_LABELS.LABEL_6774}
           </Label>
           <Button
             variant="ghost"
@@ -228,7 +229,7 @@ export function DailyPageEditor({
             className="h-6 px-2 text-xs gap-1"
           >
             <Plus size={12} />
-            新增
+            {DESIGNER_LABELS.ADD}
           </Button>
         </div>
 
@@ -264,7 +265,7 @@ export function DailyPageEditor({
                 <Input
                   value={item.activity || ''}
                   onChange={(e) => updateTimelineItem(idx, 'activity', e.target.value)}
-                  placeholder="活動內容..."
+                  placeholder={DESIGNER_LABELS.LABEL_4055}
                   className="flex-1 h-7 text-xs"
                 />
                 <button
@@ -276,7 +277,7 @@ export function DailyPageEditor({
                       ? 'text-morandi-gold bg-morandi-gold/10'
                       : 'text-morandi-muted hover:text-morandi-gold hover:bg-morandi-gold/10'
                   )}
-                  title="標記為重點"
+                  title={DESIGNER_LABELS.LABEL_3103}
                 >
                   <Star size={12} />
                 </button>
@@ -293,7 +294,7 @@ export function DailyPageEditor({
 
           {(!currentDay?.timeline || currentDay.timeline.length === 0) && (
             <p className="text-xs text-morandi-secondary text-center py-4">
-              尚未新增時間軸項目
+              {DESIGNER_LABELS.ADD_7759}
             </p>
           )}
         </div>
@@ -303,33 +304,33 @@ export function DailyPageEditor({
       <div className="space-y-2">
         <Label className="text-xs flex items-center gap-1.5">
           <Utensils size={12} />
-          餐食
+          {DESIGNER_LABELS.LABEL_6020}
         </Label>
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-morandi-secondary w-8">早餐</span>
+            <span className="text-[10px] text-morandi-secondary w-8">{DESIGNER_LABELS.LABEL_1347}</span>
             <Input
               value={currentDay?.meals?.breakfast || ''}
               onChange={(e) => updateDailyDetail('meals.breakfast', e.target.value)}
-              placeholder="早餐..."
+              placeholder={DESIGNER_LABELS.LABEL_5857}
               className="flex-1 h-7 text-xs"
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-morandi-secondary w-8">午餐</span>
+            <span className="text-[10px] text-morandi-secondary w-8">{DESIGNER_LABELS.LABEL_8515}</span>
             <Input
               value={currentDay?.meals?.lunch || ''}
               onChange={(e) => updateDailyDetail('meals.lunch', e.target.value)}
-              placeholder="午餐..."
+              placeholder={DESIGNER_LABELS.LABEL_4196}
               className="flex-1 h-7 text-xs"
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-morandi-secondary w-8">晚餐</span>
+            <span className="text-[10px] text-morandi-secondary w-8">{DESIGNER_LABELS.LABEL_8227}</span>
             <Input
               value={currentDay?.meals?.dinner || ''}
               onChange={(e) => updateDailyDetail('meals.dinner', e.target.value)}
-              placeholder="晚餐..."
+              placeholder={DESIGNER_LABELS.LABEL_2282}
               className="flex-1 h-7 text-xs"
             />
           </div>

@@ -135,7 +135,7 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
     <div className="w-64 border-l border-border bg-card flex flex-col shrink-0">
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="font-medium text-morandi-primary">成員列表</h3>
+          <h3 className="font-medium text-morandi-primary">{COMP_WORKSPACE_LABELS.LABEL_2600}</h3>
           {canManageMembers && (
             <button
               onClick={() => setShowAddMemberDialog(true)}
@@ -168,7 +168,7 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
         {members.length === 0 ? (
           <div className="text-center text-morandi-secondary text-sm py-8">
             <User size={32} className="mx-auto mb-2 opacity-50" />
-            <p>此頻道目前沒有成員</p>
+            <p>{COMP_WORKSPACE_LABELS.NOT_FOUND_8544}</p>
           </div>
         ) : (
           <div className="space-y-1">
@@ -196,7 +196,7 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
       <Dialog open={showAddMemberDialog} onOpenChange={setShowAddMemberDialog}>
         <DialogContent level={1} className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-morandi-primary">新增成員到頻道</DialogTitle>
+            <DialogTitle className="text-morandi-primary">{COMP_WORKSPACE_LABELS.ADD_6814}</DialogTitle>
           </DialogHeader>
 
           {/* 搜尋框 */}
@@ -215,7 +215,7 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
             {availableEmployees.length === 0 ? (
               <div className="text-center text-morandi-secondary text-sm py-8">
                 <User size={32} className="mx-auto mb-2 opacity-50" />
-                <p>沒有可新增的員工</p>
+                <p>{COMP_WORKSPACE_LABELS.ADD_4689}</p>
               </div>
             ) : (
               <div className="space-y-1">
@@ -263,7 +263,7 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
                 className="gap-2"
               >
                 <X size={16} />
-                取消
+                {COMP_WORKSPACE_LABELS.CANCEL}
               </Button>
               <Button
                 onClick={handleAddMembers}

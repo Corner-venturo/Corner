@@ -108,10 +108,10 @@ export function ImportActivitiesDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <MapPin className="w-5 h-5 text-[var(--morandi-gold)]" />
-            匯入景點
+            {IMPORT_ACTIVITIES_DIALOG_LABELS.LABEL_1519}
           </DialogTitle>
           <DialogDescription>
-            從行程表選擇要匯入的景點
+            {IMPORT_ACTIVITIES_DIALOG_LABELS.SELECT_9050}
           </DialogDescription>
         </DialogHeader>
 
@@ -170,7 +170,7 @@ export function ImportActivitiesDialog({
               <div className="text-center py-8">
                 <MapPin className="w-10 h-10 text-[var(--morandi-secondary)]/30 mx-auto mb-3" />
                 <p className="text-sm text-[var(--morandi-secondary)]">
-                  行程表中沒有景點資料
+                  {IMPORT_ACTIVITIES_DIALOG_LABELS.NOT_FOUND_2956}
                 </p>
               </div>
             )}
@@ -180,7 +180,7 @@ export function ImportActivitiesDialog({
           <div className="flex gap-2 pt-2">
             <Button variant="outline" onClick={onClose} className="flex-1 gap-1">
               <X size={16} />
-              取消
+              {IMPORT_ACTIVITIES_DIALOG_LABELS.CANCEL}
             </Button>
             <Button
               onClick={handleImport}

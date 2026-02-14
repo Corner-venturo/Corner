@@ -33,6 +33,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { supabase } from '@/lib/supabase/client'
 import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
+import { SUPPLIER_LABELS } from './constants/labels'
 
 interface FinanceSummary {
   totalRevenue: number
@@ -168,7 +169,7 @@ export function SupplierFinancePage() {
   return (
     <div className="space-y-6">
       <ResponsiveHeader
-        title="財務報表"
+        title={SUPPLIER_LABELS.LABEL_8192}
         icon={LineChart}
       />
 
@@ -181,9 +182,9 @@ export function SupplierFinancePage() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="this_month">本月</SelectItem>
-              <SelectItem value="last_month">上月</SelectItem>
-              <SelectItem value="last_3_months">近三個月</SelectItem>
+              <SelectItem value="this_month">{SUPPLIER_LABELS.LABEL_4658}</SelectItem>
+              <SelectItem value="last_month">{SUPPLIER_LABELS.LABEL_4990}</SelectItem>
+              <SelectItem value="last_3_months">{SUPPLIER_LABELS.LABEL_9090}</SelectItem>
             </SelectContent>
           </Select>
           <span className="text-sm text-morandi-secondary">
@@ -193,7 +194,7 @@ export function SupplierFinancePage() {
 
         <Button variant="outline" size="sm" className="gap-2">
           <Download className="h-4 w-4" />
-          匯出報表
+          {SUPPLIER_LABELS.EXPORT_5502}
         </Button>
       </div>
 
@@ -202,7 +203,7 @@ export function SupplierFinancePage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-morandi-secondary">
-              總營收
+              {SUPPLIER_LABELS.TOTAL_1389}
             </CardTitle>
             <DollarSign className="h-4 w-4 text-morandi-gold" />
           </CardHeader>
@@ -219,7 +220,7 @@ export function SupplierFinancePage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-morandi-secondary">
-              待請款
+              {SUPPLIER_LABELS.LABEL_2454}
             </CardTitle>
             <Clock className="h-4 w-4 text-morandi-blue" />
           </CardHeader>
@@ -233,7 +234,7 @@ export function SupplierFinancePage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-morandi-secondary">
-              已收款
+              {SUPPLIER_LABELS.LABEL_5100}
             </CardTitle>
             <CheckCircle2 className="h-4 w-4 text-morandi-green" />
           </CardHeader>
@@ -247,7 +248,7 @@ export function SupplierFinancePage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-morandi-secondary">
-              收款率
+              {SUPPLIER_LABELS.LABEL_7764}
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-morandi-gold" />
           </CardHeader>
@@ -266,17 +267,17 @@ export function SupplierFinancePage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            請款明細
+            {SUPPLIER_LABELS.LABEL_9799}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="text-center py-8 text-morandi-secondary">
-              載入中...
+              {SUPPLIER_LABELS.LOADING_6912}
             </div>
           ) : payments.length === 0 ? (
             <div className="text-center py-8 text-morandi-secondary">
-              目前沒有請款記錄
+              {SUPPLIER_LABELS.NOT_FOUND_6711}
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -284,19 +285,19 @@ export function SupplierFinancePage() {
                 <thead>
                   <tr className="border-b">
                     <th className="text-left py-3 px-2 text-sm font-medium text-morandi-secondary">
-                      服務日期
+                      {SUPPLIER_LABELS.LABEL_6153}
                     </th>
                     <th className="text-left py-3 px-2 text-sm font-medium text-morandi-secondary">
-                      團號
+                      {SUPPLIER_LABELS.LABEL_9750}
                     </th>
                     <th className="text-left py-3 px-2 text-sm font-medium text-morandi-secondary">
-                      團名
+                      {SUPPLIER_LABELS.LABEL_4272}
                     </th>
                     <th className="text-right py-3 px-2 text-sm font-medium text-morandi-secondary">
-                      金額
+                      {SUPPLIER_LABELS.AMOUNT}
                     </th>
                     <th className="text-center py-3 px-2 text-sm font-medium text-morandi-secondary">
-                      狀態
+                      {SUPPLIER_LABELS.STATUS}
                     </th>
                   </tr>
                 </thead>

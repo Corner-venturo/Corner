@@ -7,6 +7,7 @@
 import React from 'react'
 import { QuickQuoteItem } from '@/types/quote.types'
 import { MORANDI_COLORS, TABLE_STYLES } from '../shared/print-styles'
+import { QUICK_QUOTE_LABELS } from './constants/labels'
 
 interface QuickQuoteItemsTableProps {
   items: QuickQuoteItem[]
@@ -33,7 +34,7 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
                 fontWeight: 600,
               }}
             >
-              摘要
+              {QUICK_QUOTE_LABELS.LABEL_466}
             </th>
             <th
               className="px-2 py-2 text-center"
@@ -45,7 +46,7 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
                 fontWeight: 600,
               }}
             >
-              數量
+              {QUICK_QUOTE_LABELS.QUANTITY}
             </th>
             <th
               className="px-2 py-2 text-center"
@@ -57,7 +58,7 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
                 fontWeight: 600,
               }}
             >
-              單價
+              {QUICK_QUOTE_LABELS.LABEL_9413}
             </th>
             <th
               className="px-2 py-2 text-center"
@@ -69,7 +70,7 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
                 fontWeight: 600,
               }}
             >
-              金額
+              {QUICK_QUOTE_LABELS.AMOUNT}
             </th>
             <th
               className="px-2 py-2 text-left"
@@ -81,7 +82,7 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
                 fontWeight: 600,
               }}
             >
-              備註
+              {QUICK_QUOTE_LABELS.REMARKS}
             </th>
           </tr>
         </thead>
@@ -153,7 +154,7 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
                 className="px-3 py-8 text-center"
                 style={{ color: MORANDI_COLORS.lightGray }}
               >
-                尚無收費項目
+                {QUICK_QUOTE_LABELS.EMPTY_842}
               </td>
             </tr>
           )}

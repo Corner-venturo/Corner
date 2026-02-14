@@ -61,7 +61,7 @@ export function ChatHeader({
                 : 'text-morandi-secondary hover:text-morandi-primary'
             )}
           >
-            內部
+            {COMP_WORKSPACE_LABELS.LABEL_3084}
           </Button>
           <Button
             variant={mode === 'traveler' ? 'default' : 'ghost'}
@@ -75,7 +75,7 @@ export function ChatHeader({
             )}
           >
             <Users size={12} className="mr-1" />
-            旅伴
+            {COMP_WORKSPACE_LABELS.LABEL_6006}
             {unreadCount > 0 && mode !== 'traveler' && (
               <Badge
                 variant="destructive"
@@ -103,7 +103,7 @@ export function ChatHeader({
             )}
           >
             <Megaphone size={12} className="mr-1" />
-            公告
+            {COMP_WORKSPACE_LABELS.LABEL_1719}
           </Button>
           <Button
             variant={activeConversationType === 'tour_support' ? 'default' : 'ghost'}
@@ -117,7 +117,7 @@ export function ChatHeader({
             )}
           >
             <MessageCircle size={12} className="mr-1" />
-            客服
+            {COMP_WORKSPACE_LABELS.LABEL_9903}
           </Button>
         </div>
       )}
@@ -154,7 +154,7 @@ export function ChatHeader({
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-64 p-2" align="end">
-            <div className="text-sm font-medium text-morandi-primary mb-2">關聯報價單</div>
+            <div className="text-sm font-medium text-morandi-primary mb-2">{COMP_WORKSPACE_LABELS.關聯報價單}</div>
             {linkedQuotes.length > 0 ? (
               <div className="space-y-1">
                 {linkedQuotes.map(quote => (
@@ -189,7 +189,7 @@ export function ChatHeader({
               </div>
             ) : (
               <div className="text-sm text-morandi-secondary text-center py-4">
-                尚未關聯報價單
+                {COMP_WORKSPACE_LABELS.LABEL_354}
               </div>
             )}
           </PopoverContent>

@@ -106,4 +106,6 @@ export const TOUR_LEADERS_LABELS = {
   DELETE_AVAILABILITY_FAILED: '刪除失敗',
   EDIT_TITLE: '編輯',
   DELETE_TITLE: '刪除',
+
+  LABEL_2837: '領隊頭像',
 }

@@ -8,6 +8,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { Link2, Check, Copy, ExternalLink } from 'lucide-react'
+import { PUBLISH_LABELS } from './constants/labels'
 
 interface PublishPreviewProps {
   shareUrl: string | null
@@ -27,12 +28,12 @@ export function PublishPreview({ shareUrl, copied, onCopy }: PublishPreviewProps
           className="h-8 px-3 border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-700"
         >
           <Link2 size={14} className="mr-1.5" />
-          連結
+          {PUBLISH_LABELS.LABEL_9893}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-3" align="end">
         <div className="space-y-2">
-          <div className="text-sm font-medium text-morandi-primary">分享連結</div>
+          <div className="text-sm font-medium text-morandi-primary">{PUBLISH_LABELS.LABEL_1245}</div>
           <div className="flex items-center gap-2">
             <Input
               value={shareUrl}
@@ -59,7 +60,7 @@ export function PublishPreview({ shareUrl, copied, onCopy }: PublishPreviewProps
             </Button>
           </div>
           <p className="text-xs text-morandi-secondary">
-            此連結可分享給客戶，無需登入即可查看行程
+            {PUBLISH_LABELS.LABEL_7099}
           </p>
         </div>
       </PopoverContent>

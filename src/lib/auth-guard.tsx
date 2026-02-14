@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { useAuthStore } from '@/stores/auth-store'
 import { hasPermissionForRoute } from '@/lib/permissions'
 import { logger } from '@/lib/utils/logger'
+import { LIB_LABELS } from './constants/labels'
 
 interface AuthGuardProps {
   children: React.ReactNode
@@ -144,7 +145,7 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-morandi-gold/20 mx-auto mb-4"></div>
-        <p className="text-morandi-secondary">載入中...</p>
+        <p className="text-morandi-secondary">{LIB_LABELS.LOADING_6912}</p>
       </div>
     </div>
   )

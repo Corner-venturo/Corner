@@ -6,4 +6,8 @@ export const LABELS = {
   PRIVATE_FILES: '我的文件（僅自己可見）',
   CANCEL: '取消',
   SAVE: '儲存',
+
+  LABEL_1344: '輸入檔案名稱...',
+  SAVING_1081: '選擇儲存位置',
+  LABEL_7842: '旅遊團（團隊成員可見）',
 }

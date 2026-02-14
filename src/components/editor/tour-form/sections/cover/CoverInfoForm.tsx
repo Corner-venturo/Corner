@@ -54,7 +54,7 @@ export function CoverInfoForm({
     <div className="space-y-4">
       {/* 主題風格選擇器 */}
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-2">主題風格</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-2">{COMP_EDITOR_LABELS.LABEL_1339}</label>
         {templatesLoading ? (
           <div className="flex items-center justify-center py-4">
             <Loader2 className="w-5 h-5 animate-spin text-morandi-gold" />
@@ -82,8 +82,8 @@ export function CoverInfoForm({
       <div className="space-y-3">
         <div>
           <label className="block text-sm font-medium text-morandi-primary mb-1">
-            標籤文字
-            <span className="ml-2 text-xs text-morandi-secondary font-normal">選取文字可調整樣式</span>
+            {COMP_EDITOR_LABELS.LABEL_1694}
+            <span className="ml-2 text-xs text-morandi-secondary font-normal">{COMP_EDITOR_LABELS.LABEL_4233}</span>
           </label>
           <RichTextInput
             value={data.tagline || ''}
@@ -94,7 +94,7 @@ export function CoverInfoForm({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">主標題</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_147}</label>
             <RichTextInput
               value={data.title || ''}
               onChange={value => updateField('title', value)}
@@ -102,7 +102,7 @@ export function CoverInfoForm({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">副標題</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.副標題}</label>
             <RichTextInput
               value={data.subtitle || ''}
               onChange={value => updateField('subtitle', value)}
@@ -110,14 +110,14 @@ export function CoverInfoForm({
             />
             {data.coverStyle === 'art' && !data.subtitle && (
               <p className="text-xs text-morandi-secondary mt-1">
-                藝術雜誌風格預設為「Odyssey」，可自訂為旅行主題
+                {COMP_EDITOR_LABELS.LABEL_463}
               </p>
             )}
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">描述</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_3951}</label>
           <RichTextInput
             value={data.description || ''}
             onChange={value => updateField('description', value)}
@@ -128,7 +128,7 @@ export function CoverInfoForm({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">國家</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5040}</label>
             <Combobox
               value={selectedCountry}
               onChange={newCountry => {
@@ -148,7 +148,7 @@ export function CoverInfoForm({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">城市</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5461}</label>
             <Combobox
               value={data.city || ''}
               onChange={value => updateCity(value)}
@@ -163,7 +163,7 @@ export function CoverInfoForm({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">出發日期</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_4513}</label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -193,7 +193,7 @@ export function CoverInfoForm({
             </Popover>
           </div>
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">行程代碼</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_1470}</label>
             <Input
               type="text"
               value={data.tourCode || ''}
@@ -206,7 +206,7 @@ export function CoverInfoForm({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">價格</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.價格}</label>
             <Input
               type="text"
               value={data.price || ''}
@@ -221,7 +221,7 @@ export function CoverInfoForm({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">單位</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_9062}</label>
             <Select value={data.priceNote || COMP_EDITOR_LABELS.人} onValueChange={(value) => updateField('priceNote', value)}>
               <SelectTrigger className="h-9">
                 <SelectValue placeholder={COMP_EDITOR_LABELS.選擇單位} />

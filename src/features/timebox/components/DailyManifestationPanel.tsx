@@ -12,6 +12,7 @@ import {
   getDayDifferenceFromToday,
   type ManifestationReminderSnapshot,
 } from '@/lib/manifestation/reminder'
+import { TIMEBOX_LABELS } from './constants/labels'
 
 interface DailyManifestationPanelProps {
   className?: string
@@ -103,11 +104,11 @@ export default function DailyManifestationPanel({ className }: DailyManifestatio
             <Sparkles className="w-4 h-4" />
           </div>
           <div className="text-left">
-            <h3 className="text-sm font-semibold text-morandi-primary">每日顯化</h3>
+            <h3 className="text-sm font-semibold text-morandi-primary">{TIMEBOX_LABELS.LABEL_4938}</h3>
             <p className="text-xs text-morandi-secondary">
               {isCompletedToday ? (
                 <span className="text-morandi-gold flex items-center gap-1">
-                  <Check className="w-3 h-3" /> 今日已完成
+                  <Check className="w-3 h-3" /> {TIMEBOX_LABELS.LABEL_1559}
                 </span>
               ) : (
                 '花 3 分鐘與願望對話'
@@ -136,7 +137,7 @@ export default function DailyManifestationPanel({ className }: DailyManifestatio
             <div className="mt-4 p-3 bg-morandi-gold/10 border border-morandi-gold/30 rounded-lg text-center">
               <p className="text-sm text-morandi-gold font-medium flex items-center justify-center gap-2">
                 <Sparkles className="w-4 h-4" />
-                太棒了！今日顯化已記錄
+                {TIMEBOX_LABELS.LABEL_787}
               </p>
             </div>
           )}
@@ -145,13 +146,13 @@ export default function DailyManifestationPanel({ className }: DailyManifestatio
           <div className="mt-4">
             <label className="flex items-center gap-2 text-xs font-medium text-morandi-primary mb-2">
               <Star className="w-3.5 h-3.5 text-morandi-gold" />
-              今日意念
+              {TIMEBOX_LABELS.LABEL_5638}
             </label>
             <input
               type="text"
               value={intention}
               onChange={(e) => setIntention(e.target.value)}
-              placeholder="今天我想要專注在..."
+              placeholder={TIMEBOX_LABELS.LABEL_7168}
               className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-card focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold outline-none transition-all"
             />
           </div>
@@ -160,7 +161,7 @@ export default function DailyManifestationPanel({ className }: DailyManifestatio
           <div>
             <label className="flex items-center gap-2 text-xs font-medium text-morandi-primary mb-2">
               <Heart className="w-3.5 h-3.5 text-morandi-red" />
-              感恩三件事
+              {TIMEBOX_LABELS.LABEL_8607}
             </label>
             <div className="space-y-2">
               {gratitudes.map((gratitude, index) => (
@@ -180,13 +181,13 @@ export default function DailyManifestationPanel({ className }: DailyManifestatio
           <div>
             <label className="flex items-center gap-2 text-xs font-medium text-morandi-primary mb-2">
               <Zap className="w-3.5 h-3.5 text-morandi-gold" />
-              魔法語句
+              {TIMEBOX_LABELS.LABEL_8283}
             </label>
             <input
               type="text"
               value={magicPhrase}
               onChange={(e) => setMagicPhrase(e.target.value)}
-              placeholder="我值得擁有美好的一切..."
+              placeholder={TIMEBOX_LABELS.LABEL_4706}
               className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-card focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold outline-none transition-all"
             />
           </div>
@@ -208,9 +209,9 @@ export default function DailyManifestationPanel({ className }: DailyManifestatio
 
           {/* 提示文字 */}
           <p className="text-xs text-morandi-secondary text-center">
-            想要完整的顯化練習？
+            {TIMEBOX_LABELS.LABEL_5976}
             <a href="/manifestation" className="text-morandi-gold hover:underline ml-1">
-              前往顯化魔法
+              {TIMEBOX_LABELS.LABEL_2650}
             </a>
           </p>
         </div>

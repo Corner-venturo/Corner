@@ -54,7 +54,7 @@ export const QuotationPricingTable: React.FC<QuotationPricingTableProps> = ({
                 fontWeight: 600,
               }}
             >
-              身份
+              {QUOTATION_PRICING_TABLE_LABELS.LABEL_8725}
             </th>
             <th
               className="px-4 py-3 text-center"
@@ -65,7 +65,7 @@ export const QuotationPricingTable: React.FC<QuotationPricingTableProps> = ({
                 fontWeight: 600,
               }}
             >
-              基本報價
+              {QUOTATION_PRICING_TABLE_LABELS.LABEL_2056}
             </th>
             {tierPricings.map(tier => (
               <th

@@ -131,7 +131,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
                 clipRule="evenodd"
               />
             </svg>
-            <span className="text-sm font-medium">此為特殊團報價單，所有欄位已鎖定無法編輯</span>
+            <span className="text-sm font-medium">{QUOTE_HEADER_LABELS.EDIT_1869}</span>
           </div>
         </div>
       )}
@@ -209,7 +209,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
               className="h-8 px-2.5 text-sm gap-1"
             >
               <Map size={14} />
-              行程表
+              {QUOTE_HEADER_LABELS.LABEL_6417}
             </Button>
           )}
 
@@ -220,7 +220,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
               className="h-8 px-2.5 text-sm gap-1 bg-[var(--morandi-gold)] hover:bg-[var(--morandi-gold-hover)] text-white"
             >
               <Plane size={14} />
-              旅遊團
+              {QUOTE_HEADER_LABELS.LABEL_8875}
             </Button>
           )}
         </div>
@@ -232,14 +232,14 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Contact size={20} className="text-morandi-gold" />
-              客戶聯絡資訊
+              {QUOTE_HEADER_LABELS.LABEL_4459}
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div>
               <label className="text-sm font-medium text-morandi-primary block mb-1">
-                聯絡人
+                {QUOTE_HEADER_LABELS.LABEL_7009}
               </label>
               <input
                 type="text"
@@ -252,7 +252,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
 
             <div>
               <label className="text-sm font-medium text-morandi-primary block mb-1">
-                聯絡電話
+                {QUOTE_HEADER_LABELS.LABEL_5110}
               </label>
               <input
                 type="text"
@@ -265,7 +265,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
 
             <div>
               <label className="text-sm font-medium text-morandi-primary block mb-1">
-                通訊地址
+                {QUOTE_HEADER_LABELS.LABEL_3760}
               </label>
               <input
                 type="text"
@@ -277,18 +277,18 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
             </div>
 
             <div className="text-xs text-morandi-secondary bg-morandi-container/30 p-3 rounded-lg">
-              提示：此資訊會用於合約和信封列印，切換快速報價時也會自動帶入
+              {QUOTE_HEADER_LABELS.PRINT_8717}
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" className="gap-2" onClick={() => setIsContactDialogOpen(false)}>
               <X size={16} />
-              取消
+              {QUOTE_HEADER_LABELS.CANCEL}
             </Button>
             <Button onClick={handleSaveContactInfo} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
               <Save size={16} />
-              儲存
+              {QUOTE_HEADER_LABELS.SAVE}
             </Button>
           </DialogFooter>
         </DialogContent>

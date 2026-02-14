@@ -43,6 +43,7 @@ import {
   DailyPageEditor,
   VehicleEditor,
 } from './editors'
+import { DESIGNER_LABELS } from './constants/labels'
 
 // 重新匯出類型
 export type { TocItem, SimplePage } from './editors'
@@ -396,7 +397,7 @@ export function TemplateDataPanel({
                     <Input
                       value={(templateData.meetingPlace as string) || ''}
                       onChange={(e) => updateField('meetingPlace', e.target.value)}
-                      placeholder="桃園機場第二航廈"
+                      placeholder={DESIGNER_LABELS.LABEL_8875}
                       className="h-7 text-xs"
                     />
                   </div>
@@ -407,7 +408,7 @@ export function TemplateDataPanel({
                     <Input
                       value={(templateData.leaderName as string) || ''}
                       onChange={(e) => updateField('leaderName', e.target.value)}
-                      placeholder="王小明"
+                      placeholder={DESIGNER_LABELS.LABEL_4921}
                       className="h-7 text-xs"
                     />
                   </div>
@@ -507,13 +508,13 @@ export function TemplateDataPanel({
                           <div className="space-y-1">
                             <Label className="text-[10px] text-morandi-primary flex items-center gap-1">
                               <Utensils size={10} />
-                              午餐
+                              {DESIGNER_LABELS.LABEL_8515}
                             </Label>
                             <div className="flex gap-1">
                               <Input
                                 value={day.meals?.lunch || ''}
                                 onChange={(e) => updateDailyItinerary(idx, 'mealLunch', e.target.value)}
-                                placeholder="午餐..."
+                                placeholder={DESIGNER_LABELS.LABEL_4196}
                                 className="h-7 text-xs flex-1"
                               />
                               <Select
@@ -521,7 +522,7 @@ export function TemplateDataPanel({
                                 onValueChange={(v) => updateDailyItinerary(idx, 'mealIconLunch', v)}
                               >
                                 <SelectTrigger className="h-7 w-20 text-[10px]">
-                                  <SelectValue placeholder="圖標" />
+                                  <SelectValue placeholder={DESIGNER_LABELS.LABEL_272} />
                                 </SelectTrigger>
                                 <SelectContent>
                                   {MEAL_ICON_OPTIONS.map((opt) => (
@@ -538,13 +539,13 @@ export function TemplateDataPanel({
                           <div className="space-y-1">
                             <Label className="text-[10px] text-morandi-primary flex items-center gap-1">
                               <Utensils size={10} />
-                              晚餐
+                              {DESIGNER_LABELS.LABEL_8227}
                             </Label>
                             <div className="flex gap-1">
                               <Input
                                 value={day.meals?.dinner || ''}
                                 onChange={(e) => updateDailyItinerary(idx, 'mealDinner', e.target.value)}
-                                placeholder="晚餐..."
+                                placeholder={DESIGNER_LABELS.LABEL_2282}
                                 className="h-7 text-xs flex-1"
                               />
                               <Select
@@ -569,12 +570,12 @@ export function TemplateDataPanel({
                           <div className="space-y-1">
                             <Label className="text-[10px] text-morandi-primary flex items-center gap-1">
                               <Hotel size={10} />
-                              住宿
+                              {DESIGNER_LABELS.LABEL_8766}
                             </Label>
                             <Input
                               value={day.accommodation || ''}
                               onChange={(e) => updateDailyItinerary(idx, 'accommodation', e.target.value)}
-                              placeholder="住宿飯店..."
+                              placeholder={DESIGNER_LABELS.LABEL_2362}
                               className="h-7 text-xs"
                             />
                           </div>
@@ -587,7 +588,7 @@ export function TemplateDataPanel({
             )}
 
             <p className="text-xs text-morandi-secondary">
-              航班資訊會自動從行程表帶入
+              {DESIGNER_LABELS.LABEL_5767}
             </p>
           </>
         )}
@@ -604,7 +605,7 @@ export function TemplateDataPanel({
         )}
         {currentPageType === 'daily' && currentDayIndex === undefined && (
           <p className="text-xs text-morandi-secondary">
-            每日行程內容從行程表自動帶入，可在畫布上直接編輯文字
+            {DESIGNER_LABELS.EDIT_9488}
           </p>
         )}
 
@@ -628,7 +629,7 @@ export function TemplateDataPanel({
         {/* 景點介紹頁 */}
         {currentPageType === 'attraction' && (
           <p className="text-xs text-morandi-secondary">
-            景點資訊可在畫布上直接編輯
+            {DESIGNER_LABELS.EDIT_3995}
           </p>
         )}
 

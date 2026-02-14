@@ -103,7 +103,7 @@ export function ImageLibrarySelector({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ImageIcon size={20} className="text-morandi-gold" />
-            選擇圖庫圖片
+            {COMP_EDITOR_LABELS.SELECT_5812}
           </DialogTitle>
         </DialogHeader>
 
@@ -122,7 +122,7 @@ export function ImageLibrarySelector({
         <div className="flex-1 overflow-y-auto">
           {loading ? (
             <div className="flex items-center justify-center h-32">
-              <div className="text-sm text-morandi-secondary">載入中...</div>
+              <div className="text-sm text-morandi-secondary">{COMP_EDITOR_LABELS.載入中}</div>
             </div>
           ) : filteredImages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-32 text-morandi-secondary">
@@ -173,7 +173,7 @@ export function ImageLibrarySelector({
         {/* 底部按鈕 */}
         <div className="flex justify-end">
           <Button variant="ghost" onClick={onClose}>
-            取消
+            {COMP_EDITOR_LABELS.取消}
           </Button>
         </div>
       </DialogContent>

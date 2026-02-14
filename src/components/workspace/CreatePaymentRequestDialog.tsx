@@ -128,7 +128,7 @@ export function CreatePaymentRequestDialog({
         <div className="space-y-4">
           {/* 代墊項目資訊 */}
           <div className="bg-morandi-container/5 rounded-lg p-3 border border-morandi-gold/20">
-            <div className="text-sm font-medium text-morandi-secondary mb-2">代墊項目：</div>
+            <div className="text-sm font-medium text-morandi-secondary mb-2">{COMP_WORKSPACE_LABELS.LABEL_4228}</div>
             <div className="space-y-1">
               {itemsArray.map((item, index) => (
                 <div key={item.id} className="flex items-center justify-between text-sm">
@@ -140,7 +140,7 @@ export function CreatePaymentRequestDialog({
               ))}
             </div>
             <div className="flex items-center justify-between mt-2 pt-2 border-t border-morandi-gold/20">
-              <span className="text-sm font-medium text-morandi-secondary">總計：</span>
+              <span className="text-sm font-medium text-morandi-secondary">{COMP_WORKSPACE_LABELS.TOTAL_3424}</span>
               <CurrencyCell amount={totalAmount} className="text-lg font-semibold text-morandi-primary" />
             </div>
           </div>
@@ -164,7 +164,7 @@ export function CreatePaymentRequestDialog({
 
           {/* 類別 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-2">類別</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-2">{COMP_WORKSPACE_LABELS.LABEL_2946}</label>
             <Input
               type="text"
               value={category}
@@ -174,7 +174,7 @@ export function CreatePaymentRequestDialog({
 
           {/* 供應商 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-2">供應商</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-2">{COMP_WORKSPACE_LABELS.LABEL_561}</label>
             <Input
               type="text"
               value={supplier}
@@ -185,7 +185,7 @@ export function CreatePaymentRequestDialog({
           {/* 請款日期 */}
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
-              請款日期 (預設下個週四)
+              {COMP_WORKSPACE_LABELS.LABEL_8173}
             </label>
             <DatePicker
               value={requestDate}
@@ -197,11 +197,11 @@ export function CreatePaymentRequestDialog({
         <DialogFooter>
           <Button variant="secondary" onClick={() => onOpenChange(false)} className="gap-2">
             <X size={16} />
-            取消
+            {COMP_WORKSPACE_LABELS.CANCEL}
           </Button>
           <Button onClick={handleCreate} className="gap-2">
             <Plus size={16} />
-            建立請款單
+            {COMP_WORKSPACE_LABELS.建立請款單}
           </Button>
         </DialogFooter>
       </DialogContent>

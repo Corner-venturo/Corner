@@ -201,7 +201,7 @@ export function DisbursementPrintDialog({
                 className="gap-2"
               >
                 <Printer size={16} />
-                列印
+                {DISBURSEMENT_LABELS.PRINT}
               </Button>
               <Button
                 variant="outline"
@@ -210,7 +210,7 @@ export function DisbursementPrintDialog({
                 className="gap-2"
               >
                 <Download size={16} />
-                下載 PDF
+                {DISBURSEMENT_LABELS.LABEL_3604}
               </Button>
             </div>
           </div>
@@ -221,7 +221,7 @@ export function DisbursementPrintDialog({
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <Loader2 className="w-8 h-8 animate-spin text-morandi-secondary" />
-              <span className="ml-2 text-morandi-secondary">載入資料中...</span>
+              <span className="ml-2 text-morandi-secondary">{DISBURSEMENT_LABELS.LOADING_2648}</span>
             </div>
           ) : (
             <div className="shadow-lg">

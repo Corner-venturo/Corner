@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { isHtmlString, cleanTiptapHtml } from '@/lib/utils/rich-text'
 import { formatDateShort } from '@/lib/utils/format-date'
 import type { TourPageData } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 // 渲染可能包含 HTML 的文字
 function RichText({ html, className }: { html: string | null | undefined; className?: string }) {
@@ -266,7 +267,7 @@ export function TourHeroCollage({ data, viewMode }: TourHeroCollageProps) {
               }}
             >
               <span className="font-bold">{dateFormatted}</span>
-              <span className="ml-2">出發</span>
+              <span className="ml-2">{TOURS_LABELS.LABEL_5480}</span>
             </div>
           )}
 

@@ -300,7 +300,7 @@ export function BatchConfirmReceiptDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CheckCircle className="h-5 w-5 text-morandi-gold" />
-            批量確認收款
+            {BATCH_CONFIRM_LABELS.CONFIRM_2930}
           </DialogTitle>
         </DialogHeader>
 
@@ -341,22 +341,22 @@ export function BatchConfirmReceiptDialog({
                     <tr>
                       <th className="w-10 py-2.5 px-3 text-left"></th>
                       <th className="py-2.5 px-3 text-left font-medium text-morandi-secondary">
-                        收款單號
+                        {BATCH_CONFIRM_LABELS.LABEL_6427}
                       </th>
                       <th className="py-2.5 px-3 text-left font-medium text-morandi-secondary">
-                        訂單編號
+                        {BATCH_CONFIRM_LABELS.LABEL_7017}
                       </th>
                       <th className="py-2.5 px-3 text-left font-medium text-morandi-secondary">
-                        團名
+                        {BATCH_CONFIRM_LABELS.LABEL_4272}
                       </th>
                       <th className="py-2.5 px-3 text-left font-medium text-morandi-secondary">
-                        收款方式
+                        {BATCH_CONFIRM_LABELS.LABEL_5187}
                       </th>
                       <th className="py-2.5 px-3 text-right font-medium text-morandi-secondary">
-                        應收金額
+                        {BATCH_CONFIRM_LABELS.LABEL_6261}
                       </th>
                       <th className="py-2.5 px-3 text-right font-medium text-morandi-secondary">
-                        實收金額
+                        {BATCH_CONFIRM_LABELS.LABEL_8417}
                       </th>
                     </tr>
                   </thead>
@@ -424,7 +424,7 @@ export function BatchConfirmReceiptDialog({
                 <div className="flex items-center gap-2 p-3 mt-4 border border-morandi-gold/20 rounded-lg bg-morandi-gold/5 text-sm">
                   <AlertCircle className="h-4 w-4 text-morandi-gold flex-shrink-0" />
                   <span className="text-morandi-gold">
-                    部分收款品項的實收金額與應收金額不同，請確認
+                    {BATCH_CONFIRM_LABELS.CONFIRM_4237}
                   </span>
                 </div>
               )}
@@ -435,7 +435,7 @@ export function BatchConfirmReceiptDialog({
         <DialogFooter className="mt-4">
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting} className="gap-2">
             <X size={16} />
-            取消
+            {BATCH_CONFIRM_LABELS.CANCEL}
           </Button>
           <Button
             onClick={handleBatchConfirm}

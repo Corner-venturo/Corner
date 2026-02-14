@@ -83,7 +83,7 @@ export const ParticipantCountEditor: React.FC<ParticipantCountEditorProps> = ({
           type="button"
         >
           <Plus size={16} className="mr-1" />
-          新增檻次表
+          {PARTICIPANT_COUNT_EDITOR_LABELS.ADD_4134}
         </Button>
       </div>
     </div>

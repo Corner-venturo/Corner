@@ -469,7 +469,7 @@ export function TourPnrToolDialog({
                   className="gap-1 text-morandi-secondary"
                 >
                   <X size={14} />
-                  清除
+                  {TOUR_PNR_TOOL_DIALOG_LABELS.清除}
                 </Button>
               )}
             </div>
@@ -488,7 +488,7 @@ export function TourPnrToolDialog({
             <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg text-orange-700 text-sm">
               <div className="flex items-center gap-2 font-medium mb-2">
                 <AlertTriangle size={16} />
-                以下團員已有不同的 PNR，儲存後將覆蓋：
+                {TOUR_PNR_TOOL_DIALOG_LABELS.以下團員已有不同的_PNR_儲存後將覆蓋}
               </div>
               <ul className="ml-6 space-y-1">
                 {pnrConflicts.map(m => (
@@ -529,7 +529,7 @@ export function TourPnrToolDialog({
               {/* 基本資訊 */}
               <div className="flex items-center gap-4 p-3 bg-morandi-container/30 rounded-lg">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-morandi-secondary">訂位代號</span>
+                  <span className="text-sm text-morandi-secondary">{TOUR_PNR_TOOL_DIALOG_LABELS.訂位代號}</span>
                   <span className="font-mono font-bold text-lg">{parsedPNR.recordLocator}</span>
                 </div>
 
@@ -539,7 +539,7 @@ export function TourPnrToolDialog({
                     deadlineStatus.color
                   )}>
                     <Clock size={14} />
-                    出票期限：
+                    {TOUR_PNR_TOOL_DIALOG_LABELS.出票期限}
                     {parsedPNR.ticketingDeadline ? formatDateTW(parsedPNR.ticketingDeadline) : ''}
                     <span className="ml-1">({deadlineStatus.text})</span>
                     {deadlineStatus.urgent && <AlertTriangle size={14} className="ml-1" />}
@@ -569,7 +569,7 @@ export function TourPnrToolDialog({
               {/* 航班資訊 */}
               {parsedPNR.segments.length > 0 && (
                 <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-morandi-secondary">航班資訊</h4>
+                  <h4 className="text-sm font-medium text-morandi-secondary">{TOUR_PNR_TOOL_DIALOG_LABELS.航班資訊}</h4>
                   <div className="grid gap-3">
                     {parsedPNR.segments.map((seg, i) => {
                       // 判斷問題狀態
@@ -642,7 +642,7 @@ export function TourPnrToolDialog({
                           {/* 擴充欄位編輯 */}
                           <div className="flex flex-wrap items-center gap-3 px-3 py-2 bg-morandi-container/20 border-t border-border/50 text-xs">
                             <div className="flex items-center gap-1">
-                              <label className="text-morandi-primary whitespace-nowrap">出發航站</label>
+                              <label className="text-morandi-primary whitespace-nowrap">{TOUR_PNR_TOOL_DIALOG_LABELS.出發航站}</label>
                               <Input
                                 value={editData.departureTerminal}
                                 onChange={(e) => handleSegmentEdit(i, 'departureTerminal', e.target.value)}
@@ -651,7 +651,7 @@ export function TourPnrToolDialog({
                               />
                             </div>
                             <div className="flex items-center gap-1">
-                              <label className="text-morandi-primary whitespace-nowrap">抵達航站</label>
+                              <label className="text-morandi-primary whitespace-nowrap">{TOUR_PNR_TOOL_DIALOG_LABELS.抵達航站}</label>
                               <Input
                                 value={editData.arrivalTerminal}
                                 onChange={(e) => handleSegmentEdit(i, 'arrivalTerminal', e.target.value)}
@@ -660,7 +660,7 @@ export function TourPnrToolDialog({
                               />
                             </div>
                             <div className="flex items-center gap-1">
-                              <label className="text-morandi-primary whitespace-nowrap">餐食</label>
+                              <label className="text-morandi-primary whitespace-nowrap">{TOUR_PNR_TOOL_DIALOG_LABELS.餐食}</label>
                               <Input
                                 value={editData.meal}
                                 onChange={(e) => handleSegmentEdit(i, 'meal', e.target.value)}
@@ -669,7 +669,7 @@ export function TourPnrToolDialog({
                               />
                             </div>
                             <div className="flex items-center gap-1">
-                              <label className="text-morandi-primary whitespace-nowrap">飛行時間</label>
+                              <label className="text-morandi-primary whitespace-nowrap">{TOUR_PNR_TOOL_DIALOG_LABELS.飛行時間}</label>
                               <Input
                                 value={editData.duration}
                                 onChange={(e) => handleSegmentEdit(i, 'duration', e.target.value)}
@@ -684,7 +684,7 @@ export function TourPnrToolDialog({
                                 onChange={(e) => handleSegmentEdit(i, 'isDirect', e.target.checked)}
                                 className="rounded border-morandi-border"
                               />
-                              <span className="text-morandi-secondary">直飛</span>
+                              <span className="text-morandi-secondary">{TOUR_PNR_TOOL_DIALOG_LABELS.直飛}</span>
                             </label>
                           </div>
                         </div>
@@ -696,25 +696,25 @@ export function TourPnrToolDialog({
 
               {/* 旅客比對表 */}
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-morandi-secondary">旅客比對</h4>
+                <h4 className="text-sm font-medium text-morandi-secondary">{TOUR_PNR_TOOL_DIALOG_LABELS.旅客比對}</h4>
                 <div className="border border-border rounded-lg overflow-hidden">
                   <table className="w-full text-sm">
                     <thead className="bg-morandi-container/40">
                       <tr>
                         <th className="px-3 py-2 text-left font-medium text-morandi-secondary">#</th>
                         <th className="px-3 py-2 text-left font-medium text-morandi-secondary">{TOUR_PNR_TOOL_DIALOG_LABELS.PNR_姓名}</th>
-                        <th className="px-3 py-2 text-left font-medium text-morandi-secondary w-16">類型</th>
-                        <th className="px-3 py-2 text-left font-medium text-morandi-secondary">團員</th>
+                        <th className="px-3 py-2 text-left font-medium text-morandi-secondary w-16">{TOUR_PNR_TOOL_DIALOG_LABELS.類型}</th>
+                        <th className="px-3 py-2 text-left font-medium text-morandi-secondary">{TOUR_PNR_TOOL_DIALOG_LABELS.團員}</th>
                         <th className="px-3 py-2 text-left font-medium text-morandi-secondary">
                           <Briefcase size={14} className="inline mr-1" />
-                          行李
+                          {TOUR_PNR_TOOL_DIALOG_LABELS.行李}
                         </th>
                         <th className="px-3 py-2 text-left font-medium text-morandi-secondary">
                           <Utensils size={14} className="inline mr-1" />
                           餐食
                         </th>
-                        <th className="px-3 py-2 text-left font-medium text-morandi-secondary">票價</th>
-                        <th className="px-3 py-2 text-left font-medium text-morandi-secondary">票號</th>
+                        <th className="px-3 py-2 text-left font-medium text-morandi-secondary">{TOUR_PNR_TOOL_DIALOG_LABELS.LABEL_2736}</th>
+                        <th className="px-3 py-2 text-left font-medium text-morandi-secondary">{TOUR_PNR_TOOL_DIALOG_LABELS.LABEL_7910}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -736,7 +736,7 @@ export function TourPnrToolDialog({
                             {/* 顯示旅客類型徽章 */}
                             {match.passengerType === 'CHD' ? (
                               <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
-                                兒童
+                                {TOUR_PNR_TOOL_DIALOG_LABELS.LABEL_475}
                                 {match.birthDate && <span className="ml-1 text-blue-500">({match.birthDate})</span>}
                               </span>
                             ) : match.infant ? (
@@ -744,7 +744,7 @@ export function TourPnrToolDialog({
                                 +嬰兒
                               </span>
                             ) : (
-                              <span className="text-xs text-morandi-secondary">成人</span>
+                              <span className="text-xs text-morandi-secondary">{TOUR_PNR_TOOL_DIALOG_LABELS.成人}</span>
                             )}
                           </td>
                           <td className="px-3 py-2">
@@ -770,7 +770,7 @@ export function TourPnrToolDialog({
                                 value=""
                                 onChange={(e) => handleMemberSelect(i, e.target.value || null)}
                               >
-                                <option value="">選擇團員...</option>
+                                <option value="">{TOUR_PNR_TOOL_DIALOG_LABELS.選擇團員}</option>
                                 {members.map(m => (
                                   <option key={m.id} value={m.id}>
                                     {m.chinese_name || m.passport_name}
@@ -815,7 +815,7 @@ export function TourPnrToolDialog({
         <div className="flex justify-end gap-2 pt-4 border-t border-border">
           <Button variant="outline" onClick={onClose} className="gap-2">
             <X size={16} />
-            關閉
+            {TOUR_PNR_TOOL_DIALOG_LABELS.關閉}
           </Button>
           <Button
             onClick={handleSave}
@@ -824,7 +824,7 @@ export function TourPnrToolDialog({
           >
             <Save size={16} className={isSaving ? 'hidden' : ''} />
             <Loader2 size={16} className={isSaving ? 'animate-spin' : 'hidden'} />
-            儲存並關聯
+            {TOUR_PNR_TOOL_DIALOG_LABELS.儲存並關聯}
           </Button>
         </div>
       </DialogContent>

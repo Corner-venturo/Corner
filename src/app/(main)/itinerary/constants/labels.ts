@@ -112,6 +112,9 @@ export const PRINT_LABELS = {
   ACCOMMODATION: '住宿',
   FOOTER_PROVIDED_BY: '本行程表由',
   FOOTER_PRINT_DATE: '提供 | 列印日期：',
+
+  BACK: '返回',
+  PRINT: '列印',
 }
 
 export const EDITOR_LABELS = {
@@ -120,10 +123,17 @@ export const EDITOR_LABELS = {
   PRINT_PREVIEW: '列印預覽',
   HANDOVER_NOTICE: '此行程已交接給領隊',
   HANDOVER_DESC: '行程內容已同步到 Online App，編輯功能已停用',
+
+  ADD_9998: '新增紙本行程表',
+  PRINT: '列印',
 }
 
 export const BLOCK_EDITOR_LABELS = {
   LOADING: '載入中...',
   BLOCK_EDITOR: '區塊編輯器',
   LIVE_PREVIEW: '即時預覽',
+
+  LABEL_2827: '存檔中...',
+  SAVING_4294: '已儲存',
+  LABEL_6397: '存檔失敗',
 }

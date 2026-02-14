@@ -24,6 +24,7 @@ import { BatchPickupDialog } from './BatchPickupDialog'
 import { CustomerMatchDialog, AddCustomerFormDialog } from './CustomerMatchDialog'
 import { BatchPickupDialog as SimpleBatchPickupDialog, BatchRejectDialog } from './BatchOperationDialogs'
 import type { Visa } from '@/stores/types'
+import { VISAS_LABELS } from './constants/labels'
 
 export default function VisasPage() {
   // 資料管理
@@ -283,7 +284,7 @@ export default function VisasPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="簽證管理"
+        title={VISAS_LABELS.MANAGE_1750}
         icon={FileText}
         breadcrumb={[
           { label: '首頁', href: '/' },
@@ -294,7 +295,7 @@ export default function VisasPage() {
             {canManageVisas && selectedRows.length > 0 ? (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-morandi-secondary bg-morandi-container/50 px-3 py-1.5 rounded-full">
-                  已選 <span className="font-semibold text-morandi-primary">{selectedRows.length}</span> 筆
+                  已選 <span className="font-semibold text-morandi-primary">{selectedRows.length}</span> {VISAS_LABELS.LABEL_2269}
                 </span>
 
                 <div className="flex items-center bg-morandi-container/30 rounded-lg p-1 gap-1">
@@ -306,9 +307,9 @@ export default function VisasPage() {
                         ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white'
                         : 'bg-morandi-container text-morandi-secondary/50 cursor-not-allowed'
                     }`}
-                    title="送件給代辦商"
+                    title={VISAS_LABELS.LABEL_6162}
                   >
-                    送件
+                    {VISAS_LABELS.LABEL_7044}
                   </button>
                   <button
                     onClick={() => {
@@ -321,9 +322,9 @@ export default function VisasPage() {
                         ? 'bg-morandi-green hover:bg-morandi-green/90 text-white'
                         : 'bg-morandi-container text-morandi-secondary/50 cursor-not-allowed'
                     }`}
-                    title="取件完成"
+                    title={VISAS_LABELS.LABEL_9841}
                   >
-                    取件
+                    {VISAS_LABELS.LABEL_8304}
                   </button>
                   <button
                     onClick={() => setIsReturnDialogOpen(true)}
@@ -333,9 +334,9 @@ export default function VisasPage() {
                         ? 'bg-morandi-primary hover:bg-morandi-primary/90 text-white'
                         : 'bg-morandi-container text-morandi-secondary/50 cursor-not-allowed'
                     }`}
-                    title="登記證件歸還"
+                    title={VISAS_LABELS.LABEL_9271}
                   >
-                    歸還
+                    {VISAS_LABELS.LABEL_3853}
                   </button>
                   <button
                     onClick={() => {
@@ -348,9 +349,9 @@ export default function VisasPage() {
                         ? 'bg-morandi-red hover:bg-morandi-red/90 text-white'
                         : 'bg-morandi-container text-morandi-secondary/50 cursor-not-allowed'
                     }`}
-                    title="標記為退件"
+                    title={VISAS_LABELS.LABEL_2198}
                   >
-                    退件
+                    {VISAS_LABELS.LABEL_3434}
                   </button>
                 </div>
 
@@ -358,7 +359,7 @@ export default function VisasPage() {
                   onClick={() => setSelectedRows([])}
                   className="text-sm text-morandi-secondary hover:text-morandi-primary transition-colors"
                 >
-                  取消
+                  {VISAS_LABELS.CANCEL}
                 </button>
               </div>
             ) : (
@@ -369,7 +370,7 @@ export default function VisasPage() {
                   className="flex items-center gap-2"
                 >
                   <Info size={16} />
-                  查看簽證資訊
+                  {VISAS_LABELS.LABEL_967}
                 </Button>
                 {canManageVisas && (
                   <>
@@ -379,7 +380,7 @@ export default function VisasPage() {
                       className="flex items-center gap-2"
                     >
                       <Upload size={16} />
-                      批次下件
+                      {VISAS_LABELS.LABEL_6480}
                     </Button>
                     <Button
                       onClick={async () => {
@@ -388,7 +389,7 @@ export default function VisasPage() {
                       }}
                       className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
                     >
-                      新增簽證
+                      {VISAS_LABELS.ADD_2407}
                     </Button>
                   </>
                 )}

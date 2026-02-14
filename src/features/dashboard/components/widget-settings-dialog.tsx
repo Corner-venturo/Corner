@@ -14,6 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { useAuthStore } from '@/stores/auth-store'
 import type { WidgetType } from '../types'
 import { AVAILABLE_WIDGETS } from './widget-config'
+import { DASHBOARD_LABELS } from './constants/labels'
 
 interface WidgetSettingsDialogProps {
   activeWidgets: WidgetType[]
@@ -49,13 +50,13 @@ export function WidgetSettingsDialog({ activeWidgets, onToggleWidget }: WidgetSe
           className="gap-2 bg-card border-morandi-gold/20 hover:border-morandi-gold transition-all rounded-xl"
         >
           <Settings className="h-4 w-4" />
-          小工具設定
+          {DASHBOARD_LABELS.SETTINGS_4196}
         </Button>
       </DialogTrigger>
       <DialogContent level={1} className="sm:max-w-2xl border-morandi-gold/20 shadow-lg rounded-2xl">
         <DialogHeader>
-          <DialogTitle className="text-xl text-morandi-primary">選擇要顯示的小工具</DialogTitle>
-          <p className="text-sm text-morandi-muted mt-1">勾選你想在首頁顯示的小工具</p>
+          <DialogTitle className="text-xl text-morandi-primary">{DASHBOARD_LABELS.SELECT_1019}</DialogTitle>
+          <p className="text-sm text-morandi-muted mt-1">{DASHBOARD_LABELS.LABEL_5024}</p>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-3 py-4">
           {visibleWidgets.map(widget => {

@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import { Users } from 'lucide-react'
 import { SectionTitle } from './SectionTitle'
 import type { TourPageData, CoverStyleType } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 interface TourPriceTiersSectionProps {
   data: TourPageData
@@ -51,7 +52,7 @@ export function TourPriceTiersSection({ data, viewMode = 'desktop', coverStyle =
     <section className={cn('py-12 bg-card', isMobile && 'py-8')}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
-          title="價格方案"
+          title={TOURS_LABELS.LABEL_1385}
           coverStyle={coverStyle}
           className="mb-8"
         />

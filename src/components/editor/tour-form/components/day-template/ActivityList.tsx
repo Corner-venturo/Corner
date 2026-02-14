@@ -84,7 +84,7 @@ export function ActivityList({
             className="w-full py-3 border-2 border-dashed border-border rounded-xl text-morandi-muted hover:border-[#4a6fa5] hover:text-[#4a6fa5] transition-colors flex items-center justify-center gap-2"
           >
             <Plus size={18} />
-            <span>新增行程點</span>
+            <span>{COMP_EDITOR_LABELS.ADD_8581}</span>
           </button>
         </div>
       </div>
@@ -95,9 +95,9 @@ export function ActivityList({
     return (
       <div className="space-y-2">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-morandi-secondary">景點活動</span>
+          <span className="text-sm font-medium text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_2716}</span>
           <button type="button" onClick={addActivity} className="text-xs text-[#c76d54] hover:underline flex items-center gap-1">
-            <Plus size={12} /> 新增
+            <Plus size={12} /> {COMP_EDITOR_LABELS.新增}
           </button>
         </div>
         {activities.map((act, i) => (
@@ -171,7 +171,7 @@ export function ActivityList({
         className="h-32 border-2 border-dashed border-border rounded-xl flex flex-col items-center justify-center text-morandi-muted hover:border-[#B8A99A] hover:text-[#B8A99A] transition-colors"
       >
         <Plus size={28} />
-        <span className="text-sm mt-1">新增景點</span>
+        <span className="text-sm mt-1">{COMP_EDITOR_LABELS.ADD_14}</span>
       </button>
     </div>
   )

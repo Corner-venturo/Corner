@@ -246,19 +246,19 @@ export function MemberTableHeader({
         )}
         {cv.deposit_amount && (
           <ResizableTh columnId="deposit_amount" width={getWidth('deposit_amount')} onResize={onColumnResize} className={thBaseClass}>
-            訂金
+            {L.deposit_amount}
           </ResizableTh>
         )}
         {cv.balance && (
           <ResizableTh columnId="balance" width={getWidth('balance')} onResize={onColumnResize} className={thBaseClass}>
-            尾款
+            {L.balance}
           </ResizableTh>
         )}
 
         {/* 備註 */}
         {cv.remarks && (
           <ResizableTh columnId="remarks" width={getWidth('remarks')} onResize={onColumnResize} className={thBaseClass}>
-            備註
+            {L.remarks}
           </ResizableTh>
         )}
 
@@ -280,14 +280,14 @@ export function MemberTableHeader({
         {/* 單欄位模式（沒有飯店資訊時） */}
         {mode === 'tour' && showRoomColumn && hotelColumns.length === 0 && (
           <ResizableTh columnId="room" width={getWidth('room')} onResize={onColumnResize} className={thBaseClass}>
-            分房
+            {L.room}
           </ResizableTh>
         )}
 
         {/* 團體模式：分車 */}
         {mode === 'tour' && showVehicleColumn && (
           <ResizableTh columnId="vehicle" width={getWidth('vehicle')} onResize={onColumnResize} className={thBaseClass}>
-            分車
+            {L.vehicle}
           </ResizableTh>
         )}
 
@@ -301,21 +301,21 @@ export function MemberTableHeader({
         {/* 團體模式：機票號碼 */}
         {mode === 'tour' && cv.ticket_number && (
           <ResizableTh columnId="ticket_number" width={getWidth('ticket_number')} onResize={onColumnResize} className={thBaseClass}>
-            機票號碼
+            {L.ticket_number}
           </ResizableTh>
         )}
 
         {/* 團體模式：開票期限 */}
         {mode === 'tour' && cv.ticketing_deadline && (
           <ResizableTh columnId="ticketing_deadline" width={getWidth('ticketing_deadline')} onResize={onColumnResize} className={thBaseClass}>
-            開票期限
+            {L.ticketing_deadline}
           </ResizableTh>
         )}
 
         {/* 團體模式：機票金額 */}
         {mode === 'tour' && cv.flight_cost && (
           <ResizableTh columnId="flight_cost" width={getWidth('flight_cost')} onResize={onColumnResize} className={thBaseClass}>
-            機票金額
+            {L.flight_cost}
           </ResizableTh>
         )}
 
@@ -334,7 +334,7 @@ export function MemberTableHeader({
 
         {/* 操作 */}
         <ResizableTh columnId="actions" width={getWidth('actions')} onResize={onColumnResize} className={`${thBaseClass} text-center`}>
-          操作
+          {L.actions}
         </ResizableTh>
       </tr>
     </thead>

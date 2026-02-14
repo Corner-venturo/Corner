@@ -13,6 +13,7 @@ import { Building2 } from 'lucide-react'
 import { HotelSearchInput } from './hotel/HotelSearchInput'
 import { HotelList } from './hotel/HotelList'
 import { useHotelSelector } from './hooks/useHotelSelector'
+import { COMP_EDITOR_LABELS } from './constants/labels'
 
 // 飯店型別
 export interface LuxuryHotel {
@@ -107,7 +108,7 @@ export function HotelSelector({
         <DialogHeader className="px-6 py-4 border-b bg-gradient-to-r from-morandi-gold/10 to-transparent">
           <DialogTitle className="flex items-center gap-2 text-lg">
             <Building2 className="text-morandi-gold" size={22} />
-            選擇飯店
+            {COMP_EDITOR_LABELS.SELECT_8723}
           </DialogTitle>
         </DialogHeader>
 
@@ -159,7 +160,7 @@ export function HotelSelector({
 
         <DialogFooter className="px-6 py-4 border-t bg-muted/50">
           <Button variant="outline" onClick={handleCancel} className="rounded-xl">
-            取消
+            {COMP_EDITOR_LABELS.取消}
           </Button>
           <Button
             onClick={handleConfirm}

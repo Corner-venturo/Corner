@@ -60,4 +60,11 @@ export const COMP_LAYOUT_LABELS = {
   顧客: '顧客',
   顧客管理: '顧客管理',
   首頁: '首頁',
+
+  LABEL_9472: '更多',
+  LABEL_2572: '自訂底部導航欄',
+  CANCEL: '取消',
+  SAVE: '儲存',
+
+  FILTER_4998: '清除篩選',
 };

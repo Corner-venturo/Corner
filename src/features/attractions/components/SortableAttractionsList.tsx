@@ -265,7 +265,7 @@ export function SortableAttractionsList({
     return (
       <div className="text-center py-8 text-morandi-muted">
         <MapPin size={48} className="mx-auto mb-4 opacity-50" />
-        <p>尚無景點資料</p>
+        <p>{SORTABLE_ATTRACTIONS_LIST_LABELS.EMPTY_2193}</p>
       </div>
     )
   }

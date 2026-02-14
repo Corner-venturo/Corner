@@ -23,6 +23,7 @@ import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import { generateTourClosingPDF } from '@/lib/pdf/tour-closing-pdf'
 import { supabase } from '@/lib/supabase/client'
+import { TOURS_LABELS } from './constants/labels'
 
 interface TourClosingDialogProps {
   open: boolean
@@ -213,23 +214,23 @@ export function TourClosingDialog({
           {/* 團資訊摘要 */}
           <div className="p-4 bg-morandi-container/30 rounded-lg space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-morandi-secondary">團名</span>
+              <span className="text-morandi-secondary">{TOURS_LABELS.LABEL_4272}</span>
               <span className="font-medium">{tour.name || tour.location}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-morandi-secondary">訂單數</span>
+              <span className="text-morandi-secondary">{TOURS_LABELS.LABEL_6293}</span>
               <span className="font-medium">{tourOrders.length} 筆</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-morandi-secondary">總收入</span>
+              <span className="text-morandi-secondary">{TOURS_LABELS.TOTAL_7262}</span>
               <span className="font-medium text-morandi-green">{formatCurrency(totalRevenue)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-morandi-secondary">總成本</span>
+              <span className="text-morandi-secondary">{TOURS_LABELS.TOTAL_2585}</span>
               <span className="font-medium text-morandi-red">{formatCurrency(totalCost)}</span>
             </div>
             <div className="flex justify-between text-sm pt-2 border-t border-border/50">
-              <span className="text-morandi-secondary">毛利</span>
+              <span className="text-morandi-secondary">{TOURS_LABELS.LABEL_6713}</span>
               <span className={`font-bold ${totalRevenue - totalCost >= 0 ? 'text-morandi-gold' : 'text-morandi-red'}`}>
                 {formatCurrency(totalRevenue - totalCost)}
               </span>
@@ -238,11 +239,11 @@ export function TourClosingDialog({
 
           {/* 獎金設定 */}
           <div className="space-y-4">
-            <h3 className="font-medium text-morandi-primary">獎金設定</h3>
+            <h3 className="font-medium text-morandi-primary">{TOURS_LABELS.SETTINGS_6548}</h3>
 
             {/* 業務獎金 */}
             <div className="flex items-center gap-4">
-              <Label className="w-24 text-sm">業務獎金</Label>
+              <Label className="w-24 text-sm">{TOURS_LABELS.LABEL_6960}</Label>
               <div className="flex items-center gap-2 flex-1">
                 <Input
                   type="number"
@@ -278,7 +279,7 @@ export function TourClosingDialog({
 
             {/* 總計 */}
             <div className="flex items-center gap-4 pt-2 border-t border-border">
-              <Label className="w-24 text-sm font-medium">獎金總計</Label>
+              <Label className="w-24 text-sm font-medium">{TOURS_LABELS.TOTAL_6305}</Label>
               <span className="text-lg font-bold text-morandi-gold">{formatCurrency(totalBonus)}</span>
             </div>
           </div>
@@ -286,7 +287,7 @@ export function TourClosingDialog({
           {/* 說明 */}
           <div className="p-3 bg-status-warning-bg border border-status-warning rounded-lg">
             <p className="text-sm text-status-warning">
-              結案後將自動產生獎金請款單，狀態變更為「結案」。
+              {TOURS_LABELS.LABEL_1342}
             </p>
           </div>
         </div>
@@ -307,7 +308,7 @@ export function TourClosingDialog({
             className="gap-2"
           >
             <X size={16} />
-            取消
+            {TOURS_LABELS.CANCEL}
           </Button>
           <Button
             onClick={handleClose}

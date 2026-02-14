@@ -74,7 +74,7 @@ export function FocusCardsBlockEditor({ data, onChange }: FocusCardsBlockEditorP
       ))}
       <Button variant="outline" size="sm" className="w-full gap-2" onClick={addCard}>
         <Plus size={14} />
-        新增景點
+        {COMP_EDITOR_LABELS.ADD_14}
       </Button>
     </div>
   )
@@ -116,7 +116,7 @@ export function LeaderMeetingBlockEditor({ data, onChange }: LeaderMeetingBlockE
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Users size={14} className="text-morandi-gold" />
-          <span className="text-sm font-medium">領隊資訊</span>
+          <span className="text-sm font-medium">{COMP_EDITOR_LABELS.LABEL_6841}</span>
         </div>
         <div className="grid grid-cols-3 gap-2">
           <Input
@@ -141,7 +141,7 @@ export function LeaderMeetingBlockEditor({ data, onChange }: LeaderMeetingBlockE
       </div>
 
       <div>
-        <span className="text-sm font-medium">集合地點</span>
+        <span className="text-sm font-medium">{COMP_EDITOR_LABELS.LABEL_863}</span>
         <div className="space-y-1 mt-2">
           {points.map((point, index) => (
             <div key={index} className="flex gap-2">
@@ -164,7 +164,7 @@ export function LeaderMeetingBlockEditor({ data, onChange }: LeaderMeetingBlockE
           ))}
           <Button variant="outline" size="sm" className="w-full gap-2" onClick={addPoint}>
             <Plus size={14} />
-            新增集合地點
+            {COMP_EDITOR_LABELS.ADD_89}
           </Button>
         </div>
       </div>
@@ -187,9 +187,9 @@ export function PricingBlockEditor({ data, onChange }: PricingBlockEditorProps) 
   return (
     <div className="text-sm text-morandi-primary">
       <div className="space-y-2">
-        <div>費用包含：{pricing.included_items?.length || 0} 項</div>
-        <div>費用不含：{pricing.excluded_items?.length || 0} 項</div>
-        <div>注意事項：{pricing.notes?.length || 0} 條</div>
+        <div>{COMP_EDITOR_LABELS.LABEL_8398}{pricing.included_items?.length || 0} 項</div>
+        <div>{COMP_EDITOR_LABELS.LABEL_4198}{pricing.excluded_items?.length || 0} 項</div>
+        <div>{COMP_EDITOR_LABELS.LABEL_1507}{pricing.notes?.length || 0} 條</div>
         <p className="text-xs mt-2">（詳細編輯請使用完整版編輯器）</p>
       </div>
     </div>
@@ -245,7 +245,7 @@ export function PriceTiersBlockEditor({ data, onChange }: PriceTiersBlockEditorP
       ))}
       <Button variant="outline" size="sm" className="w-full gap-2" onClick={addTier}>
         <Plus size={14} />
-        新增方案
+        {COMP_EDITOR_LABELS.ADD_4119}
       </Button>
     </div>
   )
@@ -303,7 +303,7 @@ export function FAQsBlockEditor({ data, onChange }: FAQsBlockEditorProps) {
       ))}
       <Button variant="outline" size="sm" className="w-full gap-2" onClick={addFaq}>
         <Plus size={14} />
-        新增問題
+        {COMP_EDITOR_LABELS.ADD_6040}
       </Button>
     </div>
   )
@@ -353,7 +353,7 @@ export function NoticesBlockEditor({ data, onChange }: NoticesBlockEditorProps) 
       ))}
       <Button variant="outline" size="sm" className="w-full gap-2" onClick={addNotice}>
         <Plus size={14} />
-        新增提醒
+        {COMP_EDITOR_LABELS.ADD_9095}
       </Button>
     </div>
   )
@@ -403,7 +403,7 @@ export function CancellationBlockEditor({ data, onChange }: CancellationBlockEdi
       ))}
       <Button variant="outline" size="sm" className="w-full gap-2" onClick={addPolicy}>
         <Plus size={14} />
-        新增政策
+        {COMP_EDITOR_LABELS.ADD_1129}
       </Button>
     </div>
   )

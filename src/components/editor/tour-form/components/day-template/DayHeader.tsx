@@ -38,13 +38,13 @@ export function DayHeader({ dayIndex, currentStyle, onStyleChange, onSave, onClo
           </div>
           <div>
             <h2 className="font-bold text-lg text-foreground">Day {dayIndex + 1} 預覽編輯</h2>
-            <p className="text-sm text-morandi-secondary">點擊文字直接編輯，點擊圖片上傳更換</p>
+            <p className="text-sm text-morandi-secondary">{COMP_EDITOR_LABELS.EDIT_7600}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <Button onClick={onSave} className="gap-2 bg-[#2C5F4D] hover:bg-[#234a3d]">
             <Save size={16} />
-            儲存
+            {COMP_EDITOR_LABELS.SAVE}
           </Button>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X size={20} />
@@ -54,7 +54,7 @@ export function DayHeader({ dayIndex, currentStyle, onStyleChange, onSave, onClo
 
       {/* 風格選擇器 */}
       <div className="px-6 py-3 border-b bg-card flex items-center gap-2">
-        <span className="text-sm text-morandi-secondary mr-2">展示風格：</span>
+        <span className="text-sm text-morandi-secondary mr-2">{COMP_EDITOR_LABELS.LABEL_4473}</span>
         <div className="flex items-center bg-muted rounded-lg p-1">
           {styleOptions.map(option => (
             <button

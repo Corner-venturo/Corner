@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Trash2, Edit2, Save, Check, FileText, X } from 'lucide-react'
 import { useTimeboxScheduledBoxes, useTimeboxBoxes, type TimeboxScheduledBox, type TimeboxBox, weekDayNames } from '../../hooks/useTimeboxData'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { BOX_DIALOGS_LABELS } from './constants/labels'
 
 interface BasicData {
   notes?: string
@@ -138,11 +139,11 @@ export default function BasicDialog({ scheduledBox, box, onClose }: BasicDialogP
             <div className="bg-morandi-gold/10 border border-morandi-gold/30 rounded-lg p-4 space-y-4">
               <div className="flex items-center gap-2 text-sm font-medium text-morandi-gold">
                 <Edit2 className="h-4 w-4" />
-                編輯時間
+                {BOX_DIALOGS_LABELS.EDIT_1582}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs text-morandi-primary mb-1">開始時間</label>
+                  <label className="block text-xs text-morandi-primary mb-1">{BOX_DIALOGS_LABELS.LABEL_3952}</label>
                   <Select value={editStartTime} onValueChange={setEditStartTime}>
                     <SelectTrigger className="w-full">
                       <SelectValue />
@@ -155,7 +156,7 @@ export default function BasicDialog({ scheduledBox, box, onClose }: BasicDialogP
                   </Select>
                 </div>
                 <div>
-                  <label className="block text-xs text-morandi-primary mb-1">持續時間</label>
+                  <label className="block text-xs text-morandi-primary mb-1">{BOX_DIALOGS_LABELS.LABEL_1273}</label>
                   <Select value={editDuration.toString()} onValueChange={(v) => setEditDuration(Number(v))}>
                     <SelectTrigger className="w-full">
                       <SelectValue />
@@ -171,11 +172,11 @@ export default function BasicDialog({ scheduledBox, box, onClose }: BasicDialogP
               <div className="flex justify-end gap-2">
                 <Button variant="outline" size="sm" className="gap-2" onClick={() => setIsEditing(false)}>
                   <X size={14} />
-                  取消
+                  {BOX_DIALOGS_LABELS.CANCEL}
                 </Button>
                 <Button size="sm" onClick={handleSaveEdit} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1">
                   <Save className="h-3 w-3" />
-                  儲存
+                  {BOX_DIALOGS_LABELS.SAVE}
                 </Button>
               </div>
             </div>
@@ -183,7 +184,7 @@ export default function BasicDialog({ scheduledBox, box, onClose }: BasicDialogP
             <div className="bg-muted rounded-lg p-4">
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-morandi-secondary">開始時間：</span>
+                  <span className="text-sm text-morandi-secondary">{BOX_DIALOGS_LABELS.LABEL_5733}</span>
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{scheduledBox.start_time.substring(0, 5)}</span>
                     <button
@@ -196,11 +197,11 @@ export default function BasicDialog({ scheduledBox, box, onClose }: BasicDialogP
                   </div>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-morandi-secondary">持續時間：</span>
+                  <span className="text-sm text-morandi-secondary">{BOX_DIALOGS_LABELS.LABEL_7169}</span>
                   <span className="font-medium">{formatDuration(scheduledBox.duration)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-morandi-secondary">狀態：</span>
+                  <span className="text-sm text-morandi-secondary">{BOX_DIALOGS_LABELS.LABEL_7626}</span>
                   <span className={`font-medium ${scheduledBox.completed ? 'text-status-success' : 'text-morandi-secondary'}`}>
                     {scheduledBox.completed ? '已完成' : '未完成'}
                   </span>
@@ -213,10 +214,10 @@ export default function BasicDialog({ scheduledBox, box, onClose }: BasicDialogP
           <div>
             <label className="flex items-center gap-2 text-sm font-medium text-morandi-primary mb-2">
               <FileText className="w-4 h-4" />
-              筆記內容
+              {BOX_DIALOGS_LABELS.LABEL_2342}
             </label>
             <Textarea
-              placeholder="記錄今天的想法、進度或備註..."
+              placeholder={BOX_DIALOGS_LABELS.LABEL_5715}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={5}
@@ -237,7 +238,7 @@ export default function BasicDialog({ scheduledBox, box, onClose }: BasicDialogP
               className="text-status-danger border-morandi-red/30 hover:bg-status-danger-bg gap-1"
             >
               <Trash2 size={16} />
-              移除排程
+              {BOX_DIALOGS_LABELS.LABEL_5077}
             </Button>
             <div className="flex space-x-2">
               <Button variant="outline" className="gap-2" onClick={onClose}>
@@ -251,7 +252,7 @@ export default function BasicDialog({ scheduledBox, box, onClose }: BasicDialogP
                 className="gap-1"
               >
                 <Save size={16} />
-                儲存筆記
+                {BOX_DIALOGS_LABELS.SAVING_3605}
               </Button>
               <Button
                 onClick={handleComplete}

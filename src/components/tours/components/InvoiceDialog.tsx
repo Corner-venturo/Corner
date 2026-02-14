@@ -66,7 +66,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText size={20} />
-            開立代轉發票
+            {INVOICE_LABELS.LABEL_953}
           </DialogTitle>
         </DialogHeader>
 
@@ -170,7 +170,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
                 />
               </div>
               <div>
-                <Label>手機號碼</Label>
+                <Label>{INVOICE_LABELS.LABEL_5607}</Label>
                 <Input
                   value={invoiceBuyer.buyerMobile || ''}
                   onChange={e => onInvoiceBuyerChange({ ...invoiceBuyer, buyerMobile: e.target.value })}
@@ -183,12 +183,12 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
           {/* 商品明細 - 表格式 */}
           <div className="border rounded-lg overflow-hidden">
             <div className="grid grid-cols-12 gap-2 px-3 py-2 bg-muted/50 text-sm font-medium text-muted-foreground">
-              <div className="col-span-4">摘要</div>
-              <div className="col-span-1 text-center">數量</div>
-              <div className="col-span-2 text-right">單價</div>
-              <div className="col-span-2 text-center">單位</div>
-              <div className="col-span-2 text-right">金額</div>
-              <div className="col-span-1 text-center">處理</div>
+              <div className="col-span-4">{INVOICE_LABELS.LABEL_466}</div>
+              <div className="col-span-1 text-center">{INVOICE_LABELS.QUANTITY}</div>
+              <div className="col-span-2 text-right">{INVOICE_LABELS.LABEL_9413}</div>
+              <div className="col-span-2 text-center">{INVOICE_LABELS.LABEL_9062}</div>
+              <div className="col-span-2 text-right">{INVOICE_LABELS.AMOUNT}</div>
+              <div className="col-span-1 text-center">{INVOICE_LABELS.PROCESSING_9468}</div>
             </div>
 
             <div className="divide-y">
@@ -252,14 +252,14 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
             <div className="px-3 py-2 border-t">
               <Button type="button" variant="outline" size="sm" onClick={onAddInvoiceItem}>
                 <Plus className="mr-1 h-4 w-4" />
-                新增一列
+                {INVOICE_LABELS.ADD_1388}
               </Button>
             </div>
 
             {/* 備註 */}
             <div className="px-3 py-2 border-t">
               <div className="flex items-center gap-3">
-                <Label className="shrink-0">備註</Label>
+                <Label className="shrink-0">{INVOICE_LABELS.REMARKS}</Label>
                 <Input
                   value={invoiceRemark}
                   onChange={e => onInvoiceRemarkChange(e.target.value.slice(0, 50))}
@@ -276,7 +276,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
             {/* 總計 */}
             <div className="px-3 py-3 border-t bg-muted/30">
               <div className="flex justify-end items-center gap-4">
-                <span className="text-sm font-medium">總計</span>
+                <span className="text-sm font-medium">{INVOICE_LABELS.TOTAL}</span>
                 <span className="text-lg font-bold text-primary">
                   <CurrencyCell amount={invoiceTotal} />
                 </span>
@@ -305,7 +305,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
               className="min-w-[100px] gap-1"
             >
               <X size={16} />
-              取消
+              {INVOICE_LABELS.CANCEL}
             </Button>
             <Button
               onClick={onIssueInvoice}

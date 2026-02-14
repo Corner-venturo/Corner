@@ -112,7 +112,7 @@ export function TourInfoSection({
                   <span className="mx-2">|</span>
                   <span className="text-morandi-gold">65歲以上：{ageGroups.over65}</span>
                   <span className="mx-2">|</span>
-                  <span>一般：{ageGroups.others}</span>
+                  <span>{TOUR_INFO_LABELS.GENERAL_PREFIX}{ageGroups.others}</span>
                 </span>
               </div>
             </td>
@@ -121,15 +121,15 @@ export function TourInfoSection({
           {/* 交通（有資料才顯示） */}
           {vehicleRequests.length > 0 && (
             <tr>
-              <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium align-top w-[100px]">交通</td>
+              <td className="px-4 py-2 bg-morandi-container/30 text-morandi-secondary font-medium align-top w-[100px]">{TOUR_INFO_LABELS.LABEL_138}</td>
               <td colSpan={3}>
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-morandi-container/20">
-                      <th className="px-3 py-1.5 text-left font-medium text-morandi-secondary w-[180px]">公司名稱</th>
-                      <th className="px-3 py-1.5 text-left font-medium text-morandi-secondary w-[100px]">司機</th>
-                      <th className="px-3 py-1.5 text-left font-medium text-morandi-secondary w-[120px]">車號</th>
-                      <th className="px-3 py-1.5 text-left font-medium text-morandi-secondary">手機電話</th>
+                      <th className="px-3 py-1.5 text-left font-medium text-morandi-secondary w-[180px]">{TOUR_INFO_LABELS.LABEL_20}</th>
+                      <th className="px-3 py-1.5 text-left font-medium text-morandi-secondary w-[100px]">{TOUR_INFO_LABELS.LABEL_665}</th>
+                      <th className="px-3 py-1.5 text-left font-medium text-morandi-secondary w-[120px]">{TOUR_INFO_LABELS.LABEL_2394}</th>
+                      <th className="px-3 py-1.5 text-left font-medium text-morandi-secondary">{TOUR_INFO_LABELS.LABEL_9531}</th>
                     </tr>
                   </thead>
                   <tbody>

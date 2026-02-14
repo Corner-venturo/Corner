@@ -76,12 +76,12 @@ export function OrderSelectDialog({
         }}
       >
         <DialogHeader>
-          <DialogTitle>選擇訂單</DialogTitle>
+          <DialogTitle>{COMP_ORDERS_LABELS.選擇訂單}</DialogTitle>
         </DialogHeader>
 
         <div className="py-4">
           <label className="text-sm font-medium text-morandi-primary mb-2 block">
-            請選擇要新增成員的訂單
+            {COMP_ORDERS_LABELS.PLEASE_SELECT_2473}
           </label>
           <Combobox
             options={orderOptions}
@@ -97,7 +97,7 @@ export function OrderSelectDialog({
         <DialogFooter>
           <Button variant="outline" onClick={handleClose} className="gap-2">
             <X size={16} />
-            取消
+            {COMP_ORDERS_LABELS.取消}
           </Button>
           <Button
             onClick={handleConfirm}

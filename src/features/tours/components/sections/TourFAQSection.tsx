@@ -5,6 +5,7 @@ import { MessageCircleQuestion, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import { SectionTitle } from './SectionTitle'
 import type { TourPageData, CoverStyleType } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 interface TourFAQSectionProps {
   data: TourPageData
@@ -30,7 +31,7 @@ export function TourFAQSection({ data, viewMode = 'desktop', coverStyle = 'origi
     <section className={cn('py-12 bg-morandi-container/20', isMobile && 'py-8')}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
-          title="常見問題"
+          title={TOURS_LABELS.LABEL_2640}
           coverStyle={coverStyle}
           className="mb-8"
         />

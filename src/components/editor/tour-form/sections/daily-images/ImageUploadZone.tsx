@@ -4,6 +4,7 @@ import React, { useRef } from 'react'
 import { Loader2, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 import { DailyImage } from '../../types'
+import { DAILY_IMAGES_LABELS } from './constants/labels'
 
 // 工具函數：建立 DailyImage 物件
 function createDailyImage(url: string, position?: string): DailyImage {
@@ -79,10 +80,10 @@ export function ImageUploadZone({
           <>
             <div className="flex items-center gap-2 px-4 py-2 bg-morandi-gold text-white rounded-lg hover:bg-morandi-gold-hover transition-colors">
               <Plus size={18} />
-              <span className="text-sm font-medium">選擇照片上傳</span>
+              <span className="text-sm font-medium">{DAILY_IMAGES_LABELS.UPLOADING_5213}</span>
             </div>
             <span className="text-xs text-morandi-secondary mt-2">
-              或將照片拖曳到此區域
+              {DAILY_IMAGES_LABELS.LABEL_3185}
             </span>
           </>
         )}

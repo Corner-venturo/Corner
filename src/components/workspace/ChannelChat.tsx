@@ -227,7 +227,7 @@ export function ChannelChat() {
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <Hash size={48} className="text-morandi-secondary/50 mx-auto mb-4" />
-              <p className="text-morandi-secondary">選擇一個頻道開始對話</p>
+              <p className="text-morandi-secondary">{COMP_WORKSPACE_LABELS.SELECT_9745}</p>
             </div>
           </div>
         )}

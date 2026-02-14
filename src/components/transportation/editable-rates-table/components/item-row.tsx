@@ -8,6 +8,7 @@ import { TransportationRate } from '@/types/transportation-rates.types'
 import { cn } from '@/lib/utils'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { EDITABLE_RATES_TABLE_LABELS } from './constants/labels'
 
 interface ItemRowProps {
   rate: TransportationRate
@@ -95,7 +96,7 @@ export function ItemRow({
                 {...(categoryDragAttributes || {})}
                 {...(categoryDragListeners || {})}
                 className="cursor-move text-morandi-gold/60 hover:text-morandi-gold"
-                title="拖曳整個品項"
+                title={EDITABLE_RATES_TABLE_LABELS.LABEL_9704}
               >
                 <GripVertical size={14} />
               </button>
@@ -105,7 +106,7 @@ export function ItemRow({
               {...attributes}
               {...listeners}
               className="cursor-move text-morandi-secondary/60 hover:text-morandi-secondary"
-              title="拖曳此細項"
+              title={EDITABLE_RATES_TABLE_LABELS.LABEL_747}
             >
               <GripVertical size={12} />
             </button>
@@ -208,7 +209,7 @@ export function ItemRow({
 
           {/* 利潤（自動計算，不可編輯） */}
           <td className="px-4 py-2.5 text-right bg-status-warning-bg border-r border-border/40">
-            <span className="font-mono text-sm text-morandi-gold font-medium" title="自動計算（售價 - 成本）">
+            <span className="font-mono text-sm text-morandi-gold font-medium" title={EDITABLE_RATES_TABLE_LABELS.CALCULATING_7714}>
               {rate.kkday_profit?.toLocaleString() || '0'}
             </span>
           </td>
@@ -224,7 +225,7 @@ export function ItemRow({
               size="sm"
               onClick={() => onInsert(rate)}
               className="h-7 w-7 p-0 text-morandi-gold hover:bg-morandi-gold/10"
-              title="插入到報價單"
+              title={EDITABLE_RATES_TABLE_LABELS.LABEL_1894}
             >
               <PlusCircle size={14} />
             </Button>
@@ -235,7 +236,7 @@ export function ItemRow({
               size="sm"
               onClick={() => onDelete(rate.id)}
               className="h-7 w-7 p-0 text-morandi-red hover:bg-morandi-red/10"
-              title="刪除此筆車資"
+              title={EDITABLE_RATES_TABLE_LABELS.DELETE_8117}
             >
               <Trash2 size={14} />
             </Button>

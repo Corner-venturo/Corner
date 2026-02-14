@@ -73,12 +73,12 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
         }}
       >
         <DialogHeader>
-          <DialogTitle>新增報價單</DialogTitle>
+          <DialogTitle>{QUOTE_DIALOG_LABELS.ADD_8248}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* 選擇是否關聯旅遊團 */}
           <div>
-            <label className="text-sm font-medium text-morandi-primary">關聯旅遊團（選填）</label>
+            <label className="text-sm font-medium text-morandi-primary">{QUOTE_DIALOG_LABELS.LABEL_333}</label>
             <Combobox
               options={[
                 { value: '', label: QUOTE_DIALOG_LABELS.獨立報價單_無旅遊團 },
@@ -119,13 +119,13 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
               className="mt-1"
             />
             <p className="text-xs text-morandi-secondary mt-1">
-              選擇旅遊團後，報價單編號將使用團號
+              {QUOTE_DIALOG_LABELS.SELECT_6732}
             </p>
           </div>
 
           {/* 團體名稱 */}
           <div>
-            <label className="text-sm font-medium text-morandi-primary">團體名稱</label>
+            <label className="text-sm font-medium text-morandi-primary">{QUOTE_DIALOG_LABELS.LABEL_7457}</label>
             <Input
               value={formData.name}
               onChange={e => setFormField('name', e.target.value)}
@@ -136,7 +136,7 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
 
           {/* 人數 */}
           <div>
-            <label className="text-sm font-medium text-morandi-primary">人數</label>
+            <label className="text-sm font-medium text-morandi-primary">{QUOTE_DIALOG_LABELS.LABEL_6764}</label>
             <Input
               type="text" inputMode="decimal"
               value={formData.group_size}
@@ -152,14 +152,14 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
 
           {/* 狀態 */}
           <div>
-            <label className="text-sm font-medium text-morandi-primary">狀態</label>
+            <label className="text-sm font-medium text-morandi-primary">{QUOTE_DIALOG_LABELS.STATUS}</label>
             <Select value={formData.status} onValueChange={value => setFormField('status', value)}>
               <SelectTrigger className="mt-1">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="proposed">提案</SelectItem>
-                <SelectItem value="approved">已核准</SelectItem>
+                <SelectItem value="proposed">{QUOTE_DIALOG_LABELS.LABEL_5485}</SelectItem>
+                <SelectItem value="approved">{QUOTE_DIALOG_LABELS.LABEL_2328}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -175,20 +175,20 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
                 className="h-4 w-4 rounded border-morandi-border text-morandi-gold focus:ring-morandi-gold"
               />
               <label htmlFor="is_pinned" className="text-sm text-morandi-primary cursor-pointer">
-                設為置頂範本（方便複製使用）
+                {QUOTE_DIALOG_LABELS.COPYING_2742}
               </label>
             </div>
 
             {formData.is_pinned && (
               <div>
-                <label className="text-sm font-medium text-morandi-primary">商品編號（選填）</label>
+                <label className="text-sm font-medium text-morandi-primary">{QUOTE_DIALOG_LABELS.LABEL_9029}</label>
                 <Input
                   value={formData.code}
                   onChange={e => setFormField('code', e.target.value)}
                   placeholder={QUOTE_DIALOG_LABELS.例如_JP_BASIC_EU_LUXURY}
                   className="mt-1"
                 />
-                <p className="text-xs text-morandi-secondary mt-1">不填寫則自動生成 Q 開頭的編號</p>
+                <p className="text-xs text-morandi-secondary mt-1">{QUOTE_DIALOG_LABELS.GENERATING_4057}</p>
               </div>
             )}
           </div>
@@ -197,7 +197,7 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
           <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={onClose} className="gap-2">
               <X size={16} />
-              取消
+              {QUOTE_DIALOG_LABELS.CANCEL}
             </Button>
             <Button
               type="submit"

@@ -236,8 +236,8 @@ export function MemberBasicInfo({
               className="bg-transparent text-xs text-center border-none outline-none shadow-none cursor-pointer"
             >
               <option value="">-</option>
-              <option value="M">男</option>
-              <option value="F">女</option>
+              <option value="M">{COMP_ORDERS_LABELS.男}</option>
+              <option value="F">{COMP_ORDERS_LABELS.女}</option>
             </select>
           ) : (
             <span className="text-morandi-primary">

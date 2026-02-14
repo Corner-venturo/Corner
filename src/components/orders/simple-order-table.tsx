@@ -75,24 +75,24 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
         <div className="grid" style={{ gridTemplateColumns: gridCols }}>
           <div className="text-left py-2.5 px-4 text-xs relative">
             <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
-            <span className="font-medium text-morandi-secondary">訂單編號</span>
+            <span className="font-medium text-morandi-secondary">{COMP_ORDERS_LABELS.LABEL_7017}</span>
           </div>
           {showTourInfo && (
             <div className="text-left py-2.5 px-4 text-xs relative">
               <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
-              <span className="font-medium text-morandi-secondary">旅遊團</span>
+              <span className="font-medium text-morandi-secondary">{COMP_ORDERS_LABELS.LABEL_8875}</span>
             </div>
           )}
           <div className="text-left py-2.5 px-4 text-xs relative">
             <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
-            <span className="font-medium text-morandi-secondary">聯絡人</span>
+            <span className="font-medium text-morandi-secondary">{COMP_ORDERS_LABELS.LABEL_7009}</span>
           </div>
           <div className="text-left py-2.5 px-4 text-xs relative">
             <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
-            <span className="font-medium text-morandi-secondary">業務</span>
+            <span className="font-medium text-morandi-secondary">{COMP_ORDERS_LABELS.LABEL_8362}</span>
           </div>
           <div className="text-left py-2.5 px-4 text-xs relative">
-            <span className="font-medium text-morandi-secondary">操作</span>
+            <span className="font-medium text-morandi-secondary">{COMP_ORDERS_LABELS.ACTIONS}</span>
           </div>
         </div>
       </div>

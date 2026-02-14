@@ -7,6 +7,7 @@
 
 import React from 'react'
 import type { EditFormData } from '../MemberEditDialog'
+import { MEMBER_EDIT_LABELS } from './constants/labels'
 
 interface MemberInfoFormProps {
   formData: EditFormData
@@ -19,12 +20,12 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
 
   return (
     <div className="space-y-2">
-      <h3 className="text-sm font-medium text-morandi-primary">成員資料</h3>
+      <h3 className="text-sm font-medium text-morandi-primary">{MEMBER_EDIT_LABELS.LABEL_3362}</h3>
 
       {/* 中文姓名 + 性別 */}
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <label className={labelClass}>中文姓名</label>
+          <label className={labelClass}>{MEMBER_EDIT_LABELS.LABEL_9768}</label>
           <input
             type="text"
             value={formData.chinese_name || ''}
@@ -33,15 +34,15 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
           />
         </div>
         <div>
-          <label className={labelClass}>性別</label>
+          <label className={labelClass}>{MEMBER_EDIT_LABELS.LABEL_2195}</label>
           <select
             value={formData.gender || ''}
             onChange={e => onChange({ ...formData, gender: e.target.value })}
             className={inputClass}
           >
             <option value="">-</option>
-            <option value="M">男</option>
-            <option value="F">女</option>
+            <option value="M">{MEMBER_EDIT_LABELS.LABEL_4765}</option>
+            <option value="F">{MEMBER_EDIT_LABELS.LABEL_7599}</option>
           </select>
         </div>
       </div>
@@ -49,7 +50,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
       {/* 護照拼音 + 吊牌拼音 */}
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <label className={labelClass}>護照拼音</label>
+          <label className={labelClass}>{MEMBER_EDIT_LABELS.LABEL_1636}</label>
           <input
             type="text"
             value={formData.passport_name || ''}
@@ -59,7 +60,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
         </div>
         <div>
           <label className={labelClass}>
-            吊牌拼音
+            {MEMBER_EDIT_LABELS.LABEL_1089}
             <span className="text-morandi-muted font-normal ml-1 text-[10px]">(列印)</span>
           </label>
           <input
@@ -75,7 +76,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
       {/* 出生年月日 + 身分證號 */}
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <label className={labelClass}>出生年月日</label>
+          <label className={labelClass}>{MEMBER_EDIT_LABELS.LABEL_3396}</label>
           <input
             type="text"
             value={formData.birth_date || ''}
@@ -85,7 +86,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
           />
         </div>
         <div>
-          <label className={labelClass}>身分證號</label>
+          <label className={labelClass}>{MEMBER_EDIT_LABELS.LABEL_3405}</label>
           <input
             type="text"
             value={formData.id_number || ''}
@@ -98,7 +99,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
       {/* 護照號碼 + 護照效期 */}
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <label className={labelClass}>護照號碼</label>
+          <label className={labelClass}>{MEMBER_EDIT_LABELS.LABEL_5147}</label>
           <input
             type="text"
             value={formData.passport_number || ''}
@@ -107,7 +108,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
           />
         </div>
         <div>
-          <label className={labelClass}>護照效期</label>
+          <label className={labelClass}>{MEMBER_EDIT_LABELS.LABEL_4167}</label>
           <input
             type="text"
             value={formData.passport_expiry || ''}
@@ -121,7 +122,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
       {/* 特殊餐食 + 備註 */}
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <label className={labelClass}>特殊餐食</label>
+          <label className={labelClass}>{MEMBER_EDIT_LABELS.LABEL_6650}</label>
           <input
             type="text"
             value={formData.special_meal || ''}
@@ -130,7 +131,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
           />
         </div>
         <div>
-          <label className={labelClass}>備註</label>
+          <label className={labelClass}>{MEMBER_EDIT_LABELS.REMARKS}</label>
           <input
             type="text"
             value={formData.remarks || ''}

@@ -7,6 +7,7 @@ import { Page } from '../primitives/Page'
 import { Text } from '../primitives/Text'
 import { DaySchedule } from '../blocks/DaySchedule'
 import type { PageProps } from '../types'
+import { PAGES_LABELS } from './constants/labels'
 
 export function Toc({ data, theme, size, pageNumber = 2, className }: PageProps) {
   const dailyItineraries = data.dailyItineraries || []
@@ -18,7 +19,7 @@ export function Toc({ data, theme, size, pageNumber = 2, className }: PageProps)
         INDEX
       </Text>
       <Text theme={theme} variant="body" align="center" color="muted" style={{ marginBottom: '10mm' }}>
-        行程總覽
+        {PAGES_LABELS.TOTAL_9464}
       </Text>
 
       {/* 行程列表 */}
@@ -49,7 +50,7 @@ export function Toc({ data, theme, size, pageNumber = 2, className }: PageProps)
         }}
       >
         <Text theme={theme} variant="caption" style={{ fontWeight: 600, marginBottom: '2mm' }}>
-          聯絡資訊
+          {PAGES_LABELS.LABEL_8029}
         </Text>
         <Text theme={theme} variant="caption">
           領隊：{data.leaderName || '待確認'} {data.leaderPhone || ''}

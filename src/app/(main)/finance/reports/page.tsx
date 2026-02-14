@@ -12,6 +12,7 @@ import {
   Wallet,
   BarChart3,
 } from 'lucide-react'
+import { REPORTS_LABELS } from './constants/labels'
 
 // 報表卡片組件
 function ReportCard({
@@ -56,7 +57,7 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
       <ResponsiveHeader
-        title="報表管理"
+        title={REPORTS_LABELS.MANAGE_3253}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '財務', href: '/finance' },
@@ -66,40 +67,40 @@ export default function ReportsPage() {
 
       <ContentContainer>
         <h3 className="text-lg font-semibold text-morandi-primary mb-4">
-          財務報表
+          {REPORTS_LABELS.LABEL_8192}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <ReportCard
-            title="每月出帳報表"
-            description="顯示該月請款單數、出納單數、總金額"
+            title={REPORTS_LABELS.LABEL_3446}
+            description={REPORTS_LABELS.TOTAL_6998}
             href="/finance/reports/monthly-disbursement"
             icon={FileDown}
             iconColor="text-morandi-gold"
           />
           <ReportCard
-            title="每月收入報表"
-            description="顯示該月收款情況"
+            title={REPORTS_LABELS.LABEL_120}
+            description={REPORTS_LABELS.LABEL_7786}
             href="/finance/reports/monthly-income"
             icon={TrendingUp}
             iconColor="text-morandi-green"
           />
           <ReportCard
-            title="未結案團體報表"
-            description="回程日+7天已過但未結案的團體"
+            title={REPORTS_LABELS.LABEL_996}
+            description={REPORTS_LABELS.LABEL_4844}
             href="/finance/reports/unclosed-tours"
             icon={AlertCircle}
             iconColor="text-morandi-red"
           />
           <ReportCard
-            title="未收款報表"
-            description="尚有未收款項的訂單，含已出發逾期提醒"
+            title={REPORTS_LABELS.LABEL_1474}
+            description={REPORTS_LABELS.LABEL_5090}
             href="/finance/reports/unpaid-orders"
             icon={Wallet}
             iconColor="text-morandi-red"
           />
           <ReportCard
-            title="團收支總覽"
-            description="每團收入、成本、毛利與毛利率一覽"
+            title={REPORTS_LABELS.TOTAL_2832}
+            description={REPORTS_LABELS.LABEL_7727}
             href="/finance/reports/tour-pnl"
             icon={BarChart3}
             iconColor="text-morandi-blue"

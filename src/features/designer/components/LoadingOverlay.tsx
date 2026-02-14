@@ -8,6 +8,7 @@
 
 import { Loader2, FileText, Image, Palette, Save, Check } from 'lucide-react'
 import type { LoadingStage } from '@/stores/document-store'
+import { DESIGNER_LABELS } from './constants/labels'
 
 interface LoadingOverlayProps {
   isLoading: boolean
@@ -82,7 +83,7 @@ export function LoadingOverlay({
             ) : isSaving ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>儲存中...</span>
+                <span>{DESIGNER_LABELS.SAVING_4983}</span>
               </>
             ) : null}
           </div>
@@ -106,7 +107,7 @@ export function LoadingOverlay({
 
         {/* Tip */}
         <p className="text-center text-xs text-morandi-muted mt-6">
-          首次載入可能需要較長時間，請稍候...
+          {DESIGNER_LABELS.LOADING_3727}
         </p>
       </div>
     </div>
@@ -136,7 +137,7 @@ export function UnsavedIndicator({ isDirty }: { isDirty: boolean }) {
   return (
     <div className="flex items-center gap-1.5 px-2 py-1 bg-morandi-gold/10 rounded text-xs text-morandi-gold">
       <div className="w-1.5 h-1.5 rounded-full bg-morandi-gold animate-pulse" />
-      <span>未儲存的變更</span>
+      <span>{DESIGNER_LABELS.SAVING_7127}</span>
     </div>
   )
 }

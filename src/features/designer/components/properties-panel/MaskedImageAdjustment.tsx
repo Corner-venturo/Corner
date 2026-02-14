@@ -10,6 +10,7 @@ import * as fabric from 'fabric'
 import { Image as ImageIcon } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
+import { PROPERTIES_PANEL_LABELS } from './constants/labels'
 
 interface MaskedImageAdjustmentProps {
   canvas: fabric.Canvas | null
@@ -100,25 +101,25 @@ export function MaskedImageAdjustment({ canvas, selectedObject, onUpdate }: Mask
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-1">
           <ImageIcon size={12} className="text-morandi-secondary" />
-          <Label className="text-xs text-morandi-primary">調整遮罩內圖片</Label>
+          <Label className="text-xs text-morandi-primary">{PROPERTIES_PANEL_LABELS.LABEL_3469}</Label>
         </div>
         <button
           onClick={handleReset}
           className="text-[10px] text-morandi-gold hover:underline"
         >
-          重設
+          {PROPERTIES_PANEL_LABELS.RESET}
         </button>
       </div>
 
       <p className="text-[10px] text-morandi-muted mb-2">
-        調整圖片在遮罩形狀內的顯示位置
+        {PROPERTIES_PANEL_LABELS.LABEL_950}
       </p>
 
       <div className="space-y-3">
         {/* 縮放 */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <Label className="text-[10px] text-morandi-muted">圖片縮放</Label>
+            <Label className="text-[10px] text-morandi-muted">{PROPERTIES_PANEL_LABELS.LABEL_9571}</Label>
             <span className="text-[10px] text-morandi-muted">{zoom}%</span>
           </div>
           <Slider
@@ -133,7 +134,7 @@ export function MaskedImageAdjustment({ canvas, selectedObject, onUpdate }: Mask
         {/* 水平位移 */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <Label className="text-[10px] text-morandi-muted">左右移動</Label>
+            <Label className="text-[10px] text-morandi-muted">{PROPERTIES_PANEL_LABELS.LABEL_8522}</Label>
             <span className="text-[10px] text-morandi-muted">{offsetX > 0 ? '→' : offsetX < 0 ? '←' : ''} {Math.abs(offsetX)}%</span>
           </div>
           <Slider
@@ -148,7 +149,7 @@ export function MaskedImageAdjustment({ canvas, selectedObject, onUpdate }: Mask
         {/* 垂直位移 */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <Label className="text-[10px] text-morandi-muted">上下移動</Label>
+            <Label className="text-[10px] text-morandi-muted">{PROPERTIES_PANEL_LABELS.LABEL_2412}</Label>
             <span className="text-[10px] text-morandi-muted">{offsetY > 0 ? '↓' : offsetY < 0 ? '↑' : ''} {Math.abs(offsetY)}%</span>
           </div>
           <Slider

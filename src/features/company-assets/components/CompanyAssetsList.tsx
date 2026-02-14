@@ -97,7 +97,7 @@ export const CompanyAssetsList: React.FC<CompanyAssetsListProps> = ({
             {asset.restricted && (
               <span className="inline-flex items-center gap-1 text-xs text-status-warning bg-status-warning-bg px-1.5 py-0.5 rounded">
                 <Lock size={12} />
-                限定
+                {COMPANY_ASSETS_LABELS.LABEL_7861}
               </span>
             )}
           </div>

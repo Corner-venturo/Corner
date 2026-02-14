@@ -195,7 +195,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.FEE_DETAILS_TABLE}</label>
               <Button type="button" size="sm" onClick={addItem} variant="outline" className="gap-1">
                 <Plus size={16} />
-                新增項目
+                {QUICK_QUOTE_LABELS.ADD_2089}
               </Button>
             </div>
             <div className="border border-border rounded-md overflow-hidden">
@@ -292,7 +292,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
                   {localItems.length === 0 && (
                     <tr>
                       <td colSpan={6} className="px-3 py-8 text-center text-morandi-secondary">
-                        尚無項目，點擊「新增項目」開始
+                        {QUICK_QUOTE_LABELS.ADD_1598}
                       </td>
                     </tr>
                   )}
@@ -322,7 +322,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">應收餘額</label>
+              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.LABEL_2302}</label>
               <CurrencyCell
                 amount={balanceAmount}
                 variant={balanceAmount > 0 ? 'expense' : 'income'}
@@ -335,7 +335,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
           <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={onClose} className="gap-2">
               <X size={16} />
-              取消
+              {QUICK_QUOTE_LABELS.CANCEL}
             </Button>
             <Button
               type="submit"
@@ -343,7 +343,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
             >
               <Plus size={16} />
-              建立快速報價單
+              {QUICK_QUOTE_LABELS.LABEL_535}
             </Button>
           </div>
         </form>

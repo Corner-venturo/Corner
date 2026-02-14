@@ -25,6 +25,7 @@ import {
 import { Button } from '@/components/ui/button'
 import type { BlockType, AnyBlock } from '../types'
 import { BLOCK_CONFIGS, canAddBlock } from '../types'
+import { BLOCK_EDITOR_LABELS } from './constants/labels'
 
 // 圖示映射
 const ICON_MAP: Record<string, React.ElementType> = {
@@ -66,7 +67,7 @@ export function BlockToolbox({ blocks, onAddBlock, className = '' }: BlockToolbo
   return (
     <div className={`space-y-2 ${className}`}>
       <h3 className="text-xs font-medium text-morandi-secondary uppercase tracking-wider px-1">
-        新增區塊
+        {BLOCK_EDITOR_LABELS.ADD_8583}
       </h3>
       <div className="space-y-1">
         {availableBlocks.map(config => (

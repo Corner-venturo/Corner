@@ -1,0 +1,17 @@
+export const DISBURSEMENT_LABELS = {
+  LABEL_3476: '加入本週出帳',
+  PRINT_1814: '列印 PDF',
+  CONFIRM_5440: '確認出帳',
+  EMPTY_8471: '本週尚無出帳計劃',
+  LABEL_2549: '請先到「待出帳」頁面勾選需要出帳的請款單',
+  SELECT_3950: '前往選擇請款單',
+  LABEL_5620: '無符合條件的供應商',
+  NOT_FOUND_6490: '目前沒有待出帳的請款項目',
+  LABEL_9308: '請款單號',
+  LABEL_9750: '團號',
+  LABEL_2946: '類別',
+  LABEL_5591: '說明',
+  LABEL_9413: '單價',
+  QUANTITY: '數量',
+  LABEL_832: '小計',
+}

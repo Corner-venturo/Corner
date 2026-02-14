@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { logger } from '@/lib/utils/logger'
+import { DESIGNER_LABELS } from './constants/labels'
 
 interface ImageMaskFillDialogProps {
   open: boolean
@@ -119,7 +120,7 @@ export function ImageMaskFillDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent level={1} className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>圖片遮罩填充</DialogTitle>
+          <DialogTitle>{DESIGNER_LABELS.LABEL_8711}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -132,7 +133,7 @@ export function ImageMaskFillDialog({
               <div className="relative">
                 <img
                   src={imageUrl}
-                  alt="預覽"
+                  alt={DESIGNER_LABELS.PREVIEW}
                   className="max-h-48 mx-auto rounded"
                 />
                 <button
@@ -150,10 +151,10 @@ export function ImageMaskFillDialog({
               <>
                 <Upload className="mx-auto mb-2 text-morandi-secondary" size={32} />
                 <p className="text-sm text-morandi-secondary">
-                  點擊或拖曳上傳圖片
+                  {DESIGNER_LABELS.UPLOADING_338}
                 </p>
                 <p className="text-xs text-morandi-muted mt-1">
-                  支援 JPG、PNG、WebP
+                  {DESIGNER_LABELS.LABEL_6759}
                 </p>
               </>
             )}
@@ -178,7 +179,7 @@ export function ImageMaskFillDialog({
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={handleCancel}>
               <X size={16} className="mr-1" />
-              取消
+              {DESIGNER_LABELS.CANCEL}
             </Button>
             <Button
               onClick={handleApply}

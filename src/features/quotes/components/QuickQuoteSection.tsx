@@ -125,7 +125,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
               className="gap-1.5"
             >
               <Printer className="h-4 w-4" />
-              列印
+              {QUICK_QUOTE_LABELS.PRINT}
             </Button>
           )}
         </div>
@@ -205,7 +205,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
               {!isReadOnly && (
                 <Button onClick={addItem} size="sm" variant="outline" className="h-7 text-xs gap-1">
                   <Plus className="h-3 w-3" />
-                  新增
+                  {QUICK_QUOTE_LABELS.ADD}
                 </Button>
               )}
             </div>
@@ -326,7 +326,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
 
           {/* 費用說明 */}
           <div>
-            <label className="text-xs font-medium text-morandi-primary">費用說明</label>
+            <label className="text-xs font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.LABEL_9264}</label>
             <textarea
               value={customerInfo.expense_description}
               onChange={e => setField('expense_description', e.target.value)}
@@ -340,17 +340,17 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
           <div className={`grid gap-3 ${isReadOnly ? 'grid-cols-3' : 'grid-cols-5'}`}>
             {!isReadOnly && (
               <div className="p-3 bg-morandi-container/10 rounded-lg">
-                <label className="text-xs font-medium text-morandi-primary">總成本</label>
+                <label className="text-xs font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.TOTAL_2585}</label>
                 <CurrencyCell amount={totalCost} className="mt-1 text-lg font-bold" />
               </div>
             )}
             <div className="p-3 bg-morandi-container/10 rounded-lg">
-              <label className="text-xs font-medium text-morandi-primary">應收金額</label>
+              <label className="text-xs font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.RECEIVABLE}</label>
               <CurrencyCell amount={totalAmount} className="mt-1 text-lg font-bold" />
             </div>
             {!isReadOnly && (
               <div className="p-3 bg-morandi-container/10 rounded-lg">
-                <label className="text-xs font-medium text-morandi-primary">總利潤</label>
+                <label className="text-xs font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.TOTAL_8800}</label>
                 <CurrencyCell
                   amount={totalProfit}
                   variant={totalProfit >= 0 ? 'income' : 'expense'}
@@ -359,7 +359,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
               </div>
             )}
             <div className="p-3 bg-morandi-container/10 rounded-lg">
-              <label className="text-xs font-medium text-morandi-primary">已收金額</label>
+              <label className="text-xs font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.RECEIVED}</label>
               {!isReadOnly ? (
                 <Input
                   type="text"
@@ -376,7 +376,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
               )}
             </div>
             <div className="p-3 bg-morandi-container/10 rounded-lg">
-              <label className="text-xs font-medium text-morandi-primary">應收餘額</label>
+              <label className="text-xs font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.LABEL_2302}</label>
               <CurrencyCell
                 amount={balanceAmount}
                 variant={balanceAmount > 0 ? 'expense' : 'income'}

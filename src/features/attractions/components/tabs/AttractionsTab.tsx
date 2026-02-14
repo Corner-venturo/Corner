@@ -183,7 +183,7 @@ export default function AttractionsTab({
             className="h-8"
           >
             <List size={14} className="mr-1.5" />
-            列表檢視
+            {ATTRACTIONS_TAB_LABELS.LABEL_6756}
           </Button>
           <Button
             variant={isReorderMode ? "default" : "outline"}
@@ -192,7 +192,7 @@ export default function AttractionsTab({
             className="h-8"
           >
             <ArrowUpDown size={14} className="mr-1.5" />
-            拖拽排序
+            {ATTRACTIONS_TAB_LABELS.LABEL_3804}
           </Button>
         </div>
       </div>

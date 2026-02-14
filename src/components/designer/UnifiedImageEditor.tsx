@@ -21,6 +21,7 @@ import type { ImageAdjustments, ImagePositionSettings } from '@/features/designe
 import { DEFAULT_IMAGE_ADJUSTMENTS, DEFAULT_IMAGE_POSITION } from '@/features/designer/components/types'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
+import { DESIGNER_LABELS } from './constants/labels'
 
 type EditorMode = 'crop' | 'position' | 'adjust'
 
@@ -213,7 +214,7 @@ export function UnifiedImageEditor({
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent level={1} className="max-w-3xl max-h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>編輯圖片</DialogTitle>
+          <DialogTitle>{DESIGNER_LABELS.EDIT_5128}</DialogTitle>
         </DialogHeader>
 
         {/* 模式切換標籤 */}
@@ -266,7 +267,7 @@ export function UnifiedImageEditor({
               >
                 <img
                   src={imageSrc}
-                  alt="預覽"
+                  alt={DESIGNER_LABELS.PREVIEW}
                   className="w-full h-full object-cover pointer-events-none"
                   style={{
                     objectPosition: `${position.x}% ${position.y}%`,
@@ -283,7 +284,7 @@ export function UnifiedImageEditor({
                     )}
                   >
                     <Move size={14} />
-                    拖曳調整位置
+                    {DESIGNER_LABELS.LABEL_4538}
                   </div>
                 </div>
               </div>
@@ -383,12 +384,12 @@ export function UnifiedImageEditor({
               className="gap-1"
             >
               <RotateCcw size={14} />
-              重置
+              {DESIGNER_LABELS.LABEL_8406}
             </Button>
 
             <div className="flex gap-2">
               <Button type="button" variant="outline" onClick={onClose} disabled={isProcessing}>
-                取消
+                {DESIGNER_LABELS.CANCEL}
               </Button>
               <Button
                 type="button"

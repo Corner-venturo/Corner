@@ -93,7 +93,7 @@ export function DevToolsSettings() {
             <div className="flex-1">
               <h3 className="font-medium mb-1">{DEVTOOLS_LABELS.ONE_CLICK_ENV}</h3>
               <p className="text-sm text-morandi-secondary">
-                複製後貼給 Claude Code，自動建立完整環境設定
+                {DEVTOOLS_LABELS.COPYING_1479}
               </p>
             </div>
             <Button
@@ -105,12 +105,12 @@ export function DevToolsSettings() {
               {copiedEnv ? (
                 <span className="flex items-center gap-1 text-status-success">
                   <Check className="h-4 w-4" />
-                  已複製！
+                  {DEVTOOLS_LABELS.COPYING_9243}
                 </span>
               ) : (
                 <span className="flex items-center gap-1">
                   <Copy className="h-4 w-4" />
-                  複製指令
+                  {DEVTOOLS_LABELS.COPYING_539}
                 </span>
               )}
             </Button>
@@ -123,7 +123,7 @@ export function DevToolsSettings() {
             <div className="flex-1">
               <h3 className="font-medium mb-1">Vercel 環境變數清單</h3>
               <p className="text-sm text-morandi-secondary">
-                用於設定 Vercel 專案的環境變數
+                {DEVTOOLS_LABELS.SETTINGS_6471}
               </p>
             </div>
             <Button
@@ -140,7 +140,7 @@ export function DevToolsSettings() {
               ) : (
                 <span className="flex items-center gap-1">
                   <Copy className="h-4 w-4" />
-                  複製清單
+                  {DEVTOOLS_LABELS.COPYING_4512}
                 </span>
               )}
             </Button>
@@ -161,7 +161,7 @@ export function DevToolsSettings() {
 
             <div className="p-4 bg-status-info-bg dark:bg-status-info/10 rounded-lg">
               <h4 className="text-sm font-medium text-morandi-primary dark:text-morandi-muted mb-2">
-                使用方式：
+                {DEVTOOLS_LABELS.LABEL_2441}
               </h4>
               <ol className="text-sm text-morandi-secondary dark:text-morandi-muted space-y-1 list-decimal list-inside">
                 <li>{DEVTOOLS_LABELS.STEP_COPY}</li>

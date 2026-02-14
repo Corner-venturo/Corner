@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Plus, Trash2 } from 'lucide-react'
 import { useCountries, useCities } from '@/data'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { ITINERARY_LABELS } from './constants/labels'
 
 // 使用與 Preview 相同的型別定義
 interface DailyScheduleItem {
@@ -90,16 +91,16 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
       {/* 封面資訊 */}
       <section>
         <h3 className="text-base font-bold text-morandi-primary mb-3 pb-2 border-b border-morandi-container">
-          封面資訊
+          {ITINERARY_LABELS.LABEL_999}
         </h3>
         <div className="space-y-3">
           {/* 國家和城市選擇 */}
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-xs font-medium text-morandi-primary mb-1">國家</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">{ITINERARY_LABELS.LABEL_5040}</label>
               <Select value={data.country} onValueChange={(value) => updateField('country', value)}>
                 <SelectTrigger className="h-9">
-                  <SelectValue placeholder="選擇國家" />
+                  <SelectValue placeholder={ITINERARY_LABELS.SELECT_8015} />
                 </SelectTrigger>
                 <SelectContent>
                   {countries
@@ -114,10 +115,10 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
               </Select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-morandi-primary mb-1">城市</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">{ITINERARY_LABELS.LABEL_5461}</label>
               <Select value={data.city} onValueChange={handleCityChange} disabled={!data.country}>
                 <SelectTrigger className="h-9">
-                  <SelectValue placeholder="選擇城市" />
+                  <SelectValue placeholder={ITINERARY_LABELS.SELECT_240} />
                 </SelectTrigger>
                 <SelectContent>
                   {cities
@@ -136,20 +137,20 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
             </div>
           </div>
           <div>
-            <label className="block text-xs font-medium text-morandi-primary mb-1">標題</label>
+            <label className="block text-xs font-medium text-morandi-primary mb-1">{ITINERARY_LABELS.TITLE}</label>
             <InputIME
               value={data.title}
               onChange={value => updateField('title', value)}
-              placeholder="例如：越南峴港經典五日"
+              placeholder={ITINERARY_LABELS.EXAMPLE_9001}
               className="w-full text-sm"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-morandi-primary mb-1">副標題 (詩意文案，用換行分隔)</label>
+            <label className="block text-xs font-medium text-morandi-primary mb-1">{ITINERARY_LABELS.LABEL_4322}</label>
             <textarea
               value={data.subtitle}
               onChange={e => updateField('subtitle', e.target.value)}
-              placeholder="第一行文案&#10;第二行文案"
+              placeholder={ITINERARY_LABELS.LABEL_4873}
               className="w-full text-sm border border-border rounded-md p-2 min-h-[60px]"
             />
           </div>
@@ -164,11 +165,11 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-morandi-primary mb-1">價格備註</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">{ITINERARY_LABELS.LABEL_4452}</label>
               <InputIME
                 value={data.priceNote}
                 onChange={value => updateField('priceNote', value)}
-                placeholder="8人包團"
+                placeholder={ITINERARY_LABELS.LABEL_7894}
                 className="w-full text-sm"
               />
             </div>
@@ -179,7 +180,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
       {/* 每日行程 */}
       <section>
         <div className="flex items-center justify-between mb-3 pb-2 border-b border-morandi-container">
-          <h3 className="text-base font-bold text-morandi-primary">每日行程</h3>
+          <h3 className="text-base font-bold text-morandi-primary">{ITINERARY_LABELS.LABEL_2780}</h3>
           <Button
             onClick={() => {
               updateField('dailySchedule', [
@@ -196,7 +197,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
             className="h-7 text-xs bg-morandi-gold hover:bg-morandi-gold-hover"
           >
             <Plus size={14} className="mr-1" />
-            新增天數
+            {ITINERARY_LABELS.ADD_2985}
           </Button>
         </div>
         <div className="space-y-3">
@@ -226,7 +227,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                     newSchedule[idx].route = value
                     updateField('dailySchedule', newSchedule)
                   }}
-                  placeholder="路線 (用 > 分隔景點)"
+                  placeholder={ITINERARY_LABELS.LABEL_6980}
                   className="w-full text-xs"
                 />
                 <div className="grid grid-cols-3 gap-1">
@@ -237,7 +238,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                       newSchedule[idx].meals.breakfast = value
                       updateField('dailySchedule', newSchedule)
                     }}
-                    placeholder="早餐"
+                    placeholder={ITINERARY_LABELS.LABEL_1347}
                     className="text-xs h-8"
                   />
                   <InputIME
@@ -247,7 +248,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                       newSchedule[idx].meals.lunch = value
                       updateField('dailySchedule', newSchedule)
                     }}
-                    placeholder="午餐"
+                    placeholder={ITINERARY_LABELS.LABEL_8515}
                     className="text-xs h-8"
                   />
                   <InputIME
@@ -257,7 +258,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                       newSchedule[idx].meals.dinner = value
                       updateField('dailySchedule', newSchedule)
                     }}
-                    placeholder="晚餐"
+                    placeholder={ITINERARY_LABELS.LABEL_8227}
                     className="text-xs h-8"
                   />
                 </div>
@@ -268,7 +269,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                     newSchedule[idx].accommodation = value
                     updateField('dailySchedule', newSchedule)
                   }}
-                  placeholder="住宿飯店"
+                  placeholder={ITINERARY_LABELS.LABEL_4576}
                   className="w-full text-xs"
                 />
               </div>
@@ -280,7 +281,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
       {/* 航班資訊 */}
       <section>
         <h3 className="text-base font-bold text-morandi-primary mb-3 pb-2 border-b border-morandi-container">
-          參考航班
+          {ITINERARY_LABELS.LABEL_5074}
         </h3>
         <div className="space-y-4 text-xs">
           {data.flightOptions.map((option, idx) => (
@@ -295,7 +296,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                       newOptions[idx].outbound.code = value
                       updateField('flightOptions', newOptions)
                     }}
-                    placeholder="航班號"
+                    placeholder={ITINERARY_LABELS.LABEL_7892}
                     className="text-xs h-7"
                   />
                   <TimeInput
@@ -305,7 +306,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                       newOptions[idx].outbound.time = value
                       updateField('flightOptions', newOptions)
                     }}
-                    placeholder="出發時間"
+                    placeholder={ITINERARY_LABELS.LABEL_5706}
                     className="text-xs h-7"
                   />
                   <TimeInput
@@ -315,7 +316,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                       newOptions[idx].outbound.arrivalTime = value
                       updateField('flightOptions', newOptions)
                     }}
-                    placeholder="抵達時間"
+                    placeholder={ITINERARY_LABELS.LABEL_749}
                     className="text-xs h-7"
                   />
                 </div>
@@ -360,7 +361,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
       {/* 行程特色 */}
       <section>
         <div className="flex items-center justify-between mb-3 pb-2 border-b border-morandi-container">
-          <h3 className="text-base font-bold text-morandi-primary">行程特色</h3>
+          <h3 className="text-base font-bold text-morandi-primary">{ITINERARY_LABELS.LABEL_6890}</h3>
           <Button
             onClick={() => {
               updateField('highlightSpots', [
@@ -372,7 +373,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
             className="h-7 text-xs bg-morandi-gold hover:bg-morandi-gold-hover"
           >
             <Plus size={14} className="mr-1" />
-            新增
+            {ITINERARY_LABELS.ADD}
           </Button>
         </div>
         <div className="space-y-3">
@@ -386,7 +387,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                     newSpots[idx].name = value
                     updateField('highlightSpots', newSpots)
                   }}
-                  placeholder="景點名稱"
+                  placeholder={ITINERARY_LABELS.LABEL_3166}
                   className="flex-1 text-xs h-7 font-semibold"
                 />
                 <Button
@@ -410,7 +411,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                   newSpots[idx].nameEn = value
                   updateField('highlightSpots', newSpots)
                 }}
-                placeholder="英文名稱"
+                placeholder={ITINERARY_LABELS.LABEL_3778}
                 className="w-full text-xs h-7 mb-2"
               />
               <textarea
@@ -420,7 +421,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                   newSpots[idx].description = e.target.value
                   updateField('highlightSpots', newSpots)
                 }}
-                placeholder="景點描述"
+                placeholder={ITINERARY_LABELS.LABEL_1700}
                 className="w-full text-xs border border-border rounded-md p-2 min-h-[50px]"
               />
             </div>
@@ -431,7 +432,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
       {/* 景點介紹 */}
       <section>
         <div className="flex items-center justify-between mb-3 pb-2 border-b border-morandi-container">
-          <h3 className="text-base font-bold text-morandi-primary">景點介紹</h3>
+          <h3 className="text-base font-bold text-morandi-primary">{ITINERARY_LABELS.LABEL_4014}</h3>
           <Button
             onClick={() => {
               updateField('sights', [
@@ -491,7 +492,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                   newSights[idx].description = e.target.value
                   updateField('sights', newSights)
                 }}
-                placeholder="詳細描述"
+                placeholder={ITINERARY_LABELS.LABEL_806}
                 className="w-full text-xs border border-border rounded-md p-2 min-h-[60px]"
               />
             </div>

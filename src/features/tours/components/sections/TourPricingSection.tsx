@@ -7,6 +7,7 @@ import { TourPricingSectionArt } from './TourPricingSectionArt'
 import { TourPricingSectionCollage } from './TourPricingSectionCollage'
 import type { TourPageData, CoverStyleType } from '@/features/tours/types/tour-display.types'
 import type { PricingDetails } from '@/stores/types/tour.types'
+import { TOURS_LABELS } from './constants/labels'
 
 interface TourPricingSectionProps {
   data: TourPageData
@@ -37,7 +38,7 @@ export function TourPricingSection({ data, viewMode = 'desktop', coverStyle = 'o
     <section className={cn('py-12 bg-morandi-container/30', isMobile && 'py-8')}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
-          title="團費說明"
+          title={TOURS_LABELS.LABEL_8454}
           coverStyle={coverStyle}
           className="mb-8"
         />
@@ -55,7 +56,7 @@ export function TourPricingSection({ data, viewMode = 'desktop', coverStyle = 'o
               <div className="w-6 h-6 bg-morandi-green/20 rounded-full flex items-center justify-center">
                 <Check className="w-4 h-4 text-morandi-green" />
               </div>
-              費用包含
+              {TOURS_LABELS.LABEL_5450}
             </h3>
             <ul className="space-y-2">
               {pricingDetails.included_items
@@ -84,7 +85,7 @@ export function TourPricingSection({ data, viewMode = 'desktop', coverStyle = 'o
               <div className="w-6 h-6 bg-morandi-red/20 rounded-full flex items-center justify-center">
                 <X className="w-4 h-4 text-morandi-red" />
               </div>
-              費用不含
+              {TOURS_LABELS.LABEL_4561}
             </h3>
             <ul className="space-y-2">
               {pricingDetails.excluded_items
@@ -113,7 +114,7 @@ export function TourPricingSection({ data, viewMode = 'desktop', coverStyle = 'o
               isMobile ? 'text-base' : 'text-lg'
             )}>
               <AlertTriangle className="w-5 h-5 text-morandi-gold" />
-              注意事項
+              {TOURS_LABELS.LABEL_8733}
             </h3>
             <ol className="space-y-2 list-decimal list-inside">
               {pricingDetails.notes.map((note, index) => (

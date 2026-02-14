@@ -10,6 +10,7 @@ import { CornerHotelVoucher } from '@/features/accommodation/components/CornerHo
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { X, Printer, FileText } from 'lucide-react'
+import { HOTEL_VOUCHER_LABELS } from './constants/labels'
 
 // 預設資料（第一個 PDF - 赤阪城市酒店）
 const SAMPLE_DATA_1 = {
@@ -224,7 +225,7 @@ export default function HotelVoucherPage() {
       <div className="min-h-screen flex items-center justify-center bg-muted">
         <Button onClick={() => setIsOpen(true)} className="gap-2">
           <FileText size={16} />
-          開啟入住憑證
+          {HOTEL_VOUCHER_LABELS.LABEL_2437}
         </Button>
       </div>
     )
@@ -247,21 +248,21 @@ export default function HotelVoucherPage() {
                 variant={currentVoucher === 1 ? 'default' : 'outline'}
                 onClick={() => setCurrentVoucher(1)}
               >
-                赤阪城市酒店
+                {HOTEL_VOUCHER_LABELS.LABEL_8248}
               </Button>
               <Button
                 size="sm"
                 variant={currentVoucher === 2 ? 'default' : 'outline'}
                 onClick={() => setCurrentVoucher(2)}
               >
-                三井花園酒店
+                {HOTEL_VOUCHER_LABELS.LABEL_7137}
               </Button>
               <Button
                 size="sm"
                 variant={currentVoucher === 3 ? 'default' : 'outline'}
                 onClick={() => setCurrentVoucher(3)}
               >
-                東京灣舞濱日航
+                {HOTEL_VOUCHER_LABELS.LABEL_7921}
               </Button>
               <Button
                 size="sm"
@@ -285,19 +286,19 @@ export default function HotelVoucherPage() {
                   variant={language === 'zh' ? 'default' : 'outline'}
                   onClick={() => setLanguage('zh')}
                 >
-                  中文
+                  {HOTEL_VOUCHER_LABELS.LABEL_2428}
                 </Button>
                 <Button
                   size="sm"
                   variant={language === 'ja' ? 'default' : 'outline'}
                   onClick={() => setLanguage('ja')}
                 >
-                  日文
+                  {HOTEL_VOUCHER_LABELS.LABEL_7190}
                 </Button>
               </div>
               <Button size="sm" onClick={handlePrint} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
                 <Printer size={16} />
-                列印 / 儲存 PDF
+                {HOTEL_VOUCHER_LABELS.SAVING_2172}
               </Button>
             </div>
           </div>

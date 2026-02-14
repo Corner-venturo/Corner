@@ -151,7 +151,7 @@ export default function FinancePage() {
 
   return (
     <div className="h-full flex flex-col">
-      <ResponsiveHeader title="財務管理中心" />
+      <ResponsiveHeader title={FINANCE_PAGE_LABELS.MANAGE_8421} />
 
       <div className="flex-1 overflow-auto p-6">
         <div className="space-y-6">
@@ -245,13 +245,13 @@ export default function FinancePage() {
                   onClick={() => fetchTransactions(transactionsPage - 1)}
                   disabled={transactionsPage <= 1 || isLoading}
                 >
-                  上一頁
+                  {FINANCE_PAGE_LABELS.LABEL_5163}
                 </Button>
                 <Button
                   onClick={() => fetchTransactions(transactionsPage + 1)}
                   disabled={transactionsPage >= totalPages || isLoading}
                 >
-                  下一頁
+                  {FINANCE_PAGE_LABELS.LABEL_9383}
                 </Button>
               </div>
             </div>

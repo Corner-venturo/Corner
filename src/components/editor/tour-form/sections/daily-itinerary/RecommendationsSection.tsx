@@ -23,7 +23,7 @@ export function RecommendationsSection({
   return (
     <div className="space-y-2">
       <div className="flex justify-between items-center">
-        <label className="text-sm font-medium text-morandi-primary">推薦行程</label>
+        <label className="text-sm font-medium text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_7651}</label>
         <Button
           onClick={() => addRecommendation(dayIndex)}
           size="xs"

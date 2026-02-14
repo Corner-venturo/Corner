@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { TourPageData, HotelInfo } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 interface TourHotelsSectionArtProps {
   data: TourPageData
@@ -154,7 +155,7 @@ export function TourHotelsSectionArt({ data, viewMode }: TourHotelsSectionArtPro
                 className="text-5xl lg:text-7xl font-light mb-6"
                 style={{ fontFamily: "'Zen Old Mincho', serif", color: colors.ink }}
               >
-                精選住宿
+                {TOURS_LABELS.LABEL_1692}
               </h2>
               <div className="w-24 h-1" style={{ backgroundColor: colors.clay }} />
             </div>

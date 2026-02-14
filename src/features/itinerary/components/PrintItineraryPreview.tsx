@@ -3,6 +3,7 @@
 import React from 'react'
 import Image from 'next/image'
 import styles from './PrintItineraryPreview.module.css'
+import { ITINERARY_LABELS } from './constants/labels'
 
 // Define the data interfaces directly in the file for clarity
 interface DailyScheduleItem {
@@ -80,7 +81,7 @@ export function PrintItineraryPreview({ data }: PrintItineraryPreviewProps) {
 
       {/* --- Highlights Section --- */}
       <section className={`${styles.section} ${styles.container}`}>
-        <SectionHeader title="行程特色" subtitle="Highlights" />
+        <SectionHeader title={ITINERARY_LABELS.LABEL_6890} subtitle="Highlights" />
         <div className={styles.highlightsGrid}>
           {safeData.highlightSpots.map((spot, index) => (
             <div key={index}>
@@ -101,17 +102,17 @@ export function PrintItineraryPreview({ data }: PrintItineraryPreviewProps) {
       {/* --- Flights Section --- */}
       {safeData.flightOptions.length > 0 && (
         <section className={`${styles.section} ${styles.container}`}>
-          <SectionHeader title="參考航班" subtitle="Flights Information" />
+          <SectionHeader title={ITINERARY_LABELS.LABEL_5074} subtitle="Flights Information" />
           <div className={styles.flightsTableWrapper}>
             <table className={styles.flightsTable}>
               <thead>
                 <tr>
-                  <th>航空公司</th>
-                  <th>航班號碼</th>
-                  <th>起飛地</th>
-                  <th>目的地</th>
-                  <th>起飛時間</th>
-                  <th>抵達時間</th>
+                  <th>{ITINERARY_LABELS.LABEL_7827}</th>
+                  <th>{ITINERARY_LABELS.LABEL_8457}</th>
+                  <th>{ITINERARY_LABELS.LABEL_2395}</th>
+                  <th>{ITINERARY_LABELS.LABEL_5475}</th>
+                  <th>{ITINERARY_LABELS.LABEL_2614}</th>
+                  <th>{ITINERARY_LABELS.LABEL_749}</th>
                 </tr>
               </thead>
               <tbody>
@@ -143,7 +144,7 @@ export function PrintItineraryPreview({ data }: PrintItineraryPreviewProps) {
 
       {/* --- Itinerary Section --- */}
       <section className={`${styles.section} ${styles.container}`}>
-        <SectionHeader title="行程規劃" subtitle="Daily Itinerary" />
+        <SectionHeader title={ITINERARY_LABELS.LABEL_311} subtitle="Daily Itinerary" />
         <div className={styles.itineraryList}>
           {safeData.dailySchedule.map((day, index) => (
             <div className={styles.dayItem} key={index}>
@@ -151,13 +152,13 @@ export function PrintItineraryPreview({ data }: PrintItineraryPreviewProps) {
               <div className={styles.dayContent}>
                 <p className={styles.dayRoute}>{day.route}</p>
                 <p className={styles.dayDetails}>
-                  <strong>餐食：</strong>
+                  <strong>{ITINERARY_LABELS.LABEL_9046}</strong>
                   早 {day.meals.breakfast} / 
                   午 {day.meals.lunch} / 
                   晚 {day.meals.dinner}
                 </p>
                 <p className={styles.dayHotel}>
-                  <strong>住宿：</strong>
+                  <strong>{ITINERARY_LABELS.LABEL_8648}</strong>
                   {day.accommodation}
                 </p>
               </div>
@@ -169,9 +170,9 @@ export function PrintItineraryPreview({ data }: PrintItineraryPreviewProps) {
       {/* --- Cost Section --- */}
       {safeData.price && (
         <section className={`${styles.section} ${styles.container}`}>
-          <SectionHeader title="團費說明" subtitle="Pricing Details" />
+          <SectionHeader title={ITINERARY_LABELS.LABEL_8454} subtitle="Pricing Details" />
           <div className={styles.costCard}>
-            <div className={styles.costHeader}>參考費用</div>
+            <div className={styles.costHeader}>{ITINERARY_LABELS.LABEL_2490}</div>
             <div className={styles.costPrice}>
               NT$ {safeData.price} <small>{safeData.priceNote || '起'}</small>
             </div>

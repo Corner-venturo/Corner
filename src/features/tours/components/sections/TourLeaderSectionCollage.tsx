@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import type { TourPageData } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 /**
  * TourLeaderSectionCollage 需要的欄位
@@ -200,7 +201,7 @@ export function TourLeaderSectionCollage({ data, viewMode }: TourLeaderSectionCo
             <ul className="space-y-3 text-sm" style={{ fontFamily: "'Space Mono', monospace" }}>
               <li className="flex items-start gap-2">
                 <span className="w-1.5 h-1.5 bg-black rounded-full mt-2" />
-                請務必攜帶護照正本（有效期需在六個月以上）
+                {TOURS_LABELS.LABEL_5488}
               </li>
               <li className="flex items-start gap-2">
                 <span className="w-1.5 h-1.5 bg-black rounded-full mt-2" />
@@ -208,7 +209,7 @@ export function TourLeaderSectionCollage({ data, viewMode }: TourLeaderSectionCo
               </li>
               <li className="flex items-start gap-2">
                 <span className="w-1.5 h-1.5 bg-black rounded-full mt-2" />
-                領隊將持團體標誌旗幟等候
+                {TOURS_LABELS.LABEL_2918}
               </li>
             </ul>
           </div>

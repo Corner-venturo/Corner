@@ -26,6 +26,7 @@ import type { CanvasPage } from './types'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { cn } from '@/lib/utils'
+import { DESIGNER_LABELS } from './constants/labels'
 
 interface TemplateSelectorProps {
   itineraryId?: string | null
@@ -221,11 +222,11 @@ export function TemplateSelector({
       <div className="h-[72px] bg-background border-b border-border flex items-center px-6">
         <Button variant="ghost" size="sm" onClick={onBack} className="gap-2 mr-4">
           <ArrowLeft size={16} />
-          返回
+          {DESIGNER_LABELS.BACK}
         </Button>
         <div className="flex items-center gap-3">
           <BookOpen size={24} className="text-morandi-gold" />
-          <h1 className="text-xl font-semibold text-morandi-primary">選擇手冊風格</h1>
+          <h1 className="text-xl font-semibold text-morandi-primary">{DESIGNER_LABELS.SELECT_9662}</h1>
         </div>
       </div>
 
@@ -237,7 +238,7 @@ export function TemplateSelector({
             {isLoading ? (
               <div className="flex items-center gap-2 text-morandi-secondary">
                 <Loader2 size={16} className="animate-spin" />
-                正在載入行程資料...
+                {DESIGNER_LABELS.LOADING_406}
               </div>
             ) : loadError ? (
               <div className="text-morandi-red">{loadError}</div>
@@ -265,10 +266,10 @@ export function TemplateSelector({
         {/* 選擇風格 */}
         <div className="mb-8">
           <h2 className="text-lg font-semibold text-morandi-primary mb-4">
-            選擇設計風格
+            {DESIGNER_LABELS.SELECT_2078}
           </h2>
           <p className="text-sm text-morandi-secondary mb-4">
-            選擇風格後，會先建立封面頁，您可以在編輯器中逐步新增其他頁面
+            {DESIGNER_LABELS.ADD_795}
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -301,7 +302,7 @@ export function TemplateSelector({
                     )}
                   </div>
                   <p className="text-sm text-morandi-secondary mt-1">
-                    簡約、留白、優雅的設計風格
+                    {DESIGNER_LABELS.LABEL_6962}
                   </p>
                 </div>
               </button>
@@ -312,7 +313,7 @@ export function TemplateSelector({
         {/* 開始按鈕 */}
         <div className="flex justify-end gap-3">
           <Button variant="outline" onClick={onBack}>
-            取消
+            {DESIGNER_LABELS.CANCEL}
           </Button>
           <Button
             onClick={handleStart}
@@ -322,12 +323,12 @@ export function TemplateSelector({
             {isGenerating ? (
               <>
                 <Loader2 size={16} className="animate-spin" />
-                準備中...
+                {DESIGNER_LABELS.LABEL_9779}
               </>
             ) : (
               <>
                 <ChevronRight size={16} />
-                開始編輯
+                {DESIGNER_LABELS.EDIT_16}
               </>
             )}
           </Button>

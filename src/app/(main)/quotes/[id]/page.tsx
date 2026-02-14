@@ -38,6 +38,7 @@ import {
   calculateIdentityProfits,
   generateUniqueId,
 } from '@/features/quotes/utils/priceCalculations'
+import { ID_LABELS } from './constants/labels'
 
 export default function QuoteDetailPage() {
 
@@ -458,7 +459,7 @@ export default function QuoteDetailPage() {
       <div className="flex items-center justify-center h-[50vh]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-morandi-gold mx-auto mb-4"></div>
-          <p className="text-morandi-secondary">載入中...</p>
+          <p className="text-morandi-secondary">{ID_LABELS.LOADING_6912}</p>
         </div>
       </div>
     )
@@ -469,8 +470,8 @@ export default function QuoteDetailPage() {
     return (
       <div className="flex items-center justify-center h-[50vh]">
         <NotFoundState
-          title="找不到該報價單"
-          description="您要找的報價單可能已被刪除或不存在"
+          title={ID_LABELS.NOT_FOUND_4550}
+          description={ID_LABELS.DELETE_642}
           backButtonLabel="返回報價單列表"
           backHref="/quotes"
         />
@@ -543,22 +544,22 @@ export default function QuoteDetailPage() {
                   <thead className="bg-morandi-container/50 border-b border-border">
                     <tr>
                       <th className="text-left py-3 px-4 text-sm font-semibold text-morandi-charcoal w-12 table-divider">
-                        分類
+                        {ID_LABELS.LABEL_2257}
                       </th>
                       <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-70 table-divider">
-                        項目
+                        {ID_LABELS.LABEL_7325}
                       </th>
                       <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-20 table-divider">
-                        數量
+                        {ID_LABELS.QUANTITY}
                       </th>
                       <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-28 table-divider">
-                        單價
+                        {ID_LABELS.LABEL_9413}
                       </th>
                       <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-28 table-divider whitespace-nowrap">
-                        小計
+                        {ID_LABELS.LABEL_832}
                       </th>
                       <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-24">
-                        操作
+                        {ID_LABELS.ACTIONS}
                       </th>
                     </tr>
                   </thead>

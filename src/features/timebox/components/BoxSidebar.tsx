@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { useTimeboxBoxes, morandiColors, type TimeboxBox } from '../hooks/useTimeboxData'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
+import { TIMEBOX_LABELS } from './constants/labels'
 
 const typeIcons = {
   workout: Dumbbell,
@@ -62,7 +63,7 @@ export default function BoxSidebar({ onManageClick }: BoxSidebarProps) {
     <div className="w-64 border-l border-border bg-morandi-bg/30 flex flex-col">
       {/* 標題 */}
       <div className="p-4 border-b border-border flex items-center justify-between">
-        <h3 className="font-semibold text-morandi-primary">我的箱子</h3>
+        <h3 className="font-semibold text-morandi-primary">{TIMEBOX_LABELS.LABEL_3635}</h3>
         <Button
           variant="ghost"
           size="sm"
@@ -80,7 +81,7 @@ export default function BoxSidebar({ onManageClick }: BoxSidebarProps) {
             <Input
               value={newBoxName}
               onChange={e => setNewBoxName(e.target.value)}
-              placeholder="箱子名稱..."
+              placeholder={TIMEBOX_LABELS.LABEL_3864}
               className="h-9"
               autoFocus
               onKeyDown={e => {
@@ -108,7 +109,7 @@ export default function BoxSidebar({ onManageClick }: BoxSidebarProps) {
                 onClick={handleQuickAdd}
                 disabled={!newBoxName.trim()}
               >
-                建立
+                {TIMEBOX_LABELS.CREATE}
               </Button>
               <Button
                 variant="outline"
@@ -116,7 +117,7 @@ export default function BoxSidebar({ onManageClick }: BoxSidebarProps) {
                 className="h-8"
                 onClick={() => setShowQuickAdd(false)}
               >
-                取消
+                {TIMEBOX_LABELS.CANCEL}
               </Button>
             </div>
           </div>
@@ -128,7 +129,7 @@ export default function BoxSidebar({ onManageClick }: BoxSidebarProps) {
             onClick={() => setShowQuickAdd(true)}
           >
             <Plus className="h-4 w-4" />
-            快速新增箱子
+            {TIMEBOX_LABELS.ADD_5662}
           </Button>
         )}
       </div>
@@ -137,14 +138,14 @@ export default function BoxSidebar({ onManageClick }: BoxSidebarProps) {
       <div className="flex-1 overflow-auto p-2">
         {error ? (
           <div className="text-center py-8 text-status-danger text-sm">
-            <p>載入箱子失敗</p>
+            <p>{TIMEBOX_LABELS.LOADING_2502}</p>
             <p className="text-xs mt-1">{error.message}</p>
           </div>
         ) : userBoxes.length === 0 ? (
           <div className="text-center py-8 text-morandi-secondary text-sm">
             <Package className="h-10 w-10 mx-auto mb-2 opacity-30" />
-            <p>還沒有箱子</p>
-            <p className="text-xs mt-1">點擊上方新增</p>
+            <p>{TIMEBOX_LABELS.NOT_FOUND_2512}</p>
+            <p className="text-xs mt-1">{TIMEBOX_LABELS.ADD_8094}</p>
           </div>
         ) : (
           <div className="space-y-1">

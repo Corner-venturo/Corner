@@ -327,7 +327,7 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
           }}
         >
           <FolderPlus className="w-4 h-4 mr-1" />
-          新增資料夾
+          {COMPANY_ASSETS_LABELS.新增資料夾}
         </Button>
 
         {/* 選取資料夾時顯示的操作 */}
@@ -345,7 +345,7 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
                 }
               }}
             >
-              重命名
+              {COMPANY_ASSETS_LABELS.LABEL_4285}
             </Button>
             <Button
               variant="ghost"
@@ -353,7 +353,7 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
               className="text-destructive"
               onClick={() => handleDeleteFolder(selectedItem.data?.folderId as string)}
             >
-              刪除
+              {COMPANY_ASSETS_LABELS.刪除}
             </Button>
           </>
         )}
@@ -363,8 +363,8 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
       <div className="flex-1 overflow-auto px-4 py-2">
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">
-            <p>尚無資源</p>
-            <p className="text-sm">點擊上方按鈕新增資料夾或上傳檔案</p>
+            <p>{COMPANY_ASSETS_LABELS.EMPTY_1497}</p>
+            <p className="text-sm">{COMPANY_ASSETS_LABELS.ADD_3812}</p>
           </div>
         ) : (
           <TreeView
@@ -396,7 +396,7 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowFolderDialog(false)}>
-              取消
+              {COMPANY_ASSETS_LABELS.CANCEL}
             </Button>
             <Button onClick={handleCreateFolder} disabled={!newFolderName.trim() || creatingFolder}>
               {creatingFolder ? COMPANY_ASSETS_LABELS.處理中 : (editingFolder ? COMPANY_ASSETS_LABELS.儲存 : COMPANY_ASSETS_LABELS.建立)}

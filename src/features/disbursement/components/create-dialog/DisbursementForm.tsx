@@ -42,7 +42,7 @@ export function DisbursementForm({
       {/* 第一列：出帳日期、出納單號 */}
       <div className="grid grid-cols-2 gap-4 flex-shrink-0">
         <div className="space-y-1">
-          <label className="text-sm text-morandi-muted">出帳日期 *</label>
+          <label className="text-sm text-morandi-muted">{DISBURSEMENT_LABELS.LABEL_3745}</label>
           <div className="flex items-center gap-2">
             <DatePicker
               value={disbursementDate}
@@ -53,7 +53,7 @@ export function DisbursementForm({
           </div>
         </div>
         <div className="space-y-1">
-          <label className="text-sm text-morandi-muted">出納單號</label>
+          <label className="text-sm text-morandi-muted">{DISBURSEMENT_LABELS.出納單號}</label>
           <Input
             value={DISBURSEMENT_LABELS.自動產生_2}
             disabled
@@ -64,7 +64,7 @@ export function DisbursementForm({
 
       {/* 第二列：狀態篩選 */}
       <div className="space-y-1 flex-shrink-0">
-        <label className="text-sm text-morandi-muted">狀態</label>
+        <label className="text-sm text-morandi-muted">{DISBURSEMENT_LABELS.狀態}</label>
         <Select value={statusFilter} onValueChange={onStatusChange}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder={DISBURSEMENT_LABELS.選擇狀態} />

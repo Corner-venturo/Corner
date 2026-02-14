@@ -11,6 +11,7 @@ import {
   DialogContent,
   DialogClose,
 } from '@/components/ui/dialog'
+import { UI_LABELS } from './constants/labels'
 
 interface PhotoWallProps {
   images: string[]
@@ -71,7 +72,7 @@ export function ThreeDPhotoWall({ images, onClose, className, open = true }: Pho
 
           {/* 標題 */}
           <div className="absolute top-6 left-6 z-[100000]">
-            <h2 className="text-2xl font-bold text-white/90">行程照片牆</h2>
+            <h2 className="text-2xl font-bold text-white/90">{UI_LABELS.LABEL_7722}</h2>
             <p className="text-sm text-white/60 mt-1">{images.length} 張照片</p>
           </div>
 
@@ -110,7 +111,7 @@ export function ThreeDPhotoWall({ images, onClose, className, open = true }: Pho
 
           {/* 提示文字 */}
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/50 text-sm z-[100000]">
-            按 ESC 或點擊任意處關閉
+            {UI_LABELS.LABEL_1891}
           </div>
         </DialogContent>
       </DialogPortal>

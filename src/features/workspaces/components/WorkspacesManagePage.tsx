@@ -138,8 +138,8 @@ export function WorkspacesManagePage() {
       width: '150',
       render: (_: unknown, row: WorkspaceWithDetails) => (
         <div className="text-xs text-morandi-secondary">
-          <div>編號前綴：{row.employee_number_prefix || 'E'}</div>
-          <div>預設密碼：{row.default_password || '1234'}</div>
+          <div>{WORKSPACES_LABELS.LABEL_535}{row.employee_number_prefix || 'E'}</div>
+          <div>{WORKSPACES_LABELS.LABEL_243}{row.default_password || '1234'}</div>
         </div>
       ),
     },

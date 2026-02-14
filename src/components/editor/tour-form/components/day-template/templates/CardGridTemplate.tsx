@@ -107,7 +107,7 @@ export function CardGridTemplate({
             className="h-32 border-2 border-dashed border-border rounded-xl flex flex-col items-center justify-center text-morandi-muted hover:border-[#B8A99A] hover:text-[#B8A99A] transition-colors"
           >
             <Plus size={28} />
-            <span className="text-sm mt-1">新增景點</span>
+            <span className="text-sm mt-1">{COMP_EDITOR_LABELS.ADD_14}</span>
           </button>
         </div>
       </div>
@@ -115,7 +115,7 @@ export function CardGridTemplate({
       {/* 底部：餐食 + 住宿 */}
       <div className="px-6 py-4 bg-[#B8A99A]/5 border-t border-[#B8A99A]/20 flex gap-6">
         <div className="flex-1">
-          <div className="text-xs text-[#B8A99A] font-medium mb-1">餐食安排</div>
+          <div className="text-xs text-[#B8A99A] font-medium mb-1">{COMP_EDITOR_LABELS.LABEL_9126}</div>
           <div className="flex gap-4 text-sm">
             <span>
               早：<EditableText
@@ -153,7 +153,7 @@ export function CardGridTemplate({
           </div>
         </div>
         <div>
-          <div className="text-xs text-[#B8A99A] font-medium mb-1">住宿</div>
+          <div className="text-xs text-[#B8A99A] font-medium mb-1">{COMP_EDITOR_LABELS.住宿}</div>
           <EditableText
             value={editingDay.accommodation || ''}
             fieldKey="accommodation"

@@ -13,6 +13,7 @@ import {
   getStatusIcon,
 } from '@/lib/status-config'
 import type { LucideIcon } from 'lucide-react'
+import { TABLE_CELLS_LABELS } from './constants/labels'
 
 // ========== 類型定義 ==========
 
@@ -145,7 +146,7 @@ export function DateCell({
 
   const dateObj = new Date(date)
   if (isNaN(dateObj.getTime())) {
-    return <span className={cn('text-sm text-morandi-red', className)}>無效日期</span>
+    return <span className={cn('text-sm text-morandi-red', className)}>{TABLE_CELLS_LABELS.LABEL_5349}</span>
   }
 
   return (
@@ -270,7 +271,7 @@ export function DateRangeCell({
       <div className="text-morandi-primary">
         {formatDate(startDate, format)} ~ {formatDate(endDate, format)}
       </div>
-      {showDuration && <div className="text-xs text-morandi-secondary">共 {duration} 天</div>}
+      {showDuration && <div className="text-xs text-morandi-secondary">{TABLE_CELLS_LABELS.LABEL_5332} {duration} 天</div>}
     </div>
   )
 }

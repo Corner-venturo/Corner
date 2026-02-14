@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { ENHANCED_TABLE_LABELS } from './constants/labels'
 
 interface TablePaginationProps {
   currentPage: number
@@ -36,18 +37,18 @@ export function TablePagination({
     <div className="p-3 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-border/40 bg-morandi-container/10">
       {/* 左側：資料統計 */}
       <div className="text-sm text-morandi-secondary">
-        顯示第 <span className="font-medium text-morandi-primary">{startIndex + 1}</span> 到{' '}
+        顯示第 <span className="font-medium text-morandi-primary">{startIndex + 1}</span> {ENHANCED_TABLE_LABELS.LABEL_6376}{' '}
         <span className="font-medium text-morandi-primary">
           {Math.min(startIndex + pageSize, totalItems)}
         </span>{' '}
-        筆， 共 <span className="font-medium text-morandi-primary">{totalItems}</span> 筆資料
+        筆， 共 <span className="font-medium text-morandi-primary">{totalItems}</span> {ENHANCED_TABLE_LABELS.LABEL_7043}
       </div>
 
       {/* 右側：分頁控制 */}
       <div className="flex items-center gap-2">
         {/* 每頁顯示筆數 */}
         <div className="flex items-center gap-2">
-          <span className="text-sm text-morandi-secondary">每頁</span>
+          <span className="text-sm text-morandi-secondary">{ENHANCED_TABLE_LABELS.LABEL_2936}</span>
           <Select
             value={pageSize.toString()}
             onValueChange={value => onPageSizeChange(Number(value))}
@@ -62,7 +63,7 @@ export function TablePagination({
               <SelectItem value="100">100</SelectItem>
             </SelectContent>
           </Select>
-          <span className="text-sm text-morandi-secondary">筆</span>
+          <span className="text-sm text-morandi-secondary">{ENHANCED_TABLE_LABELS.LABEL_2269}</span>
         </div>
 
         {/* 分頁按鈕 - 只在有多頁時顯示 */}
@@ -77,7 +78,7 @@ export function TablePagination({
               disabled={currentPage === 1}
               className="h-9 px-3 text-sm"
             >
-              上一頁
+              {ENHANCED_TABLE_LABELS.LABEL_5163}
             </Button>
 
             <div className="flex items-center gap-0.5 sm:gap-1">
@@ -117,7 +118,7 @@ export function TablePagination({
               disabled={currentPage === totalPages}
               className="h-9 px-3 text-sm"
             >
-              下一頁
+              {ENHANCED_TABLE_LABELS.LABEL_9383}
             </Button>
           </>
         )}

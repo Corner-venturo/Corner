@@ -21,6 +21,7 @@ import { MemberBasicInfo, MemberPassportInfo, MemberActions } from './member-row
 
 import type { HotelColumn, RoomOption, RoomMemberInfo } from '../hooks/useRoomVehicleAssignments'
 import { RoomAssignmentCell } from './member-row/RoomAssignmentCell'
+import { ORDERS_LABELS } from './constants/labels'
 
 interface MemberRowProps {
   member: OrderMember
@@ -351,7 +352,7 @@ export function MemberRow({
           {member.ticket_number ? (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-morandi-green/20 text-morandi-green text-xs rounded-full font-medium">
               <Check size={10} />
-              已開票
+              {ORDERS_LABELS.LABEL_9032}
             </span>
           ) : (
             <input

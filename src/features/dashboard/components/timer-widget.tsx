@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TIMER_INTERVAL, SECONDS_PER_HOUR, SECONDS_PER_MINUTE } from '@/lib/constants'
+import { DASHBOARD_LABELS } from './constants/labels'
 
 export function TimerWidget() {
   const [seconds, setSeconds] = useState(0)
@@ -44,10 +45,10 @@ export function TimerWidget() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">
-                計時器
+                {DASHBOARD_LABELS.CALCULATING_3504}
               </p>
               <p className="text-xs text-morandi-secondary/90 mt-1.5 leading-relaxed">
-                精準計時，掌握每分每秒
+                {DASHBOARD_LABELS.CALCULATING_3838}
               </p>
             </div>
           </div>
@@ -62,12 +63,12 @@ export function TimerWidget() {
                 {isRunning ? (
                   <>
                     <span className="w-2 h-2 rounded-full bg-status-success animate-pulse shadow-sm"></span>
-                    <span>計時中...</span>
+                    <span>{DASHBOARD_LABELS.CALCULATING_7093}</span>
                   </>
                 ) : (
                   <>
                     <span className="w-2 h-2 rounded-full bg-morandi-muted"></span>
-                    <span>已暫停</span>
+                    <span>{DASHBOARD_LABELS.LABEL_5402}</span>
                   </>
                 )}
               </div>
@@ -97,7 +98,7 @@ export function TimerWidget() {
               }}
               className="bg-card/90 border-2 border-border/60 hover:bg-status-danger-bg hover:text-status-danger hover:border-status-danger hover:shadow-md transition-all rounded-xl font-semibold"
             >
-              重設
+              {DASHBOARD_LABELS.RESET}
             </Button>
           </div>
         </div>

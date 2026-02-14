@@ -25,12 +25,12 @@ export default function UnauthorizedPage() {
         <div className="space-y-3">
           <Button onClick={() => router.back()} variant="outline" className="w-full gap-2">
             <ArrowLeft size={16} />
-            返回上一頁
+            {LABELS.LABEL_3074}
           </Button>
 
           <Button onClick={() => router.push('/')} className="w-full gap-2">
             <Home size={16} />
-            回到首頁
+            {LABELS.LABEL_1027}
           </Button>
         </div>
 

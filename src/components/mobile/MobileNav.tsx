@@ -26,6 +26,7 @@ import {
   X,
   CheckCircle,
 } from 'lucide-react'
+import { MOBILE_LABELS } from './constants/labels'
 
 // 底部導航項目
 const NAV_ITEMS = [
@@ -134,7 +135,7 @@ export function MobileNav() {
         <DialogContent level={1} className="fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 max-w-none w-full rounded-t-2xl rounded-b-none max-h-[80vh] overflow-auto p-0 data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom">
           {/* 標題列 */}
           <div className="sticky top-0 bg-card border-b border-border px-4 py-3 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-morandi-primary">工作台</h2>
+            <h2 className="text-lg font-bold text-morandi-primary">{MOBILE_LABELS.LABEL_6263}</h2>
             <button
               onClick={() => setShowWorkbench(false)}
               className="p-2 hover:bg-morandi-container rounded-lg transition-colors"

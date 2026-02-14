@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 import { Loader2 } from 'lucide-react'
+import { DESIGNER_LABELS } from './constants/labels'
 
 // 預設漸層色票
 const PRESET_GRADIENTS = [
@@ -74,8 +75,8 @@ export function GradientPicker({ value, onChange, className }: GradientPickerPro
       <PopoverContent className="w-80 p-0" align="start">
         <Tabs value={mode} onValueChange={(v) => setMode(v as 'solid' | 'gradient')}>
           <TabsList className="w-full grid grid-cols-2">
-            <TabsTrigger value="solid">純色</TabsTrigger>
-            <TabsTrigger value="gradient">漸層</TabsTrigger>
+            <TabsTrigger value="solid">{DESIGNER_LABELS.LABEL_3502}</TabsTrigger>
+            <TabsTrigger value="gradient">{DESIGNER_LABELS.LABEL_6118}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="solid" className="p-3">
@@ -88,7 +89,7 @@ export function GradientPicker({ value, onChange, className }: GradientPickerPro
           <TabsContent value="gradient" className="p-3 space-y-3">
             {/* 預設漸層 */}
             <div>
-              <p className="text-xs text-morandi-secondary mb-2">預設漸層</p>
+              <p className="text-xs text-morandi-secondary mb-2">{DESIGNER_LABELS.LABEL_6513}</p>
               <div className="grid grid-cols-4 gap-2">
                 {PRESET_GRADIENTS.map((gradient, i) => (
                   <button
@@ -107,7 +108,7 @@ export function GradientPicker({ value, onChange, className }: GradientPickerPro
 
             {/* 自訂漸層 */}
             <div>
-              <p className="text-xs text-morandi-secondary mb-2">自訂漸層</p>
+              <p className="text-xs text-morandi-secondary mb-2">{DESIGNER_LABELS.LABEL_4278}</p>
               <GradientColorPicker
                 value={value?.includes('gradient') ? value : 'linear-gradient(90deg, #c9aa7c 0%, #e8d5b7 100%)'}
                 onChange={(gradient) => onChange(gradient, false)}

@@ -6,4 +6,16 @@ export const LABELS = {
   DEADLINE: '期限',
   NO_ASSIGN: '不指派（個人任務）',
   PUBLIC_TO_COMPANY: '公開給全公司',
+
+  LABEL_7239: '公開',
+  LABEL_9553: '待辦事項',
+  ADD_25: '快速新增... (Enter)',
+  EDIT: '編輯',
+  DELETE: '刪除',
+  LABEL_3467: '輸入任務標題...',
+  SELECT_5234: '選擇日期',
+  LABEL_7694: '指派給（可選）',
+  EDIT_8913: '其他同事可以查看此待辦，但只有你和共享者可以編輯',
+  LABEL_1974: '建立任務',
+  CANCEL: '取消',
 }

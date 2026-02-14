@@ -115,7 +115,7 @@ export function NewebPaySettings() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <CreditCard className="h-5 w-5 text-morandi-gold" />
-          <h2 className="text-lg font-semibold text-morandi-primary">藍新金流設定</h2>
+          <h2 className="text-lg font-semibold text-morandi-primary">{NEWEBPAY_LABELS.TITLE}</h2>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs text-morandi-secondary">{NEWEBPAY_LABELS.SUBTITLE}</span>
@@ -130,7 +130,7 @@ export function NewebPaySettings() {
             id="merchantId"
             value={config.merchantId}
             onChange={e => setConfig({ ...config, merchantId: e.target.value })}
-            placeholder="輸入藍新商店代號"
+            placeholder={NEWEBPAY_LABELS.LABEL_8125}
           />
           <p className="text-xs text-morandi-secondary">{NEWEBPAY_LABELS.MERCHANT_ID_HINT}</p>
         </div>
@@ -144,7 +144,7 @@ export function NewebPaySettings() {
               type={showSecrets.hashKey ? 'text' : 'password'}
               value={showSecrets.hashKey ? config.hashKey : maskValue(config.hashKey)}
               onChange={e => setConfig({ ...config, hashKey: e.target.value })}
-              placeholder="輸入 32 字元的 HashKey"
+              placeholder={NEWEBPAY_LABELS.LABEL_6384}
               className="flex-1"
             />
             <Button
@@ -168,7 +168,7 @@ export function NewebPaySettings() {
               type={showSecrets.hashIV ? 'text' : 'password'}
               value={showSecrets.hashIV ? config.hashIV : maskValue(config.hashIV)}
               onChange={e => setConfig({ ...config, hashIV: e.target.value })}
-              placeholder="輸入 16 字元的 HashIV"
+              placeholder={NEWEBPAY_LABELS.LABEL_1330}
               className="flex-1"
             />
             <Button
@@ -187,7 +187,7 @@ export function NewebPaySettings() {
         <div className="flex items-center justify-between p-4 bg-morandi-background rounded-lg border border-morandi-border">
           <div>
             <Label htmlFor="isProduction" className="text-sm font-medium">
-              正式環境
+              {NEWEBPAY_LABELS.LABEL_2112}
             </Label>
             <p className="text-xs text-morandi-secondary mt-1">
               {config.isProduction

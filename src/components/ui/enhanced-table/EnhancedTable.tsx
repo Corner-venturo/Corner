@@ -8,6 +8,7 @@ import { useTableState } from './useTableState'
 import { TableHeader } from './TableHeader'
 import { TableBody } from './TableBody'
 import { TablePagination } from './TablePagination'
+import { ENHANCED_TABLE_LABELS } from './constants/labels'
 
 export function EnhancedTable<T extends RowData = RowData>({
   columns,
@@ -149,7 +150,7 @@ export function EnhancedTable<T extends RowData = RowData>({
         )}
       >
         <div className="flex items-center justify-center py-8 text-status-danger">
-          <span>錯誤: {error}</span>
+          <span>{ENHANCED_TABLE_LABELS.LABEL_6824} {error}</span>
         </div>
       </div>
     )

@@ -27,6 +27,7 @@ import {
 } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { GroupType, VehicleData, VehicleMemberData, VehicleColumnSettings } from '../../templates/definitions/types'
+import { DESIGNER_LABELS } from './constants/labels'
 
 /**
  * 分組類型選項
@@ -236,7 +237,7 @@ export function VehicleEditor({
       <div className="space-y-3">
         {/* 類型選擇 */}
         <div className="space-y-2">
-          <Label className="text-xs">選擇類型</Label>
+          <Label className="text-xs">{DESIGNER_LABELS.SELECT_3424}</Label>
           <div className="flex gap-2">
             {GROUP_TYPE_OPTIONS.map((opt) => (
               <button
@@ -276,7 +277,7 @@ export function VehicleEditor({
     <div className="space-y-4">
       {/* 排版設定 */}
       <div className="rounded border border-border/50 bg-morandi-container/10 p-2.5 space-y-2">
-        <Label className="text-xs text-morandi-primary">排版設定</Label>
+        <Label className="text-xs text-morandi-primary">{DESIGNER_LABELS.SETTINGS_5971}</Label>
         {/* 排版模式切換 */}
         <div className="flex gap-1">
           <button
@@ -294,7 +295,7 @@ export function VehicleEditor({
                 : 'bg-white border-border hover:border-morandi-gold'
             )}
           >
-            列表式
+            {DESIGNER_LABELS.LABEL_9146}
           </button>
           <button
             type="button"
@@ -311,13 +312,13 @@ export function VehicleEditor({
                 : 'bg-white border-border hover:border-morandi-gold'
             )}
           >
-            表格式
+            {DESIGNER_LABELS.LABEL_2441}
           </button>
         </div>
         {/* 列表模式：每行人數設定 */}
         {(columnSettings.layoutMode || 'list') === 'list' && (
           <div className="flex items-center gap-2">
-            <span className="text-xs">每行人數</span>
+            <span className="text-xs">{DESIGNER_LABELS.LABEL_8436}</span>
             <Select
               value={String(columnSettings.columnsPerRow || 2)}
               onValueChange={(v) => {
@@ -347,7 +348,7 @@ export function VehicleEditor({
               checked={columnSettings.showDriverInfo}
               onCheckedChange={(checked) => updateColumnSetting('showDriverInfo', !!checked)}
             />
-            <span className="text-xs">顯示司機資訊</span>
+            <span className="text-xs">{DESIGNER_LABELS.LABEL_5378}</span>
           </label>
         )}
       </div>
@@ -356,7 +357,7 @@ export function VehicleEditor({
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Bus size={14} className="text-morandi-secondary" />
-          <span className="text-xs font-medium text-morandi-secondary">車輛</span>
+          <span className="text-xs font-medium text-morandi-secondary">{DESIGNER_LABELS.LABEL_2119}</span>
         </div>
         {vehicles.map((vehicle, vehicleIdx) => {
           if (vehicle.groupType === 'table') return null
@@ -385,13 +386,13 @@ export function VehicleEditor({
               {isExpanded && (
                 <div className="p-2 space-y-2 border-t border-border/30">
                   <div className="flex gap-2">
-                    <Input value={vehicle.vehicleType || ''} onChange={(e) => updateVehicleField(vehicleIdx, 'vehicleType', e.target.value)} placeholder="車型（選填）" className="h-7 text-xs flex-1" />
-                    <Input value={vehicle.notes || ''} onChange={(e) => updateVehicleField(vehicleIdx, 'notes', e.target.value)} placeholder="備註" className="h-7 text-xs flex-1" />
+                    <Input value={vehicle.vehicleType || ''} onChange={(e) => updateVehicleField(vehicleIdx, 'vehicleType', e.target.value)} placeholder={DESIGNER_LABELS.LABEL_3072} className="h-7 text-xs flex-1" />
+                    <Input value={vehicle.notes || ''} onChange={(e) => updateVehicleField(vehicleIdx, 'notes', e.target.value)} placeholder={DESIGNER_LABELS.REMARKS} className="h-7 text-xs flex-1" />
                   </div>
                   {vehicle.members?.map((member, memberIdx) => (
                     <div key={member.id} className="flex items-center gap-1.5 p-1.5 rounded bg-morandi-container/10">
                       <span className="text-[10px] text-morandi-secondary w-5 text-center">{memberIdx + 1}.</span>
-                      <Input value={member.chineseName || ''} onChange={(e) => updateMemberInVehicle(vehicleIdx, memberIdx, 'chineseName', e.target.value)} placeholder="姓名" className="flex-1 h-6 text-xs" />
+                      <Input value={member.chineseName || ''} onChange={(e) => updateMemberInVehicle(vehicleIdx, memberIdx, 'chineseName', e.target.value)} placeholder={DESIGNER_LABELS.LABEL_658} className="flex-1 h-6 text-xs" />
                       <button type="button" onClick={() => deleteMemberFromVehicle(vehicleIdx, memberIdx)} className="p-1 rounded text-morandi-muted hover:text-morandi-red hover:bg-morandi-red/10 transition-colors"><Trash2 size={10} /></button>
                     </div>
                   ))}
@@ -401,7 +402,7 @@ export function VehicleEditor({
                       onChange={(e) => setNewMemberNames(prev => ({ ...prev, [vehicle.id]: e.target.value }))}
                       onKeyDown={(e) => { if (e.key === 'Enter' && inputValue.trim()) { if (inputValue.includes('\n') || inputValue.includes(',') || inputValue.includes('，')) { addMembersBatchToVehicle(vehicleIdx, inputValue) } else { addMemberToVehicle(vehicleIdx, inputValue) } } }}
                       onPaste={(e) => { const text = e.clipboardData.getData('text'); if (text.includes('\n')) { e.preventDefault(); addMembersBatchToVehicle(vehicleIdx, text) } }}
-                      placeholder="輸入姓名或貼上名單..."
+                      placeholder={DESIGNER_LABELS.LABEL_794}
                       className="h-7 text-xs flex-1"
                     />
                     <Button variant="outline" size="sm" onClick={() => { if (inputValue.includes('\n') || inputValue.includes(',')) { addMembersBatchToVehicle(vehicleIdx, inputValue) } else { addMemberToVehicle(vehicleIdx, inputValue) } }} disabled={!inputValue.trim()} className="h-7 px-2"><Plus size={14} /></Button>
@@ -412,7 +413,7 @@ export function VehicleEditor({
           )
         })}
         <Button variant="outline" size="sm" onClick={() => addVehicle('vehicle')} className="w-full h-7 text-xs gap-1.5 border-dashed">
-          <Plus size={12} /> 新增車
+          <Plus size={12} /> {DESIGNER_LABELS.ADD_2744}
         </Button>
       </div>
 
@@ -420,7 +421,7 @@ export function VehicleEditor({
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Users size={14} className="text-morandi-secondary" />
-          <span className="text-xs font-medium text-morandi-secondary">桌次</span>
+          <span className="text-xs font-medium text-morandi-secondary">{DESIGNER_LABELS.LABEL_1736}</span>
         </div>
         {vehicles.map((vehicle, vehicleIdx) => {
           if (vehicle.groupType !== 'table') return null
@@ -449,7 +450,7 @@ export function VehicleEditor({
               {isExpanded && (
                 <div className="p-2 space-y-2 border-t border-border/30">
                   <div className="flex gap-2">
-                    <Input value={vehicle.vehicleType || ''} onChange={(e) => updateVehicleField(vehicleIdx, 'vehicleType', e.target.value)} placeholder="桌型（選填）" className="h-7 text-xs flex-1" />
+                    <Input value={vehicle.vehicleType || ''} onChange={(e) => updateVehicleField(vehicleIdx, 'vehicleType', e.target.value)} placeholder={DESIGNER_LABELS.LABEL_4403} className="h-7 text-xs flex-1" />
                     <Input value={vehicle.notes || ''} onChange={(e) => updateVehicleField(vehicleIdx, 'notes', e.target.value)} placeholder="備註" className="h-7 text-xs flex-1" />
                   </div>
                   {vehicle.members?.map((member, memberIdx) => (
@@ -476,7 +477,7 @@ export function VehicleEditor({
           )
         })}
         <Button variant="outline" size="sm" onClick={() => addVehicle('table')} className="w-full h-7 text-xs gap-1.5 border-dashed">
-          <Plus size={12} /> 新增桌
+          <Plus size={12} /> {DESIGNER_LABELS.ADD_4177}
         </Button>
       </div>
     </div>

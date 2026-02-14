@@ -10,6 +10,7 @@ import { Printer, X, FileSpreadsheet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import type { OrderMember, ExportColumnsConfig } from '../order-member.types'
+import { ORDERS_LABELS } from './constants/labels'
 
 interface ExportDialogProps {
   isOpen: boolean
@@ -136,7 +137,7 @@ export function ExportDialog({
       <!DOCTYPE html>
       <html>
         <head>
-          <title>成員名單</title>
+          <title>{ORDERS_LABELS.LABEL_1942}</title>
           <style>
             body { font-family: Arial, sans-serif; padding: 20px; }
             table { border-collapse: collapse; width: 100%; font-size: 12px; }
@@ -250,13 +251,13 @@ export function ExportDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Printer size={18} />
-            匯出成員名單
+            {ORDERS_LABELS.EXPORT_8916}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-morandi-secondary">選擇要匯出的欄位</span>
+            <span className="text-sm text-morandi-secondary">{ORDERS_LABELS.SELECT_6160}</span>
             <Button variant="ghost" size="sm" onClick={toggleAll}>
               {Object.values(columns).every(v => v) ? '取消全選' : '全選'}
             </Button>
@@ -282,7 +283,7 @@ export function ExportDialog({
           <div className="flex justify-end gap-2 pt-4 border-t border-morandi-border">
             <Button variant="outline" onClick={onClose}>
               <X size={16} className="mr-1" />
-              取消
+              {ORDERS_LABELS.CANCEL}
             </Button>
             <Button variant="outline" onClick={handleExportExcel}>
               <FileSpreadsheet size={16} className="mr-1" />
@@ -290,7 +291,7 @@ export function ExportDialog({
             </Button>
             <Button onClick={handlePrint}>
               <Printer size={16} className="mr-1" />
-              列印
+              {ORDERS_LABELS.PRINT}
             </Button>
           </div>
         </div>

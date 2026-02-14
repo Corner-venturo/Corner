@@ -73,7 +73,7 @@ export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
           <div className="bg-morandi-gold/10 border border-morandi-gold/30 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-3">
               <Building2 size={18} className="text-morandi-gold" />
-              <Label className="text-morandi-primary font-semibold">所屬辦公室</Label>
+              <Label className="text-morandi-primary font-semibold">{COMP_HR_LABELS.LABEL_6548}</Label>
             </div>
             <Select
               value={formData.workspace_id || ''}
@@ -91,7 +91,7 @@ export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
               </SelectContent>
             </Select>
             <p className="text-xs text-morandi-secondary mt-2">
-              選擇此員工所屬的分公司，將影響其可見的資料範圍
+              {COMP_HR_LABELS.SELECT_8103}
             </p>
           </div>
         )}
@@ -106,11 +106,11 @@ export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
             type="submit"
             className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
-            建立員工
+            {COMP_HR_LABELS.LABEL_6686}
           </Button>
           <Button type="button" variant="outline" onClick={onCancel} className="gap-2">
             <X size={16} />
-            取消
+            {COMP_HR_LABELS.取消}
           </Button>
         </div>
       </form>

@@ -54,6 +54,7 @@ import { TourRoomTab } from './assignment-tabs/TourRoomTab'
 import { TourVehicleTab } from './assignment-tabs/TourVehicleTab'
 // 子組件：分桌 Tab
 import { TourTableTab } from './assignment-tabs/TourTableTab'
+import { COMP_TOURS_LABELS } from './constants/labels'
 
 export function TourAssignmentManager({
   tourId,
@@ -84,7 +85,7 @@ export function TourAssignmentManager({
       <DialogContent level={2} className="max-w-3xl max-h-[85vh] flex flex-col">
         <DialogHeader className="pb-3 border-b border-border flex-shrink-0">
           <DialogTitle className="flex items-center gap-2 text-morandi-primary">
-            分配管理
+            {COMP_TOURS_LABELS.MANAGE_972}
             {tourNights > 0 && (
               <span className="text-sm font-normal text-morandi-muted">
                 {tourNights + 1} 天 {tourNights} 夜
@@ -97,15 +98,15 @@ export function TourAssignmentManager({
           <TabsList className="grid w-full grid-cols-3 flex-shrink-0">
             <TabsTrigger value="room" className="flex items-center gap-2">
               <Hotel className="h-4 w-4" />
-              分房
+              {COMP_TOURS_LABELS.LABEL_9712}
             </TabsTrigger>
             <TabsTrigger value="vehicle" className="flex items-center gap-2">
               <Bus className="h-4 w-4" />
-              分車
+              {COMP_TOURS_LABELS.LABEL_3590}
             </TabsTrigger>
             <TabsTrigger value="table" className="flex items-center gap-2">
               <UtensilsCrossed className="h-4 w-4" />
-              分桌
+              {COMP_TOURS_LABELS.LABEL_2548}
             </TabsTrigger>
           </TabsList>
 
@@ -125,7 +126,7 @@ export function TourAssignmentManager({
         </Tabs>
 
         <div className="pt-3 border-t border-border text-xs text-morandi-muted flex-shrink-0">
-          提示：團員分配請在成員名單中使用下拉選單操作
+          {COMP_TOURS_LABELS.LABEL_5972}
         </div>
       </DialogContent>
     </Dialog>

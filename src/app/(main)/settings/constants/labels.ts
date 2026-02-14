@@ -169,6 +169,10 @@ export const API_SETTINGS_LABELS = {
   LOADING: '載入中...',
   API_KEY_WARNING: '請勿將 API Key 分享給非授權人員',
   SETUP_GUIDE: '設定方式',
+
+  SETTINGS_4369: '未設定',
+  COPY: '複製',
+  LABEL_4474: '檔案：',
 }
 
 export const DEVTOOLS_LABELS = {
@@ -178,11 +182,24 @@ export const DEVTOOLS_LABELS = {
   STEP_OPEN_TERMINAL: '開啟 Claude Code 終端機',
   STEP_PASTE: '貼上複製的內容',
   STEP_RESTART: '重啟開發伺服器：',
+
+  COPYING_1479: '複製後貼給 Claude Code，自動建立完整環境設定',
+  COPYING_9243: '已複製！',
+  COPYING_539: '複製指令',
+  SETTINGS_6471: '用於設定 Vercel 專案的環境變數',
+  COPYING_4512: '複製清單',
+  LABEL_2441: '使用方式：',
 }
 
 export const MODULE_MANAGEMENT_LABELS = {
   TITLE: '系統模組管理',
   AUTH_MANAGEMENT: '模組授權管理',
+
+  MANAGE_4601: '管理工作空間的系統模組（會計、庫存、BI 分析等）',
+  MANAGE_8355: '管理模組',
+  LABEL_1050: '啟用/停用系統模組（會計模組、庫存模組等）',
+  SETTINGS_5976: '設定模組授權到期日',
+  LABEL_3126: '查看各模組的功能特性',
 }
 
 export const NEWEBPAY_LABELS = {
@@ -195,6 +212,11 @@ export const NEWEBPAY_LABELS = {
   GUIDE_1: '請先在藍新金流申請「旅行業代收轉付電子收據」服務',
   GUIDE_3: '測試環境可使用測試商店代號進行開發測試',
   GUIDE_4: '正式上線前請切換到正式環境並使用正式商店資訊',
+
+  LABEL_8125: '輸入藍新商店代號',
+  LABEL_6384: '輸入 32 字元的 HashKey',
+  LABEL_1330: '輸入 16 字元的 HashIV',
+  LABEL_2112: '正式環境',
 }
 
 export const OTHER_SETTINGS_LABELS = {
@@ -217,6 +239,9 @@ export const PERMISSION_LABELS = {
   PERM_3: '設定權限過期時間（可選）',
   PERM_4: '隨時撤銷權限',
   PERMISSION_SETTINGS: '權限設定',
+
+  MANAGE_2715: '管理所有分公司（台北、台中等），建立新分公司、查看員工分佈',
+  MANAGE_9542: '授權管理員查看或管理其他分公司的資料（例如：台北管理員可查看台中的旅遊團）',
 }
 
 export const PREFERRED_FEATURES_LABELS = {
@@ -228,11 +253,17 @@ export const PREFERRED_FEATURES_LABELS = {
   DESC_2: '此設定不影響你的實際權限，只是個人化介面顯示',
   DESC_3: '你只能選擇有權限的功能',
   DESC_4: '變更會在停止操作後自動儲存',
+
+  SETTINGS_6020: '常用功能設定',
+  SELECT_5572: '選擇你常用的功能，側邊欄將只顯示這些項目，讓介面更簡潔',
+  LABEL_1762: '恢復角色預設',
 }
 
 export const WORKSPACE_SWITCHER_LABELS = {
   TITLE: '工作空間切換',
   VIEW_ALL: '查看全部辦公室',
+
+  LABEL_795: '切換查看特定辦公室的資料，或查看所有辦公室的資料',
 }
 
 export const MODULES_PAGE_LABELS = {
@@ -247,4 +278,13 @@ export const MODULES_PAGE_LABELS = {
   EXPIRY_LABEL: '授權到期日（選填）',
   EXPIRY_HINT: '留空表示永久授權',
   INCLUDED_FEATURES: '包含功能',
+
+  MANAGE_8474: '系統模組管理',
+  LABEL_795: '當前工作空間',
+  LABEL_2710: '已啟用',
+  LABEL_8966: '已過期',
+  LABEL_5400: '未啟用',
+  LABEL_5213: '停用模組',
+  SELECT_5234: '選擇日期',
+  CANCEL: '取消',
 }

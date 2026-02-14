@@ -138,10 +138,10 @@ export function ImportMealsDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <UtensilsCrossed className="w-5 h-5 text-[var(--morandi-gold)]" />
-            匯入餐飲
+            {IMPORT_MEALS_DIALOG_LABELS.LABEL_6478}
           </DialogTitle>
           <DialogDescription>
-            從行程表選擇要匯入的餐點
+            {IMPORT_MEALS_DIALOG_LABELS.SELECT_4642}
           </DialogDescription>
         </DialogHeader>
 
@@ -153,7 +153,7 @@ export function ImportMealsDialog({
                 checked={includeBreakfast}
                 onCheckedChange={(checked) => setIncludeBreakfast(checked === true)}
               />
-              <span>包含早餐</span>
+              <span>{IMPORT_MEALS_DIALOG_LABELS.LABEL_9424}</span>
             </label>
             <button
               onClick={handleSelectAll}
@@ -205,7 +205,7 @@ export function ImportMealsDialog({
               <div className="text-center py-8">
                 <UtensilsCrossed className="w-10 h-10 text-[var(--morandi-secondary)]/30 mx-auto mb-3" />
                 <p className="text-sm text-[var(--morandi-secondary)]">
-                  行程表中沒有餐飲資料
+                  {IMPORT_MEALS_DIALOG_LABELS.NOT_FOUND_1124}
                 </p>
               </div>
             )}
@@ -215,7 +215,7 @@ export function ImportMealsDialog({
           <div className="flex gap-2 pt-2">
             <Button variant="outline" onClick={onClose} className="flex-1 gap-1">
               <X size={16} />
-              取消
+              {IMPORT_MEALS_DIALOG_LABELS.CANCEL}
             </Button>
             <Button
               onClick={handleImport}

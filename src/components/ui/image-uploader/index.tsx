@@ -10,6 +10,7 @@ import { logger } from '@/lib/utils/logger'
 import { useImageUploader } from './useImageUploader'
 import { DropZone } from './DropZone'
 import { ImagePreview } from './ImagePreview'
+import { IMAGE_UPLOADER_LABELS } from './constants/labels'
 
 // 導出新組件
 export { UnsplashSearch } from './UnsplashSearch'
@@ -144,7 +145,7 @@ export function ImageUploader({
           currentPosition={position}
           onConfirm={handlePositionConfirm}
           aspectRatio={aspectRatio}
-          title="調整圖片位置"
+          title={IMAGE_UPLOADER_LABELS.LABEL_318}
         />
       )}
     </div>

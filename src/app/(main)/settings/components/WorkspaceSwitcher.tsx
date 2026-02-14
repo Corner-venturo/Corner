@@ -53,7 +53,7 @@ export function WorkspaceSwitcher() {
       </div>
 
       <p className="text-sm text-morandi-secondary mb-6">
-        切換查看特定辦公室的資料，或查看所有辦公室的資料
+        {WORKSPACE_SWITCHER_LABELS.LABEL_795}
       </p>
 
       <div className="space-y-3">

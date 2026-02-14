@@ -137,20 +137,20 @@ export function BrochurePreviewDialog({
             <div class="company">${companyName}</div>
           </div>
           <div class="info-grid">
-            <div><span class="info-label">目的地：</span>${itinerary.city || itinerary.country || '-'}</div>
-            <div><span class="info-label">出發日期：</span>${itinerary.departure_date || '-'}</div>
-            <div><span class="info-label">行程天數：</span>${dailyItinerary.length} 天</div>
+            <div><span class="info-label">{BROCHURE_PREVIEW_DIALOG_LABELS.目的地標籤}</span>${itinerary.city || itinerary.country || '-'}</div>
+            <div><span class="info-label">{BROCHURE_PREVIEW_DIALOG_LABELS.出發日期標籤}</span>${itinerary.departure_date || '-'}</div>
+            <div><span class="info-label">{BROCHURE_PREVIEW_DIALOG_LABELS.行程天數標籤}</span>${dailyItinerary.length} 天</div>
           </div>
         </div>
         <table>
           <thead>
             <tr>
-              <th style="width: 80px;">日期</th>
-              <th>行程內容</th>
-              <th style="width: 70px; text-align: center;">早餐</th>
-              <th style="width: 70px; text-align: center;">午餐</th>
-              <th style="width: 70px; text-align: center;">晚餐</th>
-              <th style="width: 120px;">住宿</th>
+              <th style="width: 80px;">{BROCHURE_PREVIEW_DIALOG_LABELS.日期}</th>
+              <th>{BROCHURE_PREVIEW_DIALOG_LABELS.行程內容}</th>
+              <th style="width: 70px; text-align: center;">{BROCHURE_PREVIEW_DIALOG_LABELS.LABEL_1347}</th>
+              <th style="width: 70px; text-align: center;">{BROCHURE_PREVIEW_DIALOG_LABELS.LABEL_8515}</th>
+              <th style="width: 70px; text-align: center;">{BROCHURE_PREVIEW_DIALOG_LABELS.LABEL_8227}</th>
+              <th style="width: 120px;">{BROCHURE_PREVIEW_DIALOG_LABELS.住宿}</th>
             </tr>
           </thead>
           <tbody>

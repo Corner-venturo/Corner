@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { morandiColors } from '@/lib/constants/morandi-colors'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { TOUR_PREVIEW_LABELS } from './constants/labels'
 
 interface Activity {
   title: string
@@ -84,7 +85,7 @@ export function MobileActivityCarousel({ activities, className = '' }: MobileAct
                 transition={{ repeat: Infinity, duration: 1.2 }}
                 className="flex items-center gap-0.5 bg-black/50 text-white text-[10px] px-1.5 py-0.5 rounded-full"
               >
-                <span>滑動</span>
+                <span>{TOUR_PREVIEW_LABELS.LABEL_7322}</span>
                 <ChevronRight size={12} />
               </motion.div>
             </motion.div>
@@ -123,7 +124,7 @@ export function MobileActivityCarousel({ activities, className = '' }: MobileAct
                       className="w-full h-full flex items-center justify-center"
                       style={{ backgroundColor: morandiColors.background.cream }}
                     >
-                      <span className="text-morandi-secondary text-xs">景點資訊</span>
+                      <span className="text-morandi-secondary text-xs">{TOUR_PREVIEW_LABELS.LABEL_4245}</span>
                     </div>
                   )}
                 </div>

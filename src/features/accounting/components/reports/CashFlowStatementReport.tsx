@@ -14,6 +14,7 @@ import { useAccountingReports, type CashFlowResult } from '../../hooks/useAccoun
 import { formatDate } from '@/lib/utils/format-date'
 import { formatCurrency } from '@/lib/utils/format-currency'
 import { logger } from '@/lib/utils/logger'
+import { REPORTS_LABELS } from './constants/labels'
 export function CashFlowStatementReport() {
   const { loading, error, fetchCashFlowStatement } = useAccountingReports()
 
@@ -97,7 +98,7 @@ export function CashFlowStatementReport() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="現金流量表"
+        title={REPORTS_LABELS.LABEL_3933}
         icon={Banknote}
         breadcrumb={[
           { label: '首頁', href: '/' },
@@ -112,7 +113,7 @@ export function CashFlowStatementReport() {
             className="gap-2"
           >
             <Download size={16} />
-            匯出 CSV
+            {REPORTS_LABELS.EXPORT_9918}
           </Button>
         }
       />
@@ -126,20 +127,20 @@ export function CashFlowStatementReport() {
               <DatePicker
                 value={startDate}
                 onChange={setStartDate}
-                placeholder="開始日期"
+                placeholder={REPORTS_LABELS.LABEL_4743}
               />
-              <span className="text-morandi-secondary">至</span>
+              <span className="text-morandi-secondary">{REPORTS_LABELS.LABEL_4812}</span>
               <DatePicker
                 value={endDate}
                 onChange={setEndDate}
-                placeholder="結束日期"
+                placeholder={REPORTS_LABELS.LABEL_9824}
               />
             </div>
           </div>
 
           <Button onClick={handleSearch} disabled={loading} className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white">
             <Search size={16} />
-            查詢
+            {REPORTS_LABELS.QUERYING_754}
           </Button>
         </div>
       </div>
@@ -160,7 +161,7 @@ export function CashFlowStatementReport() {
               <div className="bg-card p-4 rounded-lg border border-border">
                 <div className="flex items-center gap-2 text-morandi-secondary mb-2">
                   <Banknote size={16} className="text-morandi-gold" />
-                  <span>期初現金</span>
+                  <span>{REPORTS_LABELS.LABEL_6771}</span>
                 </div>
                 <div className="text-xl font-bold text-morandi-primary">
                   {formatCurrency(data.opening_cash)}
@@ -174,7 +175,7 @@ export function CashFlowStatementReport() {
                   ) : (
                     <TrendingDown size={16} className="text-morandi-red" />
                   )}
-                  <span>本期增減</span>
+                  <span>{REPORTS_LABELS.LABEL_4320}</span>
                 </div>
                 <div className={`text-xl font-bold ${data.net_change >= 0 ? 'text-morandi-green' : 'text-morandi-red'}`}>
                   {formatCurrency(data.net_change)}
@@ -184,7 +185,7 @@ export function CashFlowStatementReport() {
               <div className="bg-card p-4 rounded-lg border border-border">
                 <div className="flex items-center gap-2 text-morandi-secondary mb-2">
                   <Banknote size={16} className="text-morandi-gold" />
-                  <span>期末現金</span>
+                  <span>{REPORTS_LABELS.LABEL_697}</span>
                 </div>
                 <div className="text-xl font-bold text-morandi-primary">
                   {formatCurrency(data.closing_cash)}
@@ -198,7 +199,7 @@ export function CashFlowStatementReport() {
                   ) : (
                     <ArrowDownRight size={16} className="text-morandi-red" />
                   )}
-                  <span>變動率</span>
+                  <span>{REPORTS_LABELS.LABEL_6222}</span>
                 </div>
                 <div className={`text-xl font-bold ${data.net_change >= 0 ? 'text-morandi-green' : 'text-morandi-red'}`}>
                   {data.opening_cash !== 0
@@ -213,7 +214,7 @@ export function CashFlowStatementReport() {
               {/* 一、營業活動 */}
               <div className="border-b border-border">
                 <div className="p-4 bg-blue-50 border-b border-border">
-                  <h3 className="font-bold text-blue-800">一、營業活動之現金流量</h3>
+                  <h3 className="font-bold text-blue-800">{REPORTS_LABELS.LABEL_4677}</h3>
                 </div>
                 <div className="divide-y divide-border">
                   {data.operating_activities.length > 0 ? (
@@ -227,7 +228,7 @@ export function CashFlowStatementReport() {
                     ))
                   ) : (
                     <div className="p-8 text-center text-morandi-secondary">
-                      無營業活動現金流量
+                      {REPORTS_LABELS.LABEL_2834}
                     </div>
                   )}
                   {data.operating_activities.length > 10 && (
@@ -237,7 +238,7 @@ export function CashFlowStatementReport() {
                   )}
                 </div>
                 <div className="p-4 bg-blue-100 flex items-center justify-between font-bold">
-                  <span className="text-blue-800">營業活動淨現金流量</span>
+                  <span className="text-blue-800">{REPORTS_LABELS.LABEL_4189}</span>
                   <span className={`font-mono ${data.net_operating >= 0 ? 'text-blue-800' : 'text-red-600'}`}>
                     {formatCurrency(data.net_operating)}
                   </span>
@@ -247,7 +248,7 @@ export function CashFlowStatementReport() {
               {/* 二、投資活動 */}
               <div className="border-b border-border">
                 <div className="p-4 bg-purple-50 border-b border-border">
-                  <h3 className="font-bold text-purple-800">二、投資活動之現金流量</h3>
+                  <h3 className="font-bold text-purple-800">{REPORTS_LABELS.LABEL_3365}</h3>
                 </div>
                 <div className="divide-y divide-border">
                   {data.investing_activities.length > 0 ? (
@@ -261,12 +262,12 @@ export function CashFlowStatementReport() {
                     ))
                   ) : (
                     <div className="p-8 text-center text-morandi-secondary">
-                      無投資活動現金流量
+                      {REPORTS_LABELS.LABEL_7816}
                     </div>
                   )}
                 </div>
                 <div className="p-4 bg-purple-100 flex items-center justify-between font-bold">
-                  <span className="text-purple-800">投資活動淨現金流量</span>
+                  <span className="text-purple-800">{REPORTS_LABELS.LABEL_1693}</span>
                   <span className={`font-mono ${data.net_investing >= 0 ? 'text-purple-800' : 'text-red-600'}`}>
                     {formatCurrency(data.net_investing)}
                   </span>
@@ -276,7 +277,7 @@ export function CashFlowStatementReport() {
               {/* 三、籌資活動 */}
               <div className="border-b border-border">
                 <div className="p-4 bg-orange-50 border-b border-border">
-                  <h3 className="font-bold text-orange-800">三、籌資活動之現金流量</h3>
+                  <h3 className="font-bold text-orange-800">{REPORTS_LABELS.LABEL_3153}</h3>
                 </div>
                 <div className="divide-y divide-border">
                   {data.financing_activities.length > 0 ? (
@@ -290,12 +291,12 @@ export function CashFlowStatementReport() {
                     ))
                   ) : (
                     <div className="p-8 text-center text-morandi-secondary">
-                      無籌資活動現金流量
+                      {REPORTS_LABELS.LABEL_3319}
                     </div>
                   )}
                 </div>
                 <div className="p-4 bg-orange-100 flex items-center justify-between font-bold">
-                  <span className="text-orange-800">籌資活動淨現金流量</span>
+                  <span className="text-orange-800">{REPORTS_LABELS.LABEL_5705}</span>
                   <span className={`font-mono ${data.net_financing >= 0 ? 'text-orange-800' : 'text-red-600'}`}>
                     {formatCurrency(data.net_financing)}
                   </span>
@@ -306,20 +307,20 @@ export function CashFlowStatementReport() {
               <div className={`p-6 ${data.net_change >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-lg font-medium">四、本期現金及約當現金增減數</span>
+                    <span className="text-lg font-medium">{REPORTS_LABELS.LABEL_2457}</span>
                     <span className={`font-mono text-xl font-bold ${data.net_change >= 0 ? 'text-green-800' : 'text-red-800'}`}>
                       {formatCurrency(data.net_change)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-morandi-secondary">五、期初現金及約當現金餘額</span>
+                    <span className="text-morandi-secondary">{REPORTS_LABELS.LABEL_7994}</span>
                     <span className="font-mono text-morandi-primary">
                       {formatCurrency(data.opening_cash)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between border-t border-current/20 pt-4">
                     <span className={`text-lg font-bold ${data.net_change >= 0 ? 'text-green-800' : 'text-red-800'}`}>
-                      六、期末現金及約當現金餘額
+                      {REPORTS_LABELS.LABEL_607}
                     </span>
                     <span className={`font-mono text-2xl font-bold ${data.net_change >= 0 ? 'text-green-800' : 'text-red-800'}`}>
                       {formatCurrency(data.closing_cash)}
@@ -332,7 +333,7 @@ export function CashFlowStatementReport() {
         ) : !loading ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <Banknote size={48} className="text-morandi-muted mb-4" />
-            <p className="text-morandi-secondary">請選擇日期範圍並點擊查詢</p>
+            <p className="text-morandi-secondary">{REPORTS_LABELS.PLEASE_SELECT_4556}</p>
           </div>
         ) : null}
       </div>

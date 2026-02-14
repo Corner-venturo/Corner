@@ -127,7 +127,7 @@ export const PaymentRow = React.memo(function PaymentRow({
           title={COMP_TOURS_LABELS.開立代轉發票}
         >
           <FileText size={14} className="mr-1" />
-          開代轉
+          {COMP_TOURS_LABELS.LABEL_9684}
         </Button>
       </td>
     </tr>

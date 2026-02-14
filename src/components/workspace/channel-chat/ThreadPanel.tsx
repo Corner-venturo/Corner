@@ -55,7 +55,7 @@ export function ThreadPanel({
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <div className="flex items-center gap-2">
           <MessageSquare size={16} className="text-morandi-secondary" />
-          <span className="font-medium text-morandi-primary">討論串</span>
+          <span className="font-medium text-morandi-primary">{COMP_WORKSPACE_LABELS.LABEL_9507}</span>
           <span className="text-xs text-morandi-secondary">
             {replies.length} 則回覆
           </span>

@@ -4,6 +4,7 @@ import { Loader2, Palette } from 'lucide-react'
 import { useTemplates, getTemplateColor } from '@/features/itinerary/hooks/useTemplates'
 import { useFeatures } from './features/hooks/useFeatures'
 import { FeatureList } from './features/FeatureList'
+import { TOUR_FORM_LABELS } from './constants/labels'
 
 interface FeaturesSectionProps {
   data: TourFormData
@@ -85,7 +86,7 @@ export function FeaturesSection({
     <div className="space-y-4">
       <div className="flex justify-between items-center border-b-2 border-morandi-gold pb-2">
         <div className="flex items-center gap-4">
-          <h2 className="text-lg font-bold text-morandi-primary">行程特色</h2>
+          <h2 className="text-lg font-bold text-morandi-primary">{TOUR_FORM_LABELS.LABEL_6890}</h2>
           {/* 特色風格已統一 - 跟隨主題設定 (coverStyle) */}
         </div>
         <button

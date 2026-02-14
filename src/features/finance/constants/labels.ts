@@ -24,6 +24,21 @@ export const ADD_RECEIPT_DIALOG_LABELS = {
   更新中: '更新中...',
   建立中: '建立中...',
   更新收款單: '更新收款單',
+
+  CONFIRM_469: '已確認',
+  LABEL_3406: '團體 *',
+  LABEL_3874: '訂單 *',
+  LABEL_4595: '收款項目',
+  ADD_2089: '新增項目',
+  LABEL_5187: '收款方式',
+  LABEL_1182: '交易日期',
+  LABEL_6465: '付款資訊',
+  REMARKS: '備註',
+  AMOUNT: '金額',
+  COPYING_1937: '已複製',
+  COPY: '複製',
+  LABEL_1670: '開啟',
+  TOTAL_6550: '總金額',
 };
 
 export const BATCH_RECEIPT_DIALOG_LABELS = {
@@ -54,6 +69,13 @@ export const PAYMENT_ITEM_ROW_LABELS = {
   備註_選填: '備註（選填）',
   例如_峇里島五日遊_尾款: '例如：峇里島五日遊 - 尾款',
   複製: '複製',
+
+  LABEL_6186: '付款截止日 *',
+  LABEL_4673: '付款名稱（客戶看到的）',
+  LABEL_3875: '產生中...',
+  LABEL_2899: '產生連結',
+  LABEL_1487: '付款連結',
+  LABEL_1670: '開啟',
 };
 
 export const RECEIPT_CONFIRM_DIALOG_LABELS = {
@@ -91,6 +113,8 @@ export const ADD_REQUEST_DIALOG_LABELS = {
 
 export const EXPENSE_TYPE_SELECTOR_LABELS = {
   選擇費用類型: '選擇費用類型...',
+
+  LABEL_6005: '費用類型 *',
 };
 
 export const QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS = {
@@ -98,6 +122,14 @@ export const QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS = {
   請款單建立成功: '請款單建立成功',
   建立請款單失敗: '建立請款單失敗',
   確認請款: '確認請款',
+
+  LABEL_8944: '快速請款',
+  LABEL_7325: '項目',
+  LABEL_4947: '供應商：',
+  LABEL_1073: '旅遊團：',
+  LABEL_3827: '請款金額 *',
+  REMARKS: '備註',
+  CANCEL: '取消',
 };
 
 export const REQUEST_DATE_INPUT_LABELS = {
@@ -131,6 +163,15 @@ export const REQUEST_DETAIL_DIALOG_LABELS = {
 export const REQUEST_ITEM_LIST_LABELS = {
   選擇供應商: '選擇供應商...',
   新增項目: '新增項目',
+
+  LABEL_475: '請款項目',
+  LABEL_2946: '類別',
+  LABEL_561: '供應商',
+  LABEL_6008: '項目描述',
+  LABEL_9413: '單價',
+  QUANTITY: '數量',
+  LABEL_832: '小計',
+  TOTAL_6550: '總金額',
 };
 
 export const USE_REQUEST_TABLE_LABELS = {
@@ -146,6 +187,20 @@ export const BATCH_INVOICE_DIALOG_LABELS = {
   買受人名稱: '買受人名稱',
   n_8_碼數字: '8 碼數字',
   發票通知信箱: '發票通知信箱',
+
+  LABEL_2624: '批次開立發票',
+  LABEL_9860: '團別 *',
+  LABEL_7017: '訂單編號',
+  LABEL_7009: '聯絡人',
+  LABEL_491: '可開金額',
+  NOT_FOUND_8100: '此團沒有可開發票的訂單',
+  LABEL_3592: '筆訂單',
+  LABEL_3678: '合計可開金額',
+  LABEL_8775: '發票資訊',
+  LABEL_7408: '名稱 *',
+  LABEL_3729: '統編',
+  LABEL_3494: '日期 *',
+  CANCEL: '取消',
 };
 
 export const ISSUE_INVOICE_DIALOG_LABELS = {
@@ -166,6 +221,11 @@ export const ISSUE_INVOICE_DIALOG_LABELS = {
   INVOICE_AMOUNT: '發票金額 *',
   EXCEEDS_AVAILABLE: '金額超過可開金額',
   PRODUCT_NAME: '品名',
+
+  LABEL_7283: '買受人名稱 *',
+  LABEL_8296: '統一編號',
+  LABEL_3957: '開立日期 *',
+  CANCEL: '取消',
 };
 
 // 請款單 (AddRequestDialog / RequestDetailDialog)
@@ -223,6 +283,14 @@ export const ADD_REQUEST_FORM_LABELS = {
   將建立N筆請款單: (count: number) => `將建立 ${count} 筆請款單`,
   未分配: '未分配',
   共N筆總金額: (count: number) => `共 ${count} 筆，總金額`,
+
+  LABEL_7551: '團體請款',
+  LABEL_163: '批量請款',
+  LABEL_9152: '公司請款',
+  LABEL_4300: '從需求單帶入（自動列出有供應商的項目）',
+  LABEL_6198: '需求單項目',
+  ADD_3774: '點擊「新增旅遊團」開始分配',
+  CANCEL: '取消',
 };
 
 // RequestDetailDialog 額外標籤
@@ -239,6 +307,10 @@ export const REQUEST_DETAIL_FORM_LABELS = {
   操作: '操作',
   合計: '合計',
   備註: '備註',
+
+  ADD_2089: '新增項目',
+  EMPTY_9932: '尚無請款項目',
+  DELETE: '刪除',
 };
 
 // BatchReceiptDialog 額外標籤
@@ -256,6 +328,13 @@ export const BATCH_RECEIPT_FORM_LABELS = {
   備註: '備註',
   共N筆總金額: (count: number) => `共 ${count} 筆，總金額`,
   還有金額未分配: '還有金額未分配',
+
+  LABEL_6021: '批量分配收款（一筆款分多訂單）',
+  LABEL_2869: '平均分配',
+  ADD_5419: '新增訂單',
+  ADD_8367: '點擊「新增訂單」開始分配',
+  CANCEL: '取消',
+  LABEL_7330: '建立批量收款單',
 };
 
 
@@ -272,4 +351,10 @@ export const RECEIPT_CONFIRM_LABELS = {
   REMARKS: '備註',
   RECEIVABLE: '應收金額',
   CONFIRM: '確認',
+
+  LABEL_8417: '實收金額',
+  PLEASE_ENTER_6193: '金額異常 - 請輸入實際收到金額',
+  CANCEL: '取消',
+  CONFIRM_9972: '確認異常金額',
+  CLOSE: '關閉',
 }

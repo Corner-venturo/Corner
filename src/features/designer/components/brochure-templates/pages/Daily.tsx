@@ -9,6 +9,7 @@ import { Image } from '../primitives/Image'
 import { DaySchedule } from '../blocks/DaySchedule'
 import { MealInfo } from '../blocks/MealInfo'
 import type { PageProps, DailyItinerary } from '../types'
+import { PAGES_LABELS } from './constants/labels'
 
 interface DailyProps extends PageProps {
   day: DailyItinerary
@@ -59,7 +60,7 @@ export function Daily({ data, theme, size, day, image, pageNumber, className }: 
         }}
       >
         <Text theme={theme} variant="caption" color="accent" style={{ fontWeight: 600, marginBottom: '1mm' }}>
-          住宿
+          {PAGES_LABELS.LABEL_8766}
         </Text>
         <Text theme={theme} variant="caption">
           {day.accommodation || '敬請參閱確認單'}

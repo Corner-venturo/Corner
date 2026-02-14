@@ -134,7 +134,7 @@ export function ShareOrdersDialog({ channelId, open, onClose, onSuccess }: Share
         <DialogHeader className="pb-3 border-b border-morandi-gold/20">
           <DialogTitle className="flex items-center gap-2">
             <Receipt className="text-morandi-gold" size={20} />
-            <span>選擇待收款訂單</span>
+            <span>{COMP_WORKSPACE_LABELS.SELECT_5876}</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -167,22 +167,22 @@ export function ShareOrdersDialog({ channelId, open, onClose, onSuccess }: Share
                 <tr>
                   <th className="w-10 py-2.5 px-4 text-xs"></th>
                   <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary">
-                    訂單號
+                    {COMP_WORKSPACE_LABELS.LABEL_5978}
                   </th>
                   <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary">
-                    客戶
+                    {COMP_WORKSPACE_LABELS.LABEL_565}
                   </th>
                   <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-secondary">
-                    總額
+                    {COMP_WORKSPACE_LABELS.TOTAL_9340}
                   </th>
                   <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-secondary">
-                    已收
+                    {COMP_WORKSPACE_LABELS.LABEL_8095}
                   </th>
                   <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-secondary">
-                    缺口
+                    {COMP_WORKSPACE_LABELS.LABEL_3379}
                   </th>
                   <th className="text-center py-2.5 px-4 text-xs font-semibold text-morandi-secondary">
-                    狀態
+                    {COMP_WORKSPACE_LABELS.STATUS}
                   </th>
                 </tr>
               </thead>
@@ -235,7 +235,7 @@ export function ShareOrdersDialog({ channelId, open, onClose, onSuccess }: Share
                           </span>
                         ) : (
                           <span className="text-xs bg-status-warning-bg text-status-warning px-2 py-0.5 rounded">
-                            部分收款
+                            {COMP_WORKSPACE_LABELS.部分收款}
                           </span>
                         )}
                       </td>
@@ -253,17 +253,17 @@ export function ShareOrdersDialog({ channelId, open, onClose, onSuccess }: Share
             <div className="text-sm text-morandi-secondary">
               已選擇{' '}
               <span className="font-semibold text-morandi-primary">{selectedStats.count}</span>{' '}
-              筆訂單
+              {COMP_WORKSPACE_LABELS.LABEL_3592}
             </div>
             <div className="text-right">
-              <div className="text-xs text-morandi-secondary">總缺口金額</div>
+              <div className="text-xs text-morandi-secondary">{COMP_WORKSPACE_LABELS.TOTAL_4384}</div>
               <CurrencyCell amount={selectedStats.totalGap} variant="expense" className="text-lg font-semibold" />
             </div>
           </div>
           <div className="flex gap-2 justify-end w-full">
             <button className="btn-morandi-secondary !py-2 !px-4 flex items-center gap-2" onClick={onClose}>
               <X size={16} />
-              取消
+              {COMP_WORKSPACE_LABELS.CANCEL}
             </button>
             <button
               className="btn-morandi-primary !py-2 !px-4 flex items-center gap-2"
@@ -271,7 +271,7 @@ export function ShareOrdersDialog({ channelId, open, onClose, onSuccess }: Share
               disabled={selectedOrders.size === 0}
             >
               <Check size={16} />
-              分享到頻道
+              {COMP_WORKSPACE_LABELS.LABEL_903}
             </button>
           </div>
         </DialogFooter>

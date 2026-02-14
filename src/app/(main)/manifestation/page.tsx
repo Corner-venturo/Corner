@@ -9,6 +9,7 @@ import { ChapterContent } from '@/components/manifestation/ChapterContent'
 import { WishWall } from '@/components/manifestation/WishWall'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Sparkles, Book, Heart } from 'lucide-react'
+import { MANIFESTATION_LABELS } from './constants/labels'
 
 type ViewMode = 'practice' | 'wish-wall'
 
@@ -74,7 +75,7 @@ export default function ManifestationPage() {
   return (
     <div className="absolute inset-0 flex flex-col">
       <ResponsiveHeader
-        title="顯化魔法"
+        title={MANIFESTATION_LABELS.LABEL_9240}
         icon={Sparkles}
         breadcrumb={[
           { label: '首頁', href: '/' },

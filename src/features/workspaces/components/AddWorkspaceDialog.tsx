@@ -191,7 +191,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Building2 size={20} className="text-morandi-gold" />
-            新增公司
+            {WORKSPACES_LABELS.新增公司}
           </DialogTitle>
         </DialogHeader>
 
@@ -199,12 +199,12 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
           {/* 公司資訊 */}
           <div className="space-y-4">
             <h3 className="text-sm font-medium text-morandi-primary border-b border-border pb-2">
-              公司資訊
+              {WORKSPACES_LABELS.LABEL_2270}
             </h3>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label required>公司名稱</Label>
+                <Label required>{WORKSPACES_LABELS.LABEL_20}</Label>
                 <Input
                   value={formData.name}
                   onChange={(e) => handleFieldChange('name', e.target.value)}
@@ -213,18 +213,18 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
               </div>
 
               <div className="space-y-2">
-                <Label required>公司代號</Label>
+                <Label required>{WORKSPACES_LABELS.LABEL_3535}</Label>
                 <Input
                   value={formData.code}
                   onChange={(e) => handleFieldChange('code', e.target.value.toLowerCase())}
                   placeholder={WORKSPACES_LABELS.例_corner_小寫}
                 />
-                <p className="text-xs text-morandi-secondary">登入時使用，自動轉為小寫</p>
+                <p className="text-xs text-morandi-secondary">{WORKSPACES_LABELS.LABEL_8377}</p>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label required>公司類型</Label>
+              <Label required>{WORKSPACES_LABELS.LABEL_3932}</Label>
               <Select
                 value={formData.type}
                 onValueChange={(value) => handleFieldChange('type', value)}
@@ -244,7 +244,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>員工編號前綴</Label>
+                <Label>{WORKSPACES_LABELS.LABEL_5013}</Label>
                 <Input
                   value={formData.employee_number_prefix}
                   onChange={(e) => handleFieldChange('employee_number_prefix', e.target.value)}
@@ -258,13 +258,13 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
               </div>
 
               <div className="space-y-2">
-                <Label>預設密碼</Label>
+                <Label>{WORKSPACES_LABELS.LABEL_9036}</Label>
                 <Input
                   value={formData.default_password}
                   onChange={(e) => handleFieldChange('default_password', e.target.value)}
                   placeholder="1234"
                 />
-                <p className="text-xs text-morandi-secondary">新員工預設密碼</p>
+                <p className="text-xs text-morandi-secondary">{WORKSPACES_LABELS.LABEL_9086}</p>
               </div>
             </div>
           </div>
@@ -272,12 +272,12 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
           {/* 管理員資訊 */}
           <div className="space-y-4">
             <h3 className="text-sm font-medium text-morandi-primary border-b border-border pb-2">
-              第一位管理員
+              {WORKSPACES_LABELS.MANAGE_9574}
             </h3>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label required>管理員姓名</Label>
+                <Label required>{WORKSPACES_LABELS.MANAGE_9048}</Label>
                 <Input
                   value={formData.admin_name}
                   onChange={(e) => handleFieldChange('admin_name', e.target.value)}
@@ -286,7 +286,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
               </div>
 
               <div className="space-y-2">
-                <Label required>員工編號（帳號）</Label>
+                <Label required>{WORKSPACES_LABELS.LABEL_2161}</Label>
                 <Input
                   value={formData.admin_employee_number}
                   onChange={(e) => handleFieldChange('admin_employee_number', e.target.value)}
@@ -297,7 +297,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
             </div>
 
             <div className="space-y-2">
-              <Label required>登入密碼</Label>
+              <Label required>{WORKSPACES_LABELS.LABEL_8142}</Label>
               <Input
                 type="password"
                 value={formData.admin_password}
@@ -311,7 +311,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
         <div className="flex justify-end gap-3 pt-4 border-t border-border">
           <Button variant="outline" onClick={() => onOpenChange(false)} className="gap-2">
             <X size={16} />
-            取消
+            {WORKSPACES_LABELS.CANCEL}
           </Button>
           <Button
             onClick={handleSubmit}

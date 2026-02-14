@@ -39,17 +39,17 @@ export function MemberManagementDialog({
     >
       <DialogContent level={1}>
         <DialogHeader>
-          <DialogTitle>移除頻道成員</DialogTitle>
+          <DialogTitle>{COMP_WORKSPACE_LABELS.LABEL_8217}</DialogTitle>
         </DialogHeader>
         <p className="text-sm text-morandi-secondary">
-          確定要將「
+          {COMP_WORKSPACE_LABELS.CONFIRM_9167}
           {memberToRemove?.profile?.displayName || memberToRemove?.profile?.englishName || COMP_WORKSPACE_LABELS.此成員}
           」移出頻道嗎？
         </p>
         <DialogFooter className="mt-4">
           <Button variant="ghost" onClick={onClose} disabled={isRemovingMember} className="gap-1">
             <X size={16} />
-            取消
+            {COMP_WORKSPACE_LABELS.CANCEL}
           </Button>
           <Button variant="destructive" onClick={onRemove} disabled={isRemovingMember} className="gap-2">
             <Trash2 size={16} />
@@ -87,7 +87,7 @@ export function ChannelDeleteDialog({
     >
       <DialogContent level={1}>
         <DialogHeader>
-          <DialogTitle className="text-morandi-primary">刪除頻道</DialogTitle>
+          <DialogTitle className="text-morandi-primary">{COMP_WORKSPACE_LABELS.刪除頻道}</DialogTitle>
         </DialogHeader>
         <p className="text-sm text-morandi-secondary">
           確定要刪除頻道「{channelToDelete?.name}」嗎？此操作無法復原。
@@ -149,14 +149,14 @@ export function GroupDeleteDialog({
     >
       <DialogContent level={1}>
         <DialogHeader>
-          <DialogTitle className="text-morandi-primary">刪除群組</DialogTitle>
+          <DialogTitle className="text-morandi-primary">{COMP_WORKSPACE_LABELS.刪除群組}</DialogTitle>
         </DialogHeader>
         <div className="space-y-2">
           <p className="text-sm text-morandi-secondary">
             確定要刪除群組「{groupToDelete?.name}」嗎？
           </p>
           <p className="text-sm text-morandi-secondary">
-            群組內的所有頻道將會移至「未分組」區域。此操作無法復原。
+            {COMP_WORKSPACE_LABELS.LABEL_8875}
           </p>
         </div>
         <DialogFooter className="mt-4">

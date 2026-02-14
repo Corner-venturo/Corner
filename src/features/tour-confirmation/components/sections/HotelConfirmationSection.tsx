@@ -108,17 +108,17 @@ export function HotelConfirmationSection({
     <div className="border-t border-border">
       <div className="flex items-center justify-between px-4 py-2 bg-morandi-primary text-white">
         <div className="flex items-center gap-2">
-          <span className="font-medium">飯店確認</span>
+          <span className="font-medium">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.CONFIRM_2803}</span>
           <span className="text-white/80 text-sm">({nightlyAccommodations.length} 晚)</span>
         </div>
       </div>
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-morandi-container/50 border-b border-border">
-            <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[80px]">日期</th>
-            <th className="px-3 py-2 text-left font-medium text-morandi-primary">飯店名稱</th>
-            <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[200px]">房型配置</th>
-            <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[80px]">狀態</th>
+            <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[80px]">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.日期}</th>
+            <th className="px-3 py-2 text-left font-medium text-morandi-primary">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.LABEL_5863}</th>
+            <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[200px]">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.LABEL_4541}</th>
+            <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[80px]">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.STATUS}</th>
           </tr>
         </thead>
         <tbody>

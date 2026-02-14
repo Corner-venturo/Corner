@@ -34,10 +34,10 @@ export const QuickQuoteHeader: React.FC<QuickQuoteHeaderProps> = ({
 
   return (
     <div className="bg-card border border-border rounded-xl p-6">
-      <h2 className="text-lg font-semibold text-morandi-primary mb-4">客戶資訊</h2>
+      <h2 className="text-lg font-semibold text-morandi-primary mb-4">{QUICK_QUOTE_DIALOG_LABELS.LABEL_8897}</h2>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium text-morandi-primary">客戶名稱</label>
+          <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_DIALOG_LABELS.LABEL_4015}</label>
           <Input
             value={formData.customer_name}
             onChange={e => onFieldChange('customer_name', e.target.value)}
@@ -47,7 +47,7 @@ export const QuickQuoteHeader: React.FC<QuickQuoteHeaderProps> = ({
           />
         </div>
         <div>
-          <label className="text-sm font-medium text-morandi-primary">聯絡電話</label>
+          <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_DIALOG_LABELS.LABEL_5110}</label>
           <Input
             value={formData.contact_phone}
             onChange={e => onFieldChange('contact_phone', e.target.value)}
@@ -57,7 +57,7 @@ export const QuickQuoteHeader: React.FC<QuickQuoteHeaderProps> = ({
           />
         </div>
         <div>
-          <label className="text-sm font-medium text-morandi-primary">通訊地址</label>
+          <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_DIALOG_LABELS.LABEL_3760}</label>
           <Input
             value={formData.contact_address}
             onChange={e => onFieldChange('contact_address', e.target.value)}
@@ -67,7 +67,7 @@ export const QuickQuoteHeader: React.FC<QuickQuoteHeaderProps> = ({
           />
         </div>
         <div>
-          <label className="text-sm font-medium text-morandi-primary">團體編號</label>
+          <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_DIALOG_LABELS.LABEL_4209}</label>
           <Input
             value={formData.tour_code}
             onChange={e => onFieldChange('tour_code', e.target.value)}
@@ -77,7 +77,7 @@ export const QuickQuoteHeader: React.FC<QuickQuoteHeaderProps> = ({
           />
         </div>
         <div>
-          <label className="text-sm font-medium text-morandi-primary">承辦業務</label>
+          <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_DIALOG_LABELS.LABEL_4702}</label>
           <Input
             value={formData.handler_name}
             onChange={e => onFieldChange('handler_name', e.target.value)}
@@ -87,7 +87,7 @@ export const QuickQuoteHeader: React.FC<QuickQuoteHeaderProps> = ({
           />
         </div>
         <div>
-          <label className="text-sm font-medium text-morandi-primary">開單日期</label>
+          <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_DIALOG_LABELS.LABEL_8538}</label>
           <DatePicker
             value={formData.issue_date}
             onChange={(date) => onFieldChange('issue_date', date || '')}

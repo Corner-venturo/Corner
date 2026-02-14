@@ -8,6 +8,7 @@ import { DateCell } from '@/components/table-cells'
 import type { Itinerary, Employee, Tour } from '@/stores/types'
 import { alertSuccess, alertError } from '@/lib/ui/alert-dialog'
 import { stripHtml } from '@/lib/utils/string-utils'
+import { ITINERARY_LABELS } from './constants/labels'
 
 // 🔧 優化：移除 countries/cities 參數，Itinerary 已有 denormalized 欄位
 interface UseItineraryTableColumnsProps {
@@ -133,7 +134,7 @@ export function useItineraryTableColumns({
           if (isClosed) {
             return (
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-morandi-secondary">
-                結案
+                {ITINERARY_LABELS.LABEL_248}
               </span>
             )
           }
@@ -141,20 +142,20 @@ export function useItineraryTableColumns({
             return (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-morandi-gold/10 text-morandi-gold">
                 <Building2 size={10} />
-                公司範例
+                {ITINERARY_LABELS.LABEL_4206}
               </span>
             )
           }
           if (itinerary.status === '進行中') {
             return (
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-morandi-green/10 text-morandi-green">
-                進行中
+                {ITINERARY_LABELS.LABEL_555}
               </span>
             )
           }
           return (
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-morandi-muted/20 text-morandi-secondary">
-              提案
+              {ITINERARY_LABELS.LABEL_5485}
             </span>
           )
         },
@@ -207,7 +208,7 @@ export function useItineraryTableColumns({
                     })
                 }}
                 className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors"
-                title="產生分享連結"
+                title={ITINERARY_LABELS.LABEL_9823}
               >
                 <Eye size={14} />
               </button>
@@ -218,7 +219,7 @@ export function useItineraryTableColumns({
                   handleOpenDuplicateDialog(itinerary)
                 }}
                 className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors"
-                title="複製行程"
+                title={ITINERARY_LABELS.COPYING_6704}
               >
                 <Copy size={14} />
               </button>
@@ -230,7 +231,7 @@ export function useItineraryTableColumns({
                     handleSetTemplate(itinerary.id, false)
                   }}
                   className="p-1 text-purple-600 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
-                  title="取消公司範例"
+                  title={ITINERARY_LABELS.LABEL_6743}
                 >
                   <Building2 size={14} />
                 </button>
@@ -244,7 +245,7 @@ export function useItineraryTableColumns({
                       handleReopen(itinerary.id)
                     }}
                     className="p-1 text-status-info hover:text-status-info hover:bg-muted rounded transition-colors"
-                    title="重新開啟"
+                    title={ITINERARY_LABELS.LABEL_1280}
                   >
                     <RotateCcw size={14} />
                   </button>
@@ -256,7 +257,7 @@ export function useItineraryTableColumns({
                         handleSetTemplate(itinerary.id, true)
                       }}
                       className="p-1 text-morandi-secondary hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
-                      title="設為公司範例"
+                      title={ITINERARY_LABELS.LABEL_6187}
                     >
                       <Building2 size={14} />
                     </button>
@@ -283,7 +284,7 @@ export function useItineraryTableColumns({
                       handleUnarchive(itinerary.id)
                     }}
                     className="p-1 text-morandi-green/60 hover:text-morandi-green hover:bg-morandi-green/10 rounded transition-colors"
-                    title="取消封存"
+                    title={ITINERARY_LABELS.LABEL_410}
                   >
                     <RotateCcw size={14} />
                   </button>
@@ -293,7 +294,7 @@ export function useItineraryTableColumns({
                       handleDelete(itinerary.id)
                     }}
                     className="p-1 text-morandi-red/60 hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
-                    title="永久刪除"
+                    title={ITINERARY_LABELS.DELETE_1200}
                   >
                     <Trash2 size={14} />
                   </button>
@@ -305,7 +306,7 @@ export function useItineraryTableColumns({
                     handleArchive(itinerary.id)
                   }}
                   className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors"
-                  title="封存"
+                  title={ITINERARY_LABELS.LABEL_1674}
                 >
                   <Archive size={14} />
                 </button>

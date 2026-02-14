@@ -162,9 +162,9 @@ export function DailyImagesUploader({
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <label className="text-sm font-medium text-morandi-primary">每日圖片</label>
+          <label className="text-sm font-medium text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_6290}</label>
           <p className="text-xs text-morandi-secondary mt-1">
-            點擊縮圖可預覽，點擊 <Move size={12} className="inline" /> 可調整顯示位置
+            點擊縮圖可預覽，點擊 <Move size={12} className="inline" /> {COMP_EDITOR_LABELS.LABEL_7764}
           </p>
         </div>
         <span className="text-xs text-morandi-secondary">
@@ -200,7 +200,7 @@ export function DailyImagesUploader({
         <Dialog open onOpenChange={() => setEditingIndex(null)}>
           <DialogContent level={1} className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>調整圖片顯示位置</DialogTitle>
+              <DialogTitle>{COMP_EDITOR_LABELS.LABEL_636}</DialogTitle>
             </DialogHeader>
             <ImagePositionEditor
               image={images[editingIndex]}

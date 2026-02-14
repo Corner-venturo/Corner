@@ -4,6 +4,7 @@ import { chapters } from '@/data/manifestation-chapters'
 import { cn } from '@/lib/utils'
 import { Check, Lock } from 'lucide-react'
 import { useManifestationStore } from '@/stores/manifestation-store'
+import { MANIFESTATION_LABELS } from './constants/labels'
 
 interface ChapterListProps {
   currentChapter: number
@@ -81,7 +82,7 @@ export function ChapterList({ currentChapter, onChapterSelect }: ChapterListProp
                       {chapter.title}
                     </h4>
                     {started && !completed && (
-                      <span className="text-xs text-morandi-gold">進行中</span>
+                      <span className="text-xs text-morandi-gold">{MANIFESTATION_LABELS.LABEL_555}</span>
                     )}
                   </div>
                   {chapter.subtitle && (

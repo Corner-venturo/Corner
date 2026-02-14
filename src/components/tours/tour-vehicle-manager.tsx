@@ -135,7 +135,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
           <DialogHeader className="pb-3 border-b border-border">
             <DialogTitle className="flex items-center gap-2 text-morandi-primary">
               <Bus className="h-5 w-5 text-morandi-gold" />
-              車輛管理
+              {COMP_TOURS_LABELS.MANAGE_7961}
               {vehicles.length > 0 && (
                 <span className="text-sm font-normal text-morandi-muted">
                   {vehicles.length} 輛車
@@ -148,7 +148,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
                 className="ml-auto gap-1"
               >
                 <Plus className="h-4 w-4" />
-                新增車輛
+                {COMP_TOURS_LABELS.ADD_5339}
               </Button>
             </DialogTitle>
           </DialogHeader>
@@ -158,8 +158,8 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
             {vehicles.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-morandi-muted">
                 <Bus className="h-8 w-8 mb-2" />
-                <p className="text-sm">尚未設定車輛</p>
-                <p className="text-xs mt-1">點擊「新增車輛」開始設定</p>
+                <p className="text-sm">{COMP_TOURS_LABELS.SETTINGS_4888}</p>
+                <p className="text-xs mt-1">{COMP_TOURS_LABELS.ADD_7430}</p>
               </div>
             ) : (
               <>
@@ -249,7 +249,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
           </div>
 
           <div className="pt-3 border-t border-border text-xs text-morandi-muted">
-            提示：團員分車請在成員名單中使用下拉選單操作
+            {COMP_TOURS_LABELS.LABEL_6906}
           </div>
         </DialogContent>
       </Dialog>
@@ -265,7 +265,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-1.5">
-              <Label className="text-morandi-primary">車輛名稱 *</Label>
+              <Label className="text-morandi-primary">{COMP_TOURS_LABELS.LABEL_1938}</Label>
               <Input
                 value={newVehicle.vehicle_name}
                 onChange={e => setNewVehicle({ ...newVehicle, vehicle_name: e.target.value })}
@@ -274,7 +274,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-morandi-primary">車型</Label>
+                <Label className="text-morandi-primary">{COMP_TOURS_LABELS.LABEL_8181}</Label>
                 <Select
                   value={newVehicle.vehicle_type}
                   onValueChange={value => {
@@ -297,7 +297,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-morandi-primary">座位數</Label>
+                <Label className="text-morandi-primary">{COMP_TOURS_LABELS.LABEL_7438}</Label>
                 <Input
                   type="number"
                   min={1}
@@ -308,7 +308,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-morandi-primary">司機姓名</Label>
+                <Label className="text-morandi-primary">{COMP_TOURS_LABELS.LABEL_6947}</Label>
                 <Input
                   value={newVehicle.driver_name}
                   onChange={e => setNewVehicle({ ...newVehicle, driver_name: e.target.value })}
@@ -316,7 +316,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-morandi-primary">司機電話</Label>
+                <Label className="text-morandi-primary">{COMP_TOURS_LABELS.LABEL_8290}</Label>
                 <Input
                   value={newVehicle.driver_phone}
                   onChange={e => setNewVehicle({ ...newVehicle, driver_phone: e.target.value })}
@@ -325,7 +325,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-morandi-primary">車牌號碼</Label>
+              <Label className="text-morandi-primary">{COMP_TOURS_LABELS.LABEL_6418}</Label>
               <Input
                 value={newVehicle.license_plate}
                 onChange={e => setNewVehicle({ ...newVehicle, license_plate: e.target.value })}
@@ -335,11 +335,11 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
             <div className="flex justify-end gap-2 pt-3 border-t border-border">
               <Button variant="outline" onClick={() => setShowAddVehicle(false)} className="gap-2">
                 <X size={16} />
-                取消
+                {COMP_TOURS_LABELS.取消}
               </Button>
               <Button onClick={handleAddVehicle} className="gap-2">
                 <Plus size={16} />
-                新增
+                {COMP_TOURS_LABELS.ADD}
               </Button>
             </div>
           </div>

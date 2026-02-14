@@ -228,7 +228,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-morandi-gold pb-2 flex-1">
-          飯店資訊
+          {COMP_EDITOR_LABELS.飯店資訊}
         </h2>
         <label className="flex items-center gap-2 text-sm">
           <input
@@ -237,27 +237,27 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
             onChange={e => updateField('showHotels', e.target.checked)}
             className="w-4 h-4 text-morandi-gold rounded focus:ring-morandi-gold/50"
           />
-          <span className="text-morandi-primary">顯示此區塊</span>
+          <span className="text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_3010}</span>
         </label>
       </div>
 
       <div className="bg-morandi-container/20 p-4 rounded-lg space-y-3">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm text-morandi-secondary">新增入住的飯店資訊，每間飯店最多可上傳 4 張圖片</p>
+          <p className="text-sm text-morandi-secondary">{COMP_EDITOR_LABELS.ADD_4359}</p>
           <button
             type="button"
             onClick={addHotel}
             className="flex items-center gap-1 px-3 py-1.5 bg-morandi-gold text-white rounded-lg hover:bg-morandi-gold-hover transition-colors text-sm"
           >
             <Plus size={16} />
-            新增飯店
+            {COMP_EDITOR_LABELS.ADD_9618}
           </button>
         </div>
 
         {hotels.length === 0 && (
           <div className="text-center py-8 bg-card rounded-lg border-2 border-dashed border-morandi-container">
-            <p className="text-sm text-morandi-secondary mb-2">尚未新增飯店資訊</p>
-            <p className="text-xs text-morandi-muted">點擊「新增飯店」按鈕開始</p>
+            <p className="text-sm text-morandi-secondary mb-2">{COMP_EDITOR_LABELS.ADD_3223}</p>
+            <p className="text-xs text-morandi-muted">{COMP_EDITOR_LABELS.ADD_9347}</p>
           </div>
         )}
 
@@ -280,12 +280,12 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
               </button>
 
               <div className="pr-8">
-                <h4 className="font-bold text-morandi-secondary mb-3">飯店 {hotelIndex + 1}</h4>
+                <h4 className="font-bold text-morandi-secondary mb-3">{COMP_EDITOR_LABELS.飯店} {hotelIndex + 1}</h4>
 
                 <div className="space-y-3">
                   <div>
                     <label className="block text-sm font-medium text-morandi-primary mb-1">
-                      飯店名稱 *
+                      {COMP_EDITOR_LABELS.LABEL_7447}
                     </label>
                     <input
                       type="text"
@@ -298,7 +298,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
 
                   <div>
                     <label className="block text-sm font-medium text-morandi-primary mb-1">
-                      飯店簡介
+                      {COMP_EDITOR_LABELS.LABEL_6867}
                     </label>
                     <textarea
                       value={hotel.description}
@@ -377,7 +377,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
                           ) : (
                             <>
                               <Plus size={20} className="text-morandi-secondary mb-1" />
-                              <span className="text-xs text-morandi-secondary">新增</span>
+                              <span className="text-xs text-morandi-secondary">{COMP_EDITOR_LABELS.新增}</span>
                             </>
                           )}
                         </div>

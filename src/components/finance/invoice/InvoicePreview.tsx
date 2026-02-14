@@ -3,6 +3,7 @@
 import React from 'react'
 import type { Order } from '@/types/order.types'
 import { CurrencyCell } from '@/components/table-cells'
+import { INVOICE_LABELS } from './constants/labels'
 
 interface InvoicePreviewProps {
   totalAmount: number
@@ -17,7 +18,7 @@ export function InvoicePreview({ totalAmount, currentOrder }: InvoicePreviewProp
       {/* 總計 */}
       <div className="border rounded-lg p-3 bg-muted/30">
         <div className="flex justify-end items-center gap-4">
-          <span className="text-sm font-medium">總計</span>
+          <span className="text-sm font-medium">{INVOICE_LABELS.TOTAL}</span>
           <span className="text-lg font-bold text-primary">
             <CurrencyCell amount={totalAmount} className="text-lg font-bold text-primary" />
           </span>

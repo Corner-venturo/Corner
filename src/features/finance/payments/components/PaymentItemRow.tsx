@@ -244,8 +244,8 @@ export function PaymentItemRow({
       {item.receipt_type === RECEIPT_TYPES.LINK_PAY && (
         <tr className="text-xs text-morandi-primary font-medium bg-card">
           <th className="text-left py-2.5 px-3 border-b border-r border-border">Email *</th>
-          <th className="text-left py-2.5 px-3 border-b border-r border-border">付款截止日 *</th>
-          <th className="text-left py-2.5 px-3 border-b border-r border-border" colSpan={2}>付款名稱（客戶看到的）</th>
+          <th className="text-left py-2.5 px-3 border-b border-r border-border">{PAYMENT_ITEM_ROW_LABELS.LABEL_6186}</th>
+          <th className="text-left py-2.5 px-3 border-b border-r border-border" colSpan={2}>{PAYMENT_ITEM_ROW_LABELS.LABEL_4673}</th>
           <th className="border-b border-border" colSpan={2}></th>
         </tr>
       )}
@@ -290,12 +290,12 @@ export function PaymentItemRow({
               {isGenerating ? (
                 <>
                   <Loader2 size={14} className="animate-spin" />
-                  產生中...
+                  {PAYMENT_ITEM_ROW_LABELS.LABEL_3875}
                 </>
               ) : (
                 <>
                   <Link2 size={14} />
-                  產生連結
+                  {PAYMENT_ITEM_ROW_LABELS.LABEL_2899}
                 </>
               )}
             </Button>
@@ -306,7 +306,7 @@ export function PaymentItemRow({
       {/* LinkPay 產生的連結 */}
       {item.receipt_type === RECEIPT_TYPES.LINK_PAY && generatedLink && (
         <tr className="bg-morandi-gold/10">
-          <td className="py-2 px-3 border-b border-r border-border text-xs text-morandi-secondary">付款連結</td>
+          <td className="py-2 px-3 border-b border-r border-border text-xs text-morandi-secondary">{PAYMENT_ITEM_ROW_LABELS.LABEL_1487}</td>
           <td className="py-2 px-3 border-b border-r border-border" colSpan={3}>
             <input
               type="text"
@@ -326,7 +326,7 @@ export function PaymentItemRow({
               onClick={() => window.open(generatedLink, '_blank')}
               className="text-morandi-secondary cursor-pointer hover:text-morandi-primary text-sm"
             >
-              開啟
+              {PAYMENT_ITEM_ROW_LABELS.LABEL_1670}
             </span>
           </td>
         </tr>

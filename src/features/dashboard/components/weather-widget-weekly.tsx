@@ -7,6 +7,7 @@ import { Cloud, MapPin, Loader2, AlertCircle, Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { DASHBOARD_LABELS } from './constants/labels'
 
 interface DailyWeather {
   date: string
@@ -252,10 +253,10 @@ export function WeatherWidgetWeekly() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">
-                天氣週報
+                {DASHBOARD_LABELS.LABEL_6674}
               </p>
               <p className="text-xs text-morandi-secondary/90 mt-1.5 leading-relaxed">
-                查看未來7天天氣預報
+                {DASHBOARD_LABELS.LABEL_9804}
               </p>
             </div>
           </div>
@@ -266,11 +267,11 @@ export function WeatherWidgetWeekly() {
               <div>
                 <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5" />
-                  城市
+                  {DASHBOARD_LABELS.LABEL_5461}
                 </label>
                 <Select value={selectedCity.name} onValueChange={handleCityChange}>
                   <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm">
-                    <SelectValue placeholder="選擇城市" />
+                    <SelectValue placeholder={DASHBOARD_LABELS.SELECT_240} />
                   </SelectTrigger>
                   <SelectContent>
                     {CITIES.map(city => (
@@ -285,14 +286,14 @@ export function WeatherWidgetWeekly() {
               <div>
                 <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5" />
-                  開始日期
+                  {DASHBOARD_LABELS.LABEL_4743}
                 </label>
                 <DatePicker
                   value={startDate}
                   onChange={(date) => handleDateChange(date)}
                   minDate={new Date()}
                   maxDate={maxDate}
-                  placeholder="選擇日期"
+                  placeholder={DASHBOARD_LABELS.SELECT_5234}
                   className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm"
                 />
               </div>
@@ -304,7 +305,7 @@ export function WeatherWidgetWeekly() {
             <div className="flex-1 flex items-center justify-center rounded-xl bg-card/70 p-6 shadow-md border border-border/40">
               <div className="text-center">
                 <Loader2 className="w-8 h-8 animate-spin text-status-info mx-auto mb-2" />
-                <p className="text-xs text-morandi-secondary">載入中...</p>
+                <p className="text-xs text-morandi-secondary">{DASHBOARD_LABELS.LOADING_6912}</p>
               </div>
             </div>
           ) : error ? (

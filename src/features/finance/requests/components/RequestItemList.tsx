@@ -53,17 +53,17 @@ export function EditableRequestItemList({
 
   return (
     <div>
-      <h3 className="text-sm font-medium text-morandi-primary mb-3">請款項目</h3>
+      <h3 className="text-sm font-medium text-morandi-primary mb-3">{REQUEST_ITEM_LIST_LABELS.LABEL_475}</h3>
 
       {/* 表頭 */}
       <div className="border-b border-morandi-container/60">
         <div className="grid grid-cols-[80px_1fr_1fr_96px_64px_112px_48px] px-2 py-2.5">
-          <span className="text-xs font-medium text-morandi-secondary">類別</span>
-          <span className="text-xs font-medium text-morandi-secondary">供應商</span>
-          <span className="text-xs font-medium text-morandi-secondary">項目描述</span>
-          <span className="text-xs font-medium text-morandi-secondary text-right">單價</span>
-          <span className="text-xs font-medium text-morandi-secondary text-center">數量</span>
-          <span className="text-xs font-medium text-morandi-secondary text-right">小計</span>
+          <span className="text-xs font-medium text-morandi-secondary">{REQUEST_ITEM_LIST_LABELS.LABEL_2946}</span>
+          <span className="text-xs font-medium text-morandi-secondary">{REQUEST_ITEM_LIST_LABELS.LABEL_561}</span>
+          <span className="text-xs font-medium text-morandi-secondary">{REQUEST_ITEM_LIST_LABELS.LABEL_6008}</span>
+          <span className="text-xs font-medium text-morandi-secondary text-right">{REQUEST_ITEM_LIST_LABELS.LABEL_9413}</span>
+          <span className="text-xs font-medium text-morandi-secondary text-center">{REQUEST_ITEM_LIST_LABELS.QUANTITY}</span>
+          <span className="text-xs font-medium text-morandi-secondary text-right">{REQUEST_ITEM_LIST_LABELS.LABEL_832}</span>
           <span></span>
         </div>
       </div>
@@ -208,7 +208,7 @@ export function EditableRequestItemList({
 
       {/* Total */}
       <div className="flex justify-end items-center gap-6 pt-4 mt-2">
-        <span className="text-sm text-morandi-secondary">總金額</span>
+        <span className="text-sm text-morandi-secondary">{REQUEST_ITEM_LIST_LABELS.TOTAL_6550}</span>
         <CurrencyCell amount={total_amount} className="text-lg font-semibold text-morandi-gold" />
       </div>
     </div>

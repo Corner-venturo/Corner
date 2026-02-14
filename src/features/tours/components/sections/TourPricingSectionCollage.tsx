@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import type { TourPageData } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 interface TourPricingSectionCollageProps {
   data: TourPageData
@@ -134,7 +135,7 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
                     className="w-full py-3 border-2 border-black font-bold hover:bg-black hover:text-white transition-colors uppercase tracking-widest"
                     style={{ fontFamily: "'Space Mono', monospace" }}
                   >
-                    選擇此方案
+                    {TOURS_LABELS.SELECT_2483}
                   </button>
                 </motion.div>
               )}

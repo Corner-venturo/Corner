@@ -76,7 +76,7 @@ export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionPro
       {/* ===== 提醒事項 ===== */}
       <div className="space-y-4">
         <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-morandi-gold pb-1">
-          提醒事項 NOTICES
+          {COMP_EDITOR_LABELS.LABEL_1764}
         </h2>
 
         {/* 顯示開關 */}
@@ -84,9 +84,9 @@ export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionPro
           <div className="flex items-center gap-3">
             <AlertCircle className="h-5 w-5 text-status-warning" />
             <div>
-              <h3 className="font-medium text-morandi-primary">顯示提醒事項</h3>
+              <h3 className="font-medium text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_9164}</h3>
               <p className="text-sm text-morandi-secondary">
-                出團前的重要提醒與注意事項
+                {COMP_EDITOR_LABELS.LABEL_379}
               </p>
             </div>
           </div>
@@ -111,7 +111,7 @@ export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionPro
                   <GripVertical className="h-4 w-4 text-morandi-muted/60" />
                 </div>
                 <div className="flex-1">
-                  <Label className="text-xs text-morandi-primary">第 {index + 1} 項</Label>
+                  <Label className="text-xs text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_104} {index + 1} 項</Label>
                   <Textarea
                     value={notice}
                     onChange={(e) => updateNotice(index, e.target.value)}
@@ -138,7 +138,7 @@ export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionPro
               className="w-full border-dashed"
             >
               <Plus className="h-4 w-4 mr-2" />
-              新增提醒事項
+              {COMP_EDITOR_LABELS.ADD_7126}
             </Button>
           </div>
         )}
@@ -147,7 +147,7 @@ export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionPro
       {/* ===== 取消政策 ===== */}
       <div className="space-y-4">
         <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-morandi-gold pb-1">
-          取消政策 CANCELLATION
+          {COMP_EDITOR_LABELS.LABEL_4129}
         </h2>
 
         {/* 顯示開關 */}
@@ -155,9 +155,9 @@ export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionPro
           <div className="flex items-center gap-3">
             <FileX className="h-5 w-5 text-morandi-red" />
             <div>
-              <h3 className="font-medium text-morandi-primary">顯示取消政策</h3>
+              <h3 className="font-medium text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_9277}</h3>
               <p className="text-sm text-morandi-secondary">
-                取消行程的相關規定與費用說明
+                {COMP_EDITOR_LABELS.LABEL_4169}
               </p>
             </div>
           </div>
@@ -209,7 +209,7 @@ export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionPro
               className="w-full border-dashed"
             >
               <Plus className="h-4 w-4 mr-2" />
-              新增取消政策
+              {COMP_EDITOR_LABELS.ADD_8816}
             </Button>
           </div>
         )}

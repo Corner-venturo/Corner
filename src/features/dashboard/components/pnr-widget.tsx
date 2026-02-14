@@ -40,6 +40,7 @@ import { createPNR } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { Button } from '@/components/ui/button'
 import type { PNR } from '@/types/pnr.types'
+import { DASHBOARD_LABELS } from './constants/labels'
 
 // SSR 類別圖示
 const SSR_ICONS: Record<SSRCategory, typeof Utensils> = {
@@ -190,12 +191,12 @@ export function PNRWidget() {
                 PNR 解析器
               </p>
               <p className="text-xs text-morandi-secondary/90 mt-1 leading-relaxed">
-                貼上 Amadeus 電報，自動提取資訊
+                {DASHBOARD_LABELS.LABEL_6626}
               </p>
               {refDataLoading && (
                 <p className="text-[10px] text-morandi-secondary/60 mt-1 flex items-center gap-1">
                   <Loader2 className="w-3 h-3 animate-spin" />
-                  載入參考資料中...
+                  {DASHBOARD_LABELS.LOADING_8318}
                 </p>
               )}
             </div>
@@ -212,7 +213,7 @@ export function PNRWidget() {
                 <button
                   onClick={handlePaste}
                   className="p-1.5 rounded-lg bg-card/80 hover:bg-card text-morandi-secondary hover:text-morandi-primary transition-all"
-                  title="從剪貼簿貼上"
+                  title={DASHBOARD_LABELS.LABEL_6572}
                 >
                   <Clipboard className="w-3.5 h-3.5" />
                 </button>
@@ -220,7 +221,7 @@ export function PNRWidget() {
                   <button
                     onClick={handleClear}
                     className="p-1.5 rounded-lg bg-card/80 hover:bg-card text-morandi-secondary hover:text-morandi-red transition-all"
-                    title="清除"
+                    title={DASHBOARD_LABELS.CLEAR}
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -250,7 +251,7 @@ TK TL20JAN/1200`}
               )}
             >
               <Check className="w-4 h-4" />
-              解析電報
+              {DASHBOARD_LABELS.LABEL_5472}
             </button>
           </div>
 
@@ -297,7 +298,7 @@ TK TL20JAN/1200`}
                         handleCopyLocator()
                       }}
                       className="p-1 rounded hover:bg-card/50 text-morandi-secondary hover:text-morandi-primary transition-all"
-                      title="複製訂位代號"
+                      title={DASHBOARD_LABELS.COPYING_6010}
                     >
                       <Copy className="w-3.5 h-3.5" />
                     </button>
@@ -341,7 +342,7 @@ TK TL20JAN/1200`}
                       <div className="flex items-center gap-2 mb-1">
                         <Calendar className="w-3.5 h-3.5 text-morandi-secondary" />
                         <span className="text-xs font-semibold text-morandi-primary">
-                          出票期限
+                          {DASHBOARD_LABELS.LABEL_9939}
                         </span>
                       </div>
                       <div
@@ -476,10 +477,10 @@ TK TL20JAN/1200`}
                             {(seg.departureTime || seg.arrivalTime) && (
                               <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/50 text-xs text-morandi-secondary">
                                 {seg.departureTime && (
-                                  <span>出發 {seg.departureTime.slice(0, 2)}:{seg.departureTime.slice(2)}</span>
+                                  <span>{DASHBOARD_LABELS.LABEL_5480} {seg.departureTime.slice(0, 2)}:{seg.departureTime.slice(2)}</span>
                                 )}
                                 {seg.arrivalTime && (
-                                  <span>抵達 {seg.arrivalTime.slice(0, 2)}:{seg.arrivalTime.slice(2)}</span>
+                                  <span>{DASHBOARD_LABELS.LABEL_5485} {seg.arrivalTime.slice(0, 2)}:{seg.arrivalTime.slice(2)}</span>
                                 )}
                               </div>
                             )}
@@ -546,17 +547,17 @@ TK TL20JAN/1200`}
                       {saveSuccess ? (
                         <>
                           <Check className="w-4 h-4" />
-                          已儲存
+                          {DASHBOARD_LABELS.SAVING_4294}
                         </>
                       ) : isSaving ? (
                         <>
                           <div className="w-4 h-4 border-2 border-border/30 border-t-white rounded-full animate-spin" />
-                          儲存中...
+                          {DASHBOARD_LABELS.SAVING_4983}
                         </>
                       ) : (
                         <>
                           <Save className="w-4 h-4" />
-                          儲存到 PNR 管理
+                          {DASHBOARD_LABELS.SAVING_6520}
                         </>
                       )}
                     </Button>

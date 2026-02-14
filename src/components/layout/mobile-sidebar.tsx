@@ -257,7 +257,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
               )}
             >
               <Settings className="w-5 h-5" />
-              <span>設定</span>
+              <span>{COMP_LAYOUT_LABELS.設定}</span>
             </Link>
           </nav>
         </div>

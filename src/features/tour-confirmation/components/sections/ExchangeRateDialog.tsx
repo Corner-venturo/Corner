@@ -37,7 +37,7 @@ export function ExchangeRateDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent level={1} className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>設定匯率</DialogTitle>
+          <DialogTitle>{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.SETTINGS_1263}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <p className="text-sm text-morandi-secondary">

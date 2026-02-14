@@ -170,7 +170,7 @@ export function FlightInfoSection({
             <Plane className="w-5 h-5 text-white" />
           </div>
           <div className="flex-1 text-left">
-            <h2 className="text-base font-bold text-morandi-primary">航班資訊</h2>
+            <h2 className="text-base font-bold text-morandi-primary">{COMP_EDITOR_LABELS.航班資訊}</h2>
             <p className="text-xs text-morandi-secondary">
               {currentStyle.label}{tripDays > 0 ? ` · ${tripDays} 天` : ''}
             </p>
@@ -183,9 +183,9 @@ export function FlightInfoSection({
         <div className="bg-gradient-to-r from-morandi-gold/10 to-morandi-gold/5 p-3 rounded-lg border border-morandi-gold/30">
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-morandi-primary">行程天數</span>
+              <span className="text-sm font-medium text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_6915}</span>
               <span className="text-lg font-bold text-morandi-gold">{tripDays}</span>
-              <span className="text-sm text-morandi-secondary">天</span>
+              <span className="text-sm text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_690}</span>
             </div>
             <div className="h-6 w-px bg-morandi-container hidden sm:block"></div>
             <div className="text-xs text-morandi-secondary">
@@ -222,7 +222,7 @@ export function FlightInfoSection({
                   className="text-xs gap-1 border-status-warning/30 text-status-warning hover:bg-status-warning-bg"
                 >
                   <Undo2 size={14} />
-                  復原
+                  {COMP_EDITOR_LABELS.LABEL_6053}
                 </Button>
               )}
             </div>
@@ -238,7 +238,7 @@ export function FlightInfoSection({
               <DialogHeader className="mb-4">
                 <DialogTitle className="flex items-center gap-2">
                   <Plane className="w-5 h-5" style={{ color: '#B8A99A' }} />
-                  航班設定
+                  {COMP_EDITOR_LABELS.SETTINGS_7677}
                 </DialogTitle>
               </DialogHeader>
 

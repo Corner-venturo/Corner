@@ -11,6 +11,7 @@ import { ChevronLeft, ChevronRight, FileDown, Receipt, Wallet } from 'lucide-rea
 import { usePaymentRequests, useDisbursementOrders } from '@/data'
 import { PaymentRequest, DisbursementOrder } from '@/stores/types'
 import { EXPENSE_TYPE_CONFIG, CompanyExpenseType } from '@/stores/types/finance.types'
+import { MONTHLY_DISBURSEMENT_LABELS } from './constants/labels'
 
 // 取得當前年月
 function getCurrentYearMonth(): string {
@@ -245,7 +246,7 @@ export default function MonthlyDisbursementReportPage() {
   return (
     <div className="space-y-6">
       <ResponsiveHeader
-        title="每月出帳報表"
+        title={MONTHLY_DISBURSEMENT_LABELS.LABEL_3446}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '財務', href: '/finance' },
@@ -259,26 +260,26 @@ export default function MonthlyDisbursementReportPage() {
       <ContentContainer>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
-            title="請款單數"
+            title={MONTHLY_DISBURSEMENT_LABELS.LABEL_2319}
             value={stats.paymentRequestCount}
             icon={Receipt}
             iconColor="text-morandi-gold"
           />
           <StatCard
-            title="請款總金額"
+            title={MONTHLY_DISBURSEMENT_LABELS.TOTAL_1837}
             value={stats.totalPaymentAmount}
             icon={FileDown}
             iconColor="text-morandi-gold"
             isCurrency
           />
           <StatCard
-            title="出納單數"
+            title={MONTHLY_DISBURSEMENT_LABELS.LABEL_6671}
             value={stats.disbursementOrderCount}
             icon={Wallet}
             iconColor="text-morandi-green"
           />
           <StatCard
-            title="出帳總金額"
+            title={MONTHLY_DISBURSEMENT_LABELS.TOTAL_5894}
             value={stats.totalDisbursementAmount}
             icon={FileDown}
             iconColor="text-morandi-green"
@@ -290,7 +291,7 @@ export default function MonthlyDisbursementReportPage() {
       {/* 請款單列表 */}
       <ContentContainer>
         <h3 className="text-lg font-semibold text-morandi-primary mb-4">
-          請款單明細
+          {MONTHLY_DISBURSEMENT_LABELS.LABEL_2484}
         </h3>
         <EnhancedTable
           columns={paymentColumns}
@@ -302,7 +303,7 @@ export default function MonthlyDisbursementReportPage() {
       {/* 出納單列表 */}
       <ContentContainer>
         <h3 className="text-lg font-semibold text-morandi-primary mb-4">
-          出納單明細
+          {MONTHLY_DISBURSEMENT_LABELS.LABEL_5548}
         </h3>
         <EnhancedTable
           columns={disbursementColumns}

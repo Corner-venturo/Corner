@@ -53,7 +53,7 @@ export function FlightSegmentCard({
               onChange={e => onFieldChange('hasMeal', e.target.checked)}
               className="w-3.5 h-3.5 rounded border-border text-morandi-gold focus:ring-morandi-gold"
             />
-            <span className="text-xs text-morandi-secondary">餐食</span>
+            <span className="text-xs text-morandi-secondary">{COMP_EDITOR_LABELS.餐食}</span>
           </label>
           <Button
             type="button"
@@ -78,7 +78,7 @@ export function FlightSegmentCard({
             className="h-7 text-xs gap-1 border-morandi-gold/50 text-morandi-gold hover:bg-morandi-gold/10"
           >
             <List size={12} />
-            查詢航線
+            {COMP_EDITOR_LABELS.QUERYING_9229}
           </Button>
         </div>
       </div>
@@ -87,14 +87,14 @@ export function FlightSegmentCard({
       {segments && segments.length > 0 && onSelectSegment && (
         <div className="bg-card p-3 rounded-lg border border-morandi-gold/30 space-y-2">
           <div className="flex items-center justify-between">
-            <p className="text-xs text-morandi-secondary">此航班有多個航段，請選擇：</p>
+            <p className="text-xs text-morandi-secondary">{COMP_EDITOR_LABELS.PLEASE_SELECT_4482}</p>
             {onClearSegments && (
               <button
                 type="button"
                 onClick={onClearSegments}
                 className="text-xs text-morandi-secondary hover:text-morandi-primary"
               >
-                取消
+                {COMP_EDITOR_LABELS.取消}
               </button>
             )}
           </div>
@@ -123,7 +123,7 @@ export function FlightSegmentCard({
       <div className="grid grid-cols-4 gap-2">
         <div>
           <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">
-            航空公司
+            {COMP_EDITOR_LABELS.LABEL_7827}
           </label>
           <Input
             type="text"
@@ -135,7 +135,7 @@ export function FlightSegmentCard({
         </div>
         <div>
           <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">
-            航班號碼
+            {COMP_EDITOR_LABELS.LABEL_8457}
           </label>
           <Input
             type="text"
@@ -147,7 +147,7 @@ export function FlightSegmentCard({
         </div>
         <div>
           <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">
-            日期 (月/日)
+            {COMP_EDITOR_LABELS.LABEL_6415}
           </label>
           <Input
             type="text"
@@ -160,7 +160,7 @@ export function FlightSegmentCard({
         </div>
         <div>
           <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">
-            飛行時間
+            {COMP_EDITOR_LABELS.LABEL_7552}
           </label>
           <Input
             type="text"
@@ -172,7 +172,7 @@ export function FlightSegmentCard({
         </div>
         <div>
           <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">
-            出發機場
+            {COMP_EDITOR_LABELS.LABEL_7410}
           </label>
           <Input
             type="text"
@@ -184,7 +184,7 @@ export function FlightSegmentCard({
         </div>
         <div>
           <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">
-            出發時間
+            {COMP_EDITOR_LABELS.LABEL_5706}
           </label>
           <Input
             type="text"
@@ -196,7 +196,7 @@ export function FlightSegmentCard({
         </div>
         <div>
           <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">
-            抵達機場
+            {COMP_EDITOR_LABELS.LABEL_1689}
           </label>
           <Input
             type="text"
@@ -208,7 +208,7 @@ export function FlightSegmentCard({
         </div>
         <div>
           <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">
-            抵達時間
+            {COMP_EDITOR_LABELS.LABEL_749}
           </label>
           <Input
             type="text"

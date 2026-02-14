@@ -2,6 +2,7 @@
 
 import React, { useState, ReactNode } from 'react'
 import { cn } from '@/lib/utils'
+import { TOUR_FORM_LABELS } from './constants/labels'
 
 interface PreviewPanelProps {
   children: (viewMode: 'desktop' | 'mobile') => ReactNode
@@ -32,7 +33,7 @@ export function PreviewPanel({
       {/* 標題列（和主編輯器一致） */}
       <div className="h-14 bg-card border-b px-6 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
-          <h2 className="text-lg font-semibold text-morandi-primary">即時預覽</h2>
+          <h2 className="text-lg font-semibold text-morandi-primary">{TOUR_FORM_LABELS.PREVIEW_2405}</h2>
           <div className="flex gap-2 bg-morandi-container/30 rounded-lg p-1">
             <button
               type="button"

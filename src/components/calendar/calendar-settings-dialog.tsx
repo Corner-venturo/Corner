@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useCalendarStore } from '@/stores'
+import { CALENDAR_LABELS } from './constants/labels'
 
 export function CalendarSettingsDialog() {
   const { settings, updateSettings } = useCalendarStore()
@@ -30,13 +31,13 @@ export function CalendarSettingsDialog() {
           className="h-9 gap-2 border-morandi-gold/30 bg-card text-morandi-secondary hover:bg-morandi-gold/10 hover:text-morandi-gold hover:border-morandi-gold transition-all shadow-sm"
         >
           <Settings size={16} />
-          顯示設定
+          {CALENDAR_LABELS.SETTINGS_1131}
         </Button>
       </DialogTrigger>
 
       <DialogContent level={1} className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>行事曆顯示設定</DialogTitle>
+          <DialogTitle>{CALENDAR_LABELS.SETTINGS_1824}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
@@ -49,9 +50,9 @@ export function CalendarSettingsDialog() {
             />
             <div className="space-y-0.5">
               <Label htmlFor="show-personal" className="text-base cursor-pointer">
-                個人行事曆
+                {CALENDAR_LABELS.LABEL_6154}
               </Label>
-              <p className="text-sm text-muted-foreground">只有您能看到的個人事項</p>
+              <p className="text-sm text-muted-foreground">{CALENDAR_LABELS.LABEL_7691}</p>
             </div>
           </div>
 
@@ -64,9 +65,9 @@ export function CalendarSettingsDialog() {
             />
             <div className="space-y-0.5">
               <Label htmlFor="show-company" className="text-base cursor-pointer">
-                公司行事曆
+                {CALENDAR_LABELS.LABEL_5445}
               </Label>
-              <p className="text-sm text-muted-foreground">全公司共享的會議與活動</p>
+              <p className="text-sm text-muted-foreground">{CALENDAR_LABELS.LABEL_6539}</p>
             </div>
           </div>
 
@@ -79,15 +80,15 @@ export function CalendarSettingsDialog() {
             />
             <div className="space-y-0.5">
               <Label htmlFor="show-tours" className="text-base cursor-pointer">
-                旅遊團
+                {CALENDAR_LABELS.LABEL_8875}
               </Label>
-              <p className="text-sm text-muted-foreground">自動顯示旅遊團出發與返回日期</p>
+              <p className="text-sm text-muted-foreground">{CALENDAR_LABELS.LABEL_3931}</p>
             </div>
           </div>
         </div>
 
         <div className="text-xs text-muted-foreground border-t pt-4">
-          生日名單請點擊標題列的「生日」按鈕查看
+          {CALENDAR_LABELS.LABEL_7348}
         </div>
       </DialogContent>
     </Dialog>

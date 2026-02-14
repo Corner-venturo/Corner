@@ -34,14 +34,14 @@ export function DailyItinerarySection({ itinerary }: DailyItinerarySectionProps)
   return (
     <div className="border-t border-border">
       <div className="flex items-center gap-2 px-4 py-2 bg-morandi-gold text-white">
-        <span className="font-medium">每日行程</span>
+        <span className="font-medium">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.LABEL_2780}</span>
         <span className="text-white/80 text-sm">({itinerary.daily_itinerary.length} 天)</span>
       </div>
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-morandi-container/50 border-b border-border">
-            <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[80px]">日期</th>
-            <th className="px-3 py-2 text-left font-medium text-morandi-primary">行程</th>
+            <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[80px]">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.日期}</th>
+            <th className="px-3 py-2 text-left font-medium text-morandi-primary">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.LABEL_9277}</th>
           </tr>
         </thead>
         <tbody>
@@ -75,7 +75,7 @@ export function DailyItinerarySection({ itinerary }: DailyItinerarySectionProps)
                       title={isExpanded ? '收起說明' : DAILY_ITINERARY_SECTION_LABELS.新增說明}
                     >
                       <Plus size={14} className={`transition-transform ${isExpanded ? 'rotate-45' : ''}`} />
-                      說明
+                      {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.LABEL_5591}
                     </button>
                   </td>
                   <td className="px-3 py-2">
@@ -108,7 +108,7 @@ export function DailyItinerarySection({ itinerary }: DailyItinerarySectionProps)
                 {isExpanded && (
                   <tr className="border-t border-border/30 bg-morandi-gold/5">
                     <td className="px-3 py-2 align-top">
-                      <span className="text-xs text-morandi-secondary">備註</span>
+                      <span className="text-xs text-morandi-secondary">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.REMARKS}</span>
                     </td>
                     <td className="px-3 py-2">
                       <textarea

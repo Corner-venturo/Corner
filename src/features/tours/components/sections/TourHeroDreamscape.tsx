@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { isHtmlString, cleanTiptapHtml } from '@/lib/utils/rich-text'
 import { formatDateShort } from '@/lib/utils/format-date'
 import type { TourPageData } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 // 渲染可能包含 HTML 的文字
 function RichText({ html, className }: { html: string | null | undefined; className?: string }) {
@@ -207,7 +208,7 @@ export function TourHeroDreamscape({ data, viewMode }: TourHeroDreamscapeProps) 
                   }}
                 >
                   <span className="uppercase tracking-[0.2em] text-sm font-bold">{dateFormatted}</span>
-                  <span style={{ color: DREAM.purple }}>出發</span>
+                  <span style={{ color: DREAM.purple }}>{TOURS_LABELS.LABEL_5480}</span>
                 </div>
               )}
               {data.price && (

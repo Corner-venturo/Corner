@@ -82,7 +82,7 @@ export default function InvoiceDetailPage() {
     return (
       <div className="h-full flex flex-col">
         <ResponsiveHeader
-          title="發票詳情"
+          title={TRAVEL_INVOICE_DETAIL_LABELS.LABEL_6889}
           icon={FileText}
           showBackButton={true}
           onBack={() => router.push('/finance/travel-invoice')}
@@ -107,8 +107,8 @@ export default function InvoiceDetailPage() {
         />
         <div className="flex-1 flex items-center justify-center">
           <NotFoundState
-            title="找不到該發票"
-            description="您要找的發票可能已被刪除或不存在"
+            title={TRAVEL_INVOICE_DETAIL_LABELS.NOT_FOUND_6549}
+            description={TRAVEL_INVOICE_DETAIL_LABELS.DELETE_4958}
             backButtonLabel="返回發票列表"
             backHref="/finance/travel-invoice"
           />
@@ -139,7 +139,7 @@ export default function InvoiceDetailPage() {
               className="flex items-center gap-2"
             >
               <FileX className="h-4 w-4" />
-              作廢發票
+              {TRAVEL_INVOICE_DETAIL_LABELS.VOID_INVOICE}
             </Button>
           ) : undefined
         }
@@ -226,19 +226,19 @@ export default function InvoiceDetailPage() {
                   <thead className="bg-morandi-container/40 border-b border-border/60">
                     <tr>
                       <th className="text-left py-3 px-4 text-sm font-medium text-morandi-primary">
-                        商品名稱
+                        {TRAVEL_INVOICE_DETAIL_LABELS.LABEL_6937}
                       </th>
                       <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary">
-                        數量
+                        {TRAVEL_INVOICE_DETAIL_LABELS.QUANTITY}
                       </th>
                       <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary">
-                        單位
+                        {TRAVEL_INVOICE_DETAIL_LABELS.LABEL_9062}
                       </th>
                       <th className="text-right py-3 px-4 text-sm font-medium text-morandi-primary">
-                        單價
+                        {TRAVEL_INVOICE_DETAIL_LABELS.LABEL_9413}
                       </th>
                       <th className="text-right py-3 px-4 text-sm font-medium text-morandi-primary">
-                        金額
+                        {TRAVEL_INVOICE_DETAIL_LABELS.AMOUNT}
                       </th>
                     </tr>
                   </thead>
@@ -329,14 +329,14 @@ export default function InvoiceDetailPage() {
                 id="voidReason"
                 value={voidReason}
                 onChange={e => setVoidReason(e.target.value)}
-                placeholder="請輸入作廢原因"
+                placeholder={TRAVEL_INVOICE_DETAIL_LABELS.PLEASE_ENTER_7085}
               />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowVoidDialog(false)} className="gap-2">
               <X size={16} />
-              取消
+              {TRAVEL_INVOICE_DETAIL_LABELS.CANCEL}
             </Button>
             <Button
               variant="destructive"
@@ -345,7 +345,7 @@ export default function InvoiceDetailPage() {
               className="gap-2"
             >
               <Check size={16} />
-              確認作廢
+              {TRAVEL_INVOICE_DETAIL_LABELS.CONFIRM_8486}
             </Button>
           </DialogFooter>
         </DialogContent>

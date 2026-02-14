@@ -139,7 +139,7 @@ export function QuickRequestFromItemDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <DollarSign size={20} className="text-morandi-gold" />
-            快速請款
+            {QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS.LABEL_8944}
           </DialogTitle>
         </DialogHeader>
 
@@ -154,13 +154,13 @@ export function QuickRequestFromItemDialog({
             </div>
 
             <div>
-              <div className="text-sm text-morandi-secondary">項目</div>
+              <div className="text-sm text-morandi-secondary">{QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS.LABEL_7325}</div>
               <div className="font-medium text-morandi-primary">{item.title}</div>
             </div>
 
             <div className="flex items-center gap-2">
               <Building2 size={14} className="text-morandi-secondary" />
-              <span className="text-sm text-morandi-secondary">供應商：</span>
+              <span className="text-sm text-morandi-secondary">{QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS.LABEL_4947}</span>
               <span className="text-sm font-medium text-morandi-primary">
                 {item.supplierName}
               </span>
@@ -168,7 +168,7 @@ export function QuickRequestFromItemDialog({
 
             <div className="flex items-center gap-2">
               <FileText size={14} className="text-morandi-secondary" />
-              <span className="text-sm text-morandi-secondary">旅遊團：</span>
+              <span className="text-sm text-morandi-secondary">{QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS.LABEL_1073}</span>
               <span className="text-sm font-medium text-morandi-primary">
                 {item.tourCode}
               </span>
@@ -189,7 +189,7 @@ export function QuickRequestFromItemDialog({
           {/* 金額輸入 */}
           <div>
             <label className="text-sm font-medium text-morandi-primary">
-              請款金額 *
+              {QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS.LABEL_3827}
             </label>
             <div className="relative mt-1">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-secondary">
@@ -218,7 +218,7 @@ export function QuickRequestFromItemDialog({
 
           {/* 備註 */}
           <div>
-            <label className="text-sm font-medium text-morandi-primary">備註</label>
+            <label className="text-sm font-medium text-morandi-primary">{QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS.REMARKS}</label>
             <Input
               value={note}
               onChange={(e) => setNote(e.target.value)}
@@ -236,7 +236,7 @@ export function QuickRequestFromItemDialog({
             className="gap-2"
           >
             <X size={16} />
-            取消
+            {QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS.CANCEL}
           </Button>
           <Button
             onClick={handleSubmit}

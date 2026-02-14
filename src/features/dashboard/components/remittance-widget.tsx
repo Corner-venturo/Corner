@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Banknote, Search, Loader2, AlertCircle, TrendingDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { DASHBOARD_LABELS } from './constants/labels'
 
 interface RemittanceOption {
   provider: string
@@ -134,10 +135,10 @@ export function RemittanceWidget() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">
-                匯款比較
+                {DASHBOARD_LABELS.LABEL_790}
               </p>
               <p className="text-xs text-morandi-secondary/90 mt-1.5 leading-relaxed">
-                比較不同匯款管道的手續費
+                {DASHBOARD_LABELS.LABEL_4154}
               </p>
             </div>
           </div>
@@ -147,11 +148,11 @@ export function RemittanceWidget() {
             <div className="grid grid-cols-3 gap-2">
               <div>
                 <label className="text-xs font-semibold text-morandi-primary mb-2 block">
-                  匯出國
+                  {DASHBOARD_LABELS.EXPORT_8161}
                 </label>
                 <Select value={from} onValueChange={setFrom}>
                   <SelectTrigger className="w-full px-2 py-2 text-xs font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm">
-                    <SelectValue placeholder="選擇國家" />
+                    <SelectValue placeholder={DASHBOARD_LABELS.SELECT_8015} />
                   </SelectTrigger>
                   <SelectContent>
                     {COUNTRIES.map(country => (
@@ -165,7 +166,7 @@ export function RemittanceWidget() {
 
               <div>
                 <label className="text-xs font-semibold text-morandi-primary mb-2 block">
-                  收款國
+                  {DASHBOARD_LABELS.LABEL_7349}
                 </label>
                 <Select value={to} onValueChange={setTo}>
                   <SelectTrigger className="w-full px-2 py-2 text-xs font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm">
@@ -183,7 +184,7 @@ export function RemittanceWidget() {
 
               <div>
                 <label className="text-xs font-semibold text-morandi-primary mb-2 block">
-                  金額
+                  {DASHBOARD_LABELS.AMOUNT}
                 </label>
                 <input
                   type="number"
@@ -209,12 +210,12 @@ export function RemittanceWidget() {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  比較中...
+                  {DASHBOARD_LABELS.LABEL_1001}
                 </>
               ) : (
                 <>
                   <Search className="w-4 h-4" />
-                  比較
+                  {DASHBOARD_LABELS.LABEL_6440}
                 </>
               )}
             </button>
@@ -260,7 +261,7 @@ export function RemittanceWidget() {
                       </p>
                       {index === 0 && (
                         <span className="text-xs px-2 py-0.5 bg-status-success text-white rounded-full font-semibold">
-                          最划算
+                          {DASHBOARD_LABELS.LABEL_2930}
                         </span>
                       )}
                     </div>
@@ -269,20 +270,20 @@ export function RemittanceWidget() {
 
                   <div className="grid grid-cols-3 gap-2 text-center">
                     <div className="bg-card/50 rounded-lg p-2">
-                      <p className="text-xs text-morandi-secondary mb-1">手續費</p>
+                      <p className="text-xs text-morandi-secondary mb-1">{DASHBOARD_LABELS.LABEL_4924}</p>
                       <p className="font-semibold text-xs text-status-danger">
                         -{fromCountry?.symbol}
                         {option.fee.toFixed(0)}
                       </p>
                     </div>
                     <div className="bg-card/50 rounded-lg p-2">
-                      <p className="text-xs text-morandi-secondary mb-1">匯率</p>
+                      <p className="text-xs text-morandi-secondary mb-1">{DASHBOARD_LABELS.LABEL_3165}</p>
                       <p className="font-semibold text-xs text-morandi-primary">
                         {option.exchangeRate.toFixed(2)}
                       </p>
                     </div>
                     <div className="bg-card/50 rounded-lg p-2">
-                      <p className="text-xs text-morandi-secondary mb-1">實收</p>
+                      <p className="text-xs text-morandi-secondary mb-1">{DASHBOARD_LABELS.LABEL_433}</p>
                       <p className="font-bold text-sm text-status-success">
                         {toCountry?.symbol}
                         {option.total.toFixed(0)}

@@ -19,6 +19,7 @@ import type { FleetVehicle } from '@/types/fleet.types'
 import type { TourLeader } from '@/types/tour-leader.types'
 import type { LeaderAvailability } from '@/stores/leader-availability-store'
 import type { AvailableResource } from '../hooks/useSupplierResponses'
+import { SCHEDULING_LABELS } from './constants/labels'
 
 // 需求單類型
 interface TourRequest {
@@ -291,7 +292,7 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
   if (days.length === 0) {
     return (
       <div className="h-full flex items-center justify-center border border-border rounded-lg bg-card">
-        <span className="text-morandi-secondary">載入中...</span>
+        <span className="text-morandi-secondary">{SCHEDULING_LABELS.LOADING_6912}</span>
       </div>
     )
   }
@@ -466,7 +467,7 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
             <>
               <div className="flex items-center gap-2">
                 <Package size={16} className="text-morandi-gold" />
-                <span className="font-medium text-morandi-primary text-sm">可用資源</span>
+                <span className="font-medium text-morandi-primary text-sm">{SCHEDULING_LABELS.LABEL_7348}</span>
               </div>
               <ChevronRight size={16} className="text-morandi-secondary" />
             </>
@@ -489,7 +490,7 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
             >
               <div className="flex items-center justify-center gap-1">
                 {type === 'vehicle' ? <Truck size={12} /> : <Users size={12} />}
-                <span>內部</span>
+                <span>{SCHEDULING_LABELS.LABEL_3084}</span>
               </div>
             </button>
             {type === 'leader' && (
@@ -504,7 +505,7 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
               >
                 <div className="flex items-center justify-center gap-1">
                   <UserCheck size={12} />
-                  <span>有空</span>
+                  <span>{SCHEDULING_LABELS.LABEL_763}</span>
                 </div>
               </button>
             )}
@@ -519,7 +520,7 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
             >
               <div className="flex items-center justify-center gap-1">
                 <Building2 size={12} />
-                <span>外部</span>
+                <span>{SCHEDULING_LABELS.LABEL_7036}</span>
               </div>
             </button>
           </div>
@@ -569,7 +570,7 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
                         </div>
                         {selectedRowId && (
                           <div className="mt-1 text-xs text-morandi-gold">
-                            點擊分配
+                            {SCHEDULING_LABELS.LABEL_1593}
                           </div>
                         )}
                       </div>
@@ -584,7 +585,7 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
               <>
                 {availableLeadersForRange.length === 0 ? (
                   <div className="p-4 text-center text-morandi-secondary text-xs">
-                    此期間無領隊標記有空
+                    {SCHEDULING_LABELS.LABEL_2370}
                   </div>
                 ) : (
                   availableLeadersForRange.map((item) => (
@@ -634,7 +635,7 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
               <>
                 {filteredSupplierResources.length === 0 ? (
                   <div className="p-4 text-center text-morandi-secondary text-xs">
-                    尚無供應商回覆
+                    {SCHEDULING_LABELS.EMPTY_1509}
                   </div>
                 ) : (
                   filteredSupplierResources.map((resource) => (
@@ -680,7 +681,7 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
                       </div>
                       {selectedRowId && (
                         <div className="mt-1 text-xs text-morandi-blue">
-                          點擊選用
+                          {SCHEDULING_LABELS.LABEL_3368}
                         </div>
                       )}
                     </div>

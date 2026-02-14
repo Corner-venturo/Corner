@@ -80,9 +80,9 @@ export function SingleImageTemplate({
         {/* 景點列表 */}
         <div className="space-y-2">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-morandi-secondary">景點活動</span>
+            <span className="text-sm font-medium text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_2716}</span>
             <button type="button" onClick={addActivity} className="text-xs text-[#c76d54] hover:underline flex items-center gap-1">
-              <Plus size={12} /> 新增
+              <Plus size={12} /> {COMP_EDITOR_LABELS.新增}
             </button>
           </div>
           {editingDay.activities.map((act, i) => (
@@ -114,7 +114,7 @@ export function SingleImageTemplate({
         {/* 餐食 + 住宿 */}
         <div className="mt-4 pt-4 border-t border-border/50 flex gap-4 text-sm">
           <div className="flex-1">
-            <span className="text-morandi-muted">午餐：</span>
+            <span className="text-morandi-muted">{COMP_EDITOR_LABELS.LABEL_1221}</span>
             <EditableText
               value={editingDay.meals?.lunch || ''}
               fieldKey="meals-lunch"
@@ -126,7 +126,7 @@ export function SingleImageTemplate({
             />
           </div>
           <div className="flex-1">
-            <span className="text-morandi-muted">住宿：</span>
+            <span className="text-morandi-muted">{COMP_EDITOR_LABELS.LABEL_8648}</span>
             <EditableText
               value={editingDay.accommodation || ''}
               fieldKey="accommodation"

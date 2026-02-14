@@ -62,7 +62,7 @@ export const FleetDriverDialog: React.FC<FleetDriverDialogProps> = ({
               <Input
                 value={formData.name}
                 onChange={e => onFormFieldChange('name', e.target.value)}
-                placeholder="輸入司機姓名"
+                placeholder={DRIVER_DIALOG_LABELS.LABEL_5402}
                 className="mt-1"
               />
             </div>
@@ -71,7 +71,7 @@ export const FleetDriverDialog: React.FC<FleetDriverDialogProps> = ({
               <Input
                 value={formData.phone}
                 onChange={e => onFormFieldChange('phone', e.target.value)}
-                placeholder="輸入電話號碼"
+                placeholder={DRIVER_DIALOG_LABELS.LABEL_8624}
                 className="mt-1"
               />
             </div>
@@ -80,7 +80,7 @@ export const FleetDriverDialog: React.FC<FleetDriverDialogProps> = ({
               <Input
                 value={formData.id_number}
                 onChange={e => onFormFieldChange('id_number', e.target.value.toUpperCase())}
-                placeholder="輸入身分證字號"
+                placeholder={DRIVER_DIALOG_LABELS.LABEL_4540}
                 className="mt-1 font-mono"
               />
             </div>
@@ -132,7 +132,7 @@ export const FleetDriverDialog: React.FC<FleetDriverDialogProps> = ({
               <Input
                 value={formData.license_number}
                 onChange={e => onFormFieldChange('license_number', e.target.value)}
-                placeholder="輸入駕照號碼"
+                placeholder={DRIVER_DIALOG_LABELS.LABEL_8646}
                 className="mt-1 font-mono"
               />
             </div>
@@ -157,7 +157,7 @@ export const FleetDriverDialog: React.FC<FleetDriverDialogProps> = ({
               <Input
                 value={formData.professional_license_number}
                 onChange={e => onFormFieldChange('professional_license_number', e.target.value)}
-                placeholder="輸入職業駕照號碼"
+                placeholder={DRIVER_DIALOG_LABELS.LABEL_1727}
                 className="mt-1 font-mono"
               />
             </div>
@@ -195,7 +195,7 @@ export const FleetDriverDialog: React.FC<FleetDriverDialogProps> = ({
           <Textarea
             value={formData.notes}
             onChange={e => onFormFieldChange('notes', e.target.value)}
-            placeholder="其他備註資訊（選填）"
+            placeholder={DRIVER_DIALOG_LABELS.LABEL_2669}
             rows={3}
             className="mt-1"
           />

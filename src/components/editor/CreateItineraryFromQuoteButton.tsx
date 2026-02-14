@@ -131,7 +131,7 @@ export const CreateItineraryFromQuoteButton: React.FC<CreateItineraryFromQuoteBu
       className="h-8 px-3 text-sm"
     >
       <FileText size={14} className="mr-1.5" />
-      建立行程表
+      {COMP_EDITOR_LABELS.LABEL_6273}
     </Button>
   )
 }

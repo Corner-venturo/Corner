@@ -2,6 +2,7 @@
 
 import * as Sentry from '@sentry/nextjs'
 import { useEffect } from 'react'
+import { ERROR_PAGE_LABELS } from './constants/labels'
 
 export default function GlobalError({
   error,
@@ -18,7 +19,7 @@ export default function GlobalError({
   return (
     <html lang="zh-TW">
       <head>
-        <title>系統錯誤</title>
+        <title>{ERROR_PAGE_LABELS.LABEL_4210}</title>
       </head>
       <body style={{ margin: 0, fontFamily: "'Noto Sans TC', sans-serif" }}>
         <div
@@ -50,7 +51,7 @@ export default function GlobalError({
                 marginBottom: '0.5rem',
               }}
             >
-              系統發生嚴重錯誤
+              {ERROR_PAGE_LABELS.LABEL_3257}
             </h1>
 
             {/* 描述 */}
@@ -60,7 +61,7 @@ export default function GlobalError({
                 marginBottom: '2rem',
               }}
             >
-              很抱歉，應用程式遇到了無法恢復的錯誤
+              {ERROR_PAGE_LABELS.LABEL_4904}
             </p>
 
             {/* 錯誤訊息（開發模式） */}
@@ -102,7 +103,7 @@ export default function GlobalError({
                 fontWeight: '500',
               }}
             >
-              重新載入應用程式
+              {ERROR_PAGE_LABELS.LOADING_1029}
             </button>
           </div>
         </div>

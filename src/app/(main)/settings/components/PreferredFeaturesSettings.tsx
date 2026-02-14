@@ -222,10 +222,10 @@ export function PreferredFeaturesSettings() {
         <div className="flex items-start justify-between">
           <div>
             <h3 className="text-lg font-semibold text-morandi-primary mb-1">
-              常用功能設定
+              {PREFERRED_FEATURES_LABELS.SETTINGS_6020}
             </h3>
             <p className="text-sm text-morandi-secondary">
-              選擇你常用的功能，側邊欄將只顯示這些項目，讓介面更簡潔
+              {PREFERRED_FEATURES_LABELS.SELECT_5572}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -274,7 +274,7 @@ export function PreferredFeaturesSettings() {
             disabled={isSaving}
           >
             <Star size={14} className="mr-1" />
-            恢復角色預設
+            {PREFERRED_FEATURES_LABELS.LABEL_1762}
           </Button>
           <span className="text-xs text-morandi-secondary">
             已選擇 {selectedFeatures.length} 個功能

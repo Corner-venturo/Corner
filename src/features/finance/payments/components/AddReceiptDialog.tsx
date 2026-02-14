@@ -382,7 +382,7 @@ export function AddReceiptDialog({
             {isConfirmed && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-morandi-green/20 text-morandi-green text-xs font-medium">
                 <Lock size={12} />
-                已確認
+                {ADD_RECEIPT_DIALOG_LABELS.CONFIRM_469}
               </span>
             )}
           </DialogTitle>
@@ -399,7 +399,7 @@ export function AddReceiptDialog({
         <div className="flex items-end gap-4">
           {/* 選擇團體 */}
           <div className="w-[300px]">
-            <Label className="text-sm font-medium text-muted-foreground">團體 *</Label>
+            <Label className="text-sm font-medium text-muted-foreground">{ADD_RECEIPT_DIALOG_LABELS.LABEL_3406}</Label>
             <Combobox
               options={tours.map(tour => ({
                 value: tour.id,
@@ -421,7 +421,7 @@ export function AddReceiptDialog({
 
           {/* 選擇訂單 */}
           <div className="w-[350px]">
-            <Label className="text-sm font-medium text-muted-foreground">訂單 *</Label>
+            <Label className="text-sm font-medium text-muted-foreground">{ADD_RECEIPT_DIALOG_LABELS.LABEL_3874}</Label>
             <Select
               disabled={!formData.tour_id || filteredOrders.length === 0}
               value={formData.order_id}
@@ -452,7 +452,7 @@ export function AddReceiptDialog({
         {/* 收款項目 - 文青風表格 */}
         <div className="flex-1 flex flex-col overflow-hidden pt-4 border-t border-morandi-container/30">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-medium text-morandi-primary">收款項目</h3>
+            <h3 className="text-sm font-medium text-morandi-primary">{ADD_RECEIPT_DIALOG_LABELS.LABEL_4595}</h3>
             {/* 未確認的收款單都可以新增/刪除項目 */}
             {!isConfirmed && (
               <Button
@@ -462,7 +462,7 @@ export function AddReceiptDialog({
                 className="text-morandi-gold hover:bg-morandi-gold/10"
               >
                 <Plus size={14} className="mr-2" />
-                新增項目
+                {ADD_RECEIPT_DIALOG_LABELS.ADD_2089}
               </Button>
             )}
           </div>
@@ -477,26 +477,26 @@ export function AddReceiptDialog({
                       className="text-left py-2.5 px-3 border-b border-r border-border"
                       style={{ width: '110px' }}
                     >
-                      收款方式
+                      {ADD_RECEIPT_DIALOG_LABELS.LABEL_5187}
                     </th>
                     <th
                       className="text-left py-2.5 px-3 border-b border-r border-border"
                       style={{ width: '150px' }}
                     >
-                      交易日期
+                      {ADD_RECEIPT_DIALOG_LABELS.LABEL_1182}
                     </th>
                     <th
                       className="text-left py-2.5 px-3 border-b border-r border-border"
                       style={{ width: '180px' }}
                     >
-                      付款資訊
+                      {ADD_RECEIPT_DIALOG_LABELS.LABEL_6465}
                     </th>
-                    <th className="text-left py-2.5 px-3 border-b border-r border-border">備註</th>
+                    <th className="text-left py-2.5 px-3 border-b border-r border-border">{ADD_RECEIPT_DIALOG_LABELS.REMARKS}</th>
                     <th
                       className="text-right py-2.5 px-3 border-b border-r border-border"
                       style={{ width: '120px' }}
                     >
-                      金額
+                      {ADD_RECEIPT_DIALOG_LABELS.AMOUNT}
                     </th>
                     <th className="border-b border-border" style={{ width: '50px' }}></th>
                   </tr>
@@ -565,12 +565,12 @@ export function AddReceiptDialog({
                     {copiedLink === result.receiptNumber ? (
                       <>
                         <Check size={14} />
-                        已複製
+                        {ADD_RECEIPT_DIALOG_LABELS.COPYING_1937}
                       </>
                     ) : (
                       <>
                         <Copy size={14} />
-                        複製
+                        {ADD_RECEIPT_DIALOG_LABELS.COPY}
                       </>
                     )}
                   </Button>
@@ -581,7 +581,7 @@ export function AddReceiptDialog({
                     className="gap-1 text-morandi-secondary hover:bg-morandi-container/50"
                   >
                     <ExternalLink size={14} />
-                    開啟
+                    {ADD_RECEIPT_DIALOG_LABELS.LABEL_1670}
                   </Button>
                 </div>
               ))}
@@ -594,7 +594,7 @@ export function AddReceiptDialog({
           {/* 左側：總金額 + 刪除按鈕 */}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-morandi-secondary">總金額</span>
+              <span className="text-sm text-morandi-secondary">{ADD_RECEIPT_DIALOG_LABELS.TOTAL_6550}</span>
               <span className="text-lg font-semibold text-morandi-gold w-[120px]">
                 NT$ {totalAmount.toLocaleString()}
               </span>

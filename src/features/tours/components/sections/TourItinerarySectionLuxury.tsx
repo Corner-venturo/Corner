@@ -16,6 +16,7 @@ import { formatDateShort } from '@/lib/utils/format-date'
 import { ImageGalleryModal } from './modals/ImageGalleryModal'
 import { ActivityDetailModal } from './modals/ActivityDetailModal'
 import type { TourPageData } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 interface TourItinerarySectionLuxuryProps {
   data: TourPageData
@@ -100,7 +101,7 @@ export function TourItinerarySectionLuxury({
                 fontFamily: "'Noto Serif TC', serif"
               }}
             >
-              每日行程詳情
+              {TOURS_LABELS.LABEL_5020}
             </h2>
           </div>
           {/* 裝飾線 */}
@@ -226,7 +227,7 @@ export function TourItinerarySectionLuxury({
                               color: LUXURY.secondary
                             }}
                           >
-                            建議方案
+                            {TOURS_LABELS.LABEL_1234}
                           </span>
                         )}
                       </div>
@@ -520,7 +521,7 @@ export function TourItinerarySectionLuxury({
                           )}
                           {!day.meals?.breakfast && !day.meals?.lunch && !day.meals?.dinner && (
                             <div className="text-sm" style={{ color: LUXURY.muted }}>
-                              請參考行程安排
+                              {TOURS_LABELS.LABEL_6561}
                             </div>
                           )}
                         </div>
@@ -558,7 +559,7 @@ export function TourItinerarySectionLuxury({
                                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                     </svg>
                                   </div>
-                                  <span className="text-xs" style={{ color: LUXURY.secondary }}>續住</span>
+                                  <span className="text-xs" style={{ color: LUXURY.secondary }}>{TOURS_LABELS.LABEL_3005}</span>
                                 </div>
                               )}
                               <div
@@ -585,7 +586,7 @@ export function TourItinerarySectionLuxury({
                             </div>
                           ) : (
                             <div className="text-sm" style={{ color: LUXURY.muted }}>
-                              待確認
+                              {TOURS_LABELS.CONFIRM_7150}
                             </div>
                           )}
                         </div>

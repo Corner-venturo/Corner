@@ -220,7 +220,7 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
               color: COLORS.brown,
               margin: 0,
             }}>
-              出納單
+              {PRINT_LABELS.LABEL_7295}
             </h1>
           </div>
 
@@ -251,7 +251,7 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
               paddingBottom: '8px',
               borderBottom: `1px solid ${COLORS.gold}`,
             }}>
-              團體請款 TOUR EXPENSES
+              {PRINT_LABELS.LABEL_3396}
             </div>
             <table style={{
               width: '100%',
@@ -321,7 +321,7 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
               paddingBottom: '8px',
               borderBottom: `1px solid ${COLORS.gold}`,
             }}>
-              公司請款 COMPANY EXPENSES
+              {PRINT_LABELS.LABEL_5030}
             </div>
             <table style={{
               width: '100%',
@@ -374,7 +374,7 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
             </table>
             {/* 公司小計 */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: '8px', marginBottom: '24px', borderTop: `1px solid ${COLORS.gold}` }}>
-              <span style={{ fontSize: '12px', color: COLORS.gray, marginRight: '16px' }}>公司小計</span>
+              <span style={{ fontSize: '12px', color: COLORS.gray, marginRight: '16px' }}>{PRINT_LABELS.LABEL_5145}</span>
               <span style={{ fontSize: '13px', fontWeight: 600, color: COLORS.brown }}>NT$ {companyTotal.toLocaleString()}</span>
             </div>
           </>
@@ -383,7 +383,7 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
         {/* 無資料時顯示 */}
         {tourGroups.length === 0 && companyGroups.length === 0 && (
           <div style={{ textAlign: 'center', padding: '40px', color: COLORS.lightGray }}>
-            無請款項目資料
+            {PRINT_LABELS.LABEL_9162}
           </div>
         )}
 
@@ -401,7 +401,7 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
             fontWeight: 600,
             color: COLORS.brown,
           }}>
-            總計 TOTAL
+            {PRINT_LABELS.TOTAL_3184}
           </span>
           <span style={{
             fontSize: '15px',

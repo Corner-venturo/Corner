@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils'
 import { getWeatherAction } from '../actions/weather-actions'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { DASHBOARD_LABELS } from './constants/labels'
 
 interface WeatherData {
   temperature: number
@@ -134,15 +135,15 @@ export function WeatherWidget() {
               <Cloud className="w-5 h-5 drop-shadow-sm" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">天氣查詢</p>
-              <p className="text-xs text-morandi-secondary/90 mt-1.5 leading-relaxed">查詢歷史或預報天氣</p>
+              <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">{DASHBOARD_LABELS.QUERYING_3837}</p>
+              <p className="text-xs text-morandi-secondary/90 mt-1.5 leading-relaxed">{DASHBOARD_LABELS.QUERYING_1415}</p>
             </div>
           </div>
 
           <div className="rounded-xl bg-card/70 p-3.5 shadow-md border border-border/40">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />選擇城市</label>
+                <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />{DASHBOARD_LABELS.SELECT_240}</label>
                 <Select value={selectedCity.name} onValueChange={handleCityChange}>
                   <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm">
                     <SelectValue placeholder="選擇城市" />
@@ -157,7 +158,7 @@ export function WeatherWidget() {
                 </Select>
               </div>
               <div>
-                <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" />選擇日期</label>
+                <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" />{DASHBOARD_LABELS.SELECT_5234}</label>
                 <DatePicker
                   value={selectedDate}
                   onChange={(date) => handleDateChange(date)}
@@ -174,7 +175,7 @@ export function WeatherWidget() {
             <div className="flex-1 flex items-center justify-center rounded-xl bg-card/70 p-6 shadow-md border border-border/40">
               <div className="text-center">
                 <Loader2 className="w-8 h-8 animate-spin text-status-info mx-auto mb-2" />
-                <p className="text-xs text-morandi-secondary">載入中...</p>
+                <p className="text-xs text-morandi-secondary">{DASHBOARD_LABELS.LOADING_6912}</p>
               </div>
             </div>
           ) : error ? (

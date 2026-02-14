@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { UI_LABELS } from './constants/labels'
 
 type AlertType = 'info' | 'success' | 'warning' | 'error'
 
@@ -242,7 +243,7 @@ function AlertDialogComponent() {
             onClick={() => alert.onClose?.()}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
-            確定
+            {UI_LABELS.CONFIRM}
           </Button>
         </DialogFooter>
       </DialogContent>

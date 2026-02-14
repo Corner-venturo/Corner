@@ -27,6 +27,7 @@ import { useItineraries, createItinerary, updateItinerary, useCountries, useCiti
 import type { Tour, Itinerary } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 import { stripHtml } from '@/lib/utils/string-utils'
+import { DOCUMENTS_LABELS } from './constants/labels'
 
 // 判斷是否為已確認版本（狀態為結案）
 function isConfirmedItinerary(itinerary: Itinerary): boolean {
@@ -222,7 +223,7 @@ export function ItineraryVersionPicker({
         <DialogHeader className="px-4 py-3 border-b border-border bg-morandi-container/20">
           <div className="flex items-center gap-2">
             <FileText className="w-5 h-5 text-morandi-primary" />
-            <DialogTitle className="font-medium text-morandi-primary">行程表管理</DialogTitle>
+            <DialogTitle className="font-medium text-morandi-primary">{DOCUMENTS_LABELS.MANAGE_6774}</DialogTitle>
             <span className="text-sm text-morandi-secondary">- {tour.code}</span>
           </div>
         </DialogHeader>
@@ -236,7 +237,7 @@ export function ItineraryVersionPicker({
               </div>
             ) : linkedItineraries.length === 0 ? (
               <div className="text-center py-8 text-sm text-morandi-secondary">
-                尚無行程表
+                {DOCUMENTS_LABELS.EMPTY_3128}
               </div>
             ) : (
               <div className="space-y-1">
@@ -302,7 +303,7 @@ export function ItineraryVersionPicker({
                       <button
                         onClick={e => handleStartRename(e, itinerary)}
                         className="p-1 hover:bg-morandi-container rounded"
-                        title="重新命名"
+                        title={DOCUMENTS_LABELS.LABEL_725}
                       >
                         <Pencil size={12} className="text-morandi-secondary" />
                       </button>

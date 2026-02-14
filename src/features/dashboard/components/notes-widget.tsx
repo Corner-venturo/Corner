@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Clipboard } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useNotes } from '../hooks'
+import { DASHBOARD_LABELS } from './constants/labels'
 
 const MAX_TABS = 5
 
@@ -66,10 +67,10 @@ export function NotesWidget() {
               </div>
               <div className="flex-1">
                 <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">
-                  便條紙
+                  {DASHBOARD_LABELS.LABEL_2502}
                 </p>
                 <p className="text-xs text-morandi-secondary/90 mt-1.5 leading-relaxed">
-                  隨手記錄，靈感不遺漏
+                  {DASHBOARD_LABELS.LABEL_9180}
                 </p>
               </div>
             </div>
@@ -140,7 +141,7 @@ export function NotesWidget() {
               <button
                 onClick={addTab}
                 className="p-1.5 rounded-lg bg-card/50 border border-border/40 text-morandi-muted hover:bg-card/80 hover:text-morandi-gold hover:border-border/60 transition-all shadow-sm"
-                title="新增分頁"
+                title={DASHBOARD_LABELS.ADD_5952}
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -160,7 +161,7 @@ export function NotesWidget() {
             value={activeTab.content}
             onChange={e => updateContent(activeTab.id, e.target.value)}
             className="w-full h-full p-4 border border-border/60 rounded-xl resize-none bg-card/90 hover:bg-card hover:border-border/80 hover:shadow-md focus:bg-card transition-all outline-none font-mono text-sm leading-relaxed shadow-sm backdrop-blur-sm"
-            placeholder="在這裡寫下你的筆記..."
+            placeholder={DASHBOARD_LABELS.LABEL_2922}
           />
           <p className="text-xs text-morandi-secondary/90 mt-2.5 font-medium flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-status-success animate-pulse"></span>

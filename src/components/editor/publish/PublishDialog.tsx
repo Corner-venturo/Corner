@@ -68,7 +68,7 @@ export function PublishDialog({
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} className="gap-1">
             <X size={16} />
-            取消
+            {COMP_EDITOR_LABELS.取消}
           </Button>
           <Button
             onClick={onConfirm}

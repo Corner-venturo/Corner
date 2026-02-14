@@ -4,6 +4,7 @@ import React from 'react'
 import { Input } from '@/components/ui/input'
 import { Employee } from '@/stores/types'
 import { BasicInfoFormData } from './types'
+import { BASIC_INFO_LABELS } from './constants/labels'
 
 interface EmergencyContactSectionProps {
   employee: Employee
@@ -20,11 +21,11 @@ export function EmergencyContactSection({
 }: EmergencyContactSectionProps) {
   return (
     <div className="bg-morandi-container/10 rounded-lg p-4">
-      <h4 className="font-medium text-morandi-primary mb-3">緊急聯絡人</h4>
+      <h4 className="font-medium text-morandi-primary mb-3">{BASIC_INFO_LABELS.LABEL_9309}</h4>
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">姓名</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">{BASIC_INFO_LABELS.LABEL_658}</label>
           {isEditing ? (
             <Input
               value={formData.personal_info.emergency_contact.name}
@@ -49,7 +50,7 @@ export function EmergencyContactSection({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">關係</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">{BASIC_INFO_LABELS.LABEL_6532}</label>
           {isEditing ? (
             <Input
               value={formData.personal_info.emergency_contact.relationship}
@@ -74,7 +75,7 @@ export function EmergencyContactSection({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">電話</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">{BASIC_INFO_LABELS.LABEL_6280}</label>
           {isEditing ? (
             <Input
               value={formData.personal_info.emergency_contact.phone}

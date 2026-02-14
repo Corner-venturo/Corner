@@ -36,7 +36,7 @@ export function PasswordManagementSection({
       <div className="flex items-center justify-between mb-3">
         <h4 className="font-medium text-morandi-primary flex items-center gap-2">
           <Lock size={16} />
-          密碼管理
+          {COMP_HR_LABELS.MANAGE_7095}
         </h4>
         <Button
           size="sm"
@@ -57,7 +57,7 @@ export function PasswordManagementSection({
       {showPasswordSection && (
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">新密碼</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_7220}</label>
             <div className="relative">
               <Input
                 type={showPassword ? 'text' : 'password'}
@@ -83,7 +83,7 @@ export function PasswordManagementSection({
 
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-1">
-              確認新密碼
+              {COMP_HR_LABELS.CONFIRM_1474}
             </label>
             <Input
               type={showPassword ? 'text' : 'password'}
@@ -130,16 +130,16 @@ export function PasswordManagementSection({
                 setPasswordData({ newPassword: '', confirmPassword: '' })
               }}
             >
-              取消
+              {COMP_HR_LABELS.取消}
             </Button>
           </div>
 
           <div className="text-xs text-morandi-muted bg-morandi-container/30 p-2 rounded">
             <p>📝 密碼要求：</p>
             <ul className="list-disc list-inside mt-1 space-y-1">
-              <li>至少8個字元</li>
-              <li>建議包含數字和字母</li>
-              <li>員工下次登入時需要使用新密碼</li>
+              <li>{COMP_HR_LABELS.至少8個字元}</li>
+              <li>{COMP_HR_LABELS.LABEL_8429}</li>
+              <li>{COMP_HR_LABELS.LABEL_2074}</li>
             </ul>
           </div>
         </div>

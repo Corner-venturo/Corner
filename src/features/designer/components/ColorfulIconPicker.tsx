@@ -15,6 +15,7 @@ import { Search, X, Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { DESIGNER_LABELS } from './constants/labels'
 
 interface ColorfulIconPickerProps {
   onSelectIcon: (iconName: string) => void
@@ -218,7 +219,7 @@ export function ColorfulIconPicker({ onSelectIcon }: ColorfulIconPickerProps) {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="搜尋彩色圖標..."
+            placeholder={DESIGNER_LABELS.SEARCH_12}
             className="pl-8 pr-8 h-8 text-sm"
           />
           {search && (
@@ -248,7 +249,7 @@ export function ColorfulIconPicker({ onSelectIcon }: ColorfulIconPickerProps) {
             )}
             onClick={() => setSelectedSet('all')}
           >
-            全部
+            {DESIGNER_LABELS.ALL}
           </Button>
           {(Object.entries(COLORFUL_ICON_SETS) as [IconSetKey, { name: string }][]).map(([key, { name }]) => (
             <Button
@@ -285,7 +286,7 @@ export function ColorfulIconPicker({ onSelectIcon }: ColorfulIconPickerProps) {
                 setDisplayIcons(recentIcons)
               }}
             >
-              最近
+              {DESIGNER_LABELS.LABEL_7584}
             </Button>
           )}
           <Button
@@ -301,7 +302,7 @@ export function ColorfulIconPicker({ onSelectIcon }: ColorfulIconPickerProps) {
               setDisplayIcons(POPULAR_ICONS)
             }}
           >
-            熱門
+            {DESIGNER_LABELS.LABEL_795}
           </Button>
           {CATEGORIES.map((cat) => (
             <Button
@@ -346,7 +347,7 @@ export function ColorfulIconPicker({ onSelectIcon }: ColorfulIconPickerProps) {
 
         {!isLoading && displayIcons.length === 0 && (
           <div className="p-4 text-center text-sm text-morandi-secondary">
-            找不到符合的圖標
+            {DESIGNER_LABELS.NOT_FOUND_9268}
           </div>
         )}
       </div>

@@ -1,0 +1,16 @@
+export const VISAS_LABELS = {
+  MANAGE_1750: '簽證管理',
+  LABEL_2269: '筆',
+  LABEL_6162: '送件給代辦商',
+  LABEL_7044: '送件',
+  LABEL_9841: '取件完成',
+  LABEL_8304: '取件',
+  LABEL_9271: '登記證件歸還',
+  LABEL_3853: '歸還',
+  LABEL_2198: '標記為退件',
+  LABEL_3434: '退件',
+  CANCEL: '取消',
+  LABEL_967: '查看簽證資訊',
+  LABEL_6480: '批次下件',
+  ADD_2407: '新增簽證',
+}

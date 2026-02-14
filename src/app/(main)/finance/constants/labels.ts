@@ -69,11 +69,25 @@ export const FINANCE_PAGE_LABELS = {
   NET_PROFIT: '淨利潤',
   PENDING_ITEMS: '待確認款項',
   TRANSACTION_RECORDS: '交易紀錄',
+
+  MANAGE_8421: '財務管理中心',
+  LABEL_5163: '上一頁',
+  LABEL_9383: '下一頁',
 }
 
 export const BATCH_CONFIRM_LABELS = {
   NO_PENDING_ITEMS: '沒有待確認的收款品項',
   ALL_CONFIRMED: '所有收款品項都已確認完成',
+
+  CONFIRM_2930: '批量確認收款',
+  LABEL_6427: '收款單號',
+  LABEL_7017: '訂單編號',
+  LABEL_4272: '團名',
+  LABEL_5187: '收款方式',
+  LABEL_6261: '應收金額',
+  LABEL_8417: '實收金額',
+  CONFIRM_4237: '部分收款品項的實收金額與應收金額不同，請確認',
+  CANCEL: '取消',
 }
 
 export const CREATE_RECEIPT_LABELS = {
@@ -81,6 +95,13 @@ export const CREATE_RECEIPT_LABELS = {
   BASIC_INFO: '基本資訊',
   PAYMENT_ITEMS: '收款項目',
   TOTAL_AMOUNT: '總收款金額',
+
+  SELECT_1269: '選擇團體 *',
+  SELECT_8066: '請先選擇團體...',
+  SELECT_8775: '選擇訂單 *',
+  LABEL_6150: '待收金額',
+  ADD_2089: '新增項目',
+  CANCEL: '取消',
 }
 
 export const PAYMENT_ITEM_LABELS = {
@@ -93,6 +114,22 @@ export const PAYMENT_ITEM_LABELS = {
   HANDLER: '經手人',
   HANDLING_FEE: '手續費',
   AUTH_CODE: '授權碼',
+
+  PLEASE_ENTER_3984: '請輸入金額',
+  OPTIONAL: '選填',
+  LABEL_6186: '付款截止日 *',
+  LABEL_4673: '付款名稱（客戶看到的）',
+  EXAMPLE_4757: '例如：峇里島五日遊 - 尾款',
+  PLEASE_ENTER_2071: '請輸入經手人姓名',
+  LABEL_7063: '匯入帳戶 *',
+  PLEASE_SELECT_578: '請選擇匯入帳戶',
+  LABEL_1988: '選填，如有手續費',
+  LABEL_1306: '卡號後四碼',
+  PLEASE_ENTER_1445: '請輸入授權碼',
+  LABEL_9924: '支票號碼',
+  PLEASE_ENTER_8853: '請輸入支票號碼',
+  LABEL_7421: '開票銀行',
+  PLEASE_ENTER_2131: '請輸入銀行名稱',
 }
 
 export const TOUR_PNL_LABELS = {
@@ -104,10 +141,19 @@ export const TOUR_PNL_LABELS = {
   OPERATING: '出團中',
   COMPLETED: '已完成',
   CLOSED: '已結案',
+
+  TOTAL_2832: '團收支總覽',
 }
 
 export const UNCLOSED_TOURS_LABELS = {
   DESCRIPTION: '此報表顯示<strong>回程日 + 7 天已過</strong>但尚未執行結案的團體。',
+
+  LABEL_996: '未結案團體報表',
+  LABEL_9947: '未結案團體數',
+  TOTAL_7262: '總收入',
+  TOTAL_582: '總支出',
+  TOTAL_8800: '總利潤',
+  LABEL_332: '未結案團體列表',
 }
 
 export const UNPAID_ORDERS_LABELS = {
@@ -118,10 +164,15 @@ export const UNPAID_ORDERS_LABELS = {
   UNPAID: '完全未付',
   PARTIAL: '部分付款',
   PENDING_DEPOSIT: '待收訂金',
+
+  LABEL_1474: '未收款報表',
 }
 
 export const REQUESTS_PAGE_LABELS = {
   LOADING: '載入中',
+
+  MANAGE_3483: '請款管理',
+  ADD_9640: '新增請款',
 }
 
 export const TRAVEL_INVOICE_LABELS = {
@@ -148,4 +199,16 @@ export const TRAVEL_INVOICE_DETAIL_LABELS = {
   VOID_REASON: '作廢原因',
   VOID_INVOICE: '作廢發票',
   VOID_REASON_REQUIRED: '作廢原因 *',
+
+  LABEL_6889: '發票詳情',
+  NOT_FOUND_6549: '找不到該發票',
+  DELETE_4958: '您要找的發票可能已被刪除或不存在',
+  LABEL_6937: '商品名稱',
+  QUANTITY: '數量',
+  LABEL_9062: '單位',
+  LABEL_9413: '單價',
+  AMOUNT: '金額',
+  PLEASE_ENTER_7085: '請輸入作廢原因',
+  CANCEL: '取消',
+  CONFIRM_8486: '確認作廢',
 }

@@ -343,7 +343,7 @@ export function VoucherFormDialog({
             <Textarea
               value={memo}
               onChange={(e) => setMemo(e.target.value)}
-              placeholder="傳票摘要說明..."
+              placeholder={CALCULATION_MESSAGES.LABEL_4298}
               rows={2}
               disabled={!canEdit}
             />
@@ -388,7 +388,7 @@ export function VoucherFormDialog({
                           value={line.account_id}
                           onChange={(value) => updateLine(index, 'account_id', value)}
                           options={accountOptions}
-                          placeholder="選擇科目"
+                          placeholder={CALCULATION_MESSAGES.SELECT_3}
                           disabled={!canEdit}
                           showSearchIcon={false}
                           disablePortal
@@ -399,7 +399,7 @@ export function VoucherFormDialog({
                         <Input
                           value={line.description}
                           onChange={(e) => updateLine(index, 'description', e.target.value)}
-                          placeholder="說明"
+                          placeholder={CALCULATION_MESSAGES.LABEL_5591}
                           disabled={!canEdit}
                           className="h-9"
                         />

@@ -21,6 +21,7 @@ import { supabase } from '@/lib/supabase/client'
 import { MemberCard } from '@/components/mobile/cards/MemberCard'
 import { PaymentCard } from '@/components/mobile/cards/PaymentCard'
 import { TodoCard } from '@/components/mobile/cards/TodoCard'
+import { ID_LABELS } from './constants/labels'
 
 type TabType = 'overview' | 'members' | 'rooms' | 'vehicles' | 'finance' | 'todos'
 
@@ -455,23 +456,23 @@ export default function TourDetailPage() {
           <div className="space-y-4">
             {/* 基本資訊 */}
             <div className="bg-card rounded-xl border border-border p-4">
-              <h3 className="font-medium text-morandi-primary mb-3">基本資訊</h3>
+              <h3 className="font-medium text-morandi-primary mb-3">{ID_LABELS.LABEL_8160}</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex items-center gap-3">
                   <Calendar size={16} className="text-morandi-secondary" />
-                  <span className="text-morandi-secondary">出發日期</span>
+                  <span className="text-morandi-secondary">{ID_LABELS.LABEL_4513}</span>
                   <span className="ml-auto text-morandi-primary">
                     {formatDateCompact(tour.departure_date)} - {formatDateCompact(tour.return_date)}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Users size={16} className="text-morandi-secondary" />
-                  <span className="text-morandi-secondary">總人數</span>
+                  <span className="text-morandi-secondary">{ID_LABELS.TOTAL_4426}</span>
                   <span className="ml-auto text-morandi-primary">{tour.current_participants || 0} 人</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <UserCheck size={16} className="text-morandi-secondary" />
-                  <span className="text-morandi-secondary">成員數</span>
+                  <span className="text-morandi-secondary">{ID_LABELS.LABEL_6686}</span>
                   <span className="ml-auto text-morandi-primary">{members.length} 人</span>
                 </div>
               </div>
@@ -481,11 +482,11 @@ export default function TourDetailPage() {
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-card rounded-xl border border-border p-4">
                 <div className="text-2xl font-bold text-morandi-primary">{rooms.length}</div>
-                <div className="text-sm text-morandi-secondary">房間數</div>
+                <div className="text-sm text-morandi-secondary">{ID_LABELS.LABEL_7081}</div>
               </div>
               <div className="bg-card rounded-xl border border-border p-4">
                 <div className="text-2xl font-bold text-morandi-primary">{vehicles.length}</div>
-                <div className="text-sm text-morandi-secondary">車輛數</div>
+                <div className="text-sm text-morandi-secondary">{ID_LABELS.LABEL_6648}</div>
               </div>
             </div>
           </div>
@@ -496,7 +497,7 @@ export default function TourDetailPage() {
           <div className="space-y-3">
             {/* 成員統計 */}
             <div className="bg-card rounded-xl border border-border p-4 flex items-center justify-between">
-              <span className="text-morandi-secondary">成員總數</span>
+              <span className="text-morandi-secondary">{ID_LABELS.TOTAL_3943}</span>
               <span className="font-bold text-morandi-primary">{members.length}</span>
             </div>
 
@@ -512,7 +513,7 @@ export default function TourDetailPage() {
             ))}
 
             {members.length === 0 && (
-              <div className="text-center py-8 text-morandi-secondary">尚無成員資料</div>
+              <div className="text-center py-8 text-morandi-secondary">{ID_LABELS.EMPTY_885}</div>
             )}
           </div>
         )}
@@ -547,14 +548,14 @@ export default function TourDetailPage() {
                     </span>
                   ))}
                   {room.assigned_members.length === 0 && (
-                    <span className="text-xs text-morandi-muted">尚未分配</span>
+                    <span className="text-xs text-morandi-muted">{ID_LABELS.LABEL_3641}</span>
                   )}
                 </div>
               </div>
             ))}
 
             {rooms.length === 0 && (
-              <div className="text-center py-8 text-morandi-secondary">尚無分房資料</div>
+              <div className="text-center py-8 text-morandi-secondary">{ID_LABELS.EMPTY_3224}</div>
             )}
           </div>
         )}
@@ -599,7 +600,7 @@ export default function TourDetailPage() {
             ))}
 
             {vehicles.length === 0 && (
-              <div className="text-center py-8 text-morandi-secondary">尚無分車資料</div>
+              <div className="text-center py-8 text-morandi-secondary">{ID_LABELS.EMPTY_9630}</div>
             )}
           </div>
         )}
@@ -609,19 +610,19 @@ export default function TourDetailPage() {
           <div className="space-y-4">
             {/* 財務摘要 */}
             <div className="bg-card rounded-xl border border-border p-4">
-              <h3 className="font-medium text-morandi-primary mb-3">請款狀態</h3>
+              <h3 className="font-medium text-morandi-primary mb-3">{ID_LABELS.LABEL_2382}</h3>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
                   <div className="text-lg font-bold text-green-600">
                     {payments.filter((p) => p.status === 'paid').length}
                   </div>
-                  <div className="text-xs text-morandi-secondary">已付款</div>
+                  <div className="text-xs text-morandi-secondary">{ID_LABELS.LABEL_9075}</div>
                 </div>
                 <div>
                   <div className="text-lg font-bold text-amber-600">
                     {payments.filter((p) => p.status === 'pending' || p.status === 'approved').length}
                   </div>
-                  <div className="text-xs text-morandi-secondary">處理中</div>
+                  <div className="text-xs text-morandi-secondary">{ID_LABELS.PROCESSING}</div>
                 </div>
                 <div>
                   <div className="text-lg font-bold text-morandi-primary">
@@ -629,19 +630,19 @@ export default function TourDetailPage() {
                       payments.reduce((sum, p) => sum + (p.amount || 0), 0)
                     )}
                   </div>
-                  <div className="text-xs text-morandi-secondary">總金額</div>
+                  <div className="text-xs text-morandi-secondary">{ID_LABELS.TOTAL_6550}</div>
                 </div>
               </div>
             </div>
 
             {/* 請款列表 */}
             <div className="space-y-3">
-              <h3 className="font-medium text-morandi-primary">請款明細</h3>
+              <h3 className="font-medium text-morandi-primary">{ID_LABELS.LABEL_9799}</h3>
               {payments.map((payment) => (
                 <PaymentCard key={payment.id} payment={payment} />
               ))}
               {payments.length === 0 && (
-                <div className="text-center py-8 text-morandi-secondary">尚無請款資料</div>
+                <div className="text-center py-8 text-morandi-secondary">{ID_LABELS.EMPTY_2322}</div>
               )}
             </div>
           </div>
@@ -654,7 +655,7 @@ export default function TourDetailPage() {
               <TodoCard key={todo.id} todo={todo} />
             ))}
             {todos.length === 0 && (
-              <div className="text-center py-8 text-morandi-secondary">沒有待辦事項</div>
+              <div className="text-center py-8 text-morandi-secondary">{ID_LABELS.NOT_FOUND_500}</div>
             )}
           </div>
         )}

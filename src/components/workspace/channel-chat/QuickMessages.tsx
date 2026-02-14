@@ -161,12 +161,12 @@ export function QuickMessages({ onSend, disabled }: QuickMessagesProps) {
             className="h-8 px-2 text-violet-300 hover:text-violet-200 hover:bg-violet-500/20"
           >
             <Zap size={14} className="mr-1" />
-            快速訊息
+            {COMP_WORKSPACE_LABELS.LABEL_7765}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-48 p-1 bg-[#2d2640] border-violet-500/30" align="end">
           <div className="text-xs font-medium text-violet-300 px-2 py-1.5 border-b border-violet-500/30 mb-1">
-            選擇快速訊息
+            {COMP_WORKSPACE_LABELS.SELECT_1304}
           </div>
           {QUICK_MESSAGES.map(msg => (
             <button
@@ -214,7 +214,7 @@ export function QuickMessages({ onSend, disabled }: QuickMessagesProps) {
 
             {/* 預覽 */}
             <div>
-              <Label className="text-sm text-violet-300">訊息預覽</Label>
+              <Label className="text-sm text-violet-300">{COMP_WORKSPACE_LABELS.PREVIEW_4634}</Label>
               <Textarea
                 value={previewContent}
                 onChange={(e) => setPreviewContent(e.target.value)}
@@ -230,7 +230,7 @@ export function QuickMessages({ onSend, disabled }: QuickMessagesProps) {
               onClick={handleCloseDialog}
               className="border-violet-500/30 text-violet-300 hover:bg-violet-500/20"
             >
-              取消
+              {COMP_WORKSPACE_LABELS.CANCEL}
             </Button>
             <Button
               onClick={handleSend}
@@ -245,17 +245,17 @@ export function QuickMessages({ onSend, disabled }: QuickMessagesProps) {
               {isSending ? (
                 <>
                   <span className="animate-spin">⏳</span>
-                  發送中...
+                  {COMP_WORKSPACE_LABELS.SENDING_9154}
                 </>
               ) : sendSuccess ? (
                 <>
                   <Check size={16} />
-                  已發送
+                  {COMP_WORKSPACE_LABELS.SENDING_3215}
                 </>
               ) : (
                 <>
                   <Send size={16} />
-                  發送到旅伴群組
+                  {COMP_WORKSPACE_LABELS.SENDING_5018}
                 </>
               )}
             </Button>

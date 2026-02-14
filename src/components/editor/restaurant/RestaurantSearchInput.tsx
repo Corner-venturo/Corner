@@ -143,7 +143,7 @@ export function RestaurantSearchInput({
           }`}
         >
           <Star size={14} className="inline mr-1" />
-          米其林
+          {COMP_EDITOR_LABELS.LABEL_4890}
         </button>
       )}
 

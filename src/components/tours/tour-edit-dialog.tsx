@@ -94,7 +94,7 @@ export function TourEditDialog({ isOpen, onClose, tour, onSuccess }: TourEditDia
           }}
         >
           <DialogHeader>
-            <DialogTitle>編輯旅遊團基本資料</DialogTitle>
+            <DialogTitle>{COMP_TOURS_LABELS.EDIT_7182}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
@@ -124,7 +124,7 @@ export function TourEditDialog({ isOpen, onClose, tour, onSuccess }: TourEditDia
           <div className="flex justify-end space-x-2 pt-4 border-t">
             <Button variant="outline" onClick={onClose} disabled={submitting} className="gap-1">
               <X size={16} />
-              取消
+              {COMP_TOURS_LABELS.取消}
             </Button>
             <Button
               onClick={handleSubmit}

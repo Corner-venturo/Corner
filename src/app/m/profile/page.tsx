@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 import { cn } from '@/lib/utils'
+import { PROFILE_LABELS } from './constants/labels'
 
 export default function MobileProfilePage() {
   const router = useRouter()
@@ -62,7 +63,7 @@ export default function MobileProfilePage() {
           >
             <ArrowLeft size={20} className="text-morandi-primary" />
           </Link>
-          <h1 className="text-lg font-bold text-morandi-primary">我的</h1>
+          <h1 className="text-lg font-bold text-morandi-primary">{PROFILE_LABELS.LABEL_6661}</h1>
         </div>
       </div>
 
@@ -137,7 +138,7 @@ export default function MobileProfilePage() {
                      bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
         >
           <LogOut size={18} />
-          <span className="font-medium">登出</span>
+          <span className="font-medium">{PROFILE_LABELS.LABEL_9863}</span>
         </button>
       </div>
 

@@ -143,7 +143,7 @@ export default function RegionsTab() {
           </DialogHeader>
 
           {countryCities.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">此國家尚無城市資料</div>
+            <div className="text-center py-8 text-muted-foreground">{REGIONS_TAB_LABELS.EMPTY_4173}</div>
           ) : (
             <div className="space-y-6">
               {Object.entries(citiesByRegion).map(([regionId, regionCities]) => (
@@ -169,7 +169,7 @@ export default function RegionsTab() {
           <div className="flex justify-end pt-4 border-t">
             <Button onClick={() => setIsCitiesDialogOpen(false)} className="gap-2">
               <Check size={16} />
-              關閉
+              {REGIONS_TAB_LABELS.CLOSE}
             </Button>
           </div>
         </DialogContent>

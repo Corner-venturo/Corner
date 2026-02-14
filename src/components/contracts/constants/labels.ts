@@ -63,6 +63,11 @@ export const COMP_CONTRACTS_LABELS = {
   ALL_TOURS_HAVE_CONTRACTS: '所有團體都已建立合約',
   CANCEL: '取消',
   CONFIRM_SELECT: '確認選擇',
+
+  LABEL_2532: '無合約資料',
+  SAVING_238: '此旅遊團尚未儲存合約資料。',
+  LOADING_2471: '載入合約中...',
+  CLOSE: '關閉',
 };
 
 
@@ -75,6 +80,19 @@ export const CONTRACT_DIALOG_LABELS = {
   SELECT_DESC: '選擇要加入合約的旅客',
   TOUR_INFO: '旅遊團資訊',
   TOUR_CODE: '團號',
+
+  PRINT_8406: '列印合約',
+  EMPTY_3762: '尚無合約',
+  LABEL_4272: '團名',
+  LABEL_4513: '出發日期',
+  LABEL_5475: '目的地',
+  SELECT_1070: '選擇訂單（旅客資料來源）',
+  SELECT_4327: '選擇合約範本',
+  REMARKS: '備註',
+  LABEL_7282: '合約已完成',
+  LABEL_815: '歸檔日期',
+  CANCEL: '取消',
+  PRINT: '列印',
 }
 
 export const CONTRACT_FORM_LABELS = {
@@ -86,6 +104,13 @@ export const CONTRACT_FORM_LABELS = {
   PHONE: '電話',
   MEETING_PLACE: '集合時地',
   MEETING_TIME: '集合時間',
+
+  CONFIRM: '確認',
+  LABEL_863: '集合地點',
+  LABEL_3906: '旅遊費用',
+  TOTAL_6648: '總金額（新台幣）',
+  LABEL_3770: '定金（新台幣）',
+  LABEL_2868: '乙方聯絡資訊',
 }
 
 export const ENVELOPE_LABELS = {
@@ -95,4 +120,14 @@ export const ENVELOPE_LABELS = {
   TOUR_INFO: '旅遊團資訊',
   RECIPIENT_INFO: '收件人資訊',
   RECIPIENT_NAME: '收件人姓名 *',
+
+  PRINT_9521: '列印信封標籤',
+  LABEL_2394: '收件地址 *',
+  LABEL_8172: '收件人電話 *',
+  LABEL_9195: '寄件人資訊',
+  LABEL_20: '公司名稱',
+  LABEL_5007: '公司地址',
+  PRINT_753: '提示：列印時會自動產生橫向 A4 格式的信封標籤',
+  CANCEL: '取消',
+  PRINT: '列印',
 }

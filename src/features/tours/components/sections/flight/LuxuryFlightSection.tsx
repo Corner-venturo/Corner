@@ -13,6 +13,7 @@
 import { motion } from 'framer-motion'
 import { getTheme } from '@/features/tours/themes'
 import type { FlightInfo } from '@/types/flight.types'
+import { FLIGHT_LABELS } from './constants/labels'
 
 interface LuxuryFlightSectionProps {
   outboundFlight?: FlightInfo | null
@@ -103,7 +104,7 @@ export function LuxuryFlightSection({ outboundFlight, returnFlight, viewMode }: 
             {/* 標題 */}
             <div className="pl-5 pr-4 py-3 border-b" style={{ borderColor: '#f0f0f0' }}>
               <h2 className="text-base font-bold" style={{ color: theme.colors.text }}>
-                航班資訊
+                {FLIGHT_LABELS.LABEL_1343}
               </h2>
             </div>
 
@@ -159,14 +160,14 @@ export function LuxuryFlightSection({ outboundFlight, returnFlight, viewMode }: 
                   fontFamily: theme.fonts.heading
                 }}
               >
-                航班資訊詳情
+                {FLIGHT_LABELS.LABEL_319}
               </h2>
             </div>
             <div className="flex items-center gap-2 text-sm" style={{ color: theme.colors.muted }}>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: theme.colors.primary }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>航班時間僅供參考，請以最終電子機票為主</span>
+              <span>{FLIGHT_LABELS.LABEL_6845}</span>
             </div>
           </div>
 

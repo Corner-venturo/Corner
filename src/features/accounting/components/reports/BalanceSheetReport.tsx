@@ -15,6 +15,7 @@ import { formatDate } from '@/lib/utils/format-date'
 import { formatCurrency } from '@/lib/utils/format-currency'
 import { logger } from '@/lib/utils/logger'
 import { BALANCE_SHEET_LABELS } from '@/constants/labels'
+import { REPORTS_LABELS } from './constants/labels'
 
 export function BalanceSheetReport() {
   const { loading, error, fetchBalanceSheet } = useAccountingReports()
@@ -84,7 +85,7 @@ export function BalanceSheetReport() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="資產負債表"
+        title={REPORTS_LABELS.LABEL_5536}
         icon={Wallet}
         breadcrumb={[
           { label: '首頁', href: '/' },
@@ -99,7 +100,7 @@ export function BalanceSheetReport() {
             className="gap-2"
           >
             <Download size={16} />
-            匯出 CSV
+            {REPORTS_LABELS.EXPORT_9918}
           </Button>
         }
       />
@@ -109,17 +110,17 @@ export function BalanceSheetReport() {
         <div className="flex flex-wrap items-end gap-4">
           <div className="flex items-center gap-2">
             <Calendar size={16} className="text-morandi-secondary" />
-            <span className="text-sm text-morandi-secondary">報表日期</span>
+            <span className="text-sm text-morandi-secondary">{REPORTS_LABELS.LABEL_1627}</span>
             <DatePicker
               value={asOfDate}
               onChange={setAsOfDate}
-              placeholder="選擇日期"
+              placeholder={REPORTS_LABELS.SELECT_5234}
             />
           </div>
 
           <Button onClick={handleSearch} disabled={loading} className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white">
             <Search size={16} />
-            查詢
+            {REPORTS_LABELS.QUERYING_754}
           </Button>
         </div>
       </div>
@@ -140,7 +141,7 @@ export function BalanceSheetReport() {
               <div className="bg-card p-4 rounded-lg border border-border">
                 <div className="flex items-center gap-2 text-morandi-secondary mb-2">
                   <Building size={16} className="text-blue-500" />
-                  <span>資產總額</span>
+                  <span>{REPORTS_LABELS.TOTAL_7426}</span>
                 </div>
                 <div className="text-2xl font-bold text-blue-600">
                   {formatCurrency(data.total_assets)}
@@ -150,7 +151,7 @@ export function BalanceSheetReport() {
               <div className="bg-card p-4 rounded-lg border border-border">
                 <div className="flex items-center gap-2 text-morandi-secondary mb-2">
                   <CreditCard size={16} className="text-purple-500" />
-                  <span>負債總額</span>
+                  <span>{REPORTS_LABELS.TOTAL_6478}</span>
                 </div>
                 <div className="text-2xl font-bold text-purple-600">
                   {formatCurrency(data.total_liabilities)}
@@ -160,7 +161,7 @@ export function BalanceSheetReport() {
               <div className="bg-card p-4 rounded-lg border border-border">
                 <div className="flex items-center gap-2 text-morandi-secondary mb-2">
                   <PiggyBank size={16} className={data.equity >= 0 ? 'text-morandi-green' : 'text-morandi-red'} />
-                  <span>淨資產（權益）</span>
+                  <span>{REPORTS_LABELS.LABEL_4522}</span>
                 </div>
                 <div className={`text-2xl font-bold ${data.equity >= 0 ? 'text-morandi-green' : 'text-morandi-red'}`}>
                   {formatCurrency(data.equity)}
@@ -175,7 +176,7 @@ export function BalanceSheetReport() {
                 <div className="p-4 bg-blue-50 border-b border-border">
                   <div className="flex items-center gap-2">
                     <Building size={20} className="text-blue-600" />
-                    <h3 className="font-bold text-blue-800">資產</h3>
+                    <h3 className="font-bold text-blue-800">{REPORTS_LABELS.LABEL_36}</h3>
                   </div>
                 </div>
                 <div className="divide-y divide-border">
@@ -191,12 +192,12 @@ export function BalanceSheetReport() {
                     ))
                   ) : (
                     <div className="p-8 text-center text-morandi-secondary">
-                      無資產科目餘額
+                      {REPORTS_LABELS.LABEL_4618}
                     </div>
                   )}
                 </div>
                 <div className="p-4 bg-blue-100 flex items-center justify-between font-bold">
-                  <span className="text-blue-800">資產合計</span>
+                  <span className="text-blue-800">{REPORTS_LABELS.LABEL_2007}</span>
                   <span className="font-mono text-blue-800">{formatCurrency(data.total_assets)}</span>
                 </div>
               </div>
@@ -208,7 +209,7 @@ export function BalanceSheetReport() {
                   <div className="p-4 bg-purple-50 border-b border-border">
                     <div className="flex items-center gap-2">
                       <CreditCard size={20} className="text-purple-600" />
-                      <h3 className="font-bold text-purple-800">負債</h3>
+                      <h3 className="font-bold text-purple-800">{REPORTS_LABELS.LABEL_9154}</h3>
                     </div>
                   </div>
                   <div className="divide-y divide-border">
@@ -224,12 +225,12 @@ export function BalanceSheetReport() {
                       ))
                     ) : (
                       <div className="p-8 text-center text-morandi-secondary">
-                        無負債科目餘額
+                        {REPORTS_LABELS.LABEL_6210}
                       </div>
                     )}
                   </div>
                   <div className="p-4 bg-purple-100 flex items-center justify-between font-bold">
-                    <span className="text-purple-800">負債合計</span>
+                    <span className="text-purple-800">{REPORTS_LABELS.LABEL_3703}</span>
                     <span className="font-mono text-purple-800">{formatCurrency(data.total_liabilities)}</span>
                   </div>
                 </div>
@@ -240,14 +241,14 @@ export function BalanceSheetReport() {
                     <div className="flex items-center gap-2">
                       <PiggyBank size={20} className={data.equity >= 0 ? 'text-green-600' : 'text-red-600'} />
                       <h3 className={`font-bold ${data.equity >= 0 ? 'text-green-800' : 'text-red-800'}`}>
-                        權益（資產 - 負債）
+                        {REPORTS_LABELS.LABEL_1424}
                       </h3>
                     </div>
                   </div>
                   <div className={`p-6 ${data.equity >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
                     <div className="flex items-center justify-between">
                       <span className={`text-lg ${data.equity >= 0 ? 'text-green-800' : 'text-red-800'}`}>
-                        淨資產
+                        {REPORTS_LABELS.LABEL_662}
                       </span>
                       <span className={`font-mono text-2xl font-bold ${data.equity >= 0 ? 'text-green-800' : 'text-red-800'}`}>
                         {formatCurrency(data.equity)}
@@ -274,7 +275,7 @@ export function BalanceSheetReport() {
         ) : !loading ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <Wallet size={48} className="text-morandi-muted mb-4" />
-            <p className="text-morandi-secondary">請選擇報表日期並點擊查詢</p>
+            <p className="text-morandi-secondary">{REPORTS_LABELS.PLEASE_SELECT_5423}</p>
           </div>
         ) : null}
       </div>

@@ -3,6 +3,7 @@
  */
 import { Text } from '../primitives/Text'
 import type { Theme } from '../types'
+import { BLOCKS_LABELS } from './constants/labels'
 
 interface MealInfoProps {
   theme: Theme
@@ -28,7 +29,7 @@ export function MealInfo({
   return (
     <div>
       <Text theme={theme} variant="caption" color="accent" style={{ fontWeight: 600, marginBottom: '2mm' }}>
-        餐食
+        {BLOCKS_LABELS.LABEL_6020}
       </Text>
       <div
         style={{

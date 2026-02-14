@@ -82,9 +82,9 @@ export const CompanyAssetsDialog: React.FC<CompanyAssetsDialogProps> = ({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="image">圖片</SelectItem>
-              <SelectItem value="document">文件</SelectItem>
-              <SelectItem value="video">影片</SelectItem>
+              <SelectItem value="image">{COMPANY_ASSETS_LABELS.圖片}</SelectItem>
+              <SelectItem value="document">{COMPANY_ASSETS_LABELS.文件}</SelectItem>
+              <SelectItem value="video">{COMPANY_ASSETS_LABELS.影片}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -126,7 +126,7 @@ export const CompanyAssetsDialog: React.FC<CompanyAssetsDialogProps> = ({
             htmlFor="restricted"
             className="text-sm font-medium text-morandi-primary cursor-pointer"
           >
-            僅限會計/管理者可見
+            {COMPANY_ASSETS_LABELS.MANAGE_7789}
           </label>
         </div>
       </div>

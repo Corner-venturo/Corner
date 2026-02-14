@@ -8,6 +8,7 @@ import React from 'react'
 import { formatDateTW } from '@/lib/utils/format-date'
 import { MORANDI_COLORS } from '../shared/print-styles'
 import { QUOTATION_TERMS_LABELS } from '@/constants/labels'
+import { QUOTATION_LABELS } from './constants/labels'
 
 interface QuotationTermsProps {
   validUntil?: string
@@ -27,7 +28,7 @@ export const QuotationTerms: React.FC<QuotationTermsProps> = ({ validUntil }) =>
       style={{ borderTop: `1px solid ${MORANDI_COLORS.border}`, color: MORANDI_COLORS.gray }}
     >
       <h4 className="font-semibold mb-2" style={{ color: MORANDI_COLORS.brown }}>
-        注意事項
+        {QUOTATION_LABELS.LABEL_8733}
       </h4>
       <ul className="space-y-1">
         <li>• {QUOTATION_TERMS_LABELS.本報價單有效期限至.replace('{validUntil}', formatValidUntil())}</li>

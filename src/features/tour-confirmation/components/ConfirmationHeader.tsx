@@ -91,7 +91,7 @@ export function ConfirmationHeader({
       <div className="flex items-center justify-between px-6 py-4 border-b border-border">
         <div className="flex items-center gap-4">
           <h1 className="text-xl font-semibold text-morandi-primary">
-            出團確認表
+            {CONFIRM_HEADER_LABELS.CONFIRM_2476}
           </h1>
           <Badge variant={status.variant}>{status.label}</Badge>
         </div>
@@ -106,7 +106,7 @@ export function ConfirmationHeader({
                 className="gap-1"
               >
                 <X size={14} />
-                取消
+                {CONFIRM_HEADER_LABELS.CANCEL}
               </Button>
               <Button
                 size="sm"
@@ -115,7 +115,7 @@ export function ConfirmationHeader({
                 className="bg-morandi-gold hover:bg-morandi-gold-hover gap-1"
               >
                 <Save size={14} />
-                儲存
+                {CONFIRM_HEADER_LABELS.SAVE}
               </Button>
             </>
           ) : (
@@ -126,7 +126,7 @@ export function ConfirmationHeader({
               className="gap-1"
             >
               <Edit2 size={14} />
-              編輯
+              {CONFIRM_HEADER_LABELS.EDIT}
             </Button>
           )}
         </div>

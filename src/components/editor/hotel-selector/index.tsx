@@ -14,6 +14,7 @@ import { HotelSearchBar } from './HotelSearchBar'
 import { HotelList } from './HotelList'
 import { useHotelSearch } from './hooks/useHotelSearch'
 import type { LuxuryHotel } from '../HotelSelector'
+import { HOTEL_SELECTOR_LABELS } from './constants/labels'
 
 // 品牌列表
 const HOTEL_BRANDS = [
@@ -142,7 +143,7 @@ export function HotelSelector({
         <DialogHeader className="px-6 py-4 border-b bg-gradient-to-r from-morandi-gold/10 to-transparent">
           <DialogTitle className="flex items-center gap-2 text-lg">
             <Building2 className="text-morandi-gold" size={22} />
-            選擇飯店
+            {HOTEL_SELECTOR_LABELS.SELECT_8723}
           </DialogTitle>
         </DialogHeader>
 
@@ -195,7 +196,7 @@ export function HotelSelector({
 
         <DialogFooter className="px-6 py-4 border-t bg-muted/50">
           <Button variant="outline" onClick={handleCancel} className="rounded-xl">
-            取消
+            {HOTEL_SELECTOR_LABELS.CANCEL}
           </Button>
           <Button
             onClick={handleConfirm}

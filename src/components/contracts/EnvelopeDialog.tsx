@@ -246,7 +246,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
           <div class="envelope-container">
             <!-- 寄件人 (左上角) -->
             <div class="section sender-section">
-              <div class="label">寄件人</div>
+              <div class="label">{ENVELOPE_LABELS.SENDER}</div>
               <div class="company">${senderCompany}</div>
               <div class="name">${senderName}</div>
               <div class="address">${senderAddress}</div>
@@ -255,7 +255,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
 
             <!-- 收件人 (中間) -->
             <div class="section recipient-section">
-              <div class="label">收件人</div>
+              <div class="label">{ENVELOPE_LABELS.RECIPIENT}</div>
               <div class="name">${recipient}</div>
               <div class="address">${recipientAddress}</div>
               <div class="phone">電話：${recipientPhone}</div>
@@ -285,7 +285,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Mail size={20} />
-            列印信封標籤
+            {ENVELOPE_LABELS.PRINT_9521}
           </DialogTitle>
         </DialogHeader>
 
@@ -312,7 +312,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                 />
               </div>
               <div>
-                <label className="text-xs text-morandi-primary block mb-1">收件地址 *</label>
+                <label className="text-xs text-morandi-primary block mb-1">{ENVELOPE_LABELS.LABEL_2394}</label>
                 <Input
                   type="text"
                   value={recipientAddress}
@@ -321,7 +321,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                 />
               </div>
               <div>
-                <label className="text-xs text-morandi-primary block mb-1">收件人電話 *</label>
+                <label className="text-xs text-morandi-primary block mb-1">{ENVELOPE_LABELS.LABEL_8172}</label>
                 <Input
                   type="text"
                   value={recipientPhone}
@@ -334,11 +334,11 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
 
           {/* 寄件人資訊 */}
           <div>
-            <h3 className="text-sm font-semibold text-morandi-primary mb-3">寄件人資訊</h3>
+            <h3 className="text-sm font-semibold text-morandi-primary mb-3">{ENVELOPE_LABELS.LABEL_9195}</h3>
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-morandi-primary block mb-1">公司名稱</label>
+                  <label className="text-xs text-morandi-primary block mb-1">{ENVELOPE_LABELS.LABEL_20}</label>
                   <Input
                     type="text"
                     value={senderCompany}
@@ -359,7 +359,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                 </div>
               </div>
               <div>
-                <label className="text-xs text-morandi-primary block mb-1">公司地址</label>
+                <label className="text-xs text-morandi-primary block mb-1">{ENVELOPE_LABELS.LABEL_5007}</label>
                 <Input
                   type="text"
                   value={senderAddress}
@@ -382,18 +382,18 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
           </div>
 
           <div className="text-xs text-morandi-secondary bg-morandi-container/20 p-3 rounded">
-            提示：列印時會自動產生橫向 A4 格式的信封標籤
+            {ENVELOPE_LABELS.PRINT_753}
           </div>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose} className="gap-2">
             <X size={16} />
-            取消
+            {ENVELOPE_LABELS.CANCEL}
           </Button>
           <Button onClick={handlePrint} className="gap-2">
             <Printer size={16} />
-            列印
+            {ENVELOPE_LABELS.PRINT}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { ArrowLeft, ArrowRight, Save, Check } from 'lucide-react'
 import { recordManifestationCompletion } from '@/lib/manifestation/reminder'
+import { MANIFESTATION_LABELS } from './constants/labels'
 
 interface ChapterContentProps {
   chapter: Chapter
@@ -108,11 +109,11 @@ export function ChapterContent({ chapter, onPrevious, onNext }: ChapterContentPr
       case 'desire':
         return (
           <div key={field}>
-            <label className="block text-sm font-medium text-morandi-primary mb-2">我想要……</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-2">{MANIFESTATION_LABELS.LABEL_2987}</label>
             <Textarea
               value={formData.desire || ''}
               onChange={e => handleChange('desire', e.target.value)}
-              placeholder="寫下你的願望，誠實、赤裸地表達……"
+              placeholder={MANIFESTATION_LABELS.LABEL_732}
               className="min-h-[120px]"
             />
           </div>
@@ -122,12 +123,12 @@ export function ChapterContent({ chapter, onPrevious, onNext }: ChapterContentPr
         return (
           <div key={field}>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
-              體感記錄（每行一個）
+              {MANIFESTATION_LABELS.LABEL_5133}
             </label>
             <Textarea
               value={formData.body_sensations?.join('\n') || ''}
               onChange={e => handleArrayChange('body_sensations', e.target.value)}
-              placeholder="例如：\n心跳加速\n胸口溫暖\n手心出汗"
+              placeholder={MANIFESTATION_LABELS.EXAMPLE_4283}
               className="min-h-[100px]"
             />
           </div>
@@ -137,12 +138,12 @@ export function ChapterContent({ chapter, onPrevious, onNext }: ChapterContentPr
         return (
           <div key={field}>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
-              與渴望的對話
+              {MANIFESTATION_LABELS.LABEL_3165}
             </label>
             <Textarea
               value={formData.dialogue || ''}
               onChange={e => handleChange('dialogue', e.target.value)}
-              placeholder="寫下你與內在渴望的對話……"
+              placeholder={MANIFESTATION_LABELS.LABEL_6130}
               className="min-h-[150px]"
             />
           </div>
@@ -152,12 +153,12 @@ export function ChapterContent({ chapter, onPrevious, onNext }: ChapterContentPr
         return (
           <div key={field}>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
-              我願意採取的小行動
+              {MANIFESTATION_LABELS.LABEL_6012}
             </label>
             <Input
               value={formData.small_action || ''}
               onChange={e => handleChange('small_action', e.target.value)}
-              placeholder="一個小到不可能失敗的行動……"
+              placeholder={MANIFESTATION_LABELS.LABEL_5005}
             />
           </div>
         )
@@ -165,11 +166,11 @@ export function ChapterContent({ chapter, onPrevious, onNext }: ChapterContentPr
       case 'gratitude':
         return (
           <div key={field}>
-            <label className="block text-sm font-medium text-morandi-primary mb-2">感恩記錄</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-2">{MANIFESTATION_LABELS.LABEL_1605}</label>
             <Textarea
               value={formData.gratitude || ''}
               onChange={e => handleChange('gratitude', e.target.value)}
-              placeholder="今天我感謝……"
+              placeholder={MANIFESTATION_LABELS.LABEL_9331}
               className="min-h-[120px]"
             />
           </div>
@@ -179,12 +180,12 @@ export function ChapterContent({ chapter, onPrevious, onNext }: ChapterContentPr
         return (
           <div key={field}>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
-              我的魔法語（每行一句）
+              {MANIFESTATION_LABELS.LABEL_3585}
             </label>
             <Textarea
               value={formData.magic_phrases?.join('\n') || ''}
               onChange={e => handleArrayChange('magic_phrases', e.target.value)}
-              placeholder="例如：\n我值得被愛\n豐盛正在流向我\n我信任宇宙的安排"
+              placeholder={MANIFESTATION_LABELS.EXAMPLE_153}
               className="min-h-[120px]"
             />
           </div>
@@ -194,26 +195,26 @@ export function ChapterContent({ chapter, onPrevious, onNext }: ChapterContentPr
         return (
           <div key={field}>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
-              分享到願望之牆
+              {MANIFESTATION_LABELS.LABEL_6109}
             </label>
             <Textarea
               value={formData.shared_wish || ''}
               onChange={e => handleChange('shared_wish', e.target.value)}
-              placeholder="寫下你想分享的願望，讓它被看見……"
+              placeholder={MANIFESTATION_LABELS.LABEL_6480}
               className="min-h-[100px]"
             />
-            <p className="text-xs text-morandi-secondary mt-1">這個願望將會匿名分享到願望之牆</p>
+            <p className="text-xs text-morandi-secondary mt-1">{MANIFESTATION_LABELS.LABEL_9411}</p>
           </div>
         )
 
       case 'notes':
         return (
           <div key={field}>
-            <label className="block text-sm font-medium text-morandi-primary mb-2">其他筆記</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-2">{MANIFESTATION_LABELS.LABEL_9343}</label>
             <Textarea
               value={formData.notes || ''}
               onChange={e => handleChange('notes', e.target.value)}
-              placeholder="任何你想記錄的想法、感受……"
+              placeholder={MANIFESTATION_LABELS.LABEL_9465}
               className="min-h-[100px]"
             />
           </div>
@@ -264,7 +265,7 @@ export function ChapterContent({ chapter, onPrevious, onNext }: ChapterContentPr
 
       {/* 練習說明 */}
       <div className="bg-morandi-container rounded-lg p-6">
-        <h3 className="text-lg font-medium text-morandi-primary mb-4">練習步驟</h3>
+        <h3 className="text-lg font-medium text-morandi-primary mb-4">{MANIFESTATION_LABELS.LABEL_7254}</h3>
         <ol className="space-y-2">
           {chapter.exercise.instructions.map((instruction, index) => (
             <li key={index} className="text-sm text-morandi-secondary">
@@ -281,7 +282,7 @@ export function ChapterContent({ chapter, onPrevious, onNext }: ChapterContentPr
       <div className="flex items-center justify-between pt-6 border-t">
         <Button variant="outline" onClick={onPrevious} disabled={!onPrevious} className="gap-2">
           <ArrowLeft size={16} />
-          上一步
+          {MANIFESTATION_LABELS.LABEL_951}
         </Button>
 
         <div className="flex gap-2">
@@ -291,12 +292,12 @@ export function ChapterContent({ chapter, onPrevious, onNext }: ChapterContentPr
             ) : saveSuccess ? (
               <>
                 <Check size={16} />
-                已儲存
+                {MANIFESTATION_LABELS.SAVING_4294}
               </>
             ) : (
               <>
                 <Save size={16} />
-                儲存
+                {MANIFESTATION_LABELS.SAVE}
               </>
             )}
           </Button>
@@ -306,12 +307,12 @@ export function ChapterContent({ chapter, onPrevious, onNext }: ChapterContentPr
             disabled={isSaving}
             className="bg-morandi-gold hover:bg-morandi-gold-hover"
           >
-            完成此章
+            {MANIFESTATION_LABELS.LABEL_221}
           </Button>
         </div>
 
         <Button variant="outline" onClick={onNext} disabled={!onNext} className="gap-2">
-          下一步
+          {MANIFESTATION_LABELS.LABEL_3875}
           <ArrowRight size={16} />
         </Button>
       </div>

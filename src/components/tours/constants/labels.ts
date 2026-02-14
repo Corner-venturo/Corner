@@ -444,6 +444,107 @@ export const COMP_TOURS_LABELS = {
   馬來西亞航空: '馬來西亞航空',
   馬尼拉: '馬尼拉',
   高雄: '高雄',
+
+  LABEL_5905: '行程表天數需要同步',
+  LABEL_9765: '旅遊團日期已變更，關聯的行程表天數不一致',
+  LABEL_4788: '行程表名稱',
+  LABEL_6069: '目前天數',
+  LABEL_357: '新的天數',
+  LABEL_493: '變更',
+  LABEL_7016: '天：',
+  LABEL_5498: '天空白行程。',
+  ADD_1897: '新增的天數會使用預設模板，您可以稍後在行程表編輯器中修改內容。',
+  LABEL_1982: '維持原樣',
+
+  MANAGE_972: '分配管理',
+  LABEL_9712: '分房',
+  LABEL_3590: '分車',
+  LABEL_2548: '分桌',
+  LABEL_5972: '提示：團員分配請在成員名單中使用下拉選單操作',
+
+  ADD_9831: '新增房間',
+  SETTINGS_4277: '尚未設定房間',
+  ADD_2808: '點擊「新增房間」開始設定',
+  LABEL_9: '房型',
+  LABEL_7871: '容納人數',
+  LABEL_5734: '飯店名稱（選填）',
+  ADD: '新增',
+
+  LABEL_869: '從行程帶入餐食',
+  SETTINGS_7076: '尚未設定餐食',
+  SETTINGS_4545: '請先在行程表設定餐食資訊',
+  ADD_4886: '新增桌次',
+  LABEL_7499: '每桌人數',
+  LABEL_3162: '自訂：',
+  LABEL_2543: '人',
+
+  ADD_5339: '新增車輛',
+  SETTINGS_4888: '尚未設定車輛',
+  ADD_7430: '點擊「新增車輛」開始設定',
+  LABEL_1938: '車輛名稱 *',
+  LABEL_8181: '車型',
+  LABEL_7438: '座位數',
+  LABEL_6947: '司機姓名',
+  LABEL_8290: '司機電話',
+  LABEL_6418: '車牌號碼',
+
+  LABEL_9684: '開代轉',
+
+  LABEL_939: '團體結算 -',
+  CALCULATING_8065: '計算中...',
+  LABEL_4089: '團費收入',
+  LABEL_1907: '成本支出',
+  LABEL_6713: '毛利',
+  LABEL_8090: '公司雜支 (',
+  LABEL_1032: '稅金 (12%)',
+  ADD_6980: '新增業務',
+  ADD_1122: '新增 OP',
+
+  LOADING_6912: '載入中...',
+  LABEL_1695: '此團尚未關聯報價單',
+  LABEL_8833: '請先建立或關聯報價單',
+  EMPTY_7809: '報價單尚無住宿/餐食資料',
+  LABEL_9677: '請先在報價單填寫住宿和餐食項目',
+  LABEL_460: '住宿表',
+  LABEL_7836: '已建立需求單',
+  LABEL_5591: '說明',
+  LABEL_9767: '餐食表',
+  LABEL_6198: '需求單項目',
+
+  EMPTY_3090: '尚無設計',
+  LABEL_5671: '可從行程表建立網頁行程設計',
+  LABEL_6192: '選定版本',
+  LABEL_1670: '開啟',
+
+  EDIT_7182: '編輯旅遊團基本資料',
+
+  LABEL_9750: '團號',
+  LABEL_5475: '目的地',
+  LABEL_4601: '報價單',
+  EDIT: '編輯',
+  LABEL_3513: '明細',
+
+  ADD_3548: '新增收款',
+  LABEL_8600: '收款紀錄',
+  TYPE: '類型',
+  AMOUNT: '金額',
+  LABEL_7778: '付款方式',
+  STATUS: '狀態',
+  ACTIONS: '操作',
+  EMPTY_3087: '尚無收款紀錄',
+  ADD_6738: '點擊上方「新增收款」按鈕開始記錄收款',
+
+  LABEL_1448: '尚未建立報價單',
+  CALCULATING_1295: '建立報價單以計算團費成本',
+
+  MANAGE_1448: '房間管理',
+  LABEL_9154: '提示：團員分房請在成員名單中使用下拉選單操作',
+
+  MANAGE_7961: '車輛管理',
+  LABEL_6906: '提示：團員分車請在成員名單中使用下拉選單操作',
+
+  LABEL_4270: '尚未建立行程表',
+  LABEL_4124: '建立行程表以展示旅遊行程內容',
 };
 
 // CheckinSettings 模組的 UI 標籤
@@ -582,6 +683,10 @@ export const TOUR_PNR_TOOL_DIALOG_LABELS = {
   更新失敗: (errors: string) => `更新失敗: ${errors}`,
   找不到該團員: (name: string, id: string) => `${name}: 找不到該團員(${id})`,
   PNR_已儲存_更新_位團員: (pnr: string, count: number) => `PNR ${pnr} 已儲存，更新 ${count} 位團員`,
+
+  LABEL_2736: '票價',
+  LABEL_7910: '票號',
+  LABEL_475: '兒童',
 };
 
 // TourItineraryTab 模組的 UI 標籤
@@ -768,6 +873,19 @@ export const INVOICE_LABELS = {
   BUYER_INFO: '買受人資訊',
   BUYER_NAME: '買受人名稱 *',
   TAX_ID: '統一編號',
+
+  LABEL_953: '開立代轉發票',
+  LABEL_5607: '手機號碼',
+  LABEL_466: '摘要',
+  QUANTITY: '數量',
+  LABEL_9413: '單價',
+  LABEL_9062: '單位',
+  AMOUNT: '金額',
+  PROCESSING_9468: '處理',
+  ADD_1388: '新增一列',
+  REMARKS: '備註',
+  TOTAL: '總計',
+  CANCEL: '取消',
 }
 
 export const ADD_PAYMENT_LABELS = {
@@ -779,6 +897,15 @@ export const ADD_PAYMENT_LABELS = {
   BANK_TRANSFER: '銀行轉帳',
   CREDIT_CARD: '信用卡',
   CASH: '現金',
+
+  LABEL_9638: '- 不關聯特定訂單 -',
+  LABEL_4914: '例：王小明訂金',
+  LABEL_6402: '支票',
+  CONFIRM_2526: '確認狀態',
+  CONFIRM_469: '已確認',
+  CONFIRM_7150: '待確認',
+  CANCEL: '取消',
+  ADD: '新增',
 }
 
 export const FLIGHT_SECTION_LABELS = {

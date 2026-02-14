@@ -181,19 +181,19 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
         {isSaving && (
           <div className="bg-morandi-primary/5 border border-morandi-primary/20 rounded-lg p-3 flex items-center gap-2 text-morandi-primary">
             <div className="animate-spin w-4 h-4 border-2 border-morandi-primary border-t-transparent rounded-full"></div>
-            <span className="text-sm font-medium">儲存中...</span>
+            <span className="text-sm font-medium">{COMP_HR_LABELS.SAVING_4983}</span>
           </div>
         )}
 
         {/* 角色選擇（複選） */}
         <div className="bg-card rounded-lg border border-border p-6">
           <div className="flex items-center gap-2 mb-4">
-            <h4 className="font-semibold text-lg text-morandi-primary">選擇職位角色</h4>
-            <span className="text-xs text-morandi-secondary bg-morandi-container/30 px-2 py-1 rounded">可複選</span>
+            <h4 className="font-semibold text-lg text-morandi-primary">{COMP_HR_LABELS.SELECT_1620}</h4>
+            <span className="text-xs text-morandi-secondary bg-morandi-container/30 px-2 py-1 rounded">{COMP_HR_LABELS.LABEL_9521}</span>
             <div className="group relative">
               <Info size={16} className="text-morandi-secondary cursor-help" />
               <div className="absolute left-0 top-6 w-64 bg-foreground text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                員工可以擁有多個角色。例如：超級管理員同時也可以是業務。
+                {COMP_HR_LABELS.MANAGE_5279}
               </div>
             </div>
           </div>
@@ -262,12 +262,12 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
                   已選角色：{selectedRoles.map(r => getRoleConfig(r)?.label).join('、')}
                 </h5>
                 <p className="text-sm text-morandi-secondary mb-3">
-                  這些權限由角色自動配置，如需調整請變更角色或在下方新增額外權限
+                  {COMP_HR_LABELS.ADD_9036}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {rolePermissions.includes('*') ? (
                     <span className="px-3 py-1 bg-morandi-primary/10 border border-morandi-primary/20 rounded-full text-sm text-morandi-primary font-medium">
-                      所有權限
+                      {COMP_HR_LABELS.LABEL_7322}
                     </span>
                   ) : (
                     rolePermissions.map(perm => {
@@ -291,11 +291,11 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
         {/* 額外權限（進階，可選） */}
         <details className="bg-card rounded-lg border border-border">
           <summary className="p-4 cursor-pointer font-medium text-morandi-primary hover:bg-morandi-container/10">
-            進階：新增額外功能權限（選填）
+            {COMP_HR_LABELS.ADD_223}
           </summary>
           <div className="p-4 pt-0 border-t border-border space-y-4">
             <p className="text-sm text-morandi-secondary mb-4">
-              如需賦予該員工角色以外的特殊權限，可在此勾選。一般情況下不需要調整。
+              {COMP_HR_LABELS.LABEL_8504}
             </p>
 
             {categories.map(category => (

@@ -87,7 +87,7 @@ export function OrderListCard({
             </div>
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <div className="text-xs text-morandi-secondary">總缺口</div>
+                <div className="text-xs text-morandi-secondary">{COMP_WORKSPACE_LABELS.TOTAL_3430}</div>
                 <CurrencyCell amount={totalGap} className="text-lg font-semibold text-status-danger" />
               </div>
               {isExpanded ? (
@@ -107,25 +107,25 @@ export function OrderListCard({
                 <thead className="bg-morandi-container/5 border-b border-morandi-gold/20">
                   <tr>
                     <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary">
-                      訂單號
+                      {COMP_WORKSPACE_LABELS.LABEL_5978}
                     </th>
                     <th className="text-left py-2.5 px-4 text-xs font-semibold text-morandi-secondary">
-                      客戶
+                      {COMP_WORKSPACE_LABELS.LABEL_565}
                     </th>
                     <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-secondary">
-                      總額
+                      {COMP_WORKSPACE_LABELS.TOTAL_9340}
                     </th>
                     <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-secondary">
-                      已收
+                      {COMP_WORKSPACE_LABELS.LABEL_8095}
                     </th>
                     <th className="text-right py-2.5 px-4 text-xs font-semibold text-morandi-secondary">
-                      缺口
+                      {COMP_WORKSPACE_LABELS.LABEL_3379}
                     </th>
                     <th className="text-center py-2.5 px-4 text-xs font-semibold text-morandi-secondary">
-                      狀態
+                      {COMP_WORKSPACE_LABELS.STATUS}
                     </th>
                     <th className="text-center py-2.5 px-4 text-xs font-semibold text-morandi-secondary">
-                      操作
+                      {COMP_WORKSPACE_LABELS.ACTIONS}
                     </th>
                   </tr>
                 </thead>
@@ -167,7 +167,7 @@ export function OrderListCard({
                           {isProcessed ? (
                             <div className="flex items-center justify-center gap-1 text-xs text-morandi-secondary">
                               <Check size={14} className="text-status-success" />
-                              <span>已處理</span>
+                              <span>{COMP_WORKSPACE_LABELS.PROCESSING_238}</span>
                             </div>
                           ) : canProcess ? (
                             <button
@@ -175,10 +175,10 @@ export function OrderListCard({
                               className="btn-morandi-primary !py-1 !px-2 text-xs flex items-center gap-1 mx-auto"
                             >
                               <DollarSign size={12} />
-                              <span>建立收款單</span>
+                              <span>{COMP_WORKSPACE_LABELS.LABEL_1761}</span>
                             </button>
                           ) : (
-                            <div className="text-xs text-morandi-secondary">待處理</div>
+                            <div className="text-xs text-morandi-secondary">{COMP_WORKSPACE_LABELS.待處理}</div>
                           )}
                         </td>
                       </tr>
@@ -196,7 +196,7 @@ export function OrderListCard({
                   {orderList.orders.filter(o => o.receipt_status === 'received').length > 0 && (
                     <span className="ml-2">
                       ({orderList.orders.filter(o => o.receipt_status === 'received').length}{' '}
-                      筆已處理)
+                      {COMP_WORKSPACE_LABELS.PROCESSING_9550}
                     </span>
                   )}
                 </div>

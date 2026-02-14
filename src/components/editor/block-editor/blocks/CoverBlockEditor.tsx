@@ -34,7 +34,7 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
       {/* 基本資訊 */}
       <div className="grid grid-cols-2 gap-3">
         <div className="col-span-2">
-          <label className="block text-xs font-medium text-morandi-primary mb-1">標籤文字</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_1694}</label>
           <RichTextInput
             value={data.tagline || ''}
             onChange={value => updateField('tagline', value)}
@@ -43,7 +43,7 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-morandi-primary mb-1">主標題</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_147}</label>
           <RichTextInput
             value={data.title || ''}
             onChange={value => updateField('title', value)}
@@ -52,7 +52,7 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-morandi-primary mb-1">副標題</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.副標題}</label>
           <RichTextInput
             value={data.subtitle || ''}
             onChange={value => updateField('subtitle', value)}
@@ -61,7 +61,7 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
         </div>
 
         <div className="col-span-2">
-          <label className="block text-xs font-medium text-morandi-primary mb-1">描述</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_3951}</label>
           <RichTextInput
             value={data.description || ''}
             onChange={value => updateField('description', value)}
@@ -74,7 +74,7 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
       {/* 行程資訊 */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-morandi-primary mb-1">出發日期</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_4513}</label>
           <Input
             type="text"
             value={data.departureDate || ''}
@@ -85,7 +85,7 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-morandi-primary mb-1">行程代碼</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_1470}</label>
           <Input
             type="text"
             value={data.tourCode || ''}
@@ -96,7 +96,7 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-morandi-primary mb-1">國家</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5040}</label>
           <Input
             type="text"
             value={data.country || ''}
@@ -107,7 +107,7 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-morandi-primary mb-1">城市</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5461}</label>
           <Input
             type="text"
             value={data.city || ''}
@@ -121,7 +121,7 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
       {/* 價格資訊 */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-morandi-primary mb-1">價格</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.價格}</label>
           <Input
             type="text"
             value={data.price || ''}
@@ -132,7 +132,7 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-morandi-primary mb-1">單位</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_9062}</label>
           <Select
             value={data.priceNote || COMP_EDITOR_LABELS.人}
             onValueChange={(value) => updateField('priceNote', value)}
@@ -152,7 +152,7 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
 
       {/* 封面風格 */}
       <div>
-        <label className="block text-xs font-medium text-morandi-primary mb-1">封面風格</label>
+        <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_1860}</label>
         <Select
           value={data.coverStyle || 'original'}
           onValueChange={(value) => updateField('coverStyle', value as CoverStyleType)}
@@ -161,20 +161,20 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
             <SelectValue placeholder={COMP_EDITOR_LABELS.選擇風格} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="original">經典全屏</SelectItem>
+            <SelectItem value="original">{COMP_EDITOR_LABELS.經典全屏}</SelectItem>
             <SelectItem value="gemini">Gemini</SelectItem>
-            <SelectItem value="nature">自然綠意</SelectItem>
-            <SelectItem value="luxury">奢華質感</SelectItem>
-            <SelectItem value="art">藝術雜誌</SelectItem>
-            <SelectItem value="dreamscape">夢幻漫遊</SelectItem>
-            <SelectItem value="collage">互動拼貼</SelectItem>
+            <SelectItem value="nature">{COMP_EDITOR_LABELS.LABEL_4}</SelectItem>
+            <SelectItem value="luxury">{COMP_EDITOR_LABELS.LABEL_4759}</SelectItem>
+            <SelectItem value="art">{COMP_EDITOR_LABELS.LABEL_5990}</SelectItem>
+            <SelectItem value="dreamscape">{COMP_EDITOR_LABELS.LABEL_7067}</SelectItem>
+            <SelectItem value="collage">{COMP_EDITOR_LABELS.LABEL_6627}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {/* 封面圖片 */}
       <div>
-        <label className="block text-xs font-medium text-morandi-primary mb-1">封面圖片</label>
+        <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.封面圖片}</label>
         <ImageUploader
           value={data.coverImage}
           onChange={(url) => updateField('coverImage', url)}

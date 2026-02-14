@@ -1,0 +1,15 @@
+export const EDITABLE_RATES_TABLE_LABELS = {
+  LOADING_6912: '載入中...',
+  LABEL_35: '排序',
+  LABEL_2170: '品項',
+  ADD_8750: '新增品項',
+  LABEL_8557: '廠商',
+  LABEL_312: '行程路線',
+  TYPE: '類型',
+  LABEL_1818: '越南盾',
+  LABEL_9977: '台幣',
+  LABEL_7705: '利潤',
+  ACTIONS: '操作',
+  NOT_FOUND_9408: '目前沒有車資資料',
+  ADD_4346: '新增第一筆車資',
+}

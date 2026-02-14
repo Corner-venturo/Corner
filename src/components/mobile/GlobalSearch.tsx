@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import { formatDateCompact } from '@/lib/utils/format-date'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import { MOBILE_LABELS } from './constants/labels'
 
 interface SearchResult {
   type: 'tour' | 'member'
@@ -184,7 +185,7 @@ export function GlobalSearch({ autoFocus, onResultClick, className }: GlobalSear
             setShowResults(true)
           }}
           onFocus={() => setShowResults(true)}
-          placeholder="搜尋團號、成員姓名、護照..."
+          placeholder={MOBILE_LABELS.SEARCH_3289}
           className="w-full pl-10 pr-10 py-3 bg-morandi-container/50 border border-border rounded-xl
                      text-morandi-primary placeholder:text-morandi-secondary/60
                      focus:outline-none focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold
@@ -287,7 +288,7 @@ export function GlobalSearch({ autoFocus, onResultClick, className }: GlobalSear
           {/* 最近搜尋 (當沒有輸入時顯示) */}
           {!query && recentSearches.length > 0 && (
             <div>
-              <div className="text-xs font-medium text-morandi-secondary px-1 mb-2">最近搜尋</div>
+              <div className="text-xs font-medium text-morandi-secondary px-1 mb-2">{MOBILE_LABELS.SEARCH_483}</div>
               <div className="flex flex-wrap gap-2">
                 {recentSearches.map((search, index) => (
                   <button

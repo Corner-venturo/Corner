@@ -22,6 +22,7 @@ import {
 
 // 導入靜態數據
 import { ICON_SETS, ICONS_BY_SET, ZH_TO_EN } from './icon-data'
+import { DESIGNER_LABELS } from './constants/labels'
 
 interface IconPickerProps {
   onSelectIcon: (iconName: string, iconSet: string) => void
@@ -124,7 +125,7 @@ export function IconPicker({ onSelectIcon }: IconPickerProps) {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="搜尋圖示（支援中文：飯店、餐廳...）"
+            placeholder={DESIGNER_LABELS.SEARCH_5417}
             className="pl-8 pr-8 h-8 text-sm"
           />
           {search && (
@@ -142,7 +143,7 @@ export function IconPicker({ onSelectIcon }: IconPickerProps) {
       <div className="p-2 border-b border-border">
         <Select value={selectedSet} onValueChange={setSelectedSet}>
           <SelectTrigger className="h-8 text-sm">
-            <SelectValue placeholder="選擇圖示集" />
+            <SelectValue placeholder={DESIGNER_LABELS.SELECT_5236} />
           </SelectTrigger>
           <SelectContent>
             {ICON_SETS.map((set) => (
@@ -188,7 +189,7 @@ export function IconPicker({ onSelectIcon }: IconPickerProps) {
 
         {!isLoading && icons.length === 0 && (
           <div className="p-4 text-center text-sm text-morandi-secondary">
-            找不到符合的圖示，試試其他關鍵字
+            {DESIGNER_LABELS.NOT_FOUND_2855}
           </div>
         )}
       </div>

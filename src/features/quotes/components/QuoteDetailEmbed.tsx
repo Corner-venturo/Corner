@@ -429,7 +429,7 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
       <div className="flex items-center justify-center h-[50vh]">
         <div className="text-center">
           <Loader2 className="animate-spin h-12 w-12 text-morandi-gold mx-auto mb-4" />
-          <p className="text-morandi-secondary">載入中...</p>
+          <p className="text-morandi-secondary">{QUOTE_DETAIL_EMBED_LABELS.LOADING_6912}</p>
         </div>
       </div>
     )
@@ -497,22 +497,22 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
                   <thead className="bg-morandi-container/50 border-b border-border">
                     <tr>
                       <th className="text-left py-3 px-4 text-sm font-semibold text-morandi-charcoal w-12 table-divider">
-                        分類
+                        {QUOTE_DETAIL_EMBED_LABELS.LABEL_2257}
                       </th>
                       <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-70 table-divider">
-                        項目
+                        {QUOTE_DETAIL_EMBED_LABELS.LABEL_7325}
                       </th>
                       <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-20 table-divider">
-                        數量
+                        {QUOTE_DETAIL_EMBED_LABELS.QUANTITY}
                       </th>
                       <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-28 table-divider">
-                        單價
+                        {QUOTE_DETAIL_EMBED_LABELS.LABEL_9413}
                       </th>
                       <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-28 table-divider whitespace-nowrap">
-                        小計
+                        {QUOTE_DETAIL_EMBED_LABELS.LABEL_832}
                       </th>
                       <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-24">
-                        操作
+                        {QUOTE_DETAIL_EMBED_LABELS.ACTIONS}
                       </th>
                     </tr>
                   </thead>

@@ -11,6 +11,7 @@ import { Sparkles } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import { cn } from '@/lib/utils'
+import { PROPERTIES_PANEL_LABELS } from './constants/labels'
 
 interface ImageFiltersSectionProps {
   canvas: fabric.Canvas | null
@@ -139,13 +140,13 @@ export function ImageFiltersSection({ canvas, selectedObject, onUpdate }: ImageF
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-1">
           <Sparkles size={12} className="text-morandi-secondary" />
-          <Label className="text-xs text-morandi-primary">濾鏡效果</Label>
+          <Label className="text-xs text-morandi-primary">{PROPERTIES_PANEL_LABELS.LABEL_5975}</Label>
         </div>
         <button
           onClick={handleReset}
           className="text-[10px] text-morandi-gold hover:underline"
         >
-          重設
+          {PROPERTIES_PANEL_LABELS.RESET}
         </button>
       </div>
 
@@ -173,7 +174,7 @@ export function ImageFiltersSection({ canvas, selectedObject, onUpdate }: ImageF
         {/* 亮度 */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <Label className="text-[10px] text-morandi-muted">亮度</Label>
+            <Label className="text-[10px] text-morandi-muted">{PROPERTIES_PANEL_LABELS.LABEL_126}</Label>
             <span className="text-[10px] text-morandi-muted">{brightness}</span>
           </div>
           <Slider
@@ -188,7 +189,7 @@ export function ImageFiltersSection({ canvas, selectedObject, onUpdate }: ImageF
         {/* 對比 */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <Label className="text-[10px] text-morandi-muted">對比</Label>
+            <Label className="text-[10px] text-morandi-muted">{PROPERTIES_PANEL_LABELS.LABEL_9716}</Label>
             <span className="text-[10px] text-morandi-muted">{contrast}</span>
           </div>
           <Slider
@@ -203,7 +204,7 @@ export function ImageFiltersSection({ canvas, selectedObject, onUpdate }: ImageF
         {/* 飽和度 */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <Label className="text-[10px] text-morandi-muted">飽和度</Label>
+            <Label className="text-[10px] text-morandi-muted">{PROPERTIES_PANEL_LABELS.LABEL_6868}</Label>
             <span className="text-[10px] text-morandi-muted">{saturation}</span>
           </div>
           <Slider

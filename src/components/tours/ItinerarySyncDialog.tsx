@@ -97,10 +97,10 @@ export function ItinerarySyncDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-amber-500" />
-            行程表天數需要同步
+            {COMP_TOURS_LABELS.LABEL_5905}
           </DialogTitle>
           <DialogDescription id="sync-dialog-description">
-            旅遊團日期已變更，關聯的行程表天數不一致
+            {COMP_TOURS_LABELS.LABEL_9765}
           </DialogDescription>
         </DialogHeader>
 
@@ -108,19 +108,19 @@ export function ItinerarySyncDialog({
           {/* Summary info */}
           <div className="bg-muted/50 rounded-lg p-4 space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">行程表名稱</span>
+              <span className="text-muted-foreground">{COMP_TOURS_LABELS.LABEL_4788}</span>
               <span className="font-medium">{syncInfo.itinerary.title || syncInfo.itinerary.name || COMP_TOURS_LABELS.未命名行程}</span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">目前天數</span>
+              <span className="text-muted-foreground">{COMP_TOURS_LABELS.LABEL_6069}</span>
               <span className="font-medium">{syncInfo.currentDays} 天</span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">新的天數</span>
+              <span className="text-muted-foreground">{COMP_TOURS_LABELS.LABEL_357}</span>
               <span className="font-medium text-primary">{syncInfo.newDays} 天</span>
             </div>
             <div className="flex items-center justify-between text-sm pt-2 border-t">
-              <span className="text-muted-foreground">變更</span>
+              <span className="text-muted-foreground">{COMP_TOURS_LABELS.LABEL_493}</span>
               <span className={`font-medium flex items-center gap-1 ${
                 syncInfo.action === 'increase' ? 'text-green-600' : 'text-amber-600'
               }`}>
@@ -143,7 +143,7 @@ export function ItinerarySyncDialog({
           {syncInfo.action === 'decrease' && (
             <div className="space-y-3">
               <p className="text-sm text-muted-foreground">
-                請選擇要移除的 <span className="font-medium text-foreground">{daysToRemoveCount}</span> 天：
+                請選擇要移除的 <span className="font-medium text-foreground">{daysToRemoveCount}</span> {COMP_TOURS_LABELS.LABEL_7016}
               </p>
               <div className="max-h-60 overflow-y-auto space-y-2 pr-2">
                 {dailyItinerary.map((day, idx) => (
@@ -185,10 +185,10 @@ export function ItinerarySyncDialog({
           {syncInfo.action === 'increase' && (
             <div className="space-y-3">
               <p className="text-sm text-muted-foreground">
-                將在行程表末尾新增 <span className="font-medium text-foreground">{syncInfo.newDays - syncInfo.currentDays}</span> 天空白行程。
+                將在行程表末尾新增 <span className="font-medium text-foreground">{syncInfo.newDays - syncInfo.currentDays}</span> {COMP_TOURS_LABELS.LABEL_5498}
               </p>
               <p className="text-sm text-muted-foreground">
-                新增的天數會使用預設模板，您可以稍後在行程表編輯器中修改內容。
+                {COMP_TOURS_LABELS.ADD_1897}
               </p>
             </div>
           )}
@@ -197,7 +197,7 @@ export function ItinerarySyncDialog({
         {/* Actions */}
         <div className="flex justify-end gap-2 pt-4 border-t">
           <Button variant="outline" onClick={handleIgnore}>
-            維持原樣
+            {COMP_TOURS_LABELS.LABEL_1982}
           </Button>
           <Button
             onClick={handleConfirm}

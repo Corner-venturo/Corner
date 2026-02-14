@@ -17,6 +17,7 @@ import { DreamscapeFlightSection } from './DreamscapeFlightSection'
 import { CollageFlightSection } from './CollageFlightSection'
 import { getTheme, type TourStyle } from '@/features/tours/themes'
 import type { TourPageData } from '@/features/tours/types/tour-display.types'
+import { FLIGHT_LABELS } from './constants/labels'
 
 interface TourFlightSectionUnifiedProps {
   data: TourPageData
@@ -139,7 +140,7 @@ export function TourFlightSectionUnified({ data, viewMode, forceStyle }: TourFli
               className="text-2xl md:text-3xl font-medium tracking-wide"
               style={{ color: theme.colors.text, fontFamily: theme.fonts.heading }}
             >
-              航班資訊
+              {FLIGHT_LABELS.LABEL_1343}
             </h2>
           </div>
         )}

@@ -131,7 +131,7 @@ export function DailyItinerarySection({
       {/* 標題列 */}
       <div className="flex justify-between items-center border-b-2 border-morandi-gold pb-2">
         <div className="flex items-center gap-2">
-          <h2 className="text-lg font-bold text-morandi-primary">逐日行程</h2>
+          <h2 className="text-lg font-bold text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_7217}</h2>
           {(() => {
             const total = data.dailyItinerary?.length || 0
             const mainDays = data.dailyItinerary?.filter(d => !d.isAlternative).length || 0
@@ -158,7 +158,7 @@ export function DailyItinerarySection({
             className="px-3 py-1 bg-morandi-gold text-white rounded-lg text-sm hover:bg-morandi-gold-hover flex items-center gap-1"
           >
             <Sparkles size={14} />
-            一鍵生成
+            {COMP_EDITOR_LABELS.GENERATING_8937}
           </button>
           <button
             onClick={addDailyItinerary}
@@ -246,10 +246,10 @@ export function DailyItinerarySection({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FolderPlus size={20} className="text-morandi-gold" />
-              儲存到圖庫
+              {COMP_EDITOR_LABELS.儲存到圖庫}
             </DialogTitle>
             <DialogDescription>
-              是否要將這張圖片儲存到圖庫，以便日後重複使用？
+              {COMP_EDITOR_LABELS.SAVING_183}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -264,7 +264,7 @@ export function DailyItinerarySection({
             )}
             <div className="space-y-2">
               <label className="text-sm font-medium text-morandi-primary">
-                圖片名稱
+                {COMP_EDITOR_LABELS.LABEL_3237}
               </label>
               <Input
                 value={libraryImageName}
@@ -283,7 +283,7 @@ export function DailyItinerarySection({
               }}
               disabled={isSavingToLibrary}
             >
-              不用了
+              {COMP_EDITOR_LABELS.LABEL_1066}
             </Button>
             <Button
               type="button"
@@ -294,7 +294,7 @@ export function DailyItinerarySection({
               {isSavingToLibrary ? (
                 <>
                   <Loader2 size={16} className="mr-2 animate-spin" />
-                  儲存中...
+                  {COMP_EDITOR_LABELS.儲存中}
                 </>
               ) : (
                 COMP_EDITOR_LABELS.儲存到圖庫

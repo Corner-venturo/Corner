@@ -63,7 +63,7 @@ export function DisbursementItemList({
       {/* 請款編號列表標題 + 篩選 */}
       <div className="flex items-center justify-between flex-shrink-0">
         <h3 className="font-semibold text-morandi-primary">
-          請款編號列表
+          {DISBURSEMENT_LABELS.LABEL_623}
           {selectedRequestIds.length > 0 && (
             <span className="ml-2 text-morandi-gold">
               （已選 {selectedRequestIds.length} 筆，共 NT$ {selectedAmount.toLocaleString()}）
@@ -96,7 +96,7 @@ export function DisbursementItemList({
             className="whitespace-nowrap"
           >
             <Calendar size={14} className="mr-1" />
-            當日
+            {DISBURSEMENT_LABELS.LABEL_2377}
           </Button>
           {/* 清除按鈕 */}
           <Button
@@ -106,7 +106,7 @@ export function DisbursementItemList({
             className="whitespace-nowrap"
           >
             <X size={14} className="mr-1" />
-            清除
+            {DISBURSEMENT_LABELS.CLEAR}
           </Button>
         </div>
       </div>
@@ -122,19 +122,19 @@ export function DisbursementItemList({
                   onCheckedChange={onToggleSelectAll}
                 />
               </th>
-              <th className="py-3 px-4 text-left text-morandi-muted font-medium">請款編號</th>
-              <th className="py-3 px-4 text-left text-morandi-muted font-medium">團名</th>
-              <th className="py-3 px-4 text-left text-morandi-muted font-medium">出帳日期</th>
-              <th className="py-3 px-4 text-left text-morandi-muted font-medium">請款人</th>
-              <th className="py-3 px-4 text-right text-morandi-muted font-medium">總金額</th>
-              <th className="py-3 px-4 text-center text-morandi-muted font-medium">狀態</th>
+              <th className="py-3 px-4 text-left text-morandi-muted font-medium">{DISBURSEMENT_LABELS.LABEL_6208}</th>
+              <th className="py-3 px-4 text-left text-morandi-muted font-medium">{DISBURSEMENT_LABELS.團名_th}</th>
+              <th className="py-3 px-4 text-left text-morandi-muted font-medium">{DISBURSEMENT_LABELS.出帳日期_label}</th>
+              <th className="py-3 px-4 text-left text-morandi-muted font-medium">{DISBURSEMENT_LABELS.請款人}</th>
+              <th className="py-3 px-4 text-right text-morandi-muted font-medium">{DISBURSEMENT_LABELS.總金額_label}</th>
+              <th className="py-3 px-4 text-center text-morandi-muted font-medium">{DISBURSEMENT_LABELS.狀態}</th>
             </tr>
           </thead>
           <tbody>
             {filteredRequests.length === 0 ? (
               <tr>
                 <td colSpan={7} className="py-12 text-center text-morandi-muted">
-                  沒有符合條件的請款單
+                  {DISBURSEMENT_LABELS.NOT_FOUND_1858}
                 </td>
               </tr>
             ) : (

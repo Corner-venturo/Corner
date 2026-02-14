@@ -248,7 +248,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 )}
               >
                 <Plus size={12} className="mr-1" />
-                新增天數
+                {CATEGORY_SECTION_LABELS.ADD_2985}
               </Button>
               {accommodationDays > 0 && (
                 <Button
@@ -262,7 +262,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                   )}
                 >
                   <Plus size={12} className="mr-1" />
-                  新增
+                  {CATEGORY_SECTION_LABELS.ADD}
                 </Button>
               )}
             </div>
@@ -307,7 +307,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 )}
               >
                 <Car size={12} className="mr-1" />
-                交通
+                {CATEGORY_SECTION_LABELS.LABEL_138}
               </Button>
               <Button
                 variant="ghost"
@@ -320,7 +320,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 )}
               >
                 <Users size={12} className="mr-1" />
-                導遊
+                {CATEGORY_SECTION_LABELS.LABEL_8731}
               </Button>
             </div>
           ) : category.id === 'transport' ? (
@@ -336,7 +336,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 )}
               >
                 <Plus size={12} className="mr-1" />
-                成人
+                {CATEGORY_SECTION_LABELS.成人}
               </Button>
               <Button
                 variant="ghost"
@@ -349,7 +349,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 )}
               >
                 <Plus size={12} className="mr-1" />
-                兒童
+                {CATEGORY_SECTION_LABELS.LABEL_475}
               </Button>
               <Button
                 variant="ghost"
@@ -362,7 +362,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 )}
               >
                 <Plus size={12} className="mr-1" />
-                嬰兒
+                {CATEGORY_SECTION_LABELS.LABEL_2772}
               </Button>
               <Button
                 variant="ghost"
@@ -375,7 +375,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 )}
               >
                 <Plus size={12} className="mr-1" />
-                其他
+                {CATEGORY_SECTION_LABELS.LABEL_7496}
               </Button>
             </div>
           ) : category.id === 'meals' && handleAddLunchMeal ? (
@@ -391,7 +391,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 )}
               >
                 <Plus size={12} className="mr-1" />
-                餐飲
+                {CATEGORY_SECTION_LABELS.LABEL_5098}
               </Button>
             </div>
           ) : category.id === 'activities' && handleAddActivity ? (
@@ -511,7 +511,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
             colSpan={4}
             className="py-2 px-4 text-right text-sm font-medium text-morandi-secondary"
           >
-            小計
+            {CATEGORY_SECTION_LABELS.LABEL_832}
           </td>
           <td className="py-2 px-4 text-center text-sm font-bold text-morandi-primary">
             {(() => {
@@ -538,12 +538,12 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
       <Dialog open={isCountryDialogOpen} onOpenChange={setIsCountryDialogOpen}>
         <DialogContent level={1} className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>選擇國家</DialogTitle>
+            <DialogTitle>{CATEGORY_SECTION_LABELS.SELECT_8015}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             {loading ? (
               <div className="text-center py-8 text-morandi-secondary">
-                載入中...
+                {CATEGORY_SECTION_LABELS.LOADING_6912}
               </div>
             ) : countries.length > 0 ? (
               <div className="grid grid-cols-2 gap-3">
@@ -560,7 +560,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
               </div>
             ) : (
               <div className="text-center py-8 text-morandi-secondary">
-                車資管理中尚無任何國家資料
+                {CATEGORY_SECTION_LABELS.EMPTY_4962}
               </div>
             )}
           </div>

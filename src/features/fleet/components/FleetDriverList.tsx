@@ -12,6 +12,7 @@ import { Pencil, Trash2, AlertTriangle, Phone } from 'lucide-react'
 import type { FleetDriver, DriverStatus } from '@/types/fleet.types'
 import { getDaysUntilDue, getDueStatusColor } from '@/types/fleet.types'
 import { formatDate } from '@/lib/utils/format-date'
+import { FLEET_LABELS } from './constants/labels'
 
 interface FleetDriverListProps {
   items: FleetDriver[]
@@ -155,7 +156,7 @@ export const FleetDriverList: React.FC<FleetDriverListProps> = ({
                   onEdit(item)
                 }}
                 className="text-morandi-gold hover:bg-morandi-gold/10"
-                title="編輯"
+                title={FLEET_LABELS.EDIT}
               >
                 <Pencil size={16} />
               </Button>
@@ -169,7 +170,7 @@ export const FleetDriverList: React.FC<FleetDriverListProps> = ({
                   onDelete(item)
                 }}
                 className="text-morandi-red hover:bg-morandi-red/10"
-                title="刪除"
+                title={FLEET_LABELS.DELETE}
               >
                 <Trash2 size={16} />
               </Button>

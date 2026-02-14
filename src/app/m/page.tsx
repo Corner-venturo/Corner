@@ -11,6 +11,7 @@ import { TodoCard } from '@/components/mobile/cards'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
+import { M_LABELS } from './constants/labels'
 
 interface Tour {
   id: string
@@ -151,7 +152,7 @@ export default function MobileHomePage() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Plane size={18} className="text-green-600" />
-              <h2 className="font-bold text-morandi-primary">今日出發</h2>
+              <h2 className="font-bold text-morandi-primary">{M_LABELS.LABEL_5500}</h2>
               {todayDepartures.length > 0 && (
                 <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">
                   {todayDepartures.length}
@@ -173,7 +174,7 @@ export default function MobileHomePage() {
             </div>
           ) : (
             <div className="bg-card rounded-xl border border-border p-6 text-center text-morandi-secondary">
-              今日無出發團
+              {M_LABELS.LABEL_3700}
             </div>
           )}
         </section>
@@ -183,7 +184,7 @@ export default function MobileHomePage() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <PlaneLanding size={18} className="text-blue-600" />
-              <h2 className="font-bold text-morandi-primary">今日返程</h2>
+              <h2 className="font-bold text-morandi-primary">{M_LABELS.LABEL_8173}</h2>
               {todayReturns.length > 0 && (
                 <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
                   {todayReturns.length}
@@ -205,7 +206,7 @@ export default function MobileHomePage() {
             </div>
           ) : (
             <div className="bg-card rounded-xl border border-border p-6 text-center text-morandi-secondary">
-              今日無返程團
+              {M_LABELS.LABEL_5477}
             </div>
           )}
         </section>
@@ -215,7 +216,7 @@ export default function MobileHomePage() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <AlertCircle size={18} className="text-red-600" />
-              <h2 className="font-bold text-morandi-primary">緊急待辦</h2>
+              <h2 className="font-bold text-morandi-primary">{M_LABELS.LABEL_5382}</h2>
               {urgentTodos.length > 0 && (
                 <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">
                   {urgentTodos.length}
@@ -238,7 +239,7 @@ export default function MobileHomePage() {
           ) : (
             <div className="bg-card rounded-xl border border-border p-6 text-center text-morandi-secondary">
               <ClipboardList size={24} className="mx-auto mb-2 text-morandi-muted" />
-              沒有緊急待辦事項
+              {M_LABELS.NOT_FOUND_9241}
             </div>
           )}
         </section>

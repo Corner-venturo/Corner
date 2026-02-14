@@ -19,6 +19,7 @@ import Image from 'next/image'
 import { SectionTitle } from './SectionTitle'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import type { TourPageData, CoverStyleType, DailyItinerary } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 interface TourItinerarySectionProps {
   data: TourPageData
@@ -157,7 +158,7 @@ export function TourItinerarySection({
           viewport={{ once: true }}
         >
           <SectionTitle
-            title="詳細行程"
+            title={TOURS_LABELS.LABEL_1369}
             coverStyle={coverStyle}
             className={viewMode === 'mobile' ? 'mb-4' : 'mb-12'}
           />
@@ -193,7 +194,7 @@ export function TourItinerarySection({
                       />
                       {day.isAlternative && (
                         <span className="ml-4 px-2 py-0.5 bg-[#30abe8]/10 text-[#30abe8] text-xs rounded-full">
-                          建議方案
+                          {TOURS_LABELS.LABEL_1234}
                         </span>
                       )}
                     </div>
@@ -539,7 +540,7 @@ export function TourItinerarySection({
                         "flex items-center gap-2 font-semibold text-emerald-900",
                         viewMode === 'mobile' ? 'mb-2 text-sm' : 'mb-3 text-lg'
                       )}>
-                        推薦行程
+                        {TOURS_LABELS.LABEL_7651}
                       </h4>
                       <ul className={cn(
                         "text-emerald-800",
@@ -591,7 +592,7 @@ export function TourItinerarySection({
                         <p className={cn(
                           "text-morandi-secondary/80 mb-1",
                           viewMode === 'mobile' ? 'text-[10px] text-center' : 'text-sm font-medium'
-                        )}>早餐</p>
+                        )}>{TOURS_LABELS.LABEL_1347}</p>
                         <p className={cn(
                           "font-semibold text-morandi-primary",
                           viewMode === 'mobile' ? 'text-[10px] text-center leading-tight line-clamp-1' : 'text-base leading-snug'
@@ -608,7 +609,7 @@ export function TourItinerarySection({
                         <p className={cn(
                           "text-morandi-secondary/80 mb-1",
                           viewMode === 'mobile' ? 'text-[10px] text-center' : 'text-sm font-medium'
-                        )}>午餐</p>
+                        )}>{TOURS_LABELS.LABEL_8515}</p>
                         <p className={cn(
                           "font-semibold text-morandi-primary",
                           viewMode === 'mobile' ? 'text-[10px] text-center leading-tight line-clamp-1' : 'text-base leading-snug'
@@ -625,7 +626,7 @@ export function TourItinerarySection({
                         <p className={cn(
                           "text-morandi-secondary/80 mb-1",
                           viewMode === 'mobile' ? 'text-[10px] text-center' : 'text-sm font-medium'
-                        )}>晚餐</p>
+                        )}>{TOURS_LABELS.LABEL_8227}</p>
                         <p className={cn(
                           "font-semibold text-morandi-primary",
                           viewMode === 'mobile' ? 'text-[10px] text-center leading-tight line-clamp-1' : 'text-base leading-snug'
@@ -655,7 +656,7 @@ export function TourItinerarySection({
                           "flex items-baseline gap-x-3",
                           viewMode === 'mobile' ? 'text-xs' : 'text-sm'
                         )}>
-                          <span className="font-medium tracking-wide text-morandi-secondary flex-shrink-0">住宿</span>
+                          <span className="font-medium tracking-wide text-morandi-secondary flex-shrink-0">{TOURS_LABELS.LABEL_8766}</span>
                           {day.accommodationUrl ? (
                             <a
                               href={day.accommodationUrl}

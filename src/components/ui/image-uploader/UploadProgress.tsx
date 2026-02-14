@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { Loader2 } from 'lucide-react'
+import { IMAGE_UPLOADER_LABELS } from './constants/labels'
 
 export interface UploadProgressProps {
   uploading: boolean
@@ -16,7 +17,7 @@ export function UploadProgress({ uploading, current, total }: UploadProgressProp
     <div className="flex items-center gap-2 text-sm text-morandi-secondary">
       <Loader2 size={16} className="animate-spin text-morandi-gold" />
       <span>
-        上傳中...
+        {IMAGE_UPLOADER_LABELS.UPLOADING_2213}
         {current !== undefined && total !== undefined && ` (${current}/${total})`}
       </span>
     </div>

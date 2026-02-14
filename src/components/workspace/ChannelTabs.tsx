@@ -106,7 +106,7 @@ export function ChannelTabs({ channel, children, headerActions }: ChannelTabsPro
               )}
             >
               <MessageSquare size={16} />
-              <span>對話</span>
+              <span>{COMP_WORKSPACE_LABELS.LABEL_2460}</span>
               {activeTab === 'chat' && (
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-morandi-gold transition-all"></div>
               )}

@@ -13,6 +13,7 @@ import {
 import ScheduledBoxItem from './ScheduledBoxItem'
 import BoxSelector from './BoxSelector'
 import { alert } from '@/lib/ui/alert-dialog'
+import { TIMEBOX_LABELS } from './constants/labels'
 
 // 固定格子高度（像素）- 不依賴 DOM 測量，確保一致性
 const SLOT_HEIGHTS = {
@@ -79,7 +80,7 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
     return (
       <div className="flex items-center justify-center p-8 text-status-danger">
         <div className="text-center">
-          <p className="font-medium">載入資料時發生錯誤</p>
+          <p className="font-medium">{TIMEBOX_LABELS.LOADING_1274}</p>
           <p className="text-sm mt-1">{error.message}</p>
         </div>
       </div>

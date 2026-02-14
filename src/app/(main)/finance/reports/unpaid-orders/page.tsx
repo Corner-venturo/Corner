@@ -150,7 +150,7 @@ export default function UnpaidOrdersPage() {
 
   return (
     <ListPageLayout
-      title="未收款報表"
+      title={UNPAID_ORDERS_LABELS.LABEL_1474}
       breadcrumb={[
         { label: '首頁', href: '/' },
         { label: '財務', href: '/finance' },

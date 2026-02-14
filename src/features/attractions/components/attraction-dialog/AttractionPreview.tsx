@@ -34,12 +34,12 @@ export function AttractionPreview({
 
   return (
     <div className="space-y-4 p-4 bg-morandi-bg rounded-lg border border-border">
-      <h3 className="text-lg font-medium">預覽</h3>
+      <h3 className="text-lg font-medium">{ATTRACTION_PREVIEW_LABELS.PREVIEW}</h3>
 
       {/* 圖片預覽 */}
       {uploadedImages.length > 0 && (
         <div className="space-y-2">
-          <div className="text-sm font-medium">主圖片</div>
+          <div className="text-sm font-medium">{ATTRACTION_PREVIEW_LABELS.LABEL_4308}</div>
           <img
             src={uploadedImages[0]}
             alt={formData.name}
@@ -63,7 +63,7 @@ export function AttractionPreview({
 
       {/* 地點 */}
       <div className="text-sm">
-        <span className="text-morandi-muted">地點：</span>
+        <span className="text-morandi-muted">{ATTRACTION_PREVIEW_LABELS.LABEL_350}</span>
         {[country?.name, region?.name, city?.name].filter(Boolean).join(' / ') || ATTRACTION_PREVIEW_LABELS.未設定}
       </div>
 
@@ -90,27 +90,27 @@ export function AttractionPreview({
       <div className="grid grid-cols-2 gap-2 text-xs">
         {formData.duration_minutes > 0 && (
           <div>
-            <span className="text-morandi-muted">停留時間：</span>
+            <span className="text-morandi-muted">{ATTRACTION_PREVIEW_LABELS.LABEL_4656}</span>
             {formData.duration_minutes} 分鐘
           </div>
         )}
         {formData.address && (
           <div>
-            <span className="text-morandi-muted">地址：</span>
+            <span className="text-morandi-muted">{ATTRACTION_PREVIEW_LABELS.LABEL_9379}</span>
             {formData.address}
           </div>
         )}
         {formData.phone && (
           <div>
-            <span className="text-morandi-muted">電話：</span>
+            <span className="text-morandi-muted">{ATTRACTION_PREVIEW_LABELS.LABEL_9704}</span>
             {formData.phone}
           </div>
         )}
         {formData.website && (
           <div>
-            <span className="text-morandi-muted">官網：</span>
+            <span className="text-morandi-muted">{ATTRACTION_PREVIEW_LABELS.LABEL_2203}</span>
             <a href={formData.website} target="_blank" rel="noopener noreferrer" className="text-morandi-blue hover:underline">
-              連結
+              {ATTRACTION_PREVIEW_LABELS.LABEL_9893}
             </a>
           </div>
         )}

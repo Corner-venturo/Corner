@@ -76,7 +76,7 @@ export function HotelsBlockEditor({ data, onChange }: HotelsBlockEditorProps) {
         onClick={addHotel}
       >
         <Plus size={14} />
-        新增飯店
+        {COMP_EDITOR_LABELS.ADD_9618}
       </Button>
     </div>
   )

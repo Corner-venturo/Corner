@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import { Combobox } from '@/components/ui/combobox'
 import { useAirports, type Airport } from '@/features/tours/hooks/useAirports'
+import { SELECTORS_LABELS } from './constants/labels'
 
 // 判斷是否為台灣（支援多種寫法）
 const isTaiwanCountry = (country: string | undefined | null): boolean => {
@@ -98,14 +99,14 @@ export function CountryAirportSelector({
         <div>
           {showLabels && (
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              國家
+              {SELECTORS_LABELS.LABEL_5040}
             </label>
           )}
           <Combobox
             value={country}
             onChange={handleCountryChange}
             options={countryOptions}
-            placeholder="選擇國家..."
+            placeholder={SELECTORS_LABELS.SELECT_7169}
             emptyMessage={loading ? '載入中...' : '找不到符合的國家'}
             showSearchIcon
             showClearButton
@@ -118,7 +119,7 @@ export function CountryAirportSelector({
           <div>
             {showLabels && (
               <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                城市 (機場代碼)
+                {SELECTORS_LABELS.LABEL_5022}
               </label>
             )}
             <Combobox
@@ -136,7 +137,7 @@ export function CountryAirportSelector({
         ) : (
           <div className="flex items-center">
             {showLabels && <div className="mb-2 h-5" />}
-            <p className="text-sm text-morandi-secondary">國內旅遊不需選擇城市</p>
+            <p className="text-sm text-morandi-secondary">{SELECTORS_LABELS.SELECT_7771}</p>
           </div>
         )}
       </div>

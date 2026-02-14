@@ -196,7 +196,7 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
                   <DatePicker
                     value={formData.available_start_date}
                     onChange={(date) => handleFieldChange('available_start_date', date)}
-                    placeholder="選擇開始日期"
+                    placeholder={TOUR_LEADERS_LABELS.PLACEHOLDER_START_DATE}
                     className="mt-1"
                   />
                 </div>
@@ -207,12 +207,12 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
                   <DatePicker
                     value={formData.available_end_date}
                     onChange={(date) => handleFieldChange('available_end_date', date)}
-                    placeholder="選擇結束日期"
+                    placeholder={TOUR_LEADERS_LABELS.PLACEHOLDER_END_DATE}
                     className="mt-1"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-morandi-primary">狀態</label>
+                  <label className="text-sm font-medium text-morandi-primary">{TOUR_LEADERS_LABELS.COL_STATUS}</label>
                   <Select
                     value={formData.status}
                     onValueChange={(value) => handleFieldChange('status', value as LeaderAvailabilityStatus)}
@@ -230,11 +230,11 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-morandi-primary">備註</label>
+                  <label className="text-sm font-medium text-morandi-primary">{TOUR_LEADERS_LABELS.NOTES}</label>
                   <Input
                     value={formData.notes}
                     onChange={(e) => handleFieldChange('notes', e.target.value)}
-                    placeholder="選填備註"
+                    placeholder={TOUR_LEADERS_LABELS.PLACEHOLDER_NOTES_OPTIONAL}
                     className="mt-1"
                   />
                 </div>
@@ -243,7 +243,7 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={handleCancelForm} className="gap-2">
                   <X size={16} />
-                  取消
+                  {TOUR_LEADERS_LABELS.CANCEL}
                 </Button>
                 <Button
                   onClick={handleSubmit}
@@ -261,7 +261,7 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
               className="w-full gap-2 border-dashed"
             >
               <Plus size={16} />
-              新增檔期
+              {TOUR_LEADERS_LABELS.ADD_AVAILABILITY_BTN}
             </Button>
           )}
 
@@ -272,11 +272,11 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
             </h4>
 
             {isLoading ? (
-              <div className="text-center py-8 text-morandi-secondary">載入中...</div>
+              <div className="text-center py-8 text-morandi-secondary">{TOUR_LEADERS_LABELS.LOADING}</div>
             ) : leaderAvailability.length === 0 ? (
               <div className="text-center py-8 text-morandi-secondary flex flex-col items-center gap-2">
                 <AlertCircle size={24} className="text-morandi-muted" />
-                <span>尚無設定任何檔期</span>
+                <span>{TOUR_LEADERS_LABELS.NO_AVAILABILITY}</span>
               </div>
             ) : (
               <div className="space-y-2">
@@ -311,7 +311,7 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
                           size="iconSm"
                           onClick={() => handleEdit(item)}
                           className="text-morandi-blue hover:bg-morandi-blue/10"
-                          title="編輯"
+                          title={TOUR_LEADERS_LABELS.EDIT_TITLE}
                         >
                           <Pencil size={14} />
                         </Button>
@@ -320,7 +320,7 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
                           size="iconSm"
                           onClick={() => handleDelete(item)}
                           className="text-morandi-red hover:bg-morandi-red/10"
-                          title="刪除"
+                          title={TOUR_LEADERS_LABELS.DELETE_TITLE}
                         >
                           <Trash2 size={14} />
                         </Button>
@@ -337,7 +337,7 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
         <div className="flex justify-end pt-4 border-t border-border">
           <Button variant="outline" onClick={onClose} className="gap-2">
             <X size={16} />
-            關閉
+            {TOUR_LEADERS_LABELS.CLOSE}
           </Button>
         </div>
       </DialogContent>

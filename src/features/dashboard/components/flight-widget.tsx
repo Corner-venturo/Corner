@@ -214,10 +214,10 @@ export function FlightWidget() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">
-                航班查詢
+                {FLIGHT_WIDGET_LABELS.QUERYING_9420}
               </p>
               <p className="text-xs text-morandi-secondary/90 mt-1 leading-relaxed">
-                查詢航班或機場時刻表
+                {FLIGHT_WIDGET_LABELS.QUERYING_4439}
               </p>
             </div>
           </div>
@@ -234,7 +234,7 @@ export function FlightWidget() {
               )}
             >
               <Plane className="w-3.5 h-3.5" />
-              航班號
+              {FLIGHT_WIDGET_LABELS.LABEL_7892}
             </button>
             <button
               onClick={() => setSearchMode('airport')}
@@ -246,7 +246,7 @@ export function FlightWidget() {
               )}
             >
               <Building2 className="w-3.5 h-3.5" />
-              機場時刻
+              {FLIGHT_WIDGET_LABELS.LABEL_4790}
             </button>
           </div>
 
@@ -257,14 +257,14 @@ export function FlightWidget() {
               <div>
                 <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5">
                   <Plane className="w-3.5 h-3.5" />
-                  航班號碼
+                  {FLIGHT_WIDGET_LABELS.LABEL_8457}
                 </label>
                 <input
                   type="text"
                   value={flightNumber}
                   onChange={e => setFlightNumber(toHalfWidth(e.target.value).toUpperCase())}
                   onKeyPress={handleKeyPress}
-                  placeholder="例如: BR191, CI100"
+                  placeholder={FLIGHT_WIDGET_LABELS.EXAMPLE_5877}
                   className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm placeholder:text-morandi-secondary/50"
                 />
               </div>
@@ -274,11 +274,11 @@ export function FlightWidget() {
                 <div>
                   <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5">
                     <PlaneTakeoff className="w-3.5 h-3.5" />
-                    出發
+                    {FLIGHT_WIDGET_LABELS.DEPARTURE}
                   </label>
                   <Select value={airportCode} onValueChange={setAirportCode}>
                     <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm">
-                      <SelectValue placeholder="選擇" />
+                      <SelectValue placeholder={FLIGHT_WIDGET_LABELS.SELECT} />
                     </SelectTrigger>
                     <SelectContent>
                       {COMMON_AIRPORTS.map(airport => (
@@ -292,7 +292,7 @@ export function FlightWidget() {
                 <div>
                   <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5">
                     <PlaneLanding className="w-3.5 h-3.5" />
-                    目的地
+                    {FLIGHT_WIDGET_LABELS.LABEL_5475}
                   </label>
                   <input
                     type="text"
@@ -310,12 +310,12 @@ export function FlightWidget() {
             <div>
               <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5" />
-                日期
+                {FLIGHT_WIDGET_LABELS.DATE}
               </label>
               <DatePicker
                 value={queryDate}
                 onChange={(date) => setQueryDate(date)}
-                placeholder="選擇日期"
+                placeholder={FLIGHT_WIDGET_LABELS.SELECT_5234}
                 className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm"
               />
             </div>
@@ -333,12 +333,12 @@ export function FlightWidget() {
               {isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  查詢中...
+                  {FLIGHT_WIDGET_LABELS.QUERYING_974}
                 </>
               ) : (
                 <>
                   <Search className="w-4 h-4" />
-                  查詢
+                  {FLIGHT_WIDGET_LABELS.QUERYING_754}
                 </>
               )}
             </button>
@@ -482,7 +482,7 @@ export function FlightWidget() {
                   <th className="px-2 py-3 text-center font-semibold text-morandi-secondary w-8"></th>
                   <th className="px-3 py-3 text-center font-semibold text-morandi-primary">{FLIGHT_WIDGET_LABELS.ARRIVAL}</th>
                   <th className="px-3 py-3 text-left font-semibold text-morandi-primary">{FLIGHT_WIDGET_LABELS.TERMINAL}</th>
-                  <th className="px-3 py-3 text-left font-semibold text-morandi-primary">狀態</th>
+                  <th className="px-3 py-3 text-left font-semibold text-morandi-primary">{FLIGHT_WIDGET_LABELS.STATUS}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -491,7 +491,7 @@ export function FlightWidget() {
                     <td className="px-3 py-3">
                       <p className="font-semibold text-morandi-primary">{flight.scheduledTime}</p>
                       {flight.estimatedTime && flight.estimatedTime !== flight.scheduledTime && (
-                        <p className="text-xs text-morandi-secondary">預計 {flight.estimatedTime}</p>
+                        <p className="text-xs text-morandi-secondary">{FLIGHT_WIDGET_LABELS.LABEL_6009} {flight.estimatedTime}</p>
                       )}
                     </td>
                     <td className="px-3 py-3">

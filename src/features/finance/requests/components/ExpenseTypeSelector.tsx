@@ -31,7 +31,7 @@ export function ExpenseTypeSelector({
   return (
     <div className={className}>
       <label className="text-sm font-medium text-morandi-primary">
-        費用類型 *
+        {EXPENSE_TYPE_SELECTOR_LABELS.LABEL_6005}
       </label>
       <Combobox
         options={expenseTypeOptions}

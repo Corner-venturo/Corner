@@ -4,6 +4,7 @@ import React from 'react'
 import { Plane, Check, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { FlightStyleType } from '../../types'
+import { FLIGHT_LABELS } from './constants/labels'
 
 interface FlightStyleOption {
   value: FlightStyleType
@@ -31,11 +32,11 @@ export function FlightStyleSelector({
       <div className="bg-gradient-to-r from-muted to-morandi-container/50 p-4 rounded-lg border border-border">
         <div className="flex items-center gap-2 mb-3">
           <Plane className="w-4 h-4 text-morandi-secondary" />
-          <span className="text-sm font-medium text-morandi-primary">航班卡片風格</span>
+          <span className="text-sm font-medium text-morandi-primary">{FLIGHT_LABELS.LABEL_1803}</span>
         </div>
         <div className="flex items-center justify-center py-6">
           <Loader2 className="w-5 h-5 animate-spin text-morandi-gold" />
-          <span className="ml-2 text-sm text-morandi-secondary">載入中...</span>
+          <span className="ml-2 text-sm text-morandi-secondary">{FLIGHT_LABELS.LOADING_6912}</span>
         </div>
       </div>
     )

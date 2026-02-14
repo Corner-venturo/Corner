@@ -7,6 +7,7 @@ import { SectionTitle } from './SectionTitle'
 import { TourFeaturesSectionCollage, type FeatureCardStyle } from './TourFeaturesSectionCollage'
 import { TourFeaturesSectionArt } from './TourFeaturesSectionArt'
 import type { TourPageData, CoverStyleType, FeaturesStyleType } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 // 擴展 Feature 類型（增加 icon component 和 collage 專用欄位）
 interface TourFeature {
@@ -81,7 +82,7 @@ export function TourFeaturesSection({ data, viewMode, coverStyle = 'original', f
     <section className={viewMode === 'mobile' ? 'pt-4 pb-8 bg-card' : 'pt-8 pb-16 bg-card'}>
       <div className={viewMode === 'mobile' ? 'px-4' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'}>
         <SectionTitle
-          title="行程特色"
+          title={TOURS_LABELS.LABEL_6890}
           coverStyle={coverStyle}
           className={viewMode === 'mobile' ? 'mb-6' : 'mb-12'}
         />

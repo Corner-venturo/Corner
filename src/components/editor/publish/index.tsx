@@ -129,7 +129,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
                 className="h-8 px-3 border-morandi-container hover:bg-morandi-container/30"
               >
                 <FilePlus size={14} className="mr-1.5" />
-                另存
+                {COMP_EDITOR_LABELS.LABEL_7445}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
@@ -139,8 +139,8 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
               >
                 <FilePlus size={14} className="text-morandi-secondary" />
                 <div className="flex flex-col">
-                  <span className="font-medium">另存新版本</span>
-                  <span className="text-xs text-morandi-secondary">相同連結，不同版本</span>
+                  <span className="font-medium">{COMP_EDITOR_LABELS.另存新版本}</span>
+                  <span className="text-xs text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_1615}</span>
                 </div>
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -152,8 +152,8 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
               >
                 <Files size={14} className="text-morandi-secondary" />
                 <div className="flex flex-col">
-                  <span className="font-medium">另存新檔</span>
-                  <span className="text-xs text-morandi-secondary">創建新連結</span>
+                  <span className="font-medium">{COMP_EDITOR_LABELS.另存新檔}</span>
+                  <span className="text-xs text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_578}</span>
                 </div>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -192,7 +192,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
                       <div className="flex items-center gap-2">
                         <span className="font-medium">{stripHtml(record.note) || `版本 ${record.version}`}</span>
                         {isMainVersion && (
-                          <span className="text-[10px] text-morandi-secondary bg-morandi-container px-1.5 py-0.5 rounded">主版本</span>
+                          <span className="text-[10px] text-morandi-secondary bg-morandi-container px-1.5 py-0.5 rounded">{COMP_EDITOR_LABELS.LABEL_1858}</span>
                         )}
                       </div>
                       <span className="text-xs text-morandi-secondary">
@@ -201,7 +201,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
                     </div>
                     <div className="flex items-center gap-2">
                       {isCurrentVersion && (
-                        <div className="text-xs bg-morandi-gold text-white px-2 py-0.5 rounded">當前</div>
+                        <div className="text-xs bg-morandi-gold text-white px-2 py-0.5 rounded">{COMP_EDITOR_LABELS.LABEL_6211}</div>
                       )}
                       {hoveredVersionIndex === index && !isMainVersion && (
                         <button
@@ -221,7 +221,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
               })}
               {versionRecords.length === 0 && (
                 <div className="px-2 py-3 text-sm text-morandi-secondary text-center">
-                  儲存後會自動建立版本 1
+                  {COMP_EDITOR_LABELS.SAVING_5906}
                 </div>
               )}
             </DropdownMenuContent>

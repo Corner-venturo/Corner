@@ -26,6 +26,7 @@ import {
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
+import { BOX_DIALOGS_LABELS } from './constants/labels'
 
 interface WorkoutDialogProps {
   scheduledBox: TimeboxScheduledBox
@@ -333,7 +334,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
           {/* 動作列表 */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-medium">訓練動作</h3>
+              <h3 className="font-medium">{BOX_DIALOGS_LABELS.LABEL_791}</h3>
               <div className="flex items-center gap-2">
                 {/* 模板下拉選單 */}
                 <DropdownMenu>
@@ -344,7 +345,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
                       className="text-morandi-secondary border-border hover:bg-morandi-container/20"
                     >
                       <FolderOpen className="h-4 w-4 mr-1" />
-                      模板
+                      {BOX_DIALOGS_LABELS.LABEL_5772}
                       <ChevronDown className="h-3 w-3 ml-1" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -352,7 +353,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
                     {userTemplates.length > 0 ? (
                       <>
                         <div className="px-2 py-1.5 text-xs text-morandi-secondary font-medium">
-                          載入模板
+                          {BOX_DIALOGS_LABELS.LOADING_4372}
                         </div>
                         {userTemplates.map(template => (
                           <DropdownMenuItem
@@ -383,13 +384,13 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
                       </>
                     ) : (
                       <div className="px-2 py-3 text-sm text-morandi-secondary text-center">
-                        尚無模板
+                        {BOX_DIALOGS_LABELS.EMPTY_917}
                       </div>
                     )}
                     {workoutData.exercises?.length > 0 && (
                       <DropdownMenuItem onClick={() => setShowSaveTemplate(true)}>
                         <Save className="h-4 w-4 mr-2" />
-                        儲存目前動作為模板
+                        {BOX_DIALOGS_LABELS.SAVING_7360}
                       </DropdownMenuItem>
                     )}
                   </DropdownMenuContent>
@@ -403,7 +404,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
                     className="text-morandi-gold border-morandi-gold/20 hover:bg-morandi-gold/10"
                   >
                     <Plus className="h-4 w-4 mr-1" />
-                    新增動作
+                    {BOX_DIALOGS_LABELS.ADD_5389}
                   </Button>
                 )}
               </div>
@@ -415,7 +416,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="text-sm font-medium text-morandi-gold flex items-center gap-2">
                     <Save className="h-4 w-4" />
-                    儲存為模板
+                    {BOX_DIALOGS_LABELS.SAVING_2137}
                   </h4>
                   <Button
                     variant="ghost"
@@ -433,7 +434,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
                   <Input
                     value={templateName}
                     onChange={(e) => setTemplateName(e.target.value)}
-                    placeholder="輸入模板名稱，例如：胸推日"
+                    placeholder={BOX_DIALOGS_LABELS.EXAMPLE_3865}
                     className="flex-1"
                   />
                   <Button
@@ -443,7 +444,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
                     className="bg-morandi-gold hover:bg-morandi-gold-hover gap-1"
                   >
                     <Save size={16} />
-                    儲存
+                    {BOX_DIALOGS_LABELS.SAVE}
                   </Button>
                 </div>
               </div>
@@ -468,17 +469,17 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
 
                 <div className="grid grid-cols-4 gap-3 mb-3">
                   <div className="col-span-2">
-                    <label className="text-xs text-morandi-primary">動作名稱 *</label>
+                    <label className="text-xs text-morandi-primary">{BOX_DIALOGS_LABELS.LABEL_6267}</label>
                     <Input
                       value={exerciseForm.equipment}
                       onChange={(e) => setExerciseForm(prev => ({ ...prev, equipment: e.target.value }))}
-                      placeholder="例: 槓鈴臥推"
+                      placeholder={BOX_DIALOGS_LABELS.LABEL_809}
                       className="mt-1"
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs text-morandi-primary">重量 (kg)</label>
+                    <label className="text-xs text-morandi-primary">{BOX_DIALOGS_LABELS.LABEL_2523}</label>
                     <Input
                       type="number"
                       value={exerciseForm.weight || ''}
@@ -494,7 +495,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
 
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-xs text-morandi-primary">次數</label>
+                      <label className="text-xs text-morandi-primary">{BOX_DIALOGS_LABELS.LABEL_6436}</label>
                       <Input
                         type="number"
                         value={exerciseForm.reps || ''}
@@ -507,7 +508,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-morandi-primary">組數</label>
+                      <label className="text-xs text-morandi-primary">{BOX_DIALOGS_LABELS.LABEL_3088}</label>
                       <Input
                         type="number"
                         value={exerciseForm.sets || ''}
@@ -536,7 +537,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
                   {isAdding ? (
                     <span className="flex items-center gap-2">
                       <Check className="h-4 w-4 animate-in zoom-in" />
-                      已新增！
+                      {BOX_DIALOGS_LABELS.ADD_8992}
                     </span>
                   ) : (
                     editingExerciseId ? '儲存修改' : '新增'
@@ -549,8 +550,8 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
             {!workoutData.exercises || workoutData.exercises.length === 0 ? (
               <div className="text-center py-8 text-morandi-secondary">
                 <Dumbbell className="h-12 w-12 mx-auto mb-2 opacity-30" />
-                <p>尚未新增任何訓練動作</p>
-                <p className="text-sm">點擊上方「新增動作」開始記錄</p>
+                <p>{BOX_DIALOGS_LABELS.ADD_6914}</p>
+                <p className="text-sm">{BOX_DIALOGS_LABELS.ADD_3699}</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -645,18 +646,18 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
           {/* 統計 */}
           {workoutData.exercises && workoutData.exercises.length > 0 && (
             <div className="bg-morandi-container/10 rounded-lg p-4">
-              <h3 className="font-medium mb-3">本次統計</h3>
+              <h3 className="font-medium mb-3">{BOX_DIALOGS_LABELS.LABEL_6689}</h3>
               <div className="grid grid-cols-3 gap-4 text-sm">
                 <div>
-                  <span className="text-morandi-secondary">總動作數:</span>
+                  <span className="text-morandi-secondary">{BOX_DIALOGS_LABELS.TOTAL_9366}</span>
                   <p className="font-medium text-lg">{workoutData.exercises.length}</p>
                 </div>
                 <div>
-                  <span className="text-morandi-secondary">完成組數:</span>
+                  <span className="text-morandi-secondary">{BOX_DIALOGS_LABELS.LABEL_5895}</span>
                   <p className="font-medium text-lg">{totalCompletedSets}/{totalSets}</p>
                 </div>
                 <div>
-                  <span className="text-morandi-secondary">總訓練量:</span>
+                  <span className="text-morandi-secondary">{BOX_DIALOGS_LABELS.TOTAL_572}</span>
                   <p className="font-medium text-lg">{getTotalVolume().toLocaleString()} kg</p>
                 </div>
               </div>
@@ -682,11 +683,11 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
                 className="text-status-danger border-morandi-red/30 hover:bg-status-danger-bg"
               >
                 <Trash2 size={16} className="mr-1" />
-                移除排程
+                {BOX_DIALOGS_LABELS.LABEL_5077}
               </Button>
               <Button variant="outline" onClick={onClose} className="gap-1">
                 <X size={16} />
-                關閉
+                {BOX_DIALOGS_LABELS.CLOSE}
               </Button>
             </div>
           </div>

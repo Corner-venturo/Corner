@@ -23,6 +23,7 @@ import {
 } from '@dnd-kit/sortable'
 import { AddRow } from './components/add-row'
 import { CategoryGroupRow } from './components/category-group-row'
+import { EDITABLE_RATES_TABLE_LABELS } from './constants/labels'
 
 interface EditableRatesTableProps {
   rates: TransportationRate[]
@@ -262,7 +263,7 @@ export function EditableRatesTable({
   }
 
   if (isLoading) {
-    return <div className="text-center py-8 text-morandi-secondary">載入中...</div>
+    return <div className="text-center py-8 text-morandi-secondary">{EDITABLE_RATES_TABLE_LABELS.LOADING_6912}</div>
   }
 
   return (
@@ -274,12 +275,12 @@ export function EditableRatesTable({
               <tr>
                 {isEditMode && (
                   <th className="px-2 py-2.5 text-center text-xs font-medium text-morandi-secondary border-r border-border/40" style={{ width: '40px' }}>
-                    排序
+                    {EDITABLE_RATES_TABLE_LABELS.LABEL_35}
                   </th>
                 )}
                 <th className="px-4 py-2.5 text-left text-xs font-medium text-morandi-secondary border-r border-border/40 group" style={{ width: '140px' }}>
                   <div className="flex items-center justify-between gap-2">
-                    <span>品項</span>
+                    <span>{EDITABLE_RATES_TABLE_LABELS.LABEL_2170}</span>
                     {isEditMode && (
                       <Button
                         variant="ghost"
@@ -298,7 +299,7 @@ export function EditableRatesTable({
                           })
                         }}
                         className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-morandi-gold hover:bg-morandi-gold/10"
-                        title="新增品項"
+                        title={EDITABLE_RATES_TABLE_LABELS.ADD_8750}
                       >
                         <Plus size={12} />
                       </Button>
@@ -306,19 +307,19 @@ export function EditableRatesTable({
                   </div>
                 </th>
                 <th className="px-4 py-2.5 text-left text-xs font-medium text-morandi-secondary border-r border-border/40" style={{ width: '140px' }}>
-                  廠商
+                  {EDITABLE_RATES_TABLE_LABELS.LABEL_8557}
                 </th>
                 <th className="px-4 py-2.5 text-left text-xs font-medium text-morandi-secondary border-r border-border/40" style={{ width: '220px' }}>
-                  行程路線
+                  {EDITABLE_RATES_TABLE_LABELS.LABEL_312}
                 </th>
                 <th className="px-4 py-2.5 text-center text-xs font-medium text-morandi-secondary border-r border-border/40" style={{ width: '100px' }}>
-                  類型
+                  {EDITABLE_RATES_TABLE_LABELS.TYPE}
                 </th>
                 <th className="px-4 py-2.5 text-right text-xs font-medium text-morandi-secondary border-r border-border/40" style={{ width: '120px' }}>
-                  越南盾
+                  {EDITABLE_RATES_TABLE_LABELS.LABEL_1818}
                 </th>
                 <th className="px-4 py-2.5 text-right text-xs font-medium text-morandi-secondary border-r border-morandi-gold/30" style={{ width: '100px' }}>
-                  台幣
+                  {EDITABLE_RATES_TABLE_LABELS.LABEL_9977}
                 </th>
                 {!hideKKDAYColumns && (
                   <>
@@ -329,12 +330,12 @@ export function EditableRatesTable({
                       KKDAY成本
                     </th>
                     <th className="px-4 py-2.5 text-right text-xs font-medium text-morandi-gold bg-status-warning-bg border-r border-border/40" style={{ width: '100px' }}>
-                      利潤
+                      {EDITABLE_RATES_TABLE_LABELS.LABEL_7705}
                     </th>
                   </>
                 )}
                 <th className="px-4 py-2.5 text-center text-xs font-medium text-morandi-secondary" style={{ width: '80px' }}>
-                  操作
+                  {EDITABLE_RATES_TABLE_LABELS.ACTIONS}
                 </th>
               </tr>
             </thead>
@@ -342,7 +343,7 @@ export function EditableRatesTable({
               {orderedGroups.length === 0 && !isAdding && !isEditMode ? (
                 <tr>
                   <td colSpan={hideKKDAYColumns ? 8 : 11} className="text-center py-12 text-morandi-secondary">
-                    目前沒有車資資料
+                    {EDITABLE_RATES_TABLE_LABELS.NOT_FOUND_9408}
                   </td>
                 </tr>
               ) : orderedGroups.length === 0 && isEditMode && !isAdding ? (
@@ -359,7 +360,7 @@ export function EditableRatesTable({
                       size="sm"
                     >
                       <Plus size={16} />
-                      新增第一筆車資
+                      {EDITABLE_RATES_TABLE_LABELS.ADD_4346}
                     </Button>
                   </td>
                 </tr>

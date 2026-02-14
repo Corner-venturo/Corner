@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import type { TourPageData } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 // Luxury 配色
 const LUXURY = {
@@ -81,7 +82,7 @@ export function TourPriceTiersSectionLuxury({ data, viewMode }: TourPriceTiersSe
               fontFamily: "'Noto Serif TC', serif"
             }}
           >
-            價格方案
+            {TOURS_LABELS.LABEL_1385}
           </h2>
         </motion.div>
 

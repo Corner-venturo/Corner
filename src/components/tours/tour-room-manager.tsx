@@ -156,7 +156,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
           <DialogHeader className="pb-3 border-b border-border">
             <DialogTitle className="flex items-center gap-2 text-morandi-primary">
               <Hotel className="h-5 w-5 text-morandi-gold" />
-              房間管理
+              {COMP_TOURS_LABELS.MANAGE_1448}
               {tourNights > 0 && (
                 <span className="text-sm font-normal text-morandi-muted">
                   {tourNights + 1} 天 {tourNights} 夜
@@ -192,7 +192,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
               className="ml-auto gap-1"
             >
               <Plus className="h-4 w-4" />
-              新增房間
+              {COMP_TOURS_LABELS.ADD_9831}
             </Button>
           </div>
 
@@ -201,8 +201,8 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
             {currentNightRooms.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-morandi-muted">
                 <Bed className="h-8 w-8 mb-2" />
-                <p className="text-sm">尚未設定房間</p>
-                <p className="text-xs mt-1">點擊「新增房間」開始設定</p>
+                <p className="text-sm">{COMP_TOURS_LABELS.SETTINGS_4277}</p>
+                <p className="text-xs mt-1">{COMP_TOURS_LABELS.ADD_2808}</p>
               </div>
             ) : (
               <>
@@ -255,7 +255,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
           </div>
 
           <div className="pt-3 border-t border-border text-xs text-morandi-muted">
-            提示：團員分房請在成員名單中使用下拉選單操作
+            {COMP_TOURS_LABELS.LABEL_9154}
           </div>
         </DialogContent>
       </Dialog>
@@ -272,7 +272,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-morandi-primary">房型</Label>
+                <Label className="text-morandi-primary">{COMP_TOURS_LABELS.LABEL_9}</Label>
                 <Select
                   value={newRoom.room_type}
                   onValueChange={value => {
@@ -294,7 +294,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-morandi-primary">容納人數</Label>
+                <Label className="text-morandi-primary">{COMP_TOURS_LABELS.LABEL_7871}</Label>
                 <Input
                   type="number"
                   min={1}
@@ -305,7 +305,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-morandi-primary">飯店名稱（選填）</Label>
+              <Label className="text-morandi-primary">{COMP_TOURS_LABELS.LABEL_5734}</Label>
               <Input
                 value={newRoom.hotel_name}
                 onChange={e => setNewRoom({ ...newRoom, hotel_name: e.target.value })}
@@ -315,11 +315,11 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
             <div className="flex justify-end gap-2 pt-3 border-t border-border">
               <Button variant="outline" onClick={() => setShowAddRoom(false)} className="gap-2">
                 <X size={16} />
-                取消
+                {COMP_TOURS_LABELS.取消}
               </Button>
               <Button onClick={handleAddRoom} className="gap-2">
                 <Plus size={16} />
-                新增
+                {COMP_TOURS_LABELS.ADD}
               </Button>
             </div>
           </div>

@@ -81,9 +81,9 @@ export function LinkTourDialog({
         {step === 'select' ? (
           <>
             <DialogHeader>
-              <DialogTitle>成交 - 關聯旅遊團</DialogTitle>
+              <DialogTitle>{LINK_TOUR_DIALOG_LABELS.LABEL_2010}</DialogTitle>
               <DialogDescription>
-                報價單成交後，請選擇關聯方式
+                {LINK_TOUR_DIALOG_LABELS.PLEASE_SELECT_1147}
               </DialogDescription>
             </DialogHeader>
 
@@ -97,8 +97,8 @@ export function LinkTourDialog({
                   <Plus className="w-5 h-5 text-[var(--morandi-gold)]" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-[var(--morandi-primary)]">新建旅遊團</div>
-                  <div className="text-sm text-[var(--morandi-secondary)]">建立新的旅遊團，自動帶入報價單資料</div>
+                  <div className="font-medium text-[var(--morandi-primary)]">{LINK_TOUR_DIALOG_LABELS.LABEL_8984}</div>
+                  <div className="text-sm text-[var(--morandi-secondary)]">{LINK_TOUR_DIALOG_LABELS.LABEL_6874}</div>
                 </div>
               </button>
 
@@ -112,14 +112,14 @@ export function LinkTourDialog({
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-[var(--morandi-text)] flex items-center gap-2">
-                    關聯現有旅遊團
+                    {LINK_TOUR_DIALOG_LABELS.LABEL_8435}
                     {availableTours.length > 0 && (
                       <span className="text-xs bg-status-info-bg text-status-info px-1.5 py-0.5 rounded">
                         {availableTours.length}
                       </span>
                     )}
                   </div>
-                  <div className="text-sm text-[var(--morandi-secondary)]">選擇現有的旅遊團進行關聯</div>
+                  <div className="text-sm text-[var(--morandi-secondary)]">{LINK_TOUR_DIALOG_LABELS.SELECT_2369}</div>
                 </div>
               </button>
             </div>
@@ -134,10 +134,10 @@ export function LinkTourDialog({
                 >
                   <Plane className="w-4 h-4" />
                 </button>
-                選擇旅遊團
+                {LINK_TOUR_DIALOG_LABELS.SELECT_448}
               </DialogTitle>
               <DialogDescription>
-                選擇要關聯的旅遊團
+                {LINK_TOUR_DIALOG_LABELS.SELECT_4490}
               </DialogDescription>
             </DialogHeader>
 
@@ -145,7 +145,7 @@ export function LinkTourDialog({
               {loadingTours ? (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="w-5 h-5 animate-spin text-[var(--morandi-secondary)]" />
-                  <span className="ml-2 text-sm text-[var(--morandi-secondary)]">載入中...</span>
+                  <span className="ml-2 text-sm text-[var(--morandi-secondary)]">{LINK_TOUR_DIALOG_LABELS.LOADING_6912}</span>
                 </div>
               ) : availableTours.length > 0 ? (
                 <div className="max-h-[300px] overflow-y-auto space-y-2">
@@ -191,8 +191,8 @@ export function LinkTourDialog({
               ) : (
                 <div className="text-center py-8">
                   <Plane className="w-10 h-10 text-[var(--morandi-secondary)]/30 mx-auto mb-3" />
-                  <p className="text-sm text-[var(--morandi-secondary)]">目前沒有可關聯的旅遊團</p>
-                  <p className="text-xs text-[var(--morandi-secondary)]/70 mt-1">請選擇「新建旅遊團」</p>
+                  <p className="text-sm text-[var(--morandi-secondary)]">{LINK_TOUR_DIALOG_LABELS.NOT_FOUND_3707}</p>
+                  <p className="text-xs text-[var(--morandi-secondary)]/70 mt-1">{LINK_TOUR_DIALOG_LABELS.PLEASE_SELECT_8035}</p>
                 </div>
               )}
             </div>

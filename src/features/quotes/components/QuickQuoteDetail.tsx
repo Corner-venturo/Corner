@@ -122,11 +122,11 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
               <>
                 <Button onClick={() => setShowPrintPreview(true)} variant="outline" className="gap-2">
                   <Printer className="h-4 w-4" />
-                  列印
+                  {QUICK_QUOTE_DETAIL_LABELS.PRINT}
                 </Button>
                 <Button onClick={() => setIsEditing(true)} variant="outline" className="gap-2">
                   <Edit2 size={16} />
-                  編輯
+                  {QUICK_QUOTE_DETAIL_LABELS.EDIT}
                 </Button>
               </>
             )}
@@ -136,7 +136,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
               <>
                 <Button onClick={() => setIsEditing(false)} variant="outline" className="gap-2">
                   <X size={16} />
-                  取消
+                  {QUICK_QUOTE_DETAIL_LABELS.CANCEL}
                 </Button>
                 <Button
                   onClick={() => setIsSaveVersionDialogOpen(true)}
@@ -145,7 +145,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                   className="gap-2"
                 >
                   <FilePlus className="h-4 w-4" />
-                  另存新版本
+                  {QUICK_QUOTE_DETAIL_LABELS.LABEL_6621}
                 </Button>
                 <Button
                   onClick={() => handleSave(true)}

@@ -108,8 +108,8 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent level={1} className="max-w-2xl max-h-[80vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>共享代辦事項到頻道</DialogTitle>
-          <DialogDescription>選擇要分享的代辦事項，可選擇指派對象</DialogDescription>
+          <DialogTitle>{COMP_WORKSPACE_LABELS.LABEL_1307}</DialogTitle>
+          <DialogDescription>{COMP_WORKSPACE_LABELS.SELECT_8547}</DialogDescription>
         </DialogHeader>
 
         <div className="flex-1 overflow-auto space-y-4 py-4">
@@ -185,11 +185,11 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
           {/* 指派對象（可選） */}
           {selectedTodo && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">指派給（選填）</label>
+              <label className="text-sm font-medium text-morandi-primary">{COMP_WORKSPACE_LABELS.LABEL_2777}</label>
               <div className="border border-morandi-gold/20 rounded-lg max-h-48 overflow-y-auto">
                 {employees.length === 0 ? (
                   <div className="p-4 text-center text-morandi-secondary text-sm">
-                    載入員工資料中...
+                    {COMP_WORKSPACE_LABELS.LOADING_1730}
                   </div>
                 ) : (
                   <div className="divide-y divide-morandi-gold/10">
@@ -200,7 +200,7 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
                         !selectedAssignee && 'bg-morandi-gold/10'
                       )}
                     >
-                      <span className="text-sm text-morandi-secondary">不指派</span>
+                      <span className="text-sm text-morandi-secondary">{COMP_WORKSPACE_LABELS.LABEL_802}</span>
                     </button>
                     {employees.map(employee => (
                       <button
@@ -233,7 +233,7 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
           {/* 預覽 */}
           {selectedTodo && (
             <div className="bg-morandi-gold/5 border border-morandi-gold/20 rounded-lg p-4 space-y-2">
-              <p className="text-xs font-semibold text-morandi-secondary uppercase">預覽</p>
+              <p className="text-xs font-semibold text-morandi-secondary uppercase">{COMP_WORKSPACE_LABELS.PREVIEW}</p>
               <div className="space-y-1 text-sm">
                 <p className="font-medium text-morandi-primary">{selectedTodo.title}</p>
                 <p className="text-morandi-secondary">
@@ -244,7 +244,7 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
                 </p>
                 {selectedTodo.deadline && (
                   <div className="text-morandi-secondary flex items-center gap-1">
-                    <span>截止日期：</span>
+                    <span>{COMP_WORKSPACE_LABELS.LABEL_2566}</span>
                     <DateCell date={selectedTodo.deadline} showIcon={false} className="text-morandi-secondary" />
                   </div>
                 )}
@@ -261,18 +261,18 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={isSubmitting} className="gap-1">
             <X size={16} />
-            取消
+            {COMP_WORKSPACE_LABELS.CANCEL}
           </Button>
           <Button onClick={handleShare} disabled={!selectedTodo || isSubmitting} className="gap-2">
             {isSubmitting ? (
               <>
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                分享中...
+                {COMP_WORKSPACE_LABELS.LABEL_2105}
               </>
             ) : (
               <>
                 <Share2 size={16} />
-                分享到頻道
+                {COMP_WORKSPACE_LABELS.LABEL_903}
               </>
             )}
           </Button>

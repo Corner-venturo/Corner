@@ -131,7 +131,7 @@ export function ApiSettings() {
                         </span>
                         {!config.value && (
                           <span className="text-xs text-status-danger bg-status-danger-bg px-2 py-0.5 rounded">
-                            未設定
+                            {API_SETTINGS_LABELS.SETTINGS_4369}
                           </span>
                         )}
                       </div>
@@ -172,7 +172,7 @@ export function ApiSettings() {
                               size="sm"
                               className="h-7 w-7 p-0"
                               onClick={() => copyToClipboard(config.value, config.envKey)}
-                              title="複製"
+                              title={API_SETTINGS_LABELS.COPY}
                             >
                               {copiedKey === config.envKey ? (
                                 <Check size={14} className="text-status-success" />
@@ -227,7 +227,7 @@ export function ApiSettings() {
       <div className="mt-6 p-4 bg-status-info-bg rounded-lg border border-status-info/30">
         <h4 className="text-sm font-medium text-morandi-primary mb-2">{API_SETTINGS_LABELS.SETUP_GUIDE}</h4>
         <p className="text-xs text-morandi-secondary mb-2">
-          在專案根目錄建立或編輯 <code className="bg-morandi-container px-1 rounded">.env.local</code> 檔案：
+          在專案根目錄建立或編輯 <code className="bg-morandi-container px-1 rounded">.env.local</code> {API_SETTINGS_LABELS.LABEL_4474}
         </p>
         <pre className="text-xs bg-morandi-container p-3 rounded overflow-x-auto">
 {`# Supabase

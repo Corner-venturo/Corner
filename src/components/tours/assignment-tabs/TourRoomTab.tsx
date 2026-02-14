@@ -158,7 +158,7 @@ export function TourRoomTab({ tourId, tour, members, tourNights }: TourRoomTabPr
           className="ml-auto gap-1"
         >
           <Plus className="h-4 w-4" />
-          新增房間
+          {COMP_TOURS_LABELS.ADD_9831}
         </Button>
       </div>
 
@@ -167,8 +167,8 @@ export function TourRoomTab({ tourId, tour, members, tourNights }: TourRoomTabPr
         {currentNightRooms.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-morandi-muted">
             <Bed className="h-8 w-8 mb-2" />
-            <p className="text-sm">尚未設定房間</p>
-            <p className="text-xs mt-1">點擊「新增房間」開始設定</p>
+            <p className="text-sm">{COMP_TOURS_LABELS.SETTINGS_4277}</p>
+            <p className="text-xs mt-1">{COMP_TOURS_LABELS.ADD_2808}</p>
           </div>
         ) : (
           <>
@@ -232,7 +232,7 @@ export function TourRoomTab({ tourId, tour, members, tourNights }: TourRoomTabPr
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-morandi-primary">房型</Label>
+                <Label className="text-morandi-primary">{COMP_TOURS_LABELS.LABEL_9}</Label>
                 <Select
                   value={newRoom.room_type}
                   onValueChange={value => {
@@ -254,7 +254,7 @@ export function TourRoomTab({ tourId, tour, members, tourNights }: TourRoomTabPr
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-morandi-primary">容納人數</Label>
+                <Label className="text-morandi-primary">{COMP_TOURS_LABELS.LABEL_7871}</Label>
                 <Input
                   type="number"
                   min={1}
@@ -265,7 +265,7 @@ export function TourRoomTab({ tourId, tour, members, tourNights }: TourRoomTabPr
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-morandi-primary">飯店名稱（選填）</Label>
+              <Label className="text-morandi-primary">{COMP_TOURS_LABELS.LABEL_5734}</Label>
               <Input
                 value={newRoom.hotel_name}
                 onChange={e => setNewRoom({ ...newRoom, hotel_name: e.target.value })}
@@ -275,11 +275,11 @@ export function TourRoomTab({ tourId, tour, members, tourNights }: TourRoomTabPr
             <div className="flex justify-end gap-2 pt-3 border-t border-border">
               <Button variant="outline" onClick={() => setShowAddRoom(false)} className="gap-2">
                 <X size={16} />
-                取消
+                {COMP_TOURS_LABELS.取消}
               </Button>
               <Button onClick={handleAddRoom} className="gap-2">
                 <Plus size={16} />
-                新增
+                {COMP_TOURS_LABELS.ADD}
               </Button>
             </div>
           </div>

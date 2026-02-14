@@ -357,7 +357,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                   className="h-7"
                 >
                   <Plus size={14} className="mr-1" />
-                  新增項目
+                  {REQUEST_DETAIL_FORM_LABELS.ADD_2089}
                 </Button>
               )}
             </div>
@@ -455,7 +455,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
 
                 {items.length === 0 && !isAddingItem ? (
                   <div className="text-center py-8 text-morandi-muted">
-                    尚無請款項目
+                    {REQUEST_DETAIL_FORM_LABELS.EMPTY_9932}
                   </div>
                 ) : (
                   items.map((item) => (
@@ -596,7 +596,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
               className="text-morandi-red border-morandi-red hover:bg-morandi-red/10"
             >
               <Trash2 size={16} className="mr-2" />
-              刪除
+              {REQUEST_DETAIL_FORM_LABELS.DELETE}
             </Button>
           </div>
         </div>

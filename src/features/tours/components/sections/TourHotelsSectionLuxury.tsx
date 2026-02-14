@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { TourPageData, HotelInfo } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 // Luxury 配色
 const LUXURY = {
@@ -59,7 +60,7 @@ export function TourHotelsSectionLuxury({ data, viewMode }: TourHotelsSectionLux
               fontFamily: "'Noto Serif TC', serif"
             }}
           >
-            精選極致宿旅
+            {TOURS_LABELS.LABEL_4386}
           </h2>
         </motion.div>
 
@@ -137,7 +138,7 @@ function SingleHotelLayout({ hotel }: { hotel: HotelInfo }) {
             className="w-full h-full flex items-center justify-center"
             style={{ backgroundColor: LUXURY.text }}
           >
-            <span className="text-white/50 text-sm">暫無圖片</span>
+            <span className="text-white/50 text-sm">{TOURS_LABELS.EMPTY_2912}</span>
           </div>
         )}
 

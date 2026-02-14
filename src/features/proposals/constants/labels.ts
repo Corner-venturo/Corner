@@ -36,6 +36,10 @@ export const BROCHURE_PREVIEW_DIALOG_LABELS = {
   住宿: '住宿',
   本行程表由: '本行程表由',
   提供: '提供',
+
+  LABEL_1347: '早餐',
+  LABEL_8515: '午餐',
+  LABEL_8227: '晚餐',
 };
 
 export const ITINERARY_DIALOG_LABELS = {
@@ -103,6 +107,11 @@ export const ITINERARY_DIALOG_LABELS = {
   目的地: '目的地：',
   行程天數: (days: number) => `${days} 天`,
   版本: (v: number) => `版本 ${v}`,
+
+  ADD_2951: '新增活動',
+  TIME: '時間',
+  LABEL_7032: '活動內容',
+  ADD_2139: '點擊「新增活動」加入景點',
 };
 
 export const PACKAGE_ITINERARY_DIALOG_LABELS = {
@@ -119,6 +128,15 @@ export const PACKAGE_ITINERARY_DIALOG_LABELS = {
   切換時間軸模式: '切換時間軸模式',
   簡易模式: '簡易模式',
   時間軸: '時間軸',
+
+  LOADING_6912: '載入中...',
+  PREVIEW: '預覽',
+  LABEL_5957: '行程標題 *',
+  LABEL_5475: '目的地',
+  LABEL_6915: '行程天數',
+  LABEL_4513: '出發日期',
+  LABEL_2731: '回程日期',
+  LABEL_6621: '另存新版本',
 };
 
 export const PACKAGE_LIST_PANEL_LABELS = {
@@ -170,10 +188,26 @@ export const TOUR_REQUEST_FORM_DIALOG_LABELS = {
   建立請款單: '建立請款單',
   需求單: '需求單',
   人: '人',
+
+  LABEL_9388: '航班資訊（選填）',
+  LABEL_7790: '去程航班',
+  PLEASE_SELECT_4482: '此航班有多個航段，請選擇：',
+  CANCEL: '取消',
+  LABEL_2327: '回程航班',
 };
 
 export const AI_GENERATE_DIALOG_LABELS = {
   未設定: '未設定',
+
+  LABEL_5475: '目的地',
+  LABEL_1983: '天數',
+  LABEL_4587: '住宿狀態',
+  LABEL_1928: '第一天抵達時間',
+  LABEL_4695: '最後一天離開時間',
+  LABEL_121: '行程風格',
+  CANCEL: '取消',
+  GENERATING_7316: '生成中...',
+  GENERATING_9221: '生成行程',
 };
 
 export const DAILY_SCHEDULE_EDITOR_LABELS = {
@@ -220,4 +254,27 @@ export const PROPOSAL_FORM_LABELS = {
   DRIVER: '司機',
   PLATE: '車號',
   MOBILE: '手機',
+
+  SELECT_396: '從資料庫選擇',
+  LABEL_4743: '開始日期',
+  LABEL_9824: '結束日期',
+  QUANTITY: '數量',
+  LABEL_9909: '備註說明',
+  CANCEL: '取消',
+  SAVE: '儲存',
+
+  LABEL_3621: '角落旅行社',
+  LABEL_7720: '我方資訊',
+  LABEL_3340: '廠商資訊',
+  LABEL_3785: '團號：',
+  LABEL_168: '團名：',
+  LABEL_2816: '出發日期：',
+  LABEL_8361: '人數：',
+  LABEL_9413: '單價',
+  REMARKS: '備註',
+  ACTIONS: '操作',
+  ADD_2089: '新增項目',
+  CLOSE: '關閉',
+  LABEL_4890: '建立請款單',
+  PRINT: '列印',
 }

@@ -19,6 +19,7 @@ import { Combobox } from '@/components/ui/combobox'
 import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import type { Tour, Itinerary } from '@/stores/types'
+import { DESIGNER_LABELS } from './constants/labels'
 
 // ============================================
 // 設計類型定義
@@ -228,8 +229,8 @@ export function DesignTypeSelector({
       {/* Content */}
       <div className="p-8 max-w-2xl mx-auto">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-morandi-primary mb-2">新增設計</h2>
-          <p className="text-morandi-secondary">選擇設計類型開始製作</p>
+          <h2 className="text-2xl font-bold text-morandi-primary mb-2">{DESIGNER_LABELS.ADD_4567}</h2>
+          <p className="text-morandi-secondary">{DESIGNER_LABELS.SELECT_3465}</p>
         </div>
 
         <div className="space-y-4">
@@ -237,11 +238,11 @@ export function DesignTypeSelector({
           <div className="p-6 bg-card rounded-xl border border-border space-y-4">
             <div>
               <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                設計類型 *
+                {DESIGNER_LABELS.LABEL_3670}
               </label>
               <Select value={selectedDesignTypeId} onValueChange={handleDesignTypeChange}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="請選擇設計類型" />
+                  <SelectValue placeholder={DESIGNER_LABELS.PLEASE_SELECT_8119} />
                 </SelectTrigger>
                 <SelectContent>
                   {categoryOptions.map((category) => (
@@ -267,7 +268,7 @@ export function DesignTypeSelector({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-border">
                     <div>
                       <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                        旅遊團 *
+                        {DESIGNER_LABELS.LABEL_8171}
                       </label>
                       <Combobox
                         value={selectedTourId}
@@ -286,7 +287,7 @@ export function DesignTypeSelector({
 
                     <div>
                       <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                        行程（可選）
+                        {DESIGNER_LABELS.LABEL_1624}
                       </label>
                       <Combobox
                         value={selectedItineraryId}
@@ -316,7 +317,7 @@ export function DesignTypeSelector({
                 {/* 模板風格 */}
                 <div className={cn(showTourSelector ? 'pt-4 border-t border-border' : 'pt-4 border-t border-border')}>
                   <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                    模板風格
+                    {DESIGNER_LABELS.LABEL_7216}
                   </label>
                   <Select value={selectedStyleId} onValueChange={setSelectedStyleId}>
                     <SelectTrigger>
@@ -341,7 +342,7 @@ export function DesignTypeSelector({
             disabled={!canStart}
             className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white h-12 text-base"
           >
-            開始設計
+            {DESIGNER_LABELS.LABEL_8513}
           </Button>
         </div>
       </div>

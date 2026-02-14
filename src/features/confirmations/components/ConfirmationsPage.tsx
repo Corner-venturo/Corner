@@ -14,6 +14,7 @@ import { useConfirmations, createConfirmation, deleteConfirmation } from '@/data
 import { useAuthStore } from '@/stores/auth-store'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { CONFIRMATIONS_LABELS } from './constants/labels'
 
 // 狀態篩選器
 const STATUS_FILTERS = [
@@ -95,7 +96,7 @@ export const ConfirmationsPage: React.FC = () => {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="確認單管理"
+        title={CONFIRMATIONS_LABELS.MANAGE_4795}
         icon={FileCheck}
         breadcrumb={[
           { label: '首頁', href: '/' },

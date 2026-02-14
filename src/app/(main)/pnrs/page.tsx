@@ -116,7 +116,7 @@ export default function PNRsPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="PNR 管理"
+        title={LABELS.MANAGE_9673}
         icon={Plane}
       />
 
@@ -126,7 +126,7 @@ export default function PNRsPage() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-secondary" size={18} />
             <Input
-              placeholder="搜尋訂位代號或旅客姓名..."
+              placeholder={LABELS.SEARCH_8637}
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className="pl-10"

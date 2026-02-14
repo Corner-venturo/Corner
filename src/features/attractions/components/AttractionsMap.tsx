@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { MapPin, Navigation, Loader2 } from 'lucide-react'
 import type { Attraction } from '../types'
 import type L from 'leaflet'
+import { ATTRACTIONS_LABELS } from './constants/labels'
 
 interface AttractionsMapProps {
   attractions: Attraction[]
@@ -254,7 +255,7 @@ export function AttractionsMap({
     return (
       <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted text-morandi-secondary">
         <MapPin size={40} className="mb-3 opacity-40" />
-        <p className="text-sm">選擇景點查看位置</p>
+        <p className="text-sm">{ATTRACTIONS_LABELS.SELECT_2958}</p>
       </div>
     )
   }
@@ -263,7 +264,7 @@ export function AttractionsMap({
     return (
       <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted text-morandi-secondary">
         <Navigation size={40} className="mb-3 opacity-40" />
-        <p className="text-sm">此景點尚無座標</p>
+        <p className="text-sm">{ATTRACTIONS_LABELS.EMPTY_8357}</p>
       </div>
     )
   }

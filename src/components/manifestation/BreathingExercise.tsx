@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { MANIFESTATION_LABELS } from './constants/labels'
 
 interface BreathingExerciseProps {
   onComplete: () => void
@@ -93,7 +94,7 @@ export function BreathingExercise({ onComplete, onSkip }: BreathingExerciseProps
                 {cycleCount + 1} / {totalCycles}
               </p>
 
-              <p className="text-white/40 text-sm mt-8">讓我們先深呼吸，準備好進入顯化的旅程</p>
+              <p className="text-white/40 text-sm mt-8">{MANIFESTATION_LABELS.LABEL_9468}</p>
             </>
           ) : (
             <motion.h2
@@ -101,7 +102,7 @@ export function BreathingExercise({ onComplete, onSkip }: BreathingExerciseProps
               animate={{ opacity: 1, scale: 1 }}
               className="text-3xl font-light text-white mb-4"
             >
-              完成
+              {MANIFESTATION_LABELS.LABEL_6771}
             </motion.h2>
           )}
         </div>

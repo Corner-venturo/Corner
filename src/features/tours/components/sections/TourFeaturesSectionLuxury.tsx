@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, ArrowRight, ChevronDown } from 'lucide-react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import type { TourPageData, Feature } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 // Luxury 配色
 const LUXURY = {
@@ -129,7 +130,7 @@ export function TourFeaturesSectionLuxury({ data, viewMode }: TourFeaturesSectio
               fontFamily: "'Noto Serif TC', serif"
             }}
           >
-            行程特色
+            {TOURS_LABELS.LABEL_6890}
           </h2>
         </motion.div>
 
@@ -272,7 +273,7 @@ function FeatureCard({
             className="w-full h-full flex items-center justify-center"
             style={{ backgroundColor: '#f5f5f5' }}
           >
-            <span className="text-morandi-muted text-sm">暫無圖片</span>
+            <span className="text-morandi-muted text-sm">{TOURS_LABELS.EMPTY_2912}</span>
           </div>
         )}
 

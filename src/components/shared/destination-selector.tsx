@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { Combobox } from '@/components/ui/combobox'
 import { useCountries, useCities } from '@/data'
+import { SHARED_LABELS } from './constants/labels'
 
 interface DestinationSelectorProps {
   countryCode: string
@@ -85,7 +86,7 @@ export function DestinationSelector({
               })),
               { value: '__custom__', label: '+ 新增其他目的地' },
             ]}
-            placeholder="輸入或選擇國家..."
+            placeholder={SHARED_LABELS.SELECT_7997}
             emptyMessage="找不到符合的國家"
             showSearchIcon={true}
             showClearButton={true}
@@ -101,7 +102,7 @@ export function DestinationSelector({
             <Input
               value={customLocation || ''}
               onChange={e => onCustomLocationChange?.(e.target.value)}
-              placeholder="輸入城市名稱 (如：曼谷)"
+              placeholder={SHARED_LABELS.LABEL_1384}
               className="border-morandi-container/30"
             />
           ) : (
@@ -112,7 +113,7 @@ export function DestinationSelector({
                 value: city.code,
                 label: `${city.name} (${city.code})`,
               }))}
-              placeholder="輸入或選擇城市..."
+              placeholder={SHARED_LABELS.SELECT_2332}
               emptyMessage="找不到符合的城市"
               showSearchIcon={true}
               showClearButton={true}
@@ -128,12 +129,12 @@ export function DestinationSelector({
         <>
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              國家名稱
+              {SHARED_LABELS.LABEL_9065}
             </label>
             <Input
               value={customCountry || ''}
               onChange={e => onCustomCountryChange?.(e.target.value)}
-              placeholder="輸入國家名稱 (如：泰國)"
+              placeholder={SHARED_LABELS.LABEL_5486}
               className="border-morandi-container/30"
             />
           </div>
@@ -147,7 +148,7 @@ export function DestinationSelector({
                 const value = e.target.value.toUpperCase().slice(0, 3)
                 onCustomCityCodeChange?.(value)
               }}
-              placeholder="輸入 3 碼代號 (如：BKK)"
+              placeholder={SHARED_LABELS.LABEL_8396}
               maxLength={3}
               className="border-morandi-container/30"
             />

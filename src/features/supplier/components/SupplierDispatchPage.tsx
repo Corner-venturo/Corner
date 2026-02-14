@@ -41,6 +41,7 @@ import { supabase } from '@/lib/supabase/client'
 import { format } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 import { cn } from '@/lib/utils'
+import { SUPPLIER_LABELS } from './constants/labels'
 
 interface ConfirmedRequest {
   id: string
@@ -323,23 +324,23 @@ export function SupplierDispatchPage() {
   return (
     <div className="space-y-6">
       <ResponsiveHeader
-        title="派單管理"
+        title={SUPPLIER_LABELS.MANAGE_5809}
         icon={Truck}
       />
 
       {/* 篩選器 */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-morandi-secondary">狀態：</span>
+          <span className="text-sm text-morandi-secondary">{SUPPLIER_LABELS.LABEL_7626}</span>
           <Select value={filterStatus} onValueChange={setFilterStatus}>
             <SelectTrigger className="w-[120px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">全部</SelectItem>
-              <SelectItem value="pending">待派單</SelectItem>
-              <SelectItem value="assigned">已派單</SelectItem>
-              <SelectItem value="completed">已完成</SelectItem>
+              <SelectItem value="all">{SUPPLIER_LABELS.ALL}</SelectItem>
+              <SelectItem value="pending">{SUPPLIER_LABELS.LABEL_444}</SelectItem>
+              <SelectItem value="assigned">{SUPPLIER_LABELS.LABEL_4291}</SelectItem>
+              <SelectItem value="completed">{SUPPLIER_LABELS.LABEL_7255}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -363,9 +364,9 @@ export function SupplierDispatchPage() {
       <Dialog open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>
         <DialogContent level={2}>
           <DialogHeader>
-            <DialogTitle>指派司機</DialogTitle>
+            <DialogTitle>{SUPPLIER_LABELS.LABEL_8625}</DialogTitle>
             <DialogDescription>
-              將此需求派給司機執行
+              {SUPPLIER_LABELS.LABEL_2651}
             </DialogDescription>
           </DialogHeader>
 
@@ -391,10 +392,10 @@ export function SupplierDispatchPage() {
 
               {/* 司機選擇 */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">選擇司機</label>
+                <label className="text-sm font-medium">{SUPPLIER_LABELS.SELECT_5145}</label>
                 <Select value={selectedDriverId} onValueChange={setSelectedDriverId}>
                   <SelectTrigger>
-                    <SelectValue placeholder="請選擇司機" />
+                    <SelectValue placeholder={SUPPLIER_LABELS.PLEASE_SELECT_2927} />
                   </SelectTrigger>
                   <SelectContent>
                     {drivers.map(driver => (
@@ -416,7 +417,7 @@ export function SupplierDispatchPage() {
                 {drivers.length === 0 && (
                   <div className="flex items-center gap-2 p-3 bg-morandi-gold/10 rounded text-sm">
                     <AlertCircle className="h-4 w-4 text-morandi-gold" />
-                    <span>尚未建立司機資料，請先到車隊管理新增司機</span>
+                    <span>{SUPPLIER_LABELS.ADD_9655}</span>
                   </div>
                 )}
               </div>
@@ -425,7 +426,7 @@ export function SupplierDispatchPage() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setSelectedRequest(null)}>
-              取消
+              {SUPPLIER_LABELS.CANCEL}
             </Button>
             <Button
               onClick={handleAssign}

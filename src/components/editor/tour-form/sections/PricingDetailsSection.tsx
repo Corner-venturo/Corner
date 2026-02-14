@@ -163,7 +163,7 @@ export function PricingDetailsSection({
     <div className="space-y-6">
       {/* 區塊標題 */}
       <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-morandi-gold pb-1">
-        詳細團費
+        {COMP_EDITOR_LABELS.LABEL_9319}
       </h2>
 
       {/* 顯示開關 */}
@@ -171,9 +171,9 @@ export function PricingDetailsSection({
         <div className="flex items-center gap-3">
           <DollarSign className="h-5 w-5 text-morandi-primary" />
           <div>
-            <h3 className="font-medium text-morandi-primary">詳細團費資訊</h3>
+            <h3 className="font-medium text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_8607}</h3>
             <p className="text-sm text-morandi-secondary">
-              顯示費用包含/不含及注意事項
+              {COMP_EDITOR_LABELS.LABEL_5515}
             </p>
           </div>
         </div>
@@ -201,7 +201,7 @@ export function PricingDetailsSection({
           <div className="p-4 border border-morandi-container rounded-lg">
             <div className="flex items-center gap-2 mb-3">
               <Shield className="h-4 w-4 text-emerald-600" />
-              <Label className="font-medium">旅遊責任險</Label>
+              <Label className="font-medium">{COMP_EDITOR_LABELS.旅遊責任險}</Label>
             </div>
             <div className="flex items-center gap-3">
               <Select
@@ -215,7 +215,7 @@ export function PricingDetailsSection({
                   <SelectItem value="250">250 萬元</SelectItem>
                   <SelectItem value="300">300 萬元</SelectItem>
                   <SelectItem value="500">500 萬元</SelectItem>
-                  <SelectItem value="custom">自訂金額</SelectItem>
+                  <SelectItem value="custom">{COMP_EDITOR_LABELS.LABEL_2157}</SelectItem>
                 </SelectContent>
               </Select>
               {pricingDetails.insurance_amount === 'custom' && (
@@ -229,7 +229,7 @@ export function PricingDetailsSection({
                       handleInsuranceChange(customAmount)
                     }}
                   />
-                  <span className="text-sm text-morandi-secondary">萬元</span>
+                  <span className="text-sm text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_646}</span>
                 </div>
               )}
             </div>
@@ -240,7 +240,7 @@ export function PricingDetailsSection({
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Check className="h-4 w-4 text-emerald-600" />
-                <Label className="font-medium">費用包含</Label>
+                <Label className="font-medium">{COMP_EDITOR_LABELS.LABEL_5450}</Label>
               </div>
               <Button
                 type="button"
@@ -250,7 +250,7 @@ export function PricingDetailsSection({
                 className="h-7 text-xs"
               >
                 <Plus className="h-3 w-3 mr-1" />
-                新增
+                {COMP_EDITOR_LABELS.新增}
               </Button>
             </div>
             <div className="space-y-2">
@@ -293,7 +293,7 @@ export function PricingDetailsSection({
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <X className="h-4 w-4 text-status-danger" />
-                <Label className="font-medium">費用不含</Label>
+                <Label className="font-medium">{COMP_EDITOR_LABELS.LABEL_4561}</Label>
               </div>
               <Button
                 type="button"
@@ -346,7 +346,7 @@ export function PricingDetailsSection({
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4 text-status-warning" />
-                <Label className="font-medium">注意事項</Label>
+                <Label className="font-medium">{COMP_EDITOR_LABELS.LABEL_8733}</Label>
               </div>
               <Button
                 type="button"

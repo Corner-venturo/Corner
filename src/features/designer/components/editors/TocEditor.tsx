@@ -36,6 +36,7 @@ import {
 } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { calculatePageNumberForToc } from '../../utils/page-number'
+import { DESIGNER_LABELS } from './constants/labels'
 
 // 目錄項目類型
 export interface TocItem {
@@ -143,7 +144,7 @@ export function TocEditor({
     return (
       <div className="space-y-3">
         <p className="text-xs text-morandi-secondary">
-          設定要顯示在目錄中的頁面
+          {DESIGNER_LABELS.SETTINGS_7690}
         </p>
         <Button
           variant="outline"
@@ -152,7 +153,7 @@ export function TocEditor({
           className="w-full gap-2"
         >
           <RefreshCw size={14} />
-          載入頁面列表
+          {DESIGNER_LABELS.LOADING_5110}
         </Button>
       </div>
     )
@@ -209,16 +210,16 @@ export function TocEditor({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <Label className="text-xs">目錄項目 ({enabledCount})</Label>
+        <Label className="text-xs">{DESIGNER_LABELS.LABEL_5681}{enabledCount})</Label>
         <Button
           variant="ghost"
           size="sm"
           onClick={refreshPageNumbers}
           className="h-6 px-2 text-[10px] gap-1"
-          title="刷新頁碼"
+          title={DESIGNER_LABELS.LABEL_155}
         >
           <RefreshCw size={10} />
-          刷新
+          {DESIGNER_LABELS.LABEL_9382}
         </Button>
       </div>
 
@@ -305,7 +306,7 @@ export function TocEditor({
           className="w-full gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
         >
           <Check size={14} />
-          套用到目錄頁
+          {DESIGNER_LABELS.LABEL_9768}
         </Button>
       )}
     </div>

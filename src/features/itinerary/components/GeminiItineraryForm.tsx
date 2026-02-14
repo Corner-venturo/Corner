@@ -197,24 +197,24 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
           <span>Gemini AI 智慧助手</span>
         </div>
         <p className="text-sm text-status-info">
-          點擊 <Sparkles size={14} className="inline" /> 按鈕，AI 會自動幫你生成景點描述和插圖。
-          目前為測試模式，之後會接上 Gemini Pro API。
+          點擊 <Sparkles size={14} className="inline" /> {ITINERARY_LABELS.GENERATING_7626}
+          {ITINERARY_LABELS.LABEL_1199}
         </p>
       </div>
 
       {/* 封面資訊 */}
       <section>
         <h3 className="text-base font-bold text-morandi-primary mb-3 pb-2 border-b border-morandi-container">
-          封面資訊
+          {ITINERARY_LABELS.LABEL_999}
         </h3>
         <div className="space-y-3">
           {/* 國家和城市選擇 */}
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-xs font-medium text-morandi-primary mb-1">國家</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">{ITINERARY_LABELS.LABEL_5040}</label>
               <Select value={data.country} onValueChange={(value) => updateField('country', value)}>
                 <SelectTrigger className="h-9">
-                  <SelectValue placeholder="選擇國家" />
+                  <SelectValue placeholder={ITINERARY_LABELS.選擇國家} />
                 </SelectTrigger>
                 <SelectContent>
                   {countries
@@ -229,10 +229,10 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
               </Select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-morandi-primary mb-1">城市</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">{ITINERARY_LABELS.LABEL_5461}</label>
               <Select value={data.city} onValueChange={handleCityChange} disabled={!data.country}>
                 <SelectTrigger className="h-9">
-                  <SelectValue placeholder="選擇城市" />
+                  <SelectValue placeholder={ITINERARY_LABELS.選擇城市} />
                 </SelectTrigger>
                 <SelectContent>
                   {cities
@@ -253,12 +253,12 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
 
           {/* 封面圖片 with AI 生成 */}
           <div>
-            <label className="block text-xs font-medium text-morandi-primary mb-1">封面圖片</label>
+            <label className="block text-xs font-medium text-morandi-primary mb-1">{ITINERARY_LABELS.封面圖片}</label>
             <div className="flex gap-2">
               <InputIME
                 value={data.coverImage}
                 onChange={value => updateField('coverImage', value)}
-                placeholder="圖片網址或點擊 AI 生成"
+                placeholder={ITINERARY_LABELS.GENERATING_6137}
                 className="flex-1 text-sm"
               />
               <Button
@@ -277,20 +277,20 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-morandi-primary mb-1">標題</label>
+            <label className="block text-xs font-medium text-morandi-primary mb-1">{ITINERARY_LABELS.TITLE}</label>
             <InputIME
               value={data.title}
               onChange={value => updateField('title', value)}
-              placeholder="例如：越南峴港經典五日"
+              placeholder={ITINERARY_LABELS.EXAMPLE_9001}
               className="w-full text-sm"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-morandi-primary mb-1">副標題 (詩意文案，用換行分隔)</label>
+            <label className="block text-xs font-medium text-morandi-primary mb-1">{ITINERARY_LABELS.LABEL_4322}</label>
             <textarea
               value={data.subtitle}
               onChange={e => updateField('subtitle', e.target.value)}
-              placeholder="第一行文案&#10;第二行文案"
+              placeholder={ITINERARY_LABELS.LABEL_4873}
               className="w-full text-sm border border-border rounded-md p-2 min-h-[60px]"
             />
           </div>
@@ -305,11 +305,11 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-morandi-primary mb-1">價格備註</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">{ITINERARY_LABELS.LABEL_4452}</label>
               <InputIME
                 value={data.priceNote}
                 onChange={value => updateField('priceNote', value)}
-                placeholder="8人包團"
+                placeholder={ITINERARY_LABELS.LABEL_7894}
                 className="w-full text-sm"
               />
             </div>
@@ -367,7 +367,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                     newSchedule[idx].route = value
                     updateField('dailySchedule', newSchedule)
                   }}
-                  placeholder="路線 (用 > 分隔景點)"
+                  placeholder={ITINERARY_LABELS.LABEL_6980}
                   className="w-full text-xs"
                 />
                 <div className="grid grid-cols-3 gap-1">
@@ -378,7 +378,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                       newSchedule[idx].meals.breakfast = value
                       updateField('dailySchedule', newSchedule)
                     }}
-                    placeholder="早餐"
+                    placeholder={ITINERARY_LABELS.早餐}
                     className="text-xs h-8"
                   />
                   <InputIME
@@ -388,7 +388,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                       newSchedule[idx].meals.lunch = value
                       updateField('dailySchedule', newSchedule)
                     }}
-                    placeholder="午餐"
+                    placeholder={ITINERARY_LABELS.午餐}
                     className="text-xs h-8"
                   />
                   <InputIME
@@ -398,7 +398,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                       newSchedule[idx].meals.dinner = value
                       updateField('dailySchedule', newSchedule)
                     }}
-                    placeholder="晚餐"
+                    placeholder={ITINERARY_LABELS.晚餐}
                     className="text-xs h-8"
                   />
                 </div>
@@ -409,7 +409,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                     newSchedule[idx].accommodation = value
                     updateField('dailySchedule', newSchedule)
                   }}
-                  placeholder="住宿飯店"
+                  placeholder={ITINERARY_LABELS.LABEL_4576}
                   className="w-full text-xs"
                 />
               </div>
@@ -421,7 +421,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
       {/* 航班資訊 */}
       <section>
         <h3 className="text-base font-bold text-morandi-primary mb-3 pb-2 border-b border-morandi-container">
-          參考航班
+          {ITINERARY_LABELS.LABEL_5074}
         </h3>
         <div className="space-y-4 text-xs">
           {data.flightOptions.map((option, idx) => (
@@ -436,7 +436,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                       newOptions[idx].outbound.code = value
                       updateField('flightOptions', newOptions)
                     }}
-                    placeholder="航班號"
+                    placeholder={ITINERARY_LABELS.LABEL_7892}
                     className="text-xs h-7"
                   />
                   <InputIME
@@ -446,7 +446,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                       newOptions[idx].outbound.time = value
                       updateField('flightOptions', newOptions)
                     }}
-                    placeholder="出發"
+                    placeholder={ITINERARY_LABELS.LABEL_5480}
                     className="text-xs h-7"
                   />
                   <InputIME
@@ -456,7 +456,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                       newOptions[idx].outbound.arrivalTime = value
                       updateField('flightOptions', newOptions)
                     }}
-                    placeholder="抵達"
+                    placeholder={ITINERARY_LABELS.LABEL_5485}
                     className="text-xs h-7"
                   />
                 </div>
@@ -501,7 +501,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
       {/* 行程特色 with AI */}
       <section>
         <div className="flex items-center justify-between mb-3 pb-2 border-b border-morandi-container">
-          <h3 className="text-base font-bold text-morandi-primary">行程特色</h3>
+          <h3 className="text-base font-bold text-morandi-primary">{ITINERARY_LABELS.LABEL_6890}</h3>
           <Button
             onClick={() => {
               updateField('highlightSpots', [
@@ -513,7 +513,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
             className="h-7 text-xs bg-morandi-gold hover:bg-morandi-gold-hover"
           >
             <Plus size={14} className="mr-1" />
-            新增
+            {ITINERARY_LABELS.ADD}
           </Button>
         </div>
         <div className="space-y-3">
@@ -527,7 +527,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                     newSpots[idx].name = value
                     updateField('highlightSpots', newSpots)
                   }}
-                  placeholder="景點名稱"
+                  placeholder={ITINERARY_LABELS.LABEL_3166}
                   className="flex-1 text-xs h-7 font-semibold"
                 />
                 <div className="flex gap-1 ml-2">
@@ -537,7 +537,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                     size="sm"
                     variant="ghost"
                     className="h-6 px-2 text-status-info hover:text-status-info hover:bg-muted"
-                    title="AI 生成描述"
+                    title={ITINERARY_LABELS.GENERATING_5671}
                   >
                     {generatingDescription === idx ? (
                       <Loader2 size={12} className="animate-spin" />
@@ -551,7 +551,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                     size="sm"
                     variant="ghost"
                     className="h-6 px-2 text-purple-600 hover:text-purple-600 hover:bg-purple-50"
-                    title="AI 生成圖片"
+                    title={ITINERARY_LABELS.GENERATING_7963}
                   >
                     {generatingImage === `spot-${idx}` ? (
                       <Loader2 size={12} className="animate-spin" />
@@ -581,7 +581,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                   newSpots[idx].nameEn = value
                   updateField('highlightSpots', newSpots)
                 }}
-                placeholder="英文名稱"
+                placeholder={ITINERARY_LABELS.LABEL_3778}
                 className="w-full text-xs h-7 mb-2"
               />
               {spot.imageUrl && (
@@ -596,7 +596,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                   newSpots[idx].description = e.target.value
                   updateField('highlightSpots', newSpots)
                 }}
-                placeholder="景點描述（可點擊 AI 按鈕自動生成）"
+                placeholder={ITINERARY_LABELS.GENERATING_146}
                 className="w-full text-xs border border-border rounded-md p-2 min-h-[50px]"
               />
             </div>
@@ -607,7 +607,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
       {/* 景點介紹 with AI */}
       <section>
         <div className="flex items-center justify-between mb-3 pb-2 border-b border-morandi-container">
-          <h3 className="text-base font-bold text-morandi-primary">景點介紹</h3>
+          <h3 className="text-base font-bold text-morandi-primary">{ITINERARY_LABELS.LABEL_4014}</h3>
           <Button
             onClick={() => {
               updateField('sights', [
@@ -702,7 +702,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                   newSights[idx].description = e.target.value
                   updateField('sights', newSights)
                 }}
-                placeholder="詳細描述（可點擊 AI 按鈕自動生成）"
+                placeholder={ITINERARY_LABELS.GENERATING_7535}
                 className="w-full text-xs border border-border rounded-md p-2 min-h-[60px]"
               />
             </div>

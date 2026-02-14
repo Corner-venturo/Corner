@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { ZoomIn, ZoomOut, RotateCcw, Move } from 'lucide-react'
+import { UI_LABELS } from './constants/labels'
 
 // 圖片位置設定的型別
 export interface ImagePositionSettings {
@@ -204,7 +205,7 @@ export function ImagePositionEditor({
           >
             <img
               src={imageSrc}
-              alt="預覽"
+              alt={UI_LABELS.PREVIEW}
               className="w-full h-full object-cover pointer-events-none"
               style={{
                 objectPosition: `${position.x}% ${position.y}%`,
@@ -217,7 +218,7 @@ export function ImagePositionEditor({
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className={`bg-black/50 text-white px-3 py-1.5 rounded-full text-sm flex items-center gap-2 transition-opacity ${isDragging ? 'opacity-0' : 'opacity-70'}`}>
                 <Move size={14} />
-                拖曳調整位置
+                {UI_LABELS.LABEL_4538}
               </div>
             </div>
           </div>
@@ -279,7 +280,7 @@ export function ImagePositionEditor({
                 className="gap-1"
               >
                 <RotateCcw size={14} />
-                重置
+                {UI_LABELS.LABEL_8406}
               </Button>
 
               <div className="flex gap-2">
@@ -288,14 +289,14 @@ export function ImagePositionEditor({
                   variant="outline"
                   onClick={onClose}
                 >
-                  取消
+                  {UI_LABELS.CANCEL}
                 </Button>
                 <Button
                   type="button"
                   onClick={handleConfirm}
                   className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
                 >
-                  套用
+                  {UI_LABELS.LABEL_4550}
                 </Button>
               </div>
             </div>
@@ -303,7 +304,7 @@ export function ImagePositionEditor({
 
           {/* 提示文字 */}
           <p className="text-xs text-morandi-secondary text-center">
-            拖曳圖片調整位置，使用滑桿調整縮放 · 原圖不變，隨時可調整
+            {UI_LABELS.LABEL_5032}
           </p>
         </div>
       </DialogContent>

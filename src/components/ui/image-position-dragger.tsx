@@ -23,6 +23,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DIALOG_SIZES } from '
 import { Button } from '@/components/ui/button'
 import { RotateCcw, Move, Check, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { UI_LABELS } from './constants/labels'
 
 // 精細位置設定（x, y 百分比）
 export interface ImagePosition {
@@ -126,7 +127,7 @@ interface ImagePositionDraggerProps {
 
 export function ImagePositionDragger({
   src,
-  alt = '圖片',
+  alt = UI_LABELS.LABEL_5261,
   position,
   onChange,
   className,
@@ -166,7 +167,7 @@ export function ImagePositionDragger({
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
             <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 text-white px-3 py-1.5 rounded-full text-sm flex items-center gap-2">
               <Move size={14} />
-              點擊調整位置
+              {UI_LABELS.LABEL_8171}
             </div>
           </div>
         )}
@@ -331,7 +332,7 @@ export function ImagePositionDialog({
           >
             <img
               src={imageSrc}
-              alt="預覽"
+              alt={UI_LABELS.PREVIEW}
               className="w-full h-full object-cover pointer-events-none"
               style={{
                 objectPosition: `${position.x}% ${position.y}%`,
@@ -348,7 +349,7 @@ export function ImagePositionDialog({
                 )}
               >
                 <Move size={16} />
-                拖曳調整顯示區域
+                {UI_LABELS.LABEL_1191}
               </div>
             </div>
 
@@ -373,7 +374,7 @@ export function ImagePositionDialog({
               className="gap-2"
             >
               <RotateCcw size={14} />
-              重置
+              {UI_LABELS.LABEL_8406}
             </Button>
 
             <div className="flex gap-2">
@@ -384,7 +385,7 @@ export function ImagePositionDialog({
                 className="gap-2"
               >
                 <X size={14} />
-                取消
+                {UI_LABELS.CANCEL}
               </Button>
               <Button
                 type="button"
@@ -392,14 +393,14 @@ export function ImagePositionDialog({
                 className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
               >
                 <Check size={14} />
-                確認
+                {UI_LABELS.CONFIRM}
               </Button>
             </div>
           </div>
 
           {/* 提示文字 */}
           <p className="text-xs text-morandi-secondary text-center">
-            拖曳圖片調整顯示區域 · 金色圓點表示目前焦點位置
+            {UI_LABELS.LABEL_2371}
           </p>
         </div>
       </DialogContent>
@@ -527,7 +528,7 @@ export function SimpleImagePositionDragger({
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
                 <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
                   <Move size={12} />
-                  調整位置
+                  {UI_LABELS.LABEL_9042}
                 </div>
               </div>
             )}
@@ -543,7 +544,7 @@ export function SimpleImagePositionDragger({
         currentPosition={currentPosition}
         onConfirm={handleConfirm}
         aspectRatio={aspectRatio}
-        title="調整圖片顯示位置"
+        title={UI_LABELS.LABEL_636}
       />
     </>
   )

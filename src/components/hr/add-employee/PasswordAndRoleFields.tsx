@@ -33,7 +33,7 @@ export function PasswordAndRoleFields({ formData, setFormData }: PasswordAndRole
   return (
     <>
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">預設登入密碼</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_9167}</label>
         <Input
           type="text"
           value={formData.defaultPassword}
@@ -42,13 +42,13 @@ export function PasswordAndRoleFields({ formData, setFormData }: PasswordAndRole
           required
         />
         <p className="text-xs text-morandi-muted mt-1">
-          員工可使用此密碼首次登入，建議提醒其登入後更改密碼
+          {COMP_HR_LABELS.LABEL_3681}
         </p>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-morandi-primary mb-2">
-          員工角色（可複選）
+          {COMP_HR_LABELS.LABEL_4884}
         </label>
         <div className="flex flex-wrap gap-4">
           {SELECTABLE_ROLES.map(({ value, label }) => (
@@ -65,7 +65,7 @@ export function PasswordAndRoleFields({ formData, setFormData }: PasswordAndRole
           ))}
         </div>
         <p className="text-xs text-morandi-muted mt-2">
-          角色會影響員工可使用的功能。一般員工請選擇「一般員工」
+          {COMP_HR_LABELS.PLEASE_SELECT_1794}
         </p>
       </div>
     </>

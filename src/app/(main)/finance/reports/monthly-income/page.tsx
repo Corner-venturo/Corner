@@ -11,6 +11,7 @@ import { ChevronLeft, ChevronRight, TrendingUp, Receipt, Users } from 'lucide-re
 import { useReceiptOrders } from '@/data'
 import { ReceiptOrder } from '@/types'
 import { RECEIPT_PAYMENT_METHOD_LABELS } from '@/types/receipt.types'
+import { MONTHLY_INCOME_LABELS } from './constants/labels'
 
 // 取得當前年月
 function getCurrentYearMonth(): string {
@@ -195,7 +196,7 @@ export default function MonthlyIncomeReportPage() {
   return (
     <div className="space-y-6">
       <ResponsiveHeader
-        title="每月收入報表"
+        title={MONTHLY_INCOME_LABELS.LABEL_120}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '財務', href: '/finance' },
@@ -209,20 +210,20 @@ export default function MonthlyIncomeReportPage() {
       <ContentContainer>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <StatCard
-            title="收款單數"
+            title={MONTHLY_INCOME_LABELS.LABEL_6326}
             value={stats.receiptCount}
             icon={Receipt}
             iconColor="text-morandi-green"
           />
           <StatCard
-            title="收款總金額"
+            title={MONTHLY_INCOME_LABELS.TOTAL_2019}
             value={stats.totalAmount}
             icon={TrendingUp}
             iconColor="text-morandi-green"
             isCurrency
           />
           <StatCard
-            title="付款方式統計"
+            title={MONTHLY_INCOME_LABELS.LABEL_4193}
             value={Object.keys(stats.byPaymentMethod).length}
             icon={Users}
             iconColor="text-morandi-gold"
@@ -234,7 +235,7 @@ export default function MonthlyIncomeReportPage() {
       {Object.keys(stats.byPaymentMethod).length > 0 && (
         <ContentContainer>
           <h3 className="text-lg font-semibold text-morandi-primary mb-4">
-            依付款方式統計
+            {MONTHLY_INCOME_LABELS.LABEL_4586}
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             {Object.entries(stats.byPaymentMethod).map(([method, data]) => (
@@ -255,7 +256,7 @@ export default function MonthlyIncomeReportPage() {
       {/* 收款單列表 */}
       <ContentContainer>
         <h3 className="text-lg font-semibold text-morandi-primary mb-4">
-          收款單明細
+          {MONTHLY_INCOME_LABELS.LABEL_9606}
         </h3>
         <EnhancedTable
           columns={columns}

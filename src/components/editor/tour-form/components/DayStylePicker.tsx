@@ -75,7 +75,7 @@ export function DayStylePicker({
           className="flex items-center gap-1.5 px-3 py-1.5 bg-morandi-gold text-white rounded-lg text-xs hover:bg-morandi-gold-hover transition-colors"
         >
           <Eye size={14} />
-          預覽編輯
+          {COMP_EDITOR_LABELS.EDIT_302}
         </button>
       </div>
 

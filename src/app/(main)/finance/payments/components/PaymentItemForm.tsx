@@ -93,7 +93,7 @@ export function PaymentItemForm({
             type="number"
             value={item.amount || ''}
             onChange={e => onUpdate(item.id, { amount: Number(e.target.value) })}
-            placeholder="請輸入金額"
+            placeholder={PAYMENT_ITEM_LABELS.PLEASE_ENTER_3984}
           />
         </div>
 
@@ -118,7 +118,7 @@ export function PaymentItemForm({
           <Input
             value={item.notes || ''}
             onChange={e => onUpdate(item.id, { notes: e.target.value })}
-            placeholder="選填"
+            placeholder={PAYMENT_ITEM_LABELS.OPTIONAL}
           />
         </div>
       </div>
@@ -138,7 +138,7 @@ export function PaymentItemForm({
 
           <div className="col-span-4">
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              付款截止日 *
+              {PAYMENT_ITEM_LABELS.LABEL_6186}
             </label>
             <DateInput
               value={item.pay_dateline || ''}
@@ -148,12 +148,12 @@ export function PaymentItemForm({
 
           <div className="col-span-4">
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              付款名稱（客戶看到的）
+              {PAYMENT_ITEM_LABELS.LABEL_4673}
             </label>
             <Input
               value={item.payment_name || ''}
               onChange={e => onUpdate(item.id, { payment_name: e.target.value })}
-              placeholder="例如：峇里島五日遊 - 尾款"
+              placeholder={PAYMENT_ITEM_LABELS.EXAMPLE_4757}
             />
           </div>
         </div>
@@ -167,7 +167,7 @@ export function PaymentItemForm({
             <Input
               value={item.handler_name || ''}
               onChange={e => onUpdate(item.id, { handler_name: e.target.value })}
-              placeholder="請輸入經手人姓名"
+              placeholder={PAYMENT_ITEM_LABELS.PLEASE_ENTER_2071}
             />
           </div>
         </div>
@@ -178,14 +178,14 @@ export function PaymentItemForm({
         <div className="grid grid-cols-12 gap-3 pt-3 border-t">
           <div className="col-span-4">
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              匯入帳戶 *
+              {PAYMENT_ITEM_LABELS.LABEL_7063}
             </label>
             <Select
               value={item.account_info || ''}
               onValueChange={value => onUpdate(item.id, { account_info: value })}
             >
               <SelectTrigger>
-                <SelectValue placeholder="請選擇匯入帳戶" />
+                <SelectValue placeholder={PAYMENT_ITEM_LABELS.PLEASE_SELECT_578} />
               </SelectTrigger>
               <SelectContent>
                 {BANK_ACCOUNTS.map(bank => (
@@ -203,7 +203,7 @@ export function PaymentItemForm({
               type="number"
               value={item.fees || ''}
               onChange={e => onUpdate(item.id, { fees: Number(e.target.value) })}
-              placeholder="選填，如有手續費"
+              placeholder={PAYMENT_ITEM_LABELS.LABEL_1988}
             />
           </div>
         </div>
@@ -214,7 +214,7 @@ export function PaymentItemForm({
         <div className="grid grid-cols-12 gap-3 pt-3 border-t">
           <div className="col-span-3">
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              卡號後四碼
+              {PAYMENT_ITEM_LABELS.LABEL_1306}
             </label>
             <Input
               maxLength={4}
@@ -231,12 +231,12 @@ export function PaymentItemForm({
             <Input
               value={item.auth_code || ''}
               onChange={e => onUpdate(item.id, { auth_code: e.target.value })}
-              placeholder="請輸入授權碼"
+              placeholder={PAYMENT_ITEM_LABELS.PLEASE_ENTER_1445}
             />
           </div>
 
           <div className="col-span-3">
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">手續費</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.HANDLING_FEE}</label>
             <Input
               type="number"
               value={item.fees || ''}
@@ -251,20 +251,20 @@ export function PaymentItemForm({
       {item.receipt_type === ReceiptType.CHECK && (
         <div className="grid grid-cols-12 gap-3 pt-3 border-t">
           <div className="col-span-4">
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">支票號碼</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.LABEL_9924}</label>
             <Input
               value={item.check_number || ''}
               onChange={e => onUpdate(item.id, { check_number: e.target.value })}
-              placeholder="請輸入支票號碼"
+              placeholder={PAYMENT_ITEM_LABELS.PLEASE_ENTER_8853}
             />
           </div>
 
           <div className="col-span-4">
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">開票銀行</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.LABEL_7421}</label>
             <Input
               value={item.check_bank || ''}
               onChange={e => onUpdate(item.id, { check_bank: e.target.value })}
-              placeholder="請輸入銀行名稱"
+              placeholder={PAYMENT_ITEM_LABELS.PLEASE_ENTER_2131}
             />
           </div>
         </div>

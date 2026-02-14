@@ -4,6 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import { FileText, BookOpen, Scale, TrendingUp, Wallet, Banknote, ClipboardList } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { REPORTS_LABELS } from './constants/labels'
 
 const reports = [
   {
@@ -47,7 +48,7 @@ export default function AccountingReportsPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="會計報表"
+        title={REPORTS_LABELS.LABEL_1150}
         icon={FileText}
         breadcrumb={[
           { label: '首頁', href: '/' },

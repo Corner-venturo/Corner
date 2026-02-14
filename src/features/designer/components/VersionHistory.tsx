@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { useDocumentStore, type DocumentVersion } from '@/stores/document-store'
 import { formatDistanceToNow } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
+import { DESIGNER_LABELS } from './constants/labels'
 
 interface VersionHistoryProps {
   onClose: () => void
@@ -47,7 +48,7 @@ export function VersionHistory({ onClose, onPreview }: VersionHistoryProps) {
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-2">
           <Clock size={18} className="text-morandi-gold" />
-          <h3 className="font-semibold text-morandi-primary">版本歷史</h3>
+          <h3 className="font-semibold text-morandi-primary">{DESIGNER_LABELS.LABEL_3328}</h3>
         </div>
         <Button variant="ghost" size="icon" onClick={onClose}>
           <X size={18} />
@@ -62,7 +63,7 @@ export function VersionHistory({ onClose, onPreview }: VersionHistoryProps) {
           </div>
         ) : versions.length === 0 ? (
           <div className="p-4 text-center text-morandi-secondary text-sm">
-            尚無版本記錄
+            {DESIGNER_LABELS.EMPTY_6687}
           </div>
         ) : (
           <div className="p-2 space-y-2">
@@ -103,7 +104,7 @@ export function VersionHistory({ onClose, onPreview }: VersionHistoryProps) {
                         </span>
                         {isCurrent && (
                           <span className="text-xs bg-morandi-gold text-white px-1.5 py-0.5 rounded">
-                            目前
+                            {DESIGNER_LABELS.LABEL_7651}
                           </span>
                         )}
                       </div>
@@ -123,7 +124,7 @@ export function VersionHistory({ onClose, onPreview }: VersionHistoryProps) {
 
                       {version.restored_from && (
                         <div className="text-xs text-morandi-gold mt-0.5">
-                          從舊版本恢復
+                          {DESIGNER_LABELS.LABEL_6119}
                         </div>
                       )}
                     </div>
@@ -139,7 +140,7 @@ export function VersionHistory({ onClose, onPreview }: VersionHistoryProps) {
                           className="flex-1 text-xs"
                           onClick={() => onPreview(version)}
                         >
-                          預覽
+                          {DESIGNER_LABELS.PREVIEW}
                         </Button>
                       )}
                       <Button
@@ -162,7 +163,7 @@ export function VersionHistory({ onClose, onPreview }: VersionHistoryProps) {
                   {isCurrent && (
                     <div className="flex items-center gap-1 mt-3 text-xs text-morandi-gold">
                       <Check size={12} />
-                      <span>目前使用中</span>
+                      <span>{DESIGNER_LABELS.LABEL_2872}</span>
                     </div>
                   )}
                 </div>
@@ -174,7 +175,7 @@ export function VersionHistory({ onClose, onPreview }: VersionHistoryProps) {
 
       {/* Footer */}
       <div className="p-3 border-t border-border text-xs text-morandi-muted text-center">
-        版本會在每次儲存時自動建立
+        {DESIGNER_LABELS.SAVING_4103}
       </div>
     </div>
   )

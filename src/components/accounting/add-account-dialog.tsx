@@ -8,6 +8,7 @@ import { Wallet, CreditCard, PiggyBank, TrendingUp, Building2 } from 'lucide-rea
 import { cn } from '@/lib/utils'
 import { CurrencyCell } from '@/components/table-cells'
 import { useEnterSubmit } from '@/hooks/useEnterSubmit'
+import { ACCOUNTING_LABELS } from './constants/labels'
 
 interface AddAccountDialogProps {
   isOpen: boolean
@@ -142,7 +143,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
     <FormDialog
       open={isOpen}
       onOpenChange={open => !open && handleClose()}
-      title="新增帳戶"
+      title={ACCOUNTING_LABELS.ADD_236}
       onSubmit={handleSubmit}
       onCancel={handleClose}
       submitLabel="建立帳戶"
@@ -151,7 +152,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
     >
       {/* 帳戶類型選擇 */}
       <div>
-        <label className="text-sm font-medium text-[#8C8C8C] mb-3 block">帳戶類型</label>
+        <label className="text-sm font-medium text-[#8C8C8C] mb-3 block">{ACCOUNTING_LABELS.LABEL_7125}</label>
         <div className="grid grid-cols-1 gap-2">
           {accountTypes.map(type => {
             const Icon = type.icon
@@ -203,7 +204,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
 
       {/* 帳戶名稱 */}
       <div>
-        <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">帳戶名稱</label>
+        <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">{ACCOUNTING_LABELS.LABEL_1477}</label>
         <Input
           value={formData.name}
           onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
@@ -236,7 +237,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
         </div>
         {formData.type === 'credit' && (
           <div className="text-xs text-[#8C8C8C] mt-1.5 bg-[#F9F8F6] px-3 py-2 rounded-lg">
-            信用卡請輸入負數（如：-5000 表示欠款5000元）
+            {ACCOUNTING_LABELS.PLEASE_ENTER_247}
           </div>
         )}
       </div>
@@ -244,7 +245,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
       {/* 信用卡額度 */}
       {formData.type === 'credit' && (
         <div>
-          <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">信用額度</label>
+          <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">{ACCOUNTING_LABELS.LABEL_1690}</label>
           <div className="relative">
             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8C8C8C] text-sm">
               NT$
@@ -261,13 +262,13 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
               step="1000"
             />
           </div>
-          <div className="text-xs text-[#8C8C8C] mt-1.5">設定這張信用卡的總額度限制</div>
+          <div className="text-xs text-[#8C8C8C] mt-1.5">{ACCOUNTING_LABELS.TOTAL_9749}</div>
         </div>
       )}
 
       {/* 顏色選擇 */}
       <div>
-        <label className="text-sm font-medium text-[#8C8C8C] mb-2 block">顏色標識</label>
+        <label className="text-sm font-medium text-[#8C8C8C] mb-2 block">{ACCOUNTING_LABELS.LABEL_3288}</label>
         <div className="flex flex-wrap gap-2.5">
           {predefinedColors.map(color => (
             <button
@@ -288,13 +289,13 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
 
       {/* 描述 */}
       <div>
-        <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">備註說明</label>
+        <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">{ACCOUNTING_LABELS.LABEL_9909}</label>
         <Input
           value={formData.description}
           onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
           onKeyDown={handleKeyDown}
           {...compositionProps}
-          placeholder="輸入帳戶備註（選填）"
+          placeholder={ACCOUNTING_LABELS.LABEL_9373}
           className="border-[#E8E4E0] bg-card/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
         />
       </div>
@@ -302,7 +303,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
       {/* 預覽卡片 */}
       {formData.name && (
         <div className="p-4 bg-gradient-to-br from-[#F9F8F6] to-[#F9F8F6] rounded-xl">
-          <div className="text-xs font-medium text-[#8C8C8C] mb-3">預覽效果</div>
+          <div className="text-xs font-medium text-[#8C8C8C] mb-3">{ACCOUNTING_LABELS.PREVIEW_1832}</div>
           <div className="flex items-center space-x-3">
             <div
               className="w-3 h-3 rounded-full shadow-sm"

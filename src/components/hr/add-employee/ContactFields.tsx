@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Plus, Trash2 } from 'lucide-react'
 import { EmployeeFormData } from './types'
+import { ADD_EMPLOYEE_LABELS } from './constants/labels'
 
 interface ContactFieldsProps {
   formData: EmployeeFormData
@@ -16,7 +17,7 @@ export function ContactFields({ formData, setFormData }: ContactFieldsProps) {
     <>
       <div>
         <label className="block text-sm font-medium text-morandi-primary mb-1 flex items-center justify-between">
-          <span>聯絡電話</span>
+          <span>{ADD_EMPLOYEE_LABELS.LABEL_5110}</span>
           <Button
             type="button"
             size="sm"
@@ -33,7 +34,7 @@ export function ContactFields({ formData, setFormData }: ContactFieldsProps) {
             className="h-6 text-xs"
           >
             <Plus size={12} className="mr-1" />
-            新增電話
+            {ADD_EMPLOYEE_LABELS.ADD_3363}
           </Button>
         </label>
         <div className="space-y-2">

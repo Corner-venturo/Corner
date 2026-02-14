@@ -110,7 +110,7 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
     <div className="space-y-6">
       {/* 區塊標題 */}
       <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-morandi-gold pb-1">
-        價格方案
+        {COMP_EDITOR_LABELS.價格方案}
       </h2>
 
       {/* 顯示開關 */}
@@ -118,9 +118,9 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
         <div className="flex items-center gap-3">
           <Users className="h-5 w-5 text-morandi-primary" />
           <div>
-            <h3 className="font-medium text-morandi-primary">多人數價格方案</h3>
+            <h3 className="font-medium text-morandi-primary">{COMP_EDITOR_LABELS.多人數價格方案}</h3>
             <p className="text-sm text-morandi-secondary">
-              顯示不同人數的包團價格（4人、6人、8人等）
+              {COMP_EDITOR_LABELS.LABEL_6795}
             </p>
           </div>
         </div>
@@ -188,7 +188,7 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
 
                 {/* 方案名稱 */}
                 <div>
-                  <Label className="text-xs text-morandi-primary">方案名稱</Label>
+                  <Label className="text-xs text-morandi-primary">{COMP_EDITOR_LABELS.方案名稱}</Label>
                   <div className="flex gap-2 mt-1">
                     <Input
                       value={tier.label}
@@ -207,7 +207,7 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
 
                 {/* 價格 */}
                 <div>
-                  <Label className="text-xs text-morandi-primary">價格</Label>
+                  <Label className="text-xs text-morandi-primary">{COMP_EDITOR_LABELS.價格}</Label>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-sm text-morandi-secondary">NT$</span>
                     <Input
@@ -238,7 +238,7 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
 
                 {/* 加購說明 */}
                 <div>
-                  <Label className="text-xs text-morandi-primary">加購說明（選填）</Label>
+                  <Label className="text-xs text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_9399}</Label>
                   <Input
                     value={tier.addon || ''}
                     onChange={(e) => updatePriceTier(index, { addon: e.target.value })}
@@ -258,7 +258,7 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
             className="w-full border-dashed"
           >
             <Plus className="h-4 w-4 mr-2" />
-            新增價格方案
+            {COMP_EDITOR_LABELS.ADD_9299}
           </Button>
 
           {/* 預覽提示 */}

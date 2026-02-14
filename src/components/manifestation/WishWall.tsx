@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase/client'
 import { Heart, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatDateTW } from '@/lib/utils/format-date'
+import { MANIFESTATION_LABELS } from './constants/labels'
 
 interface Wish {
   id: string
@@ -44,7 +45,7 @@ export function WishWall() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <div className="text-morandi-secondary">載入中...</div>
+        <div className="text-morandi-secondary">{MANIFESTATION_LABELS.LOADING_6912}</div>
       </div>
     )
   }
@@ -53,8 +54,8 @@ export function WishWall() {
     return (
       <div className="text-center p-12">
         <Sparkles className="mx-auto mb-4 text-morandi-gold" size={48} />
-        <h3 className="text-lg font-medium text-morandi-primary mb-2">願望之牆還很空</h3>
-        <p className="text-sm text-morandi-secondary">成為第一個分享願望的人吧</p>
+        <h3 className="text-lg font-medium text-morandi-primary mb-2">{MANIFESTATION_LABELS.LABEL_966}</h3>
+        <p className="text-sm text-morandi-secondary">{MANIFESTATION_LABELS.LABEL_1430}</p>
       </div>
     )
   }
@@ -62,8 +63,8 @@ export function WishWall() {
   return (
     <div className="space-y-4">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-light text-morandi-primary mb-2">願望之牆</h2>
-        <p className="text-sm text-morandi-secondary">每一個願望，都值得被看見和祝福</p>
+        <h2 className="text-2xl font-light text-morandi-primary mb-2">{MANIFESTATION_LABELS.LABEL_3743}</h2>
+        <p className="text-sm text-morandi-secondary">{MANIFESTATION_LABELS.LABEL_4687}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -106,7 +107,7 @@ function WishCard({ wish, index }: { wish: Wish; index: number }) {
         </span>
         <button
           className="text-morandi-secondary hover:text-morandi-gold transition-colors"
-          title="為這個願望祝福"
+          title={MANIFESTATION_LABELS.LABEL_7872}
         >
           <Heart size={16} />
         </button>

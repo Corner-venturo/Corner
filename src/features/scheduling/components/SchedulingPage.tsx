@@ -46,6 +46,7 @@ import {
   subMonths,
 } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
+import { SCHEDULING_LABELS } from './constants/labels'
 
 // 需求單類型
 interface TourRequest {
@@ -449,7 +450,7 @@ export const SchedulingPage: React.FC = () => {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="資源調度"
+        title={SCHEDULING_LABELS.LABEL_7493}
         icon={Calendar}
         breadcrumb={[
           { label: '首頁', href: '/' },
@@ -466,7 +467,7 @@ export const SchedulingPage: React.FC = () => {
                 className={activeTab === 'vehicles' ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1' : 'gap-1'}
               >
                 <Bus size={14} />
-                車輛
+                {SCHEDULING_LABELS.LABEL_2119}
               </Button>
               <Button
                 variant={activeTab === 'leaders' ? 'default' : 'outline'}
@@ -475,7 +476,7 @@ export const SchedulingPage: React.FC = () => {
                 className={activeTab === 'leaders' ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1' : 'gap-1'}
               >
                 <Users size={14} />
-                領隊
+                {SCHEDULING_LABELS.LABEL_1098}
               </Button>
             </div>
 
@@ -485,7 +486,7 @@ export const SchedulingPage: React.FC = () => {
                 <ChevronLeft size={16} />
               </Button>
               <Button variant="outline" size="sm" onClick={navigateToday}>
-                今天
+                {SCHEDULING_LABELS.LABEL_6113}
               </Button>
               <Button variant="outline" size="sm" onClick={navigateNext}>
                 <ChevronRight size={16} />
@@ -503,7 +504,7 @@ export const SchedulingPage: React.FC = () => {
                 onClick={() => setViewMode('week')}
                 className={viewMode === 'week' ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white' : ''}
               >
-                週
+                {SCHEDULING_LABELS.LABEL_8946}
               </Button>
               <Button
                 variant={viewMode === 'month' ? 'default' : 'outline'}
@@ -511,7 +512,7 @@ export const SchedulingPage: React.FC = () => {
                 onClick={() => setViewMode('month')}
                 className={viewMode === 'month' ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white' : ''}
               >
-                月
+                {SCHEDULING_LABELS.LABEL_6426}
               </Button>
             </div>
           </div>

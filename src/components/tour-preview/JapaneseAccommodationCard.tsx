@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils'
 import { Bed } from 'lucide-react'
+import { TOUR_PREVIEW_LABELS } from './constants/labels'
 
 interface JapaneseAccommodationCardProps {
   name: string
@@ -111,7 +112,7 @@ export function JapaneseAccommodationCard({
               className="text-[8px] sm:text-[10px] font-serif"
               style={{ color: matchaColor }}
             >
-              特色旅宿
+              {TOUR_PREVIEW_LABELS.LABEL_6456}
             </span>
           ) : (
             // 星級顯示

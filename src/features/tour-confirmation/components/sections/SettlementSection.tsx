@@ -6,6 +6,7 @@ import React from 'react'
 import { Button } from '@/components/ui/button'
 import { getCurrencySymbol } from '../../constants/currency'
 import type { TourConfirmationItem } from '@/types/tour-confirmation-sheet.types'
+import { TOUR_CONFIRMATION_LABELS } from './constants/labels'
 
 interface SettlementSectionProps {
   items: TourConfirmationItem[]
@@ -34,7 +35,7 @@ export function SettlementSection({
   return (
     <div className="border-t border-border p-4 bg-morandi-container/20">
       <div className="flex items-center justify-between">
-        <h3 className="font-medium text-morandi-primary">結算</h3>
+        <h3 className="font-medium text-morandi-primary">{TOUR_CONFIRMATION_LABELS.LABEL_1407}</h3>
         {destinationCurrency && (
           <div className="flex items-center gap-2 text-sm">
             {effectiveExchangeRate ? (
@@ -48,7 +49,7 @@ export function SettlementSection({
                   className="h-6 px-2 text-xs text-morandi-gold hover:text-morandi-gold-hover"
                   onClick={onEditExchangeRate}
                 >
-                  修改
+                  {TOUR_CONFIRMATION_LABELS.LABEL_9071}
                 </Button>
               </>
             ) : (
@@ -69,20 +70,20 @@ export function SettlementSection({
         {destinationCurrency && expectedForeign > 0 ? (
           <>
             <div className="space-y-1">
-              <p className="text-xs text-morandi-secondary">預計支出 ({destinationCurrency})</p>
+              <p className="text-xs text-morandi-secondary">{TOUR_CONFIRMATION_LABELS.LABEL_949}{destinationCurrency})</p>
               <p className="text-2xl font-mono font-medium text-morandi-gold">
                 {getCurrencySymbol(destinationCurrency)} {expectedForeign.toLocaleString()}
               </p>
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-morandi-secondary">實際支出 ({destinationCurrency})</p>
+              <p className="text-xs text-morandi-secondary">{TOUR_CONFIRMATION_LABELS.LABEL_5818}{destinationCurrency})</p>
               <p className="text-2xl font-mono font-medium text-morandi-gold">
                 {getCurrencySymbol(destinationCurrency)} 0
               </p>
             </div>
           </>
         ) : (
-          <div className="text-sm text-morandi-secondary">尚無外幣支出項目</div>
+          <div className="text-sm text-morandi-secondary">{TOUR_CONFIRMATION_LABELS.EMPTY_7495}</div>
         )}
       </div>
     </div>

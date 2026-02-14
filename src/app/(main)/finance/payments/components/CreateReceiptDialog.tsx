@@ -122,7 +122,7 @@ export function CreateReceiptDialog({
               {/* 選擇團體 */}
               <div>
                 <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                  選擇團體 *
+                  {CREATE_RECEIPT_LABELS.SELECT_1269}
                 </label>
                 <Combobox
                   options={tours.filter(t => t.id).map(tour => ({
@@ -134,14 +134,14 @@ export function CreateReceiptDialog({
                     setSelectedTourId(value)
                     setSelectedOrderId('') // 清空已選訂單
                   }}
-                  placeholder="請先選擇團體..."
+                  placeholder={CREATE_RECEIPT_LABELS.SELECT_8066}
                 />
               </div>
 
               {/* 選擇訂單 */}
               <div>
                 <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                  選擇訂單 *
+                  {CREATE_RECEIPT_LABELS.SELECT_8775}
                 </label>
                 <Select
                   disabled={!selectedTourId || filteredOrders.length === 0}
@@ -179,7 +179,7 @@ export function CreateReceiptDialog({
               {selectedOrder && (
                 <div>
                   <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                    待收金額
+                    {CREATE_RECEIPT_LABELS.LABEL_6150}
                   </label>
                   <div className="flex h-10 w-full rounded-md border border-input bg-morandi-container/30 px-3 py-2 text-sm">
                     <CurrencyCell amount={selectedOrder.remaining_amount || 0} />
@@ -195,7 +195,7 @@ export function CreateReceiptDialog({
               <h3 className="text-lg font-semibold">{CREATE_RECEIPT_LABELS.PAYMENT_ITEMS}</h3>
               <Button onClick={addPaymentItem} variant="outline" size="sm">
                 <Plus size={16} className="mr-2" />
-                新增項目
+                {CREATE_RECEIPT_LABELS.ADD_2089}
               </Button>
             </div>
 
@@ -225,7 +225,7 @@ export function CreateReceiptDialog({
           <div className="flex justify-end gap-4">
             <Button variant="outline" onClick={handleClose} disabled={isSubmitting} className="gap-2">
               <X size={16} />
-              取消
+              {CREATE_RECEIPT_LABELS.CANCEL}
             </Button>
             <Button
               onClick={handleSubmit}

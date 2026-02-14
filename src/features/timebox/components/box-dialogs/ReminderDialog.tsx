@@ -14,6 +14,7 @@ import {
   weekDayNames,
 } from '../../hooks/useTimeboxData'
 import { confirm } from '@/lib/ui/alert-dialog'
+import { BOX_DIALOGS_LABELS } from './constants/labels'
 
 interface ReminderDialogProps {
   scheduledBox: TimeboxScheduledBox
@@ -108,7 +109,7 @@ export default function ReminderDialog({ scheduledBox, box, onClose }: ReminderD
           {/* 提示內容 */}
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
-              提示內容
+              {BOX_DIALOGS_LABELS.LABEL_9596}
             </label>
             <Textarea
               placeholder={`例如：保濕程序\n1. 卸妝\n2. 洗臉\n3. 化妝水\n4. 精華液\n5. 乳液\n6. 面膜敷30分鐘`}
@@ -134,16 +135,16 @@ export default function ReminderDialog({ scheduledBox, box, onClose }: ReminderD
               className="text-status-danger border-morandi-red/30 hover:bg-status-danger-bg gap-1"
             >
               <Trash2 size={16} />
-              移除排程
+              {BOX_DIALOGS_LABELS.LABEL_5077}
             </Button>
             <div className="flex space-x-2">
               <Button variant="outline" className="gap-2" onClick={onClose}>
                 <X size={16} />
-                取消
+                {BOX_DIALOGS_LABELS.CANCEL}
               </Button>
               <Button variant="outline" onClick={handleUpdate} className="gap-1">
                 <Check size={16} />
-                更新內容
+                {BOX_DIALOGS_LABELS.LABEL_3227}
               </Button>
               <Button
                 onClick={handleComplete}

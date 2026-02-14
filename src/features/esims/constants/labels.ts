@@ -36,4 +36,8 @@ export const LABELS = {
   statusPlaceholder: '選擇狀態',
   reset: '重置',
   search: '搜尋',
+
+  CONFIRM_7150: '待確認',
+  CONFIRM_469: '已確認',
+  LABEL_8594: '錯誤',
 }

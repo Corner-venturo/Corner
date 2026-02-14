@@ -7,13 +7,14 @@
 import React from 'react'
 import { MORANDI_COLORS } from '../shared/print-styles'
 import { QUOTATION_INCLUSIONS_LABELS } from '@/constants/labels'
+import { QUOTATION_LABELS } from './constants/labels'
 
 export const QuotationInclusions: React.FC = () => {
   return (
     <div className="grid grid-cols-2 gap-6 mb-6">
       <div>
         <h4 className="font-semibold mb-2" style={{ color: MORANDI_COLORS.brown }}>
-          費用包含
+          {QUOTATION_LABELS.LABEL_5450}
         </h4>
         <ul className="space-y-1 text-sm" style={{ color: MORANDI_COLORS.gray }}>
           <li>• 行程表所列之交通費用</li>
@@ -26,7 +27,7 @@ export const QuotationInclusions: React.FC = () => {
       </div>
       <div>
         <h4 className="font-semibold mb-2" style={{ color: MORANDI_COLORS.brown }}>
-          費用不含
+          {QUOTATION_LABELS.LABEL_4561}
         </h4>
         <ul className="space-y-1 text-sm" style={{ color: MORANDI_COLORS.gray }}>
           <li>• 個人護照及簽證費用</li>

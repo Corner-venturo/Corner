@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ERROR_PAGE_LABELS } from './constants/labels'
 
 export const dynamic = 'force-dynamic'
 export const dynamicParams = true
@@ -18,9 +19,9 @@ export default function NotFound() {
       <div style={{ maxWidth: '28rem', width: '100%', textAlign: 'center' }}>
         <h1 style={{ fontSize: '4rem', fontWeight: 'bold', marginBottom: '1rem' }}>404</h1>
         <h2 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '0.5rem' }}>
-          找不到頁面
+          {ERROR_PAGE_LABELS.NOT_FOUND_9250}
         </h2>
-        <p style={{ color: '#666', marginBottom: '2rem' }}>很抱歉，您訪問的頁面不存在</p>
+        <p style={{ color: '#666', marginBottom: '2rem' }}>{ERROR_PAGE_LABELS.LABEL_9421}</p>
         <Link
           href="/"
           style={{
@@ -33,7 +34,7 @@ export default function NotFound() {
             fontWeight: '500',
           }}
         >
-          返回首頁
+          {ERROR_PAGE_LABELS.GO_HOME}
         </Link>
       </div>
     </div>

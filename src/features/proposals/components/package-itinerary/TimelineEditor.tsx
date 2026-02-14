@@ -86,7 +86,7 @@ export function TimelineEditor({
             className="h-7 px-2 text-xs gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
             <Plus size={12} />
-            新增活動
+            {ITINERARY_DIALOG_LABELS.ADD_2951}
           </Button>
         </div>
 
@@ -189,8 +189,8 @@ export function TimelineEditor({
         <div className="border border-border rounded-lg overflow-hidden">
           {/* 表頭 */}
           <div className="flex items-center bg-morandi-container/30 text-[10px] text-morandi-secondary font-medium">
-            <div className="w-[100px] px-2 py-1.5 text-center border-r border-morandi-container/50">時間</div>
-            <div className="flex-1 px-2 py-1.5">活動內容</div>
+            <div className="w-[100px] px-2 py-1.5 text-center border-r border-morandi-container/50">{ITINERARY_DIALOG_LABELS.TIME}</div>
+            <div className="flex-1 px-2 py-1.5">{ITINERARY_DIALOG_LABELS.LABEL_7032}</div>
           </div>
 
           {/* 活動列表 */}
@@ -254,7 +254,7 @@ export function TimelineEditor({
             ))
           ) : (
             <div className="text-center py-4 text-xs text-morandi-muted">
-              點擊「新增活動」加入景點
+              {ITINERARY_DIALOG_LABELS.ADD_2139}
             </div>
           )}
         </div>

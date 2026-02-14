@@ -35,6 +35,7 @@ import type {
 } from '@/types/fleet.types'
 import { VEHICLE_TYPE_OPTIONS } from '@/types/fleet.types'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { FLEET_LABELS } from './constants/labels'
 
 // 車輛表單預設值
 const emptyVehicleFormData: FleetVehicleFormData = {
@@ -327,7 +328,7 @@ export const FleetPage: React.FC = () => {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="車隊管理"
+        title={FLEET_LABELS.MANAGE_8153}
         icon={Bus}
         breadcrumb={[
           { label: '首頁', href: '/' },
@@ -365,7 +366,7 @@ export const FleetPage: React.FC = () => {
                 className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-morandi-gold rounded-none px-1 pb-2"
               >
                 <Wrench size={16} className="mr-2" />
-                維護記錄
+                {FLEET_LABELS.LABEL_9547}
               </TabsTrigger>
             </TabsList>
           </div>
@@ -391,7 +392,7 @@ export const FleetPage: React.FC = () => {
 
           <TabsContent value="logs" className="flex-1 overflow-auto mt-0 p-0">
             <div className="flex items-center justify-center h-full text-morandi-secondary">
-              維護記錄功能開發中...
+              {FLEET_LABELS.LABEL_7181}
             </div>
           </TabsContent>
         </Tabs>

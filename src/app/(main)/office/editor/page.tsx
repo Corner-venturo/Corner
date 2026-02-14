@@ -93,7 +93,7 @@ function SaveAsDialog({
               id="filename"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="輸入檔案名稱..."
+              placeholder={LABELS.LABEL_1344}
               className="mt-2"
               autoFocus
               onKeyDown={(e) => {
@@ -108,14 +108,14 @@ function SaveAsDialog({
               onValueChange={(value) => setSelectedTourId(value === 'private' ? null : value)}
             >
               <SelectTrigger className="mt-2">
-                <SelectValue placeholder="選擇儲存位置" />
+                <SelectValue placeholder={LABELS.SAVING_1081} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="private">{LABELS.PRIVATE_FILES}</SelectItem>
                 {tours && tours.length > 0 && (
                   <>
                     <div className="px-2 py-1.5 text-xs text-muted-foreground border-t mt-1 pt-1">
-                      旅遊團（團隊成員可見）
+                      {LABELS.LABEL_7842}
                     </div>
                     {tours.map((tour) => (
                       <SelectItem key={tour.id} value={tour.id}>

@@ -23,6 +23,7 @@ import {
   Download,
 } from 'lucide-react'
 import type { DailyItinerary, HotelData } from '../../templates/definitions/types'
+import { DESIGNER_LABELS } from './constants/labels'
 
 interface HotelEditorProps {
   templateData: Record<string, unknown>
@@ -161,7 +162,7 @@ export function HotelEditor({
       {extractedHotels.length > 0 && hotels.length === 0 && (
         <div className="p-3 bg-morandi-gold/10 border border-morandi-gold/30 rounded-lg">
           <p className="text-xs text-morandi-primary mb-2">
-            偵測到行程中有 <span className="font-bold text-morandi-gold">{extractedHotels.length}</span> 間不同的飯店：
+            偵測到行程中有 <span className="font-bold text-morandi-gold">{extractedHotels.length}</span> {DESIGNER_LABELS.LABEL_6107}
           </p>
           <ul className="text-[11px] text-morandi-secondary space-y-1 mb-3">
             {extractedHotels.map((h, idx) => (
@@ -180,7 +181,7 @@ export function HotelEditor({
             className="w-full gap-1.5 text-xs bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
             <Download size={12} />
-            從行程帶入飯店
+            {DESIGNER_LABELS.LABEL_2050}
           </Button>
         </div>
       )}
@@ -196,13 +197,13 @@ export function HotelEditor({
             onClick={importHotelsFromItinerary}
             className="text-morandi-gold hover:underline"
           >
-            重新帶入
+            {DESIGNER_LABELS.LABEL_6276}
           </button>
         </div>
       )}
 
       <p className="text-xs text-morandi-secondary">
-        勾選要介紹的飯店，點擊名稱可編輯詳細資訊
+        {DESIGNER_LABELS.EDIT_2476}
       </p>
 
       {/* 飯店列表 */}
@@ -258,7 +259,7 @@ export function HotelEditor({
                 {/* 目前顯示標記 */}
                 {hotel.enabled !== false && idx === currentHotelIndex && (
                   <span className="text-[9px] px-1.5 py-0.5 bg-morandi-gold/20 text-morandi-gold rounded shrink-0">
-                    目前顯示
+                    {DESIGNER_LABELS.LABEL_2986}
                   </span>
                 )}
 
@@ -269,7 +270,7 @@ export function HotelEditor({
                     onClick={() => setCurrentHotel(idx)}
                     className="text-[9px] text-morandi-secondary hover:text-morandi-gold shrink-0"
                   >
-                    切換
+                    {DESIGNER_LABELS.LABEL_4463}
                   </button>
                 )}
 
@@ -295,62 +296,62 @@ export function HotelEditor({
                 <div className="px-2 pb-2 space-y-2 border-t border-border/30 pt-2">
                   {/* 中文名稱 */}
                   <div className="space-y-1">
-                    <Label className="text-[10px] text-morandi-primary">飯店名稱（中文）</Label>
+                    <Label className="text-[10px] text-morandi-primary">{DESIGNER_LABELS.LABEL_5430}</Label>
                     <Input
                       value={hotel.nameZh || ''}
                       onChange={(e) => updateHotelField(idx, 'nameZh', e.target.value)}
                       className="h-7 text-xs"
-                      placeholder="例：星野集團 界 由布院"
+                      placeholder={DESIGNER_LABELS.LABEL_7502}
                     />
                   </div>
 
                   {/* 英文名稱 */}
                   <div className="space-y-1">
-                    <Label className="text-[10px] text-morandi-primary">飯店名稱（英文）</Label>
+                    <Label className="text-[10px] text-morandi-primary">{DESIGNER_LABELS.LABEL_9990}</Label>
                     <Input
                       value={hotel.nameEn || ''}
                       onChange={(e) => updateHotelField(idx, 'nameEn', e.target.value)}
                       className="h-7 text-xs"
-                      placeholder="例：Hoshino Resorts KAI Yufuin"
+                      placeholder={DESIGNER_LABELS.LABEL_4049}
                     />
                   </div>
 
                   {/* 地點 */}
                   <div className="space-y-1">
-                    <Label className="text-[10px] text-morandi-primary">地點</Label>
+                    <Label className="text-[10px] text-morandi-primary">{DESIGNER_LABELS.LABEL_8716}</Label>
                     <Input
                       value={hotel.location || ''}
                       onChange={(e) => updateHotelField(idx, 'location', e.target.value)}
                       className="h-7 text-xs"
-                      placeholder="例：大分縣由布市湯布院町川上"
+                      placeholder={DESIGNER_LABELS.LABEL_3245}
                     />
                   </div>
 
                   {/* 描述 */}
                   <div className="space-y-1">
-                    <Label className="text-[10px] text-morandi-primary">飯店介紹</Label>
+                    <Label className="text-[10px] text-morandi-primary">{DESIGNER_LABELS.LABEL_8542}</Label>
                     <Textarea
                       value={hotel.description || ''}
                       onChange={(e) => updateHotelField(idx, 'description', e.target.value)}
                       className="text-xs min-h-[80px] resize-none"
-                      placeholder="飯店特色介紹..."
+                      placeholder={DESIGNER_LABELS.LABEL_5150}
                     />
                   </div>
 
                   {/* 設施標籤 */}
                   <div className="space-y-1">
-                    <Label className="text-[10px] text-morandi-primary">設施標籤（逗號分隔）</Label>
+                    <Label className="text-[10px] text-morandi-primary">{DESIGNER_LABELS.LABEL_5630}</Label>
                     <Input
                       value={(hotel.tags || []).join(', ')}
                       onChange={(e) => updateHotelField(idx, 'tags', e.target.value.split(',').map(t => t.trim()).filter(Boolean))}
                       className="h-7 text-xs"
-                      placeholder="例：露天溫泉, 懷石料理, 梯田景觀"
+                      placeholder={DESIGNER_LABELS.LABEL_5957}
                     />
                   </div>
 
                   {/* 飯店圖片 */}
                   <div className="space-y-1">
-                    <Label className="text-[10px] text-morandi-primary">飯店圖片</Label>
+                    <Label className="text-[10px] text-morandi-primary">{DESIGNER_LABELS.LABEL_1815}</Label>
                     <ImageUploader
                       value={hotel.image}
                       onChange={(url) => updateHotelField(idx, 'image', url || '')}
@@ -358,7 +359,7 @@ export function HotelEditor({
                       filePrefix="hotel"
                       previewHeight="80px"
                       aspectRatio={16 / 9}
-                      placeholder="上傳飯店圖片"
+                      placeholder={DESIGNER_LABELS.UPLOADING_5167}
                     />
                   </div>
                 </div>
@@ -376,11 +377,11 @@ export function HotelEditor({
         className="w-full gap-1.5 text-xs"
       >
         <Plus size={12} />
-        手動新增飯店
+        {DESIGNER_LABELS.ADD_9739}
       </Button>
 
       <p className="text-[10px] text-morandi-muted">
-        取消勾選可排除不需介紹的飯店（如過境酒店）。續住飯店已自動合併。
+        {DESIGNER_LABELS.LABEL_7873}
       </p>
     </div>
   )

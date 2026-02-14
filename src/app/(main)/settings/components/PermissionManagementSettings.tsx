@@ -24,7 +24,7 @@ export function PermissionManagementSettings() {
                 <h3 className="font-medium">{PERMISSION_LABELS.BRANCH_MANAGEMENT}</h3>
               </div>
               <p className="text-sm text-morandi-secondary mb-3">
-                管理所有分公司（台北、台中等），建立新分公司、查看員工分佈
+                {PERMISSION_LABELS.MANAGE_2715}
               </p>
             </div>
 
@@ -48,7 +48,7 @@ export function PermissionManagementSettings() {
                 <h3 className="font-medium">{PERMISSION_LABELS.CROSS_BRANCH_PERMISSION}</h3>
               </div>
               <p className="text-sm text-morandi-secondary mb-3">
-                授權管理員查看或管理其他分公司的資料（例如：台北管理員可查看台中的旅遊團）
+                {PERMISSION_LABELS.MANAGE_9542}
               </p>
 
               {/* 功能說明 */}

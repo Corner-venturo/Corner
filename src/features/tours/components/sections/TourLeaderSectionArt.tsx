@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import type { TourPageData } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 /**
  * TourLeaderSectionArt 需要的欄位
@@ -72,7 +73,7 @@ export function TourLeaderSectionArt({ data, viewMode }: TourLeaderSectionArtPro
                 className="text-5xl lg:text-7xl font-light mb-6"
                 style={{ fontFamily: "'Zen Old Mincho', serif", color: colors.ink }}
               >
-                領隊資訊
+                {TOURS_LABELS.LABEL_6841}
               </h2>
               <div className="w-24 h-1" style={{ backgroundColor: colors.clay }} />
             </div>
@@ -410,7 +411,7 @@ export function TourLeaderSectionArt({ data, viewMode }: TourLeaderSectionArtPro
                   className="text-lg font-light"
                   style={{ fontFamily: "'Zen Old Mincho', serif", color: colors.ink }}
                 >
-                  集合注意事項
+                  {TOURS_LABELS.LABEL_7853}
                 </h4>
               </div>
 
@@ -427,7 +428,7 @@ export function TourLeaderSectionArt({ data, viewMode }: TourLeaderSectionArtPro
                     1
                   </span>
                   <span style={{ fontFamily: "'Noto Serif TC', serif" }}>
-                    請務必攜帶護照正本（有效期需在六個月以上）
+                    {TOURS_LABELS.LABEL_5488}
                   </span>
                 </li>
                 <li className="flex items-start gap-4 text-sm" style={{ color: colors.ink }}>
@@ -457,7 +458,7 @@ export function TourLeaderSectionArt({ data, viewMode }: TourLeaderSectionArtPro
                     3
                   </span>
                   <span style={{ fontFamily: "'Noto Serif TC', serif" }}>
-                    領隊將穿著公司制服並持團體標誌旗幟等候
+                    {TOURS_LABELS.LABEL_7622}
                   </span>
                 </li>
               </ul>

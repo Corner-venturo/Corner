@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { isHtmlString, cleanTiptapHtml } from '@/lib/utils/rich-text'
 import type { TourPageData } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 // 渲染可能包含 HTML 的文字（保留內聯樣式）
 function RichText({ html, className }: { html: string | null | undefined; className?: string }) {
@@ -119,7 +120,7 @@ export function TourHeroSection({ data, viewMode }: TourHeroSectionProps) {
                     : 'text-xs sm:text-sm text-white/70'
                 }
               >
-                出發日期
+                {TOURS_LABELS.LABEL_4513}
               </div>
               <div
                 className={
@@ -145,7 +146,7 @@ export function TourHeroSection({ data, viewMode }: TourHeroSectionProps) {
                     : 'text-xs sm:text-sm text-white/70'
                 }
               >
-                行程代碼
+                {TOURS_LABELS.LABEL_1470}
               </div>
               <div
                 className={
@@ -172,7 +173,7 @@ export function TourHeroSection({ data, viewMode }: TourHeroSectionProps) {
                       : 'text-xs sm:text-sm text-white/90'
                   }
                 >
-                  售價
+                  {TOURS_LABELS.LABEL_561}
                 </div>
                 <div
                   className={
@@ -195,7 +196,7 @@ export function TourHeroSection({ data, viewMode }: TourHeroSectionProps) {
           transition={{ duration: 2, repeat: Infinity }}
         >
           <p className={viewMode === 'mobile' ? 'text-sm mb-2 font-medium' : 'text-sm mb-2'}>
-            探索行程
+            {TOURS_LABELS.LABEL_4545}
           </p>
           <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path

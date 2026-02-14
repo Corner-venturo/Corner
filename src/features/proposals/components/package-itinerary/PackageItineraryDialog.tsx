@@ -50,7 +50,7 @@ export function PackageItineraryDialog({
           {hook.isDataLoading ? (
             <div className="h-64 flex items-center justify-center">
               <VisuallyHidden>
-                <DialogTitle>載入中...</DialogTitle>
+                <DialogTitle>{PACKAGE_ITINERARY_DIALOG_LABELS.LOADING_6912}</DialogTitle>
               </VisuallyHidden>
               <Loader2 className="w-6 h-6 animate-spin text-morandi-gold" />
             </div>
@@ -88,14 +88,14 @@ export function PackageItineraryDialog({
                       className="ml-auto h-6 px-2 text-[10px] gap-1"
                     >
                       <Eye size={10} />
-                      預覽
+                      {PACKAGE_ITINERARY_DIALOG_LABELS.PREVIEW}
                     </Button>
                   </DialogTitle>
                 </DialogHeader>
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-xs text-morandi-primary">行程標題 *</Label>
+                    <Label className="text-xs text-morandi-primary">{PACKAGE_ITINERARY_DIALOG_LABELS.LABEL_5957}</Label>
                     <Input
                       value={hook.formData.title}
                       onChange={e => hook.setFormData({ ...hook.formData, title: e.target.value })}
@@ -105,7 +105,7 @@ export function PackageItineraryDialog({
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-xs text-morandi-primary">目的地</Label>
+                      <Label className="text-xs text-morandi-primary">{PACKAGE_ITINERARY_DIALOG_LABELS.LABEL_5475}</Label>
                       <Input
                         value={pkg.country_id && pkg.main_city_id
                           ? `${pkg.country_id} (${pkg.main_city_id})`
@@ -115,7 +115,7 @@ export function PackageItineraryDialog({
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-xs text-morandi-primary">行程天數</Label>
+                      <Label className="text-xs text-morandi-primary">{PACKAGE_ITINERARY_DIALOG_LABELS.LABEL_6915}</Label>
                       <Input
                         value={`${hook.calculateDays()} 天`}
                         disabled
@@ -126,7 +126,7 @@ export function PackageItineraryDialog({
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-xs text-morandi-primary">出發日期</Label>
+                      <Label className="text-xs text-morandi-primary">{PACKAGE_ITINERARY_DIALOG_LABELS.LABEL_4513}</Label>
                       <Input
                         value={pkg.start_date || '(未設定)'}
                         disabled
@@ -134,7 +134,7 @@ export function PackageItineraryDialog({
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-xs text-morandi-primary">回程日期</Label>
+                      <Label className="text-xs text-morandi-primary">{PACKAGE_ITINERARY_DIALOG_LABELS.LABEL_2731}</Label>
                       <Input
                         value={pkg.end_date || '(未設定)'}
                         disabled
@@ -216,7 +216,7 @@ export function PackageItineraryDialog({
                           className="h-7 px-2 text-[11px] gap-1 border-morandi-gold text-morandi-gold hover:bg-morandi-gold/10"
                         >
                           <FilePlus size={12} />
-                          另存新版本
+                          {PACKAGE_ITINERARY_DIALOG_LABELS.LABEL_6621}
                         </Button>
                       )}
                       <Button

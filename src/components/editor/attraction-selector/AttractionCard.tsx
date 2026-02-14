@@ -83,7 +83,7 @@ export function AttractionCard({
           {attraction.name}
           {isExisting && (
             <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-morandi-container text-morandi-secondary rounded">
-              已選
+              {COMP_EDITOR_LABELS.LABEL_4095}
             </span>
           )}
         </div>

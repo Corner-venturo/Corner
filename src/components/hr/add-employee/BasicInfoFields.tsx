@@ -15,11 +15,11 @@ interface BasicInfoFieldsProps {
 export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps) {
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-morandi-primary border-b pb-2">基本資料</h3>
+      <h3 className="text-lg font-semibold text-morandi-primary border-b pb-2">{COMP_HR_LABELS.基本資料}</h3>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">顯示名稱 *</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_4383}</label>
           <Input
             value={formData.display_name}
             onChange={e => setFormData({ ...formData, display_name: e.target.value })}
@@ -27,7 +27,7 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">中文姓名</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_9768}</label>
           <Input
             value={formData.chinese_name}
             onChange={e => setFormData({ ...formData, chinese_name: e.target.value })}
@@ -39,7 +39,7 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-morandi-primary mb-1">
-            英文姓名 *
+            {COMP_HR_LABELS.LABEL_3837}
           </label>
           <Input
             value={formData.english_name}
@@ -50,7 +50,7 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
         </div>
         <div>
           <label className="block text-sm font-medium text-morandi-primary mb-1">
-            員工編號（自動生成）
+            {COMP_HR_LABELS.GENERATING_9845}
           </label>
           <Input
             value={userStoreHelpers.generateUserNumber()}
@@ -64,7 +64,7 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">身分證號</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_3405}</label>
         <Input
           value={formData.personal_info.national_id}
           onChange={e =>
@@ -77,7 +77,7 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">生日</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_8658}</label>
         <DatePicker
           value={formData.personal_info.birthday}
           onChange={date =>

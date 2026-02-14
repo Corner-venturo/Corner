@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react'
 import { ChevronsUpDown, ChevronsDownUp } from 'lucide-react'
 import { DailyItinerary, TourFormData, Activity } from '../../types'
 import { DayCard } from './DayCard'
+import { DAILY_ITINERARY_LABELS } from './constants/labels'
 
 interface DayListProps {
   data: TourFormData
@@ -98,7 +99,7 @@ export function DayList({
             }`}
           >
             <ChevronsDownUp size={14} />
-            全部摺疊
+            {DAILY_ITINERARY_LABELS.LABEL_7366}
           </button>
           <button
             type="button"
@@ -111,7 +112,7 @@ export function DayList({
             }`}
           >
             <ChevronsUpDown size={14} />
-            全部展開
+            {DAILY_ITINERARY_LABELS.LABEL_2347}
           </button>
         </div>
       )}

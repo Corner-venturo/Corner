@@ -111,7 +111,7 @@ export function ColleaguesSection({
       >
         {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
         <User size={14} />
-        <span>同事</span>
+        <span>{COMP_WORKSPACE_LABELS.同事}</span>
         <span className="text-xs text-morandi-muted ml-auto">
           {totalColleagues}
         </span>

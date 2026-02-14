@@ -14,11 +14,11 @@ interface JobInfoFieldsProps {
 export function JobInfoFields({ formData, setFormData }: JobInfoFieldsProps) {
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-morandi-primary border-b pb-2">職務資料</h3>
+      <h3 className="text-lg font-semibold text-morandi-primary border-b pb-2">{COMP_HR_LABELS.LABEL_2872}</h3>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">入職日期</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_9610}</label>
           <DatePicker
             value={formData.job_info.hire_date}
             onChange={date =>
@@ -31,7 +31,7 @@ export function JobInfoFields({ formData, setFormData }: JobInfoFieldsProps) {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">起薪</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_8149}</label>
           <Input
             type="number"
             value={formData.salary_info.base_salary}

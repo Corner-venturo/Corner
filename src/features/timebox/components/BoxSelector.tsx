@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Dumbbell, MessageSquare, Package, X } from 'lucide-react'
 import { type TimeboxBox } from '../hooks/useTimeboxData'
+import { TIMEBOX_LABELS } from './constants/labels'
 
 const typeIcons = {
   workout: Dumbbell,
@@ -63,7 +64,7 @@ export default function BoxSelector({ boxes, onSelect, onClose, timeInterval }: 
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent level={1} className="max-w-md">
         <DialogHeader>
-          <DialogTitle>選擇箱子</DialogTitle>
+          <DialogTitle>{TIMEBOX_LABELS.SELECT_4577}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -74,8 +75,8 @@ export default function BoxSelector({ boxes, onSelect, onClose, timeInterval }: 
             </label>
             {boxes.length === 0 ? (
               <div className="text-center text-morandi-secondary py-4">
-                <div className="mb-3">還沒有建立任何箱子</div>
-                <p className="text-sm">請先到右上角「管理箱子」建立箱子模板</p>
+                <div className="mb-3">{TIMEBOX_LABELS.NOT_FOUND_5847}</div>
+                <p className="text-sm">{TIMEBOX_LABELS.MANAGE_6118}</p>
               </div>
             ) : (
               <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -116,7 +117,7 @@ export default function BoxSelector({ boxes, onSelect, onClose, timeInterval }: 
           {selectedBox && (
             <div>
               <label className="block text-sm font-medium text-morandi-primary mb-2">
-                持續時間
+                {TIMEBOX_LABELS.LABEL_1273}
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {durationOptions.slice(0, 12).map((option) => (
@@ -141,13 +142,13 @@ export default function BoxSelector({ boxes, onSelect, onClose, timeInterval }: 
           <div className="flex justify-end space-x-2 pt-4">
             <Button variant="outline" onClick={onClose} className="text-morandi-secondary border-border gap-2">
               <X size={16} />
-              取消
+              {TIMEBOX_LABELS.CANCEL}
             </Button>
             <Button
               onClick={handleConfirm}
               disabled={!selectedBox}
             >
-              選擇
+              {TIMEBOX_LABELS.SELECT}
             </Button>
           </div>
         </div>

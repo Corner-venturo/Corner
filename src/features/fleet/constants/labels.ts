@@ -99,6 +99,18 @@ export const VEHICLE_DIALOG_LABELS = {
   REGISTRATION_DATE: '領牌日期',
   INSPECTION_EXPIRY: '驗車到期日',
   INSURANCE_EXPIRY: '保險到期日',
+
+  EXAMPLE_2914: '例如：ABC-1234',
+  EXAMPLE_6950: '例如：1號車、A車',
+  EXAMPLE_4883: '例如：Toyota',
+  EXAMPLE_1982: '例如：Coaster',
+  EXAMPLE_1039: '例如：2020',
+  LABEL_8240: '車身號碼',
+  LABEL_5555: '公里數',
+  LABEL_9755: '下次保養日',
+  LABEL_974: '下次保養里程',
+  REMARKS: '備註',
+  LABEL_2669: '其他備註資訊（選填）',
 }
 
 export const DRIVER_DIALOG_LABELS = {
@@ -116,4 +128,11 @@ export const DRIVER_DIALOG_LABELS = {
   HEALTH_CHECK: '健康檢查',
   HEALTH_CHECK_EXPIRY: '體檢到期日',
   REMARKS: '備註',
+
+  LABEL_5402: '輸入司機姓名',
+  LABEL_8624: '輸入電話號碼',
+  LABEL_4540: '輸入身分證字號',
+  LABEL_8646: '輸入駕照號碼',
+  LABEL_1727: '輸入職業駕照號碼',
+  LABEL_2669: '其他備註資訊（選填）',
 }

@@ -11,6 +11,7 @@ import { Edit2, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DateCell } from '@/components/table-cells'
 import type { Confirmation } from '@/types/confirmation.types'
+import { CONFIRMATIONS_LABELS } from './constants/labels'
 
 interface ConfirmationsListProps {
   confirmations: Confirmation[]
@@ -138,7 +139,7 @@ export const ConfirmationsList: React.FC<ConfirmationsListProps> = ({
               onEdit(conf.id)
             }}
             className="text-morandi-gold hover:bg-morandi-gold/10"
-            title="編輯"
+            title={CONFIRMATIONS_LABELS.EDIT}
           >
             <Edit2 size={16} />
           </Button>
@@ -151,7 +152,7 @@ export const ConfirmationsList: React.FC<ConfirmationsListProps> = ({
               onDelete(conf.id)
             }}
             className="text-morandi-red hover:bg-morandi-red/10"
-            title="刪除"
+            title={CONFIRMATIONS_LABELS.DELETE}
           >
             <Trash2 size={16} />
           </Button>

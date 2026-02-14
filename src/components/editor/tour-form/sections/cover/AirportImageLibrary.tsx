@@ -99,9 +99,9 @@ export function AirportImageLibrary({
   if (!airportCode) {
     return (
       <div className="space-y-3">
-        <label className="block text-sm font-medium text-morandi-primary">封面圖片</label>
+        <label className="block text-sm font-medium text-morandi-primary">{COMP_EDITOR_LABELS.封面圖片}</label>
         <div className="text-sm text-morandi-secondary p-4 bg-morandi-container/30 rounded-lg text-center">
-          請先選擇城市
+          {COMP_EDITOR_LABELS.SELECT_6587}
         </div>
         <ImageUploader
           value={selectedImage}
@@ -132,7 +132,7 @@ export function AirportImageLibrary({
           className="h-7 px-2 text-xs"
         >
           <Plus size={14} className="mr-1" />
-          新增
+          {COMP_EDITOR_LABELS.新增}
         </Button>
       </div>
 
@@ -188,7 +188,7 @@ export function AirportImageLibrary({
         </div>
       ) : (
         <div className="text-sm text-morandi-secondary p-4 bg-morandi-container/30 rounded-lg text-center">
-          尚無圖片
+          {COMP_EDITOR_LABELS.EMPTY_3148}
         </div>
       )}
 
@@ -198,7 +198,7 @@ export function AirportImageLibrary({
         <div className="space-y-1.5">
           <div className="flex items-center gap-1 text-[11px] text-morandi-secondary">
             <Upload size={11} />
-            <span>上傳</span>
+            <span>{COMP_EDITOR_LABELS.UPLOAD}</span>
           </div>
           <ImageUploader
             value={selectedImage}
@@ -227,7 +227,7 @@ export function AirportImageLibrary({
           >
             <div className="flex flex-col items-center gap-0.5 text-morandi-secondary">
               <Search size={18} />
-              <span className="text-[10px]">搜尋圖片</span>
+              <span className="text-[10px]">{COMP_EDITOR_LABELS.SEARCH_4460}</span>
             </div>
           </Button>
         </div>
@@ -256,7 +256,7 @@ export function AirportImageLibrary({
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent level={2} className="max-w-md">
           <DialogHeader>
-            <DialogTitle>新增圖片到 {airportCode}</DialogTitle>
+            <DialogTitle>{COMP_EDITOR_LABELS.ADD_6489} {airportCode}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -272,7 +272,7 @@ export function AirportImageLibrary({
 
             <div>
               <label className="block text-sm font-medium text-morandi-primary mb-1">
-                標籤（選填）
+                {COMP_EDITOR_LABELS.LABEL_9093}
               </label>
               <Input
                 value={newImageLabel}
@@ -293,7 +293,7 @@ export function AirportImageLibrary({
                 }}
                 className="flex-1"
               >
-                取消
+                {COMP_EDITOR_LABELS.取消}
               </Button>
               <Button
                 type="button"

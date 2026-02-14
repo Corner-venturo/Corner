@@ -174,12 +174,12 @@ function TourCard({ tour }: { tour: TourData }) {
         {isExpanded ? (
           <>
             <ChevronUp size={14} />
-            <span>收合</span>
+            <span>{COMP_WORKSPACE_LABELS.LABEL_5509}</span>
           </>
         ) : (
           <>
             <ChevronDown size={14} />
-            <span>展開名單</span>
+            <span>{COMP_WORKSPACE_LABELS.LABEL_684}</span>
           </>
         )}
       </button>
@@ -192,7 +192,7 @@ function TourCard({ tour }: { tour: TourData }) {
             <div>
               <div className="flex items-center gap-1.5 text-xs font-medium text-amber-600 mb-1">
                 <AlertTriangle size={12} />
-                <span>待開票 ({groupedMembers.needs_ticketing.length})</span>
+                <span>{COMP_WORKSPACE_LABELS.LABEL_8022}{groupedMembers.needs_ticketing.length})</span>
               </div>
               <div className="flex flex-wrap gap-1">
                 {groupedMembers.needs_ticketing.map(m => (
@@ -213,7 +213,7 @@ function TourCard({ tour }: { tour: TourData }) {
             <div>
               <div className="flex items-center gap-1.5 text-xs font-medium text-morandi-red mb-1">
                 <HelpCircle size={12} />
-                <span>無紀錄 ({groupedMembers.no_record.length})</span>
+                <span>{COMP_WORKSPACE_LABELS.LABEL_2393}{groupedMembers.no_record.length})</span>
               </div>
               <div className="flex flex-wrap gap-1">
                 {groupedMembers.no_record.map(m => (
@@ -233,7 +233,7 @@ function TourCard({ tour }: { tour: TourData }) {
             <div>
               <div className="flex items-center gap-1.5 text-xs font-medium text-morandi-green mb-1">
                 <Check size={12} />
-                <span>已開票 ({groupedMembers.ticketed.length})</span>
+                <span>{COMP_WORKSPACE_LABELS.LABEL_3751}{groupedMembers.ticketed.length})</span>
               </div>
               <div className="flex flex-wrap gap-1">
                 {groupedMembers.ticketed.map(m => (
@@ -253,7 +253,7 @@ function TourCard({ tour }: { tour: TourData }) {
             <div>
               <div className="flex items-center gap-1.5 text-xs font-medium text-morandi-secondary mb-1">
                 <Plane size={12} />
-                <span>機票自理 ({groupedMembers.self_arranged.length})</span>
+                <span>{COMP_WORKSPACE_LABELS.LABEL_8616}{groupedMembers.self_arranged.length})</span>
               </div>
               <div className="flex flex-wrap gap-1">
                 {groupedMembers.self_arranged.map(m => (
@@ -278,7 +278,7 @@ export function TicketStatusCard({ tours, summary, generatedAt }: TicketStatusCa
   if (!tours || tours.length === 0) {
     return (
       <div className="text-sm text-morandi-secondary">
-        沒有需要處理的開票資料
+        {COMP_WORKSPACE_LABELS.PROCESSING_3053}
       </div>
     )
   }
@@ -288,7 +288,7 @@ export function TicketStatusCard({ tours, summary, generatedAt }: TicketStatusCa
       {/* 標題 */}
       <div className="flex items-center gap-2 text-sm">
         <span className="text-lg">🎫</span>
-        <span className="font-medium text-morandi-primary">開票狀態提醒</span>
+        <span className="font-medium text-morandi-primary">{COMP_WORKSPACE_LABELS.LABEL_6681}</span>
         {generatedAt && (
           <span className="text-xs text-morandi-secondary">
             {formatDateDisplay(generatedAt, 'MM/dd HH:mm')}
@@ -306,7 +306,7 @@ export function TicketStatusCard({ tours, summary, generatedAt }: TicketStatusCa
       {/* 總計 */}
       {tours.length > 1 && (
         <div className="flex items-center gap-3 text-xs text-morandi-secondary pt-1 border-t border-morandi-container/30">
-          <span>共 {tours.length} 個團</span>
+          <span>{COMP_WORKSPACE_LABELS.LABEL_5332} {tours.length} 個團</span>
           {summary.needs_ticketing > 0 && (
             <span className="text-amber-600">{summary.needs_ticketing} 待開票</span>
           )}

@@ -30,6 +30,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import type { CanvasElement, TextElement, ShapeElement, ImageElement, GroupElement } from './types'
+import { DESIGNER_LABELS } from './constants/labels'
 
 // 區塊定義
 interface BlockDefinition {
@@ -766,7 +767,7 @@ export function BlockLibrary({ isOpen, onClose, onInsertBlock, insertY = 100 }: 
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent level={2} className="max-w-md">
         <DialogHeader>
-          <DialogTitle>插入區塊</DialogTitle>
+          <DialogTitle>{DESIGNER_LABELS.LABEL_5421}</DialogTitle>
         </DialogHeader>
 
         {/* 分類選擇 */}

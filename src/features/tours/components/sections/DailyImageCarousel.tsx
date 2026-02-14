@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { ThreeDPhotoWall } from '@/components/ui/3d-photo-wall'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { TOURS_LABELS } from './constants/labels'
 
 // 每日圖片型別（支援位置調整）
 interface DailyImage {
@@ -115,7 +116,7 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
               {allTourImages.length >= 4 && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/20 transition-colors group">
                   <div className="px-4 py-2 bg-black/60 text-white text-sm rounded-full opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
-                    點擊查看照片牆
+                    {TOURS_LABELS.LABEL_4032}
                   </div>
                 </div>
               )}

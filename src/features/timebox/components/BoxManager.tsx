@@ -11,6 +11,7 @@ import { Plus, Dumbbell, MessageSquare, Package, Trash2, Save, X } from 'lucide-
 import { useTimeboxBoxes, morandiColors, type TimeboxBox, type ReminderData } from '../hooks/useTimeboxData'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
+import { TIMEBOX_LABELS } from './constants/labels'
 
 const typeIcons = {
   workout: Dumbbell,
@@ -150,7 +151,7 @@ export default function BoxManager() {
       <div className="space-y-1">
         {userBoxes.length === 0 ? (
           <div className="text-center text-morandi-secondary py-8">
-            還沒有建立任何箱子
+            {TIMEBOX_LABELS.NOT_FOUND_5847}
           </div>
         ) : (
           userBoxes.map((box) => {
@@ -182,7 +183,7 @@ export default function BoxManager() {
 
                 {/* 提示有預設內容 */}
                 {boxType === 'reminder' && box.default_content && (
-                  <div className="text-xs text-morandi-gold">已設定</div>
+                  <div className="text-xs text-morandi-gold">{TIMEBOX_LABELS.SETTINGS_7373}</div>
                 )}
               </button>
             )
@@ -197,7 +198,7 @@ export default function BoxManager() {
         onClick={openCreateDialog}
       >
         <Plus className="h-4 w-4" />
-        新增箱子
+        {TIMEBOX_LABELS.ADD_7028}
       </Button>
 
       {/* 編輯/新增對話框 */}
@@ -213,19 +214,19 @@ export default function BoxManager() {
             {/* 名稱 */}
             <div>
               <label className="block text-sm font-medium text-morandi-primary mb-2">
-                名稱
+                {TIMEBOX_LABELS.NAME}
               </label>
               <Input
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="箱子名稱"
+                placeholder={TIMEBOX_LABELS.LABEL_7747}
               />
             </div>
 
             {/* 類型 */}
             <div>
               <label className="block text-sm font-medium text-morandi-primary mb-2">
-                類型
+                {TIMEBOX_LABELS.TYPE}
               </label>
               <Select
                 value={formData.type}
@@ -237,9 +238,9 @@ export default function BoxManager() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="basic">一般箱子</SelectItem>
-                  <SelectItem value="workout">重訓箱子</SelectItem>
-                  <SelectItem value="reminder">文字提示箱子</SelectItem>
+                  <SelectItem value="basic">{TIMEBOX_LABELS.LABEL_9487}</SelectItem>
+                  <SelectItem value="workout">{TIMEBOX_LABELS.LABEL_3464}</SelectItem>
+                  <SelectItem value="reminder">{TIMEBOX_LABELS.LABEL_2802}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -247,7 +248,7 @@ export default function BoxManager() {
             {/* 顏色 */}
             <div>
               <label className="block text-sm font-medium text-morandi-primary mb-2">
-                顏色
+                {TIMEBOX_LABELS.LABEL_418}
               </label>
               <div className="flex flex-wrap gap-2">
                 {morandiColors.map((c) => (
@@ -270,7 +271,7 @@ export default function BoxManager() {
             {/* 預設時長 */}
             <div>
               <label className="block text-sm font-medium text-morandi-primary mb-2">
-                預設時長
+                {TIMEBOX_LABELS.LABEL_6251}
               </label>
               <div className="flex flex-wrap gap-2">
                 {[30, 60, 90, 120, 180].map((duration) => (
@@ -294,7 +295,7 @@ export default function BoxManager() {
             {formData.type === 'reminder' && (
               <div>
                 <label className="block text-sm font-medium text-morandi-primary mb-2">
-                  預設提示內容
+                  {TIMEBOX_LABELS.LABEL_3950}
                 </label>
                 <Textarea
                   placeholder={`例如：保濕程序\n1. 卸妝\n2. 洗臉\n3. 化妝水...`}
@@ -304,7 +305,7 @@ export default function BoxManager() {
                   className="resize-none"
                 />
                 <p className="text-xs text-morandi-secondary mt-1">
-                  新增排程時會自動帶入此內容
+                  {TIMEBOX_LABELS.ADD_2897}
                 </p>
               </div>
             )}
@@ -318,7 +319,7 @@ export default function BoxManager() {
                   className="text-status-danger border-morandi-red/30 hover:bg-status-danger-bg gap-1"
                 >
                   <Trash2 size={16} />
-                  刪除
+                  {TIMEBOX_LABELS.DELETE}
                 </Button>
               ) : (
                 <div />
@@ -326,7 +327,7 @@ export default function BoxManager() {
               <div className="flex gap-2">
                 <Button variant="outline" onClick={closeDialog} className="gap-1">
                   <X size={16} />
-                  取消
+                  {TIMEBOX_LABELS.CANCEL}
                 </Button>
                 <Button
                   onClick={handleSave}
@@ -334,7 +335,7 @@ export default function BoxManager() {
                   className="bg-morandi-gold hover:bg-morandi-gold-hover gap-1"
                 >
                   <Save size={16} />
-                  儲存
+                  {TIMEBOX_LABELS.SAVE}
                 </Button>
               </div>
             </div>

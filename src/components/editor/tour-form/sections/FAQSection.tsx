@@ -68,7 +68,7 @@ export function FAQSection({ data, onChange }: FAQSectionProps) {
     <div className="space-y-6">
       {/* 區塊標題 */}
       <h2 className="text-lg font-bold text-morandi-primary border-b-2 border-morandi-gold pb-1">
-        常見問題
+        {COMP_EDITOR_LABELS.常見問題}
       </h2>
 
       {/* 顯示開關 */}
@@ -76,9 +76,9 @@ export function FAQSection({ data, onChange }: FAQSectionProps) {
         <div className="flex items-center gap-3">
           <MessageCircleQuestion className="h-5 w-5 text-morandi-primary" />
           <div>
-            <h3 className="font-medium text-morandi-primary">常見問題 FAQ</h3>
+            <h3 className="font-medium text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_4954}</h3>
             <p className="text-sm text-morandi-secondary">
-              顯示常見問題與解答，幫助客戶快速了解行程資訊
+              {COMP_EDITOR_LABELS.LABEL_7714}
             </p>
           </div>
         </div>
@@ -127,7 +127,7 @@ export function FAQSection({ data, onChange }: FAQSectionProps) {
 
                 {/* 問題 */}
                 <div>
-                  <Label className="text-xs text-morandi-primary">問題 (Q)</Label>
+                  <Label className="text-xs text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_5266}</Label>
                   <Input
                     value={faq.question}
                     onChange={(e) => updateFAQ(index, { question: e.target.value })}
@@ -138,7 +138,7 @@ export function FAQSection({ data, onChange }: FAQSectionProps) {
 
                 {/* 答案 */}
                 <div>
-                  <Label className="text-xs text-morandi-primary">答案 (A)</Label>
+                  <Label className="text-xs text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_1877}</Label>
                   <Textarea
                     value={faq.answer}
                     onChange={(e) => updateFAQ(index, { answer: e.target.value })}
@@ -159,7 +159,7 @@ export function FAQSection({ data, onChange }: FAQSectionProps) {
             className="w-full border-dashed"
           >
             <Plus className="h-4 w-4 mr-2" />
-            新增常見問題
+            {COMP_EDITOR_LABELS.ADD_8197}
           </Button>
 
           {/* 預覽提示 */}

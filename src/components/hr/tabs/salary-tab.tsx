@@ -6,6 +6,7 @@ import { TrendingUp } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { useUserStore } from '@/stores/user-store'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
+import { HR_LABELS } from './constants/labels'
 
 interface SalaryTabProps {
   employee: Employee
@@ -34,7 +35,7 @@ export const SalaryTab = forwardRef<{ handleSave: () => void }, SalaryTabProps>(
       <div className="space-y-6">
         {/* 月薪設定（主要薪資）*/}
         <div className="bg-morandi-gold/10 rounded-lg p-4 border-2 border-morandi-gold/30">
-          <h4 className="font-medium text-morandi-primary mb-3">月薪</h4>
+          <h4 className="font-medium text-morandi-primary mb-3">{HR_LABELS.LABEL_5360}</h4>
           <div className="flex items-center gap-4">
             {isEditing ? (
               <>
@@ -50,25 +51,25 @@ export const SalaryTab = forwardRef<{ handleSave: () => void }, SalaryTabProps>(
               <CurrencyCell amount={monthlySalary} className="text-3xl font-bold text-morandi-primary" />
             )}
           </div>
-          <p className="text-xs text-morandi-secondary mt-2">用於薪資請款的主要薪資金額</p>
+          <p className="text-xs text-morandi-secondary mt-2">{HR_LABELS.LABEL_3358}</p>
         </div>
 
         {/* 目前薪資資訊（舊系統 salary_info）*/}
         {(baseSalary > 0 || allowances.length > 0) && (
           <div className="bg-morandi-container/10 rounded-lg p-4">
-            <h4 className="font-medium text-morandi-primary mb-3 text-sm">薪資詳細結構（選填）</h4>
+            <h4 className="font-medium text-morandi-primary mb-3 text-sm">{HR_LABELS.LABEL_6093}</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="text-center">
                 <CurrencyCell amount={baseSalary} className="text-xl font-bold text-morandi-primary" />
-                <p className="text-xs text-morandi-muted">底薪</p>
+                <p className="text-xs text-morandi-muted">{HR_LABELS.LABEL_786}</p>
               </div>
               <div className="text-center">
                 <CurrencyCell amount={totalAllowances} className="text-xl font-bold text-morandi-gold" />
-                <p className="text-xs text-morandi-muted">津貼</p>
+                <p className="text-xs text-morandi-muted">{HR_LABELS.LABEL_295}</p>
               </div>
               <div className="text-center">
                 <CurrencyCell amount={baseSalary + totalAllowances} className="text-xl font-bold text-status-success" />
-                <p className="text-xs text-morandi-muted">總薪資</p>
+                <p className="text-xs text-morandi-muted">{HR_LABELS.TOTAL_2192}</p>
               </div>
             </div>
           </div>
@@ -76,7 +77,7 @@ export const SalaryTab = forwardRef<{ handleSave: () => void }, SalaryTabProps>(
 
         {/* 津貼明細 */}
         <div className="bg-morandi-container/10 rounded-lg p-4">
-          <h4 className="font-medium text-morandi-primary mb-3">津貼明細</h4>
+          <h4 className="font-medium text-morandi-primary mb-3">{HR_LABELS.LABEL_4237}</h4>
           {allowances.length > 0 ? (
             <div className="space-y-2">
               {allowances.map((allowance, index) => (
@@ -90,7 +91,7 @@ export const SalaryTab = forwardRef<{ handleSave: () => void }, SalaryTabProps>(
               ))}
             </div>
           ) : (
-            <p className="text-morandi-muted text-sm">無津貼項目</p>
+            <p className="text-morandi-muted text-sm">{HR_LABELS.LABEL_8719}</p>
           )}
         </div>
 
@@ -98,7 +99,7 @@ export const SalaryTab = forwardRef<{ handleSave: () => void }, SalaryTabProps>(
         <div className="bg-morandi-container/10 rounded-lg p-4">
           <h4 className="font-medium text-morandi-primary mb-3 flex items-center gap-2">
             <TrendingUp size={16} />
-            薪資調整歷史
+            {HR_LABELS.LABEL_4231}
           </h4>
           <div className="space-y-3">
             {salaryHistory.map((record, index: number) => (

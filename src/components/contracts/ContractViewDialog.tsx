@@ -148,9 +148,9 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
       <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
         <DialogContent level={2}>
           <DialogHeader>
-            <DialogTitle>無合約資料</DialogTitle>
+            <DialogTitle>{COMP_CONTRACTS_LABELS.LABEL_2532}</DialogTitle>
           </DialogHeader>
-          <div className="py-4 text-morandi-secondary">此旅遊團尚未儲存合約資料。</div>
+          <div className="py-4 text-morandi-secondary">{COMP_CONTRACTS_LABELS.SAVING_238}</div>
         </DialogContent>
       </Dialog>
     )
@@ -169,7 +169,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
         <div className="flex-1 overflow-auto py-4">
           {loading ? (
             <div className="flex items-center justify-center h-64">
-              <div className="text-morandi-secondary">載入合約中...</div>
+              <div className="text-morandi-secondary">{COMP_CONTRACTS_LABELS.LOADING_2471}</div>
             </div>
           ) : (
             <div
@@ -182,7 +182,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={printing} className="gap-2">
             <X size={16} />
-            關閉
+            {COMP_CONTRACTS_LABELS.CLOSE}
           </Button>
           <Button
             onClick={handlePrint}

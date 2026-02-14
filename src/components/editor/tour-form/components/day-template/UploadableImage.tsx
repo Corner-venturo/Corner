@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { Upload, Loader2, ImageIcon } from 'lucide-react'
+import { DAY_TEMPLATE_LABELS } from './constants/labels'
 
 interface UploadableImageProps {
   src?: string
@@ -38,7 +39,7 @@ export function UploadableImage({
           ) : (
             <div className="text-white text-center">
               <Upload size={20} className="mx-auto mb-1" />
-              <span className="text-xs">更換圖片</span>
+              <span className="text-xs">{DAY_TEMPLATE_LABELS.LABEL_1707}</span>
             </div>
           )}
         </div>
@@ -56,7 +57,7 @@ export function UploadableImage({
       ) : (
         <>
           <ImageIcon size={20} className="text-morandi-muted mb-1" />
-          <span className="text-xs text-morandi-muted">上傳圖片</span>
+          <span className="text-xs text-morandi-muted">{DAY_TEMPLATE_LABELS.UPLOADING_201}</span>
         </>
       )}
     </div>

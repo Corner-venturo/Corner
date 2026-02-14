@@ -147,12 +147,12 @@ export const TourOverview = React.memo(function TourOverview({
         <div className="flex items-center gap-8 text-sm">
           <div className="flex items-center gap-2">
             <FileText size={16} className="text-morandi-secondary" />
-            <span className="text-morandi-secondary">團號</span>
+            <span className="text-morandi-secondary">{COMP_TOURS_LABELS.LABEL_9750}</span>
             <span className="font-medium text-morandi-primary">{tour.code}</span>
           </div>
           <div className="flex items-center gap-2">
             <MapPin size={16} className="text-morandi-secondary" />
-            <span className="text-morandi-secondary">目的地</span>
+            <span className="text-morandi-secondary">{COMP_TOURS_LABELS.LABEL_5475}</span>
             <span className="font-medium text-morandi-primary">{tour.location}</span>
           </div>
           <div className="flex items-center gap-2">
@@ -165,15 +165,15 @@ export const TourOverview = React.memo(function TourOverview({
         </div>
         <div className="flex items-center gap-2">
           <Button onClick={onManageQuote} size="sm" className="bg-morandi-gold hover:bg-morandi-gold-hover text-white">
-            <Calculator size={14} className="mr-1" />報價單
+            <Calculator size={14} className="mr-1" />{COMP_TOURS_LABELS.LABEL_4601}
           </Button>
           {onManageItinerary && (
             <Button onClick={onManageItinerary} size="sm" variant="outline">
-              <FileText size={14} className="mr-1" />行程表
+              <FileText size={14} className="mr-1" />{COMP_TOURS_LABELS.行程表}
             </Button>
           )}
           <Button onClick={onEdit} size="sm" variant="outline">
-            <FileText size={14} className="mr-1" />編輯
+            <FileText size={14} className="mr-1" />{COMP_TOURS_LABELS.EDIT}
           </Button>
         </div>
       </div>
@@ -182,7 +182,7 @@ export const TourOverview = React.memo(function TourOverview({
       <div className="border border-border rounded-lg overflow-hidden bg-card">
         {/* 區塊標題行 */}
         <div className="bg-morandi-container/50 border-b border-border/60 px-4 py-2">
-          <span className="text-sm font-medium text-morandi-primary">明細</span>
+          <span className="text-sm font-medium text-morandi-primary">{COMP_TOURS_LABELS.LABEL_3513}</span>
         </div>
         {/* 內容 */}
         <div className="flex items-stretch">

@@ -19,6 +19,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { CurrencyCell } from '@/components/table-cells'
+import { COMP_WORKSPACE_LABELS } from './constants/labels'
 
 interface CreateReceiptDialogProps {
   order: {
@@ -75,7 +76,7 @@ export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateR
         <DialogHeader className="pb-3 border-b border-morandi-gold/20">
           <DialogTitle className="flex items-center gap-2">
             <DollarSign className="text-morandi-gold" size={20} />
-            <span>建立收款單</span>
+            <span>{COMP_WORKSPACE_LABELS.LABEL_1761}</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -83,26 +84,26 @@ export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateR
         <div className="space-y-4 my-4">
           {/* 訂單資訊 */}
           <div className="bg-morandi-container/5 rounded-lg p-3 border border-morandi-gold/20">
-            <div className="text-sm font-medium text-morandi-secondary mb-2">訂單資訊：</div>
+            <div className="text-sm font-medium text-morandi-secondary mb-2">{COMP_WORKSPACE_LABELS.LABEL_1002}</div>
             <div className="space-y-1">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-morandi-secondary">訂單號：</span>
+                <span className="text-morandi-secondary">{COMP_WORKSPACE_LABELS.LABEL_9754}</span>
                 <span className="font-medium text-morandi-primary">{order.order_number || '-'}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-morandi-secondary">客戶：</span>
+                <span className="text-morandi-secondary">{COMP_WORKSPACE_LABELS.LABEL_6286}</span>
                 <span className="text-morandi-primary">{order.contact_person}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-morandi-secondary">總額：</span>
+                <span className="text-morandi-secondary">{COMP_WORKSPACE_LABELS.TOTAL_8832}</span>
                 <CurrencyCell amount={order.total_amount} className="text-morandi-primary" />
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-morandi-secondary">已收：</span>
+                <span className="text-morandi-secondary">{COMP_WORKSPACE_LABELS.LABEL_7341}</span>
                 <CurrencyCell amount={order.paid_amount} className="text-morandi-primary" />
               </div>
               <div className="flex items-center justify-between text-sm pt-2 border-t border-morandi-gold/20">
-                <span className="text-morandi-secondary">待收金額：</span>
+                <span className="text-morandi-secondary">{COMP_WORKSPACE_LABELS.LABEL_385}</span>
                 <CurrencyCell amount={order.gap} variant="expense" className="text-lg font-semibold" />
               </div>
             </div>
@@ -111,13 +112,13 @@ export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateR
           {/* 收款日期 */}
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
-              收款日期
+              {COMP_WORKSPACE_LABELS.LABEL_4500}
             </label>
             <div className="relative">
               <DatePicker
                 value={receiptDate}
                 onChange={date => setReceiptDate(date)}
-                placeholder="選擇日期"
+                placeholder={COMP_WORKSPACE_LABELS.選擇日期}
                 className="pl-10"
               />
               <Calendar
@@ -130,7 +131,7 @@ export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateR
           {/* 收款方式 */}
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
-              收款方式
+              {COMP_WORKSPACE_LABELS.LABEL_5187}
             </label>
             <Select
               value={paymentMethod}
@@ -144,10 +145,10 @@ export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateR
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="現金">現金</SelectItem>
-                <SelectItem value="匯款">匯款</SelectItem>
-                <SelectItem value="刷卡">刷卡</SelectItem>
-                <SelectItem value="支票">支票</SelectItem>
+                <SelectItem value="現金">{COMP_WORKSPACE_LABELS.現金}</SelectItem>
+                <SelectItem value="匯款">{COMP_WORKSPACE_LABELS.匯款}</SelectItem>
+                <SelectItem value="刷卡">{COMP_WORKSPACE_LABELS.刷卡}</SelectItem>
+                <SelectItem value="支票">{COMP_WORKSPACE_LABELS.支票}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -155,26 +156,26 @@ export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateR
           {/* 收款金額 */}
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
-              收款金額
+              {COMP_WORKSPACE_LABELS.LABEL_811}
             </label>
             <Input
               type="number"
               value={amount}
               onChange={e => setAmount(e.target.value)}
-              placeholder="輸入收款金額"
+              placeholder={COMP_WORKSPACE_LABELS.輸入收款金額}
             />
           </div>
 
           {/* 備註 */}
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
-              備註（選填）
+              {COMP_WORKSPACE_LABELS.LABEL_8278}
             </label>
             <Textarea
               value={note}
               onChange={e => setNote(e.target.value)}
               rows={3}
-              placeholder="輸入備註..."
+              placeholder={COMP_WORKSPACE_LABELS.輸入備註}
             />
           </div>
         </div>
@@ -183,7 +184,7 @@ export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateR
         <DialogFooter className="pt-3 border-t border-morandi-gold/20">
           <button className="btn-morandi-secondary !py-2 !px-4 flex items-center gap-2" onClick={onClose}>
             <X size={16} />
-            取消
+            {COMP_WORKSPACE_LABELS.CANCEL}
           </button>
           <button
             className="btn-morandi-primary !py-2 !px-4 flex items-center gap-2"

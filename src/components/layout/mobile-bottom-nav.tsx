@@ -237,7 +237,7 @@ export function MobileBottomNav() {
             )}
           >
             <MoreHorizontal size={20} />
-            <span className="text-xs mt-1 font-medium">更多</span>
+            <span className="text-xs mt-1 font-medium">{COMP_LAYOUT_LABELS.LABEL_9472}</span>
           </button>
         </div>
       </div>
@@ -294,7 +294,7 @@ function MobileNavSettings({ availableItems, selectedItemIds, onSave, onClose }:
       <DialogContent level={1} className="fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 w-full max-w-full md:max-w-md md:left-[50%] md:top-[50%] md:translate-x-[-50%] md:translate-y-[-50%] md:bottom-auto rounded-t-xl md:rounded-xl p-0 gap-0">
         {/* 標題列 */}
         <DialogHeader className="p-4 border-b border-border">
-          <DialogTitle className="text-lg font-bold text-morandi-primary">自訂底部導航欄</DialogTitle>
+          <DialogTitle className="text-lg font-bold text-morandi-primary">{COMP_LAYOUT_LABELS.LABEL_2572}</DialogTitle>
         </DialogHeader>
 
         {/* 提示 */}
@@ -343,13 +343,13 @@ function MobileNavSettings({ availableItems, selectedItemIds, onSave, onClose }:
             onClick={onClose}
             className="flex-1 px-4 py-3 rounded-lg border border-border hover:bg-morandi-container/50 transition-colors font-medium"
           >
-            取消
+            {COMP_LAYOUT_LABELS.CANCEL}
           </button>
           <button
             onClick={() => onSave(tempSelected)}
             className="flex-1 px-4 py-3 rounded-lg bg-morandi-gold hover:bg-morandi-gold-hover text-white transition-colors font-medium"
           >
-            儲存
+            {COMP_LAYOUT_LABELS.SAVE}
           </button>
         </div>
       </DialogContent>

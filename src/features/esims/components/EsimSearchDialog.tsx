@@ -120,9 +120,9 @@ export function EsimSearchDialog({ open, onOpenChange, onSearch }: EsimSearchDia
                 <SelectValue placeholder={LABELS.statusPlaceholder} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={ESIM_STATUSES.UNCONFIRMED.toString()}>待確認</SelectItem>
-                <SelectItem value={ESIM_STATUSES.CONFIRMED.toString()}>已確認</SelectItem>
-                <SelectItem value={ESIM_STATUSES.ERROR.toString()}>錯誤</SelectItem>
+                <SelectItem value={ESIM_STATUSES.UNCONFIRMED.toString()}>{LABELS.CONFIRM_7150}</SelectItem>
+                <SelectItem value={ESIM_STATUSES.CONFIRMED.toString()}>{LABELS.CONFIRM_469}</SelectItem>
+                <SelectItem value={ESIM_STATUSES.ERROR.toString()}>{LABELS.LABEL_8594}</SelectItem>
               </SelectContent>
             </Select>
           </div>

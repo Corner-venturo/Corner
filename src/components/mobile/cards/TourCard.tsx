@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { MapPin, Users, Calendar, Plane, ChevronRight, Bed, Bus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatDateCompact } from '@/lib/utils/format-date'
+import { CARDS_LABELS } from './constants/labels'
 
 interface TourCardProps {
   tour: {
@@ -95,7 +96,7 @@ export function TourCard({ tour, showActions = true, children, className }: Tour
               <div className="mb-2">
                 {daysUntil === 0 ? (
                   <span className="text-xs font-bold text-white bg-green-500 px-2 py-1 rounded-full">
-                    今日出發
+                    {CARDS_LABELS.LABEL_5500}
                   </span>
                 ) : (
                   <span className="text-xs font-medium text-orange-600 bg-orange-100 px-2 py-1 rounded-full">
@@ -119,7 +120,7 @@ export function TourCard({ tour, showActions = true, children, className }: Tour
                        border-r border-border"
           >
             <Bed size={16} />
-            <span>分房</span>
+            <span>{CARDS_LABELS.LABEL_9712}</span>
           </Link>
           <Link
             href={`/m/tours/${tour.id}/vehicles`}
@@ -128,7 +129,7 @@ export function TourCard({ tour, showActions = true, children, className }: Tour
                        border-r border-border"
           >
             <Bus size={16} />
-            <span>分車</span>
+            <span>{CARDS_LABELS.LABEL_3590}</span>
           </Link>
           <Link
             href={`/m/tours/${tour.id}/members`}
@@ -136,7 +137,7 @@ export function TourCard({ tour, showActions = true, children, className }: Tour
                        hover:bg-morandi-container/50 hover:text-morandi-primary transition-colors"
           >
             <Users size={16} />
-            <span>成員</span>
+            <span>{CARDS_LABELS.LABEL_8172}</span>
           </Link>
         </div>
       )}

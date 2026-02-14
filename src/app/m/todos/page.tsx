@@ -9,6 +9,7 @@ import { TodoCard } from '@/components/mobile/cards'
 import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
+import { TODOS_LABELS } from './constants/labels'
 
 interface DbTodo {
   id: string
@@ -163,7 +164,7 @@ export default function MobileTodosPage() {
             >
               <ArrowLeft size={20} className="text-morandi-primary" />
             </Link>
-            <h1 className="text-lg font-bold text-morandi-primary">待辦事項</h1>
+            <h1 className="text-lg font-bold text-morandi-primary">{TODOS_LABELS.LABEL_9553}</h1>
           </div>
           <button className="w-10 h-10 flex items-center justify-center rounded-full bg-morandi-gold text-white">
             <Plus size={20} />
@@ -197,7 +198,7 @@ export default function MobileTodosPage() {
           </div>
         ) : todos.length === 0 ? (
           <div className="text-center py-12 text-morandi-secondary">
-            沒有待辦事項
+            {TODOS_LABELS.NOT_FOUND_500}
           </div>
         ) : (
           <div className="space-y-6">

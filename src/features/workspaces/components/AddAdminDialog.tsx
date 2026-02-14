@@ -113,18 +113,18 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <UserPlus size={20} className="text-morandi-gold" />
-            新增管理員
+            {WORKSPACES_LABELS.新增管理員}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="p-3 bg-morandi-container/30 rounded-lg">
-            <p className="text-sm text-morandi-secondary">公司：</p>
+            <p className="text-sm text-morandi-secondary">{WORKSPACES_LABELS.LABEL_4033}</p>
             <p className="font-medium text-morandi-primary">{workspace.name}</p>
           </div>
 
           <div className="space-y-2">
-            <Label required>姓名</Label>
+            <Label required>{WORKSPACES_LABELS.LABEL_658}</Label>
             <Input
               value={formData.name}
               onChange={(e) => handleFieldChange('name', e.target.value)}
@@ -133,7 +133,7 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
           </div>
 
           <div className="space-y-2">
-            <Label required>員工編號（帳號）</Label>
+            <Label required>{WORKSPACES_LABELS.LABEL_2161}</Label>
             <Input
               value={formData.employee_number}
               onChange={(e) => handleFieldChange('employee_number', e.target.value)}
@@ -143,7 +143,7 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
           </div>
 
           <div className="space-y-2">
-            <Label required>登入密碼</Label>
+            <Label required>{WORKSPACES_LABELS.LABEL_8142}</Label>
             <Input
               type="password"
               value={formData.password}
@@ -156,7 +156,7 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
         <div className="flex justify-end gap-3 pt-4 border-t border-border">
           <Button variant="outline" onClick={() => onOpenChange(false)} className="gap-2">
             <X size={16} />
-            取消
+            {WORKSPACES_LABELS.CANCEL}
           </Button>
           {/* eslint-disable-next-line venturo/button-requires-icon -- 三元運算式中有圖標 */}
           <Button

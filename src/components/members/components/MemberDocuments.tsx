@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { Upload, Trash2, FileText, FileImage } from 'lucide-react'
 import type { ProcessedFile } from '../hooks/useMemberView'
+import { MEMBERS_LABELS } from './constants/labels'
 
 interface MemberDocumentsProps {
   open: boolean
@@ -35,14 +36,14 @@ export function MemberDocuments({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent level={1} className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>上傳護照以批次新增成員</DialogTitle>
+          <DialogTitle>{MEMBERS_LABELS.ADD_6565}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="bg-morandi-primary/5 border border-morandi-primary/20 rounded-lg p-3">
             <h4 className="text-xs font-semibold text-morandi-primary mb-2">⚠️ 重要提醒</h4>
             <ul className="text-xs text-morandi-secondary space-y-1">
               <li>• OCR 辨識的資料會自動標記為<strong>「待驗證」</strong></li>
-              <li>• 請務必<strong>人工檢查護照資訊</strong></li>
+              <li>• 請務必<strong>{MEMBERS_LABELS.LABEL_809}</strong></li>
               <li>• 支援所有國家護照（TWN、USA、JPN 等）</li>
             </ul>
           </div>
@@ -79,13 +80,13 @@ export function MemberDocuments({
               {isProcessing ? (
                 <>
                   <div className="w-6 h-6 mb-2 border-2 border-morandi-gold border-t-transparent rounded-full animate-spin" />
-                  <p className="text-sm text-morandi-primary">處理檔案中...</p>
+                  <p className="text-sm text-morandi-primary">{MEMBERS_LABELS.PROCESSING_6696}</p>
                 </>
               ) : (
                 <>
                   <Upload className="w-6 h-6 mb-2 text-morandi-secondary" />
                   <p className="text-sm text-morandi-primary">
-                    <span className="font-semibold">點擊上傳</span> 或拖曳檔案
+                    <span className="font-semibold">{MEMBERS_LABELS.UPLOADING_9146}</span> {MEMBERS_LABELS.LABEL_591}
                   </p>
                   <p className="text-xs text-morandi-secondary">支援 JPG, PNG, PDF（可多選）</p>
                 </>

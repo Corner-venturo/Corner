@@ -62,7 +62,7 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
                   disabled={isReadOnly}
                   className="w-3 h-3 rounded border-border text-morandi-gold focus:ring-morandi-gold"
                 />
-                <span className="text-morandi-secondary">續住</span>
+                <span className="text-morandi-secondary">{ACCOMMODATION_ITEM_ROW_LABELS.續住}</span>
               </label>
             )}
           </div>
@@ -72,7 +72,7 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
       {/* 項目欄：房型名稱（續住時顯示提示） */}
       <td className="py-3 px-4 text-sm text-morandi-primary text-center table-divider">
         {isSameAsPrevious ? (
-          <span className="text-morandi-secondary italic">同上 ({prevDayHotelName})</span>
+          <span className="text-morandi-secondary italic">{ACCOMMODATION_ITEM_ROW_LABELS.LABEL_1440}{prevDayHotelName})</span>
         ) : (
           <input
             type="text"

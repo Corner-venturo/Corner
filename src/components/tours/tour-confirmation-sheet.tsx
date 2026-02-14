@@ -247,7 +247,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
     return (
       <div className="flex items-center justify-center h-32 text-morandi-secondary">
         <Loader2 className="animate-spin mr-2" size={20} />
-        載入中...
+        {COMP_TOURS_LABELS.LOADING_6912}
       </div>
     )
   }
@@ -257,8 +257,8 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
     return (
       <div className="flex flex-col items-center justify-center h-32 text-morandi-secondary">
         <AlertCircle size={32} className="mb-2 opacity-50" />
-        <p>此團尚未關聯報價單</p>
-        <p className="text-xs mt-1">請先建立或關聯報價單</p>
+        <p>{COMP_TOURS_LABELS.LABEL_1695}</p>
+        <p className="text-xs mt-1">{COMP_TOURS_LABELS.LABEL_8833}</p>
       </div>
     )
   }
@@ -268,8 +268,8 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
     return (
       <div className="flex flex-col items-center justify-center h-32 text-morandi-secondary">
         <Calendar size={32} className="mb-2 opacity-50" />
-        <p>報價單尚無住宿/餐食資料</p>
-        <p className="text-xs mt-1">請先在報價單填寫住宿和餐食項目</p>
+        <p>{COMP_TOURS_LABELS.EMPTY_7809}</p>
+        <p className="text-xs mt-1">{COMP_TOURS_LABELS.LABEL_9677}</p>
       </div>
     )
   }
@@ -281,7 +281,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
         <div className="border border-border rounded-lg overflow-hidden">
           <div className="flex items-center gap-2 px-4 py-3 bg-blue-500 text-white">
             <Hotel size={18} />
-            <span className="font-medium">住宿表</span>
+            <span className="font-medium">{COMP_TOURS_LABELS.LABEL_460}</span>
             <span className="text-blue-100 text-sm">({hotelGroups.length} 間飯店)</span>
           </div>
           <div className="bg-card p-4 space-y-4">
@@ -301,7 +301,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                     {hasRequest ? (
                       <span className="flex items-center gap-1 text-xs text-morandi-green">
                         <Check size={14} />
-                        已建立需求單
+                        {COMP_TOURS_LABELS.LABEL_7836}
                       </span>
                     ) : (
                       <Button
@@ -324,8 +324,8 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-morandi-container/30 text-morandi-secondary">
-                        <th className="text-left px-3 py-2 font-medium w-24">日期</th>
-                        <th className="text-left px-3 py-2 font-medium">說明</th>
+                        <th className="text-left px-3 py-2 font-medium w-24">{COMP_TOURS_LABELS.日期}</th>
+                        <th className="text-left px-3 py-2 font-medium">{COMP_TOURS_LABELS.LABEL_5591}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
@@ -349,7 +349,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
         <div className="border border-border rounded-lg overflow-hidden">
           <div className="flex items-center gap-2 px-4 py-3 bg-orange-500 text-white">
             <Utensils size={18} />
-            <span className="font-medium">餐食表</span>
+            <span className="font-medium">{COMP_TOURS_LABELS.LABEL_9767}</span>
             <span className="text-orange-100 text-sm">({restaurantGroups.length} 間餐廳)</span>
           </div>
           <div className="bg-card p-4 space-y-4">
@@ -417,7 +417,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
         <div className="border border-border rounded-lg overflow-hidden">
           <div className="flex items-center gap-2 px-4 py-3 bg-morandi-gold text-white">
             <DollarSign size={18} />
-            <span className="font-medium">需求單項目</span>
+            <span className="font-medium">{COMP_TOURS_LABELS.LABEL_6198}</span>
             <span className="text-white/80 text-sm">({requestsWithSupplier.length} 項可請款)</span>
           </div>
           <div className="bg-card divide-y divide-border">
@@ -476,7 +476,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                   className="h-8 px-3 gap-1.5 bg-morandi-gold hover:bg-morandi-gold-hover text-white flex-shrink-0"
                 >
                   <DollarSign size={14} />
-                  請款
+                  {COMP_TOURS_LABELS.請款}
                 </Button>
               </div>
             ))}

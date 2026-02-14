@@ -25,6 +25,7 @@ import {
   NoticesBlockEditor,
   CancellationBlockEditor,
 } from '../blocks/SimpleBlockEditors'
+import { BLOCK_EDITOR_LABELS } from './constants/labels'
 
 interface BlockCanvasProps {
   blocks: AnyBlock[]
@@ -146,7 +147,7 @@ export function BlockCanvas({
           />
         )
       default:
-        return <div className="text-sm text-morandi-secondary">未知區塊類型</div>
+        return <div className="text-sm text-morandi-secondary">{BLOCK_EDITOR_LABELS.LABEL_6612}</div>
     }
   }
 
@@ -171,8 +172,8 @@ export function BlockCanvas({
 
       {blocks.length === 0 && (
         <div className="text-center py-12 text-morandi-secondary">
-          <p className="text-sm">尚無區塊</p>
-          <p className="text-xs mt-1">從右側工具箱新增區塊</p>
+          <p className="text-sm">{BLOCK_EDITOR_LABELS.EMPTY_7991}</p>
+          <p className="text-xs mt-1">{BLOCK_EDITOR_LABELS.ADD_8157}</p>
         </div>
       )}
     </div>

@@ -14,6 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { ChevronUp, ChevronDown, ChevronsUpDown, Filter } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TableColumn, SelectionConfig, RowData } from './types'
+import { ENHANCED_TABLE_LABELS } from './constants/labels'
 
 interface TableHeaderProps<T extends RowData = RowData> {
   columns: TableColumn<T>[]
@@ -124,7 +125,7 @@ export function TableHeader({
         {/* Actions column */}
         {actions && (
           <th className="text-left py-2.5 px-4 text-xs relative" style={{ width: actionsWidth }}>
-            <span className="font-medium text-morandi-secondary">操作</span>
+            <span className="font-medium text-morandi-secondary">{ENHANCED_TABLE_LABELS.ACTIONS}</span>
           </th>
         )}
       </tr>
@@ -147,7 +148,7 @@ export function TableHeader({
                       <SelectValue placeholder={`選擇${column.label}...`} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="__all__">全部{column.label}</SelectItem>
+                      <SelectItem value="__all__">{ENHANCED_TABLE_LABELS.ALL}{column.label}</SelectItem>
                       {column.filterOptions?.map(option => (
                         <SelectItem key={option.value} value={option.value}>
                           {option.label}

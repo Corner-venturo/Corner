@@ -61,15 +61,15 @@ export function AiGenerateDialog({
           {/* 基本資訊（唯讀） */}
           <div className="flex items-center gap-4 p-3 bg-morandi-container/30 rounded-lg">
             <div className="flex-1">
-              <div className="text-[10px] text-morandi-secondary">目的地</div>
+              <div className="text-[10px] text-morandi-secondary">{AI_GENERATE_DIALOG_LABELS.LABEL_5475}</div>
               <div className="text-sm font-medium">{destination || AI_GENERATE_DIALOG_LABELS.未設定}</div>
             </div>
             <div className="flex-1">
-              <div className="text-[10px] text-morandi-secondary">天數</div>
+              <div className="text-[10px] text-morandi-secondary">{AI_GENERATE_DIALOG_LABELS.LABEL_1983}</div>
               <div className="text-sm font-medium">{numDays} 天</div>
             </div>
             <div className="flex-1">
-              <div className="text-[10px] text-morandi-secondary">住宿狀態</div>
+              <div className="text-[10px] text-morandi-secondary">{AI_GENERATE_DIALOG_LABELS.LABEL_4587}</div>
               <div className="text-sm font-medium text-morandi-green">
                 ✓ 已填寫 {accommodationStatus.filledCount}/{accommodationStatus.requiredDays} 天
               </div>
@@ -79,7 +79,7 @@ export function AiGenerateDialog({
           {/* 時間設定 */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
-              <Label className="text-xs text-morandi-primary">第一天抵達時間</Label>
+              <Label className="text-xs text-morandi-primary">{AI_GENERATE_DIALOG_LABELS.LABEL_1928}</Label>
               <Input
                 type="time"
                 value={arrivalTime}
@@ -88,7 +88,7 @@ export function AiGenerateDialog({
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-morandi-primary">最後一天離開時間</Label>
+              <Label className="text-xs text-morandi-primary">{AI_GENERATE_DIALOG_LABELS.LABEL_4695}</Label>
               <Input
                 type="time"
                 value={departureTime}
@@ -100,7 +100,7 @@ export function AiGenerateDialog({
 
           {/* 行程風格選擇 */}
           <div className="space-y-2">
-            <Label className="text-xs text-morandi-primary">行程風格</Label>
+            <Label className="text-xs text-morandi-primary">{AI_GENERATE_DIALOG_LABELS.LABEL_121}</Label>
             <div className="grid grid-cols-3 gap-2">
               {AI_THEMES.map((t) => (
                 <button
@@ -136,7 +136,7 @@ export function AiGenerateDialog({
             className="gap-1"
           >
             <X size={14} />
-            取消
+            {AI_GENERATE_DIALOG_LABELS.CANCEL}
           </Button>
           <Button
             onClick={onGenerate}
@@ -146,12 +146,12 @@ export function AiGenerateDialog({
             {isGenerating ? (
               <>
                 <Loader2 size={14} className="animate-spin" />
-                生成中...
+                {AI_GENERATE_DIALOG_LABELS.GENERATING_7316}
               </>
             ) : (
               <>
                 <Sparkles size={14} />
-                生成行程
+                {AI_GENERATE_DIALOG_LABELS.GENERATING_9221}
               </>
             )}
           </Button>

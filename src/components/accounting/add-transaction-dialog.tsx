@@ -13,6 +13,7 @@ import { CurrencyCell } from '@/components/table-cells'
 import { useEnterSubmit } from '@/hooks/useEnterSubmit'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { ACCOUNTING_LABELS } from './constants/labels'
 
 interface AddTransactionDialogProps {
   isOpen: boolean
@@ -160,7 +161,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
       <FormDialog
         open={isOpen}
         onOpenChange={open => !open && handleClose()}
-        title="選擇交易類型"
+        title={ACCOUNTING_LABELS.SELECT_2544}
         onCancel={handleClose}
         maxWidth="sm"
       >
@@ -201,25 +202,25 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
           className="flex items-center text-[#8C8C8C] hover:text-[#8C8C8C] mb-4 -mt-2"
         >
           <ChevronLeft size={20} />
-          <span className="text-sm">返回</span>
+          <span className="text-sm">{ACCOUNTING_LABELS.BACK}</span>
         </button>
 
         {/* 分類列表或空狀態 */}
         {filteredCategories.length === 0 && !isAddingCategory ? (
           <div className="text-center py-12">
-            <div className="text-[#8C8C8C] mb-4">還沒有分類</div>
+            <div className="text-[#8C8C8C] mb-4">{ACCOUNTING_LABELS.NOT_FOUND_7772}</div>
             <Button
               onClick={() => setIsAddingCategory(true)}
               className="bg-[#B8A99A] hover:bg-[#9E8C7A] text-white"
             >
               <Plus className="h-4 w-4 mr-2" />
-              新增第一個分類
+              {ACCOUNTING_LABELS.ADD_7344}
             </Button>
           </div>
         ) : isAddingCategory ? (
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">分類名稱</label>
+              <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">{ACCOUNTING_LABELS.LABEL_5271}</label>
               <Input
                 value={newCategoryName}
                 onChange={e => setNewCategoryName(e.target.value)}
@@ -229,7 +230,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
                     handleAddCategory()
                   }
                 }}
-                placeholder="例如：餐費、交通、娛樂"
+                placeholder={ACCOUNTING_LABELS.EXAMPLE_9015}
                 className="border-[#E8E4E0] bg-card/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
                 autoFocus
               />
@@ -244,7 +245,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
                 className="flex-1 border-[#E8E4E0] gap-1"
               >
                 <X size={16} />
-                取消
+                {ACCOUNTING_LABELS.CANCEL}
               </Button>
               <Button
                 onClick={handleAddCategory}
@@ -252,7 +253,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
                 className="flex-1 bg-[#B8A99A] hover:bg-[#9E8C7A] text-white gap-1"
               >
                 <Plus size={16} />
-                新增
+                {ACCOUNTING_LABELS.ADD}
               </Button>
             </div>
           </div>
@@ -277,7 +278,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
               className="w-full p-3 rounded-xl border-2 border-dashed border-[#E8E4E0] hover:border-[#B8A99A] text-[#8C8C8C] hover:text-[#8C8C8C] transition-all flex items-center justify-center space-x-2"
             >
               <Plus size={18} />
-              <span className="text-sm font-medium">新增分類</span>
+              <span className="text-sm font-medium">{ACCOUNTING_LABELS.ADD_8245}</span>
             </button>
           </div>
         )}
@@ -290,7 +291,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
     <FormDialog
       open={isOpen}
       onOpenChange={open => !open && handleClose()}
-      title="新增記帳"
+      title={ACCOUNTING_LABELS.ADD_3016}
       onSubmit={handleSubmit}
       onCancel={handleClose}
       submitLabel="新增記帳"
@@ -303,7 +304,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
         className="flex items-center text-[#8C8C8C] hover:text-[#8C8C8C] mb-4 -mt-2"
       >
         <ChevronLeft size={20} />
-        <span className="text-sm">更改分類</span>
+        <span className="text-sm">{ACCOUNTING_LABELS.LABEL_2477}</span>
       </button>
 
       {/* 已選分類顯示 */}
@@ -318,10 +319,10 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
 
       {/* 帳戶選擇 */}
       <div>
-        <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">選擇帳戶</label>
+        <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">{ACCOUNTING_LABELS.SELECT_6666}</label>
         <Select value={formData.account_id} onValueChange={(value) => setFormData(prev => ({ ...prev, account_id: value }))}>
           <SelectTrigger className="h-12">
-            <SelectValue placeholder="請選擇帳戶" />
+            <SelectValue placeholder={ACCOUNTING_LABELS.PLEASE_SELECT_6196} />
           </SelectTrigger>
           <SelectContent>
             {accounts.map(account => (
@@ -337,7 +338,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
 
       {/* 金額 */}
       <div>
-        <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">金額</label>
+        <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">{ACCOUNTING_LABELS.AMOUNT}</label>
         <div className="relative">
           <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8C8C8C] text-sm">
             NT$
@@ -359,24 +360,24 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
 
       {/* 日期 */}
       <div>
-        <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">日期</label>
+        <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">{ACCOUNTING_LABELS.DATE}</label>
         <DatePicker
           value={formData.date}
           onChange={date => setFormData(prev => ({ ...prev, date }))}
-          placeholder="選擇日期"
+          placeholder={ACCOUNTING_LABELS.SELECT_5234}
           className="border-[#E8E4E0] bg-card/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
         />
       </div>
 
       {/* 備註 */}
       <div>
-        <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">備註</label>
+        <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">{ACCOUNTING_LABELS.REMARKS}</label>
         <Input
           value={formData.description}
           onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
           onKeyDown={handleKeyDown}
           {...compositionProps}
-          placeholder="輸入備註（選填）"
+          placeholder={ACCOUNTING_LABELS.LABEL_3027}
           className="border-[#E8E4E0] bg-card/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
         />
       </div>

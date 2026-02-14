@@ -205,24 +205,24 @@ export function EditorToolbar({
             <DropdownMenuContent align="start">
               <DropdownMenuItem onClick={onAddRectangle}>
                 <Square size={14} className="mr-2" />
-                矩形
+                {TOOLBAR_LABELS.LABEL_6232}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onAddCircle}>
                 <Circle size={14} className="mr-2" />
-                圓形
+                {TOOLBAR_LABELS.LABEL_5823}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onAddEllipse}>
                 <Circle size={14} className="mr-2" style={{ transform: 'scaleX(1.5)' }} />
-                橢圓
+                {TOOLBAR_LABELS.LABEL_2823}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onAddTriangle}>
                 <Triangle size={14} className="mr-2" />
-                三角形
+                {TOOLBAR_LABELS.LABEL_8751}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={onAddLine}>
                 <Minus size={14} className="mr-2" />
-                線條
+                {TOOLBAR_LABELS.LABEL_9869}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -334,31 +334,31 @@ export function EditorToolbar({
             <DropdownMenuContent align="start">
               <DropdownMenuItem onClick={onBringToFront}>
                 <ChevronsUp size={14} className="mr-2" />
-                置頂
+                {TOOLBAR_LABELS.LABEL_7759}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onBringForward}>
                 <ChevronUp size={14} className="mr-2" />
-                上移一層
+                {TOOLBAR_LABELS.LABEL_2439}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onSendBackward}>
                 <ChevronDown size={14} className="mr-2" />
-                下移一層
+                {TOOLBAR_LABELS.LABEL_8528}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onSendToBack}>
                 <ChevronsDown size={14} className="mr-2" />
-                置底
+                {TOOLBAR_LABELS.LABEL_9654}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={onToggleLock}>
                 {isLocked ? (
                   <>
                     <Unlock size={14} className="mr-2" />
-                    解除鎖定
+                    {TOOLBAR_LABELS.LABEL_1159}
                   </>
                 ) : (
                   <>
                     <Lock size={14} className="mr-2" />
-                    鎖定元素
+                    {TOOLBAR_LABELS.LABEL_3652}
                   </>
                 )}
               </DropdownMenuItem>
@@ -394,7 +394,7 @@ export function EditorToolbar({
                 <AlignRight size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>靠右對齊</TooltipContent>
+            <TooltipContent>{TOOLBAR_LABELS.LABEL_1012}</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -403,7 +403,7 @@ export function EditorToolbar({
                 <AlignStartVertical size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>靠上對齊</TooltipContent>
+            <TooltipContent>{TOOLBAR_LABELS.LABEL_6004}</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -412,7 +412,7 @@ export function EditorToolbar({
                 <AlignCenterVertical size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>垂直置中</TooltipContent>
+            <TooltipContent>{TOOLBAR_LABELS.LABEL_1391}</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -421,7 +421,7 @@ export function EditorToolbar({
                 <AlignEndVertical size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>靠下對齊</TooltipContent>
+            <TooltipContent>{TOOLBAR_LABELS.LABEL_6000}</TooltipContent>
           </Tooltip>
         </div>
 
@@ -435,7 +435,7 @@ export function EditorToolbar({
                 <AlignHorizontalSpaceAround size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>水平等距分佈 (需選3個以上)</TooltipContent>
+            <TooltipContent>{TOOLBAR_LABELS.LABEL_4797}</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -444,7 +444,7 @@ export function EditorToolbar({
                 <AlignVerticalSpaceAround size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>垂直等距分佈 (需選3個以上)</TooltipContent>
+            <TooltipContent>{TOOLBAR_LABELS.LABEL_6513}</TooltipContent>
           </Tooltip>
         </div>
 

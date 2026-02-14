@@ -39,6 +39,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { logger } from '@/lib/utils/logger'
 import { cn } from '@/lib/utils'
 import type { SupplierRequest } from '../hooks/useSupplierRequests'
+import { SUPPLIER_LABELS } from './constants/labels'
 
 interface ResponseItem {
   id: string
@@ -219,11 +220,11 @@ export function SupplierResponseDialog({
         <div className="flex-1 overflow-y-auto space-y-6 py-4">
           {/* 需求資訊 */}
           <div className="bg-morandi-container/30 rounded-lg p-4 space-y-3">
-            <h3 className="font-medium text-morandi-primary">需求資訊</h3>
+            <h3 className="font-medium text-morandi-primary">{SUPPLIER_LABELS.LABEL_8868}</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-morandi-secondary" />
-                <span className="text-morandi-secondary">日期：</span>
+                <span className="text-morandi-secondary">{SUPPLIER_LABELS.LABEL_9868}</span>
                 <span className="font-medium">
                   {request.service_date}
                   {request.service_date_end && request.service_date_end !== request.service_date &&
@@ -232,12 +233,12 @@ export function SupplierResponseDialog({
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-morandi-secondary" />
-                <span className="text-morandi-secondary">數量：</span>
+                <span className="text-morandi-secondary">{SUPPLIER_LABELS.LABEL_4600}</span>
                 <span className="font-medium">{request.quantity || 1}</span>
               </div>
               {request.description && (
                 <div className="col-span-2">
-                  <span className="text-morandi-secondary">說明：</span>
+                  <span className="text-morandi-secondary">{SUPPLIER_LABELS.LABEL_5457}</span>
                   <span className="font-medium ml-1">{request.description}</span>
                 </div>
               )}
@@ -300,11 +301,11 @@ export function SupplierResponseDialog({
                     {/* 車牌（僅車輛） */}
                     {isVehicle && (
                       <div className="space-y-2">
-                        <Label>車牌號碼</Label>
+                        <Label>{SUPPLIER_LABELS.LABEL_6418}</Label>
                         <Input
                           value={item.licensePlate}
                           onChange={(e) => updateItem(item.id, 'licensePlate', e.target.value)}
-                          placeholder="例如：ABC-1234"
+                          placeholder={SUPPLIER_LABELS.EXAMPLE_2914}
                           disabled={isReadOnly}
                         />
                       </div>
@@ -313,11 +314,11 @@ export function SupplierResponseDialog({
                     {/* 司機姓名（僅車輛） */}
                     {isVehicle && (
                       <div className="space-y-2">
-                        <Label>司機姓名</Label>
+                        <Label>{SUPPLIER_LABELS.LABEL_6947}</Label>
                         <Input
                           value={item.driverName}
                           onChange={(e) => updateItem(item.id, 'driverName', e.target.value)}
-                          placeholder="輸入司機姓名"
+                          placeholder={SUPPLIER_LABELS.LABEL_5402}
                           disabled={isReadOnly}
                         />
                       </div>
@@ -329,14 +330,14 @@ export function SupplierResponseDialog({
                       <Input
                         value={item.driverPhone}
                         onChange={(e) => updateItem(item.id, 'driverPhone', e.target.value)}
-                        placeholder="輸入電話號碼"
+                        placeholder={SUPPLIER_LABELS.LABEL_8624}
                         disabled={isReadOnly}
                       />
                     </div>
 
                     {/* 可用日期 */}
                     <div className="space-y-2">
-                      <Label>可用開始日期</Label>
+                      <Label>{SUPPLIER_LABELS.LABEL_915}</Label>
                       <Input
                         type="date"
                         value={item.availableStartDate}
@@ -346,7 +347,7 @@ export function SupplierResponseDialog({
                     </div>
 
                     <div className="space-y-2">
-                      <Label>可用結束日期</Label>
+                      <Label>{SUPPLIER_LABELS.LABEL_7036}</Label>
                       <Input
                         type="date"
                         value={item.availableEndDate}
@@ -357,23 +358,23 @@ export function SupplierResponseDialog({
 
                     {/* 報價 */}
                     <div className="space-y-2">
-                      <Label>報價金額</Label>
+                      <Label>{SUPPLIER_LABELS.LABEL_3404}</Label>
                       <Input
                         type="number"
                         value={item.unitPrice || ''}
                         onChange={(e) => updateItem(item.id, 'unitPrice', parseInt(e.target.value) || 0)}
-                        placeholder="輸入金額"
+                        placeholder={SUPPLIER_LABELS.LABEL_2285}
                         disabled={isReadOnly}
                       />
                     </div>
 
                     {/* 備註 */}
                     <div className="space-y-2">
-                      <Label>備註</Label>
+                      <Label>{SUPPLIER_LABELS.REMARKS}</Label>
                       <Input
                         value={item.notes}
                         onChange={(e) => updateItem(item.id, 'notes', e.target.value)}
-                        placeholder="選填備註"
+                        placeholder={SUPPLIER_LABELS.LABEL_8253}
                         disabled={isReadOnly}
                       />
                     </div>
@@ -385,11 +386,11 @@ export function SupplierResponseDialog({
 
           {/* 整體備註 */}
           <div className="space-y-2">
-            <Label>回覆備註</Label>
+            <Label>{SUPPLIER_LABELS.LABEL_7829}</Label>
             <Textarea
               value={responseNotes}
               onChange={(e) => setResponseNotes(e.target.value)}
-              placeholder="其他說明或備註..."
+              placeholder={SUPPLIER_LABELS.LABEL_694}
               rows={3}
               disabled={isReadOnly}
             />
@@ -409,7 +410,7 @@ export function SupplierResponseDialog({
               className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
               {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-              送出回覆
+              {SUPPLIER_LABELS.LABEL_9}
             </Button>
           )}
         </div>

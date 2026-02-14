@@ -9,6 +9,7 @@ import { PaymentSummary } from './components/PaymentSummary'
 import { PaymentRow } from './components/PaymentRow'
 import { AddPaymentDialog } from './components/AddPaymentDialog'
 import { InvoiceDialog } from './components/InvoiceDialog'
+import { COMP_TOURS_LABELS } from './constants/labels'
 
 interface TourPaymentsProps {
   tour: Tour
@@ -92,7 +93,7 @@ export const TourPayments = React.memo(function TourPayments({
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
             <Plus size={14} className="mr-1" />
-            新增收款
+            {COMP_TOURS_LABELS.ADD_3548}
           </Button>
         </div>
       )}
@@ -105,34 +106,34 @@ export const TourPayments = React.memo(function TourPayments({
               {/* 區塊標題行 */}
               <tr className="bg-morandi-container/50 border-b border-border/60">
                 <th colSpan={8} className="text-left py-2 px-4 text-sm font-medium text-morandi-primary">
-                  收款紀錄
+                  {COMP_TOURS_LABELS.LABEL_8600}
                 </th>
               </tr>
               {/* 欄位標題行 */}
               <tr className="bg-morandi-container/30">
                 <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">
-                  日期
+                  {COMP_TOURS_LABELS.日期}
                 </th>
                 <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">
-                  類型
+                  {COMP_TOURS_LABELS.TYPE}
                 </th>
                 <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">
-                  金額
+                  {COMP_TOURS_LABELS.AMOUNT}
                 </th>
                 <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">
-                  說明
+                  {COMP_TOURS_LABELS.LABEL_5591}
                 </th>
                 <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">
-                  付款方式
+                  {COMP_TOURS_LABELS.LABEL_7778}
                 </th>
                 <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">
-                  訂單
+                  {COMP_TOURS_LABELS.訂單}
                 </th>
                 <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">
-                  狀態
+                  {COMP_TOURS_LABELS.STATUS}
                 </th>
                 <th className="text-center py-2.5 px-4 text-xs font-medium text-morandi-secondary">
-                  操作
+                  {COMP_TOURS_LABELS.ACTIONS}
                 </th>
               </tr>
             </thead>
@@ -153,8 +154,8 @@ export const TourPayments = React.memo(function TourPayments({
                 <tr>
                   <td colSpan={8} className="py-12 text-center text-morandi-secondary">
                     <DollarSign size={24} className="mx-auto mb-4 opacity-50" />
-                    <p>尚無收款紀錄</p>
-                    <p className="text-sm mt-1">點擊上方「新增收款」按鈕開始記錄收款</p>
+                    <p>{COMP_TOURS_LABELS.EMPTY_3087}</p>
+                    <p className="text-sm mt-1">{COMP_TOURS_LABELS.ADD_6738}</p>
                   </td>
                 </tr>
               )}

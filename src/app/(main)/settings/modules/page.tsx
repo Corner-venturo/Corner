@@ -187,7 +187,7 @@ export default function ModulesManagementPage() {
   return (
     <>
       <ResponsiveHeader
-        title="系統模組管理"
+        title={MODULES_PAGE_LABELS.MANAGE_8474}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '設定', href: '/settings' },
@@ -202,7 +202,7 @@ export default function ModulesManagementPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Package className="h-5 w-5" />
-                當前工作空間
+                {MODULES_PAGE_LABELS.LABEL_795}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -257,17 +257,17 @@ export default function ModulesManagementPage() {
                       {status.enabled && !status.expired ? (
                         <Badge className="bg-status-success-bg text-status-success border-status-success/30">
                           <CheckCircle2 className="h-3 w-3 mr-1" />
-                          已啟用
+                          {MODULES_PAGE_LABELS.LABEL_2710}
                         </Badge>
                       ) : status.enabled && status.expired ? (
                         <Badge className="bg-status-danger-bg text-status-danger border-status-danger/30">
                           <XCircle className="h-3 w-3 mr-1" />
-                          已過期
+                          {MODULES_PAGE_LABELS.LABEL_8966}
                         </Badge>
                       ) : (
                         <Badge variant="outline" className="text-morandi-secondary">
                           <XCircle className="h-3 w-3 mr-1" />
-                          未啟用
+                          {MODULES_PAGE_LABELS.LABEL_5400}
                         </Badge>
                       )}
                     </div>
@@ -309,7 +309,7 @@ export default function ModulesManagementPage() {
                           className="w-full border-status-danger/30 text-status-danger hover:bg-status-danger-bg"
                           disabled={loading}
                         >
-                          停用模組
+                          {MODULES_PAGE_LABELS.LABEL_5213}
                         </Button>
                       ) : (
                         <Button
@@ -365,7 +365,7 @@ export default function ModulesManagementPage() {
               <DatePicker
                 value={expiresDate}
                 onChange={date => setExpiresDate(date)}
-                placeholder="選擇日期"
+                placeholder={MODULES_PAGE_LABELS.SELECT_5234}
                 minDate={new Date()}
               />
               <p className="text-sm text-[#8C8C8C]">{MODULES_PAGE_LABELS.EXPIRY_HINT}</p>
@@ -389,7 +389,7 @@ export default function ModulesManagementPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowEnableDialog(false)} disabled={loading} className="gap-2">
               <X size={16} />
-              取消
+              {MODULES_PAGE_LABELS.CANCEL}
             </Button>
             <Button
               onClick={handleConfirmEnable}

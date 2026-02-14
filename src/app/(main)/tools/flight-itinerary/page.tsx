@@ -10,6 +10,7 @@ import { CornerFlightItinerary } from '@/features/itinerary/components/CornerFli
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Printer, FileText } from 'lucide-react'
+import { FLIGHT_ITINERARY_LABELS } from './constants/labels'
 
 // 預設資料（從 PDF 提取）
 const SAMPLE_DATA_1 = {
@@ -121,7 +122,7 @@ export default function FlightItineraryPage() {
       <div className="min-h-screen flex items-center justify-center bg-muted">
         <Button onClick={() => setIsOpen(true)} className="gap-2">
           <FileText size={16} />
-          開啟機票行程單
+          {FLIGHT_ITINERARY_LABELS.LABEL_3931}
         </Button>
       </div>
     )
@@ -135,7 +136,7 @@ export default function FlightItineraryPage() {
           {/* 控制面板 - 只在螢幕上顯示 */}
           <div className="print:hidden sticky top-0 bg-background border-b border-border px-6 py-4 flex items-center justify-between z-10 rounded-t-xl">
             <DialogHeader className="flex-row items-center gap-2">
-              <DialogTitle className="sr-only">機票行程單</DialogTitle>
+              <DialogTitle className="sr-only">{FLIGHT_ITINERARY_LABELS.LABEL_2428}</DialogTitle>
               <div className="flex gap-2 flex-wrap">
                 <Button
                   size="sm"
@@ -153,7 +154,7 @@ export default function FlightItineraryPage() {
                   variant={language === 'zh' ? 'default' : 'outline'}
                   onClick={() => setLanguage('zh')}
                 >
-                  中文
+                  {FLIGHT_ITINERARY_LABELS.LABEL_2428_1}
                 </Button>
                 <Button
                   size="sm"
@@ -165,7 +166,7 @@ export default function FlightItineraryPage() {
               </div>
               <Button size="sm" onClick={handlePrint} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
                 <Printer size={16} />
-                列印 / 儲存 PDF
+                {FLIGHT_ITINERARY_LABELS.SAVING_2172}
               </Button>
             </div>
           </div>

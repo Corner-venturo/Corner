@@ -5,6 +5,7 @@ import { logger } from '@/lib/utils/logger'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { AlertCircle, CheckCircle2, Database, Trash2, RefreshCw } from 'lucide-react'
+import { RESET_DB_LABELS } from './constants/labels'
 
 export default function ResetDBPage() {
   const [status, setStatus] = useState<'idle' | 'deleting' | 'success' | 'error'>('idle')
@@ -116,7 +117,7 @@ export default function ResetDBPage() {
             IndexedDB 重置工具
           </CardTitle>
           <CardDescription>
-            徹底清空本地資料庫，並從 Supabase 重新同步所有資料
+            {RESET_DB_LABELS.LABEL_4817}
           </CardDescription>
         </CardHeader>
 
@@ -126,11 +127,11 @@ export default function ResetDBPage() {
             <div className="flex gap-2">
               <AlertCircle className="h-5 w-5 text-status-info flex-shrink-0 mt-0.5" />
               <div className="text-sm text-morandi-primary">
-                <strong>這個工具會：</strong>
+                <strong>{RESET_DB_LABELS.LABEL_6622}</strong>
                 <ol className="list-decimal ml-4 mt-2 space-y-1">
-                  <li>刪除本地 IndexedDB 的所有資料</li>
-                  <li>重新整理頁面後，系統會自動重建資料庫結構</li>
-                  <li>從 Supabase 雲端重新下載所有資料</li>
+                  <li>{RESET_DB_LABELS.DELETE_8975}</li>
+                  <li>{RESET_DB_LABELS.LABEL_6968}</li>
+                  <li>{RESET_DB_LABELS.LABEL_2869}</li>
                 </ol>
                 <p className="mt-3 text-status-warning font-semibold">
                   ⚠️ 注意：所有未同步到 Supabase 的資料將會遺失！
@@ -141,7 +142,7 @@ export default function ResetDBPage() {
 
           {/* 當前狀態 */}
           <div className="bg-muted p-4 rounded-lg border border-border">
-            <h3 className="font-semibold mb-2">將清空以下資料庫</h3>
+            <h3 className="font-semibold mb-2">{RESET_DB_LABELS.LABEL_6918}</h3>
             <div className="space-y-1 text-sm">
               <div>
                 1. <code className="bg-card px-2 py-1 rounded border">VenturoOfflineDB</code>
@@ -182,7 +183,7 @@ export default function ResetDBPage() {
             {status === 'success' ? (
               <Button onClick={handleReload} className="w-full gap-2" size="lg">
                 <RefreshCw size={16} />
-                重新整理頁面
+                {RESET_DB_LABELS.LABEL_1215}
               </Button>
             ) : (
               <Button
@@ -201,20 +202,20 @@ export default function ResetDBPage() {
           {/* 技術說明 */}
           <details className="text-sm text-morandi-secondary border-t pt-4">
             <summary className="cursor-pointer font-semibold hover:text-foreground">
-              為什麼需要這個工具？
+              {RESET_DB_LABELS.LABEL_6860}
             </summary>
             <div className="mt-2 space-y-2 pl-4">
               <p>
-                <strong>問題：</strong>當 IndexedDB 的表格結構與代碼定義不一致時，
-                可能導致資料讀取失敗（例如「目前沒有資料」但 Supabase 有資料）。
+                <strong>{RESET_DB_LABELS.LABEL_5751}</strong>{RESET_DB_LABELS.LABEL_8168}
+                {RESET_DB_LABELS.NOT_FOUND_9170}
               </p>
               <p>
-                <strong>原因：</strong>資料庫版本升級機制只會新增缺少的表格，
-                但如果舊表格的索引結構已經改變，就會出現不一致。
+                <strong>{RESET_DB_LABELS.LABEL_7651}</strong>{RESET_DB_LABELS.ADD_2547}
+                {RESET_DB_LABELS.LABEL_995}
               </p>
               <p>
-                <strong>解決方案：</strong>完全刪除舊資料庫 → 重建全新的 v6 版本 →
-                確保所有 46 個表格結構都正確。
+                <strong>{RESET_DB_LABELS.LABEL_3533}</strong>完全刪除舊資料庫 → 重建全新的 v6 版本 →
+                {RESET_DB_LABELS.LABEL_9350}
               </p>
             </div>
           </details>

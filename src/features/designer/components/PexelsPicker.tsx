@@ -18,6 +18,7 @@ import {
   PEXELS_TRAVEL_KEYWORDS,
   type PexelsPhoto,
 } from '@/lib/pexels'
+import { DESIGNER_LABELS } from './constants/labels'
 
 interface PexelsPickerProps {
   onSelectImage: (imageUrl: string, attribution?: { name: string; link: string }) => void
@@ -112,7 +113,7 @@ export function PexelsPicker({ onSelectImage }: PexelsPickerProps) {
         </div>
         <h3 className="font-medium text-morandi-primary mb-2">Pexels API 未設定</h3>
         <p className="text-sm text-morandi-secondary mb-4">
-          請在 .env.local 設定 NEXT_PUBLIC_PEXELS_API_KEY
+          {DESIGNER_LABELS.SETTINGS_9925}
         </p>
         <a
           href="https://www.pexels.com/api/"
@@ -120,7 +121,7 @@ export function PexelsPicker({ onSelectImage }: PexelsPickerProps) {
           rel="noopener noreferrer"
           className="text-sm text-morandi-gold hover:underline flex items-center gap-1"
         >
-          前往 Pexels 申請免費 API Key
+          {DESIGNER_LABELS.LABEL_1754}
           <ExternalLink size={12} />
         </a>
       </div>
@@ -137,7 +138,7 @@ export function PexelsPicker({ onSelectImage }: PexelsPickerProps) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="搜尋圖片（英文效果較佳）..."
+            placeholder={DESIGNER_LABELS.SEARCH_2404}
             className="pl-8 pr-8 h-8 text-sm"
           />
           {search && (
@@ -164,12 +165,12 @@ export function PexelsPicker({ onSelectImage }: PexelsPickerProps) {
           {loading ? (
             <>
               <Loader2 size={12} className="mr-1 animate-spin" />
-              搜尋中...
+              {DESIGNER_LABELS.SEARCH_2692}
             </>
           ) : (
             <>
               <Search size={12} className="mr-1" />
-              搜尋
+              {DESIGNER_LABELS.SEARCH}
             </>
           )}
         </Button>
@@ -178,7 +179,7 @@ export function PexelsPicker({ onSelectImage }: PexelsPickerProps) {
       {/* 快速關鍵字 */}
       {!hasSearched && (
         <div className="p-2 border-b border-border">
-          <p className="text-[10px] text-morandi-secondary mb-1.5">熱門搜尋</p>
+          <p className="text-[10px] text-morandi-secondary mb-1.5">{DESIGNER_LABELS.SEARCH_6536}</p>
           <div className="flex flex-wrap gap-1">
             {PEXELS_TRAVEL_KEYWORDS.en.slice(0, 10).map((keyword, i) => (
               <button
@@ -232,11 +233,11 @@ export function PexelsPicker({ onSelectImage }: PexelsPickerProps) {
           </div>
         ) : hasSearched && !loading ? (
           <div className="p-4 text-center text-sm text-morandi-secondary">
-            找不到符合的圖片
+            {DESIGNER_LABELS.NOT_FOUND_2874}
           </div>
         ) : !hasSearched ? (
           <div className="p-4 text-center text-sm text-morandi-secondary">
-            輸入關鍵字搜尋圖片
+            {DESIGNER_LABELS.SEARCH_2947}
           </div>
         ) : null}
 

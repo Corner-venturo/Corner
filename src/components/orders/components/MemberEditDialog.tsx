@@ -259,7 +259,7 @@ export function MemberEditDialog({
                 disabled={isSyncing || isSaving}
               >
                 <RefreshCw size={14} className={isSyncing ? 'animate-spin' : ''} />
-                從顧客同步
+                {COMP_ORDERS_LABELS.從顧客同步}
               </Button>
             )}
           </div>

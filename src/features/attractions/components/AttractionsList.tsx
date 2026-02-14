@@ -76,7 +76,7 @@ export function AttractionsList({
                     <AlertTriangle size={14} className="text-status-warning mt-1 flex-shrink-0" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>缺少：{missing.join('、')}</p>
+                    <p>{ATTRACTIONS_LIST_LABELS.LABEL_7396}{missing.join('、')}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

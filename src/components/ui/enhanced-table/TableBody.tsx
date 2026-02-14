@@ -5,6 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TableColumn, SelectionConfig, ExpandableConfig, RowData } from './types'
+import { ENHANCED_TABLE_LABELS } from './constants/labels'
 
 interface TableBodyProps<T extends RowData = RowData> {
   columns: TableColumn<T>[]
@@ -86,7 +87,7 @@ export function TableBody({
           <td colSpan={totalColumns} className="py-4">
             <div className="flex items-center justify-center text-morandi-secondary">
               <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              <span className="text-sm">載入中...</span>
+              <span className="text-sm">{ENHANCED_TABLE_LABELS.LOADING_6912}</span>
             </div>
           </td>
         </tr>
@@ -119,7 +120,7 @@ export function TableBody({
                     d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
                   />
                 </svg>
-                <p className="text-sm">目前沒有資料</p>
+                <p className="text-sm">{ENHANCED_TABLE_LABELS.NOT_FOUND_8580}</p>
               </div>
             )}
           </td>

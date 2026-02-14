@@ -16,6 +16,7 @@ import {
 } from '../hooks/useTimeboxData'
 import { alert } from '@/lib/ui/alert-dialog'
 import { WEEK_REVIEW_DIALOG_LABELS } from '@/constants/labels'
+import { TIMEBOX_LABELS } from './constants/labels'
 
 interface WeekReviewDialogProps {
   open: boolean
@@ -306,7 +307,7 @@ export default function WeekReviewDialog({ open, onOpenChange, selectedWeek }: W
               <div className="bg-morandi-container/30 border border-border rounded-xl p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-sm font-semibold text-morandi-primary">複製上週排程</h4>
+                    <h4 className="text-sm font-semibold text-morandi-primary">{TIMEBOX_LABELS.COPYING_928}</h4>
                     <p className="text-xs text-morandi-secondary mt-1">
                       上週有 {lastWeekScheduledBoxes.length} 個排程，要複製到本週嗎？
                     </p>
@@ -319,11 +320,11 @@ export default function WeekReviewDialog({ open, onOpenChange, selectedWeek }: W
                     className="gap-2"
                   >
                     {isCopying ? (
-                      <>複製中...</>
+                      <>{TIMEBOX_LABELS.COPYING_342}</>
                     ) : (
                       <>
                         <Copy className="h-4 w-4" />
-                        複製到本週
+                        {TIMEBOX_LABELS.COPYING_6181}
                       </>
                     )}
                   </Button>
@@ -336,7 +337,7 @@ export default function WeekReviewDialog({ open, onOpenChange, selectedWeek }: W
               <div className="bg-morandi-gold/10 border border-morandi-gold/30 rounded-xl p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-sm font-semibold text-morandi-primary">複製到下週</h4>
+                    <h4 className="text-sm font-semibold text-morandi-primary">{TIMEBOX_LABELS.COPYING_8464}</h4>
                     <p className="text-xs text-morandi-secondary mt-1">
                       本週有 {currentScheduledBoxes.length} 個排程
                       {nextWeekScheduledBoxes.length > 0 && (
@@ -368,7 +369,7 @@ export default function WeekReviewDialog({ open, onOpenChange, selectedWeek }: W
           <div className="flex justify-end gap-3 pt-4 border-t">
             <Button variant="outline" onClick={() => onOpenChange(false)} className="gap-2">
               <X size={16} />
-              關閉
+              {TIMEBOX_LABELS.CLOSE}
             </Button>
             <Button
               onClick={handleSave}
@@ -376,11 +377,11 @@ export default function WeekReviewDialog({ open, onOpenChange, selectedWeek }: W
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
             >
               {isSaving ? (
-                <>儲存中...</>
+                <>{TIMEBOX_LABELS.SAVING_4983}</>
               ) : (
                 <>
                   <Save className="h-4 w-4" />
-                  儲存回顧
+                  {TIMEBOX_LABELS.SAVING_9813}
                 </>
               )}
             </Button>

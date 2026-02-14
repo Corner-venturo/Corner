@@ -169,7 +169,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
             type="button"
           >
             <Save size={14} />
-            儲存
+            {SELLING_PRICE_SECTION_LABELS.SAVE}
           </Button>
         )}
         <Button
@@ -187,7 +187,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
           type="button"
         >
           <Printer size={14} />
-          列印
+          {SELLING_PRICE_SECTION_LABELS.PRINT}
         </Button>
       </div>
 
@@ -200,7 +200,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
           type="button"
         >
           <Plus size={14} />
-          新增檻次
+          {SELLING_PRICE_SECTION_LABELS.ADD_8828}
         </Button>
       )}
 
@@ -228,16 +228,16 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
                 isReadOnly && 'cursor-not-allowed opacity-60'
               )}
             />
-            <span className="text-sm font-semibold text-morandi-primary">人</span>
+            <span className="text-sm font-semibold text-morandi-primary">{SELLING_PRICE_SECTION_LABELS.LABEL_2543}</span>
           </div>
         </div>
         <table className="w-full text-sm">
           <thead className="border-b border-morandi-container/60">
             <tr>
-              <th className="text-left py-2 px-4 text-xs font-medium text-morandi-secondary">身份</th>
-              <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">成本</th>
-              <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">售價</th>
-              <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">利潤</th>
+              <th className="text-left py-2 px-4 text-xs font-medium text-morandi-secondary">{SELLING_PRICE_SECTION_LABELS.LABEL_8725}</th>
+              <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">{SELLING_PRICE_SECTION_LABELS.LABEL_7178}</th>
+              <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">{SELLING_PRICE_SECTION_LABELS.LABEL_561}</th>
+              <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">{SELLING_PRICE_SECTION_LABELS.LABEL_7705}</th>
             </tr>
           </thead>
           <tbody>

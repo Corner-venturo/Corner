@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Phone, Mail, MapPin, Plus, Trash2 } from 'lucide-react'
 import { Employee } from '@/stores/types'
 import { BasicInfoFormData } from './types'
+import { BASIC_INFO_LABELS } from './constants/labels'
 
 interface ContactInfoSectionProps {
   employee: Employee
@@ -22,14 +23,14 @@ export function ContactInfoSection({
 }: ContactInfoSectionProps) {
   return (
     <div className="bg-morandi-container/10 rounded-lg p-4">
-      <h4 className="font-medium text-morandi-primary mb-3">聯絡資訊</h4>
+      <h4 className="font-medium text-morandi-primary mb-3">{BASIC_INFO_LABELS.LABEL_8029}</h4>
 
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-morandi-primary mb-1 flex items-center justify-between">
             <span className="flex items-center gap-1">
               <Phone size={14} />
-              聯絡電話
+              {BASIC_INFO_LABELS.LABEL_5110}
             </span>
             {isEditing && (
               <Button
@@ -50,7 +51,7 @@ export function ContactInfoSection({
                 className="h-6 text-xs"
               >
                 <Plus size={12} className="mr-1" />
-                新增電話
+                {BASIC_INFO_LABELS.ADD_3363}
               </Button>
             )}
           </label>
@@ -136,7 +137,7 @@ export function ContactInfoSection({
         <div>
           <label className="block text-sm font-medium text-morandi-primary mb-1 flex items-center gap-1">
             <MapPin size={14} />
-            地址
+            {BASIC_INFO_LABELS.LABEL_8201}
           </label>
           {isEditing ? (
             <Input

@@ -28,6 +28,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { DESIGNER_LABELS } from './constants/labels'
 
 interface LayerPanelProps {
   canvas: fabric.Canvas | null
@@ -195,7 +196,7 @@ export function LayerPanel({
       {/* 標題 */}
       <div className="p-3 border-b border-border flex items-center gap-2">
         <Layers size={16} className="text-morandi-gold" />
-        <span className="text-sm font-medium text-morandi-primary">圖層</span>
+        <span className="text-sm font-medium text-morandi-primary">{DESIGNER_LABELS.LABEL_5431}</span>
         <span className="text-xs text-morandi-secondary ml-auto">{layers.length}</span>
       </div>
 
@@ -207,10 +208,10 @@ export function LayerPanel({
           onClick={onBringToFront}
           disabled={!hasSelection}
           className="flex-1 h-7 text-xs"
-          title="移到最上層"
+          title={DESIGNER_LABELS.LABEL_8232}
         >
           <ChevronUp size={14} className="mr-1" />
-          上
+          {DESIGNER_LABELS.LABEL_8631}
         </Button>
         <Button
           variant="ghost"
@@ -218,10 +219,10 @@ export function LayerPanel({
           onClick={onSendToBack}
           disabled={!hasSelection}
           className="flex-1 h-7 text-xs"
-          title="移到最下層"
+          title={DESIGNER_LABELS.LABEL_5443}
         >
           <ChevronDown size={14} className="mr-1" />
-          下
+          {DESIGNER_LABELS.LABEL_3113}
         </Button>
       </div>
 
@@ -229,7 +230,7 @@ export function LayerPanel({
       <div className="flex-1 overflow-auto">
         {layers.length === 0 ? (
           <div className="p-4 text-center text-sm text-morandi-secondary">
-            尚無元素
+            {DESIGNER_LABELS.EMPTY_2886}
           </div>
         ) : (
           <div className="p-1">

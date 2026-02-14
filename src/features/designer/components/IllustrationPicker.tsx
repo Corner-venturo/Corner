@@ -21,6 +21,7 @@ import {
   type IllustrationCategory,
   type Illustration,
 } from './core/illustration-library'
+import { DESIGNER_LABELS } from './constants/labels'
 
 interface IllustrationPickerProps {
   onSelectIllustration: (illustration: Illustration) => void
@@ -71,7 +72,7 @@ export function IllustrationPicker({ onSelectIllustration }: IllustrationPickerP
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-morandi-secondary" size={14} />
           <Input
             type="text"
-            placeholder="搜尋插圖..."
+            placeholder={DESIGNER_LABELS.SEARCH_3666}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-7 pr-7 h-8 text-xs"
@@ -94,7 +95,7 @@ export function IllustrationPicker({ onSelectIllustration }: IllustrationPickerP
             active={selectedCategory === 'all'}
             onClick={() => setSelectedCategory('all')}
           >
-            全部
+            {DESIGNER_LABELS.ALL}
           </CategoryButton>
           {categories.map(([category, label]) => (
             <CategoryButton
@@ -130,7 +131,7 @@ export function IllustrationPicker({ onSelectIllustration }: IllustrationPickerP
 
           {filteredIllustrations.length === 0 && (
             <div className="text-center py-8 text-morandi-secondary text-sm">
-              找不到符合的插圖
+              {DESIGNER_LABELS.NOT_FOUND_9243}
             </div>
           )}
         </div>

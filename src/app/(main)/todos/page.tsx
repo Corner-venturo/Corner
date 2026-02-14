@@ -182,7 +182,7 @@ export default function TodosPage() {
               {/* 公開標記 */}
               {todo.is_public && (
                 <span className="text-[10px] bg-status-info-bg text-status-info px-1.5 py-0.5 rounded">
-                  公開
+                  {LABELS.LABEL_7239}
                 </span>
               )}
             </div>
@@ -377,7 +377,7 @@ export default function TodosPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="待辦事項"
+        title={LABELS.LABEL_9553}
         showSearch={true}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -386,7 +386,7 @@ export default function TodosPage() {
         addLabel="新增任務"
         actions={
           <Input
-            placeholder="快速新增... (Enter)"
+            placeholder={LABELS.ADD_25}
             className="w-64"
             value={quickAddValue}
             onChange={e => setQuickAddValue(e.target.value)}
@@ -491,14 +491,14 @@ export default function TodosPage() {
                     setExpandedTodo(todo.id)
                   }}
                   className="p-1 hover:bg-morandi-gold/10 rounded transition-colors"
-                  title="編輯"
+                  title={LABELS.EDIT}
                 >
                   <Edit2 size={14} />
                 </button>
                 <button
                   onClick={e => handleDeleteTodo(todo, e)}
                   className="p-1 text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
-                  title="刪除"
+                  title={LABELS.DELETE}
                 >
                   <Trash2 size={14} />
                 </button>
@@ -590,7 +590,7 @@ function AddTodoForm({
         <Input
           value={formData.title}
           onChange={e => setFormData({ ...formData, title: e.target.value })}
-          placeholder="輸入任務標題..."
+          placeholder={LABELS.LABEL_3467}
           required
         />
       </div>
@@ -608,13 +608,13 @@ function AddTodoForm({
         <DatePicker
           value={formData.deadline}
           onChange={date => setFormData({ ...formData, deadline: date })}
-          placeholder="選擇日期"
+          placeholder={LABELS.SELECT_5234}
         />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-morandi-primary mb-1">
-          指派給（可選）
+          {LABELS.LABEL_7694}
         </label>
         <Select
           value={formData.assignee || '__none__'}
@@ -645,18 +645,18 @@ function AddTodoForm({
           <span className="text-sm font-medium text-morandi-primary">{LABELS.PUBLIC_TO_COMPANY}</span>
         </label>
         <p className="text-xs text-morandi-secondary mt-1 ml-6">
-          其他同事可以查看此待辦，但只有你和共享者可以編輯
+          {LABELS.EDIT_8913}
         </p>
       </div>
 
       <div className="flex gap-2 pt-4">
         <Button type="submit" className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
           <Plus size={16} />
-          建立任務
+          {LABELS.LABEL_1974}
         </Button>
         <Button type="button" variant="outline" onClick={onCancel} className="gap-2">
           <X size={16} />
-          取消
+          {LABELS.CANCEL}
         </Button>
       </div>
     </form>

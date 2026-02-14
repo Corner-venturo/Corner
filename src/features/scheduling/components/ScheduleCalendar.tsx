@@ -24,6 +24,7 @@ import { Plus, Trash2 } from 'lucide-react'
 import type { FleetVehicle, FleetSchedule, LeaderSchedule } from '@/types/fleet.types'
 import type { TourLeader } from '@/types/tour-leader.types'
 import { getVehicleTypeLabel } from '@/types/fleet.types'
+import { SCHEDULING_LABELS } from './constants/labels'
 
 interface ScheduleCalendarProps {
   type: 'vehicle' | 'leader'
@@ -94,7 +95,7 @@ export const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
   if (!days || days.length === 0 || !resources || !schedules) {
     return (
       <div className="h-full flex items-center justify-center border border-border rounded-lg bg-card shadow-sm">
-        <span className="text-morandi-secondary">載入中...</span>
+        <span className="text-morandi-secondary">{SCHEDULING_LABELS.LOADING_6912}</span>
       </div>
     )
   }
@@ -180,7 +181,7 @@ export const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
           style={{ gridTemplateColumns: `200px repeat(${days.length}, minmax(${viewMode === 'week' ? '100px' : '40px'}, 1fr))` }}
         >
           <div className={cn('px-4 flex items-center font-medium text-morandi-primary border-r border-border', headerHeight)}>
-            資源
+            {SCHEDULING_LABELS.LABEL_1014}
           </div>
           {Array.isArray(days) && days.map((day, i) => {
             if (!(day instanceof Date)) return null

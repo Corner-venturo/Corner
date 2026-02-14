@@ -8,6 +8,7 @@ import { useTimeboxDrag } from '../hooks/useTimeboxDrag'
 import BasicDialog from './box-dialogs/BasicDialog'
 import WorkoutDialog from './box-dialogs/WorkoutDialog'
 import ReminderDialog from './box-dialogs/ReminderDialog'
+import { TIMEBOX_LABELS } from './constants/labels'
 
 const typeIcons = {
   workout: Dumbbell,
@@ -178,7 +179,7 @@ function ScheduledBoxItem({
               ? 'bg-card/50'
               : 'bg-transparent group-hover:bg-card/20'
           }`}
-          title="拖曳調整時長"
+          title={TIMEBOX_LABELS.LABEL_850}
         />
       </div>
 

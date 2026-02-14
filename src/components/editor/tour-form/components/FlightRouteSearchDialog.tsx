@@ -140,7 +140,7 @@ export function FlightRouteSearchDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Plane className="w-5 h-5 text-morandi-gold" />
-            查詢航線航班
+            {COMP_EDITOR_LABELS.QUERYING_9873}
           </DialogTitle>
         </DialogHeader>
 
@@ -150,7 +150,7 @@ export function FlightRouteSearchDialog({
             <div className="grid grid-cols-4 gap-3">
               <div>
                 <label className="block text-xs font-medium text-morandi-primary mb-1">
-                  出發機場
+                  {COMP_EDITOR_LABELS.LABEL_7410}
                 </label>
                 <Input
                   type="text"
@@ -163,7 +163,7 @@ export function FlightRouteSearchDialog({
               </div>
               <div>
                 <label className="block text-xs font-medium text-morandi-primary mb-1">
-                  目的地
+                  {COMP_EDITOR_LABELS.LABEL_5475}
                 </label>
                 <Input
                   type="text"
@@ -176,7 +176,7 @@ export function FlightRouteSearchDialog({
               </div>
               <div>
                 <label className="block text-xs font-medium text-morandi-primary mb-1">
-                  日期
+                  {COMP_EDITOR_LABELS.DATE}
                 </label>
                 <DatePicker
                   value={searchDate}
@@ -233,13 +233,13 @@ export function FlightRouteSearchDialog({
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-6 h-6 animate-spin text-morandi-gold" />
-                <span className="ml-2 text-morandi-secondary">查詢中...</span>
+                <span className="ml-2 text-morandi-secondary">{COMP_EDITOR_LABELS.QUERYING_974}</span>
               </div>
             ) : searched && flights.length === 0 ? (
               <div className="text-center py-12 text-morandi-secondary">
                 <Plane className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                <p>找不到符合條件的航班</p>
-                <p className="text-xs mt-1">請確認機場代碼是否正確</p>
+                <p>{COMP_EDITOR_LABELS.NOT_FOUND_5487}</p>
+                <p className="text-xs mt-1">{COMP_EDITOR_LABELS.CONFIRM_3826}</p>
               </div>
             ) : flights.length > 0 ? (
               <div className="space-y-2">
@@ -289,10 +289,10 @@ export function FlightRouteSearchDialog({
                       </div>
                       <div className="flex items-center gap-2">
                         {flight.terminal && (
-                          <span>航廈 {flight.terminal}</span>
+                          <span>{COMP_EDITOR_LABELS.LABEL_3761} {flight.terminal}</span>
                         )}
                         {flight.gate && (
-                          <span>登機門 {flight.gate}</span>
+                          <span>{COMP_EDITOR_LABELS.LABEL_785} {flight.gate}</span>
                         )}
                         <span className={cn(
                           'px-1.5 py-0.5 rounded text-[10px]',

@@ -31,7 +31,7 @@ export function MealSection({
   if (variant === 'grid') {
     return (
       <div>
-        <div className="text-xs font-medium mb-1" style={{ color: themeColor }}>餐食安排</div>
+        <div className="text-xs font-medium mb-1" style={{ color: themeColor }}>{COMP_EDITOR_LABELS.LABEL_9126}</div>
         <div className="flex gap-4 text-sm">
           <span>
             早：<EditableText
@@ -94,7 +94,7 @@ export function MealSection({
   return (
     <div className="flex gap-4 text-sm">
       <div className="flex-1">
-        <span className="text-morandi-muted">午餐：</span>
+        <span className="text-morandi-muted">{COMP_EDITOR_LABELS.LABEL_1221}</span>
         <EditableText
           value={meals.lunch || ''}
           fieldKey="meals-lunch"

@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import { AlertCircle, FileX } from 'lucide-react'
 import { SectionTitle } from './SectionTitle'
 import type { TourPageData, CoverStyleType } from '@/features/tours/types/tour-display.types'
+import { TOURS_LABELS } from './constants/labels'
 
 interface TourNoticesSectionProps {
   data: TourPageData
@@ -35,7 +36,7 @@ export function TourNoticesSection({ data, viewMode = 'desktop', coverStyle = 'o
           {hasNotices && (
             <div className="bg-card rounded-2xl p-6 shadow-sm border border-border">
               <SectionTitle
-                title="提醒事項"
+                title={TOURS_LABELS.LABEL_1403}
                 subtitle="NOTICES"
                 coverStyle={coverStyle}
                 className="mb-6"
@@ -64,7 +65,7 @@ export function TourNoticesSection({ data, viewMode = 'desktop', coverStyle = 'o
           {hasCancellation && (
             <div className="bg-card rounded-2xl p-6 shadow-sm border border-border">
               <SectionTitle
-                title="取消政策"
+                title={TOURS_LABELS.LABEL_5312}
                 subtitle="CANCELLATION"
                 coverStyle={coverStyle}
                 className="mb-6"

@@ -243,7 +243,7 @@ function BlockEditorPageContent() {
     <div className="h-full flex flex-col">
       {/* 頁面頂部 */}
       <ResponsiveHeader
-        title="區塊編輯器"
+        title={BLOCK_EDITOR_LABELS.BLOCK_EDITOR}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '行程管理', href: '/itinerary' },
@@ -284,19 +284,19 @@ function BlockEditorPageContent() {
                 {autoSaveStatus === 'saving' && (
                   <span className="flex items-center gap-1 text-white/80">
                     <Cloud size={12} className="animate-pulse" />
-                    存檔中...
+                    {BLOCK_EDITOR_LABELS.LABEL_2827}
                   </span>
                 )}
                 {autoSaveStatus === 'saved' && (
                   <span className="flex items-center gap-1 text-white/80">
                     <Cloud size={12} />
-                    已儲存
+                    {BLOCK_EDITOR_LABELS.SAVING_4294}
                   </span>
                 )}
                 {autoSaveStatus === 'error' && (
                   <span className="flex items-center gap-1 text-morandi-red/80">
                     <CloudOff size={12} />
-                    存檔失敗
+                    {BLOCK_EDITOR_LABELS.LABEL_6397}
                   </span>
                 )}
               </div>

@@ -77,14 +77,14 @@ export default function RequestsPage() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="請款管理"
+        title={REQUESTS_PAGE_LABELS.MANAGE_3483}
         actions={
           <button
             onClick={() => setIsAddDialogOpen(true)}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white px-4 py-2 rounded-md text-sm font-medium flex items-center transition-colors"
           >
             <Plus size={16} className="mr-2" />
-            新增請款
+            {REQUESTS_PAGE_LABELS.ADD_9640}
           </button>
         }
       />
