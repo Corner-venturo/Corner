@@ -28,6 +28,7 @@ import type {
   PreviewDayData,
   AccommodationStatus,
 } from './types'
+import { formatDailyItinerary, getPreviewDailyData as getPreviewData, generatePrintHtml } from './format-itinerary'
 import { PROPOSAL_LABELS } from '../../constants'
 
 interface UsePackageItineraryOptions {
@@ -449,39 +450,7 @@ export function usePackageItinerary({
 
   // 產生預覽資料
   const getPreviewDailyData = useCallback((): PreviewDayData[] => {
-    return dailySchedule.map((day, idx) => {
-      let dateLabel = ''
-      if (pkg.start_date) {
-        const date = new Date(pkg.start_date)
-        date.setDate(date.getDate() + idx)
-        const weekdays = ['日', '一', '二', '三', '四', '五', '六']
-        dateLabel = `${date.getMonth() + 1}/${date.getDate()} (${weekdays[date.getDay()]})`
-      }
-      const isFirst = idx === 0
-      const isLast = idx === dailySchedule.length - 1
-      const defaultTitle = isFirst ? '抵達目的地' : isLast ? '返回台灣' : `第 ${day.day} 天行程`
-      const title = day.route?.trim() || defaultTitle
-      const breakfast = day.hotelBreakfast ? '飯店早餐' : day.meals.breakfast
-      const lunch = day.lunchSelf ? '敬請自理' : day.meals.lunch
-      const dinner = day.dinnerSelf ? '敬請自理' : day.meals.dinner
-      let accommodation = day.accommodation || ''
-      if (day.sameAsPrevious && idx > 0) {
-        for (let i = idx - 1; i >= 0; i--) {
-          if (!dailySchedule[i].sameAsPrevious && dailySchedule[i].accommodation) {
-            accommodation = dailySchedule[i].accommodation
-            break
-          }
-        }
-        if (!accommodation) accommodation = '續住'
-      }
-      return {
-        dayLabel: `Day ${day.day}`,
-        date: dateLabel,
-        title,
-        meals: { breakfast, lunch, dinner },
-        accommodation: isLast ? '' : accommodation,
-      }
-    })
+    return getPreviewData(dailySchedule, pkg.start_date || null)
   }, [dailySchedule, pkg.start_date])
 
   // 列印預覽
@@ -490,83 +459,16 @@ export function usePackageItinerary({
     if (!printWindow) return
 
     const dailyData = getPreviewDailyData()
-    const companyName = currentUser?.workspace_code || '旅行社'
-    const destination = pkg.destination || pkg.country_id || ''
-
-    const printContent = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>${formData.title || '行程表'}</title>
-        <style>
-          @page { size: A4; margin: 10mm; }
-          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
-          .header { border-bottom: 2px solid #c9aa7c; padding-bottom: 16px; margin-bottom: 24px; }
-          .title { font-size: 24px; font-weight: bold; color: #3a3633; margin-bottom: 4px; }
-          .company { text-align: right; color: #c9aa7c; font-weight: 600; }
-          .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; font-size: 14px; }
-          .info-label { color: #8b8680; }
-          table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px; }
-          th { background: #c9aa7c; color: white; padding: 8px; text-align: left; border: 1px solid #c9aa7c; }
-          td { padding: 8px; border: 1px solid #e8e5e0; }
-          tr:nth-child(even) { background: #f6f4f1; }
-          .day-label { font-weight: 600; color: #c9aa7c; }
-          .day-date { font-size: 11px; color: #8b8680; }
-          .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid #e8e5e0; text-align: center; font-size: 12px; color: #8b8680; }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <div style="display: flex; justify-content: space-between;">
-            <div>
-              <div class="title">${formData.title || '行程表'}</div>
-            </div>
-            <div class="company">${companyName}</div>
-          </div>
-          <div class="info-grid">
-            <div><span class="info-label">目的地：</span>${destination}</div>
-            <div><span class="info-label">出發日期：</span>${pkg.start_date || '-'}</div>
-            <div><span class="info-label">行程天數：</span>${dailyData.length} 天</div>
-          </div>
-          ${!isDomestic && (formData.outboundFlight || formData.returnFlight) ? `
-          <div class="info-grid" style="margin-top: 8px;">
-            ${formData.outboundFlight ? `<div><span class="info-label">去程航班：</span>${formData.outboundFlight.airline} ${formData.outboundFlight.flightNumber} (${formData.outboundFlight.departureAirport} ${formData.outboundFlight.departureTime} → ${formData.outboundFlight.arrivalAirport} ${formData.outboundFlight.arrivalTime})</div>` : ''}
-            ${formData.returnFlight ? `<div><span class="info-label">回程航班：</span>${formData.returnFlight.airline} ${formData.returnFlight.flightNumber} (${formData.returnFlight.departureAirport} ${formData.returnFlight.departureTime} → ${formData.returnFlight.arrivalAirport} ${formData.returnFlight.arrivalTime})</div>` : ''}
-          </div>` : ''}
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th style="width: 80px;">日期</th>
-              <th>行程內容</th>
-              <th style="width: 70px; text-align: center;">早餐</th>
-              <th style="width: 70px; text-align: center;">午餐</th>
-              <th style="width: 70px; text-align: center;">晚餐</th>
-              <th style="width: 120px;">住宿</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${dailyData.map((day) => `
-              <tr>
-                <td>
-                  <div class="day-label">${day.dayLabel}</div>
-                  <div class="day-date">${day.date}</div>
-                </td>
-                <td>${day.title}</td>
-                <td style="text-align: center; font-size: 12px;">${day.meals.breakfast || '-'}</td>
-                <td style="text-align: center; font-size: 12px;">${day.meals.lunch || '-'}</td>
-                <td style="text-align: center; font-size: 12px;">${day.meals.dinner || '-'}</td>
-                <td style="font-size: 12px;">${day.accommodation || '-'}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-        <div class="footer">
-          本行程表由 ${companyName} 提供 | 列印日期：${new Date().toLocaleDateString('zh-TW')}
-        </div>
-      </body>
-      </html>
-    `
+    const printContent = generatePrintHtml({
+      title: formData.title,
+      companyName: currentUser?.workspace_code || '旅行社',
+      destination: pkg.destination || pkg.country_id || '',
+      startDate: pkg.start_date || null,
+      isDomestic,
+      outboundFlight: formData.outboundFlight,
+      returnFlight: formData.returnFlight,
+      dailyData,
+    })
 
     printWindow.document.write(printContent)
     printWindow.document.close()
@@ -685,49 +587,10 @@ export function usePackageItinerary({
       setIsCreating(true)
       setCreateError(null)
 
-      const formattedDailyItinerary = dailySchedule.map((day, idx) => {
-        let dateLabel = ''
-        if (pkg.start_date) {
-          const date = new Date(pkg.start_date)
-          date.setDate(date.getDate() + idx)
-          const weekdays = ['日', '一', '二', '三', '四', '五', '六']
-          dateLabel = `${date.getMonth() + 1}/${date.getDate()} (${weekdays[date.getDay()]})`
-        }
-
-        const isFirst = idx === 0
-        const isLast = idx === dailySchedule.length - 1
-        const defaultTitle = isFirst ? '抵達目的地' : isLast ? '返回台灣' : `第 ${day.day} 天行程`
-        const title = day.route?.trim() || defaultTitle
-        const breakfast = day.hotelBreakfast ? '飯店早餐' : day.meals.breakfast
-        let accommodation = day.accommodation || ''
-        if (day.sameAsPrevious) {
-          accommodation = getPreviousAccommodation(idx) || '續住'
-        }
-
-        const formattedActivities = (day.activities || []).map(act => ({
-          icon: '',
-          title: act.title,
-          description: '',
-          startTime: act.startTime,
-          endTime: act.endTime,
-        }))
-
-        return {
-          dayLabel: `Day ${day.day}`,
-          date: dateLabel,
-          title: title,
-          highlight: '',
-          description: '',
-          activities: formattedActivities,
-          recommendations: [],
-          meals: {
-            breakfast,
-            lunch: day.meals.lunch,
-            dinner: day.meals.dinner,
-          },
-          accommodation,
-          images: [],
-        }
+      const formattedDailyItinerary = formatDailyItinerary({
+        dailySchedule,
+        startDate: pkg.start_date || null,
+        getPreviousAccommodation,
       })
 
       const authorName = currentUser?.display_name || currentUser?.chinese_name || ''
@@ -874,48 +737,11 @@ export function usePackageItinerary({
 
     setIsCreating(true)
     try {
-      const formattedDailyItinerary = dailySchedule.map((day, idx) => {
-        let dateLabel = ''
-        if (pkg.start_date) {
-          const date = new Date(pkg.start_date)
-          date.setDate(date.getDate() + idx)
-          const weekdays = ['日', '一', '二', '三', '四', '五', '六']
-          dateLabel = `${date.getMonth() + 1}/${date.getDate()} (${weekdays[date.getDay()]})`
-        }
-
-        const isFirst = idx === 0
-        const isLast = idx === dailySchedule.length - 1
-        const defaultTitle = isFirst ? '抵達目的地' : isLast ? '返回台灣' : `第 ${day.day} 天行程`
-        const title = day.route?.trim() || defaultTitle
-        const breakfast = day.hotelBreakfast ? '飯店早餐' : day.meals.breakfast
-        const lunch = day.lunchSelf ? '敬請自理' : day.meals.lunch
-        const dinner = day.dinnerSelf ? '敬請自理' : day.meals.dinner
-        let accommodation = day.accommodation || ''
-        if (day.sameAsPrevious) {
-          accommodation = getPreviousAccommodation(idx) || '續住'
-        }
-
-        const formattedActivities = (day.activities || []).map(act => ({
-          icon: '',
-          title: act.title,
-          description: '',
-          startTime: act.startTime,
-          endTime: act.endTime,
-        }))
-
-        return {
-          dayLabel: `Day ${day.day}`,
-          date: dateLabel,
-          title: title,
-          highlight: '',
-          description: '',
-          activities: formattedActivities,
-          recommendations: [],
-          meals: { breakfast, lunch, dinner },
-          accommodation: day.sameAsPrevious ? `同上 (${getPreviousAccommodation(idx) || ''})` : accommodation,
-          isSameAccommodation: day.sameAsPrevious || false,
-          images: [],
-        }
+      const formattedDailyItinerary = formatDailyItinerary({
+        dailySchedule,
+        startDate: pkg.start_date || null,
+        getPreviousAccommodation,
+        includeSameAccommodation: true,
       })
 
       const newVersion: ItineraryVersionRecord = {
