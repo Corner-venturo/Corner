@@ -23,6 +23,7 @@ import {
   ChevronRight,
   ClipboardList,
 } from 'lucide-react'
+// TODO: [品質優化] 將 supabase 操作搬到 confirmations/services/ — 目前因 setState 交錯暫保留
 import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores'

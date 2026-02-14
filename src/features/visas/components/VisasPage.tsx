@@ -50,7 +50,7 @@ export default function VisasPage() {
       const { invalidateVisas } = await import('@/data')
       await invalidateVisas()
     }
-    loadData()
+    loadData().catch((err) => logger.error('[loadData]', err))
   }, [])
 
   // 篩選管理

@@ -113,7 +113,7 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
       }
     }
 
-    checkAuth()
+    checkAuth().catch((err) => logger.error('[checkAuth]', err))
   }, [
     user,
     _hasHydrated,

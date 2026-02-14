@@ -1,6 +1,7 @@
 'use client'
 
 import { getTodayString } from '@/lib/utils/format-date'
+import { logger } from '@/lib/utils/logger'
 
 import { useState, useEffect, useMemo } from 'react'
 import { useToast } from '@/components/ui/use-toast'
@@ -60,9 +61,9 @@ export function useInvoiceDialog({
   useEffect(() => {
     if (open) {
       setDataLoaded(false)
-      Promise.all([invalidateTours(), invalidateOrders(), fetchInvoices()]).then(() => {
-        setDataLoaded(true)
-      })
+      Promise.all([invalidateTours(), invalidateOrders(), fetchInvoices()])
+        .then(() => { setDataLoaded(true) })
+        .catch(err => logger.error('[useInvoiceDialog] loadData', err))
     }
   }, [open, fetchInvoices])
 

@@ -20,6 +20,7 @@ import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import type { Tour, Itinerary } from '@/stores/types'
 import { DESIGNER_LABELS } from './constants/labels'
+import { logger } from '@/lib/utils/logger'
 
 // ============================================
 // 設計類型定義
@@ -152,7 +153,7 @@ export function DesignTypeSelector({
       setLoadingTours(false)
     }
 
-    fetchTours()
+    fetchTours().catch((err) => logger.error('[fetchTours]', err))
   }, [workspaceId, isBrochureType])
 
   // 載入行程列表
@@ -175,7 +176,7 @@ export function DesignTypeSelector({
       setLoadingItineraries(false)
     }
 
-    fetchItineraries()
+    fetchItineraries().catch((err) => logger.error('[fetchItineraries]', err))
   }, [selectedTourId, preselectedTourId, isBrochureType])
 
   const handleDesignTypeChange = (value: string) => {

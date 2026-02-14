@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
 import { DASHBOARD_LABELS } from './constants/labels'
+import { logger } from '@/lib/utils/logger'
 
 interface ReminderView {
   title: string
@@ -148,7 +149,7 @@ export function ManifestationWidget() {
       if (custom.detail) {
         setSnapshot(custom.detail)
       } else {
-        syncFromStorage()
+        syncFromStorage().catch((err) => logger.error('[syncFromStorage]', err))
       }
     }
 

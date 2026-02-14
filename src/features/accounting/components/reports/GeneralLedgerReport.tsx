@@ -62,7 +62,7 @@ export function GeneralLedgerReport() {
       setAccountsLoading(false)
     }
 
-    loadAccounts()
+    loadAccounts().catch((err) => logger.error('[loadAccounts]', err))
   }, [user?.workspace_id])
 
   // 科目下拉選項

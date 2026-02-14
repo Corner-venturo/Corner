@@ -194,7 +194,7 @@ export function AddReceiptDialog({
       }
     }
 
-    initialize()
+    initialize().catch((err) => logger.error('[initialize]', err))
   }, [open, defaultTourId, defaultOrderId, resetForm, setFormData, editingReceipt, setPaymentItems])
 
   // 如果只有一個訂單，自動帶入（編輯模式除外）

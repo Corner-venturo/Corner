@@ -5,6 +5,7 @@ import { MapPin, Navigation, Loader2 } from 'lucide-react'
 import type { Attraction } from '../types'
 import type L from 'leaflet'
 import { ATTRACTIONS_LABELS } from './constants/labels'
+import { logger } from '@/lib/utils/logger'
 
 interface AttractionsMapProps {
   attractions: Attraction[]
@@ -235,7 +236,7 @@ export function AttractionsMap({
       setIsLoading(false)
     }
 
-    initMap()
+    initMap().catch((err) => logger.error('[initMap]', err))
 
     return () => {}
   }, [selectedAttraction?.id, selectedAttraction?.latitude, selectedAttraction?.longitude, nearbyAttractions, radiusKm])

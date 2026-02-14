@@ -27,7 +27,7 @@ export default function WorkspacePage() {
       await loadWorkspaces()
     }
 
-    init()
+    init().catch((err) => logger.error('[init]', err))
 
   }, [])
 
@@ -42,7 +42,7 @@ export default function WorkspacePage() {
       logger.log('✅ [WorkspacePage] 初始化完成')
     }
 
-    loadData()
+    loadData().catch((err) => logger.error('[loadData]', err))
 
   }, [currentWorkspace?.id])
 

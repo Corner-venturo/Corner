@@ -77,7 +77,7 @@ export function PackageListPanel({
         setCountries(data.filter(c => c.is_active === true) as Array<{ id: string; name: string; is_active: boolean }>)
       }
     }
-    fetchCountries()
+    fetchCountries().catch((err) => logger.error('[fetchCountries]', err))
   }, [])
 
   // 取得目的地顯示名稱（國家 + 機場代碼）

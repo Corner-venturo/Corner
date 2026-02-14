@@ -180,7 +180,7 @@ export function createEntityHook<T extends BaseEntity>(
         if (!cancelled && entry) {
           setFallback(entry.data)
         }
-      })
+      }).catch(() => { /* cache miss is non-critical */ })
       return () => { cancelled = true }
     }, [cache_key])
 

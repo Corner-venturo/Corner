@@ -26,6 +26,7 @@ import { supabase } from '@/lib/supabase/client'
 import type { Itinerary, ItineraryVersionRecord } from '@/stores/types'
 import { PROPOSAL_LABELS } from '../constants'
 import { BROCHURE_PREVIEW_DIALOG_LABELS } from '../constants/labels';
+import { logger } from '@/lib/utils/logger'
 
 interface BrochurePreviewDialogProps {
   isOpen: boolean
@@ -91,7 +92,7 @@ export function BrochurePreviewDialog({
         setLoading(false)
       }
 
-      loadData()
+      loadData().catch((err) => logger.error('[loadData]', err))
       invalidateItineraries() // 同時更新 SWR 快取
     }
   }, [isOpen, itineraryId])

@@ -12,6 +12,7 @@ import { supabase } from '@/lib/supabase/client'
 import { useWorkspaceId } from '@/lib/workspace-context'
 import type { Tour, Itinerary } from '@/stores/types'
 import { LABELS } from '../constants/labels'
+import { logger } from '@/lib/utils/logger'
 
 interface TourItinerarySelectorProps {
   selectedTourId: string
@@ -53,7 +54,7 @@ export function TourItinerarySelector({
       setLoadingTours(false)
     }
 
-    fetchTours()
+    fetchTours().catch((err) => logger.error('[fetchTours]', err))
   }, [workspaceId])
 
   // 根據選擇的團載入行程列表
@@ -75,7 +76,7 @@ export function TourItinerarySelector({
       setLoadingItineraries(false)
     }
 
-    fetchItineraries()
+    fetchItineraries().catch((err) => logger.error('[fetchItineraries]', err))
   }, [selectedTourId])
 
   const handleTourChange = (tourId: string) => {

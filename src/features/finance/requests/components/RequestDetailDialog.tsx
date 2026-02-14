@@ -83,7 +83,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
       setSelectedRequestId(request.id)
     }
 
-    loadBatchRequests()
+    loadBatchRequests().catch((err) => logger.error('[loadBatchRequests]', err))
   }, [open, request])
 
   // 載入請款項目

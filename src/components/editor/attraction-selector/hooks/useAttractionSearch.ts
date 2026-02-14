@@ -4,6 +4,7 @@ import { useState, useMemo, useRef, useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { Attraction } from '@/features/attractions/types'
 import type { Country as FullCountry, City as FullCity } from '@/stores/region-store'
+import { logger } from '@/lib/utils/logger'
 
 // 此 hook 只需要 id 和 name
 type City = Pick<FullCity, 'id' | 'name'>
@@ -91,7 +92,7 @@ export function useAttractionSearch({
         .order('name')
       setCountries(data || [])
     }
-    loadCountries()
+    loadCountries().catch((err) => logger.error('[loadCountries]', err))
   }, [isOpen])
 
   // 打開對話框時自動選擇行程的國家

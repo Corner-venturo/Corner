@@ -21,6 +21,7 @@ import { Label } from '@/components/ui/label'
 import { useTravelInvoiceStore } from '@/stores/travel-invoice-store'
 import { alert } from '@/lib/ui/alert-dialog'
 import { TRAVEL_INVOICE_LABELS, TRAVEL_INVOICE_DETAIL_LABELS } from '../../constants/labels'
+import { logger } from '@/lib/utils/logger'
 
 export default function InvoiceDetailPage() {
   const params = useParams()
@@ -39,7 +40,7 @@ export default function InvoiceDetailPage() {
         setHasLoaded(true)
       }
     }
-    loadInvoice()
+    loadInvoice().catch((err) => logger.error('[loadInvoice]', err))
   }, [params.id, fetchInvoiceById])
 
   useEffect(() => {

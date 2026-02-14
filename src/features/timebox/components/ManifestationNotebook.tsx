@@ -84,7 +84,7 @@ export default function ManifestationNotebook() {
         fetchEntries()
       }
     }
-    loadData()
+    loadData().catch((err) => logger.error('[loadData]', err))
   }, [user?.id, fetchEntries])
 
   // 載入歷史紀錄

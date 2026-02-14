@@ -7,6 +7,7 @@ import { Globe, FileText, Loader2, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { COMP_TOURS_LABELS } from '../constants/labels'
+import { logger } from '@/lib/utils/logger'
 
 interface DesignItem {
   id: string
@@ -100,7 +101,7 @@ export function TourDesignsTab({ tourId, proposalId }: TourDesignsTabProps) {
     }
 
     if (tourId) {
-      fetchDesigns()
+      fetchDesigns().catch((err) => logger.error('[fetchDesigns]', err))
     }
   }, [tourId, proposalId])
 

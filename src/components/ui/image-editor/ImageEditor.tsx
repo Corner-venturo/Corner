@@ -122,15 +122,19 @@ export function ImageEditor({
         setTransformedSrc(transformed)
       }
     }
-    applyTransform()
+    applyTransform().catch((err) => logger.error('[applyTransform]', err))
     return () => { cancelled = true }
   }, [imageSrc, settings.rotation, settings.flipH])
 
   // 色彩調整預覽（debounce）- 使用已變換的圖片作為來源
   useEffect(() => {
     const timeout = setTimeout(async () => {
-      const processed = await applyAdjustmentsToImage(transformedSrc, settings.adjustments)
-      setPreviewSrc(processed)
+      try {
+        const processed = await applyAdjustmentsToImage(transformedSrc, settings.adjustments)
+        setPreviewSrc(processed)
+      } catch (err) {
+        logger.error('[ImageEditor] applyAdjustments', err)
+      }
     }, 150)
     return () => clearTimeout(timeout)
   }, [transformedSrc, settings.adjustments])

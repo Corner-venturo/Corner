@@ -39,7 +39,9 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+// TODO: [品質優化] 進一步將顧客同步的 supabase 操作也搬到 service 層
 import { supabase } from '@/lib/supabase/client'
+import { updateMembersTicketingDeadline } from '@/features/orders/services/order_member.service'
 import { updateMember } from '@/data/entities/members'
 import { logger } from '@/lib/utils/logger'
 import { useOcrRecognition } from '@/hooks'
@@ -449,7 +451,7 @@ export function OrderMembersExpandable({
         // 更新資料庫中所有同 PNR 的成員
         try {
           const memberIds = samePnrMembers.map(m => m.id)
-          await supabase.from('order_members').update({ ticketing_deadline: deadlineValue }).in('id', memberIds)
+          await updateMembersTicketingDeadline(memberIds, deadlineValue)
         } catch (error) {
           logger.error(COMP_ORDERS_LABELS.更新欄位失敗, error)
         }

@@ -122,7 +122,7 @@ export function useRestaurantSelector({
         .order('name')
       setCountries(data || [])
     }
-    loadCountries()
+    loadCountries().catch((err) => logger.error('[loadCountries]', err))
   }, [isOpen])
 
   // 打開對話框時自動選擇行程的國家
@@ -202,7 +202,7 @@ export function useRestaurantSelector({
         .order('name')
       setRegions(data || [])
     }
-    loadRegions()
+    loadRegions().catch((err) => logger.error('[loadRegions]', err))
   }, [isOpen, selectedCountryId])
 
   // 載入城市列表（根據區域或國家）
@@ -228,7 +228,7 @@ export function useRestaurantSelector({
       const { data } = await query
       setCities(data || [])
     }
-    loadCities()
+    loadCities().catch((err) => logger.error('[loadCities]', err))
   }, [isOpen, selectedCountryId, selectedRegionId])
 
   // 載入餐廳資料（包含一般餐廳和米其林餐廳）

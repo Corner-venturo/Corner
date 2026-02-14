@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores'
 import type { RealtimeChannel } from '@supabase/supabase-js'
+import { logger } from '@/lib/utils/logger'
 
 interface EditorInfo {
   id: string
@@ -89,7 +90,7 @@ export function useEditingPresence({
       })
     }
 
-    setupPresence()
+    setupPresence().catch((err) => logger.error('[setupPresence]', err))
 
     // 清理函數
     return () => {

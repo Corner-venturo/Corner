@@ -290,7 +290,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
       }
     }
 
-    initialize()
+    initialize().catch((err) => logger.error('[initialize]', err))
   }, [open, defaultTourId, defaultOrderId, resetForm, setFormData])
 
   // 自動帶入訂單

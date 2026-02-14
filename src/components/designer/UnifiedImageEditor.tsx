@@ -99,8 +99,12 @@ export function UnifiedImageEditor({
     if (mode !== 'adjust') return
 
     const timeout = setTimeout(async () => {
-      const processed = await applyAdjustments(imageSrc, adjustments)
-      setPreviewImageSrc(processed)
+      try {
+        const processed = await applyAdjustments(imageSrc, adjustments)
+        setPreviewImageSrc(processed)
+      } catch (err) {
+        logger.error('[UnifiedImageEditor] applyAdjustments', err)
+      }
     }, 100)
 
     return () => clearTimeout(timeout)

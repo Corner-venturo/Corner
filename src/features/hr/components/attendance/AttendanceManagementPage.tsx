@@ -37,6 +37,7 @@ import {
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
 import { ATTENDANCE_PAGE_LABELS as L } from '@/features/hr/constants/labels'
+import { logger } from '@/lib/utils/logger'
 
 interface Employee {
   id: string
@@ -99,7 +100,7 @@ export function AttendanceManagementPage() {
       }
     }
 
-    loadEmployees()
+    loadEmployees().catch((err) => logger.error('[loadEmployees]', err))
   }, [user?.workspace_id])
 
   // 載入紀錄

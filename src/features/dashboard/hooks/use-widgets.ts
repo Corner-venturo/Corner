@@ -5,6 +5,7 @@ import type { WidgetType } from '../types'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
+import { saveWidgetPreferences } from '@/features/dashboard/services/dashboard.service'
 
 const STORAGE_KEY = 'homepage-widgets'
 const PREFERENCE_KEY = 'homepage-widgets-order'
@@ -77,21 +78,9 @@ export function useWidgets() {
     // 如果有登入用戶，保存到 Supabase
     if (user?.id) {
       try {
-        const { error } = await supabase.from('user_preferences').upsert(
-          {
-            user_id: user.id,
-            preference_key: PREFERENCE_KEY,
-            preference_value: widgets,
-            updated_at: new Date().toISOString(),
-          },
-          {
-            onConflict: 'user_id,preference_key',
-          }
-        )
-
-        if (error) {
-          logger.warn('[useWidgets] Failed to save to Supabase:', error.message)
-        }
+        await saveWidgetPreferences(user.id, PREFERENCE_KEY, widgets as string[]).catch(err => {
+          logger.warn('[useWidgets] Failed to save to Supabase:', err.message)
+        })
       } catch (error) {
         logger.warn('[useWidgets] Error saving widget preferences:', error)
       }

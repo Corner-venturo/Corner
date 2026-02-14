@@ -3,8 +3,11 @@
  */
 
 import { useState, useCallback } from 'react'
-import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import {
+  checkVehicleScheduleConflict as checkVehicleConflictService,
+  checkLeaderScheduleConflict as checkLeaderConflictService,
+} from '@/features/scheduling/services/schedule.service'
 
 interface ConflictCheckResult {
   hasConflict: boolean
@@ -35,20 +38,7 @@ export function useVehicleScheduleConflict() {
     setResult(prev => ({ ...prev, loading: true, error: null }))
 
     try {
-      const { data, error } = await supabase.rpc('check_vehicle_schedule_conflict', {
-        p_vehicle_id: vehicleId,
-        p_start_date: startDate,
-        p_end_date: endDate,
-        p_exclude_id: excludeId,
-      })
-
-      if (error) {
-        logger.error('檢查車輛調度衝突失敗:', error)
-        setResult({ hasConflict: false, loading: false, error: error.message })
-        return false
-      }
-
-      const hasConflict = data === true
+      const hasConflict = await checkVehicleConflictService(vehicleId, startDate, endDate, excludeId)
       setResult({ hasConflict, loading: false, error: null })
       return hasConflict
     } catch (err) {
@@ -84,20 +74,7 @@ export function useLeaderScheduleConflict() {
     setResult(prev => ({ ...prev, loading: true, error: null }))
 
     try {
-      const { data, error } = await supabase.rpc('check_leader_schedule_conflict', {
-        p_leader_id: leaderId,
-        p_start_date: startDate,
-        p_end_date: endDate,
-        p_exclude_id: excludeId,
-      })
-
-      if (error) {
-        logger.error('檢查領隊調度衝突失敗:', error)
-        setResult({ hasConflict: false, loading: false, error: error.message })
-        return false
-      }
-
-      const hasConflict = data === true
+      const hasConflict = await checkLeaderConflictService(leaderId, startDate, endDate, excludeId)
       setResult({ hasConflict, loading: false, error: null })
       return hasConflict
     } catch (err) {

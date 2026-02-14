@@ -20,6 +20,7 @@ import {
   DEFAULT_COLUMNS,
 } from './tour-print-constants'
 import { TOUR_PRINT_DIALOG_LABELS } from '../constants/labels'
+import { logger } from '@/lib/utils/logger'
 import {
   generateMembersPrintContent,
   generateFlightPrintContent,
@@ -107,7 +108,7 @@ export function TourPrintDialog({ isOpen, tour, members, onClose }: TourPrintDia
         setPnrData(results)
         setLoadingPnr(false)
       }
-      fetchPnrs()
+      fetchPnrs().catch((err) => logger.error('[fetchPnrs]', err))
     }
   }, [isOpen, tour.id, members])
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
+import { insertRoomAssignments } from '@/features/orders/services/order_member.service'
 import { logger } from '@/lib/utils/logger'
 import { toast } from 'sonner'
 import { COMP_ORDERS_LABELS } from '../constants/labels'
@@ -586,7 +587,7 @@ export function useRoomVehicleAssignments({
               room_id: rid,
               order_member_id: memberId,
             }))
-            await supabase.from('tour_room_assignments').insert(newAssignments)
+            await insertRoomAssignments(newAssignments)
           }
         }
       }

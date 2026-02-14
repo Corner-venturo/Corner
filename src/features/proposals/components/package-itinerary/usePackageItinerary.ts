@@ -266,7 +266,7 @@ export function usePackageItinerary({
         loadingRef.current = false
       }
 
-      loadData()
+      loadData().catch((err) => logger.error('[loadData]', err))
     } else if (!isOpen) {
       loadingRef.current = false
     }

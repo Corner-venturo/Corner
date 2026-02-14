@@ -10,6 +10,7 @@
 
 import { useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
+import { fetchAllCustomers } from '@/features/orders/services/order_member.service'
 import { createCustomer, invalidateCustomers } from '@/data'
 import { logger } from '@/lib/utils/logger'
 import { syncPassportImageToMembers } from '@/lib/utils/sync-passport-image'
@@ -168,9 +169,9 @@ export function usePassportValidation(): UsePassportValidationReturn {
 
       if (newMember && canSyncCustomer) {
         await invalidateCustomers()
-        const { data: freshCustomers } = await supabase.from('customers').select('*')
+        const freshCustomers = await fetchAllCustomers()
 
-        const existingCustomer = (freshCustomers || []).find(c => {
+        const existingCustomer = freshCustomers.find(c => {
           if (isValidPassport && c.passport_number === passportNumber) return true
           if (isValidIdNumber && c.national_id === idNumber) return true
           // 也比對姓名+生日（作為輔助比對，但不會因為這個而建立新顧客）

@@ -125,6 +125,7 @@ export function TourItineraryDialog({
         .then(pkg => {
           setTourProposalPackage(pkg)
         })
+        .catch(err => logger.error('[getOrCreatePackageForTour]', err))
         .finally(() => {
           setIsLoading(false)
         })

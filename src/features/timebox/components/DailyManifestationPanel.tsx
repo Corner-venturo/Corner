@@ -13,6 +13,7 @@ import {
   type ManifestationReminderSnapshot,
 } from '@/lib/manifestation/reminder'
 import { TIMEBOX_LABELS } from './constants/labels'
+import { logger } from '@/lib/utils/logger'
 
 interface DailyManifestationPanelProps {
   className?: string
@@ -46,7 +47,7 @@ export default function DailyManifestationPanel({ className }: DailyManifestatio
         }
       }
     }
-    loadData()
+    loadData().catch((err) => logger.error('[loadData]', err))
   }, [user?.id])
 
   // 處理感恩輸入
