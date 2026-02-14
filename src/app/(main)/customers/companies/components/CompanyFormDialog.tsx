@@ -21,6 +21,7 @@ import type { Company } from '@/stores'
 import type { CreateCompanyData } from '@/types/company.types'
 import { PAYMENT_METHOD_LABELS, PAYMENT_TERMS_OPTIONS } from '@/types/company.types'
 import { alert } from '@/lib/ui/alert-dialog'
+import { COMPANY_LABELS } from '../constants/labels'
 
 interface CompanyFormDialogProps {
   isOpen: boolean
@@ -323,12 +324,12 @@ export function CompanyFormDialog({
 
         {/* 備註 */}
         <div>
-          <Label htmlFor="note">備註</Label>
+          <Label htmlFor="note">{COMPANY_LABELS.FORM_NOTES_LABEL}</Label>
           <Textarea
             id="note"
             value={formData.notes || ''}
             onChange={e => setFormData({ ...formData, notes: e.target.value || null })}
-            placeholder="其他備註資訊..."
+            placeholder={COMPANY_LABELS.FORM_NOTES_PLACEHOLDER}
             rows={3}
           />
         </div>

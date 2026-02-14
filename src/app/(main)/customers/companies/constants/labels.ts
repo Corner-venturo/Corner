@@ -23,4 +23,49 @@ export const COMPANY_LABELS = {
     `確定要刪除企業「${companyName}」嗎？`,
   CONTACTS_OVERFLOW: (names: string, count: number) =>
     `${names}... 等 ${count} 位聯絡人`,
-} as const
+
+  // CompanyDetailDialog
+  DETAIL_BASIC_INFO: '基本資訊',
+  DETAIL_COMPANY_NAME: '企業名稱',
+  DETAIL_TAX_ID: '統一編號',
+  DETAIL_PHONE: '聯絡電話',
+  DETAIL_WEBSITE: '網站',
+  DETAIL_CREATED_DATE: '建立日期',
+  DETAIL_PAYMENT_INFO: '付款資訊',
+  DETAIL_PAYMENT_METHOD: '付款方式',
+  DETAIL_PAYMENT_TERMS: '付款期限',
+  DETAIL_PAYMENT_IMMEDIATE: '即付',
+  DETAIL_PAYMENT_DAYS: '天',
+  DETAIL_CREDIT_LIMIT: '信用額度',
+  DETAIL_INVOICE_INFO: '發票資訊',
+  DETAIL_INVOICE_TITLE: '發票抬頭',
+  DETAIL_INVOICE_ADDRESS: '發票地址',
+  DETAIL_INVOICE_EMAIL: '發票 Email',
+  DETAIL_BANK_INFO: '銀行資訊',
+  DETAIL_BANK_NAME: '銀行名稱',
+  DETAIL_BRANCH: '分行',
+  DETAIL_ACCOUNT: '帳號',
+  DETAIL_ADDRESS_INFO: '地址資訊',
+  DETAIL_REGISTERED_ADDRESS: '登記地址',
+  DETAIL_MAILING_ADDRESS: '通訊地址',
+  DETAIL_NOTES: '備註',
+  DETAIL_CLOSE: '關閉',
+  DETAIL_EDIT: '編輯',
+  DETAIL_REGULAR_CUSTOMER: '普通客戶',
+
+  // CompanyTableColumns
+  COL_COMPANY_NAME: '企業名稱',
+  COL_TAX_ID_PREFIX: '統編：',
+  COL_VIP_LEVEL: 'VIP 等級',
+  COL_PHONE: '聯絡電話',
+  COL_PAYMENT_TERMS: '付款條件',
+  COL_CREDIT_LIMIT: '信用額度',
+  COL_CREATED_DATE: '建立日期',
+  COL_ACTIONS: '操作',
+  COL_EDIT_TITLE: '編輯企業',
+  COL_DELETE_TITLE: '刪除企業',
+
+  // CompanyFormDialog
+  FORM_NOTES_LABEL: '備註',
+  FORM_NOTES_PLACEHOLDER: '其他備註資訊...',
+}

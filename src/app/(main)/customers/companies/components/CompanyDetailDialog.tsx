@@ -24,6 +24,7 @@ import {
 } from '@/types/company.types'
 import { CompanyFormDialog } from './CompanyFormDialog'
 import type { CreateCompanyData } from '@/types/company.types'
+import { COMPANY_LABELS } from '../constants/labels'
 
 interface CompanyDetailDialogProps {
   company: Company | null
@@ -44,7 +45,7 @@ export function CompanyDetailDialog({
 
   const getVipBadge = (level: number) => {
     if (level === 0) {
-      return <Badge variant="secondary">普通客戶</Badge>
+      return <Badge variant="secondary">{COMPANY_LABELS.DETAIL_REGULAR_CUSTOMER}</Badge>
     }
     return (
       <Badge className="bg-morandi-gold text-white">
@@ -78,23 +79,23 @@ export function CompanyDetailDialog({
             {/* 基本資訊 */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-base">基本資訊</CardTitle>
+                <CardTitle className="text-base">{COMPANY_LABELS.DETAIL_BASIC_INFO}</CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <p className="text-sm text-morandi-secondary">企業名稱</p>
+                  <p className="text-sm text-morandi-secondary">{COMPANY_LABELS.DETAIL_COMPANY_NAME}</p>
                   <p className="font-medium text-morandi-primary">
                     {company.company_name}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-morandi-secondary">統一編號</p>
+                  <p className="text-sm text-morandi-secondary">{COMPANY_LABELS.DETAIL_TAX_ID}</p>
                   <p className="font-medium text-morandi-primary font-mono">
                     {company.tax_id || '-'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-morandi-secondary">聯絡電話</p>
+                  <p className="text-sm text-morandi-secondary">{COMPANY_LABELS.DETAIL_PHONE}</p>
                   <p className="font-medium text-morandi-primary">
                     {company.phone || '-'}
                   </p>
@@ -107,7 +108,7 @@ export function CompanyDetailDialog({
                 </div>
                 {company.website && (
                   <div className="col-span-2">
-                    <p className="text-sm text-morandi-secondary">網站</p>
+                    <p className="text-sm text-morandi-secondary">{COMPANY_LABELS.DETAIL_WEBSITE}</p>
                     <a
                       href={company.website}
                       target="_blank"
@@ -119,7 +120,7 @@ export function CompanyDetailDialog({
                   </div>
                 )}
                 <div>
-                  <p className="text-sm text-morandi-secondary">建立日期</p>
+                  <p className="text-sm text-morandi-secondary">{COMPANY_LABELS.DETAIL_CREATED_DATE}</p>
                   <DateCell date={company.created_at} showIcon={false} className="font-medium text-morandi-primary" />
                 </div>
               </CardContent>
@@ -128,23 +129,23 @@ export function CompanyDetailDialog({
             {/* 付款資訊 */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-base">付款資訊</CardTitle>
+                <CardTitle className="text-base">{COMPANY_LABELS.DETAIL_PAYMENT_INFO}</CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div>
-                  <p className="text-sm text-morandi-secondary">付款方式</p>
+                  <p className="text-sm text-morandi-secondary">{COMPANY_LABELS.DETAIL_PAYMENT_METHOD}</p>
                   <p className="font-medium text-morandi-primary">
                     {PAYMENT_METHOD_LABELS[company.payment_method]}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-morandi-secondary">付款期限</p>
+                  <p className="text-sm text-morandi-secondary">{COMPANY_LABELS.DETAIL_PAYMENT_TERMS}</p>
                   <p className="font-medium text-morandi-primary">
-                    {company.payment_terms === 0 ? '即付' : `${company.payment_terms} 天`}
+                    {company.payment_terms === 0 ? COMPANY_LABELS.DETAIL_PAYMENT_IMMEDIATE : `${company.payment_terms} ${COMPANY_LABELS.DETAIL_PAYMENT_DAYS}`}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-morandi-secondary">信用額度</p>
+                  <p className="text-sm text-morandi-secondary">{COMPANY_LABELS.DETAIL_CREDIT_LIMIT}</p>
                   <CurrencyCell
                     amount={company.credit_limit}
                     className="font-medium text-morandi-gold"
@@ -157,12 +158,12 @@ export function CompanyDetailDialog({
             {(company.invoice_title || company.invoice_address || company.invoice_email) && (
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base">發票資訊</CardTitle>
+                  <CardTitle className="text-base">{COMPANY_LABELS.DETAIL_INVOICE_INFO}</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {company.invoice_title && (
                     <div className="col-span-2">
-                      <p className="text-sm text-morandi-secondary">發票抬頭</p>
+                      <p className="text-sm text-morandi-secondary">{COMPANY_LABELS.DETAIL_INVOICE_TITLE}</p>
                       <p className="font-medium text-morandi-primary">
                         {company.invoice_title}
                       </p>
@@ -170,7 +171,7 @@ export function CompanyDetailDialog({
                   )}
                   {company.invoice_address && (
                     <div className="col-span-2">
-                      <p className="text-sm text-morandi-secondary">發票地址</p>
+                      <p className="text-sm text-morandi-secondary">{COMPANY_LABELS.DETAIL_INVOICE_ADDRESS}</p>
                       <p className="font-medium text-morandi-primary">
                         {company.invoice_address}
                       </p>
@@ -178,7 +179,7 @@ export function CompanyDetailDialog({
                   )}
                   {company.invoice_email && (
                     <div>
-                      <p className="text-sm text-morandi-secondary">發票 Email</p>
+                      <p className="text-sm text-morandi-secondary">{COMPANY_LABELS.DETAIL_INVOICE_EMAIL}</p>
                       <p className="font-medium text-morandi-primary">
                         {company.invoice_email}
                       </p>
@@ -192,12 +193,12 @@ export function CompanyDetailDialog({
             {(company.bank_name || company.bank_account || company.bank_branch) && (
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base">銀行資訊</CardTitle>
+                  <CardTitle className="text-base">{COMPANY_LABELS.DETAIL_BANK_INFO}</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {company.bank_name && (
                     <div>
-                      <p className="text-sm text-morandi-secondary">銀行名稱</p>
+                      <p className="text-sm text-morandi-secondary">{COMPANY_LABELS.DETAIL_BANK_NAME}</p>
                       <p className="font-medium text-morandi-primary">
                         {company.bank_name}
                       </p>
@@ -205,7 +206,7 @@ export function CompanyDetailDialog({
                   )}
                   {company.bank_branch && (
                     <div>
-                      <p className="text-sm text-morandi-secondary">分行</p>
+                      <p className="text-sm text-morandi-secondary">{COMPANY_LABELS.DETAIL_BRANCH}</p>
                       <p className="font-medium text-morandi-primary">
                         {company.bank_branch}
                       </p>
@@ -213,7 +214,7 @@ export function CompanyDetailDialog({
                   )}
                   {company.bank_account && (
                     <div>
-                      <p className="text-sm text-morandi-secondary">帳號</p>
+                      <p className="text-sm text-morandi-secondary">{COMPANY_LABELS.DETAIL_ACCOUNT}</p>
                       <p className="font-medium text-morandi-primary font-mono">
                         {company.bank_account}
                       </p>
@@ -227,12 +228,12 @@ export function CompanyDetailDialog({
             {(company.registered_address || company.mailing_address) && (
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base">地址資訊</CardTitle>
+                  <CardTitle className="text-base">{COMPANY_LABELS.DETAIL_ADDRESS_INFO}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {company.registered_address && (
                     <div>
-                      <p className="text-sm text-morandi-secondary">登記地址</p>
+                      <p className="text-sm text-morandi-secondary">{COMPANY_LABELS.DETAIL_REGISTERED_ADDRESS}</p>
                       <p className="font-medium text-morandi-primary">
                         {company.registered_address}
                       </p>
@@ -240,7 +241,7 @@ export function CompanyDetailDialog({
                   )}
                   {company.mailing_address && (
                     <div>
-                      <p className="text-sm text-morandi-secondary">通訊地址</p>
+                      <p className="text-sm text-morandi-secondary">{COMPANY_LABELS.DETAIL_MAILING_ADDRESS}</p>
                       <p className="font-medium text-morandi-primary">
                         {company.mailing_address}
                       </p>
@@ -254,7 +255,7 @@ export function CompanyDetailDialog({
             {company.notes && (
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base">備註</CardTitle>
+                  <CardTitle className="text-base">{COMPANY_LABELS.DETAIL_NOTES}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-morandi-primary whitespace-pre-wrap">
@@ -268,7 +269,7 @@ export function CompanyDetailDialog({
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => onOpenChange(false)} className="gap-2">
               <X size={16} />
-              關閉
+              {COMPANY_LABELS.DETAIL_CLOSE}
             </Button>
             {onUpdate && (
               <Button
@@ -276,7 +277,7 @@ export function CompanyDetailDialog({
                 className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
                 <Edit2 size={16} />
-                編輯
+                {COMPANY_LABELS.DETAIL_EDIT}
               </Button>
             )}
           </DialogFooter>

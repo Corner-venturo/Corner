@@ -9,6 +9,7 @@ import type { Company } from '@/stores'
 import { PAYMENT_METHOD_LABELS, VIP_LEVEL_LABELS } from '@/types/company.types'
 import { Badge } from '@/components/ui/badge'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
+import { COMPANY_LABELS } from '../constants/labels'
 
 interface UseCompanyColumnsProps {
   onView: (company: Company) => void
@@ -21,7 +22,7 @@ export function useCompanyColumns({ onView, onEdit, onDelete }: UseCompanyColumn
     () => [
       {
         key: 'company_name',
-        label: '企業名稱',
+        label: COMPANY_LABELS.COL_COMPANY_NAME,
         width: '200px',
         render: (value, row) => {
           const company = row as Company
@@ -35,7 +36,7 @@ export function useCompanyColumns({ onView, onEdit, onDelete }: UseCompanyColumn
                 <div>
                   <div className="font-medium">{company.company_name}</div>
                   {company.tax_id && (
-                    <div className="text-xs text-morandi-muted">統編：{company.tax_id}</div>
+                    <div className="text-xs text-morandi-muted">{COMPANY_LABELS.COL_TAX_ID_PREFIX}{company.tax_id}</div>
                   )}
                 </div>
               </div>
@@ -45,7 +46,7 @@ export function useCompanyColumns({ onView, onEdit, onDelete }: UseCompanyColumn
       },
       {
         key: 'vip_level',
-        label: 'VIP 等級',
+        label: COMPANY_LABELS.COL_VIP_LEVEL,
         width: '100px',
         render: (value) => {
           const level = value as number
@@ -66,7 +67,7 @@ export function useCompanyColumns({ onView, onEdit, onDelete }: UseCompanyColumn
       },
       {
         key: 'phone',
-        label: '聯絡電話',
+        label: COMPANY_LABELS.COL_PHONE,
         width: '150px',
         render: (value, row) => {
           const company = row as Company
@@ -103,7 +104,7 @@ export function useCompanyColumns({ onView, onEdit, onDelete }: UseCompanyColumn
       },
       {
         key: 'payment_terms',
-        label: '付款條件',
+        label: COMPANY_LABELS.COL_PAYMENT_TERMS,
         width: '120px',
         render: (value, row) => {
           const company = row as Company
@@ -116,7 +117,7 @@ export function useCompanyColumns({ onView, onEdit, onDelete }: UseCompanyColumn
                 </span>
               </div>
               <div className="text-xs text-morandi-muted mt-1">
-                {company.payment_terms === 0 ? '即付' : `${company.payment_terms} 天`}
+                {company.payment_terms === 0 ? COMPANY_LABELS.DETAIL_PAYMENT_IMMEDIATE : `${company.payment_terms} ${COMPANY_LABELS.DETAIL_PAYMENT_DAYS}`}
               </div>
             </div>
           )
@@ -124,7 +125,7 @@ export function useCompanyColumns({ onView, onEdit, onDelete }: UseCompanyColumn
       },
       {
         key: 'credit_limit',
-        label: '信用額度',
+        label: COMPANY_LABELS.COL_CREDIT_LIMIT,
         width: '120px',
         render: (value) => {
           const limit = value as number
@@ -140,7 +141,7 @@ export function useCompanyColumns({ onView, onEdit, onDelete }: UseCompanyColumn
       },
       {
         key: 'created_at',
-        label: '建立日期',
+        label: COMPANY_LABELS.COL_CREATED_DATE,
         width: '120px',
         render: (value) => (
           <DateCell
@@ -152,7 +153,7 @@ export function useCompanyColumns({ onView, onEdit, onDelete }: UseCompanyColumn
       },
       {
         key: 'actions',
-        label: '操作',
+        label: COMPANY_LABELS.COL_ACTIONS,
         width: '80px',
         render: (_value, row) => {
           const company = row as Company
@@ -161,7 +162,7 @@ export function useCompanyColumns({ onView, onEdit, onDelete }: UseCompanyColumn
               {onEdit && (
                 <button
                   className="p-1 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
-                  title="編輯企業"
+                  title={COMPANY_LABELS.COL_EDIT_TITLE}
                   onClick={(e) => {
                     e.stopPropagation()
                     onEdit(company)
@@ -173,7 +174,7 @@ export function useCompanyColumns({ onView, onEdit, onDelete }: UseCompanyColumn
               {onDelete && (
                 <button
                   className="p-1 text-morandi-secondary hover:text-status-danger hover:bg-status-danger-bg rounded transition-colors"
-                  title="刪除企業"
+                  title={COMPANY_LABELS.COL_DELETE_TITLE}
                   onClick={(e) => {
                     e.stopPropagation()
                     onDelete(company)
