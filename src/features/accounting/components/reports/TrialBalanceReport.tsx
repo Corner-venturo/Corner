@@ -15,12 +15,13 @@ import { CurrencyCell } from '@/components/table-cells'
 import { useAccountingReports, type TrialBalanceEntry } from '../../hooks/useAccountingReports'
 import { formatDate } from '@/lib/utils/format-date'
 import { logger } from '@/lib/utils/logger'
+import { ACCOUNTING_REPORT_LABELS } from '../../constants/labels'
 const ACCOUNT_TYPE_LABELS: Record<string, string> = {
-  asset: '資產',
-  liability: '負債',
-  revenue: '收入',
-  expense: '費用',
-  cost: '成本',
+  asset: ACCOUNTING_REPORT_LABELS.TYPE_ASSET,
+  liability: ACCOUNTING_REPORT_LABELS.TYPE_LIABILITY,
+  revenue: ACCOUNTING_REPORT_LABELS.TYPE_REVENUE,
+  expense: ACCOUNTING_REPORT_LABELS.TYPE_EXPENSE,
+  cost: ACCOUNTING_REPORT_LABELS.TYPE_COST,
 }
 
 export function TrialBalanceReport() {
@@ -71,7 +72,7 @@ export function TrialBalanceReport() {
   const handleExport = () => {
     if (entries.length === 0) return
 
-    const headers = ['科目代碼', '科目名稱', '類型', '借方發生額', '貸方發生額', '借方餘額', '貸方餘額']
+    const headers = [ACCOUNTING_REPORT_LABELS.TB_COL_CODE, ACCOUNTING_REPORT_LABELS.TB_COL_NAME, ACCOUNTING_REPORT_LABELS.TB_COL_TYPE, ACCOUNTING_REPORT_LABELS.TB_COL_DEBIT_AMOUNT, ACCOUNTING_REPORT_LABELS.TB_COL_CREDIT_AMOUNT, ACCOUNTING_REPORT_LABELS.TB_COL_DEBIT_BALANCE, ACCOUNTING_REPORT_LABELS.TB_COL_CREDIT_BALANCE]
     const rows = entries.map(e => [
       e.account_code,
       e.account_name,
@@ -85,7 +86,7 @@ export function TrialBalanceReport() {
     // 加入合計列
     rows.push([
       '',
-      '合計',
+      ACCOUNTING_REPORT_LABELS.TOTAL,
       '',
       totals.debit_total.toString(),
       totals.credit_total.toString(),
@@ -109,7 +110,7 @@ export function TrialBalanceReport() {
   const columns: Column<TrialBalanceEntry>[] = [
     {
       key: 'account_code',
-      label: '科目代碼',
+      label: ACCOUNTING_REPORT_LABELS.TB_COL_CODE,
       width: '120px',
       render: (_, row) => (
         <span className="font-mono text-morandi-gold">{row.account_code}</span>
@@ -117,7 +118,7 @@ export function TrialBalanceReport() {
     },
     {
       key: 'account_name',
-      label: '科目名稱',
+      label: ACCOUNTING_REPORT_LABELS.TB_COL_NAME,
       width: '200px',
       render: (_, row) => (
         <span className="text-morandi-primary">{row.account_name}</span>
@@ -125,7 +126,7 @@ export function TrialBalanceReport() {
     },
     {
       key: 'account_type',
-      label: '類型',
+      label: ACCOUNTING_REPORT_LABELS.TB_COL_TYPE,
       width: '80px',
       render: (_, row) => (
         <span className={`px-2 py-0.5 rounded text-xs ${
@@ -141,7 +142,7 @@ export function TrialBalanceReport() {
     },
     {
       key: 'debit_total',
-      label: '借方發生額',
+      label: ACCOUNTING_REPORT_LABELS.TB_COL_DEBIT_AMOUNT,
       width: '140px',
       align: 'right',
       render: (_, row) => (
@@ -150,7 +151,7 @@ export function TrialBalanceReport() {
     },
     {
       key: 'credit_total',
-      label: '貸方發生額',
+      label: ACCOUNTING_REPORT_LABELS.TB_COL_CREDIT_AMOUNT,
       width: '140px',
       align: 'right',
       render: (_, row) => (
@@ -159,7 +160,7 @@ export function TrialBalanceReport() {
     },
     {
       key: 'debit_balance',
-      label: '借方餘額',
+      label: ACCOUNTING_REPORT_LABELS.TB_COL_DEBIT_BALANCE,
       width: '140px',
       align: 'right',
       render: (_, row) => (
@@ -168,7 +169,7 @@ export function TrialBalanceReport() {
     },
     {
       key: 'credit_balance',
-      label: '貸方餘額',
+      label: ACCOUNTING_REPORT_LABELS.TB_COL_CREDIT_BALANCE,
       width: '140px',
       align: 'right',
       render: (_, row) => (
@@ -180,12 +181,12 @@ export function TrialBalanceReport() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="試算表"
+        title={ACCOUNTING_REPORT_LABELS.TB_TITLE}
         icon={Scale}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '會計', href: '/erp-accounting' },
-          { label: '試算表', href: '/erp-accounting/reports/trial-balance' },
+          { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_ACCOUNTING, href: '/erp-accounting' },
+          { label: ACCOUNTING_REPORT_LABELS.TB_TITLE, href: '/erp-accounting/reports/trial-balance' },
         ]}
         actions={
           <Button
@@ -195,7 +196,7 @@ export function TrialBalanceReport() {
             className="gap-2"
           >
             <Download size={16} />
-            匯出 CSV
+            {ACCOUNTING_REPORT_LABELS.EXPORT_CSV}
           </Button>
         }
       />
@@ -205,17 +206,17 @@ export function TrialBalanceReport() {
         <div className="flex flex-wrap items-end gap-4">
           <div className="flex items-center gap-2">
             <Calendar size={16} className="text-morandi-secondary" />
-            <span className="text-sm text-morandi-secondary">截止日期</span>
+            <span className="text-sm text-morandi-secondary">{ACCOUNTING_REPORT_LABELS.END_DATE}</span>
             <DatePicker
               value={endDate}
               onChange={setEndDate}
-              placeholder="選擇日期"
+              placeholder={ACCOUNTING_REPORT_LABELS.SELECT_DATE}
             />
           </div>
 
           <Button onClick={handleSearch} disabled={loading} className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white">
             <Search size={16} />
-            查詢
+            {ACCOUNTING_REPORT_LABELS.QUERY}
           </Button>
 
           {/* 平衡狀態指示 */}
@@ -225,7 +226,7 @@ export function TrialBalanceReport() {
             }`}>
               {isBalanced ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
               <span className="text-sm font-medium">
-                {isBalanced ? '借貸平衡' : '借貸不平衡'}
+                {isBalanced ? ACCOUNTING_REPORT_LABELS.TB_BALANCED : ACCOUNTING_REPORT_LABELS.TB_UNBALANCED}
               </span>
             </div>
           )}
@@ -253,16 +254,16 @@ export function TrialBalanceReport() {
             <div className="mt-4 p-4 bg-morandi-container/30 rounded-lg border border-border">
               <div className="grid grid-cols-5 gap-4">
                 <div className="col-span-2">
-                  <span className="font-medium text-morandi-primary">合計</span>
+                  <span className="font-medium text-morandi-primary">{ACCOUNTING_REPORT_LABELS.TOTAL}</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm text-morandi-secondary block">借方發生額</span>
+                  <span className="text-sm text-morandi-secondary block">{ACCOUNTING_REPORT_LABELS.TB_COL_DEBIT_AMOUNT}</span>
                   <span className="font-mono font-medium text-morandi-primary">
                     NT$ {totals.debit_total.toLocaleString()}
                   </span>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm text-morandi-secondary block">貸方發生額</span>
+                  <span className="text-sm text-morandi-secondary block">{ACCOUNTING_REPORT_LABELS.TB_COL_CREDIT_AMOUNT}</span>
                   <span className="font-mono font-medium text-morandi-primary">
                     NT$ {totals.credit_total.toLocaleString()}
                   </span>
@@ -271,17 +272,17 @@ export function TrialBalanceReport() {
 
               <div className="grid grid-cols-5 gap-4 mt-4 pt-4 border-t border-border">
                 <div className="col-span-2">
-                  <span className="font-medium text-morandi-primary">餘額合計</span>
+                  <span className="font-medium text-morandi-primary">{ACCOUNTING_REPORT_LABELS.TB_BALANCE_TOTAL}</span>
                 </div>
                 <div />
                 <div className="text-right">
-                  <span className="text-sm text-morandi-secondary block">借方餘額</span>
+                  <span className="text-sm text-morandi-secondary block">{ACCOUNTING_REPORT_LABELS.TB_COL_DEBIT_BALANCE}</span>
                   <span className="font-mono font-medium text-morandi-primary">
                     NT$ {totals.debit_balance.toLocaleString()}
                   </span>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm text-morandi-secondary block">貸方餘額</span>
+                  <span className="text-sm text-morandi-secondary block">{ACCOUNTING_REPORT_LABELS.TB_COL_CREDIT_BALANCE}</span>
                   <span className="font-mono font-medium text-morandi-primary">
                     NT$ {totals.credit_balance.toLocaleString()}
                   </span>
@@ -301,7 +302,7 @@ export function TrialBalanceReport() {
         ) : !loading ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <Scale size={48} className="text-morandi-muted mb-4" />
-            <p className="text-morandi-secondary">請選擇截止日期並點擊查詢</p>
+            <p className="text-morandi-secondary">{ACCOUNTING_REPORT_LABELS.TB_EMPTY}</p>
           </div>
         ) : null}
       </div>
