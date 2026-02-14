@@ -1,5 +1,7 @@
 'use client'
 
+import { LABELS } from './constants/labels'
+
 import { usePNRs } from '@/data'
 import { useState, useMemo } from 'react'
 import { Input } from '@/components/ui/input'
@@ -144,7 +146,7 @@ export default function PNRsPage() {
             onExpand: (id: string) => toggleExpand(id),
             renderExpanded: (row: PNR) => row.segments && row.segments.length > 0 ? (
               <div className="bg-morandi-container/5 px-6 py-3">
-                <h4 className="text-xs font-medium text-morandi-secondary mb-2">航班資訊</h4>
+                <h4 className="text-xs font-medium text-morandi-secondary mb-2">{LABELS.FLIGHT_INFO}</h4>
                 <div className="space-y-1">
                   {row.segments.map((seg: FlightSegment, idx: number) => (
                     <div

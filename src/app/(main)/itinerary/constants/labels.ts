@@ -94,3 +94,36 @@ export const LABELS = {
   COPY_DESCRIPTION1: '封面、行程內容、圖片等將會完整複製。',
   COPY_DESCRIPTION2: '關聯的報價單也會一併複製（客戶資料會清空，價格保留）。',
 }
+
+export const PRINT_LABELS = {
+  NOT_FOUND: '找不到行程表',
+  DESTINATION: '目的地：',
+  DEPARTURE_DATE: '出發日期：',
+  TRIP_DAYS: '行程天數：',
+  TOUR_CODE: '團號：',
+  FLIGHT_INFO: '航班資訊',
+  OUTBOUND: '去程：',
+  RETURN: '回程：',
+  DATE: '日期',
+  ITINERARY_CONTENT: '行程內容',
+  BREAKFAST: '早餐',
+  LUNCH: '午餐',
+  DINNER: '晚餐',
+  ACCOMMODATION: '住宿',
+  FOOTER_PROVIDED_BY: '本行程表由',
+  FOOTER_PRINT_DATE: '提供 | 列印日期：',
+}
+
+export const EDITOR_LABELS = {
+  LOADING: '載入中...',
+  EDIT_FORM: '編輯表單',
+  PRINT_PREVIEW: '列印預覽',
+  HANDOVER_NOTICE: '此行程已交接給領隊',
+  HANDOVER_DESC: '行程內容已同步到 Online App，編輯功能已停用',
+}
+
+export const BLOCK_EDITOR_LABELS = {
+  LOADING: '載入中...',
+  BLOCK_EDITOR: '區塊編輯器',
+  LIVE_PREVIEW: '即時預覽',
+}

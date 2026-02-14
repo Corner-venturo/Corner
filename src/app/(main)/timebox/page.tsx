@@ -1,5 +1,7 @@
 'use client'
 
+import { LABELS } from './constants/labels'
+
 import { useState, useMemo } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
@@ -194,7 +196,7 @@ export default function TimeboxPage() {
       <Dialog open={showBoxManager} onOpenChange={setShowBoxManager}>
         <DialogContent level={1} className="max-w-sm max-h-[80vh]">
           <DialogHeader>
-            <DialogTitle>管理箱子</DialogTitle>
+            <DialogTitle>{LABELS.MANAGE_BOXES}</DialogTitle>
           </DialogHeader>
           <div className="overflow-y-auto max-h-[calc(80vh-80px)]">
             <BoxManager />

@@ -7,6 +7,8 @@
 
 'use client'
 
+import { BLOCK_EDITOR_LABELS } from '../constants/labels'
+
 import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
@@ -232,7 +234,7 @@ function BlockEditorPageContent() {
   if (loading) {
     return (
       <div className="h-full flex items-center justify-center">
-        <div className="text-morandi-secondary">載入中...</div>
+        <div className="text-morandi-secondary">{BLOCK_EDITOR_LABELS.LOADING}</div>
       </div>
     )
   }
@@ -276,7 +278,7 @@ function BlockEditorPageContent() {
             <div className="h-12 bg-morandi-gold/90 text-white px-4 flex items-center justify-between border-b">
               <div className="flex items-center gap-2">
                 <Sparkles size={16} />
-                <h2 className="text-sm font-semibold">區塊編輯器</h2>
+                <h2 className="text-sm font-semibold">{BLOCK_EDITOR_LABELS.BLOCK_EDITOR}</h2>
               </div>
               <div className="flex items-center gap-2 text-xs">
                 {autoSaveStatus === 'saving' && (
@@ -311,7 +313,7 @@ function BlockEditorPageContent() {
           {/* 右側：即時預覽 */}
           <div className="w-1/2 bg-muted flex flex-col">
             <div className="h-12 bg-card border-b px-4 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-morandi-primary">即時預覽</h2>
+              <h2 className="text-sm font-semibold text-morandi-primary">{BLOCK_EDITOR_LABELS.LIVE_PREVIEW}</h2>
               <div className="flex gap-1 bg-morandi-container/30 rounded p-0.5">
                 <button
                   onClick={() => setViewMode('desktop')}

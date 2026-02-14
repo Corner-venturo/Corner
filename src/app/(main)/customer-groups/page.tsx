@@ -1,5 +1,7 @@
 'use client'
 
+import { LABELS as CG_LABELS } from './constants/labels'
+
 import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { Users, Edit2, Trash2, Plus, UserPlus, ChevronDown, ChevronRight } from 'lucide-react'
@@ -353,13 +355,13 @@ export default function CustomerGroupsPage() {
       const members = getGroupMembers(group.id)
       if (members.length === 0) {
         return (
-          <div className="p-4 text-center text-morandi-secondary text-sm">尚無成員</div>
+          <div className="p-4 text-center text-morandi-secondary text-sm">{CG_LABELS.NO_MEMBERS}</div>
         )
       }
 
       return (
         <div className="p-4 bg-morandi-container/20">
-          <div className="text-sm font-medium text-morandi-primary mb-2">群組成員</div>
+          <div className="text-sm font-medium text-morandi-primary mb-2">{CG_LABELS.GROUP_MEMBERS}</div>
           <div className="flex flex-wrap gap-2">
             {members.map(member => {
               const customerName = getCustomerName(member.customer_id)
@@ -465,7 +467,7 @@ export default function CustomerGroupsPage() {
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">備註</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">{CG_LABELS.REMARKS}</label>
             <Input
               value={formData.notes}
               onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
@@ -512,7 +514,7 @@ export default function CustomerGroupsPage() {
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">備註</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">{CG_LABELS.REMARKS}</label>
             <Input
               value={formData.notes}
               onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}

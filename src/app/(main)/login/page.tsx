@@ -1,5 +1,7 @@
 'use client'
 
+import { LABELS } from './constants/labels'
+
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuthStore } from '@/stores/auth-store'
@@ -93,7 +95,7 @@ export default function LoginPage() {
             <User size={32} className="text-white" />
           </div>
           <h2 className="text-2xl font-bold text-morandi-primary">Venturo 系統登入</h2>
-          <p className="text-sm text-morandi-secondary mt-2">請輸入代號和帳號密碼</p>
+          <p className="text-sm text-morandi-secondary mt-2">{LABELS.LOGIN_HINT}</p>
         </div>
 
         {/* 錯誤訊息 */}
@@ -153,7 +155,7 @@ export default function LoginPage() {
 
           {/* 密碼 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-2">密碼</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-2">{LABELS.PASSWORD}</label>
             <div className="relative">
               <Lock
                 size={18}

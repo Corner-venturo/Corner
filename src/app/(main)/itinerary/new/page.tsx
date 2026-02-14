@@ -1,5 +1,7 @@
 'use client'
 
+import { EDITOR_LABELS } from '../constants/labels'
+
 import React, { useState, Suspense, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -180,7 +182,7 @@ function NewItineraryPageContent() {
   if (loading) {
     return (
       <div className="h-full flex items-center justify-center">
-        <div className="text-morandi-secondary">載入中...</div>
+        <div className="text-morandi-secondary">{EDITOR_LABELS.LOADING}</div>
       </div>
     )
   }
@@ -213,7 +215,7 @@ function NewItineraryPageContent() {
           <div className="h-full flex">
             <div className="w-1/2 bg-morandi-container/30 border-r border-morandi-container flex flex-col print:hidden">
               <div className="h-14 bg-morandi-green/90 text-white px-6 flex items-center border-b border-morandi-container">
-                <h2 className="text-lg font-semibold">編輯表單</h2>
+                <h2 className="text-lg font-semibold">{EDITOR_LABELS.EDIT_FORM}</h2>
               </div>
               <div className="flex-1 overflow-y-auto bg-card">
                 <PrintItineraryForm data={printData} onChange={setPrintData} />
@@ -222,7 +224,7 @@ function NewItineraryPageContent() {
 
             <div className="w-1/2 bg-muted flex flex-col print:w-full">
               <div className="h-14 bg-card border-b px-6 flex items-center justify-between print:hidden">
-                <h2 className="text-lg font-semibold text-morandi-primary">列印預覽</h2>
+                <h2 className="text-lg font-semibold text-morandi-primary">{EDITOR_LABELS.PRINT_PREVIEW}</h2>
                 <div className="text-sm text-morandi-secondary">A4 尺寸 (210mm × 297mm)</div>
               </div>
 
@@ -259,8 +261,8 @@ function NewItineraryPageContent() {
         <div className="bg-amber-50 border-b border-amber-200 px-4 py-3 flex items-center gap-3">
           <span className="material-symbols-outlined text-amber-600">lock</span>
           <div>
-            <p className="text-sm font-medium text-amber-800">此行程已交接給領隊</p>
-            <p className="text-xs text-amber-600">行程內容已同步到 Online App，編輯功能已停用</p>
+            <p className="text-sm font-medium text-amber-800">{EDITOR_LABELS.HANDOVER_NOTICE}</p>
+            <p className="text-xs text-amber-600">{EDITOR_LABELS.HANDOVER_DESC}</p>
           </div>
         </div>
       )}
@@ -297,7 +299,7 @@ export default function NewItineraryPage() {
         <div className="h-full flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-morandi-gold mx-auto mb-4"></div>
-            <p className="text-morandi-secondary">載入中...</p>
+            <p className="text-morandi-secondary">{EDITOR_LABELS.LOADING}</p>
           </div>
         </div>
       }

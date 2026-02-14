@@ -5,6 +5,8 @@
 
 'use client'
 
+import { PRINT_LABELS } from '../constants/labels'
+
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useEffect, useState, Suspense } from 'react'
 import { Printer, ArrowLeft, Loader2 } from 'lucide-react'
@@ -66,7 +68,7 @@ function ItineraryPrintContent() {
   if (!itinerary) {
     return (
       <div className="h-screen flex flex-col items-center justify-center gap-4">
-        <p className="text-morandi-secondary">找不到行程表</p>
+        <p className="text-morandi-secondary">{PRINT_LABELS.NOT_FOUND}</p>
         <Button variant="outline" onClick={handleBack} className="gap-2">
           <ArrowLeft size={16} />
           返回
@@ -117,20 +119,20 @@ function ItineraryPrintContent() {
             {/* 基本資訊 */}
             <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
               <div className="flex gap-2">
-                <span className="text-morandi-secondary">目的地：</span>
+                <span className="text-morandi-secondary">{PRINT_LABELS.DESTINATION}</span>
                 <span className="font-medium">{itinerary.city || itinerary.country || '-'}</span>
               </div>
               <div className="flex gap-2">
-                <span className="text-morandi-secondary">出發日期：</span>
+                <span className="text-morandi-secondary">{PRINT_LABELS.DEPARTURE_DATE}</span>
                 <span className="font-medium">{itinerary.departure_date || '-'}</span>
               </div>
               <div className="flex gap-2">
-                <span className="text-morandi-secondary">行程天數：</span>
+                <span className="text-morandi-secondary">{PRINT_LABELS.TRIP_DAYS}</span>
                 <span className="font-medium">{dailyItinerary.length} 天</span>
               </div>
               {tour && (
                 <div className="flex gap-2">
-                  <span className="text-morandi-secondary">團號：</span>
+                  <span className="text-morandi-secondary">{PRINT_LABELS.TOUR_CODE}</span>
                   <span className="font-medium font-mono">{tour.code}</span>
                 </div>
               )}
@@ -140,11 +142,11 @@ function ItineraryPrintContent() {
           {/* 航班資訊（如果有） */}
           {(itinerary.outbound_flight || itinerary.return_flight) && (
             <div className="mb-6 p-4 bg-morandi-container/30 rounded-lg">
-              <h3 className="text-sm font-semibold text-morandi-primary mb-2">航班資訊</h3>
+              <h3 className="text-sm font-semibold text-morandi-primary mb-2">{PRINT_LABELS.FLIGHT_INFO}</h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 {itinerary.outbound_flight && (
                   <div>
-                    <span className="text-morandi-secondary">去程：</span>
+                    <span className="text-morandi-secondary">{PRINT_LABELS.OUTBOUND}</span>
                     <span className="ml-2">
                       {itinerary.outbound_flight.airline} {itinerary.outbound_flight.flightNumber}
                       {' '}
@@ -154,7 +156,7 @@ function ItineraryPrintContent() {
                 )}
                 {itinerary.return_flight && (
                   <div>
-                    <span className="text-morandi-secondary">回程：</span>
+                    <span className="text-morandi-secondary">{PRINT_LABELS.RETURN}</span>
                     <span className="ml-2">
                       {itinerary.return_flight.airline} {itinerary.return_flight.flightNumber}
                       {' '}
@@ -170,12 +172,12 @@ function ItineraryPrintContent() {
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="bg-morandi-gold text-white">
-                <th className="border border-morandi-gold/50 px-3 py-2 text-left w-24">日期</th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-left">行程內容</th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-20">早餐</th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-20">午餐</th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-20">晚餐</th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-left w-36">住宿</th>
+                <th className="border border-morandi-gold/50 px-3 py-2 text-left w-24">{PRINT_LABELS.DATE}</th>
+                <th className="border border-morandi-gold/50 px-3 py-2 text-left">{PRINT_LABELS.ITINERARY_CONTENT}</th>
+                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-20">{PRINT_LABELS.BREAKFAST}</th>
+                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-20">{PRINT_LABELS.LUNCH}</th>
+                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-20">{PRINT_LABELS.DINNER}</th>
+                <th className="border border-morandi-gold/50 px-3 py-2 text-left w-36">{PRINT_LABELS.ACCOMMODATION}</th>
               </tr>
             </thead>
             <tbody>
@@ -210,7 +212,7 @@ function ItineraryPrintContent() {
 
           {/* 頁尾 */}
           <div className="mt-8 pt-4 border-t border-morandi-container text-xs text-morandi-secondary text-center">
-            <p>本行程表由 {companyName} 提供 | 列印日期：{formatDateTW(new Date())}</p>
+            <p>{PRINT_LABELS.FOOTER_PROVIDED_BY} {companyName} {PRINT_LABELS.FOOTER_PRINT_DATE}{formatDateTW(new Date())}</p>
           </div>
         </div>
       </div>

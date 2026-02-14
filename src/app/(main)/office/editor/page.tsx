@@ -1,5 +1,7 @@
 'use client'
 
+import { LABELS } from './constants/labels'
+
 import dynamic from 'next/dynamic'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useState, useEffect, useCallback, Suspense } from 'react'
@@ -41,7 +43,7 @@ function EditorLoading() {
     <div className="flex items-center justify-center h-full bg-morandi-container">
       <div className="text-center">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-morandi-gold mx-auto mb-3"></div>
-        <p className="text-sm text-morandi-secondary">載入編輯器中...</p>
+        <p className="text-sm text-morandi-secondary">{LABELS.LOADING_EDITOR}</p>
       </div>
     </div>
   )
@@ -82,11 +84,11 @@ function SaveAsDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent level={1} className="max-w-md">
         <DialogHeader>
-          <DialogTitle>另存新檔</DialogTitle>
+          <DialogTitle>{LABELS.SAVE_AS}</DialogTitle>
         </DialogHeader>
         <div className="py-4 space-y-4">
           <div>
-            <Label htmlFor="filename">檔案名稱</Label>
+            <Label htmlFor="filename">{LABELS.FILE_NAME}</Label>
             <Input
               id="filename"
               value={name}
@@ -100,7 +102,7 @@ function SaveAsDialog({
             />
           </div>
           <div>
-            <Label htmlFor="tour">儲存位置</Label>
+            <Label htmlFor="tour">{LABELS.SAVE_LOCATION}</Label>
             <Select
               value={selectedTourId || 'private'}
               onValueChange={(value) => setSelectedTourId(value === 'private' ? null : value)}
@@ -109,7 +111,7 @@ function SaveAsDialog({
                 <SelectValue placeholder="選擇儲存位置" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="private">我的文件（僅自己可見）</SelectItem>
+                <SelectItem value="private">{LABELS.PRIVATE_FILES}</SelectItem>
                 {tours && tours.length > 0 && (
                   <>
                     <div className="px-2 py-1.5 text-xs text-muted-foreground border-t mt-1 pt-1">
@@ -130,8 +132,8 @@ function SaveAsDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>取消</Button>
-          <Button onClick={handleConfirm}>儲存</Button>
+          <Button variant="outline" onClick={onClose}>{LABELS.CANCEL}</Button>
+          <Button onClick={handleConfirm}>{LABELS.SAVE}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

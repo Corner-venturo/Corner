@@ -31,6 +31,7 @@ import {
   type ClosingHistory,
 } from '../hooks/usePeriodClosing'
 import { PERIOD_CLOSING_LABELS } from '@/constants/labels'
+import { ACCOUNTING_REPORT_LABELS } from '../constants/labels'
 
 const PERIOD_TYPE_OPTIONS: { value: PeriodType; label: string }[] = [
   { value: 'month', label: PERIOD_CLOSING_LABELS.月結 },
@@ -40,7 +41,7 @@ const PERIOD_TYPE_OPTIONS: { value: PeriodType; label: string }[] = [
 
 const MONTH_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
   value: i + 1,
-  label: `${i + 1} 月`,
+  label: `${i + 1} ${ACCOUNTING_REPORT_LABELS.PC_MONTH_SUFFIX}`,
 }))
 
 const QUARTER_OPTIONS = [
@@ -123,7 +124,7 @@ export function PeriodEndClosing() {
   const historyColumns: Column<ClosingHistory>[] = [
     {
       key: 'period',
-      label: '期間',
+      label: ACCOUNTING_REPORT_LABELS.PC_COL_PERIOD,
       width: '150px',
       render: (_, row) => {
         const typeLabel = PERIOD_TYPE_OPTIONS.find(t => t.value === row.period_type)?.label || row.period_type
@@ -139,7 +140,7 @@ export function PeriodEndClosing() {
     },
     {
       key: 'net_income',
-      label: '本期損益',
+      label: ACCOUNTING_REPORT_LABELS.PC_COL_NET_INCOME,
       width: '150px',
       align: 'right',
       render: (_, row) => (
@@ -151,7 +152,7 @@ export function PeriodEndClosing() {
     },
     {
       key: 'closed_at',
-      label: '結轉時間',
+      label: ACCOUNTING_REPORT_LABELS.PC_COL_CLOSING_TIME,
       width: '150px',
       render: (_, row) => row.closed_at ? <DateCell date={row.closed_at} /> : '-',
     },
@@ -161,7 +162,7 @@ export function PeriodEndClosing() {
   const previewItemColumns: Column<ClosingPreviewItem>[] = [
     {
       key: 'account_code',
-      label: '科目代碼',
+      label: ACCOUNTING_REPORT_LABELS.PC_COL_ACCOUNT_CODE,
       width: '100px',
       render: (_, row) => (
         <span className="font-mono text-morandi-gold">{row.account_code}</span>
@@ -169,7 +170,7 @@ export function PeriodEndClosing() {
     },
     {
       key: 'account_name',
-      label: '科目名稱',
+      label: ACCOUNTING_REPORT_LABELS.PC_COL_ACCOUNT_NAME,
       width: '200px',
       render: (_, row) => (
         <span className="text-morandi-primary">{row.account_name}</span>
@@ -177,14 +178,14 @@ export function PeriodEndClosing() {
     },
     {
       key: 'amount',
-      label: '金額',
+      label: ACCOUNTING_REPORT_LABELS.PC_COL_AMOUNT,
       width: '150px',
       align: 'right',
       render: (_, row) => <CurrencyCell amount={row.amount} />,
     },
     {
       key: 'closing_entry',
-      label: '結轉分錄',
+      label: ACCOUNTING_REPORT_LABELS.PC_COL_ENTRY,
       width: '100px',
       render: (_, row) => (
         <span className={`px-2 py-0.5 rounded text-xs ${
@@ -192,7 +193,7 @@ export function PeriodEndClosing() {
             ? 'bg-blue-100 text-blue-700'
             : 'bg-purple-100 text-purple-700'
         }`}>
-          {row.closing_entry === 'debit' ? '借' : '貸'} {formatCurrency(row.amount)}
+          {row.closing_entry === 'debit' ? ACCOUNTING_REPORT_LABELS.PC_DEBIT : ACCOUNTING_REPORT_LABELS.PC_CREDIT} {formatCurrency(row.amount)}
         </span>
       ),
     },
@@ -201,12 +202,12 @@ export function PeriodEndClosing() {
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="期末結轉"
+        title={ACCOUNTING_REPORT_LABELS.PC_TITLE}
         icon={FileCheck}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '會計', href: '/erp-accounting' },
-          { label: '期末結轉', href: '/erp-accounting/period-closing' },
+          { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_ACCOUNTING, href: '/erp-accounting' },
+          { label: ACCOUNTING_REPORT_LABELS.PC_TITLE, href: '/erp-accounting/period-closing' },
         ]}
         actions={
           <Button
@@ -215,7 +216,7 @@ export function PeriodEndClosing() {
             className="gap-2"
           >
             <History size={16} />
-            {showHistory ? '返回結轉' : '結轉紀錄'}
+            {showHistory ? ACCOUNTING_REPORT_LABELS.PC_TOGGLE_CLOSING : ACCOUNTING_REPORT_LABELS.PC_TOGGLE_HISTORY}
           </Button>
         }
       />
@@ -231,7 +232,7 @@ export function PeriodEndClosing() {
           {history.length === 0 && !loading && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <History size={48} className="text-morandi-muted mb-4" />
-              <p className="text-morandi-secondary">尚無結轉紀錄</p>
+              <p className="text-morandi-secondary">{ACCOUNTING_REPORT_LABELS.PC_NO_RECORDS}</p>
             </div>
           )}
         </div>
@@ -269,7 +270,7 @@ export function PeriodEndClosing() {
                   min={2020}
                   max={2100}
                 />
-                <span className="text-morandi-secondary">年</span>
+                <span className="text-morandi-secondary">{ACCOUNTING_REPORT_LABELS.PC_YEAR_SUFFIX}</span>
               </div>
 
               {periodType === 'month' && (
@@ -308,7 +309,7 @@ export function PeriodEndClosing() {
                 className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
                 <Play size={16} />
-                預覽結轉
+                {ACCOUNTING_REPORT_LABELS.PC_PREVIEW}
               </Button>
             </div>
           </div>
@@ -328,26 +329,26 @@ export function PeriodEndClosing() {
               {preview.already_closed && (
                 <div className="p-4 bg-morandi-gold/10 border border-morandi-gold/30 rounded-lg flex items-center gap-2 text-morandi-gold">
                   <CheckCircle size={16} />
-                  <span>此期間已完成結轉</span>
+                  <span>{ACCOUNTING_REPORT_LABELS.PC_ALREADY_CLOSED}</span>
                 </div>
               )}
 
               {/* 摘要卡片 */}
               <div className="grid grid-cols-4 gap-4">
                 <div className="bg-card p-4 rounded-lg border border-border">
-                  <div className="text-sm text-morandi-secondary mb-1">營業收入</div>
+                  <div className="text-sm text-morandi-secondary mb-1">{ACCOUNTING_REPORT_LABELS.PC_REVENUE}</div>
                   <div className="text-xl font-bold text-morandi-green">
                     {formatCurrency(preview.total_revenue)}
                   </div>
                 </div>
                 <div className="bg-card p-4 rounded-lg border border-border">
-                  <div className="text-sm text-morandi-secondary mb-1">營業成本</div>
+                  <div className="text-sm text-morandi-secondary mb-1">{ACCOUNTING_REPORT_LABELS.PC_COST}</div>
                   <div className="text-xl font-bold text-orange-600">
                     {formatCurrency(preview.total_cost)}
                   </div>
                 </div>
                 <div className="bg-card p-4 rounded-lg border border-border">
-                  <div className="text-sm text-morandi-secondary mb-1">營業費用</div>
+                  <div className="text-sm text-morandi-secondary mb-1">{ACCOUNTING_REPORT_LABELS.PC_EXPENSE}</div>
                   <div className="text-xl font-bold text-morandi-red">
                     {formatCurrency(preview.total_expense)}
                   </div>
@@ -361,7 +362,7 @@ export function PeriodEndClosing() {
                     ) : (
                       <TrendingDown size={16} className="text-morandi-red" />
                     )}
-                    本期{preview.is_profit ? '盈餘' : '虧損'}
+                    {ACCOUNTING_REPORT_LABELS.PC_CURRENT_PERIOD_PREFIX}{preview.is_profit ? ACCOUNTING_REPORT_LABELS.PC_PROFIT : ACCOUNTING_REPORT_LABELS.PC_LOSS}
                   </div>
                   <div className={`text-xl font-bold ${
                     preview.is_profit ? 'text-morandi-green' : 'text-morandi-red'
@@ -374,9 +375,9 @@ export function PeriodEndClosing() {
               {/* 結轉分錄預覽 */}
               <div className="bg-card rounded-lg border border-border overflow-hidden">
                 <div className="p-4 bg-morandi-container/30 border-b border-border">
-                  <h3 className="font-medium text-morandi-primary">結轉分錄預覽</h3>
+                  <h3 className="font-medium text-morandi-primary">{ACCOUNTING_REPORT_LABELS.PC_ENTRY_PREVIEW_TITLE}</h3>
                   <p className="text-sm text-morandi-secondary mt-1">
-                    以下分錄將在確認後自動產生
+                    {ACCOUNTING_REPORT_LABELS.PC_ENTRY_PREVIEW_DESC}
                   </p>
                 </div>
 
@@ -386,7 +387,7 @@ export function PeriodEndClosing() {
                     <div className="p-3 bg-green-50">
                       <h4 className="font-medium text-green-800 flex items-center gap-2">
                         <ArrowRight size={16} />
-                        收入科目（借方結清）
+                        {ACCOUNTING_REPORT_LABELS.PC_REVENUE_DEBIT}
                       </h4>
                     </div>
                     <EnhancedTable
@@ -402,7 +403,7 @@ export function PeriodEndClosing() {
                     <div className="p-3 bg-orange-50">
                       <h4 className="font-medium text-orange-800 flex items-center gap-2">
                         <ArrowRight size={16} />
-                        成本科目（貸方結清）
+                        {ACCOUNTING_REPORT_LABELS.PC_COST_CREDIT}
                       </h4>
                     </div>
                     <EnhancedTable
@@ -418,7 +419,7 @@ export function PeriodEndClosing() {
                     <div className="p-3 bg-red-50">
                       <h4 className="font-medium text-red-800 flex items-center gap-2">
                         <ArrowRight size={16} />
-                        費用科目（貸方結清）
+                        {ACCOUNTING_REPORT_LABELS.PC_EXPENSE_CREDIT}
                       </h4>
                     </div>
                     <EnhancedTable
@@ -433,7 +434,7 @@ export function PeriodEndClosing() {
                   preview.cost_items.length === 0 &&
                   preview.expense_items.length === 0 && (
                     <div className="p-8 text-center text-morandi-secondary">
-                      此期間無損益科目餘額
+                      {ACCOUNTING_REPORT_LABELS.PC_NO_BALANCE}
                     </div>
                   )}
               </div>
@@ -451,7 +452,7 @@ export function PeriodEndClosing() {
                     className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
                   >
                     <CheckCircle size={16} />
-                    確認結轉
+                    {ACCOUNTING_REPORT_LABELS.PC_CONFIRM_CLOSING}
                   </Button>
                 </div>
               )}
@@ -462,7 +463,7 @@ export function PeriodEndClosing() {
           {!preview && !loading && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <FileCheck size={48} className="text-morandi-muted mb-4" />
-              <p className="text-morandi-secondary">選擇期間並點擊「預覽結轉」</p>
+              <p className="text-morandi-secondary">{ACCOUNTING_REPORT_LABELS.PC_EMPTY}</p>
             </div>
           )}
         </div>

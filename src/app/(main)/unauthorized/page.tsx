@@ -1,5 +1,7 @@
 'use client'
 
+import { LABELS } from './constants/labels'
+
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -16,8 +18,8 @@ export default function UnauthorizedPage() {
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-morandi-primary">存取被拒絕</h1>
-          <p className="text-morandi-secondary">您沒有權限存取此頁面</p>
+          <h1 className="text-2xl font-bold text-morandi-primary">{LABELS.ACCESS_DENIED}</h1>
+          <p className="text-morandi-secondary">{LABELS.NO_PERMISSION}</p>
         </div>
 
         <div className="space-y-3">
@@ -32,7 +34,7 @@ export default function UnauthorizedPage() {
           </Button>
         </div>
 
-        <p className="text-xs text-morandi-muted">如果您認為這是錯誤，請聯繫系統管理員</p>
+        <p className="text-xs text-morandi-muted">{LABELS.CONTACT_ADMIN}</p>
       </Card>
     </div>
   )

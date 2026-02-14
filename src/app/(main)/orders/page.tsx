@@ -1,5 +1,7 @@
 'use client'
 
+import { LABELS } from './constants/labels'
+
 import React, { useState, useEffect, useMemo } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -190,7 +192,7 @@ export default function OrdersPage() {
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent level={1} className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>新增訂單</DialogTitle>
+            <DialogTitle>{LABELS.ADD_ORDER}</DialogTitle>
           </DialogHeader>
           <AddOrderForm onSubmit={handleAddOrder} onCancel={() => setIsAddDialogOpen(false)} />
         </DialogContent>
@@ -200,7 +202,7 @@ export default function OrdersPage() {
       <Dialog open={isReceiptDialogOpen} onOpenChange={setIsReceiptDialogOpen}>
         <DialogContent level={1} className="max-w-xl">
           <DialogHeader>
-            <DialogTitle>快速收款</DialogTitle>
+            <DialogTitle>{LABELS.QUICK_RECEIPT}</DialogTitle>
           </DialogHeader>
           <QuickReceipt
             defaultTourId={selectedOrderForReceipt?.tourId}

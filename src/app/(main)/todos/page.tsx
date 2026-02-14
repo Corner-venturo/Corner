@@ -1,5 +1,7 @@
 'use client'
 
+import { LABELS } from './constants/labels'
+
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
@@ -528,8 +530,8 @@ export default function TodosPage() {
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent level={1} className="max-w-md">
           <DialogHeader>
-            <DialogTitle>新增待辦事項</DialogTitle>
-            <DialogDescription>建立新的待辦任務，設定優先級和截止日期</DialogDescription>
+            <DialogTitle>{LABELS.ADD_TODO}</DialogTitle>
+            <DialogDescription>{LABELS.ADD_TODO_DESC}</DialogDescription>
           </DialogHeader>
           <AddTodoForm onSubmit={handleAddTodo} onCancel={() => setIsAddDialogOpen(false)} />
         </DialogContent>
@@ -584,7 +586,7 @@ function AddTodoForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">任務標題</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">{LABELS.TASK_TITLE}</label>
         <Input
           value={formData.title}
           onChange={e => setFormData({ ...formData, title: e.target.value })}
@@ -594,7 +596,7 @@ function AddTodoForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">緊急度</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">{LABELS.URGENCY}</label>
         <StarRating
           value={formData.priority}
           onChange={value => setFormData({ ...formData, priority: value as 1 | 2 | 3 | 4 | 5 })}
@@ -602,7 +604,7 @@ function AddTodoForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">期限</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">{LABELS.DEADLINE}</label>
         <DatePicker
           value={formData.deadline}
           onChange={date => setFormData({ ...formData, deadline: date })}
@@ -623,7 +625,7 @@ function AddTodoForm({
             <SelectValue placeholder={isLoadingUsers ? '載入員工資料中...' : '不指派（個人任務）'} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="__none__">不指派（個人任務）</SelectItem>
+            <SelectItem value="__none__">{LABELS.NO_ASSIGN}</SelectItem>
             {users &&
               users.map(user => (
                 <SelectItem key={user.id} value={user.id}>
@@ -640,7 +642,7 @@ function AddTodoForm({
             checked={formData.is_public}
             onCheckedChange={checked => setFormData({ ...formData, is_public: checked as boolean })}
           />
-          <span className="text-sm font-medium text-morandi-primary">公開給全公司</span>
+          <span className="text-sm font-medium text-morandi-primary">{LABELS.PUBLIC_TO_COMPANY}</span>
         </label>
         <p className="text-xs text-morandi-secondary mt-1 ml-6">
           其他同事可以查看此待辦，但只有你和共享者可以編輯

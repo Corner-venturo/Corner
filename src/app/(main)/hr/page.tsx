@@ -1,5 +1,7 @@
 'use client'
 
+import { LABELS } from './constants/labels'
+
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
@@ -229,7 +231,7 @@ export default function HRPage() {
         render: (_value, employee: Employee) => {
           const roles = employee.roles as UserRole[] | undefined
           if (!roles || roles.length === 0) {
-            return <span className="text-morandi-muted text-sm">未設定</span>
+            return <span className="text-morandi-muted text-sm">{LABELS.NOT_SET}</span>
           }
           return (
             <div className="flex flex-wrap gap-1">
@@ -282,7 +284,7 @@ export default function HRPage() {
         sortable: true,
         render: (_value, employee: Employee) => {
           if (!employee.job_info?.hire_date)
-            return <span className="text-morandi-muted text-sm">未設定</span>
+            return <span className="text-morandi-muted text-sm">{LABELS.NOT_SET}</span>
           return <DateCell date={employee.job_info.hire_date} />
         },
       },
@@ -454,7 +456,7 @@ export default function HRPage() {
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent level={1} className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>新增員工</DialogTitle>
+            <DialogTitle>{LABELS.ADD_EMPLOYEE}</DialogTitle>
           </DialogHeader>
           <AddEmployeeForm
             onSubmit={() => setIsAddDialogOpen(false)}
