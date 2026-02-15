@@ -280,11 +280,21 @@ export async function findActiveOrderConflicts(params: {
       return []
     }
 
+    // 查詢所有簽證關聯的 order_id，這些訂單不需要被檢查
+    const { data: visaOrders } = await supabase
+      .from('visas')
+      .select('order_id')
+      .not('order_id', 'is', null)
+    const visaOrderIds = new Set((visaOrders || []).map(v => v.order_id).filter(Boolean))
+
     const conflicts: ActiveOrderConflict[] = []
 
     for (const member of members || []) {
       // 排除自己
       if (currentMemberId && member.id === currentMemberId) continue
+
+      // 排除簽證訂單（簽證在辦理中，不需要同步檢查）
+      if (visaOrderIds.has(member.order_id)) continue
 
       // 排除已完成/已取消的訂單
       const order = member.orders as { code?: string; tour_name?: string; status?: string } | null
@@ -323,10 +333,6 @@ export async function findActiveOrderConflicts(params: {
         })
       }
     }
-
-    // 查詢簽證訂單（透過 order_members 的 order_id 關聯 visas）
-    // 簽證本身沒有 passport 欄位，衝突只看 order_members
-    // 所以上面的查詢已經涵蓋了，不需要額外查詢 visas 表
 
     return conflicts
   } catch (error) {
