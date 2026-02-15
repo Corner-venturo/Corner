@@ -34,11 +34,11 @@ export const ROLES: Record<UserRole, RoleConfig> = {
   super_admin: {
     id: 'super_admin',
     label: '超級管理員',
-    description: '擁有所有權限，可跨 workspace 管理所有資料',
+    description: '擁有所有權限，管理所屬 workspace 的所有資料',
     color: 'text-morandi-red bg-morandi-red/10 border-morandi-red/20',
     permissions: ['*'], // 所有權限
     canManageWorkspace: true,
-    canCrossWorkspace: true,
+    canCrossWorkspace: false,
   },
 
   admin: {
