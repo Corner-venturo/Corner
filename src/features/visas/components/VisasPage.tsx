@@ -6,7 +6,7 @@ import React, { useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { FileText, Clock, CheckCircle, XCircle, AlertCircle, RotateCcw, Info, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { logger } from '@/lib/utils/logger'
 import { toast } from 'sonner'
 import { useVisasData } from '../hooks/useVisasData'
@@ -282,15 +282,14 @@ export default function VisasPage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={VISAS_LABELS.MANAGE_1750}
-        icon={FileText}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '簽證管理', href: '/visas' },
-        ]}
-        actions={
+    <ContentPageLayout
+      title={VISAS_LABELS.MANAGE_1750}
+      icon={FileText}
+      breadcrumb={[
+        { label: '首頁', href: '/' },
+        { label: '簽證管理', href: '/visas' },
+      ]}
+      headerActions={
           <div className="flex items-center gap-3">
             {canManageVisas && selectedRows.length > 0 ? (
               <div className="flex items-center gap-2">
@@ -407,9 +406,7 @@ export default function VisasPage() {
         ]}
         activeTab={activeTab}
         onTabChange={setActiveTab}
-      />
-
-      <div className="flex-1 overflow-auto">
+    >
         <VisasList
           filteredVisas={filteredVisas}
           canManageVisas={canManageVisas}
@@ -421,7 +418,6 @@ export default function VisasPage() {
             loadVisaForEdit(visa) // 編輯不需要載入 tours
           }}
         />
-      </div>
 
       {/* 簽證資訊對話框 */}
       <VisasInfoDialog open={isInfoDialogOpen} onClose={() => setIsInfoDialogOpen(false)} />
@@ -530,6 +526,6 @@ export default function VisasPage() {
         }}
         updateVisa={updateVisa}
       />
-    </div>
+    </ContentPageLayout>
   )
 }

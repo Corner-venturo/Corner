@@ -6,7 +6,7 @@
 
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Calendar, Bus, Users, ChevronLeft, ChevronRight, ClipboardList } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 // ScheduleCalendar 保留用於未來可能的資源視圖
@@ -448,15 +448,14 @@ export const SchedulingPage: React.FC = () => {
   }, [leaderFormData, leaderEditMode, editingLeaderSchedule, checkLeaderConflict])
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={SCHEDULING_LABELS.LABEL_7493}
-        icon={Calendar}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '資源調度', href: '/scheduling' },
-        ]}
-        actions={
+    <ContentPageLayout
+      title={SCHEDULING_LABELS.LABEL_7493}
+      icon={Calendar}
+      breadcrumb={[
+        { label: '首頁', href: '/' },
+        { label: '資源調度', href: '/scheduling' },
+      ]}
+      headerActions={
           <div className="flex items-center gap-4">
             {/* 資源類型切換 */}
             <div className="flex items-center gap-1">
@@ -517,8 +516,7 @@ export const SchedulingPage: React.FC = () => {
             </div>
           </div>
         }
-      />
-
+    >
       {/* 需求甘特圖 - 左邊需求列表，右邊資源庫存 */}
       <div className="flex-1 min-h-0 pb-4">
         <RequirementGanttChart
@@ -555,6 +553,6 @@ export const SchedulingPage: React.FC = () => {
         onFormFieldChange={handleLeaderFormChange}
         onSubmit={handleLeaderSubmit}
       />
-    </div>
+    </ContentPageLayout>
   )
 }

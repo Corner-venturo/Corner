@@ -8,7 +8,7 @@
 
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useCallback } from 'react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { FolderArchive } from 'lucide-react'
 import {
   Dialog,
@@ -178,20 +178,18 @@ export const CompanyAssetsPage: React.FC = () => {
   }, [formData, isEditMode, editingAsset, user, handleCloseDialog, targetFolderId])
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={COMPANY_ASSETS_LABELS.公司資源管理}
-        icon={FolderArchive}
-        breadcrumb={[
-          { label: COMPANY_ASSETS_LABELS.首頁, href: '/' },
-          { label: COMPANY_ASSETS_LABELS.資料庫管理, href: '/database' },
-          { label: COMPANY_ASSETS_LABELS.公司資源管理, href: '/database/company-assets' },
-        ]}
-        onAdd={() => handleAddFile(null)}
-        addLabel={COMPANY_ASSETS_LABELS.上傳檔案}
-      />
-
-      <div className="flex-1 overflow-hidden">
+    <ContentPageLayout
+      title={COMPANY_ASSETS_LABELS.公司資源管理}
+      icon={FolderArchive}
+      breadcrumb={[
+        { label: COMPANY_ASSETS_LABELS.首頁, href: '/' },
+        { label: COMPANY_ASSETS_LABELS.資料庫管理, href: '/database' },
+        { label: COMPANY_ASSETS_LABELS.公司資源管理, href: '/database/company-assets' },
+      ]}
+      onAdd={() => handleAddFile(null)}
+      addLabel={COMPANY_ASSETS_LABELS.上傳檔案}
+      contentClassName="flex-1 overflow-hidden"
+    >
         <div className="h-full border border-border rounded-xl overflow-hidden bg-card shadow-sm flex flex-col">
           <CompanyAssetsTree
             key={refreshKey}
@@ -199,7 +197,6 @@ export const CompanyAssetsPage: React.FC = () => {
             onAddFile={handleAddFile}
           />
         </div>
-      </div>
 
       <CompanyAssetsDialog
         isOpen={isDialogOpen}
@@ -243,6 +240,6 @@ export const CompanyAssetsPage: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </ContentPageLayout>
   )
 }

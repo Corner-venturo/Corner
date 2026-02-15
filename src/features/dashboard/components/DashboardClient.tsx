@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores/auth-store'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Card } from '@/components/ui/card'
 import { Settings } from 'lucide-react'
 import { useWidgets } from '@/features/dashboard/hooks'
@@ -130,16 +130,14 @@ export function DashboardClient() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={DASHBOARD_LABELS.home}
-        breadcrumb={[{ label: DASHBOARD_LABELS.home, href: '/' }]}
-        actions={
-          <WidgetSettingsDialog activeWidgets={activeWidgets} onToggleWidget={toggleWidget} />
-        }
-      />
-
-      <div className="flex-1 overflow-auto min-h-0">
+    <ContentPageLayout
+      title={DASHBOARD_LABELS.home}
+      breadcrumb={[{ label: DASHBOARD_LABELS.home, href: '/' }]}
+      headerActions={
+        <WidgetSettingsDialog activeWidgets={activeWidgets} onToggleWidget={toggleWidget} />
+      }
+      contentClassName="flex-1 overflow-auto min-h-0"
+    >
         {filteredActiveWidgets.length === 0 ? (
           <Card className="p-12 text-center border-morandi-gold/20 shadow-sm rounded-2xl bg-card">
             <div className="max-w-md mx-auto">
@@ -171,7 +169,6 @@ export function DashboardClient() {
             </SortableContext>
           </DndContext>
         )}
-      </div>
-    </div>
+    </ContentPageLayout>
   )
 }

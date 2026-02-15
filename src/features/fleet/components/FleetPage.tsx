@@ -6,7 +6,7 @@
 
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useCallback } from 'react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Bus, Users, Wrench } from 'lucide-react'
 import { FleetVehicleList } from './FleetVehicleList'
@@ -326,24 +326,22 @@ export const FleetPage: React.FC = () => {
   const addLabel = activeTab === 'vehicles' ? '新增車輛' : activeTab === 'drivers' ? '新增司機' : ''
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={FLEET_LABELS.MANAGE_8153}
-        icon={Bus}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '資料庫管理', href: '/database' },
-          { label: '車隊管理', href: '/database/fleet' },
-        ]}
-        showSearch
-        searchTerm={searchQuery}
-        onSearchChange={setSearchQuery}
-        searchPlaceholder="搜尋車牌、司機、品牌..."
-        onAdd={activeTab !== 'logs' ? handleAdd : undefined}
-        addLabel={addLabel}
-      />
-
-      <div className="flex-1 overflow-hidden flex flex-col">
+    <ContentPageLayout
+      title={FLEET_LABELS.MANAGE_8153}
+      icon={Bus}
+      breadcrumb={[
+        { label: '首頁', href: '/' },
+        { label: '資料庫管理', href: '/database' },
+        { label: '車隊管理', href: '/database/fleet' },
+      ]}
+      showSearch
+      searchTerm={searchQuery}
+      onSearchChange={setSearchQuery}
+      searchPlaceholder="搜尋車牌、司機、品牌..."
+      onAdd={activeTab !== 'logs' ? handleAdd : undefined}
+      addLabel={addLabel}
+      contentClassName="flex-1 overflow-hidden flex flex-col"
+    >
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
           <div className="px-4 border-b border-border">
             <TabsList className="bg-transparent h-auto p-0 gap-4">
@@ -396,7 +394,6 @@ export const FleetPage: React.FC = () => {
             </div>
           </TabsContent>
         </Tabs>
-      </div>
 
       {/* 車輛對話框 */}
       <FleetVehicleDialog
@@ -418,6 +415,6 @@ export const FleetPage: React.FC = () => {
         onFormFieldChange={handleDriverFormFieldChange}
         onSubmit={handleDriverSubmit}
       />
-    </div>
+    </ContentPageLayout>
   )
 }

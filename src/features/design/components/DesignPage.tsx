@@ -3,7 +3,7 @@
 import { useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Palette, Plus } from 'lucide-react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { DesignList } from './DesignList'
 import { useDesigns } from '../hooks/useDesigns'
@@ -57,31 +57,27 @@ export function DesignPage() {
   }, [deleteDesign])
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={LABELS.design}
-        icon={Palette}
-        breadcrumb={[
-          { label: LABELS.home, href: '/' },
-          { label: LABELS.design, href: '/design' },
-        ]}
-        actions={
-          <Button
-            onClick={handleCreate}
-            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
-          >
-            <Plus size={16} />
-            {LABELS.addDesign}
-          </Button>
-        }
+    <ContentPageLayout
+      title={LABELS.design}
+      icon={Palette}
+      breadcrumb={[
+        { label: LABELS.home, href: '/' },
+        { label: LABELS.design, href: '/design' },
+      ]}
+      headerActions={
+        <Button
+          onClick={handleCreate}
+          className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
+        >
+          <Plus size={16} />
+          {LABELS.addDesign}
+        </Button>
+      }
+    >
+      <DesignList
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
-
-      <div className="flex-1 overflow-auto">
-        <DesignList
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
-      </div>
-    </div>
+    </ContentPageLayout>
   )
 }

@@ -3,7 +3,7 @@
 import { useState, lazy, Suspense, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { MapPin, Star, Sparkles, Globe } from 'lucide-react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAttractionsDialog } from '../hooks/useAttractionsDialog'
 import { useCountries } from '@/data'
@@ -85,8 +85,7 @@ export default function DatabaseManagementPage() {
   ]
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
+    <ContentPageLayout
         title={DATABASE_MANAGEMENT_PAGE_LABELS.旅遊資料庫}
         icon={MapPin}
         breadcrumb={[
@@ -144,9 +143,7 @@ export default function DatabaseManagementPage() {
         onClearFilters={clearFilters}
         onAdd={activeTab === 'attractions' ? openAdd : undefined}
         addLabel={ATTRACTIONS_DIALOG_LABELS.新增景點}
-      />
-
-      <div className="flex-1 overflow-auto">
+    >
         <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full flex flex-col">
           {/* 分頁內容 - 只載入已訪問過的 tab */}
           <div className="flex-1 overflow-hidden">
@@ -209,7 +206,6 @@ export default function DatabaseManagementPage() {
             </TabsContent>
           </div>
         </Tabs>
-      </div>
-    </div>
+    </ContentPageLayout>
   )
 }

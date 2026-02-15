@@ -9,7 +9,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { logger } from '@/lib/utils/logger'
 import { formatCurrency } from '@/lib/utils/format-currency'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -159,11 +159,11 @@ export function SupplierFinancePage() {
   }, [user?.workspace_id, dateRange])
 
   return (
-    <div className="space-y-6">
-      <ResponsiveHeader
-        title={SUPPLIER_LABELS.LABEL_8192}
-        icon={LineChart}
-      />
+    <ContentPageLayout
+      title={SUPPLIER_LABELS.LABEL_8192}
+      icon={LineChart}
+      className="space-y-6"
+    >
 
       {/* 期間選擇 */}
       <div className="flex items-center justify-between">
@@ -323,6 +323,6 @@ export function SupplierFinancePage() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </ContentPageLayout>
   )
 }

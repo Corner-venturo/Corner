@@ -7,7 +7,7 @@
 import { logger } from '@/lib/utils/logger'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { FileCheck, FileText, CheckCircle, Send, XCircle } from 'lucide-react'
 import { ConfirmationsList } from './ConfirmationsList'
 import { useConfirmations, createConfirmation, deleteConfirmation } from '@/data'
@@ -94,38 +94,34 @@ export const ConfirmationsPage: React.FC = () => {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={CONFIRMATIONS_LABELS.MANAGE_4795}
-        icon={FileCheck}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '確認單管理', href: '/confirmations' },
-        ]}
-        tabs={STATUS_FILTERS.map(f => ({
-          value: f.value,
-          label: f.label,
-          icon: f.icon,
-        }))}
-        activeTab={statusFilter}
-        onTabChange={setStatusFilter}
-        showSearch={true}
+    <ContentPageLayout
+      title={CONFIRMATIONS_LABELS.MANAGE_4795}
+      icon={FileCheck}
+      breadcrumb={[
+        { label: '首頁', href: '/' },
+        { label: '確認單管理', href: '/confirmations' },
+      ]}
+      tabs={STATUS_FILTERS.map(f => ({
+        value: f.value,
+        label: f.label,
+        icon: f.icon,
+      }))}
+      activeTab={statusFilter}
+      onTabChange={setStatusFilter}
+      showSearch={true}
+      searchTerm={searchTerm}
+      onSearchChange={setSearchTerm}
+      searchPlaceholder="搜尋訂單編號或確認單號碼..."
+      onAdd={handleAdd}
+      addLabel="新增確認單"
+    >
+      <ConfirmationsList
+        confirmations={filteredConfirmations}
         searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        searchPlaceholder="搜尋訂單編號或確認單號碼..."
-        onAdd={handleAdd}
-        addLabel="新增確認單"
+        onConfirmationClick={handleConfirmationClick}
+        onEdit={handleConfirmationClick}
+        onDelete={handleDelete}
       />
-
-      <div className="flex-1 overflow-auto">
-        <ConfirmationsList
-          confirmations={filteredConfirmations}
-          searchTerm={searchTerm}
-          onConfirmationClick={handleConfirmationClick}
-          onEdit={handleConfirmationClick}
-          onDelete={handleDelete}
-        />
-      </div>
-    </div>
+    </ContentPageLayout>
   )
 }
