@@ -2,7 +2,7 @@
 
 /**
  * 供應商 UI 測試頁面（暫時）
- * 用假資料模擬供應商收到需求單的畫面
+ * 模擬供應商收到整張需求單並一次回覆
  * TODO: 上線後刪除此頁面
  */
 
@@ -18,176 +18,159 @@ import {
   Eye,
   Clock,
   CheckCircle2,
-  Bus,
-  Plus,
-  Trash2,
   Save,
   Calendar,
-  MapPin,
+  Users,
+  Plane,
   ChevronDown,
   ChevronRight,
   ArrowLeft,
   X,
+  FileText,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+
+// ============================================
+// 型別
+// ============================================
+
+interface RequestItem {
+  id: string
+  category: string
+  title: string
+  service_date: string
+  quantity: number
+  description: string
+  instruction: string // 需報價 / 只訂位 / 報價+訂位
+  // 供應商回覆欄位
+  reply_status: string
+  reply_price: number
+  reply_note: string
+  // 交通專用
+  vehicle_type: string
+  driver_name: string
+  driver_phone: string
+  license_plate: string
+  // 餐飲專用
+  price_per_person: number
+  booking_status: string
+}
+
+interface RequestSheet {
+  id: string
+  code: string
+  tour_code: string
+  tour_name: string
+  departure_date: string
+  pax: number
+  sender_company: string
+  sender_contact: string
+  sender_phone: string
+  status: 'pending' | 'responded' | 'accepted'
+  items: RequestItem[]
+  created_at: string
+  total_price_mode: 'per_item' | 'package'
+  package_prices: PackagePrice[]
+  package_note: string
+}
+
+interface PackagePrice {
+  id: string
+  min_pax: number
+  price_per_person: number
+  note: string
+}
 
 // ============================================
 // 假資料
 // ============================================
 
-interface MockRequest {
-  id: string
-  response_status: string
-  category: string
-  tour_name: string
-  tour_code: string
-  title: string
-  service_date: string
-  service_date_end: string
-  quantity: number
-  description: string
-  created_at: string
-  notes?: string
-}
+const createDefaultItem = (overrides: Partial<RequestItem>): RequestItem => ({
+  id: '',
+  category: 'transport',
+  title: '',
+  service_date: '',
+  quantity: 1,
+  description: '',
+  instruction: '需報價',
+  reply_status: '',
+  reply_price: 0,
+  reply_note: '',
+  vehicle_type: '',
+  driver_name: '',
+  driver_phone: '',
+  license_plate: '',
+  price_per_person: 0,
+  booking_status: '',
+  ...overrides,
+})
 
-const MOCK_REQUESTS: MockRequest[] = [
+const MOCK_SHEETS: RequestSheet[] = [
   {
-    id: '1',
-    response_status: 'pending',
-    category: 'transport',
-    tour_name: '清邁經典五日遊',
+    id: 'sheet-1',
+    code: 'CNX250315A-RQ01',
     tour_code: 'CNX250315A',
-    title: '機場接機',
-    service_date: '2025-03-15',
-    service_date_end: '2025-03-15',
-    quantity: 2,
-    description: '清邁機場 → 飯店，預計 30 人，需要 2 台中巴',
+    tour_name: '清邁經典五日遊',
+    departure_date: '2025-03-15',
+    pax: 30,
+    sender_company: '角落旅行社',
+    sender_contact: '王小明',
+    sender_phone: '02-2345-6789',
+    status: 'pending',
     created_at: '2025-02-15T10:00:00Z',
-    notes: '需報價',
+    total_price_mode: 'per_item',
+    package_prices: [],
+    package_note: '',
+    items: [
+      createDefaultItem({ id: 'i1', category: 'transport', title: '機場接機', service_date: '2025-03-15', quantity: 2, description: '清邁機場 → 飯店，30 人，需 2 台中巴', instruction: '需報價' }),
+      createDefaultItem({ id: 'i2', category: 'transport', title: '一日包車（清邁市區）', service_date: '2025-03-16', quantity: 2, description: '飯店 → 雙龍寺 → 古城 → 夜市 → 回飯店，08:00-21:00', instruction: '需報價' }),
+      createDefaultItem({ id: 'i3', category: 'transport', title: '一日包車（清萊）', service_date: '2025-03-17', quantity: 2, description: '清邁 → 白廟 → 藍廟 → 黑屋 → 清邁，07:00-20:00', instruction: '需報價' }),
+      createDefaultItem({ id: 'i4', category: 'meal', title: '晚餐 - 帝王餐', service_date: '2025-03-15', quantity: 30, description: '30 人帝王餐體驗', instruction: '只要訂位，不需報價' }),
+      createDefaultItem({ id: 'i5', category: 'activity', title: '大象自然公園半日遊', service_date: '2025-03-16', quantity: 30, description: '含接送、午餐、英文導覽', instruction: '需報價' }),
+      createDefaultItem({ id: 'i6', category: 'meal', title: '午餐 - 河邊餐廳', service_date: '2025-03-17', quantity: 30, description: '河邊景觀餐廳', instruction: '訂位＋報價' }),
+    ],
   },
   {
-    id: '2',
-    response_status: 'pending',
-    category: 'transport',
-    tour_name: '清邁經典五日遊',
-    tour_code: 'CNX250315A',
-    title: '一日包車（清邁市區）',
-    service_date: '2025-03-16',
-    service_date_end: '2025-03-16',
-    quantity: 2,
-    description: '飯店出發 → 雙龍寺 → 古城 → 夜市 → 回飯店，全天 08:00-21:00',
-    created_at: '2025-02-15T10:00:00Z',
-    notes: '需報價',
-  },
-  {
-    id: '3',
-    response_status: 'pending',
-    category: 'transport',
-    tour_name: '清邁經典五日遊',
-    tour_code: 'CNX250315A',
-    title: '一日包車（清萊）',
-    service_date: '2025-03-17',
-    service_date_end: '2025-03-17',
-    quantity: 2,
-    description: '清邁 → 白廟 → 藍廟 → 黑屋 → 清邁，全天 07:00-20:00',
-    created_at: '2025-02-15T10:00:00Z',
-    notes: '需報價',
-  },
-  {
-    id: '4',
-    response_status: 'pending',
-    category: 'meal',
-    tour_name: '清邁經典五日遊',
-    tour_code: 'CNX250315A',
-    title: '晚餐 - 帝王餐',
-    service_date: '2025-03-15',
-    service_date_end: '2025-03-15',
-    quantity: 30,
-    description: '30 人，帝王餐體驗',
-    created_at: '2025-02-15T10:00:00Z',
-    notes: '只要訂位，不需報價',
-  },
-  {
-    id: '5',
-    response_status: 'pending',
-    category: 'activity',
-    tour_name: '清邁經典五日遊',
-    tour_code: 'CNX250315A',
-    title: '大象自然公園半日遊',
-    service_date: '2025-03-16',
-    service_date_end: '2025-03-16',
-    quantity: 30,
-    description: '含接送、午餐、英文導覽',
-    created_at: '2025-02-15T10:00:00Z',
-    notes: '需報價',
-  },
-  {
-    id: '6',
-    response_status: 'pending',
-    category: 'meal',
-    tour_name: '東京秘境三日遊',
+    id: 'sheet-2',
+    code: 'TYO250320A-RQ01',
     tour_code: 'TYO250320A',
-    title: '午餐 - 割烹料理',
-    service_date: '2025-03-20',
-    service_date_end: '2025-03-20',
-    quantity: 6,
-    description: '6 人，需訂位，預算 ¥5,000/人',
-    created_at: '2025-02-15T11:00:00Z',
-    notes: '訂位＋報價',
-  },
-  {
-    id: '7',
-    response_status: 'pending',
-    category: 'meal',
     tour_name: '東京秘境三日遊',
-    tour_code: 'TYO250320A',
-    title: '晚餐 - 燒肉店',
-    service_date: '2025-03-20',
-    service_date_end: '2025-03-20',
-    quantity: 6,
-    description: '6 人',
+    departure_date: '2025-03-20',
+    pax: 6,
+    sender_company: '角落旅行社',
+    sender_contact: '王小明',
+    sender_phone: '02-2345-6789',
+    status: 'pending',
     created_at: '2025-02-15T11:00:00Z',
-    notes: '只要訂位',
+    total_price_mode: 'package',
+    package_prices: [],
+    package_note: '',
+    items: [
+      createDefaultItem({ id: 'i7', category: 'meal', title: '午餐 - 割烹料理', service_date: '2025-03-20', quantity: 6, description: '6 人，預算 ¥5,000/人', instruction: '訂位＋報價' }),
+      createDefaultItem({ id: 'i8', category: 'meal', title: '晚餐 - 燒肉店', service_date: '2025-03-20', quantity: 6, description: '6 人', instruction: '只要訂位' }),
+      createDefaultItem({ id: 'i9', category: 'meal', title: '午餐 - 拉麵店', service_date: '2025-03-21', quantity: 6, description: '6 人', instruction: '只要訂位' }),
+      createDefaultItem({ id: 'i10', category: 'transport', title: '三日包車', service_date: '2025-03-20', quantity: 1, description: '6 人，小車即可，含司機', instruction: '需報價' }),
+    ],
   },
   {
-    id: '8',
-    response_status: 'pending',
-    category: 'meal',
-    tour_name: '東京秘境三日遊',
-    tour_code: 'TYO250320A',
-    title: '午餐 - 拉麵店',
-    service_date: '2025-03-21',
-    service_date_end: '2025-03-21',
-    quantity: 6,
-    description: '6 人',
-    created_at: '2025-02-15T11:00:00Z',
-    notes: '只要訂位',
-  },
-  {
-    id: '9',
-    response_status: 'responded',
-    category: 'transport',
-    tour_name: '北海道冬季六日',
+    id: 'sheet-3',
+    code: 'CTS250210A-RQ01',
     tour_code: 'CTS250210A',
-    title: '新千歲機場接機',
-    service_date: '2025-02-10',
-    service_date_end: '2025-02-10',
-    quantity: 1,
-    description: '機場 → 札幌飯店，15 人',
-    created_at: '2025-02-01T09:00:00Z',
-  },
-  {
-    id: '10',
-    response_status: 'responded',
-    category: 'transport',
     tour_name: '北海道冬季六日',
-    tour_code: 'CTS250210A',
-    title: '六日包車',
-    service_date: '2025-02-10',
-    service_date_end: '2025-02-15',
-    quantity: 1,
-    description: '札幌 → 小樽 → 富良野 → 旭川 → 札幌',
+    departure_date: '2025-02-10',
+    pax: 15,
+    sender_company: '角落旅行社',
+    sender_contact: '李大華',
+    sender_phone: '02-2345-6789',
+    status: 'responded',
     created_at: '2025-02-01T09:00:00Z',
+    total_price_mode: 'per_item',
+    package_prices: [],
+    package_note: '',
+    items: [
+      createDefaultItem({ id: 'i11', category: 'transport', title: '機場接機', service_date: '2025-02-10', quantity: 1, description: '新千歲 → 札幌飯店，15 人', instruction: '需報價', reply_price: 45000 }),
+      createDefaultItem({ id: 'i12', category: 'transport', title: '六日包車', service_date: '2025-02-10', quantity: 1, description: '札幌 → 小樽 → 富良野 → 旭川 → 札幌', instruction: '需報價', reply_price: 480000 }),
+    ],
   },
 ]
 
@@ -195,46 +178,18 @@ const MOCK_REQUESTS: MockRequest[] = [
 // 配置
 // ============================================
 
-const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.ReactNode }> = {
-  pending: { label: '待回覆', variant: 'outline', icon: <Clock className="h-3 w-3" /> },
-  responded: { label: '已回覆', variant: 'secondary', icon: <Send className="h-3 w-3" /> },
-  accepted: { label: '已確認', variant: 'default', icon: <CheckCircle2 className="h-3 w-3" /> },
+const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
+  pending: { label: '待回覆', color: 'bg-amber-100 text-amber-700 border-amber-200' },
+  responded: { label: '已回覆', color: 'bg-blue-100 text-blue-700 border-blue-200' },
+  accepted: { label: '已確認', color: 'bg-green-100 text-green-700 border-green-200' },
 }
 
 const CATEGORY_CONFIG: Record<string, { label: string; emoji: string }> = {
   transport: { label: '交通', emoji: '🚌' },
-  guide: { label: '領隊', emoji: '🧑‍✈️' },
-  hotel: { label: '住宿', emoji: '🏨' },
-  accommodation: { label: '住宿', emoji: '🏨' },
-  restaurant: { label: '餐食', emoji: '🍽️' },
   meal: { label: '餐食', emoji: '🍽️' },
   activity: { label: '活動', emoji: '🎯' },
+  accommodation: { label: '住宿', emoji: '🏨' },
   other: { label: '其他', emoji: '📋' },
-}
-
-// ============================================
-// 分組
-// ============================================
-
-interface TourGroup {
-  tour_code: string
-  tour_name: string
-  requests: MockRequest[]
-  pending_count: number
-}
-
-// ============================================
-// 回覆項目
-// ============================================
-
-interface ResponseItem {
-  id: string
-  resource_name: string
-  license_plate: string
-  driver_name: string
-  driver_phone: string
-  unit_price: number
-  notes: string
 }
 
 // ============================================
@@ -242,269 +197,401 @@ interface ResponseItem {
 // ============================================
 
 export default function TestSupplierPage() {
+  const [selectedSheet, setSelectedSheet] = useState<RequestSheet | null>(null)
+  const [editingItems, setEditingItems] = useState<RequestItem[]>([])
+  const [priceMode, setPriceMode] = useState<'per_item' | 'package'>('per_item')
+  const [packagePrices, setPackagePrices] = useState<PackagePrice[]>([])
+  const [packageNote, setPackageNote] = useState('')
+  const [overallNote, setOverallNote] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
-  const [selectedTourGroup, setSelectedTourGroup] = useState<TourGroup | null>(null)
-  const [selectedRequest, setSelectedRequest] = useState<MockRequest | null>(null)
-  const [responseItems, setResponseItems] = useState<ResponseItem[]>([])
-  const [responseNotes, setResponseNotes] = useState('')
-  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
 
-  // 按團分組
-  const tourGroups = useMemo(() => {
-    const groups: Record<string, TourGroup> = {}
-    const filtered = MOCK_REQUESTS.filter(r => {
-      if (filterStatus === 'all') return true
-      if (filterStatus === 'pending') return r.response_status === 'pending'
-      return r.response_status === filterStatus
-    })
-    for (const r of filtered) {
-      if (!groups[r.tour_code]) {
-        groups[r.tour_code] = {
-          tour_code: r.tour_code,
-          tour_name: r.tour_name,
-          requests: [],
-          pending_count: 0,
-        }
-      }
-      groups[r.tour_code].requests.push(r)
-      if (r.response_status === 'pending') {
-        groups[r.tour_code].pending_count++
-      }
-    }
-    return Object.values(groups)
-  }, [filterStatus])
+  const filteredSheets = MOCK_SHEETS.filter(s => {
+    if (filterStatus === 'all') return true
+    return s.status === filterStatus
+  })
 
-  const toggleGroup = (code: string) => {
-    setExpandedGroups(prev => {
-      const next = new Set(prev)
-      if (next.has(code)) next.delete(code)
-      else next.add(code)
-      return next
-    })
+  const openSheet = (sheet: RequestSheet) => {
+    setSelectedSheet(sheet)
+    setEditingItems(sheet.items.map(i => ({ ...i })))
+    setPriceMode(sheet.total_price_mode)
+    setPackagePrices(sheet.package_prices.length > 0 ? sheet.package_prices : [
+      { id: 'p1', min_pax: 3, price_per_person: 0, note: '' },
+      { id: 'p2', min_pax: 6, price_per_person: 0, note: '' },
+      { id: 'p3', min_pax: 10, price_per_person: 0, note: '' },
+    ])
+    setPackageNote(sheet.package_note)
+    setOverallNote('')
   }
 
-  // 預設展開所有
-  const isExpanded = (code: string) => !expandedGroups.has(code)
-
-  const openResponse = (request: MockRequest) => {
-    setSelectedRequest(request)
-    const items: ResponseItem[] = []
-    for (let i = 0; i < request.quantity; i++) {
-      items.push({
-        id: `item-${i}`,
-        resource_name: '',
-        license_plate: '',
-        driver_name: '',
-        driver_phone: '',
-        unit_price: 0,
-        notes: '',
-      })
-    }
-    setResponseItems(items)
-    setResponseNotes('')
+  const updateItemField = (itemId: string, field: keyof RequestItem, value: string | number) => {
+    setEditingItems(prev => prev.map(item =>
+      item.id === itemId ? { ...item, [field]: value } : item
+    ))
   }
 
-  const updateItem = (id: string, field: keyof ResponseItem, value: string | number) => {
-    setResponseItems(prev => prev.map(item => item.id === id ? { ...item, [field]: value } : item))
+  const updatePackagePrice = (id: string, field: keyof PackagePrice, value: string | number) => {
+    setPackagePrices(prev => prev.map(p =>
+      p.id === id ? { ...p, [field]: value } : p
+    ))
   }
 
-  const addItem = () => {
-    setResponseItems(prev => [...prev, {
-      id: `item-${Date.now()}`,
-      resource_name: '',
-      license_plate: '',
-      driver_name: '',
-      driver_phone: '',
-      unit_price: 0,
-      notes: '',
-    }])
+  const addPackagePrice = () => {
+    setPackagePrices(prev => [...prev, { id: `p-${Date.now()}`, min_pax: 0, price_per_person: 0, note: '' }])
   }
 
-  const removeItem = (id: string) => {
-    setResponseItems(prev => prev.filter(item => item.id !== id))
-  }
-
-  const isVehicle = selectedRequest?.category === 'transport'
-  const resourceLabel = isVehicle ? '車輛' : '資源'
+  const isReadOnly = selectedSheet?.status !== 'pending'
 
   // ============================================
-  // 單筆回覆畫面
+  // 整張需求單回覆畫面
   // ============================================
-  if (selectedRequest) {
+  if (selectedSheet) {
+    const totalPerItem = editingItems.reduce((sum, item) => sum + (item.reply_price || 0), 0)
+
     return (
       <div className="min-h-screen bg-[#faf9f7]">
-        <div className="max-w-4xl mx-auto p-4 md:p-8">
+        <div className="max-w-5xl mx-auto p-4 md:p-8">
+          {/* 返回 */}
           <button
-            onClick={() => setSelectedRequest(null)}
+            onClick={() => setSelectedSheet(null)}
             className="flex items-center gap-2 text-sm text-[#8a7e72] hover:text-[#6b6159] mb-6"
           >
             <ArrowLeft size={16} />
             返回收件匣
           </button>
 
-          <div className="flex items-center gap-3 mb-6">
-            <Bus className="h-6 w-6 text-amber-600" />
-            <div>
-              <h1 className="text-xl font-semibold text-[#4a4540]">
-                回覆需求 - {selectedRequest.title}
-              </h1>
-              <p className="text-sm text-[#8a7e72]">{selectedRequest.tour_code} {selectedRequest.tour_name}</p>
-            </div>
-          </div>
-
-          {/* 需求資訊 */}
-          <div className="bg-white rounded-xl border border-[#e8e4df] p-5 mb-6">
-            <h3 className="font-medium text-[#4a4540] mb-3">需求詳情</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-[#8a7e72]" />
-                <span className="text-[#8a7e72]">日期：</span>
-                <span className="font-medium text-[#4a4540]">
-                  {selectedRequest.service_date}
-                  {selectedRequest.service_date_end !== selectedRequest.service_date && ` ~ ${selectedRequest.service_date_end}`}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-[#8a7e72]" />
-                <span className="text-[#8a7e72]">數量：</span>
-                <span className="font-medium text-[#4a4540]">{selectedRequest.quantity}</span>
-              </div>
-              <div className="col-span-2">
-                <span className="text-[#8a7e72]">說明：</span>
-                <span className="font-medium text-[#4a4540] ml-1">{selectedRequest.description}</span>
-              </div>
-              {selectedRequest.notes && (
-                <div className="col-span-2">
-                  <Badge variant="outline" className="text-amber-700 border-amber-300 bg-amber-50">
-                    📌 {selectedRequest.notes}
+          {/* 需求單標題 */}
+          <div className="bg-white rounded-xl border border-[#e8e4df] p-6 mb-6">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <div className="flex items-center gap-3 mb-1">
+                  <FileText className="h-5 w-5 text-amber-600" />
+                  <h1 className="text-xl font-semibold text-[#4a4540]">
+                    需求單 {selectedSheet.code}
+                  </h1>
+                  <Badge className={STATUS_CONFIG[selectedSheet.status].color}>
+                    {STATUS_CONFIG[selectedSheet.status].label}
                   </Badge>
                 </div>
-              )}
+                <p className="text-[#8a7e72] text-sm ml-8">
+                  {selectedSheet.tour_code} {selectedSheet.tour_name}
+                </p>
+              </div>
+            </div>
+
+            {/* 基本資訊 */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm bg-[#faf9f7] rounded-lg p-4">
+              <div>
+                <span className="text-[#8a7e72]">發送方</span>
+                <div className="font-medium text-[#4a4540]">{selectedSheet.sender_company}</div>
+              </div>
+              <div>
+                <span className="text-[#8a7e72]">聯絡人</span>
+                <div className="font-medium text-[#4a4540]">{selectedSheet.sender_contact}</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Plane className="h-4 w-4 text-[#8a7e72]" />
+                <div>
+                  <span className="text-[#8a7e72]">出發日</span>
+                  <div className="font-medium text-[#4a4540]">{selectedSheet.departure_date}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-[#8a7e72]" />
+                <div>
+                  <span className="text-[#8a7e72]">人數</span>
+                  <div className="font-medium text-[#4a4540]">{selectedSheet.pax} 人</div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* 回覆欄位 */}
-          <div className="space-y-4 mb-6">
-            <div className="flex items-center justify-between">
-              <h3 className="font-medium text-[#4a4540]">
-                {resourceLabel}資訊 ({responseItems.length})
-              </h3>
-              <Button variant="outline" size="sm" onClick={addItem} className="gap-1">
-                <Plus className="h-4 w-4" />
-                新增{resourceLabel}
-              </Button>
+          {/* 需求項目列表 + 回覆 */}
+          <div className="bg-white rounded-xl border border-[#e8e4df] overflow-hidden mb-6">
+            <div className="px-6 py-4 border-b border-[#e8e4df]">
+              <h2 className="font-semibold text-[#4a4540]">需求明細</h2>
+              <p className="text-xs text-[#8a7e72] mt-1">請在每個項目右側填寫回覆資訊</p>
             </div>
 
-            {responseItems.map((item, index) => (
-              <div key={item.id} className="bg-white rounded-xl border border-[#e8e4df] p-5 space-y-4">
-                <div className="flex items-center justify-between">
-                  <Badge variant="outline">{resourceLabel} #{index + 1}</Badge>
-                  {responseItems.length > 1 && (
-                    <Button variant="ghost" size="sm" onClick={() => removeItem(item.id)} className="text-red-400 hover:bg-red-50 h-8 w-8 p-0">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>{isVehicle ? '車輛名稱/車型' : '名稱'}</Label>
-                    <Input
-                      value={item.resource_name}
-                      onChange={(e) => updateItem(item.id, 'resource_name', e.target.value)}
-                      placeholder={isVehicle ? '例如：Toyota Coaster 中巴' : ''}
-                    />
+            <div className="divide-y divide-[#f0ece7]">
+              {editingItems.map((item, index) => {
+                const cat = CATEGORY_CONFIG[item.category] || { label: item.category, emoji: '📋' }
+                const needsPrice = item.instruction.includes('報價')
+                const needsBooking = item.instruction.includes('訂位')
+
+                return (
+                  <div key={item.id} className="p-5">
+                    {/* 項目標題行 */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-lg">{cat.emoji}</span>
+                        <div>
+                          <div className="font-medium text-[#4a4540]">
+                            <span className="text-[#8a7e72] text-sm mr-2">{item.service_date}</span>
+                            {item.title}
+                          </div>
+                          <div className="text-xs text-[#8a7e72] mt-0.5">{item.description}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs">
+                          數量：{item.quantity}
+                        </Badge>
+                        <Badge className={cn(
+                          'text-xs',
+                          item.instruction.includes('不需報價')
+                            ? 'bg-slate-100 text-slate-600 border-slate-200'
+                            : 'bg-amber-50 text-amber-700 border-amber-200'
+                        )}>
+                          📌 {item.instruction}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    {/* 回覆欄位 */}
+                    {!isReadOnly && (
+                      <div className="ml-9 bg-[#faf9f7] rounded-lg p-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                          {/* 交通類：車型、司機、車牌 */}
+                          {item.category === 'transport' && (
+                            <>
+                              <div className="space-y-1">
+                                <Label className="text-xs">車型</Label>
+                                <Input
+                                  value={item.vehicle_type}
+                                  onChange={(e) => updateItemField(item.id, 'vehicle_type', e.target.value)}
+                                  placeholder="Toyota Coaster 中巴"
+                                  className="h-9 text-sm"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs">司機</Label>
+                                <Input
+                                  value={item.driver_name}
+                                  onChange={(e) => updateItemField(item.id, 'driver_name', e.target.value)}
+                                  placeholder="司機姓名"
+                                  className="h-9 text-sm"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs">司機電話</Label>
+                                <Input
+                                  value={item.driver_phone}
+                                  onChange={(e) => updateItemField(item.id, 'driver_phone', e.target.value)}
+                                  placeholder="電話號碼"
+                                  className="h-9 text-sm"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs">車牌</Label>
+                                <Input
+                                  value={item.license_plate}
+                                  onChange={(e) => updateItemField(item.id, 'license_plate', e.target.value)}
+                                  placeholder="車牌號碼"
+                                  className="h-9 text-sm"
+                                />
+                              </div>
+                            </>
+                          )}
+
+                          {/* 餐飲類：訂位狀態、餐標 */}
+                          {item.category === 'meal' && (
+                            <>
+                              {needsBooking && (
+                                <div className="space-y-1">
+                                  <Label className="text-xs">訂位狀態</Label>
+                                  <Input
+                                    value={item.booking_status}
+                                    onChange={(e) => updateItemField(item.id, 'booking_status', e.target.value)}
+                                    placeholder="已訂位 / 候補中 / 建議替代"
+                                    className="h-9 text-sm"
+                                  />
+                                </div>
+                              )}
+                              {needsPrice && (
+                                <div className="space-y-1">
+                                  <Label className="text-xs">餐標（每人）</Label>
+                                  <Input
+                                    type="number"
+                                    value={item.price_per_person || ''}
+                                    onChange={(e) => updateItemField(item.id, 'price_per_person', parseInt(e.target.value) || 0)}
+                                    placeholder="0"
+                                    className="h-9 text-sm"
+                                  />
+                                </div>
+                              )}
+                            </>
+                          )}
+
+                          {/* 活動類 */}
+                          {item.category === 'activity' && needsBooking && (
+                            <div className="space-y-1">
+                              <Label className="text-xs">預約狀態</Label>
+                              <Input
+                                value={item.booking_status}
+                                onChange={(e) => updateItemField(item.id, 'booking_status', e.target.value)}
+                                placeholder="已預約 / 候補"
+                                className="h-9 text-sm"
+                              />
+                            </div>
+                          )}
+
+                          {/* 通用：報價、備註 */}
+                          {needsPrice && priceMode === 'per_item' && (
+                            <div className="space-y-1">
+                              <Label className="text-xs">報價金額</Label>
+                              <Input
+                                type="number"
+                                value={item.reply_price || ''}
+                                onChange={(e) => updateItemField(item.id, 'reply_price', parseInt(e.target.value) || 0)}
+                                placeholder="0"
+                                className="h-9 text-sm"
+                              />
+                            </div>
+                          )}
+                          <div className="space-y-1">
+                            <Label className="text-xs">備註</Label>
+                            <Input
+                              value={item.reply_note}
+                              onChange={(e) => updateItemField(item.id, 'reply_note', e.target.value)}
+                              placeholder="補充說明"
+                              className="h-9 text-sm"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 唯讀模式：顯示已回覆的內容 */}
+                    {isReadOnly && item.reply_price > 0 && (
+                      <div className="ml-9 text-sm text-[#4a4540]">
+                        <span className="text-[#8a7e72]">回覆報價：</span>
+                        <span className="font-medium">¥{item.reply_price.toLocaleString()}</span>
+                      </div>
+                    )}
                   </div>
-                  {isVehicle && (
-                    <>
-                      <div className="space-y-2">
-                        <Label>車牌號碼</Label>
-                        <Input
-                          value={item.license_plate}
-                          onChange={(e) => updateItem(item.id, 'license_plate', e.target.value)}
-                          placeholder="例如：กข-1234"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>司機姓名</Label>
-                        <Input
-                          value={item.driver_name}
-                          onChange={(e) => updateItem(item.id, 'driver_name', e.target.value)}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>司機電話</Label>
-                        <Input
-                          value={item.driver_phone}
-                          onChange={(e) => updateItem(item.id, 'driver_phone', e.target.value)}
-                        />
-                      </div>
-                    </>
-                  )}
-                  {!isVehicle && (
-                    <>
-                      <div className="space-y-2">
-                        <Label>餐標（每人）</Label>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* 報價模式切換 + 整包報價 */}
+          {!isReadOnly && (
+            <div className="bg-white rounded-xl border border-[#e8e4df] p-6 mb-6">
+              <h2 className="font-semibold text-[#4a4540] mb-4">報價方式</h2>
+
+              <div className="flex gap-3 mb-4">
+                <Button
+                  variant={priceMode === 'per_item' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setPriceMode('per_item')}
+                  className={cn(priceMode === 'per_item' && 'bg-amber-600 hover:bg-amber-700 text-white')}
+                >
+                  <ClipboardList className="h-4 w-4 mr-1" />
+                  逐項報價
+                </Button>
+                <Button
+                  variant={priceMode === 'package' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setPriceMode('package')}
+                  className={cn(priceMode === 'package' && 'bg-amber-600 hover:bg-amber-700 text-white')}
+                >
+                  <FileText className="h-4 w-4 mr-1" />
+                  整包報價（按人數階梯）
+                </Button>
+              </div>
+
+              {priceMode === 'per_item' && (
+                <div className="bg-[#faf9f7] rounded-lg p-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#8a7e72]">逐項加總</span>
+                    <span className="text-xl font-semibold text-[#4a4540]">
+                      ¥{totalPerItem.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {priceMode === 'package' && (
+                <div className="space-y-3">
+                  <p className="text-sm text-[#8a7e72]">整包價格，依人數階梯報價：</p>
+                  {packagePrices.map((pp, idx) => (
+                    <div key={pp.id} className="flex items-center gap-3 bg-[#faf9f7] rounded-lg p-3">
+                      <div className="flex items-center gap-2 min-w-[120px]">
+                        <Users className="h-4 w-4 text-[#8a7e72]" />
                         <Input
                           type="number"
-                          value={item.unit_price || ''}
-                          onChange={(e) => updateItem(item.id, 'unit_price', parseInt(e.target.value) || 0)}
+                          value={pp.min_pax || ''}
+                          onChange={(e) => updatePackagePrice(pp.id, 'min_pax', parseInt(e.target.value) || 0)}
+                          className="h-9 text-sm w-20"
+                          placeholder="人數"
+                        />
+                        <span className="text-sm text-[#8a7e72]">人</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-[#8a7e72]">每人</span>
+                        <Input
+                          type="number"
+                          value={pp.price_per_person || ''}
+                          onChange={(e) => updatePackagePrice(pp.id, 'price_per_person', parseInt(e.target.value) || 0)}
+                          className="h-9 text-sm w-32"
                           placeholder="0"
                         />
                       </div>
-                      <div className="space-y-2">
-                        <Label>訂位狀態</Label>
-                        <Input
-                          value={item.notes}
-                          onChange={(e) => updateItem(item.id, 'notes', e.target.value)}
-                          placeholder="已訂位 / 候補中 / 客滿建議替代"
-                        />
-                      </div>
-                    </>
-                  )}
-                  <div className="space-y-2">
-                    <Label>報價金額</Label>
-                    <Input
-                      type="number"
-                      value={item.unit_price || ''}
-                      onChange={(e) => updateItem(item.id, 'unit_price', parseInt(e.target.value) || 0)}
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>備註</Label>
-                    <Input
-                      value={item.notes}
-                      onChange={(e) => updateItem(item.id, 'notes', e.target.value)}
+                      <Input
+                        value={pp.note}
+                        onChange={(e) => updatePackagePrice(pp.id, 'note', e.target.value)}
+                        className="h-9 text-sm flex-1"
+                        placeholder="備註"
+                      />
+                    </div>
+                  ))}
+                  <Button variant="outline" size="sm" onClick={addPackagePrice} className="gap-1">
+                    <ClipboardList className="h-4 w-4" />
+                    新增階梯
+                  </Button>
+                  <div className="mt-3">
+                    <Label className="text-xs">整包報價說明</Label>
+                    <Textarea
+                      value={packageNote}
+                      onChange={(e) => setPackageNote(e.target.value)}
+                      placeholder="例如：以上報價含交通、餐食、活動門票，不含住宿..."
+                      rows={2}
+                      className="mt-1 text-sm"
                     />
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              )}
+            </div>
+          )}
 
           {/* 整體備註 */}
-          <div className="bg-white rounded-xl border border-[#e8e4df] p-5 mb-6">
-            <Label className="mb-2 block">整體備註</Label>
-            <Textarea
-              value={responseNotes}
-              onChange={(e) => setResponseNotes(e.target.value)}
-              placeholder="有任何補充說明可以在這裡填寫..."
-              rows={3}
-            />
-          </div>
+          {!isReadOnly && (
+            <div className="bg-white rounded-xl border border-[#e8e4df] p-6 mb-6">
+              <Label className="mb-2 block font-medium text-[#4a4540]">整體備註</Label>
+              <Textarea
+                value={overallNote}
+                onChange={(e) => setOverallNote(e.target.value)}
+                placeholder="有任何補充說明可以在這裡填寫..."
+                rows={3}
+              />
+            </div>
+          )}
 
+          {/* 按鈕 */}
           <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setSelectedRequest(null)} className="gap-2">
+            <Button variant="outline" onClick={() => setSelectedSheet(null)} className="gap-2">
               <X size={16} />
-              取消
+              {isReadOnly ? '返回' : '取消'}
             </Button>
-            <Button
-              onClick={() => alert('這是測試頁面，不會真的送出！')}
-              className="gap-2 bg-amber-600 hover:bg-amber-700 text-white"
-            >
-              <Save size={16} />
-              送出回覆
-            </Button>
+            {!isReadOnly && (
+              <Button
+                onClick={() => alert('這是測試頁面，不會真的送出！')}
+                className="gap-2 bg-amber-600 hover:bg-amber-700 text-white"
+              >
+                <Save size={16} />
+                送出回覆
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -512,12 +599,11 @@ export default function TestSupplierPage() {
   }
 
   // ============================================
-  // 收件匣列表（按團分組）
+  // 收件匣
   // ============================================
   return (
     <div className="min-h-screen bg-[#faf9f7]">
       <div className="max-w-5xl mx-auto p-4 md:p-8">
-        {/* 標題 */}
         <div className="flex items-center gap-3 mb-2">
           <ClipboardList className="h-6 w-6 text-amber-600" />
           <h1 className="text-xl font-semibold text-[#4a4540]">需求收件匣</h1>
@@ -527,9 +613,9 @@ export default function TestSupplierPage() {
         {/* 篩選 */}
         <div className="flex gap-2 mb-6">
           {[
-            { value: 'all', label: '全部', count: MOCK_REQUESTS.length },
-            { value: 'pending', label: '待回覆', count: MOCK_REQUESTS.filter(r => r.response_status === 'pending').length },
-            { value: 'responded', label: '已回覆', count: MOCK_REQUESTS.filter(r => r.response_status === 'responded').length },
+            { value: 'all', label: '全部', count: MOCK_SHEETS.length },
+            { value: 'pending', label: '待回覆', count: MOCK_SHEETS.filter(s => s.status === 'pending').length },
+            { value: 'responded', label: '已回覆', count: MOCK_SHEETS.filter(s => s.status === 'responded').length },
           ].map(tab => (
             <Button
               key={tab.value}
@@ -551,106 +637,67 @@ export default function TestSupplierPage() {
           ))}
         </div>
 
-        {/* 按團分組 */}
+        {/* 需求單卡片 */}
         <div className="space-y-4">
-          {tourGroups.map(group => (
-            <div key={group.tour_code} className="bg-white rounded-xl border border-[#e8e4df] overflow-hidden">
-              {/* 團標題 */}
-              <button
-                onClick={() => toggleGroup(group.tour_code)}
-                className="w-full flex items-center justify-between px-5 py-4 hover:bg-[#faf9f7] transition-colors"
+          {filteredSheets.map(sheet => {
+            const statusConfig = STATUS_CONFIG[sheet.status]
+            const categories = [...new Set(sheet.items.map(i => i.category))]
+
+            return (
+              <div
+                key={sheet.id}
+                onClick={() => openSheet(sheet)}
+                className="bg-white rounded-xl border border-[#e8e4df] p-5 hover:border-amber-300 hover:shadow-sm transition-all cursor-pointer"
               >
-                <div className="flex items-center gap-3">
-                  {isExpanded(group.tour_code)
-                    ? <ChevronDown className="h-4 w-4 text-[#8a7e72]" />
-                    : <ChevronRight className="h-4 w-4 text-[#8a7e72]" />
-                  }
-                  <div className="text-left">
-                    <div className="font-semibold text-[#4a4540]">
-                      {group.tour_code} {group.tour_name}
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <FileText className="h-4 w-4 text-amber-600" />
+                      <span className="font-semibold text-[#4a4540]">{sheet.code}</span>
+                      <Badge className={statusConfig.color}>
+                        {statusConfig.label}
+                      </Badge>
                     </div>
-                    <div className="text-xs text-[#8a7e72] mt-0.5">
-                      {group.requests.length} 筆需求
+                    <div className="text-sm text-[#8a7e72]">
+                      {sheet.tour_name}
+                    </div>
+                  </div>
+                  <div className="text-right text-sm">
+                    <div className="text-[#8a7e72]">
+                      <Calendar className="h-3.5 w-3.5 inline mr-1" />
+                      {sheet.departure_date}
+                    </div>
+                    <div className="text-[#8a7e72]">
+                      <Users className="h-3.5 w-3.5 inline mr-1" />
+                      {sheet.pax} 人
                     </div>
                   </div>
                 </div>
-                {group.pending_count > 0 && (
-                  <Badge className="bg-amber-100 text-amber-700 border-amber-200">
-                    {group.pending_count} 筆待回覆
-                  </Badge>
-                )}
-              </button>
 
-              {/* 需求列表 */}
-              {isExpanded(group.tour_code) && (
-                <div className="border-t border-[#e8e4df]">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="bg-[#faf9f7]">
-                        <th className="px-5 py-2.5 text-left font-medium text-[#8a7e72] w-[90px]">狀態</th>
-                        <th className="px-3 py-2.5 text-left font-medium text-[#8a7e72] w-[90px]">類別</th>
-                        <th className="px-3 py-2.5 text-left font-medium text-[#8a7e72] w-[120px]">日期</th>
-                        <th className="px-3 py-2.5 text-left font-medium text-[#8a7e72]">項目</th>
-                        <th className="px-3 py-2.5 text-center font-medium text-[#8a7e72] w-[60px]">數量</th>
-                        <th className="px-3 py-2.5 text-left font-medium text-[#8a7e72] w-[140px]">備註指示</th>
-                        <th className="px-3 py-2.5 text-center font-medium text-[#8a7e72] w-[70px]">操作</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {group.requests.map(request => {
-                        const status = STATUS_CONFIG[request.response_status] || STATUS_CONFIG.pending
-                        const cat = CATEGORY_CONFIG[request.category] || { label: request.category, emoji: '📋' }
-                        return (
-                          <tr key={request.id} className="border-t border-[#f0ece7] hover:bg-[#faf9f7]/50">
-                            <td className="px-5 py-3">
-                              <Badge variant={status.variant} className="gap-1 text-xs">
-                                {status.icon}
-                                {status.label}
-                              </Badge>
-                            </td>
-                            <td className="px-3 py-3 text-[#4a4540]">
-                              <span className="mr-1">{cat.emoji}</span>{cat.label}
-                            </td>
-                            <td className="px-3 py-3 text-[#4a4540]">
-                              {request.service_date}
-                            </td>
-                            <td className="px-3 py-3">
-                              <div className="font-medium text-[#4a4540]">{request.title}</div>
-                              <div className="text-xs text-[#8a7e72] mt-0.5 line-clamp-1">{request.description}</div>
-                            </td>
-                            <td className="px-3 py-3 text-center font-medium text-[#4a4540]">{request.quantity}</td>
-                            <td className="px-3 py-3">
-                              {request.notes && (
-                                <Badge variant="outline" className="text-xs text-amber-700 border-amber-300 bg-amber-50">
-                                  {request.notes}
-                                </Badge>
-                              )}
-                            </td>
-                            <td className="px-3 py-3 text-center">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => openResponse(request)}
-                                className={cn(
-                                  'h-8 w-8 p-0',
-                                  request.response_status === 'pending'
-                                    ? 'text-amber-600 hover:bg-amber-50'
-                                    : 'text-[#8a7e72] hover:bg-[#f0ece7]'
-                                )}
-                                title={request.response_status === 'pending' ? '回覆' : '查看'}
-                              >
-                                {request.response_status === 'pending' ? <Send size={16} /> : <Eye size={16} />}
-                              </Button>
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
+                <div className="flex items-center justify-between">
+                  <div className="flex gap-2">
+                    {categories.map(cat => {
+                      const config = CATEGORY_CONFIG[cat] || { emoji: '📋', label: cat }
+                      const count = sheet.items.filter(i => i.category === cat).length
+                      return (
+                        <span key={cat} className="text-xs text-[#8a7e72] bg-[#faf9f7] px-2 py-1 rounded">
+                          {config.emoji} {config.label} ×{count}
+                        </span>
+                      )
+                    })}
+                  </div>
+                  <div className="flex items-center gap-1 text-sm text-[#8a7e72]">
+                    共 {sheet.items.length} 個項目
+                    {sheet.status === 'pending' ? (
+                      <Send className="h-4 w-4 text-amber-600 ml-2" />
+                    ) : (
+                      <Eye className="h-4 w-4 ml-2" />
+                    )}
+                  </div>
                 </div>
-              )}
-            </div>
-          ))}
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>
