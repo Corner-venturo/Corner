@@ -66,6 +66,7 @@ export const COMP_ORDERS_LABELS = {
   從顧客同步: '從顧客同步',
   快速收款: '快速收款',
   快速請款: '快速請款',
+  快速開簽證單: '快速開簽證單',
   性別: '性別',
   應付金額: '應付金額',
   批次上傳失敗: '批次上傳失敗:',
@@ -331,4 +332,37 @@ export const PASSPORT_CONFLICT_LABELS = {
   success: '已更新 {count} 位團員的護照資料',
   fail: '更新衝突成員失敗',
   writeback_fail: '回寫客戶護照資料失敗',
+};
+
+// 批次簽證對話框標籤
+export const BATCH_VISA_LABELS = {
+  btn_visa: '簽證',
+  dialog_title: '快速開簽證單',
+  step_select_type: '選擇簽證類型',
+  step_select_members: '勾選團員',
+  no_members: '此訂單尚無團員',
+  col_name: '姓名',
+  btn_cancel: '取消',
+  btn_next: '下一步',
+  btn_back: '上一步',
+  btn_submit: '送出',
+  btn_submitting: '建立中...',
+  btn_select_all: '全選',
+  btn_deselect_all: '取消全選',
+  toast_success: (count: number) => `已建立 ${count} 筆簽證`,
+  toast_fail: '批次建立簽證失敗，請稍後再試',
+  toast_no_selection: '請至少勾選一位團員的一種簽證',
+  // 簽證類型群組
+  group_passport: '護照',
+  group_taiwan: '台胞證',
+  group_usa: '美國簽證',
+  // 簽證類型選項
+  type_passport_adult: '護照 成人',
+  type_passport_child: '護照 兒童',
+  type_passport_adult_lost: '護照 成人 遺失件',
+  type_passport_child_lost: '護照 兒童 遺失件',
+  type_taiwan: '台胞證',
+  type_taiwan_lost: '台胞證 遺失件',
+  type_taiwan_first: '台胞證 首辦',
+  type_usa_esta: '美國 ESTA',
 };

@@ -13,6 +13,7 @@ import { SimpleOrderTable } from '@/features/orders/components/simple-order-tabl
 import { AddOrderForm } from '@/features/orders/components/add-order-form'
 import { OrderEditDialog } from '@/features/orders/components/order-edit-dialog'
 import { InvoiceDialog } from '@/features/finance/components/invoice-dialog'
+import { BatchVisaDialog } from '@/features/orders/components/BatchVisaDialog'
 import type { Order } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 
@@ -38,6 +39,8 @@ export default function OrdersPage() {
   // 編輯對話框狀態
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [selectedOrderForEdit, setSelectedOrderForEdit] = useState<Order | null>(null)
+  const [isVisaDialogOpen, setIsVisaDialogOpen] = useState(false)
+  const [selectedOrderForVisa, setSelectedOrderForVisa] = useState<Order | null>(null)
 
   // 🔥 載入 workspace（只執行一次）
   useEffect(() => {
@@ -181,6 +184,10 @@ export default function OrdersPage() {
             setSelectedOrderForInvoice(order)
             setIsInvoiceDialogOpen(true)
           }}
+          onQuickVisa={order => {
+            setSelectedOrderForVisa(order)
+            setIsVisaDialogOpen(true)
+          }}
           onEdit={order => {
             setSelectedOrderForEdit(order)
             setIsEditDialogOpen(true)
@@ -235,6 +242,16 @@ export default function OrdersPage() {
         }}
         order={selectedOrderForEdit}
         level={1}
+      />
+
+      {/* 批次簽證對話框 */}
+      <BatchVisaDialog
+        open={isVisaDialogOpen}
+        onOpenChange={open => {
+          setIsVisaDialogOpen(open)
+          if (!open) setSelectedOrderForVisa(null)
+        }}
+        order={selectedOrderForVisa}
       />
     </div>
   )
