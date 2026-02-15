@@ -16,7 +16,7 @@ import { Search, X, Plus, AlertTriangle, Edit, Trash2, Users } from 'lucide-reac
 import { formatPassportExpiryWithStatus } from '@/lib/utils/passport-expiry'
 import { DateCell } from '@/components/table-cells'
 
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import {
@@ -294,8 +294,10 @@ export default function CustomersPage() {
 
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader title={L.page_title}>
+    <ContentPageLayout
+      title={L.page_title}
+      icon={Users}
+      headerActions={
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -338,8 +340,8 @@ export default function CustomersPage() {
             <span className="hidden sm:inline">{L.btn_add_customer}</span>
           </Button>
         </div>
-      </ResponsiveHeader>
-
+      }
+    >
       {hasActiveFilters && (
         <div className="px-4 py-2 bg-morandi-container/20 border-b border-border">
           <div className="text-xs text-morandi-secondary">
@@ -439,6 +441,6 @@ export default function CustomersPage() {
         onOpenChange={setIsResetPasswordDialogOpen}
         customer={selectedCustomer}
       />
-    </div>
+    </ContentPageLayout>
   )
 }

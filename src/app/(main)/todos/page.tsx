@@ -4,7 +4,7 @@ import { LABELS } from './constants/labels'
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -375,68 +375,67 @@ export default function TodosPage() {
   )
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={LABELS.LABEL_9553}
-        showSearch={true}
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        searchPlaceholder="搜尋任務..."
-        onAdd={() => setIsAddDialogOpen(true)}
-        addLabel="新增任務"
-        actions={
-          <Input
-            placeholder={LABELS.ADD_25}
-            className="w-64"
-            value={quickAddValue}
-            onChange={e => setQuickAddValue(e.target.value)}
-            onKeyDown={async e => {
-              // 使用原生事件檢查輸入法狀態，避免 React 狀態更新時序問題
-              if (
-                e.key === 'Enter' &&
-                quickAddValue.trim() &&
-                !isSubmitting &&
-                !e.nativeEvent.isComposing
-              ) {
-                e.preventDefault()
-                const auth = useRequireAuthSync()
-                if (!auth.isAuthenticated) {
-                  auth.showLoginRequired()
-                  return
-                }
-                const title = quickAddValue.trim()
-                setIsSubmitting(true)
-
-                const newTodoData = {
-                  title,
-                  priority: 1 as const,
-                  status: 'pending' as const,
-                  completed: false,
-                  creator: auth.user!.id,
-                  assignee: undefined,
-                  visibility: [auth.user!.id],
-                  related_items: [] as Todo['related_items'],
-                  sub_tasks: [] as Todo['sub_tasks'],
-                  notes: [] as Todo['notes'],
-                  enabled_quick_actions: ['receipt', 'quote'] as Todo['enabled_quick_actions'],
-                }
-
-                try {
-                  await addTodo(newTodoData)
-                  setQuickAddValue('') // ✅ 修正：成功後才清空輸入框
-                  logger.log('✅ 待辦事項新增成功:', title)
-                } catch (error) {
-                  logger.error('快速新增失敗:', error)
-                  await alertError('新增失敗，請稍後再試')
-                } finally {
-                  setIsSubmitting(false)
-                }
+    <ContentPageLayout
+      title={LABELS.LABEL_9553}
+      showSearch={true}
+      searchTerm={searchTerm}
+      onSearchChange={setSearchTerm}
+      searchPlaceholder="搜尋任務..."
+      onAdd={() => setIsAddDialogOpen(true)}
+      addLabel="新增任務"
+      headerActions={
+        <Input
+          placeholder={LABELS.ADD_25}
+          className="w-64"
+          value={quickAddValue}
+          onChange={e => setQuickAddValue(e.target.value)}
+          onKeyDown={async e => {
+            // 使用原生事件檢查輸入法狀態，避免 React 狀態更新時序問題
+            if (
+              e.key === 'Enter' &&
+              quickAddValue.trim() &&
+              !isSubmitting &&
+              !e.nativeEvent.isComposing
+            ) {
+              e.preventDefault()
+              const auth = useRequireAuthSync()
+              if (!auth.isAuthenticated) {
+                auth.showLoginRequired()
+                return
               }
-            }}
-          />
-        }
-      >
-        {/* 狀態篩選 */}
+              const title = quickAddValue.trim()
+              setIsSubmitting(true)
+
+              const newTodoData = {
+                title,
+                priority: 1 as const,
+                status: 'pending' as const,
+                completed: false,
+                creator: auth.user!.id,
+                assignee: undefined,
+                visibility: [auth.user!.id],
+                related_items: [] as Todo['related_items'],
+                sub_tasks: [] as Todo['sub_tasks'],
+                notes: [] as Todo['notes'],
+                enabled_quick_actions: ['receipt', 'quote'] as Todo['enabled_quick_actions'],
+              }
+
+              try {
+                await addTodo(newTodoData)
+                setQuickAddValue('') // ✅ 修正：成功後才清空輸入框
+                logger.log('✅ 待辦事項新增成功:', title)
+              } catch (error) {
+                logger.error('快速新增失敗:', error)
+                await alertError('新增失敗，請稍後再試')
+              } finally {
+                setIsSubmitting(false)
+              }
+            }
+          }}
+        />
+      }
+      headerChildren={
+        /* 狀態篩選 */
         <div className="flex gap-2">
           {statusFilters.map(filter => (
             <button
@@ -453,7 +452,8 @@ export default function TodosPage() {
             </button>
           ))}
         </div>
-      </ResponsiveHeader>
+      }
+    >
 
       {/* 待辦事項列表 */}
       <div className="flex-1 overflow-hidden">
@@ -539,7 +539,7 @@ export default function TodosPage() {
 
       {/* Confirm Dialog */}
       <ConfirmDialog {...confirmDialogProps} />
-    </div>
+    </ContentPageLayout>
   )
 }
 

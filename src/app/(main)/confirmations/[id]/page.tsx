@@ -3,7 +3,7 @@
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { NotFoundState } from '@/components/ui/not-found-state'
 import { EditorContainer } from '../components/EditorContainer'
 import { PreviewContainer } from '../components/PreviewContainer'
@@ -173,32 +173,7 @@ export default function EditConfirmationPage() {
 
   if (notFound) {
     return (
-      <div className="h-full flex flex-col">
-        <ResponsiveHeader
-          title={LABELS.EDIT_CONFIRMATION}
-          breadcrumb={[
-            { label: LABELS.HOME, href: '/' },
-            { label: LABELS.CONFIRMATIONS_MANAGEMENT, href: '/confirmations' },
-            { label: LABELS.EDIT_CONFIRMATION, href: '#' },
-          ]}
-          showBackButton={true}
-        />
-        <div className="flex-1 flex items-center justify-center">
-          <NotFoundState
-            title={LABELS.NOT_FOUND_TITLE}
-            description={LABELS.NOT_FOUND_DESCRIPTION}
-            backButtonLabel={LABELS.BACK_TO_CONFIRMATIONS}
-            backHref="/confirmations"
-          />
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="h-full flex flex-col">
-      {/* 頁面頂部 */}
-      <ResponsiveHeader
+      <ContentPageLayout
         title={LABELS.EDIT_CONFIRMATION}
         breadcrumb={[
           { label: LABELS.HOME, href: '/' },
@@ -206,48 +181,67 @@ export default function EditConfirmationPage() {
           { label: LABELS.EDIT_CONFIRMATION, href: '#' },
         ]}
         showBackButton={true}
-        actions={
-          <div className="flex gap-2">
-            {formData.type === 'flight' && (
-              <Button
-                variant="outline"
-                onClick={() => setIsImportDialogOpen(true)}
-                className="gap-2"
-              >
-                <Upload className="h-4 w-4" />
-                {LABELS.IMPORT_PNR}
-              </Button>
-            )}
+        contentClassName="flex-1 flex items-center justify-center"
+      >
+        <NotFoundState
+          title={LABELS.NOT_FOUND_TITLE}
+          description={LABELS.NOT_FOUND_DESCRIPTION}
+          backButtonLabel={LABELS.BACK_TO_CONFIRMATIONS}
+          backHref="/confirmations"
+        />
+      </ContentPageLayout>
+    )
+  }
+
+  return (
+    <ContentPageLayout
+      title={LABELS.EDIT_CONFIRMATION}
+      breadcrumb={[
+        { label: LABELS.HOME, href: '/' },
+        { label: LABELS.CONFIRMATIONS_MANAGEMENT, href: '/confirmations' },
+        { label: LABELS.EDIT_CONFIRMATION, href: '#' },
+      ]}
+      showBackButton={true}
+      headerActions={
+        <div className="flex gap-2">
+          {formData.type === 'flight' && (
             <Button
               variant="outline"
-              onClick={() => setIsPrintDialogOpen(true)}
+              onClick={() => setIsImportDialogOpen(true)}
               className="gap-2"
             >
-              <Printer className="h-4 w-4" />
-              {LABELS.PRINT}
+              <Upload className="h-4 w-4" />
+              {LABELS.IMPORT_PNR}
             </Button>
-            <Button variant="outline" onClick={() => router.push('/confirmations')} className="gap-2">
-              <X size={16} />
-              {LABELS.CANCEL}
-            </Button>
-            <Button onClick={handleSave} disabled={isSaving} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
-              <Save size={16} />
-              {isSaving ? LABELS.SAVE : LABELS.UPDATE_CONFIRMATION}
-            </Button>
-          </div>
-        }
-      />
-
-      {/* 主要內容區域 */}
-      <div className="flex-1 overflow-hidden">
-        <div className="h-full flex">
-          <EditorContainer
-            formData={formData}
-            onFormDataChange={setFormData}
-            onTypeChange={handleTypeChange}
-          />
-          <PreviewContainer formData={formData} />
+          )}
+          <Button
+            variant="outline"
+            onClick={() => setIsPrintDialogOpen(true)}
+            className="gap-2"
+          >
+            <Printer className="h-4 w-4" />
+            {LABELS.PRINT}
+          </Button>
+          <Button variant="outline" onClick={() => router.push('/confirmations')} className="gap-2">
+            <X size={16} />
+            {LABELS.CANCEL}
+          </Button>
+          <Button onClick={handleSave} disabled={isSaving} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+            <Save size={16} />
+            {isSaving ? LABELS.SAVE : LABELS.UPDATE_CONFIRMATION}
+          </Button>
         </div>
+      }
+      contentClassName="flex-1 overflow-hidden"
+    >
+      {/* 主要內容區域 */}
+      <div className="h-full flex">
+        <EditorContainer
+          formData={formData}
+          onFormDataChange={setFormData}
+          onTypeChange={handleTypeChange}
+        />
+        <PreviewContainer formData={formData} />
       </div>
 
       {/* 列印預覽 */}
@@ -266,6 +260,6 @@ export default function EditConfirmationPage() {
         onClose={() => setIsImportDialogOpen(false)}
         onImport={handleImportPNR}
       />
-    </div>
+    </ContentPageLayout>
   )
 }

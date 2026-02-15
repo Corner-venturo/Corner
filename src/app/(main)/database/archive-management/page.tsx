@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { Archive, RotateCcw, Trash2, Plane, FileText, FileQuestion, CheckCircle } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { DateCell, CurrencyCell, ActionCell } from '@/components/table-cells'
 import { confirm } from '@/lib/ui/alert-dialog'
@@ -519,21 +519,19 @@ export default function ArchiveManagementPage() {
   ]
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={ARCHIVE_LABELS.PAGE_TITLE}
-        icon={Archive}
-        breadcrumb={[
-          { label: ARCHIVE_LABELS.BREADCRUMB_HOME, href: '/' },
-          { label: ARCHIVE_LABELS.BREADCRUMB_DATABASE, href: '/database' },
-          { label: ARCHIVE_LABELS.BREADCRUMB_ARCHIVE, href: '/database/archive-management' },
-        ]}
-        tabs={STATUS_TABS}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      />
-
-      <div className="flex-1 overflow-hidden">
+    <ContentPageLayout
+      title={ARCHIVE_LABELS.PAGE_TITLE}
+      icon={Archive}
+      breadcrumb={[
+        { label: ARCHIVE_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: ARCHIVE_LABELS.BREADCRUMB_DATABASE, href: '/database' },
+        { label: ARCHIVE_LABELS.BREADCRUMB_ARCHIVE, href: '/database/archive-management' },
+      ]}
+      tabs={STATUS_TABS}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      contentClassName="flex-1 overflow-hidden"
+    >
         {isLoading ? (
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-morandi-gold" />
@@ -601,7 +599,6 @@ export default function ArchiveManagementPage() {
             )}
           </>
         )}
-      </div>
-    </div>
+    </ContentPageLayout>
   )
 }

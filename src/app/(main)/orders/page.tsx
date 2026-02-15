@@ -3,7 +3,7 @@
 import { LABELS } from './constants/labels'
 
 import React, { useState, useEffect, useMemo } from 'react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { QuickReceipt } from '@/features/todos/components/quick-actions/quick-receipt'
 import { useOrdersListSlim, useToursListSlim } from '@/hooks/useListSlim'
@@ -147,33 +147,31 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={LABELS.MANAGE_949}
-        icon={ShoppingCart}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '訂單管理', href: '/orders' },
-        ]}
-        showSearch={true}
-        searchTerm={searchQuery}
-        onSearchChange={setSearchQuery}
-        searchPlaceholder="搜尋訂單..."
-        tabs={[
-          { value: 'all', label: '全部', icon: ShoppingCart },
-          { value: 'unpaid', label: '未收款', icon: AlertCircle },
-          { value: 'partial', label: '部分收款', icon: Clock },
-          { value: 'paid', label: '已收款', icon: CheckCircle },
-          { value: 'visa-only', label: '簽證專用', icon: Shield },
-          { value: 'sim-only', label: '網卡專用', icon: Wifi },
-        ]}
-        activeTab={statusFilter}
-        onTabChange={setStatusFilter}
-        onAdd={() => setIsAddDialogOpen(true)}
-        addLabel="新增訂單"
-      />
-
-      <div className="flex-1 overflow-auto flex flex-col">
+    <ContentPageLayout
+      title={LABELS.MANAGE_949}
+      icon={ShoppingCart}
+      breadcrumb={[
+        { label: '首頁', href: '/' },
+        { label: '訂單管理', href: '/orders' },
+      ]}
+      showSearch={true}
+      searchTerm={searchQuery}
+      onSearchChange={setSearchQuery}
+      searchPlaceholder="搜尋訂單..."
+      tabs={[
+        { value: 'all', label: '全部', icon: ShoppingCart },
+        { value: 'unpaid', label: '未收款', icon: AlertCircle },
+        { value: 'partial', label: '部分收款', icon: Clock },
+        { value: 'paid', label: '已收款', icon: CheckCircle },
+        { value: 'visa-only', label: '簽證專用', icon: Shield },
+        { value: 'sim-only', label: '網卡專用', icon: Wifi },
+      ]}
+      activeTab={statusFilter}
+      onTabChange={setStatusFilter}
+      onAdd={() => setIsAddDialogOpen(true)}
+      addLabel="新增訂單"
+      contentClassName="flex-1 overflow-auto flex flex-col"
+    >
         {/* 訂單列表 */}
         <SimpleOrderTable
           className="flex-1"
@@ -193,7 +191,6 @@ export default function OrdersPage() {
             setIsEditDialogOpen(true)
           }}
         />
-      </div>
 
       {/* 新增訂單對話框 */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -253,6 +250,6 @@ export default function OrdersPage() {
         }}
         order={selectedOrderForVisa}
       />
-    </div>
+    </ContentPageLayout>
   )
 }

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import useSWR from 'swr'
 import { useParams, useRouter } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { Loader2, MapPin, MessageSquare } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
@@ -60,84 +60,84 @@ export default function TourDetailPage() {
   // 載入中
   if (loadingTourId || loading) {
     return (
-      <div className="h-full flex flex-col">
-        <ResponsiveHeader
-          title={CODE_LABELS.LOADING_6912}
-          icon={MapPin}
-          breadcrumb={[
-            { label: '首頁', href: '/' },
-            { label: '旅遊團管理', href: '/tours' },
-            { label: code, href: `/tours/${code}` },
-          ]}
-        />
+      <ContentPageLayout
+        title={CODE_LABELS.LOADING_6912}
+        icon={MapPin}
+        breadcrumb={[
+          { label: '首頁', href: '/' },
+          { label: '旅遊團管理', href: '/tours' },
+          { label: code, href: `/tours/${code}` },
+        ]}
+        showBackButton={true}
+        onBack={handleBack}
+      >
         <div className="flex-1 flex items-center justify-center">
           <Loader2 className="animate-spin text-morandi-secondary" size={32} />
         </div>
-      </div>
+      </ContentPageLayout>
     )
   }
 
   // 找不到團
   if (!tour) {
     return (
-      <div className="h-full flex flex-col">
-        <ResponsiveHeader
-          title={CODE_LABELS.NOT_FOUND_9865}
-          icon={MapPin}
-          breadcrumb={[
-            { label: '首頁', href: '/' },
-            { label: '旅遊團管理', href: '/tours' },
-            { label: code, href: `/tours/${code}` },
-          ]}
-        />
+      <ContentPageLayout
+        title={CODE_LABELS.NOT_FOUND_9865}
+        icon={MapPin}
+        breadcrumb={[
+          { label: '首頁', href: '/' },
+          { label: '旅遊團管理', href: '/tours' },
+          { label: code, href: `/tours/${code}` },
+        ]}
+        showBackButton={true}
+        onBack={handleBack}
+      >
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <p className="text-morandi-secondary mb-4">{CODE_LABELS.NOT_FOUND_2154} {code} 的旅遊團</p>
             <Button onClick={handleBack}>{CODE_LABELS.LABEL_5810}</Button>
           </div>
         </div>
-      </div>
+      </ContentPageLayout>
     )
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={tour.name}
-        icon={MapPin}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '旅遊團管理', href: '/tours' },
-          { label: `${tour.code} ${tour.name}`, href: `/tours/${code}` },
-        ]}
-        tabs={[...TOUR_TABS]}
+    <ContentPageLayout
+      title={tour.name}
+      icon={MapPin}
+      breadcrumb={[
+        { label: '首頁', href: '/' },
+        { label: '旅遊團管理', href: '/tours' },
+        { label: `${tour.code} ${tour.name}`, href: `/tours/${code}` },
+      ]}
+      showBackButton={true}
+      onBack={handleBack}
+      tabs={[...TOUR_TABS]}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      headerActions={
+        <div className="flex items-center gap-2">
+          {existingChannel && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.push(`/workspace?channel=${existingChannel.id}`)}
+            >
+              <MessageSquare size={16} className="mr-1" />
+              {CODE_LABELS.LABEL_9173}
+            </Button>
+          )}
+        </div>
+      }
+      contentClassName="flex-1 overflow-auto"
+    >
+      <TourTabContent
+        tour={tour}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
-        actions={
-          <div className="flex items-center gap-2">
-            {existingChannel && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => router.push(`/workspace?channel=${existingChannel.id}`)}
-              >
-                <MessageSquare size={16} className="mr-1" />
-                {CODE_LABELS.LABEL_9173}
-              </Button>
-            )}
-          </div>
-        }
+        workspaceId={currentWorkspace?.id}
+        forceShowPnr={forceShowPnr}
       />
-
-      {/* 內容區域 - 使用共用元件 */}
-      <div className="flex-1 overflow-auto">
-        <TourTabContent
-          tour={tour}
-          activeTab={activeTab}
-          workspaceId={currentWorkspace?.id}
-          forceShowPnr={forceShowPnr}
-        />
-      </div>
-    </div>
+    </ContentPageLayout>
   )
 }
