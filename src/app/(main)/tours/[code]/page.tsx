@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import useSWR from 'swr'
 import { useParams, useRouter } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
@@ -12,6 +13,11 @@ import { useTourDetails } from '@/features/tours/hooks/useTours-advanced'
 import { useWorkspaceChannels } from '@/stores/workspace-store'
 import { TOUR_TABS, TourTabContent } from '@/features/tours/components/TourTabs'
 import { CODE_LABELS } from './constants/labels'
+
+const TourRequestFormDialog = dynamic(
+  () => import('@/features/proposals/components/TourRequestFormDialog').then(m => m.TourRequestFormDialog),
+  { ssr: false }
+)
 
 const fetchTourIdByCode = async (code: string): Promise<string | null> => {
   const { data, error } = await supabase
@@ -39,6 +45,15 @@ export default function TourDetailPage() {
   )
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'members')
   const [forceShowPnr, setForceShowPnr] = useState(false)
+
+  // 需求單 Dialog 狀態
+  const [showRequestDialog, setShowRequestDialog] = useState(false)
+  const [requestData, setRequestData] = useState<{
+    category: string
+    supplierName: string
+    items: { serviceDate: string | null; title: string; quantity: number; note?: string }[]
+    startDate: string | null
+  } | null>(null)
 
   // 載入團詳情
   const { tour, loading, actions } = useTourDetails(tourId || '')
@@ -137,7 +152,31 @@ export default function TourDetailPage() {
         activeTab={activeTab}
         workspaceId={currentWorkspace?.id}
         forceShowPnr={forceShowPnr}
+        onOpenRequestDialog={(data) => {
+          setRequestData({
+            category: data.category,
+            supplierName: data.supplierName,
+            items: data.items,
+            startDate: data.startDate,
+          })
+          setShowRequestDialog(true)
+        }}
       />
+
+      {/* 需求單對話框 */}
+      {requestData && tour && (
+        <TourRequestFormDialog
+          isOpen={showRequestDialog}
+          onClose={() => {
+            setShowRequestDialog(false)
+            setRequestData(null)
+          }}
+          tour={tour}
+          category={requestData.category}
+          supplierName={requestData.supplierName}
+          items={requestData.items}
+        />
+      )}
     </ContentPageLayout>
   )
 }
