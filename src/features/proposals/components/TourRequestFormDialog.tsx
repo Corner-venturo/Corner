@@ -30,6 +30,8 @@ import {
   Trash2,
   Loader2,
   Receipt,
+  Send,
+  Building2,
 } from 'lucide-react'
 import { SupplierSearchInput, type Supplier as SupplierData } from './SupplierSearchInput'
 import { usePrintLogo } from '@/features/quotes/components/printable/shared/usePrintLogo'
@@ -41,8 +43,11 @@ import { useToast } from '@/components/ui/use-toast'
 import { logger } from '@/lib/utils/logger'
 import type { Proposal, ProposalPackage } from '@/types/proposal.types'
 import type { Tour } from '@/stores/types'
+import type { Database } from '@/lib/supabase/types'
 import { ADD_MANUAL_REQUEST_DIALOG_LABELS, PACKAGE_LIST_PANEL_LABELS, TOUR_REQUEST_FORM_DIALOG_LABELS } from '../constants/labels';
 import { formatDateTW } from '@/lib/utils/format-date'
+
+type Workspace = Database['public']['Tables']['workspaces']['Row']
 
 // 分類對應表（TourRequest category → supplier_type_code）
 const CATEGORY_TO_SUPPLIER_TYPE: Record<string, string> = {
@@ -154,6 +159,11 @@ export function TourRequestFormDialog({
     customCity: '',  // 不在列表時手動輸入
   })
 
+  // 接收供應商 workspace
+  const [recipientWorkspaceId, setRecipientWorkspaceId] = useState<string>('')
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([])
+  const [sending, setSending] = useState(false)
+
   // 列印/儲存狀態
   const [saving, setSaving] = useState(false)
 
@@ -190,6 +200,27 @@ export function TourRequestFormDialog({
     sales: '',
     assistant: '',
   })
+
+  // 載入可選的 workspace 清單
+  useEffect(() => {
+    if (!isOpen || !user?.workspace_id) return
+    const currentWorkspaceId = user.workspace_id
+    const fetchWorkspaces = async () => {
+      if (!currentWorkspaceId) return
+      const { data, error } = await supabase
+        .from('workspaces')
+        .select('*')
+        .neq('id', currentWorkspaceId)
+        .eq('is_active', true)
+        .order('name')
+      if (error) {
+        logger.warn('載入 workspace 清單失敗:', error)
+        return
+      }
+      setWorkspaces(data || [])
+    }
+    fetchWorkspaces()
+  }, [isOpen, user?.workspace_id])
 
   // 載入員工清單並預設助理為當前登入者
   useEffect(() => {
@@ -491,6 +522,55 @@ export function TourRequestFormDialog({
     }
   }
 
+  // 系統內發送需求單
+  const handleSendRequest = async () => {
+    if (!recipientWorkspaceId) return
+    setSending(true)
+
+    try {
+      const requestIds = items
+        .map((item: RequestItem) => item.id)
+        .filter((id: string): id is string => !!id && !id.startsWith('new-'))
+
+      if (requestIds.length === 0) {
+        toast({ title: TOUR_REQUEST_FORM_DIALOG_LABELS.發送失敗, description: '沒有可發送的需求項目', variant: 'destructive' })
+        return
+      }
+
+      // 儲存供應商資訊
+      await saveSupplierInfo()
+
+      const now = new Date().toISOString()
+      const { error } = await supabase
+        .from('tour_requests')
+        .update({
+          recipient_workspace_id: recipientWorkspaceId,
+          status: 'sent',
+          sent_at: now,
+          updated_at: now,
+        })
+        .in('id', requestIds)
+
+      if (error) {
+        logger.error('發送需求單失敗:', error)
+        toast({ title: TOUR_REQUEST_FORM_DIALOG_LABELS.發送失敗, description: TOUR_REQUEST_FORM_DIALOG_LABELS.請重試或聯繫系統管理員, variant: 'destructive' })
+        return
+      }
+
+      const targetWs = workspaces.find(w => w.id === recipientWorkspaceId)
+      toast({
+        title: TOUR_REQUEST_FORM_DIALOG_LABELS.需求單已發送,
+        description: `${TOUR_REQUEST_FORM_DIALOG_LABELS.已發送至供應商}${targetWs?.name || ''}`,
+      })
+      onClose()
+    } catch (err) {
+      logger.error('發送需求單錯誤:', err)
+      toast({ title: TOUR_REQUEST_FORM_DIALOG_LABELS.發送失敗, description: TOUR_REQUEST_FORM_DIALOG_LABELS.請重試或聯繫系統管理員, variant: 'destructive' })
+    } finally {
+      setSending(false)
+    }
+  }
+
   // 開啟新視窗列印（避免 Dialog z-index 問題）
   const handlePrintInNewWindow = async () => {
     setSaving(true)
@@ -658,6 +738,26 @@ export function TourRequestFormDialog({
               </div>
             </div>
 
+            {/* 接收供應商 workspace 選擇器 */}
+            <div className="flex items-center gap-3 px-1">
+              <div className="flex items-center gap-1.5 text-sm text-morandi-secondary whitespace-nowrap">
+                <Building2 size={14} />
+                <span>{TOUR_REQUEST_FORM_DIALOG_LABELS.接收供應商}</span>
+              </div>
+              <select
+                value={recipientWorkspaceId}
+                onChange={(e) => setRecipientWorkspaceId(e.target.value)}
+                className="flex-1 h-8 px-2 text-sm rounded-md border border-border bg-background focus:outline-none focus:ring-1 focus:ring-morandi-gold"
+              >
+                <option value="">{TOUR_REQUEST_FORM_DIALOG_LABELS.不發送_列印模式}</option>
+                {workspaces.map((ws) => (
+                  <option key={ws.id} value={ws.id}>
+                    {ws.name}{ws.code ? ` (${ws.code})` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* 團體資訊 */}
             <div className="bg-morandi-container/30 rounded-lg p-4">
               <div className="grid grid-cols-4 gap-4 text-sm">
@@ -785,12 +885,22 @@ export function TourRequestFormDialog({
             )}
             <Button
               onClick={handlePrintInNewWindow}
-              disabled={saving}
+              disabled={saving || sending}
               className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
               {saving ? <Loader2 size={16} className="animate-spin" /> : <Printer size={16} />}
               {PROPOSAL_FORM_LABELS.PRINT}
             </Button>
+            {recipientWorkspaceId && (
+              <Button
+                onClick={handleSendRequest}
+                disabled={sending || saving}
+                className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+              >
+                {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                {TOUR_REQUEST_FORM_DIALOG_LABELS.發送}
+              </Button>
+            )}
           </div>
         </DialogContent>
       </Dialog>
