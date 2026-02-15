@@ -15,7 +15,7 @@ import {
   CreditCard,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { AddAccountDialog } from '@/features/erp-accounting/components/add-account-dialog'
 import { AddTransactionDialog } from '@/features/erp-accounting/components/add-transaction-dialog'
 import { AccountsManagementDialog } from '@/features/erp-accounting/components/accounts-management-dialog'
@@ -176,45 +176,44 @@ export default function AccountingPage() {
 
   return (
     <>
-      {/* 使用標準 ResponsiveHeader - 添加自定義按鈕 */}
-      <ResponsiveHeader
+      <ContentPageLayout
         title={ACCOUNTING_PAGE_LABELS.ACCOUNTING_MANAGEMENT}
         icon={CreditCard}
         breadcrumb={[
           { label: ACCOUNTING_PAGE_LABELS.HOME, href: '/' },
           { label: ACCOUNTING_PAGE_LABELS.ACCOUNTING_MANAGEMENT, href: '/accounting' },
         ]}
+        headerChildren={
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={() => setIsAccountsManagementOpen(true)}
+              variant="outline"
+              size="sm"
+            >
+              <Wallet className="h-4 w-4 mr-1.5" />
+              <span className="hidden sm:inline">{ACCOUNTING_PAGE_LABELS.ACCOUNT_MANAGEMENT}</span>
+            </Button>
+            <Button
+              onClick={() => {
+                if (accounts.length === 0) {
+                  setIsAddAccountOpen(true)
+                } else {
+                  setIsAddTransactionOpen(true)
+                }
+              }}
+              variant="default"
+              size="sm"
+              className="btn-gradient-primary"
+            >
+              <Plus className="h-4 w-4 mr-1.5" />
+              <span className="hidden sm:inline">{ACCOUNTING_PAGE_LABELS.NEW_TRANSACTION}</span>
+            </Button>
+          </div>
+        }
+        className=""
       >
-        {/* 自定義按鈕群組 */}
-        <div className="flex items-center gap-2">
-          <Button
-            onClick={() => setIsAccountsManagementOpen(true)}
-            variant="outline"
-            size="sm"
-          >
-            <Wallet className="h-4 w-4 mr-1.5" />
-            <span className="hidden sm:inline">{ACCOUNTING_PAGE_LABELS.ACCOUNT_MANAGEMENT}</span>
-          </Button>
-          <Button
-            onClick={() => {
-              if (accounts.length === 0) {
-                setIsAddAccountOpen(true)
-              } else {
-                setIsAddTransactionOpen(true)
-              }
-            }}
-            variant="default"
-            size="sm"
-            className="btn-gradient-primary"
-          >
-            <Plus className="h-4 w-4 mr-1.5" />
-            <span className="hidden sm:inline">{ACCOUNTING_PAGE_LABELS.NEW_TRANSACTION}</span>
-          </Button>
-        </div>
-      </ResponsiveHeader>
-
       {/* 內容區 */}
-      <div className="pt-[72px]">
+      <div>
         {/* ===== 電腦版佈局 (>= lg) ===== */}
         <div className="hidden lg:block p-6">
           {/* 統計卡片 - 使用標準 Card 元件 */}
@@ -521,6 +520,7 @@ export default function AccountingPage() {
           </Card>
         </div>
       </div>
+      </ContentPageLayout>
 
       {/* 帳戶管理對話框 */}
       <AccountsManagementDialog

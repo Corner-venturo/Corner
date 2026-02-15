@@ -2,7 +2,7 @@
 
 import { useThemeStore } from '@/stores/theme-store'
 import { useAuthStore } from '@/stores/auth-store'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { User, LogOut, AlertCircle, Lock, Camera } from 'lucide-react'
 import { useSettingsState } from './hooks/useSettingsState'
@@ -73,43 +73,40 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={LABELS.SYSTEM_SETTINGS}
-        breadcrumb={[
-          { label: LABELS.HOME, href: '/' },
-          { label: LABELS.SETTINGS, href: '/settings' },
-        ]}
-        actions={
-          <div className="flex items-center gap-3">
-            {/* 用戶資訊 */}
-            {user && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-morandi-container rounded-lg">
-                <User className="h-4 w-4 text-morandi-secondary" />
-                <span className="text-sm font-medium text-morandi-primary">
-                  {user.display_name ||
-                    user.chinese_name ||
-                    user.english_name ||
-                    user.personal_info?.email ||
-                    LABELS.USER}
-                </span>
-              </div>
-            )}
+    <ContentPageLayout
+      title={LABELS.SYSTEM_SETTINGS}
+      breadcrumb={[
+        { label: LABELS.HOME, href: '/' },
+        { label: LABELS.SETTINGS, href: '/settings' },
+      ]}
+      headerActions={
+        <div className="flex items-center gap-3">
+          {/* 用戶資訊 */}
+          {user && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-morandi-container rounded-lg">
+              <User className="h-4 w-4 text-morandi-secondary" />
+              <span className="text-sm font-medium text-morandi-primary">
+                {user.display_name ||
+                  user.chinese_name ||
+                  user.english_name ||
+                  user.personal_info?.email ||
+                  LABELS.USER}
+              </span>
+            </div>
+          )}
 
-            {/* 登出按鈕 */}
-            <Button
-              variant="outline"
-              onClick={handleLogout}
-              className="flex items-center gap-2 text-morandi-red border-morandi-red hover:bg-morandi-red hover:text-white"
-            >
-              <LogOut className="h-4 w-4" />
-              {LABELS.LOGOUT}
-            </Button>
-          </div>
-        }
-      />
-
-      <div className="flex-1 overflow-auto">
+          {/* 登出按鈕 */}
+          <Button
+            variant="outline"
+            onClick={handleLogout}
+            className="flex items-center gap-2 text-morandi-red border-morandi-red hover:bg-morandi-red hover:text-white"
+          >
+            <LogOut className="h-4 w-4" />
+            {LABELS.LOGOUT}
+          </Button>
+        </div>
+      }
+    >
         <div className="max-w-4xl mx-auto space-y-8 p-6">
           {/* 首次設定提示 */}
           {isSetupMode && (
@@ -208,7 +205,6 @@ export default function SettingsPage() {
             </>
           )}
         </div>
-      </div>
-    </div>
+    </ContentPageLayout>
   )
 }

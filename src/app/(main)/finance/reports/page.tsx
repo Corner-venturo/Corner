@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { ContentContainer } from '@/components/layout/content-container'
 import { Card } from '@/components/ui/card'
 import {
@@ -55,16 +55,15 @@ function ReportCard({
 
 export default function ReportsPage() {
   return (
-    <div className="space-y-6">
-      <ResponsiveHeader
-        title={REPORTS_LABELS.MANAGE_3253}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '財務', href: '/finance' },
-          { label: '報表管理', href: '/finance/reports' },
-        ]}
-      />
-
+    <ContentPageLayout
+      title={REPORTS_LABELS.MANAGE_3253}
+      breadcrumb={[
+        { label: '首頁', href: '/' },
+        { label: '財務', href: '/finance' },
+        { label: '報表管理', href: '/finance/reports' },
+      ]}
+      className="space-y-6"
+    >
       <ContentContainer>
         <h3 className="text-lg font-semibold text-morandi-primary mb-4">
           {REPORTS_LABELS.LABEL_8192}
@@ -107,6 +106,6 @@ export default function ReportsPage() {
           />
         </div>
       </ContentContainer>
-    </div>
+    </ContentPageLayout>
   )
 }

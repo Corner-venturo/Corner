@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { ContentContainer } from '@/components/layout/content-container'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -244,17 +244,17 @@ export default function MonthlyDisbursementReportPage() {
   ]
 
   return (
-    <div className="space-y-6">
-      <ResponsiveHeader
-        title={MONTHLY_DISBURSEMENT_LABELS.LABEL_3446}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '財務', href: '/finance' },
-          { label: '報表管理', href: '/finance/reports' },
-          { label: '每月出帳報表', href: '/finance/reports/monthly-disbursement' },
-        ]}
-        actions={<MonthSelector value={selectedMonth} onChange={setSelectedMonth} />}
-      />
+    <ContentPageLayout
+      title={MONTHLY_DISBURSEMENT_LABELS.LABEL_3446}
+      breadcrumb={[
+        { label: '首頁', href: '/' },
+        { label: '財務', href: '/finance' },
+        { label: '報表管理', href: '/finance/reports' },
+        { label: '每月出帳報表', href: '/finance/reports/monthly-disbursement' },
+      ]}
+      headerActions={<MonthSelector value={selectedMonth} onChange={setSelectedMonth} />}
+      className="space-y-6"
+    >
 
       {/* 統計卡片 */}
       <ContentContainer>
@@ -311,6 +311,6 @@ export default function MonthlyDisbursementReportPage() {
           emptyMessage="此月份沒有出納單"
         />
       </ContentContainer>
-    </div>
+    </ContentPageLayout>
   )
 }

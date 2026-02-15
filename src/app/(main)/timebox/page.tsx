@@ -3,7 +3,7 @@
 import { LABELS } from './constants/labels'
 
 import { useState, useMemo } from 'react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Clock, ChevronLeft, ChevronRight, Settings, BookOpen, Sparkles } from 'lucide-react'
@@ -75,15 +75,15 @@ export default function TimeboxPage() {
   }, [userId, weekStart, weeks, scheduledBoxes])
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={LABELS.LABEL_9636}
-        icon={Clock}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '箱型時間', href: '/timebox' }
-        ]}
-        actions={(
+    <ContentPageLayout
+      title={LABELS.LABEL_9636}
+      icon={Clock}
+      breadcrumb={[
+        { label: '首頁', href: '/' },
+        { label: '箱型時間', href: '/timebox' }
+      ]}
+      contentClassName="flex-1 overflow-hidden"
+      headerActions={(
           <div className="flex items-center gap-2">
             {/* 週選擇器 */}
             <div className="flex items-center border border-border rounded-lg overflow-hidden">
@@ -183,14 +183,11 @@ export default function TimeboxPage() {
             </div>
           </div>
         )}
-      />
-
-      <div className="flex-1 overflow-hidden">
+    >
         <WeekView
           selectedWeek={selectedWeek}
           timeInterval={timeInterval}
         />
-      </div>
 
       {/* 管理箱子對話框 */}
       <Dialog open={showBoxManager} onOpenChange={setShowBoxManager}>
@@ -223,6 +220,6 @@ export default function TimeboxPage() {
           <ManifestationNotebook />
         </DialogContent>
       </Dialog>
-    </div>
+    </ContentPageLayout>
   )
 }

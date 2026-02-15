@@ -9,7 +9,7 @@
  * - 90%+ reduction in data transfer
  */
 
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { ContentContainer } from '@/components/layout/content-container'
 import { Card } from '@/components/ui/card'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
@@ -162,16 +162,16 @@ export default function UnclosedToursReportPage() {
   ]
 
   return (
-    <div className="space-y-6">
-      <ResponsiveHeader
-        title={UNCLOSED_TOURS_LABELS.LABEL_996}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '財務', href: '/finance' },
-          { label: '報表管理', href: '/finance/reports' },
-          { label: '未結案團體報表', href: '/finance/reports/unclosed-tours' },
-        ]}
-      />
+    <ContentPageLayout
+      title={UNCLOSED_TOURS_LABELS.LABEL_996}
+      breadcrumb={[
+        { label: '首頁', href: '/' },
+        { label: '財務', href: '/finance' },
+        { label: '報表管理', href: '/finance/reports' },
+        { label: '未結案團體報表', href: '/finance/reports/unclosed-tours' },
+      ]}
+      className="space-y-6"
+    >
 
       {/* 說明 */}
       <ContentContainer>
@@ -236,6 +236,6 @@ export default function UnclosedToursReportPage() {
           searchPlaceholder="搜尋團號或團名..."
         />
       </ContentContainer>
-    </div>
+    </ContentPageLayout>
   )
 }

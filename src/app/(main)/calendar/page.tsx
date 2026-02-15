@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic'
 import { Plus, Building2, Calendar, CalendarDays, CalendarClock, Cake } from 'lucide-react'
 import { CALENDAR_LABELS } from '@/features/calendar/constants/labels'
 import { CalendarSettingsDialog } from '@/features/calendar/components/calendar-settings-dialog'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -84,14 +84,13 @@ export default function CalendarPage() {
 
   return (
     <>
-      <div className="h-full flex flex-col">
-        <ResponsiveHeader
-          title={CALENDAR_LABELS.PAGE_TITLE}
-          breadcrumb={[
-            { label: CALENDAR_LABELS.BREADCRUMB_HOME, href: '/' },
-            { label: CALENDAR_LABELS.BREADCRUMB_CALENDAR, href: '/calendar' },
-          ]}
-          actions={
+      <ContentPageLayout
+        title={CALENDAR_LABELS.PAGE_TITLE}
+        breadcrumb={[
+          { label: CALENDAR_LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: CALENDAR_LABELS.BREADCRUMB_CALENDAR, href: '/calendar' },
+        ]}
+        headerActions={
             <div className="flex items-center gap-3">
               {/* 月份切換 */}
               <div className="flex items-center gap-2 bg-card border border-border rounded-lg shadow-sm">
@@ -225,9 +224,8 @@ export default function CalendarPage() {
               </Button>
             </div>
           }
-        />
-
-        <div className="flex-1 overflow-hidden">
+        contentClassName="flex-1 overflow-hidden"
+      >
           <div className="h-full bg-card rounded-lg border border-border shadow-sm flex flex-col overflow-hidden">
             {/* 日曆主體 */}
             <div className="flex-1 overflow-hidden">
@@ -243,8 +241,7 @@ export default function CalendarPage() {
               />
             </div>
           </div>
-        </div>
-      </div>
+      </ContentPageLayout>
 
       {/* 新增行事曆事項對話框 */}
       <AddEventDialog

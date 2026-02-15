@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react'
 import useSWR from 'swr'
 import { Bus, Plus } from 'lucide-react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -70,30 +70,26 @@ export default function TransportationRatesPage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={TRANSPORTATION_RATES_LABELS.PAGE_TITLE}
-        icon={Bus}
-        breadcrumb={[
-          { label: TRANSPORTATION_RATES_LABELS.BREADCRUMB_HOME, href: '/' },
-          { label: TRANSPORTATION_RATES_LABELS.BREADCRUMB_DATABASE, href: '/database' },
-          { label: TRANSPORTATION_RATES_LABELS.BREADCRUMB_RATES, href: '/database/transportation-rates' },
-        ]}
-        actions={
-          <Button
-            onClick={() => setIsAddingNewCountry(true)}
-            className="gap-2"
-            size="sm"
-          >
-            <Plus size={16} />
-            {TRANSPORTATION_RATES_LABELS.ADD_COUNTRY}
-          </Button>
-        }
-      />
-
-      <div className="flex-1 overflow-auto">
+    <ContentPageLayout
+      title={TRANSPORTATION_RATES_LABELS.PAGE_TITLE}
+      icon={Bus}
+      breadcrumb={[
+        { label: TRANSPORTATION_RATES_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: TRANSPORTATION_RATES_LABELS.BREADCRUMB_DATABASE, href: '/database' },
+        { label: TRANSPORTATION_RATES_LABELS.BREADCRUMB_RATES, href: '/database/transportation-rates' },
+      ]}
+      headerActions={
+        <Button
+          onClick={() => setIsAddingNewCountry(true)}
+          className="gap-2"
+          size="sm"
+        >
+          <Plus size={16} />
+          {TRANSPORTATION_RATES_LABELS.ADD_COUNTRY}
+        </Button>
+      }
+    >
         <CountryList rates={rates} loading={loading} onOpenCountry={handleOpenCountry} />
-      </div>
 
       {/* 新增國家 Dialog */}
       <Dialog open={isAddingNewCountry} onOpenChange={setIsAddingNewCountry}>
@@ -147,6 +143,6 @@ export default function TransportationRatesPage() {
           isEditMode={isEditMode}
         />
       )}
-    </div>
+    </ContentPageLayout>
   )
 }

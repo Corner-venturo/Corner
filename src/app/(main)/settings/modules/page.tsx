@@ -29,7 +29,7 @@ import {
   AlertCircle,
   X,
 } from 'lucide-react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { DateCell } from '@/components/table-cells'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { toast } from 'sonner'
@@ -186,16 +186,16 @@ export default function ModulesManagementPage() {
 
   return (
     <>
-      <ResponsiveHeader
+      <ContentPageLayout
         title={MODULES_PAGE_LABELS.MANAGE_8474}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '設定', href: '/settings' },
           { label: '模組管理', href: '/settings/modules' },
         ]}
-      />
-
-      <div className="pt-[72px] p-6">
+        className=""
+      >
+      <div className="p-6">
         <div className="max-w-6xl mx-auto space-y-6">
           {/* 工作空間資訊 */}
           <Card className="bg-gradient-to-br from-[#F9F8F6] to-[#F9F8F6] border-[#E8E4E0]">
@@ -346,6 +346,7 @@ export default function ModulesManagementPage() {
           </Card>
         </div>
       </div>
+      </ContentPageLayout>
 
       {/* 啟用模組對話框 */}
       <Dialog open={showEnableDialog} onOpenChange={setShowEnableDialog}>
