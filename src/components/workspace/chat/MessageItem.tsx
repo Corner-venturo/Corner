@@ -40,6 +40,7 @@ function renderMessageContent(content: string) {
 interface MessageItemProps {
   message: Message
   currentUserId?: string
+  employeeNameMap?: Map<string, string>
   onReaction: (messageId: string, emoji: string) => void
   onDelete: (messageId: string) => void
   onReply?: (message: Message) => void
@@ -47,7 +48,7 @@ interface MessageItemProps {
 }
 
 // 使用 memo 避免不必要的重新渲染
-export const MessageItem = memo(function MessageItem({ message, currentUserId, onReaction, onDelete, onReply, replyCount = 0 }: MessageItemProps) {
+export const MessageItem = memo(function MessageItem({ message, currentUserId, employeeNameMap, onReaction, onDelete, onReply, replyCount = 0 }: MessageItemProps) {
   const handleDownloadAttachment = async (attachment: MessageAttachment) => {
     const fileName = attachment.fileName || attachment.name || COMP_WORKSPACE_LABELS.未命名檔案
     const targetUrl = resolveAttachmentUrl(attachment)
@@ -65,11 +66,16 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, o
     }
   }
 
+  // Resolve author name: prefer employee map lookup, fallback to snapshot
+  const resolvedAuthorName = (message.author_id && employeeNameMap?.get(message.author_id))
+    || message.author?.display_name
+    || COMP_WORKSPACE_LABELS.未知用戶
+
   return (
     <div className="flex gap-3 group hover:bg-morandi-container/5 -mx-2 px-3 py-1.5 rounded transition-colors">
       {/* 用戶頭像 */}
       <div className="w-9 h-9 bg-gradient-to-br from-morandi-gold/30 to-morandi-gold/10 rounded-md flex items-center justify-center text-sm font-semibold text-morandi-gold shrink-0 mt-0.5">
-        {message.author?.display_name?.charAt(0) || '?'}
+        {resolvedAuthorName.charAt(0) || '?'}
       </div>
 
       {/* 訊息內容 */}
@@ -77,7 +83,7 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, o
         {/* 訊息標題 */}
         <div className="flex items-baseline gap-2 mb-0.5">
           <span className="font-semibold text-morandi-primary text-[15px]">
-            {message.author?.display_name || COMP_WORKSPACE_LABELS.未知用戶}
+            {resolvedAuthorName}
           </span>
           <span className="text-[11px] text-morandi-secondary/80 font-normal">
             {formatMessageTime(message.created_at)}

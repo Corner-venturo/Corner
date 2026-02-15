@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Hash } from 'lucide-react'
 import { ChannelSidebar } from './ChannelSidebar'
 import { ChannelTabs } from './ChannelTabs'
@@ -14,6 +14,7 @@ import { TravelerMessageList } from './channel-chat/TravelerMessageList'
 import { QuickMessages } from './channel-chat/QuickMessages'
 import { TravelerMessageInput } from './channel-chat/TravelerMessageInput'
 import { cn } from '@/lib/utils'
+import { useEmployeesSlim } from '@/data'
 import { COMP_WORKSPACE_LABELS } from './constants/labels'
 
 export function ChannelChat() {
@@ -106,6 +107,31 @@ export function ChannelChat() {
   // 旅伴模式 Hook
   const travelerMode = useTravelerMode(selectedChannel?.tour_id || null)
 
+  // Resolve DM channel display name
+  const { items: slimEmployees = [] } = useEmployeesSlim()
+  const resolvedChannelName = useMemo(() => {
+    if (!selectedChannel) return ''
+    if (selectedChannel.type !== 'direct') return selectedChannel.name
+
+    // Try dm_target_id first
+    if (selectedChannel.dm_target_id) {
+      const target = slimEmployees.find(e => e.id === selectedChannel.dm_target_id)
+      if (target) return target.display_name || target.chinese_name || selectedChannel.name
+    }
+
+    // Parse dm:userA:userB format
+    if (selectedChannel.name.startsWith('dm:')) {
+      const ids = selectedChannel.name.replace('dm:', '').split(':').filter(Boolean)
+      const otherId = ids.find(id => id !== user?.id)
+      if (otherId) {
+        const target = slimEmployees.find(e => e.id === otherId)
+        if (target) return target.display_name || target.chinese_name || selectedChannel.name
+      }
+    }
+
+    return selectedChannel.name
+  }, [selectedChannel, slimEmployees, user?.id])
+
   // 機器人快捷操作 Dialog 狀態
   const [showCheckTicketStatusDialog, setShowCheckTicketStatusDialog] = useState(false)
   const [showTourReviewDialog, setShowTourReviewDialog] = useState(false)
@@ -183,7 +209,7 @@ export function ChannelChat() {
                 messages={currentMessages || []}
                 advanceLists={advanceLists}
                 sharedOrderLists={sharedOrderLists}
-                channelName={selectedChannel.name}
+                channelName={resolvedChannelName}
                 currentUserId={user?.id}
                 isLoading={isMessagesLoading}
                 showMemberSidebar={showMemberSidebar}

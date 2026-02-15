@@ -64,10 +64,21 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
 ) {
   const { items: employees = [] } = useEmployeesSlim()
 
+  // Build a name map from employee list for efficient lookups
+  const employeeNameMap = useMemo(() => {
+    const map = new Map<string, string>()
+    for (const emp of employees) {
+      const name = emp.display_name || (emp as { name?: string }).name
+      if (name) {
+        map.set(emp.id, name)
+      }
+    }
+    return map
+  }, [employees])
+
   // 根據 created_by 查找員工名字
   const getEmployeeName = (userId: string) => {
-    const employee = employees.find(e => e.id === userId)
-    return employee?.display_name || (employee as { name?: string } | undefined)?.name || COMP_WORKSPACE_LABELS.未知
+    return employeeNameMap.get(userId) || COMP_WORKSPACE_LABELS.未知
   }
 
   // 合併所有項目為單一列表（必須在 early return 之前）
@@ -136,6 +147,7 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
                     key={item.data.id}
                     message={item.data}
                     currentUserId={currentUserId}
+                    employeeNameMap={employeeNameMap}
                     onReaction={onReaction}
                     onDelete={onDeleteMessage}
                     onReply={onReply}
