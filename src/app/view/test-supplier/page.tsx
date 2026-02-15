@@ -29,6 +29,7 @@ import {
   FileText,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { TEST_SUPPLIER_LABELS } from './constants/labels'
 
 // ============================================
 // 型別
@@ -256,7 +257,7 @@ export default function TestSupplierPage() {
             className="flex items-center gap-2 text-sm text-[#8a7e72] hover:text-[#6b6159] mb-6"
           >
             <ArrowLeft size={16} />
-            返回收件匣
+            {TEST_SUPPLIER_LABELS.LABEL_2180}
           </button>
 
           {/* 需求單標題 */}
@@ -281,24 +282,24 @@ export default function TestSupplierPage() {
             {/* 基本資訊 */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm bg-[#faf9f7] rounded-lg p-4">
               <div>
-                <span className="text-[#8a7e72]">發送方</span>
+                <span className="text-[#8a7e72]">{TEST_SUPPLIER_LABELS.SENDING_5443}</span>
                 <div className="font-medium text-[#4a4540]">{selectedSheet.sender_company}</div>
               </div>
               <div>
-                <span className="text-[#8a7e72]">聯絡人</span>
+                <span className="text-[#8a7e72]">{TEST_SUPPLIER_LABELS.LABEL_4863}</span>
                 <div className="font-medium text-[#4a4540]">{selectedSheet.sender_contact}</div>
               </div>
               <div className="flex items-center gap-2">
                 <Plane className="h-4 w-4 text-[#8a7e72]" />
                 <div>
-                  <span className="text-[#8a7e72]">出發日</span>
+                  <span className="text-[#8a7e72]">{TEST_SUPPLIER_LABELS.LABEL_9113}</span>
                   <div className="font-medium text-[#4a4540]">{selectedSheet.departure_date}</div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-[#8a7e72]" />
                 <div>
-                  <span className="text-[#8a7e72]">人數</span>
+                  <span className="text-[#8a7e72]">{TEST_SUPPLIER_LABELS.LABEL_1251}</span>
                   <div className="font-medium text-[#4a4540]">{selectedSheet.pax} 人</div>
                 </div>
               </div>
@@ -308,8 +309,8 @@ export default function TestSupplierPage() {
           {/* 需求項目列表 + 回覆 */}
           <div className="bg-white rounded-xl border border-[#e8e4df] overflow-hidden mb-6">
             <div className="px-6 py-4 border-b border-[#e8e4df]">
-              <h2 className="font-semibold text-[#4a4540]">需求明細</h2>
-              <p className="text-xs text-[#8a7e72] mt-1">請在每個項目右側填寫回覆資訊</p>
+              <h2 className="font-semibold text-[#4a4540]">{TEST_SUPPLIER_LABELS.LABEL_8730}</h2>
+              <p className="text-xs text-[#8a7e72] mt-1">{TEST_SUPPLIER_LABELS.LABEL_4435}</p>
             </div>
 
             <div className="divide-y divide-[#f0ece7]">
@@ -355,38 +356,38 @@ export default function TestSupplierPage() {
                           {item.category === 'transport' && (
                             <>
                               <div className="space-y-1">
-                                <Label className="text-xs">車型</Label>
+                                <Label className="text-xs">{TEST_SUPPLIER_LABELS.LABEL_3737}</Label>
                                 <Input
                                   value={item.vehicle_type}
                                   onChange={(e) => updateItemField(item.id, 'vehicle_type', e.target.value)}
-                                  placeholder="Toyota Coaster 中巴"
+                                  placeholder={TEST_SUPPLIER_LABELS.LABEL_4184}
                                   className="h-9 text-sm"
                                 />
                               </div>
                               <div className="space-y-1">
-                                <Label className="text-xs">司機</Label>
+                                <Label className="text-xs">{TEST_SUPPLIER_LABELS.LABEL_3628}</Label>
                                 <Input
                                   value={item.driver_name}
                                   onChange={(e) => updateItemField(item.id, 'driver_name', e.target.value)}
-                                  placeholder="司機姓名"
+                                  placeholder={TEST_SUPPLIER_LABELS.LABEL_579}
                                   className="h-9 text-sm"
                                 />
                               </div>
                               <div className="space-y-1">
-                                <Label className="text-xs">司機電話</Label>
+                                <Label className="text-xs">{TEST_SUPPLIER_LABELS.LABEL_50}</Label>
                                 <Input
                                   value={item.driver_phone}
                                   onChange={(e) => updateItemField(item.id, 'driver_phone', e.target.value)}
-                                  placeholder="電話號碼"
+                                  placeholder={TEST_SUPPLIER_LABELS.LABEL_1544}
                                   className="h-9 text-sm"
                                 />
                               </div>
                               <div className="space-y-1">
-                                <Label className="text-xs">車牌</Label>
+                                <Label className="text-xs">{TEST_SUPPLIER_LABELS.LABEL_6580}</Label>
                                 <Input
                                   value={item.license_plate}
                                   onChange={(e) => updateItemField(item.id, 'license_plate', e.target.value)}
-                                  placeholder="車牌號碼"
+                                  placeholder={TEST_SUPPLIER_LABELS.LABEL_9596}
                                   className="h-9 text-sm"
                                 />
                               </div>
@@ -398,18 +399,18 @@ export default function TestSupplierPage() {
                             <>
                               {needsBooking && (
                                 <div className="space-y-1">
-                                  <Label className="text-xs">訂位狀態</Label>
+                                  <Label className="text-xs">{TEST_SUPPLIER_LABELS.LABEL_386}</Label>
                                   <Input
                                     value={item.booking_status}
                                     onChange={(e) => updateItemField(item.id, 'booking_status', e.target.value)}
-                                    placeholder="已訂位 / 候補中 / 建議替代"
+                                    placeholder={TEST_SUPPLIER_LABELS.LABEL_468}
                                     className="h-9 text-sm"
                                   />
                                 </div>
                               )}
                               {needsPrice && (
                                 <div className="space-y-1">
-                                  <Label className="text-xs">餐標（每人）</Label>
+                                  <Label className="text-xs">{TEST_SUPPLIER_LABELS.LABEL_8589}</Label>
                                   <Input
                                     type="number"
                                     value={item.price_per_person || ''}
@@ -425,11 +426,11 @@ export default function TestSupplierPage() {
                           {/* 活動類 */}
                           {item.category === 'activity' && needsBooking && (
                             <div className="space-y-1">
-                              <Label className="text-xs">預約狀態</Label>
+                              <Label className="text-xs">{TEST_SUPPLIER_LABELS.LABEL_266}</Label>
                               <Input
                                 value={item.booking_status}
                                 onChange={(e) => updateItemField(item.id, 'booking_status', e.target.value)}
-                                placeholder="已預約 / 候補"
+                                placeholder={TEST_SUPPLIER_LABELS.LABEL_9901}
                                 className="h-9 text-sm"
                               />
                             </div>
@@ -438,7 +439,7 @@ export default function TestSupplierPage() {
                           {/* 通用：報價、備註 */}
                           {needsPrice && priceMode === 'per_item' && (
                             <div className="space-y-1">
-                              <Label className="text-xs">報價金額</Label>
+                              <Label className="text-xs">{TEST_SUPPLIER_LABELS.LABEL_7411}</Label>
                               <Input
                                 type="number"
                                 value={item.reply_price || ''}
@@ -449,11 +450,11 @@ export default function TestSupplierPage() {
                             </div>
                           )}
                           <div className="space-y-1">
-                            <Label className="text-xs">備註</Label>
+                            <Label className="text-xs">{TEST_SUPPLIER_LABELS.REMARKS}</Label>
                             <Input
                               value={item.reply_note}
                               onChange={(e) => updateItemField(item.id, 'reply_note', e.target.value)}
-                              placeholder="補充說明"
+                              placeholder={TEST_SUPPLIER_LABELS.LABEL_6086}
                               className="h-9 text-sm"
                             />
                           </div>
@@ -464,7 +465,7 @@ export default function TestSupplierPage() {
                     {/* 唯讀模式：顯示已回覆的內容 */}
                     {isReadOnly && item.reply_price > 0 && (
                       <div className="ml-9 text-sm text-[#4a4540]">
-                        <span className="text-[#8a7e72]">回覆報價：</span>
+                        <span className="text-[#8a7e72]">{TEST_SUPPLIER_LABELS.LABEL_9734}</span>
                         <span className="font-medium">¥{item.reply_price.toLocaleString()}</span>
                       </div>
                     )}
@@ -477,7 +478,7 @@ export default function TestSupplierPage() {
           {/* 報價模式切換 + 整包報價 */}
           {!isReadOnly && (
             <div className="bg-white rounded-xl border border-[#e8e4df] p-6 mb-6">
-              <h2 className="font-semibold text-[#4a4540] mb-4">報價方式</h2>
+              <h2 className="font-semibold text-[#4a4540] mb-4">{TEST_SUPPLIER_LABELS.LABEL_1538}</h2>
 
               <div className="flex gap-3 mb-4">
                 <Button
@@ -487,7 +488,7 @@ export default function TestSupplierPage() {
                   className={cn(priceMode === 'per_item' && 'bg-amber-600 hover:bg-amber-700 text-white')}
                 >
                   <ClipboardList className="h-4 w-4 mr-1" />
-                  逐項報價
+                  {TEST_SUPPLIER_LABELS.LABEL_8184}
                 </Button>
                 <Button
                   variant={priceMode === 'package' ? 'default' : 'outline'}
@@ -496,14 +497,14 @@ export default function TestSupplierPage() {
                   className={cn(priceMode === 'package' && 'bg-amber-600 hover:bg-amber-700 text-white')}
                 >
                   <FileText className="h-4 w-4 mr-1" />
-                  整包報價（按人數階梯）
+                  {TEST_SUPPLIER_LABELS.LABEL_7427}
                 </Button>
               </div>
 
               {priceMode === 'per_item' && (
                 <div className="bg-[#faf9f7] rounded-lg p-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-[#8a7e72]">逐項加總</span>
+                    <span className="text-[#8a7e72]">{TEST_SUPPLIER_LABELS.TOTAL_9243}</span>
                     <span className="text-xl font-semibold text-[#4a4540]">
                       ¥{totalPerItem.toLocaleString()}
                     </span>
@@ -513,7 +514,7 @@ export default function TestSupplierPage() {
 
               {priceMode === 'package' && (
                 <div className="space-y-3">
-                  <p className="text-sm text-[#8a7e72]">整包價格，依人數階梯報價：</p>
+                  <p className="text-sm text-[#8a7e72]">{TEST_SUPPLIER_LABELS.LABEL_723}</p>
                   {packagePrices.map((pp, idx) => (
                     <div key={pp.id} className="flex items-center gap-3 bg-[#faf9f7] rounded-lg p-3">
                       <div className="flex items-center gap-2 min-w-[120px]">
@@ -525,10 +526,10 @@ export default function TestSupplierPage() {
                           className="h-9 text-sm w-20"
                           placeholder="人數"
                         />
-                        <span className="text-sm text-[#8a7e72]">人</span>
+                        <span className="text-sm text-[#8a7e72]">{TEST_SUPPLIER_LABELS.LABEL_9104}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-[#8a7e72]">每人</span>
+                        <span className="text-sm text-[#8a7e72]">{TEST_SUPPLIER_LABELS.LABEL_6356}</span>
                         <Input
                           type="number"
                           value={pp.price_per_person || ''}
@@ -547,14 +548,14 @@ export default function TestSupplierPage() {
                   ))}
                   <Button variant="outline" size="sm" onClick={addPackagePrice} className="gap-1">
                     <ClipboardList className="h-4 w-4" />
-                    新增階梯
+                    {TEST_SUPPLIER_LABELS.ADD_8787}
                   </Button>
                   <div className="mt-3">
-                    <Label className="text-xs">整包報價說明</Label>
+                    <Label className="text-xs">{TEST_SUPPLIER_LABELS.LABEL_52}</Label>
                     <Textarea
                       value={packageNote}
                       onChange={(e) => setPackageNote(e.target.value)}
-                      placeholder="例如：以上報價含交通、餐食、活動門票，不含住宿..."
+                      placeholder={TEST_SUPPLIER_LABELS.EXAMPLE_9702}
                       rows={2}
                       className="mt-1 text-sm"
                     />
@@ -567,11 +568,11 @@ export default function TestSupplierPage() {
           {/* 整體備註 */}
           {!isReadOnly && (
             <div className="bg-white rounded-xl border border-[#e8e4df] p-6 mb-6">
-              <Label className="mb-2 block font-medium text-[#4a4540]">整體備註</Label>
+              <Label className="mb-2 block font-medium text-[#4a4540]">{TEST_SUPPLIER_LABELS.LABEL_1920}</Label>
               <Textarea
                 value={overallNote}
                 onChange={(e) => setOverallNote(e.target.value)}
-                placeholder="有任何補充說明可以在這裡填寫..."
+                placeholder={TEST_SUPPLIER_LABELS.LABEL_2542}
                 rows={3}
               />
             </div>
@@ -589,7 +590,7 @@ export default function TestSupplierPage() {
                 className="gap-2 bg-amber-600 hover:bg-amber-700 text-white"
               >
                 <Save size={16} />
-                送出回覆
+                {TEST_SUPPLIER_LABELS.LABEL_8347}
               </Button>
             )}
           </div>
@@ -606,7 +607,7 @@ export default function TestSupplierPage() {
       <div className="max-w-5xl mx-auto p-4 md:p-8">
         <div className="flex items-center gap-3 mb-2">
           <ClipboardList className="h-6 w-6 text-amber-600" />
-          <h1 className="text-xl font-semibold text-[#4a4540]">需求收件匣</h1>
+          <h1 className="text-xl font-semibold text-[#4a4540]">{TEST_SUPPLIER_LABELS.LABEL_6359}</h1>
         </div>
         <p className="text-sm text-[#b0a89e] mb-6">⚠️ 測試頁面，使用假資料模擬</p>
 
