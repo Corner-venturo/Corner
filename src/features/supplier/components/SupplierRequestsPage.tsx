@@ -7,7 +7,7 @@
 
 
 import React, { useState, useCallback } from 'react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -182,16 +182,15 @@ export function SupplierRequestsPage() {
   ]
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={SUPPLIER_LABELS.LABEL_174}
-        icon={ClipboardList}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '供應商首頁', href: '/supplier' },
-          { label: '需求收件匣', href: '/supplier/requests' },
-        ]}
-      />
+    <ContentPageLayout
+      title={SUPPLIER_LABELS.LABEL_174}
+      icon={ClipboardList}
+      breadcrumb={[
+        { label: '首頁', href: '/' },
+        { label: '供應商首頁', href: '/supplier' },
+        { label: '需求收件匣', href: '/supplier/requests' },
+      ]}
+    >
 
       {/* 篩選 Tabs */}
       <div className="px-4 py-2 border-b border-border bg-card flex gap-2">
@@ -266,6 +265,6 @@ export function SupplierRequestsPage() {
         request={selectedRequest}
         onSuccess={handleResponseSuccess}
       />
-    </div>
+    </ContentPageLayout>
   )
 }

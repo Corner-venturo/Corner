@@ -17,7 +17,7 @@ import {
   CreditCard,
   Users,
 } from 'lucide-react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, type Column } from '@/components/ui/enhanced-table'
 import { CurrencyCell, ActionCell, StatusCell } from '@/components/table-cells'
@@ -296,25 +296,24 @@ export function PayrollManagementPage() {
   const summary = calculateSummary(records)
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={L.page_title}
-        icon={DollarSign}
-        breadcrumb={[
-          { label: L.breadcrumb_home, href: '/' },
-          { label: L.breadcrumb_hr, href: '/hr' },
-          { label: L.breadcrumb_payroll, href: '/hr/payroll' },
-        ]}
-        actions={
-          <Button
-            onClick={() => setShowCreateDialog(true)}
-            className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-          >
-            <Plus size={16} />
-            {L.btn_create}
-          </Button>
-        }
-      />
+    <ContentPageLayout
+      title={L.page_title}
+      icon={DollarSign}
+      breadcrumb={[
+        { label: L.breadcrumb_home, href: '/' },
+        { label: L.breadcrumb_hr, href: '/hr' },
+        { label: L.breadcrumb_payroll, href: '/hr/payroll' },
+      ]}
+      headerActions={
+        <Button
+          onClick={() => setShowCreateDialog(true)}
+          className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+        >
+          <Plus size={16} />
+          {L.btn_create}
+        </Button>
+      }
+    >
 
       {/* 年度篩選 */}
       <div className="p-4 bg-card border-b border-border">
@@ -485,7 +484,7 @@ export function PayrollManagementPage() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </ContentPageLayout>
   )
 }
 
