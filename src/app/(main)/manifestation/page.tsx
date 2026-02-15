@@ -7,7 +7,7 @@ import { BreathingExercise } from '@/features/manifestation/components/Breathing
 import { ChapterList } from '@/features/manifestation/components/ChapterList'
 import { ChapterContent } from '@/features/manifestation/components/ChapterContent'
 import { WishWall } from '@/features/manifestation/components/WishWall'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Sparkles, Book, Heart } from 'lucide-react'
 import { MANIFESTATION_LABELS } from './constants/labels'
 
@@ -73,23 +73,22 @@ export default function ManifestationPage() {
   }
 
   return (
-    <div className="absolute inset-0 flex flex-col">
-      <ResponsiveHeader
-        title={MANIFESTATION_LABELS.LABEL_9240}
-        icon={Sparkles}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '顯化魔法', href: '/manifestation' },
-        ]}
-        tabs={[
-          { value: 'practice', label: '練習', icon: Book },
-          { value: 'wish-wall', label: '願望牆', icon: Heart },
-        ]}
-        activeTab={viewMode}
-        onTabChange={tab => setViewMode(tab as ViewMode)}
-      />
-
-      <div className="flex-1 flex min-h-0">
+    <ContentPageLayout
+      className="absolute inset-0 flex flex-col"
+      title={MANIFESTATION_LABELS.LABEL_9240}
+      icon={Sparkles}
+      breadcrumb={[
+        { label: '首頁', href: '/' },
+        { label: '顯化魔法', href: '/manifestation' },
+      ]}
+      tabs={[
+        { value: 'practice', label: '練習', icon: Book },
+        { value: 'wish-wall', label: '願望牆', icon: Heart },
+      ]}
+      activeTab={viewMode}
+      onTabChange={tab => setViewMode(tab as ViewMode)}
+      contentClassName="flex-1 flex min-h-0"
+    >
         {/* 側邊欄 - 章節列表（僅在練習模式顯示） */}
         {viewMode === 'practice' && (
           <aside className="w-80 border-r border-border shrink-0 overflow-y-auto">
@@ -113,7 +112,6 @@ export default function ManifestationPage() {
             {viewMode === 'wish-wall' && <WishWall />}
           </div>
         </main>
-      </div>
-    </div>
+    </ContentPageLayout>
   )
 }

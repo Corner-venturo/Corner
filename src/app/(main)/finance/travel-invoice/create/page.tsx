@@ -11,7 +11,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, Trash2, FileText } from 'lucide-react'
 import { FinanceLabels } from '../../constants/labels'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { ContentContainer } from '@/components/layout/content-container'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -126,15 +126,14 @@ export default function CreateInvoicePage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={FinanceLabels.invoiceCreateTitle}
-        icon={FileText}
-        showBackButton={true}
-        onBack={() => router.push('/finance/travel-invoice')}
-      />
-
-      <ContentContainer className="flex-1 overflow-auto">
+    <ContentPageLayout
+      title={FinanceLabels.invoiceCreateTitle}
+      icon={FileText}
+      showBackButton={true}
+      onBack={() => router.push('/finance/travel-invoice')}
+      contentClassName="flex-1 overflow-auto"
+    >
+      <ContentContainer>
         <form onSubmit={handleSubmit} className="space-y-6 pb-6 max-w-4xl mx-auto">
           {/* 錯誤訊息 */}
           {error && (
@@ -395,6 +394,6 @@ export default function CreateInvoicePage() {
           </div>
         </form>
       </ContentContainer>
-    </div>
+    </ContentPageLayout>
   )
 }

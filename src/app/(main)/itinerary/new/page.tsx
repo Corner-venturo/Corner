@@ -10,7 +10,7 @@ import { PrintItineraryForm } from '@/features/itinerary/components/PrintItinera
 import { PrintItineraryPreview } from '@/features/itinerary/components/PrintItineraryPreview'
 import { EditingWarningBanner } from '@/components/EditingWarningBanner'
 import { Printer } from 'lucide-react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { useItineraryEditor } from './hooks/useItineraryEditor'
 import { useItineraryDataLoader } from './hooks/useItineraryDataLoader'
 import { ItineraryHeader } from './components/ItineraryHeader'
@@ -190,28 +190,26 @@ function NewItineraryPageContent() {
   // 列印版行程表
   if (type === 'print') {
     return (
-      <div className="h-full flex flex-col">
-        <ResponsiveHeader
-          title={EDITOR_LABELS.ADD_9998}
-          breadcrumb={[
-            { label: '首頁', href: '/' },
-            { label: '行程管理', href: '/itinerary' },
-            { label: '新增紙本行程表', href: '#' },
-          ]}
-          showBackButton={true}
-          onBack={() => router.back()}
-          actions={
-            <Button
-              onClick={() => window.print()}
-              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-            >
-              <Printer size={16} className="mr-2" />
-              {EDITOR_LABELS.PRINT}
-            </Button>
-          }
-        />
-
-        <div className="flex-1 overflow-hidden">
+      <ContentPageLayout
+        title={EDITOR_LABELS.ADD_9998}
+        breadcrumb={[
+          { label: '首頁', href: '/' },
+          { label: '行程管理', href: '/itinerary' },
+          { label: '新增紙本行程表', href: '#' },
+        ]}
+        showBackButton={true}
+        onBack={() => router.back()}
+        headerActions={
+          <Button
+            onClick={() => window.print()}
+            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+          >
+            <Printer size={16} className="mr-2" />
+            {EDITOR_LABELS.PRINT}
+          </Button>
+        }
+        contentClassName="flex-1 overflow-hidden"
+      >
           <div className="h-full flex">
             <div className="w-1/2 bg-morandi-container/30 border-r border-morandi-container flex flex-col print:hidden">
               <div className="h-14 bg-morandi-green/90 text-white px-6 flex items-center border-b border-morandi-container">
@@ -234,7 +232,7 @@ function NewItineraryPageContent() {
             </div>
           </div>
         </div>
-      </div>
+      </ContentPageLayout>
     )
   }
 

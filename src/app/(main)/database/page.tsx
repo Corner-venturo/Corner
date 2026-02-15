@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { MapPin, Bus, Building2, ImageIcon, Archive, Building } from 'lucide-react'
 
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { DATABASE_LABELS } from './constants/labels'
@@ -69,16 +69,14 @@ export default function DatabasePage() {
   const router = useRouter()
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={DATABASE_LABELS.PAGE_TITLE}
-        onAdd={() => {
-          /* 批次匯入邏輯 */
-        }}
-        addLabel={DATABASE_LABELS.BATCH_IMPORT}
-      />
-
-      <div className="flex-1 overflow-auto pb-6">
+    <ContentPageLayout
+      title={DATABASE_LABELS.PAGE_TITLE}
+      onAdd={() => {
+        /* 批次匯入邏輯 */
+      }}
+      addLabel={DATABASE_LABELS.BATCH_IMPORT}
+    >
+      <div className="pb-6">
         {/* 概覽卡片 */}
         <div className="mb-8 bg-gradient-to-r from-morandi-gold/10 to-morandi-primary/10 rounded-lg border border-morandi-gold/20 p-6">
           <div className="flex items-center justify-between">
@@ -178,6 +176,6 @@ export default function DatabasePage() {
           </div>
         </div>
       </div>
-    </div>
+    </ContentPageLayout>
   )
 }

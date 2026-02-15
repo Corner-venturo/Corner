@@ -18,7 +18,7 @@ import { InvoiceDialog } from '@/features/finance/components/invoice-dialog'
 import { TravelInvoiceDetailDialog } from './components/TravelInvoiceDetailDialog'
 import { BatchInvoiceDialog } from '@/features/finance/travel-invoice/components/BatchInvoiceDialog'
 import { TRAVEL_INVOICE_LABELS } from './constants/labels'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 
 // 狀態標籤定義
 const statusTabs = [
@@ -131,17 +131,16 @@ export default function TravelInvoicePage() {
 
   if (error) {
     return (
-      <div className="h-full flex flex-col">
-        <ResponsiveHeader
-          title={TRAVEL_INVOICE_LABELS.MANAGE_1246}
-          icon={FileText}
-        />
+      <ContentPageLayout
+        title={TRAVEL_INVOICE_LABELS.MANAGE_1246}
+        icon={FileText}
+      >
         <ContentContainer>
           <div className="text-center py-12">
             <p className="text-status-danger">{error}</p>
           </div>
         </ContentContainer>
-      </div>
+      </ContentPageLayout>
     )
   }
 

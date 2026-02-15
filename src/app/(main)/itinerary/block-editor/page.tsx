@@ -11,7 +11,7 @@ import { BLOCK_EDITOR_LABELS } from '../constants/labels'
 
 import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { TourPreview } from '@/components/editor/TourPreview'
 import { PublishButton } from '@/components/editor/PublishButton'
 import { Button } from '@/components/ui/button'
@@ -240,38 +240,34 @@ function BlockEditorPageContent() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      {/* 頁面頂部 */}
-      <ResponsiveHeader
-        title={BLOCK_EDITOR_LABELS.BLOCK_EDITOR}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '行程管理', href: '/itinerary' },
-          { label: '區塊編輯器', href: '#' },
-        ]}
-        showBackButton
-        onBack={() => router.push('/itinerary')}
-        actions={
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={performAutoSave}
-              disabled={!isDirty || autoSaveStatus === 'saving'}
-            >
-              {autoSaveStatus === 'saving' ? '存檔中...' : '手動存檔'}
-            </Button>
-            <PublishButton
-              data={{ ...tourData, id: currentItineraryId || undefined }}
-              currentVersionIndex={currentVersionIndex}
-              onVersionChange={() => {}}
-            />
-          </div>
-        }
-      />
-
-      {/* 主要內容區域 */}
-      <div className="flex-1 overflow-hidden">
+    <ContentPageLayout
+      title={BLOCK_EDITOR_LABELS.BLOCK_EDITOR}
+      breadcrumb={[
+        { label: '首頁', href: '/' },
+        { label: '行程管理', href: '/itinerary' },
+        { label: '區塊編輯器', href: '#' },
+      ]}
+      showBackButton
+      onBack={() => router.push('/itinerary')}
+      headerActions={
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={performAutoSave}
+            disabled={!isDirty || autoSaveStatus === 'saving'}
+          >
+            {autoSaveStatus === 'saving' ? '存檔中...' : '手動存檔'}
+          </Button>
+          <PublishButton
+            data={{ ...tourData, id: currentItineraryId || undefined }}
+            currentVersionIndex={currentVersionIndex}
+            onVersionChange={() => {}}
+          />
+        </div>
+      }
+      contentClassName="flex-1 overflow-hidden"
+    >
         <div className="h-full flex">
           {/* 左側：區塊編輯器 */}
           <div className="w-1/2 bg-card border-r border-border flex flex-col">
@@ -362,7 +358,7 @@ function BlockEditorPageContent() {
           </div>
         </div>
       </div>
-    </div>
+    </ContentPageLayout>
   )
 }
 

@@ -8,7 +8,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { FileText, FileX, X, Check } from 'lucide-react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { NotFoundState } from '@/components/ui/not-found-state'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { ContentContainer } from '@/components/layout/content-container'
@@ -81,40 +81,37 @@ export default function InvoiceDetailPage() {
 
   if (isLoading && !hasLoaded) {
     return (
-      <div className="h-full flex flex-col">
-        <ResponsiveHeader
-          title={TRAVEL_INVOICE_DETAIL_LABELS.LABEL_6889}
-          icon={FileText}
-          showBackButton={true}
-          onBack={() => router.push('/finance/travel-invoice')}
-        />
+      <ContentPageLayout
+        title={TRAVEL_INVOICE_DETAIL_LABELS.LABEL_6889}
+        icon={FileText}
+        showBackButton={true}
+        onBack={() => router.push('/finance/travel-invoice')}
+      >
         <ContentContainer>
           <div className="text-center py-12">
             <p className="text-morandi-secondary">{TRAVEL_INVOICE_LABELS.LOADING}</p>
           </div>
         </ContentContainer>
-      </div>
+      </ContentPageLayout>
     )
   }
 
   if (notFound) {
     return (
-      <div className="h-full flex flex-col">
-        <ResponsiveHeader
-          title={TRAVEL_INVOICE_DETAIL_LABELS.LABEL_6889}
-          icon={FileText}
-          showBackButton={true}
-          onBack={() => router.push('/finance/travel-invoice')}
-        />
-        <div className="flex-1 flex items-center justify-center">
+      <ContentPageLayout
+        title={TRAVEL_INVOICE_DETAIL_LABELS.LABEL_6889}
+        icon={FileText}
+        showBackButton={true}
+        onBack={() => router.push('/finance/travel-invoice')}
+        contentClassName="flex-1 flex items-center justify-center"
+      >
           <NotFoundState
             title={TRAVEL_INVOICE_DETAIL_LABELS.NOT_FOUND_6549}
             description={TRAVEL_INVOICE_DETAIL_LABELS.DELETE_4958}
             backButtonLabel="返回發票列表"
             backHref="/finance/travel-invoice"
           />
-        </div>
-      </div>
+      </ContentPageLayout>
     )
   }
 
@@ -123,30 +120,29 @@ export default function InvoiceDetailPage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={currentInvoice.transactionNo}
-        icon={FileText}
-        showBackButton={true}
-        onBack={() => router.push('/finance/travel-invoice')}
-        badge={
-          <span className="ml-2">{getStatusBadge(currentInvoice.status)}</span>
-        }
-        actions={
-          currentInvoice.status === 'issued' ? (
-            <Button
-              variant="destructive"
-              onClick={() => setShowVoidDialog(true)}
-              className="flex items-center gap-2"
-            >
-              <FileX className="h-4 w-4" />
-              {TRAVEL_INVOICE_DETAIL_LABELS.VOID_INVOICE}
-            </Button>
-          ) : undefined
-        }
-      />
-
-      <ContentContainer className="flex-1 overflow-auto">
+    <ContentPageLayout
+      title={currentInvoice.transactionNo}
+      icon={FileText}
+      showBackButton={true}
+      onBack={() => router.push('/finance/travel-invoice')}
+      badge={
+        <span className="ml-2">{getStatusBadge(currentInvoice.status)}</span>
+      }
+      headerActions={
+        currentInvoice.status === 'issued' ? (
+          <Button
+            variant="destructive"
+            onClick={() => setShowVoidDialog(true)}
+            className="flex items-center gap-2"
+          >
+            <FileX className="h-4 w-4" />
+            {TRAVEL_INVOICE_DETAIL_LABELS.VOID_INVOICE}
+          </Button>
+        ) : undefined
+      }
+      contentClassName="flex-1 overflow-auto"
+    >
+      <ContentContainer>
         <div className="space-y-6 pb-6">
           {/* 基本資訊 */}
           <Card>
@@ -317,7 +313,7 @@ export default function InvoiceDetailPage() {
         </div>
       </ContentContainer>
 
-      {/* 作廢對話框 */}
+      {/* 作廢對話框 -- rendered outside ContentContainer but inside ContentPageLayout */}
       <Dialog open={showVoidDialog} onOpenChange={setShowVoidDialog}>
         <DialogContent level={1} className="max-w-md">
           <DialogHeader>
@@ -351,6 +347,6 @@ export default function InvoiceDetailPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </ContentPageLayout>
   )
 }

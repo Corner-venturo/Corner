@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { FileText, BookOpen, Scale, TrendingUp, Wallet, Banknote, ClipboardList } from 'lucide-react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { REPORTS_LABELS } from './constants/labels'
 
 const reports = [
@@ -46,18 +46,16 @@ const reports = [
 
 export default function AccountingReportsPage() {
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={REPORTS_LABELS.LABEL_1150}
-        icon={FileText}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '會計', href: '/erp-accounting' },
-          { label: '報表', href: '/erp-accounting/reports' },
-        ]}
-      />
-
-      <div className="flex-1 overflow-auto p-6">
+    <ContentPageLayout
+      title={REPORTS_LABELS.LABEL_1150}
+      icon={FileText}
+      breadcrumb={[
+        { label: '首頁', href: '/' },
+        { label: '會計', href: '/erp-accounting' },
+        { label: '報表', href: '/erp-accounting/reports' },
+      ]}
+      contentClassName="flex-1 overflow-auto p-6"
+    >
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {reports.map((report) => (
@@ -83,7 +81,6 @@ export default function AccountingReportsPage() {
             ))}
           </div>
         </div>
-      </div>
-    </div>
+    </ContentPageLayout>
   )
 }

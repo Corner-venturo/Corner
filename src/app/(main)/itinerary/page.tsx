@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -128,14 +128,14 @@ export default function ItineraryPage() {
   }, [employees, user?.id, itineraries])
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={LABELS.ITINERARY_MANAGEMENT}
-        showSearch={true}
-        searchTerm={pageState.searchTerm}
-        onSearchChange={pageState.setSearchTerm}
-        searchPlaceholder="搜尋行程..."
-      >
+    <ContentPageLayout
+      title={LABELS.ITINERARY_MANAGEMENT}
+      showSearch={true}
+      searchTerm={pageState.searchTerm}
+      onSearchChange={pageState.setSearchTerm}
+      searchPlaceholder="搜尋行程..."
+      contentClassName="flex-1 overflow-hidden"
+      headerChildren={
         <div className="flex items-center gap-4">
           <div className="flex gap-2">
             {statusFilters.map(filter => (
@@ -200,7 +200,8 @@ export default function ItineraryPage() {
             </div>
           )}
         </div>
-      </ResponsiveHeader>
+      }
+    >
 
       {/* 新增行程對話框 */}
       <CreateItineraryDialog
@@ -234,7 +235,6 @@ export default function ItineraryPage() {
         onSubmit={actions.handleDuplicateSubmit}
       />
 
-      <div className="flex-1 overflow-hidden">
         <div className="h-full">
           <EnhancedTable
             columns={tableColumns as TableColumn[]}
@@ -252,8 +252,7 @@ export default function ItineraryPage() {
             }}
           />
         </div>
-      </div>
-    </div>
+    </ContentPageLayout>
   )
 }
 

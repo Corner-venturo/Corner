@@ -4,7 +4,7 @@ import { FINANCE_PAGE_LABELS } from './constants/labels'
 
 import React, { useEffect, useMemo } from 'react'
 import Link from 'next/link'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
@@ -150,10 +150,7 @@ export default function FinancePage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader title={FINANCE_PAGE_LABELS.MANAGE_8421} />
-
-      <div className="flex-1 overflow-auto p-6">
+    <ContentPageLayout title={FINANCE_PAGE_LABELS.MANAGE_8421} contentClassName="flex-1 overflow-auto p-6">
         <div className="space-y-6">
                     {/* 財務總覽 - Enhanced UI */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -257,7 +254,6 @@ export default function FinancePage() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </ContentPageLayout>
   )
 }
