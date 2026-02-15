@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { ArrowLeft, ArrowRight, Send } from 'lucide-react'
 import { BATCH_VISA_LABELS as L } from '../constants/labels'
 import { useBatchVisa } from '../hooks/useBatchVisa'
+import { VISA_TYPE_GROUPS } from '@/constants/visa-types'
 import type { Order } from '@/stores/types'
 
 interface BatchVisaDialogProps {
@@ -14,31 +15,6 @@ interface BatchVisaDialogProps {
   onOpenChange: (open: boolean) => void
   order: Order | null
 }
-
-interface VisaTypeGroup {
-  label: string
-  types: string[]
-}
-
-const VISA_TYPE_GROUPS: VisaTypeGroup[] = [
-  {
-    label: L.group_passport,
-    types: [
-      L.type_passport_adult,
-      L.type_passport_child,
-      L.type_passport_adult_lost,
-      L.type_passport_child_lost,
-    ],
-  },
-  {
-    label: L.group_taiwan,
-    types: [L.type_taiwan, L.type_taiwan_lost, L.type_taiwan_first],
-  },
-  {
-    label: L.group_usa,
-    types: [L.type_usa_esta],
-  },
-]
 
 export function BatchVisaDialog({ open, onOpenChange, order }: BatchVisaDialogProps) {
   const [step, setStep] = useState<1 | 2>(1)

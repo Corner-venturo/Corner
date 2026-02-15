@@ -352,17 +352,4 @@ export const BATCH_VISA_LABELS = {
   toast_success: (count: number) => `已建立 ${count} 筆簽證`,
   toast_fail: '批次建立簽證失敗，請稍後再試',
   toast_no_selection: '請至少勾選一位團員的一種簽證',
-  // 簽證類型群組
-  group_passport: '護照',
-  group_taiwan: '台胞證',
-  group_usa: '美國簽證',
-  // 簽證類型選項
-  type_passport_adult: '護照 成人',
-  type_passport_child: '護照 兒童',
-  type_passport_adult_lost: '護照 成人 遺失件',
-  type_passport_child_lost: '護照 兒童 遺失件',
-  type_taiwan: '台胞證',
-  type_taiwan_lost: '台胞證 遺失件',
-  type_taiwan_first: '台胞證 首辦',
-  type_usa_esta: '美國 ESTA',
 };
