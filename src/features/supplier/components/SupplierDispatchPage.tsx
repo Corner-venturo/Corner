@@ -8,7 +8,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { logger } from '@/lib/utils/logger'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -322,11 +322,10 @@ export function SupplierDispatchPage() {
   ]
 
   return (
-    <div className="space-y-6">
-      <ResponsiveHeader
-        title={SUPPLIER_LABELS.MANAGE_5809}
-        icon={Truck}
-      />
+    <ContentPageLayout
+      title={SUPPLIER_LABELS.MANAGE_5809}
+      icon={Truck}
+    >
 
       {/* 篩選器 */}
       <div className="flex items-center gap-4">
@@ -437,6 +436,6 @@ export function SupplierDispatchPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </ContentPageLayout>
   )
 }

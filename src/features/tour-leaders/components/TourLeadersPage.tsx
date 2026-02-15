@@ -6,7 +6,7 @@
 
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useCallback } from 'react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Users } from 'lucide-react'
 import { TourLeadersList } from './TourLeadersList'
 import { TourLeadersDialog } from './TourLeadersDialog'
@@ -173,32 +173,28 @@ export const TourLeadersPage: React.FC = () => {
   }, [formData, isEditMode, editingItem, handleCloseDialog])
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={TOUR_LEADERS_LABELS.PAGE_TITLE}
-        icon={Users}
-        breadcrumb={[
-          { label: TOUR_LEADERS_LABELS.BREADCRUMB_HOME, href: '/' },
-          { label: TOUR_LEADERS_LABELS.BREADCRUMB_DATABASE, href: '/database' },
-          { label: TOUR_LEADERS_LABELS.BREADCRUMB_TOUR_LEADERS, href: '/database/tour-leaders' },
-        ]}
-        showSearch
-        searchTerm={searchQuery}
-        onSearchChange={setSearchQuery}
-        searchPlaceholder={TOUR_LEADERS_LABELS.SEARCH_PLACEHOLDER}
-        onAdd={handleOpenAddDialog}
-        addLabel={TOUR_LEADERS_LABELS.ADD_LEADER}
+    <ContentPageLayout
+      title={TOUR_LEADERS_LABELS.PAGE_TITLE}
+      icon={Users}
+      breadcrumb={[
+        { label: TOUR_LEADERS_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: TOUR_LEADERS_LABELS.BREADCRUMB_DATABASE, href: '/database' },
+        { label: TOUR_LEADERS_LABELS.BREADCRUMB_TOUR_LEADERS, href: '/database/tour-leaders' },
+      ]}
+      showSearch
+      searchTerm={searchQuery}
+      onSearchChange={setSearchQuery}
+      searchPlaceholder={TOUR_LEADERS_LABELS.SEARCH_PLACEHOLDER}
+      onAdd={handleOpenAddDialog}
+      addLabel={TOUR_LEADERS_LABELS.ADD_LEADER}
+    >
+      <TourLeadersList
+        items={filteredItems}
+        loading={loading}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onAvailability={handleOpenAvailability}
       />
-
-      <div className="flex-1 overflow-auto">
-        <TourLeadersList
-          items={filteredItems}
-          loading={loading}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onAvailability={handleOpenAvailability}
-        />
-      </div>
 
       <TourLeadersDialog
         isOpen={isDialogOpen}
@@ -214,6 +210,6 @@ export const TourLeadersPage: React.FC = () => {
         onClose={handleCloseAvailability}
         leader={availabilityLeader}
       />
-    </div>
+    </ContentPageLayout>
   )
 }

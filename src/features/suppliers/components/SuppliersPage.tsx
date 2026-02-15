@@ -6,7 +6,7 @@
 
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useCallback } from 'react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Building2 } from 'lucide-react'
 import { SuppliersList } from './SuppliersList'
 import { SuppliersDialog } from './SuppliersDialog'
@@ -128,30 +128,26 @@ export const SuppliersPage: React.FC = () => {
   }, [formData, isEditMode, editingSupplier, handleCloseDialog])
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={LABELS.supplierManagement}
-        icon={Building2}
-        breadcrumb={[
-          { label: LABELS.home, href: '/' },
-          { label: LABELS.databaseManagement, href: '/database' },
-          { label: LABELS.supplierManagement, href: '/database/suppliers' },
-        ]}
-        showSearch
-        searchTerm={searchQuery}
-        onSearchChange={setSearchQuery}
-        searchPlaceholder={LABELS.searchPlaceholder}
-        onAdd={handleOpenAddDialog}
-        addLabel={LABELS.addSupplier}
+    <ContentPageLayout
+      title={LABELS.supplierManagement}
+      icon={Building2}
+      breadcrumb={[
+        { label: LABELS.home, href: '/' },
+        { label: LABELS.databaseManagement, href: '/database' },
+        { label: LABELS.supplierManagement, href: '/database/suppliers' },
+      ]}
+      showSearch
+      searchTerm={searchQuery}
+      onSearchChange={setSearchQuery}
+      searchPlaceholder={LABELS.searchPlaceholder}
+      onAdd={handleOpenAddDialog}
+      addLabel={LABELS.addSupplier}
+    >
+      <SuppliersList
+        suppliers={filteredSuppliers}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
-
-      <div className="flex-1 overflow-auto">
-        <SuppliersList
-          suppliers={filteredSuppliers}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
-      </div>
 
       {/* 新增/編輯供應商對話框 */}
       <SuppliersDialog
@@ -162,6 +158,6 @@ export const SuppliersPage: React.FC = () => {
         onSubmit={handleSubmit}
         isEditMode={isEditMode}
       />
-    </div>
+    </ContentPageLayout>
   )
 }

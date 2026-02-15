@@ -7,7 +7,7 @@
 
 import React, { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { Calculator, FileText, Calendar, MapPin, Users, LayoutList, Archive } from 'lucide-react'
 import { DocumentVersionPicker } from '@/components/documents'
@@ -236,24 +236,22 @@ export const QuotesPage: React.FC = () => {
   const loading = toursLoading || quotesLoading
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={QUOTES_PAGE_LABELS.報價單管理}
-        icon={Calculator}
-        breadcrumb={[
-          { label: QUOTES_PAGE_LABELS.首頁, href: '/' },
-          { label: QUOTES_PAGE_LABELS.報價單管理, href: '/quotes' },
-        ]}
-        tabs={STATUS_TABS}
-        activeTab={statusFilter}
-        onTabChange={setStatusFilter}
-        showSearch
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        searchPlaceholder={QUOTES_PAGE_LABELS.搜尋團號_團名}
-      />
-
-      <div className="flex-1 overflow-hidden">
+    <ContentPageLayout
+      title={QUOTES_PAGE_LABELS.報價單管理}
+      icon={Calculator}
+      breadcrumb={[
+        { label: QUOTES_PAGE_LABELS.首頁, href: '/' },
+        { label: QUOTES_PAGE_LABELS.報價單管理, href: '/quotes' },
+      ]}
+      tabs={STATUS_TABS}
+      activeTab={statusFilter}
+      onTabChange={setStatusFilter}
+      showSearch
+      searchTerm={searchTerm}
+      onSearchChange={setSearchTerm}
+      searchPlaceholder={QUOTES_PAGE_LABELS.搜尋團號_團名}
+      contentClassName="flex-1 overflow-hidden"
+    >
         {statusFilter === 'standalone' ? (
           <EnhancedTable
             columns={standaloneColumns}
@@ -281,7 +279,6 @@ export const QuotesPage: React.FC = () => {
             rowClassName={() => "cursor-pointer hover:bg-morandi-gold/5"}
           />
         )}
-      </div>
 
       {/* 報價單管理懸浮視窗（依團顯示） */}
       {selectedTour && (
@@ -291,6 +288,6 @@ export const QuotesPage: React.FC = () => {
           tour={selectedTour}
         />
       )}
-    </div>
+    </ContentPageLayout>
   )
 }
