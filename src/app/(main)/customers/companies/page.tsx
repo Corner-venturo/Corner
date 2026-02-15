@@ -13,9 +13,8 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useCallback } from 'react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { Button } from '@/components/ui/button'
-import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { Plus } from 'lucide-react'
 import { useAuthStore, type Company } from '@/stores'
 import { useCompanies, createCompany, updateCompany, deleteCompany } from '@/data'
@@ -137,10 +136,15 @@ export default function CompaniesPage() {
   })
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
+    <>
+      <ListPageLayout
         title={L.PAGE_TITLE}
-        actions={
+        data={companies}
+        columns={columns}
+        searchFields={['company_name', 'tax_id'] as (keyof Company)[]}
+        searchPlaceholder={L.SEARCH_PLACEHOLDER}
+        onRowClick={handleViewDetail}
+        headerActions={
           <Button
             onClick={handleOpenCreateDialog}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
@@ -149,18 +153,8 @@ export default function CompaniesPage() {
             {L.ADD_COMPANY}
           </Button>
         }
+        defaultSort={{ key: 'created_at', direction: 'desc' }}
       />
-
-      <div className="flex-1 overflow-auto">
-        <EnhancedTable
-          className="min-h-full"
-          data={companies}
-          columns={columns}
-          defaultSort={{ key: 'created_at', direction: 'desc' }}
-          searchable
-          searchPlaceholder={L.SEARCH_PLACEHOLDER}
-        />
-      </div>
 
       <CompanyFormDialog
         isOpen={isDialogOpen}
@@ -179,6 +173,6 @@ export default function CompaniesPage() {
         onOpenChange={setIsDetailOpen}
         onUpdate={handleUpdateFromDetail}
       />
-    </div>
+    </>
   )
 }

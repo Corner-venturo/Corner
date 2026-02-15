@@ -90,6 +90,20 @@ export interface ListPageLayoutProps<T extends Record<string, any>> {
   /** 排序變更事件 */
   onSort?: (field: string, order: 'asc' | 'desc') => void
 
+  // ========== 表格額外配置 ==========
+  /** 預設排序 */
+  defaultSort?: { key: string; direction: 'asc' | 'desc' }
+  /** 空資料訊息 */
+  emptyMessage?: string
+  /** 每頁顯示筆數 */
+  initialPageSize?: number
+
+  // ========== Header 額外配置 ==========
+  /** 標題旁徽章 */
+  badge?: React.ReactNode
+  /** Header 下方子內容（如統計資訊） */
+  headerChildren?: React.ReactNode
+
   // ========== 樣式 ==========
   /** 容器 className */
   className?: string
@@ -147,6 +161,11 @@ export function ListPageLayout<T extends Record<string, any>>({
   expandedRows,
   onToggleExpand,
   onSort,
+  defaultSort,
+  emptyMessage,
+  initialPageSize,
+  badge,
+  headerChildren,
   className,
 }: ListPageLayoutProps<T>) {
   // ========== 內部狀態管理 ==========
@@ -181,7 +200,10 @@ export function ListPageLayout<T extends Record<string, any>>({
         onAdd={onAdd}
         addLabel={addLabel}
         actions={headerActions}
-      />
+        badge={badge}
+      >
+        {headerChildren}
+      </ResponsiveHeader>
 
       {/* 表格前自訂內容 */}
       {beforeTable}
@@ -206,6 +228,9 @@ export function ListPageLayout<T extends Record<string, any>>({
             }
             onSort={onSort}
             bordered={bordered}
+            defaultSort={defaultSort}
+            emptyMessage={emptyMessage}
+            initialPageSize={initialPageSize}
           />
         </div>
       </div>

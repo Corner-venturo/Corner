@@ -6,8 +6,7 @@
 
 
 import { useState, useEffect, useCallback } from 'react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
-import { EnhancedTable } from '@/components/ui/enhanced-table'
+import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { StatusCell, ActionCell, DateCell } from '@/components/table-cells'
 import { Building2, Edit2, Trash2, UserPlus, Settings } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
@@ -23,7 +22,6 @@ import { WORKSPACES_LABELS } from '../constants/labels'
 export function WorkspacesManagePage() {
   const [workspaces, setWorkspaces] = useState<WorkspaceWithDetails[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isAddAdminDialogOpen, setIsAddAdminDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -53,14 +51,6 @@ export function WorkspacesManagePage() {
   useEffect(() => {
     fetchWorkspaces()
   }, [fetchWorkspaces])
-
-  // 過濾
-  const filteredWorkspaces = workspaces.filter((ws) =>
-    searchQuery
-      ? ws.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        ws.code?.toLowerCase().includes(searchQuery.toLowerCase())
-      : true
-  )
 
   // 刪除公司
   const handleDelete = useCallback(async (workspace: WorkspaceWithDetails) => {
@@ -112,7 +102,7 @@ export function WorkspacesManagePage() {
   // 表格欄位
   const columns = [
     {
-      key: 'name',
+      key: 'name' as const,
       label: WORKSPACES_LABELS.名稱,
       width: '200',
       render: (_: unknown, row: WorkspaceWithDetails) => (
@@ -123,7 +113,7 @@ export function WorkspacesManagePage() {
       ),
     },
     {
-      key: 'type',
+      key: 'type' as const,
       label: WORKSPACES_LABELS.類型,
       width: '100',
       render: (_: unknown, row: WorkspaceWithDetails) => (
@@ -133,7 +123,7 @@ export function WorkspacesManagePage() {
       ),
     },
     {
-      key: 'settings',
+      key: 'settings' as const,
       label: WORKSPACES_LABELS.設定,
       width: '150',
       render: (_: unknown, row: WorkspaceWithDetails) => (
@@ -144,7 +134,7 @@ export function WorkspacesManagePage() {
       ),
     },
     {
-      key: 'is_active',
+      key: 'is_active' as const,
       label: WORKSPACES_LABELS.狀態,
       width: '100',
       render: (_: unknown, row: WorkspaceWithDetails) => (
@@ -158,7 +148,7 @@ export function WorkspacesManagePage() {
       ),
     },
     {
-      key: 'created_at',
+      key: 'created_at' as const,
       label: WORKSPACES_LABELS.建立時間,
       width: '150',
       render: (_: unknown, row: WorkspaceWithDetails) => (
@@ -166,7 +156,7 @@ export function WorkspacesManagePage() {
       ),
     },
     {
-      key: 'actions',
+      key: 'actions' as const,
       label: '',
       width: '120',
       render: (_: unknown, row: WorkspaceWithDetails) => (
@@ -195,8 +185,8 @@ export function WorkspacesManagePage() {
   ]
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
+    <>
+      <ListPageLayout
         title={WORKSPACES_LABELS.公司管理}
         icon={Building2}
         breadcrumb={[
@@ -204,22 +194,15 @@ export function WorkspacesManagePage() {
           { label: WORKSPACES_LABELS.資料庫管理, href: '/database' },
           { label: WORKSPACES_LABELS.公司管理, href: '/database/workspaces' },
         ]}
-        showSearch
-        searchTerm={searchQuery}
-        onSearchChange={setSearchQuery}
+        data={workspaces}
+        loading={isLoading}
+        columns={columns}
+        searchFields={['name', 'code']}
         searchPlaceholder={WORKSPACES_LABELS.搜尋公司名稱或代號}
         onAdd={() => setIsAddDialogOpen(true)}
         addLabel={WORKSPACES_LABELS.新增公司}
+        emptyMessage={WORKSPACES_LABELS.尚無公司資料}
       />
-
-      <div className="flex-1 overflow-auto">
-        <EnhancedTable
-          columns={columns}
-          data={filteredWorkspaces}
-          isLoading={isLoading}
-          emptyMessage={WORKSPACES_LABELS.尚無公司資料}
-        />
-      </div>
 
       {/* 新增公司對話框 */}
       <AddWorkspaceDialog
@@ -243,6 +226,6 @@ export function WorkspacesManagePage() {
         workspace={selectedWorkspace}
         onSuccess={fetchWorkspaces}
       />
-    </div>
+    </>
   )
 }

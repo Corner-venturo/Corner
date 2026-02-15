@@ -2,13 +2,13 @@
 
 /**
  * 代轉發票管理頁面
- * 改用統一的 ResponsiveHeader + EnhancedTable 佈局
+ * 使用 ListPageLayout 統一佈局
  */
 
 import { useEffect, useState, useMemo } from 'react'
 import { FileText, Eye, ListChecks } from 'lucide-react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
-import { EnhancedTable, TableColumn as Column } from '@/components/ui/enhanced-table'
+import { ListPageLayout } from '@/components/layout/list-page-layout'
+import { TableColumn as Column } from '@/components/ui/enhanced-table'
 import { ContentContainer } from '@/components/layout/content-container'
 import { Button } from '@/components/ui/button'
 import { useTravelInvoiceStore, TravelInvoice } from '@/stores/travel-invoice-store'
@@ -18,6 +18,7 @@ import { InvoiceDialog } from '@/features/finance/components/invoice-dialog'
 import { TravelInvoiceDetailDialog } from './components/TravelInvoiceDetailDialog'
 import { BatchInvoiceDialog } from '@/features/finance/travel-invoice/components/BatchInvoiceDialog'
 import { TRAVEL_INVOICE_LABELS } from './constants/labels'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
 
 // 狀態標籤定義
 const statusTabs = [
@@ -30,50 +31,9 @@ const statusTabs = [
   { value: 'failed', label: '失敗' },
 ]
 
-// 狀態配色
-const getStatusVariant = (status: string): 'default' | 'success' | 'warning' | 'error' | 'info' => {
-  switch (status) {
-    case 'issued':
-      return 'success'
-    case 'pending':
-      return 'warning'
-    case 'scheduled':
-      return 'info'
-    case 'voided':
-    case 'failed':
-      return 'error'
-    case 'allowance':
-      return 'info'
-    default:
-      return 'default'
-  }
-}
-
-// 狀態文字
-const getStatusLabel = (status: string): string => {
-  switch (status) {
-    case 'pending':
-      return '待處理'
-    case 'scheduled':
-      return '預約中'
-    case 'issued':
-      return '已開立'
-    case 'voided':
-      return '已作廢'
-    case 'allowance':
-      return '已折讓'
-    case 'failed':
-      return '失敗'
-    default:
-      return status
-  }
-}
-
 export default function TravelInvoicePage() {
   const { invoices, isLoading, error, fetchInvoices } = useTravelInvoiceStore()
   const { items: tours } = useToursListSlim()
-  const [searchTerm, setSearchTerm] = useState('')
-  const [activeTab, setActiveTab] = useState('all')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [selectedInvoice, setSelectedInvoice] = useState<TravelInvoice | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
@@ -90,24 +50,6 @@ export default function TravelInvoicePage() {
       label: `${tour.code} - ${tour.name}`,
     }))
   }, [tours])
-
-  // 篩選發票
-  const filteredInvoices = useMemo(() => {
-    return (invoices || []).filter(invoice => {
-      // 狀態篩選
-      const matchesStatus = activeTab === 'all' || invoice.status === activeTab
-
-      // 搜尋篩選
-      const searchLower = searchTerm.toLowerCase()
-      const matchesSearch =
-        !searchTerm ||
-        invoice.transactionNo.toLowerCase().includes(searchLower) ||
-        invoice.invoice_number?.toLowerCase().includes(searchLower) ||
-        invoice.buyerInfo.buyerName?.toLowerCase().includes(searchLower)
-
-      return matchesStatus && matchesSearch
-    })
-  }, [invoices, activeTab, searchTerm])
 
   // 表格欄位定義
   const columns: Column<TravelInvoice>[] = [
@@ -204,20 +146,22 @@ export default function TravelInvoicePage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
+    <>
+      <ListPageLayout<TravelInvoice>
         title={TRAVEL_INVOICE_LABELS.MANAGE_1246}
         icon={FileText}
-        showSearch={true}
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
+        data={invoices || []}
+        loading={isLoading}
+        columns={columns}
+        searchFields={['transactionNo', 'invoice_number']}
         searchPlaceholder="搜尋交易編號、發票號碼、買受人..."
+        statusTabs={statusTabs}
+        statusField="status"
         onAdd={handleAdd}
         addLabel="開立新發票"
-        tabs={statusTabs}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        customActions={
+        onRowClick={handleRowClick}
+        renderActions={renderActions}
+        headerActions={
           <Button
             variant="outline"
             onClick={() => setIsBatchDialogOpen(true)}
@@ -228,18 +172,6 @@ export default function TravelInvoicePage() {
           </Button>
         }
       />
-
-      <div className="flex-1 overflow-hidden">
-        <EnhancedTable
-          columns={columns}
-          data={filteredInvoices}
-          loading={isLoading}
-          actions={renderActions}
-          onRowClick={handleRowClick}
-          bordered={true}
-          emptyMessage="尚無發票資料"
-        />
-      </div>
 
       {/* 開立發票懸浮視窗 */}
       <InvoiceDialog
@@ -263,6 +195,6 @@ export default function TravelInvoicePage() {
           fetchInvoices()
         }}
       />
-    </div>
+    </>
   )
 }

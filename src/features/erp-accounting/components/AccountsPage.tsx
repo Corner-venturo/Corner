@@ -1,11 +1,9 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { BookOpen, Plus, Pencil, Trash2, Search } from 'lucide-react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
-import { EnhancedTable, type Column } from '@/components/ui/enhanced-table'
+import { useState } from 'react'
+import { BookOpen, Plus, Pencil, Trash2 } from 'lucide-react'
+import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { useAccounts } from '../hooks'
 import { AccountDialog } from './AccountDialog'
@@ -25,18 +23,8 @@ const typeConfig: Record<AccountType, { label: string; color: string }> = {
 
 export function AccountsPage() {
   const { items: accounts, isLoading, create, update, delete: deleteAccount } = useAccounts()
-  const [searchTerm, setSearchTerm] = useState('')
   const [showDialog, setShowDialog] = useState(false)
   const [editingAccount, setEditingAccount] = useState<Account | null>(null)
-
-  const filteredAccounts = useMemo(() => {
-    if (!searchTerm) return accounts
-    const term = searchTerm.toLowerCase()
-    return accounts.filter(a =>
-      a.code.toLowerCase().includes(term) ||
-      a.name.toLowerCase().includes(term)
-    )
-  }, [accounts, searchTerm])
 
   const handleAdd = () => {
     setEditingAccount(null)
@@ -92,9 +80,9 @@ export function AccountsPage() {
     }
   }
 
-  const columns: Column<Account>[] = [
+  const columns = [
     {
-      key: 'code',
+      key: 'code' as const,
       label: L.col_code,
       width: '120px',
       render: (value: unknown) => (
@@ -102,11 +90,11 @@ export function AccountsPage() {
       ),
     },
     {
-      key: 'name',
+      key: 'name' as const,
       label: L.col_name,
     },
     {
-      key: 'account_type',
+      key: 'account_type' as const,
       label: L.col_type,
       width: '100px',
       render: (value: unknown) => {
@@ -119,13 +107,13 @@ export function AccountsPage() {
       },
     },
     {
-      key: 'is_system_locked',
+      key: 'is_system_locked' as const,
       label: L.col_system,
       width: '100px',
       render: (value: unknown) => value ? <Badge variant="secondary">{L.system_yes}</Badge> : null,
     },
     {
-      key: 'is_active',
+      key: 'is_active' as const,
       label: L.col_status,
       width: '80px',
       render: (value: unknown) => (
@@ -134,68 +122,48 @@ export function AccountsPage() {
         </Badge>
       ),
     },
-    {
-      key: 'actions',
-      label: L.col_status,
-      width: '100px',
-      render: (_: unknown, row: Account) => (
-        <div className="flex gap-1">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleEdit(row)}
-            disabled={row.is_system_locked}
-          >
-            <Pencil size={14} />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleDelete(row)}
-            disabled={row.is_system_locked}
-            className="text-destructive hover:text-destructive"
-          >
-            <Trash2 size={14} />
-          </Button>
-        </div>
-      ),
-    },
   ]
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
+    <>
+      <ListPageLayout<Account>
         title={L.page_title}
         icon={BookOpen}
-        badge={filteredAccounts.length}
-        actions={
+        data={accounts}
+        loading={isLoading}
+        columns={columns}
+        searchFields={['code', 'name']}
+        searchPlaceholder={L.search_placeholder}
+        badge={accounts.length}
+        emptyMessage={L.empty_message}
+        headerActions={
           <Button onClick={handleAdd} size="sm">
             <Plus size={16} className="mr-1" />
             {L.btn_add}
           </Button>
         }
+        renderActions={(row: Account) => (
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => handleEdit(row)}
+              disabled={row.is_system_locked}
+            >
+              <Pencil size={14} />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => handleDelete(row)}
+              disabled={row.is_system_locked}
+              className="text-destructive hover:text-destructive"
+            >
+              <Trash2 size={14} />
+            </Button>
+          </div>
+        )}
       />
-
-      <div className="p-4 border-b">
-        <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder={L.search_placeholder}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-      </div>
-
-      <div className="flex-1 overflow-auto">
-        <EnhancedTable
-          columns={columns}
-          data={filteredAccounts}
-          isLoading={isLoading}
-          emptyMessage={L.empty_message}
-        />
-      </div>
 
       <AccountDialog
         open={showDialog}
@@ -203,6 +171,6 @@ export function AccountsPage() {
         account={editingAccount}
         onSave={handleSave}
       />
-    </div>
+    </>
   )
 }

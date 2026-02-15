@@ -11,8 +11,7 @@
 
 
 import { useCallback, useState, useMemo } from 'react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
-import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
+import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { FileText, Eye, Trash2 } from 'lucide-react'
@@ -40,14 +39,11 @@ export function DisbursementPage() {
   const { items: payment_requests } = usePaymentRequests()
 
   // 狀態
-  const [searchTerm, setSearchTerm] = useState('')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<DisbursementOrder | null>(null)
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false)
   const [printOrder, setPrintOrder] = useState<DisbursementOrder | null>(null)
-
-  // SWR 自動載入資料，無需 useEffect
 
   // 取得待出帳的請款單（狀態為 pending，且尚未加入任何出納單）
   const pendingRequests = useMemo(() => {
@@ -64,47 +60,47 @@ export function DisbursementPage() {
   }, [payment_requests, disbursement_orders])
 
   // 表格欄位
-  const columns: TableColumn<DisbursementOrder>[] = useMemo(() => [
+  const columns = useMemo(() => [
     {
-      key: 'order_number',
+      key: 'order_number' as const,
       label: DISBURSEMENT_LABELS.出納單號,
       sortable: true,
-      render: (value) => (
+      render: (value: unknown) => (
         <div className="font-medium text-morandi-primary">{String(value || DISBURSEMENT_LABELS.自動產生)}</div>
       ),
     },
     {
-      key: 'disbursement_date',
+      key: 'disbursement_date' as const,
       label: DISBURSEMENT_LABELS.出帳日期,
       sortable: true,
-      render: (value) => (
+      render: (value: unknown) => (
         <DateCell date={value as string | null} showIcon={false} className="text-morandi-secondary" />
       ),
     },
     {
-      key: 'payment_request_ids',
+      key: 'payment_request_ids' as const,
       label: DISBURSEMENT_LABELS.請款單數,
-      render: (value) => (
+      render: (value: unknown) => (
         <div className="text-center">
           {Array.isArray(value) ? value.length : 0} {DISBURSEMENT_LABELS.筆}
         </div>
       ),
     },
     {
-      key: 'amount',
+      key: 'amount' as const,
       label: DISBURSEMENT_LABELS.總金額,
       sortable: true,
-      render: (value) => (
+      render: (value: unknown) => (
         <div className="text-right">
           <CurrencyCell amount={Number(value) || 0} className="font-semibold text-morandi-gold" />
         </div>
       ),
     },
     {
-      key: 'status',
+      key: 'status' as const,
       label: DISBURSEMENT_LABELS.狀態,
       sortable: true,
-      render: (value) => {
+      render: (value: unknown) => {
         const status = DISBURSEMENT_STATUS[value as keyof typeof DISBURSEMENT_STATUS] || DISBURSEMENT_STATUS.pending
         return (
           <Badge className={cn('text-white', status.color)}>
@@ -114,55 +110,11 @@ export function DisbursementPage() {
       },
     },
     {
-      key: 'created_at',
+      key: 'created_at' as const,
       label: DISBURSEMENT_LABELS.建立時間,
       sortable: true,
-      render: (value) => (
+      render: (value: unknown) => (
         <DateCell date={value as string | null} showIcon={false} className="text-morandi-secondary" />
-      ),
-    },
-    {
-      key: 'actions',
-      label: DISBURSEMENT_LABELS.操作,
-      width: '120px',
-      render: (_value, row) => (
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation()
-              handleViewDetail(row)
-            }}
-            className="h-8 w-8 p-0"
-          >
-            <Eye size={16} className="text-morandi-secondary" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation()
-              handlePrintPDF(row)
-            }}
-            className="h-8 w-8 p-0"
-          >
-            <FileText size={16} className="text-morandi-gold" />
-          </Button>
-          {row.status === 'pending' && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation()
-                handleDelete(row)
-              }}
-              className="h-8 w-8 p-0"
-            >
-              <Trash2 size={16} className="text-status-danger" />
-            </Button>
-          )}
-        </div>
       ),
     },
   ], [])
@@ -220,44 +172,73 @@ export function DisbursementPage() {
   }, [thisMonthOrders])
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
+    <>
+      <ListPageLayout<DisbursementOrder>
         title={DISBURSEMENT_LABELS.出納單管理}
+        data={disbursement_orders}
+        columns={columns}
+        searchFields={['order_number']}
+        searchPlaceholder={DISBURSEMENT_LABELS.搜尋出納單號}
         onAdd={() => setIsCreateDialogOpen(true)}
         addLabel={DISBURSEMENT_LABELS.新增出納單}
-        showSearch={true}
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        searchPlaceholder={DISBURSEMENT_LABELS.搜尋出納單號}
-      >
-        {/* 統計資訊 */}
-        <div className="flex items-center gap-6 text-sm">
-          <div className="text-right">
-            <span className="text-morandi-muted">{DISBURSEMENT_LABELS.待出帳}</span>
-            <span className="ml-2 font-semibold text-morandi-gold">{pendingRequests.length}{DISBURSEMENT_LABELS.筆}</span>
+        onRowClick={handleViewDetail}
+        initialPageSize={20}
+        headerChildren={
+          <div className="flex items-center gap-6 text-sm">
+            <div className="text-right">
+              <span className="text-morandi-muted">{DISBURSEMENT_LABELS.待出帳}</span>
+              <span className="ml-2 font-semibold text-morandi-gold">{pendingRequests.length}{DISBURSEMENT_LABELS.筆}</span>
+            </div>
+            <div className="text-right">
+              <span className="text-morandi-muted">{DISBURSEMENT_LABELS.LABEL_4658}</span>
+              <span className="ml-2 font-semibold text-morandi-primary">{thisMonthOrders.length}{DISBURSEMENT_LABELS.筆}</span>
+            </div>
+            <div className="text-right flex items-center gap-2">
+              <span className="text-morandi-muted">{DISBURSEMENT_LABELS.LABEL_1688}</span>
+              <CurrencyCell amount={thisMonthAmount} className="font-semibold text-morandi-green" />
+            </div>
           </div>
-          <div className="text-right">
-            <span className="text-morandi-muted">{DISBURSEMENT_LABELS.LABEL_4658}</span>
-            <span className="ml-2 font-semibold text-morandi-primary">{thisMonthOrders.length}{DISBURSEMENT_LABELS.筆}</span>
+        }
+        renderActions={(row: DisbursementOrder) => (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation()
+                handleViewDetail(row)
+              }}
+              className="h-8 w-8 p-0"
+            >
+              <Eye size={16} className="text-morandi-secondary" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation()
+                handlePrintPDF(row)
+              }}
+              className="h-8 w-8 p-0"
+            >
+              <FileText size={16} className="text-morandi-gold" />
+            </Button>
+            {row.status === 'pending' && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleDelete(row)
+                }}
+                className="h-8 w-8 p-0"
+              >
+                <Trash2 size={16} className="text-status-danger" />
+              </Button>
+            )}
           </div>
-          <div className="text-right flex items-center gap-2">
-            <span className="text-morandi-muted">{DISBURSEMENT_LABELS.LABEL_1688}</span>
-            <CurrencyCell amount={thisMonthAmount} className="font-semibold text-morandi-green" />
-          </div>
-        </div>
-      </ResponsiveHeader>
-
-      <div className="flex-1 overflow-hidden">
-        {/* 出納單列表 */}
-        <EnhancedTable
-          data={disbursement_orders}
-          columns={columns}
-          searchableFields={['order_number']}
-          initialPageSize={20}
-          searchTerm={searchTerm}
-          onRowClick={handleViewDetail}
-        />
-      </div>
+        )}
+      />
 
       {/* 新增出納單對話框 */}
       <CreateDisbursementDialog
@@ -280,6 +261,6 @@ export function DisbursementPage() {
         open={isPrintDialogOpen}
         onOpenChange={setIsPrintDialogOpen}
       />
-    </div>
+    </>
   )
 }

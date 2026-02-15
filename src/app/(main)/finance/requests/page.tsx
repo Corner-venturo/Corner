@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
-import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
+import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { usePayments } from '@/features/payments/hooks/usePayments'
 import { Plus, Loader2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
@@ -75,10 +74,15 @@ export default function RequestsPage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
+    <>
+      <ListPageLayout
         title={REQUESTS_PAGE_LABELS.MANAGE_3483}
-        actions={
+        data={filteredAndSortedRequests}
+        columns={tableColumns}
+        searchable={false}
+        onRowClick={handleRowClick}
+        onSort={handleSort}
+        headerActions={
           <button
             onClick={() => setIsAddDialogOpen(true)}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white px-4 py-2 rounded-md text-sm font-medium flex items-center transition-colors"
@@ -88,17 +92,6 @@ export default function RequestsPage() {
           </button>
         }
       />
-
-      <div className="flex-1 overflow-auto">
-        <EnhancedTable
-          className="min-h-full"
-          columns={tableColumns as TableColumn[]}
-          data={filteredAndSortedRequests}
-          onSort={handleSort}
-          onRowClick={handleRowClick}
-          selection={undefined}
-        />
-      </div>
 
       <AddRequestDialog
         open={isAddDialogOpen}
@@ -112,6 +105,6 @@ export default function RequestsPage() {
         open={!!selectedRequest}
         onOpenChange={(open) => !open && setSelectedRequest(null)}
       />
-    </div>
+    </>
   )
 }

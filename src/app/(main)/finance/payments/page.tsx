@@ -12,14 +12,14 @@
 
 
 import { logger } from '@/lib/utils/logger'
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { FinanceLabels } from '../constants/labels'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { Button } from '@/components/ui/button'
-import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
-import { Plus, Search, FileDown, Layers, Edit2, CheckSquare, Loader2 } from 'lucide-react'
+import { TableColumn } from '@/components/ui/enhanced-table'
+import { Plus, FileDown, Layers, Edit2, CheckSquare, Loader2 } from 'lucide-react'
 import { alert } from '@/lib/ui/alert-dialog'
 import { DateCell, StatusCell, ActionCell, CurrencyCell } from '@/components/table-cells'
 
@@ -75,9 +75,6 @@ export default function PaymentsPage() {
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
   const [selectedReceipt, setSelectedReceipt] = useState<Receipt | null>(null)
   const [editingReceipt, setEditingReceipt] = useState<Receipt | null>(null)
-  const [searchQuery, setSearchQuery] = useState('')
-
-  // SWR 自動載入資料，不需要手動 fetch
 
   // 如果有 URL 參數，自動開啟新增對話框
   useEffect(() => {
@@ -104,9 +101,6 @@ export default function PaymentsPage() {
     setIsDialogOpen(true)
   }, [])
 
-  // 收款單資料（搜尋由 EnhancedTable 處理）
-  const filteredReceipts = receipts
-
   // 事件處理（會計確認對話框用）
   const handleViewDetail = useCallback((receipt: Receipt) => {
     setSelectedReceipt(receipt)
@@ -129,7 +123,7 @@ export default function PaymentsPage() {
   }
 
   const handleExportExcel = () => {
-    exportReceiptsToExcel(filteredReceipts)
+    exportReceiptsToExcel(receipts)
   }
 
   // 表格欄位
@@ -145,14 +139,16 @@ export default function PaymentsPage() {
   ]
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
+    <>
+      <ListPageLayout
         title={FinanceLabels.paymentManagement}
-        showSearch={true}
-        searchTerm={searchQuery}
-        onSearchChange={setSearchQuery}
+        data={receipts}
+        columns={columns}
+        searchFields={['receipt_number', 'order_number', 'tour_name']}
         searchPlaceholder={FinanceLabels.searchReceiptPlaceholder}
-        actions={
+        onRowClick={handleRowClick}
+        defaultSort={{ key: 'receipt_date', direction: 'desc' }}
+        headerActions={
           <div className="flex gap-2">
             <Button
               variant="outline"
@@ -194,18 +190,6 @@ export default function PaymentsPage() {
         }
       />
 
-      <div className="flex-1 overflow-auto">
-        <EnhancedTable
-          className="min-h-full"
-          data={filteredReceipts}
-          columns={columns as TableColumn[]}
-          defaultSort={{ key: 'receipt_date', direction: 'desc' }}
-          searchTerm={searchQuery}
-          searchableFields={['receipt_number', 'order_number', 'tour_name']}
-          onRowClick={handleRowClick}
-        />
-      </div>
-
       {/* 新增/編輯收款對話框 */}
       <AddReceiptDialog
         open={isDialogOpen}
@@ -235,6 +219,6 @@ export default function PaymentsPage() {
         onConfirm={handleConfirmReceipt}
         onSuccess={invalidateReceipts}
       />
-    </div>
+    </>
   )
 }
