@@ -19,7 +19,7 @@ import {
   Clock,
   AlertCircle,
 } from 'lucide-react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, type Column } from '@/components/ui/enhanced-table'
 import { DateCell, StatusCell, ActionCell } from '@/components/table-cells'
@@ -332,16 +332,15 @@ export function LeaveManagementPage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={L.page_title}
-        icon={Calendar}
-        breadcrumb={[
-          { label: L.breadcrumb_home, href: '/' },
-          { label: L.breadcrumb_hr, href: '/hr' },
-          { label: L.breadcrumb_leave, href: '/hr/leave' },
-        ]}
-      />
+    <ContentPageLayout
+      title={L.page_title}
+      icon={Calendar}
+      breadcrumb={[
+        { label: L.breadcrumb_home, href: '/' },
+        { label: L.breadcrumb_hr, href: '/hr' },
+        { label: L.breadcrumb_leave, href: '/hr/leave' },
+      ]}
+    >
 
       {/* 頁籤 */}
       <div className="p-4 bg-card border-b border-border">
@@ -482,7 +481,7 @@ export function LeaveManagementPage() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </ContentPageLayout>
   )
 }
 

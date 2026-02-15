@@ -17,7 +17,7 @@ import {
   Play,
   ArrowRight,
 } from 'lucide-react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { EnhancedTable, type Column } from '@/components/ui/enhanced-table'
@@ -200,26 +200,25 @@ export function PeriodEndClosing() {
   ]
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={ACCOUNTING_REPORT_LABELS.PC_TITLE}
-        icon={FileCheck}
-        breadcrumb={[
-          { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_HOME, href: '/' },
-          { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_ACCOUNTING, href: '/erp-accounting' },
-          { label: ACCOUNTING_REPORT_LABELS.PC_TITLE, href: '/erp-accounting/period-closing' },
-        ]}
-        actions={
-          <Button
-            onClick={() => setShowHistory(!showHistory)}
-            variant="outline"
-            className="gap-2"
-          >
-            <History size={16} />
-            {showHistory ? ACCOUNTING_REPORT_LABELS.PC_TOGGLE_CLOSING : ACCOUNTING_REPORT_LABELS.PC_TOGGLE_HISTORY}
-          </Button>
-        }
-      />
+    <ContentPageLayout
+      title={ACCOUNTING_REPORT_LABELS.PC_TITLE}
+      icon={FileCheck}
+      breadcrumb={[
+        { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_ACCOUNTING, href: '/erp-accounting' },
+        { label: ACCOUNTING_REPORT_LABELS.PC_TITLE, href: '/erp-accounting/period-closing' },
+      ]}
+      headerActions={
+        <Button
+          onClick={() => setShowHistory(!showHistory)}
+          variant="outline"
+          className="gap-2"
+        >
+          <History size={16} />
+          {showHistory ? ACCOUNTING_REPORT_LABELS.PC_TOGGLE_CLOSING : ACCOUNTING_REPORT_LABELS.PC_TOGGLE_HISTORY}
+        </Button>
+      }
+    >
 
       {showHistory ? (
         // 歷史記錄
@@ -468,6 +467,6 @@ export function PeriodEndClosing() {
           )}
         </div>
       )}
-    </div>
+    </ContentPageLayout>
   )
 }

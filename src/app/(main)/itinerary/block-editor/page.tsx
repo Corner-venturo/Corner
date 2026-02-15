@@ -357,7 +357,6 @@ function BlockEditorPageContent() {
             </div>
           </div>
         </div>
-      </div>
     </ContentPageLayout>
   )
 }

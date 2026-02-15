@@ -7,7 +7,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { Scale, Download, Calendar, Search, CheckCircle, AlertCircle } from 'lucide-react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { EnhancedTable, type Column } from '@/components/ui/enhanced-table'
@@ -179,27 +179,26 @@ export function TrialBalanceReport() {
   ]
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={ACCOUNTING_REPORT_LABELS.TB_TITLE}
-        icon={Scale}
-        breadcrumb={[
-          { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_HOME, href: '/' },
-          { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_ACCOUNTING, href: '/erp-accounting' },
-          { label: ACCOUNTING_REPORT_LABELS.TB_TITLE, href: '/erp-accounting/reports/trial-balance' },
-        ]}
-        actions={
-          <Button
-            onClick={handleExport}
-            disabled={entries.length === 0}
-            variant="outline"
-            className="gap-2"
-          >
-            <Download size={16} />
-            {ACCOUNTING_REPORT_LABELS.EXPORT_CSV}
-          </Button>
-        }
-      />
+    <ContentPageLayout
+      title={ACCOUNTING_REPORT_LABELS.TB_TITLE}
+      icon={Scale}
+      breadcrumb={[
+        { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_ACCOUNTING, href: '/erp-accounting' },
+        { label: ACCOUNTING_REPORT_LABELS.TB_TITLE, href: '/erp-accounting/reports/trial-balance' },
+      ]}
+      headerActions={
+        <Button
+          onClick={handleExport}
+          disabled={entries.length === 0}
+          variant="outline"
+          className="gap-2"
+        >
+          <Download size={16} />
+          {ACCOUNTING_REPORT_LABELS.EXPORT_CSV}
+        </Button>
+      }
+    >
 
       {/* 篩選區 */}
       <div className="p-4 bg-card border-b border-border">
@@ -306,6 +305,6 @@ export function TrialBalanceReport() {
           </div>
         ) : null}
       </div>
-    </div>
+    </ContentPageLayout>
   )
 }

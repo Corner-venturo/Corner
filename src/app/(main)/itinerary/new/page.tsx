@@ -231,7 +231,6 @@ function NewItineraryPageContent() {
               </div>
             </div>
           </div>
-        </div>
       </ContentPageLayout>
     )
   }

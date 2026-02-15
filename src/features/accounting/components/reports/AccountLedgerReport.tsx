@@ -7,7 +7,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { FileText, Download, Calendar, Search } from 'lucide-react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Combobox, type ComboboxOption } from '@/components/ui/combobox'
@@ -313,28 +313,27 @@ export function AccountLedgerReport() {
   ]
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={ACCOUNTING_REPORT_LABELS.AL_TITLE}
-        icon={FileText}
-        breadcrumb={[
-          { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_HOME, href: '/' },
-          { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_ACCOUNTING, href: '/erp-accounting' },
-          { label: ACCOUNTING_REPORT_LABELS.AL_BREADCRUMB_REPORTS, href: '/erp-accounting/reports' },
-          { label: ACCOUNTING_REPORT_LABELS.AL_TITLE, href: '/erp-accounting/reports/account-ledger' },
-        ]}
-        actions={
-          <Button
-            onClick={handleExport}
-            disabled={entries.length === 0 || !selectedAccount}
-            variant="outline"
-            className="gap-2"
-          >
-            <Download size={16} />
-            {ACCOUNTING_REPORT_LABELS.EXPORT_CSV}
-          </Button>
-        }
-      />
+    <ContentPageLayout
+      title={ACCOUNTING_REPORT_LABELS.AL_TITLE}
+      icon={FileText}
+      breadcrumb={[
+        { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_ACCOUNTING, href: '/erp-accounting' },
+        { label: ACCOUNTING_REPORT_LABELS.AL_BREADCRUMB_REPORTS, href: '/erp-accounting/reports' },
+        { label: ACCOUNTING_REPORT_LABELS.AL_TITLE, href: '/erp-accounting/reports/account-ledger' },
+      ]}
+      headerActions={
+        <Button
+          onClick={handleExport}
+          disabled={entries.length === 0 || !selectedAccount}
+          variant="outline"
+          className="gap-2"
+        >
+          <Download size={16} />
+          {ACCOUNTING_REPORT_LABELS.EXPORT_CSV}
+        </Button>
+      }
+    >
 
       {/* 篩選區 */}
       <div className="p-4 bg-card border-b border-border">
@@ -457,6 +456,6 @@ export function AccountLedgerReport() {
           </div>
         ) : null}
       </div>
-    </div>
+    </ContentPageLayout>
   )
 }

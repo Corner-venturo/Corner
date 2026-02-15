@@ -7,7 +7,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { Wallet, Download, Calendar, Search, Building, CreditCard, PiggyBank } from 'lucide-react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { useAccountingReports, type BalanceSheetResult } from '../../hooks/useAccountingReports'
@@ -83,27 +83,26 @@ export function BalanceSheetReport() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={REPORTS_LABELS.LABEL_5536}
-        icon={Wallet}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '會計', href: '/erp-accounting' },
-          { label: '資產負債表', href: '/erp-accounting/reports/balance-sheet' },
-        ]}
-        actions={
-          <Button
-            onClick={handleExport}
-            disabled={!data}
-            variant="outline"
-            className="gap-2"
-          >
-            <Download size={16} />
-            {REPORTS_LABELS.EXPORT_9918}
-          </Button>
-        }
-      />
+    <ContentPageLayout
+      title={REPORTS_LABELS.LABEL_5536}
+      icon={Wallet}
+      breadcrumb={[
+        { label: '首頁', href: '/' },
+        { label: '會計', href: '/erp-accounting' },
+        { label: '資產負債表', href: '/erp-accounting/reports/balance-sheet' },
+      ]}
+      headerActions={
+        <Button
+          onClick={handleExport}
+          disabled={!data}
+          variant="outline"
+          className="gap-2"
+        >
+          <Download size={16} />
+          {REPORTS_LABELS.EXPORT_9918}
+        </Button>
+      }
+    >
 
       {/* 篩選區 */}
       <div className="p-4 bg-card border-b border-border">
@@ -279,6 +278,6 @@ export function BalanceSheetReport() {
           </div>
         ) : null}
       </div>
-    </div>
+    </ContentPageLayout>
   )
 }

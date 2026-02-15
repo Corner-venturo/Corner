@@ -7,7 +7,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { Banknote, Download, Calendar, Search, ArrowUpRight, ArrowDownRight, TrendingUp, TrendingDown } from 'lucide-react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { useAccountingReports, type CashFlowResult } from '../../hooks/useAccountingReports'
@@ -96,27 +96,26 @@ export function CashFlowStatementReport() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={REPORTS_LABELS.LABEL_3933}
-        icon={Banknote}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '會計', href: '/erp-accounting' },
-          { label: '現金流量表', href: '/erp-accounting/reports/cash-flow' },
-        ]}
-        actions={
-          <Button
-            onClick={handleExport}
-            disabled={!data}
-            variant="outline"
-            className="gap-2"
-          >
-            <Download size={16} />
-            {REPORTS_LABELS.EXPORT_9918}
-          </Button>
-        }
-      />
+    <ContentPageLayout
+      title={REPORTS_LABELS.LABEL_3933}
+      icon={Banknote}
+      breadcrumb={[
+        { label: '首頁', href: '/' },
+        { label: '會計', href: '/erp-accounting' },
+        { label: '現金流量表', href: '/erp-accounting/reports/cash-flow' },
+      ]}
+      headerActions={
+        <Button
+          onClick={handleExport}
+          disabled={!data}
+          variant="outline"
+          className="gap-2"
+        >
+          <Download size={16} />
+          {REPORTS_LABELS.EXPORT_9918}
+        </Button>
+      }
+    >
 
       {/* 篩選區 */}
       <div className="p-4 bg-card border-b border-border">
@@ -337,6 +336,6 @@ export function CashFlowStatementReport() {
           </div>
         ) : null}
       </div>
-    </div>
+    </ContentPageLayout>
   )
 }

@@ -7,7 +7,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { TrendingUp, Download, Calendar, Search, ArrowUp, ArrowDown, Minus } from 'lucide-react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { useAccountingReports, type IncomeStatementResult } from '../../hooks/useAccountingReports'
@@ -103,27 +103,26 @@ export function IncomeStatementReport() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={ACCOUNTING_REPORT_LABELS.IS_TITLE}
-        icon={TrendingUp}
-        breadcrumb={[
-          { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_HOME, href: '/' },
-          { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_ACCOUNTING, href: '/erp-accounting' },
-          { label: ACCOUNTING_REPORT_LABELS.IS_TITLE, href: '/erp-accounting/reports/income-statement' },
-        ]}
-        actions={
-          <Button
-            onClick={handleExport}
-            disabled={!data}
-            variant="outline"
-            className="gap-2"
-          >
-            <Download size={16} />
-            {ACCOUNTING_REPORT_LABELS.EXPORT_CSV}
-          </Button>
-        }
-      />
+    <ContentPageLayout
+      title={ACCOUNTING_REPORT_LABELS.IS_TITLE}
+      icon={TrendingUp}
+      breadcrumb={[
+        { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: ACCOUNTING_REPORT_LABELS.BREADCRUMB_ACCOUNTING, href: '/erp-accounting' },
+        { label: ACCOUNTING_REPORT_LABELS.IS_TITLE, href: '/erp-accounting/reports/income-statement' },
+      ]}
+      headerActions={
+        <Button
+          onClick={handleExport}
+          disabled={!data}
+          variant="outline"
+          className="gap-2"
+        >
+          <Download size={16} />
+          {ACCOUNTING_REPORT_LABELS.EXPORT_CSV}
+        </Button>
+      }
+    >
 
       {/* 篩選區 */}
       <div className="p-4 bg-card border-b border-border">
@@ -311,6 +310,6 @@ export function IncomeStatementReport() {
           </div>
         ) : null}
       </div>
-    </div>
+    </ContentPageLayout>
   )
 }

@@ -17,7 +17,7 @@ import {
   LogIn,
   LogOut,
 } from 'lucide-react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, type Column } from '@/components/ui/enhanced-table'
 import { DateCell, ActionCell } from '@/components/table-cells'
@@ -288,25 +288,24 @@ export function AttendanceManagementPage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title={L.page_title}
-        icon={Clock}
-        breadcrumb={[
-          { label: L.breadcrumb_home, href: '/' },
-          { label: L.breadcrumb_hr, href: '/hr' },
-          { label: L.breadcrumb_attendance, href: '/hr/attendance' },
-        ]}
-        actions={
-          <Button
-            onClick={handleAdd}
-            className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-          >
-            <Plus size={16} />
-            {L.btn_add}
-          </Button>
-        }
-      />
+    <ContentPageLayout
+      title={L.page_title}
+      icon={Clock}
+      breadcrumb={[
+        { label: L.breadcrumb_home, href: '/' },
+        { label: L.breadcrumb_hr, href: '/hr' },
+        { label: L.breadcrumb_attendance, href: '/hr/attendance' },
+      ]}
+      headerActions={
+        <Button
+          onClick={handleAdd}
+          className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+        >
+          <Plus size={16} />
+          {L.btn_add}
+        </Button>
+      }
+    >
 
       {/* 篩選區 */}
       <div className="p-4 bg-card border-b border-border">
@@ -486,6 +485,6 @@ export function AttendanceManagementPage() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </ContentPageLayout>
   )
 }
