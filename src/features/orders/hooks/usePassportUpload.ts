@@ -23,12 +23,28 @@ import type { ProcessedFile } from '../types/order-member.types'
 import { usePassportFiles } from './passport/usePassportFiles'
 import { usePassportOcr } from './passport/usePassportOcr'
 import { usePassportValidation } from './passport/usePassportValidation'
-import { COMP_ORDERS_LABELS } from '../constants/labels'
+import { COMP_ORDERS_LABELS, PASSPORT_CONFLICT_LABELS } from '../constants/labels'
+import {
+  syncPassportToCustomer,
+  findActiveOrderConflicts,
+  type ActiveOrderConflict,
+} from '@/lib/utils/sync-passport-image'
 
 interface UsePassportUploadParams {
   orderId: string | undefined
   workspaceId: string
   onSuccess: () => Promise<void>  // 上傳成功後的回呼（通常是重新載入成員）
+}
+
+/** 護照資料（用於衝突 Dialog） */
+interface PassportDataForConflict {
+  passport_number?: string | null
+  passport_name?: string | null
+  passport_expiry?: string | null
+  passport_image_url?: string | null
+  birth_date?: string | null
+  gender?: string | null
+  national_id?: string | null
 }
 
 interface UsePassportUploadReturn {
@@ -37,6 +53,12 @@ interface UsePassportUploadReturn {
   isUploading: boolean
   isDragging: boolean
   isProcessing: boolean
+
+  // 衝突 Dialog 狀態
+  conflictDialogOpen: boolean
+  setConflictDialogOpen: (open: boolean) => void
+  conflicts: ActiveOrderConflict[]
+  conflictPassportData: PassportDataForConflict | null
 
   // 操作
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>
@@ -55,6 +77,9 @@ export function usePassportUpload({
   onSuccess,
 }: UsePassportUploadParams): UsePassportUploadReturn {
   const [isUploading, setIsUploading] = useState(false)
+  const [conflictDialogOpen, setConflictDialogOpen] = useState(false)
+  const [conflicts, setConflicts] = useState<ActiveOrderConflict[]>([])
+  const [conflictPassportData, setConflictPassportData] = useState<PassportDataForConflict | null>(null)
 
   // 使用子模組
   const fileModule = usePassportFiles()
@@ -157,6 +182,74 @@ export function usePassportUpload({
         }
       }
 
+      // 護照回寫客戶 + 檢查未出發訂單衝突
+      // 收集所有處理過的成員的 customer_id，用於回寫和衝突檢查
+      const processedCustomerIds = new Set<string>()
+      let lastPassportData: PassportDataForConflict | null = null
+
+      for (let i = 0; i < result.results.length; i++) {
+        const item = result.results[i]
+        if (!item.success || !item.customer) continue
+
+        // 查詢剛建立/更新的成員，取得 customer_id
+        const passportNum = item.customer.passport_number
+        const idNum = item.customer.national_id
+        if (!passportNum && !idNum) continue
+
+        let memberQuery = supabase
+          .from('order_members')
+          .select('id, customer_id')
+          .eq('order_id', orderId)
+
+        if (passportNum) {
+          memberQuery = memberQuery.eq('passport_number', passportNum)
+        } else if (idNum) {
+          memberQuery = memberQuery.eq('id_number', idNum)
+        }
+
+        const { data: memberRows } = await memberQuery.limit(1)
+        const member = memberRows?.[0]
+
+        if (member?.customer_id) {
+          const custId = member.customer_id as string
+          const pData: PassportDataForConflict = {
+            passport_number: item.customer.passport_number || null,
+            passport_name: item.customer.passport_romanization || item.customer.english_name || null,
+            passport_expiry: item.customer.passport_expiry || null,
+            birth_date: item.customer.birth_date || null,
+            gender: item.customer.sex === COMP_ORDERS_LABELS.男 ? 'M' : item.customer.sex === COMP_ORDERS_LABELS.女 ? 'F' : null,
+            national_id: item.customer.national_id || null,
+          }
+
+          // 回寫客戶
+          const writebackOk = await syncPassportToCustomer(custId, pData)
+          if (!writebackOk) {
+            logger.warn(PASSPORT_CONFLICT_LABELS.writeback_fail, { customerId: custId })
+          }
+
+          processedCustomerIds.add(custId)
+          lastPassportData = pData
+        }
+      }
+
+      // 檢查未出發訂單衝突
+      const allConflicts: ActiveOrderConflict[] = []
+      for (const custId of processedCustomerIds) {
+        const custConflicts = await findActiveOrderConflicts({
+          customerId: custId,
+          passportData: lastPassportData || {},
+        })
+        // 排除當前訂單的成員
+        const filtered = custConflicts.filter(c => c.orderId !== orderId)
+        allConflicts.push(...filtered)
+      }
+
+      if (allConflicts.length > 0) {
+        setConflicts(allConflicts)
+        setConflictPassportData(lastPassportData)
+        setConflictDialogOpen(true)
+      }
+
       // 顯示結果
       let message = `成功辨識 ${result.successful}/${result.total} 張護照`
       if (successCount > 0) {
@@ -204,6 +297,12 @@ export function usePassportUpload({
     isUploading,
     isDragging: fileModule.isDragging,
     isProcessing: fileModule.isProcessing,
+    // 衝突 Dialog
+    conflictDialogOpen,
+    setConflictDialogOpen,
+    conflicts,
+    conflictPassportData,
+    // 操作
     handleFileChange: fileModule.handleFileChange,
     handleDragOver: fileModule.handleDragOver,
     handleDragLeave: fileModule.handleDragLeave,

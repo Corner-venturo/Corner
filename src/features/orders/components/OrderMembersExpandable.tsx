@@ -67,6 +67,7 @@ import {
   PnrMatchDialog,
 } from './'
 import dynamic from 'next/dynamic'
+import { PassportConflictDialog } from './PassportConflictDialog'
 
 const TourPrintDialog = dynamic(() => import('@/features/tours/components/TourPrintDialog').then(m => m.TourPrintDialog), { ssr: false })
 import type { OrderMember, OrderMembersExpandableProps, CustomCostField } from '../types/order-member.types'
@@ -904,6 +905,12 @@ export function OrderMembersExpandable({
           onClose={() => memberExport.setIsExportDialogOpen(false)}
         />
       )}
+      <PassportConflictDialog
+        open={passportUpload.conflictDialogOpen}
+        onOpenChange={passportUpload.setConflictDialogOpen}
+        conflicts={passportUpload.conflicts}
+        passportData={passportUpload.conflictPassportData || {}}
+      />
       <TourAssignmentManager
         tourId={tourId}
         tour={membersData.departureDate && membersData.returnDate ? {

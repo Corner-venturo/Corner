@@ -314,3 +314,21 @@ export const EXPORT_DIALOG_LABELS = {
   gender_male: '男',
   gender_female: '女',
 };
+
+// 護照衝突 Dialog 標籤
+export const PASSPORT_CONFLICT_LABELS = {
+  title: '護照資料衝突',
+  desc: '以下未出發訂單的團員護照資料與新上傳的不同，是否要一併更新？',
+  order: '訂單',
+  tour: '團號',
+  member: '團員',
+  field: '欄位',
+  old_value: '舊值',
+  new_value: '新值',
+  update_all: '全部更新',
+  skip: '跳過',
+  updating: '更新中...',
+  success: '已更新 {count} 位團員的護照資料',
+  fail: '更新衝突成員失敗',
+  writeback_fail: '回寫客戶護照資料失敗',
+};
