@@ -6,6 +6,10 @@ import { useState, useRef } from 'react'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import type { Visa } from '@/stores/types'
+import {
+  findActiveOrderConflicts,
+  type ActiveOrderConflict,
+} from '@/lib/utils/sync-passport-image'
 
 // 從 URL 提取檔名並刪除舊照片（僅處理 storage URL，忽略 base64）
 async function deleteOldPassportImage(oldUrl: string | null | undefined): Promise<void> {
@@ -65,6 +69,18 @@ export function useBatchPickup({ pendingVisas, updateVisa, onComplete }: UseBatc
   // 配對結果
   const [matchedItems, setMatchedItems] = useState<MatchedItem[]>([])
   const [pickupDate, setPickupDate] = useState(getTodayString())
+
+  // 衝突 Dialog 狀態
+  const [conflictDialogOpen, setConflictDialogOpen] = useState(false)
+  const [conflicts, setConflicts] = useState<ActiveOrderConflict[]>([])
+  const [conflictPassportData, setConflictPassportData] = useState<{
+    passport_number?: string | null
+    passport_name?: string | null
+    passport_expiry?: string | null
+    birth_date?: string | null
+    gender?: string | null
+    national_id?: string | null
+  } | null>(null)
 
   // 重置狀態
   const resetState = () => {
@@ -286,6 +302,8 @@ export function useBatchPickup({ pendingVisas, updateVisa, onComplete }: UseBatc
     setIsProcessing(true)
     try {
       const updatedVisaIds: string[] = []
+      const allConflicts: ActiveOrderConflict[] = []
+      let lastPData: typeof conflictPassportData = null
 
       for (const item of itemsToProcess) {
         if (!item.manualVisaId) continue
@@ -331,13 +349,41 @@ export function useBatchPickup({ pendingVisas, updateVisa, onComplete }: UseBatc
                   await deleteOldPassportImage(oldPassportUrl)
                 }
 
-                logger.log(`✅ 已更新顧客護照資訊: ${customer.name}`)
+                logger.log(`已更新顧客護照資訊: ${customer.name}`)
+
+                // 檢查未出發訂單衝突
+                const ocrCustomer = item.ocrResult.customer
+                if (ocrCustomer) {
+                  const pData = {
+                    passport_number: ocrCustomer.passport_number || null,
+                    passport_name: ocrCustomer.passport_name || null,
+                    passport_expiry: ocrCustomer.passport_expiry || null,
+                    birth_date: ocrCustomer.birth_date || null,
+                    gender: ocrCustomer.gender || null,
+                    national_id: ocrCustomer.national_id || null,
+                  }
+                  const custConflicts = await findActiveOrderConflicts({
+                    customerId: customer.id,
+                    passportData: pData,
+                  })
+                  if (custConflicts.length > 0) {
+                    allConflicts.push(...custConflicts)
+                    lastPData = pData
+                  }
+                }
               }
             }
           } catch (err) {
             logger.error('更新顧客資訊失敗:', err)
           }
         }
+      }
+
+      // 如果有衝突，顯示 Dialog
+      if (allConflicts.length > 0) {
+        setConflicts(allConflicts)
+        setConflictPassportData(lastPData)
+        setConflictDialogOpen(true)
       }
 
       toast.success(`已完成 ${updatedVisaIds.length} 筆下件`)
@@ -370,6 +416,12 @@ export function useBatchPickup({ pendingVisas, updateVisa, onComplete }: UseBatc
     pickupDate,
     selectedVisaIds,
     confirmableCount,
+
+    // 衝突 Dialog
+    conflictDialogOpen,
+    setConflictDialogOpen,
+    conflicts,
+    conflictPassportData,
 
     // Actions
     setStep,

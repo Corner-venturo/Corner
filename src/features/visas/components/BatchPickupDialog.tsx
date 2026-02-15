@@ -16,6 +16,7 @@ import { useBatchPickup } from '../hooks/useBatchPickup'
 import { PickupList } from './PickupList'
 import { PickupSummary } from './PickupSummary'
 import { BATCH_PICKUP_DIALOG_LABELS as L } from '../constants/labels'
+import { PassportConflictDialog } from '@/features/orders/components/PassportConflictDialog'
 
 interface BatchPickupDialogProps {
   open: boolean
@@ -54,6 +55,10 @@ export function BatchPickupDialog({
     handleManualSelect,
     handleToggleUpdateCustomer,
     handleConfirmPickup,
+    conflictDialogOpen,
+    setConflictDialogOpen,
+    conflicts,
+    conflictPassportData,
   } = useBatchPickup({ pendingVisas, updateVisa, onComplete })
 
   const handleClose = () => {
@@ -62,6 +67,7 @@ export function BatchPickupDialog({
   }
 
   return (
+    <>
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
       <DialogContent level={1} className="max-w-4xl max-h-[90vh] flex flex-col">
         <DialogHeader>
@@ -230,5 +236,12 @@ export function BatchPickupDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    <PassportConflictDialog
+      open={conflictDialogOpen}
+      onOpenChange={setConflictDialogOpen}
+      conflicts={conflicts}
+      passportData={conflictPassportData || {}}
+    />
+  </>
   )
 }
