@@ -27,7 +27,7 @@ import { TourItineraryDialog } from './TourItineraryDialog'
 import { ContractDialog } from '@/features/contracts/components/ContractDialog'
 import { TourClosingDialog } from './TourClosingDialog'
 // TourControlDialogWrapper 已移除，功能整合到團確單
-import { TourRequirementsDialog } from './TourRequirementsDialog'
+// TourRequirementsDialog removed — use tour detail page instead
 import { TourEditDialog } from '@/features/tours/components/tour-edit-dialog'
 import { ProposalsTableContent } from '@/features/proposals/components/ProposalsTableContent'
 import { convertToTour } from '@/services/proposal.service'
@@ -42,7 +42,7 @@ export const ToursPage: React.FC = () => {
   const router = useRouter()
   const { user } = useAuthStore()
 
-  const [requirementsDialogTour, setRequirementsDialogTour] = useState<Tour | null>(null)
+  // requirementsDialogTour removed — use tour detail page instead
 
   // Edit dialog state (using TourEditDialog instead of TourForm for edit mode)
   const [editDialogTour, setEditDialogTour] = useState<Tour | null>(null)
@@ -242,9 +242,7 @@ export const ToursPage: React.FC = () => {
     onOpenContractDialog: openContractDialog,
     onCloseTour: openClosingDialog,
     onOpenArchiveDialog: openArchiveDialog,
-    onOpenRequirementsDialog: (tour: Tour) => {
-      setRequirementsDialogTour(tour)
-    },
+    onOpenRequirementsDialog: undefined,
     onProposalClick: handleProposalClick,
     onProposalEdit: handleEditProposal,
     onProposalArchive: handleOpenArchiveDialog,
@@ -439,12 +437,7 @@ export const ToursPage: React.FC = () => {
         />
       )}
 
-      {/* 需求總表對話框 */}
-      <TourRequirementsDialog
-        open={!!requirementsDialogTour}
-        tour={requirementsDialogTour}
-        onClose={() => setRequirementsDialogTour(null)}
-      />
+      {/* 需求總表對話框已移除 — 統一使用詳情頁 */}
 
       {/* 🔧 TOUR-01: 提案對話框整合到 ProposalDialogsWrapper */}
       <ProposalDialogsWrapper {...proposalOps} onRefreshProposals={refreshProposals} />
