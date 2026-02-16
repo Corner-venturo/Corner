@@ -20,6 +20,7 @@ import {
   Users,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { TEST_SUPPLIER_LABELS } from './constants/labels'
 
 // ============================================
 // 型別
@@ -169,7 +170,7 @@ export default function TestSupplierPage() {
             className="flex items-center gap-1.5 text-sm text-[#8a7e72] hover:text-[#4a4540]"
           >
             <ArrowLeft size={16} />
-            返回
+            {TEST_SUPPLIER_LABELS.BACK}
           </button>
           {!isReadOnly && (
             <Button
@@ -178,7 +179,7 @@ export default function TestSupplierPage() {
               className="bg-amber-600 hover:bg-amber-700 text-white gap-1.5"
             >
               <Save size={14} />
-              送出回覆
+              {TEST_SUPPLIER_LABELS.LABEL_8347}
             </Button>
           )}
         </div>
@@ -191,27 +192,27 @@ export default function TestSupplierPage() {
             </h1>
             <div className="grid grid-cols-4 gap-x-8 gap-y-1 text-sm border border-[#e0dcd7] rounded p-4 bg-[#faf9f7]">
               <div>
-                <span className="text-[#8a7e72]">發送方：</span>
+                <span className="text-[#8a7e72]">{TEST_SUPPLIER_LABELS.SENDING_6731}</span>
                 <span className="text-[#4a4540] font-medium">{selectedSheet.sender_company}</span>
               </div>
               <div>
-                <span className="text-[#8a7e72]">聯絡人：</span>
+                <span className="text-[#8a7e72]">{TEST_SUPPLIER_LABELS.LABEL_8976}</span>
                 <span className="text-[#4a4540]">{selectedSheet.sender_contact}</span>
               </div>
               <div>
-                <span className="text-[#8a7e72]">出發日：</span>
+                <span className="text-[#8a7e72]">{TEST_SUPPLIER_LABELS.LABEL_1613}</span>
                 <span className="text-[#4a4540] font-medium">{selectedSheet.departure_date}</span>
               </div>
               <div>
-                <span className="text-[#8a7e72]">人數：</span>
+                <span className="text-[#8a7e72]">{TEST_SUPPLIER_LABELS.LABEL_7494}</span>
                 <span className="text-[#4a4540] font-medium">{selectedSheet.pax} 人</span>
               </div>
               <div className="col-span-2">
-                <span className="text-[#8a7e72]">團名：</span>
+                <span className="text-[#8a7e72]">{TEST_SUPPLIER_LABELS.LABEL_5719}</span>
                 <span className="text-[#4a4540]">{selectedSheet.tour_name}</span>
               </div>
               <div>
-                <span className="text-[#8a7e72]">電話：</span>
+                <span className="text-[#8a7e72]">{TEST_SUPPLIER_LABELS.LABEL_6786}</span>
                 <span className="text-[#4a4540]">{selectedSheet.sender_phone}</span>
               </div>
             </div>
@@ -222,14 +223,14 @@ export default function TestSupplierPage() {
             <table className="w-full text-sm border-collapse">
               <thead>
                 <tr className="bg-[#f0ece7]">
-                  <th className="border-b border-r border-[#d5d0ca] px-3 py-2.5 text-left font-semibold text-[#4a4540] w-[70px]">日期</th>
-                  <th className="border-b border-r border-[#d5d0ca] px-3 py-2.5 text-left font-semibold text-[#4a4540] w-[60px]">類別</th>
-                  <th className="border-b border-r border-[#d5d0ca] px-3 py-2.5 text-left font-semibold text-[#4a4540]">項目</th>
-                  <th className="border-b border-r border-[#d5d0ca] px-3 py-2.5 text-center font-semibold text-[#4a4540] w-[60px]">數量</th>
-                  <th className="border-b border-r border-[#d5d0ca] px-3 py-2.5 text-center font-semibold text-[#4a4540] w-[90px]">指示</th>
-                  <th className="border-b border-r border-[#d5d0ca] px-3 py-2.5 text-left font-semibold text-amber-700 w-[100px] bg-amber-50/50">報價</th>
-                  <th className="border-b border-r border-[#d5d0ca] px-3 py-2.5 text-left font-semibold text-amber-700 w-[180px] bg-amber-50/50">回覆明細</th>
-                  <th className="border-b border-[#d5d0ca] px-3 py-2.5 text-left font-semibold text-amber-700 w-[140px] bg-amber-50/50">備註</th>
+                  <th className="border-b border-r border-[#d5d0ca] px-3 py-2.5 text-left font-semibold text-[#4a4540] w-[70px]">{TEST_SUPPLIER_LABELS.DATE}</th>
+                  <th className="border-b border-r border-[#d5d0ca] px-3 py-2.5 text-left font-semibold text-[#4a4540] w-[60px]">{TEST_SUPPLIER_LABELS.LABEL_8047}</th>
+                  <th className="border-b border-r border-[#d5d0ca] px-3 py-2.5 text-left font-semibold text-[#4a4540]">{TEST_SUPPLIER_LABELS.LABEL_2283}</th>
+                  <th className="border-b border-r border-[#d5d0ca] px-3 py-2.5 text-center font-semibold text-[#4a4540] w-[60px]">{TEST_SUPPLIER_LABELS.QUANTITY}</th>
+                  <th className="border-b border-r border-[#d5d0ca] px-3 py-2.5 text-center font-semibold text-[#4a4540] w-[90px]">{TEST_SUPPLIER_LABELS.LABEL_3532}</th>
+                  <th className="border-b border-r border-[#d5d0ca] px-3 py-2.5 text-left font-semibold text-amber-700 w-[100px] bg-amber-50/50">{TEST_SUPPLIER_LABELS.LABEL_9228}</th>
+                  <th className="border-b border-r border-[#d5d0ca] px-3 py-2.5 text-left font-semibold text-amber-700 w-[180px] bg-amber-50/50">{TEST_SUPPLIER_LABELS.LABEL_375}</th>
+                  <th className="border-b border-[#d5d0ca] px-3 py-2.5 text-left font-semibold text-amber-700 w-[140px] bg-amber-50/50">{TEST_SUPPLIER_LABELS.REMARKS}</th>
                 </tr>
               </thead>
               <tbody>
@@ -276,7 +277,7 @@ export default function TestSupplierPage() {
                               value={item.reply_price}
                               onChange={(e) => updateItem(item.id, 'reply_price', e.target.value)}
                               className="h-7 text-sm border-[#d5d0ca] bg-white"
-                              placeholder="金額"
+                              placeholder={TEST_SUPPLIER_LABELS.AMOUNT}
                             />
                           )
                         ) : (
@@ -318,22 +319,22 @@ export default function TestSupplierPage() {
           {!isReadOnly && (
             <div className="mt-4 flex gap-4">
               <div className="flex-1">
-                <label className="text-xs text-[#8a7e72] mb-1 block">整體備註</label>
+                <label className="text-xs text-[#8a7e72] mb-1 block">{TEST_SUPPLIER_LABELS.LABEL_1920}</label>
                 <textarea
                   value={overallNote}
                   onChange={(e) => setOverallNote(e.target.value)}
                   className="w-full border border-[#d5d0ca] rounded px-3 py-2 text-sm resize-none h-20 focus:outline-none focus:border-amber-400"
-                  placeholder="補充說明..."
+                  placeholder={TEST_SUPPLIER_LABELS.LABEL_7916}
                 />
               </div>
               <div className="w-[280px]">
-                <label className="text-xs text-[#8a7e72] mb-1 block">如需整包報價（按人數階梯）</label>
+                <label className="text-xs text-[#8a7e72] mb-1 block">{TEST_SUPPLIER_LABELS.LABEL_3563}</label>
                 <div className="border border-[#d5d0ca] rounded overflow-hidden">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-[#f0ece7]">
-                        <th className="border-b border-r border-[#d5d0ca] px-2 py-1.5 text-left text-xs font-medium text-[#8a7e72]">人數</th>
-                        <th className="border-b border-[#d5d0ca] px-2 py-1.5 text-left text-xs font-medium text-[#8a7e72]">每人價格</th>
+                        <th className="border-b border-r border-[#d5d0ca] px-2 py-1.5 text-left text-xs font-medium text-[#8a7e72]">{TEST_SUPPLIER_LABELS.LABEL_1251}</th>
+                        <th className="border-b border-[#d5d0ca] px-2 py-1.5 text-left text-xs font-medium text-[#8a7e72]">{TEST_SUPPLIER_LABELS.LABEL_2541}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -364,7 +365,7 @@ export default function TestSupplierPage() {
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="flex items-center gap-3 mb-2">
           <ClipboardList className="h-5 w-5 text-amber-600" />
-          <h1 className="text-lg font-semibold text-[#4a4540]">需求收件匣</h1>
+          <h1 className="text-lg font-semibold text-[#4a4540]">{TEST_SUPPLIER_LABELS.LABEL_6359}</h1>
         </div>
         <p className="text-xs text-[#b0a89e] mb-6">⚠️ 測試頁面</p>
 
@@ -395,12 +396,12 @@ export default function TestSupplierPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-[#f0ece7]">
-                <th className="border-b border-[#d5d0ca] px-4 py-2.5 text-left font-semibold text-[#4a4540]">需求單</th>
-                <th className="border-b border-[#d5d0ca] px-4 py-2.5 text-left font-semibold text-[#4a4540]">團名</th>
+                <th className="border-b border-[#d5d0ca] px-4 py-2.5 text-left font-semibold text-[#4a4540]">{TEST_SUPPLIER_LABELS.LABEL_7885}</th>
+                <th className="border-b border-[#d5d0ca] px-4 py-2.5 text-left font-semibold text-[#4a4540]">{TEST_SUPPLIER_LABELS.LABEL_1594}</th>
                 <th className="border-b border-[#d5d0ca] px-4 py-2.5 text-center font-semibold text-[#4a4540] w-[70px]">人數</th>
                 <th className="border-b border-[#d5d0ca] px-4 py-2.5 text-center font-semibold text-[#4a4540] w-[70px]">項目</th>
-                <th className="border-b border-[#d5d0ca] px-4 py-2.5 text-center font-semibold text-[#4a4540] w-[80px]">狀態</th>
-                <th className="border-b border-[#d5d0ca] px-4 py-2.5 text-center font-semibold text-[#4a4540] w-[80px]">收到日</th>
+                <th className="border-b border-[#d5d0ca] px-4 py-2.5 text-center font-semibold text-[#4a4540] w-[80px]">{TEST_SUPPLIER_LABELS.STATUS}</th>
+                <th className="border-b border-[#d5d0ca] px-4 py-2.5 text-center font-semibold text-[#4a4540] w-[80px]">{TEST_SUPPLIER_LABELS.LABEL_5510}</th>
                 <th className="border-b border-[#d5d0ca] px-4 py-2.5 text-center font-semibold text-[#4a4540] w-[60px]"></th>
               </tr>
             </thead>
@@ -419,7 +420,7 @@ export default function TestSupplierPage() {
                   </td>
                   <td className="border-b border-[#e8e4df] px-4 py-3 text-[#4a4540]">
                     <div>{sheet.tour_name}</div>
-                    <div className="text-xs text-[#8a7e72]">出發 {sheet.departure_date}</div>
+                    <div className="text-xs text-[#8a7e72]">{TEST_SUPPLIER_LABELS.LABEL_5892} {sheet.departure_date}</div>
                   </td>
                   <td className="border-b border-[#e8e4df] px-4 py-3 text-center text-[#4a4540]">
                     {sheet.pax}
