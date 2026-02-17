@@ -33,6 +33,7 @@ import { useBrochureEditorV2 } from '@/features/designer/hooks/useBrochureEditor
 import { useMaskEditMode } from '@/features/designer/hooks/useMaskEditMode'
 import { LoadingOverlay, SavingIndicator } from '@/features/designer/components/LoadingOverlay'
 import { ElementLibrary } from '@/features/designer/components/ElementLibrary'
+import { ComponentLibrary } from '@/features/designer/components/ComponentLibrary'
 import { DesignerToolbar } from '@/features/designer/components/DesignerToolbar'
 import { LayerPanel } from '@/features/designer/components/LayerPanel'
 import { TemplateSelector } from '@/features/designer/components/TemplateSelector'
@@ -109,7 +110,8 @@ export default function DesignerPageContent() {
   const [templateData, setTemplateData] = useState<Record<string, unknown> | null>(null)
   const [selectedStyle, setSelectedStyle] = useState<(typeof styleSeries)[number] | null>(null)
   const [showPageList, setShowPageList] = useState(true)
-  const [showLeftPanel, setShowLeftPanel] = useState(false)
+  const [showLeftPanel, setShowLeftPanel] = useState(true)
+  const [leftPanelMode, setLeftPanelMode] = useState<'elements' | 'components'>('components')
   const [showRightPanel, setShowRightPanel] = useState(true)
   const [showLayerPanel, setShowLayerPanel] = useState(false)
   const [showBlockLibrary, setShowBlockLibrary] = useState(false)
@@ -791,6 +793,8 @@ export default function DesignerPageContent() {
         isDualPageMode={isDualPageMode}
         setIsDualPageMode={setIsDualPageMode}
         setShowBlockLibrary={setShowBlockLibrary}
+        leftPanelMode={leftPanelMode}
+        setLeftPanelMode={setLeftPanelMode}
         pageCount={generatedPages.length}
         onSave={handleSave}
         onExportPDF={handleExportPDF}
@@ -860,8 +864,17 @@ export default function DesignerPageContent() {
           />
         )}
 
-        {/* Left Panel - Element Library */}
-        {showLeftPanel && (
+        {/* Left Panel - Component Library or Element Library */}
+        {showLeftPanel && leftPanelMode === 'components' && (
+          <ComponentLibrary
+            onInsertComponent={(elements) => {
+              const handler = createBlockInsertHandler(canvas)
+              handler(elements)
+            }}
+            templateData={templateData}
+          />
+        )}
+        {showLeftPanel && leftPanelMode === 'elements' && (
           <ElementLibrary
             onAddLine={addLine}
             onAddShape={(type) => {

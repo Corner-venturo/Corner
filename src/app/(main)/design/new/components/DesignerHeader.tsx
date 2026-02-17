@@ -46,6 +46,9 @@ interface DesignerHeaderProps {
   isDualPageMode: boolean
   setIsDualPageMode: (mode: boolean) => void
   setShowBlockLibrary: (show: boolean) => void
+  // 左側面板模式
+  leftPanelMode?: 'elements' | 'components'
+  setLeftPanelMode?: (mode: 'elements' | 'components') => void
   // 頁面數量（用於判斷雙頁模式是否可用）
   pageCount: number
   // 操作
@@ -72,6 +75,8 @@ export function DesignerHeader({
   isDualPageMode,
   setIsDualPageMode,
   setShowBlockLibrary,
+  leftPanelMode,
+  setLeftPanelMode,
   pageCount,
   onSave,
   onExportPDF,
@@ -117,19 +122,20 @@ export function DesignerHeader({
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => setShowLeftPanel(!showLeftPanel)}
+        onClick={() => {
+          if (!showLeftPanel) {
+            setShowLeftPanel(true)
+            setLeftPanelMode?.('components')
+          } else if (leftPanelMode === 'components') {
+            setLeftPanelMode?.('elements')
+          } else {
+            setShowLeftPanel(false)
+          }
+        }}
         className={cn(!showLeftPanel && 'text-morandi-muted')}
-        title={DESIGNER_LABELS.ELEMENT_LIB_TITLE}
+        title={showLeftPanel && leftPanelMode === 'components' ? '切換至元素庫' : showLeftPanel ? '關閉面板' : '開啟元件庫'}
       >
-        <PanelLeftClose size={16} />
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => setShowBlockLibrary(true)}
-        title={DESIGNER_LABELS.INSERT_BLOCK_TITLE}
-      >
-        <LayoutGrid size={16} />
+        {showLeftPanel && leftPanelMode === 'components' ? <LayoutGrid size={16} /> : <PanelLeftClose size={16} />}
       </Button>
       <Button
         variant="ghost"
