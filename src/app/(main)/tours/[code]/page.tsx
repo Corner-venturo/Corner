@@ -109,7 +109,7 @@ export default function TourDetailPage() {
       >
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <p className="text-morandi-secondary mb-4">{CODE_LABELS.NOT_FOUND_2154} {code} 的旅遊團</p>
+            <p className="text-morandi-secondary mb-4">{CODE_LABELS.NOT_FOUND_2154} {code} {CODE_LABELS.NOT_FOUND_SUFFIX}</p>
             <Button onClick={handleBack}>{CODE_LABELS.LABEL_5810}</Button>
           </div>
         </div>

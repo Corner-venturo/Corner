@@ -16,6 +16,7 @@ import { InvoiceDialog } from '@/features/finance/components/invoice-dialog'
 import { BatchVisaDialog } from '@/features/orders/components/BatchVisaDialog'
 import type { Order } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
+import { alert as showAlert } from '@/lib/ui/alert-dialog'
 
 export default function OrdersPage() {
   const { items: orders, create: addOrder } = useOrdersListSlim()
@@ -102,15 +103,15 @@ export default function OrdersPage() {
   }) => {
     const selectedTour = tours.find(t => t.id === orderData.tour_id)
     if (!selectedTour) {
-      alert('請選擇旅遊團')
+      void showAlert(LABELS.SELECT_TOUR, 'warning')
       return
     }
     if (!currentWorkspace) {
-      alert('無法取得工作空間，請重新登入')
+      void showAlert(LABELS.WORKSPACE_ERROR, 'error')
       return
     }
     if (!orderData.sales_person?.trim()) {
-      alert('請選擇業務人員')
+      void showAlert(LABELS.SELECT_SALES, 'warning')
       return
     }
 
@@ -142,7 +143,7 @@ export default function OrdersPage() {
       setIsAddDialogOpen(false)
     } catch (error) {
       logger.error('[Orders] 新增訂單失敗:', error)
-      alert(error instanceof Error ? error.message : '新增訂單失敗，請稍後再試')
+      void showAlert(error instanceof Error ? error.message : LABELS.ADD_ORDER_FAILED, 'error')
     }
   }
 
@@ -157,7 +158,7 @@ export default function OrdersPage() {
       showSearch={true}
       searchTerm={searchQuery}
       onSearchChange={setSearchQuery}
-      searchPlaceholder="搜尋訂單..."
+      searchPlaceholder={LABELS.SEARCH_PLACEHOLDER}
       tabs={[
         { value: 'all', label: '全部', icon: ShoppingCart },
         { value: 'unpaid', label: '未收款', icon: AlertCircle },
