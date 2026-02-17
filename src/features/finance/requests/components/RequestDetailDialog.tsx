@@ -52,6 +52,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
     quantity: 1,
   })
   const [editItem, setEditItem] = useState<Partial<PaymentRequestItem>>({})
+  const [is_submitting, setIsSubmitting] = useState(false)
 
   // 載入批次請款單（如果有 batch_id）
   useEffect(() => {
@@ -139,6 +140,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
 
   // 刪除請款單
   const handleDelete = async () => {
+    if (is_submitting) return
     const deleteMessage = isBatch
       ? `確定要刪除此請款單（${currentRequest.code}）嗎？此操作無法復原。\n\n注意：只會刪除當前選中的請款單，同批次的其他請款單不受影響。`
       : REQUEST_DETAIL_DIALOG_LABELS.確定要刪除此請款單嗎_此操作無法復原
@@ -151,6 +153,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
       return
     }
 
+    setIsSubmitting(true)
     try {
       await deletePaymentRequestApi(currentRequest.id)
 
@@ -172,11 +175,14 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
     } catch (error) {
       logger.error('刪除請款單失敗:', error)
       await alert(REQUEST_DETAIL_DIALOG_LABELS.刪除請款單失敗, 'error')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   // 新增項目
   const handleAddItem = async () => {
+    if (is_submitting) return
     if (!newItem.description || newItem.unit_price <= 0) {
       await alert(REQUEST_DETAIL_DIALOG_LABELS.請填寫說明和單價, 'warning')
       return
@@ -234,6 +240,8 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
 
   // 儲存編輯
   const handleSaveEdit = async (itemId: string) => {
+    if (is_submitting) return
+    setIsSubmitting(true)
     try {
       const selectedSupplier = suppliers.find(s => s.id === editItem.supplier_id)
       await paymentRequestService.updateItem(currentRequest.id, itemId, {
@@ -250,6 +258,8 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
     } catch (error) {
       logger.error('更新項目失敗:', error)
       await alert(REQUEST_DETAIL_DIALOG_LABELS.更新項目失敗, 'error')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -616,6 +626,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
               variant="outline"
               size="sm"
               onClick={handleDelete}
+              disabled={is_submitting}
               className="text-morandi-red border-morandi-red hover:bg-morandi-red/10"
             >
               <Trash2 size={16} className="mr-2" />
