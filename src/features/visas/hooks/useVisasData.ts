@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
 import { deleteMember } from '@/data/entities/members'
+import { recalculateParticipants } from '@/features/tours/services/tour-stats.service'
 import type { Tour, Order } from '@/stores/types'
 
 /**
@@ -77,6 +78,19 @@ export function useVisasData() {
 
         if (memberToDelete) {
           await deleteMember(memberToDelete.id)
+          // 重算團人數
+          if (order_id) {
+            const { data: order } = await supabase
+              .from('orders')
+              .select('tour_id')
+              .eq('id', order_id)
+              .single()
+            if (order?.tour_id) {
+              recalculateParticipants(order.tour_id).catch(err => {
+                logger.error('重算團人數失敗:', err)
+              })
+            }
+          }
         }
       }
 

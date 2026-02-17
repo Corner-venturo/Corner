@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/stores'
 import { deleteOrder } from '@/data'
+import { recalculateParticipants } from '@/features/tours/services/tour-stats.service'
+import { recalculateReceiptStats } from '@/features/finance/payments/services/receipt-core.service'
+import { logger } from '@/lib/utils/logger'
 import { User, Trash2, FileText, Pencil, Stamp } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Order, Tour } from '@/stores/types'
@@ -58,7 +61,18 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
     }
 
     try {
+      const tour_id = order.tour_id
       await deleteOrder(order.id)
+
+      // 刪除後重算團統計
+      if (tour_id) {
+        recalculateParticipants(tour_id).catch(error => {
+          logger.error('[SimpleOrderTable] 重算團人數失敗:', error)
+        })
+        recalculateReceiptStats(null, tour_id).catch(error => {
+          logger.error('[SimpleOrderTable] 重算團收入失敗:', error)
+        })
+      }
     } catch (err) {
       await alert(COMP_ORDERS_LABELS.刪除失敗_請稍後再試, 'error')
     }

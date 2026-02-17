@@ -276,6 +276,21 @@ export function usePassportUpload({
       // 清空檔案並重新載入
       fileModule.clearFiles()
       await onSuccess()
+
+      // 重算團人數（批次上傳後）
+      if (orderId && successCount > 0) {
+        const { recalculateParticipants } = await import('@/features/tours/services/tour-stats.service')
+        const { data: order } = await supabase
+          .from('orders')
+          .select('tour_id')
+          .eq('id', orderId)
+          .single()
+        if (order?.tour_id) {
+          recalculateParticipants(order.tour_id).catch(err => {
+            logger.error('重算團人數失敗:', err)
+          })
+        }
+      }
     } catch (error) {
       logger.error(COMP_ORDERS_LABELS.批次上傳失敗, error)
       void alert(COMP_ORDERS_LABELS.批次上傳失敗_2 + (error instanceof Error ? error.message : COMP_ORDERS_LABELS.未知錯誤), 'error')

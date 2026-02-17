@@ -11,6 +11,8 @@ import { getCurrentWorkspaceId } from '@/lib/workspace-helpers'
 import type { Member } from '@/stores/types'
 import type { Database } from '@/lib/supabase/types'
 import { deleteMember, updateMember } from '@/data/entities/members'
+import { recalculateParticipants } from '@/features/tours/services/tour-stats.service'
+import { recalculateOrderTotal } from '@/features/orders/services/order-stats.service'
 
 // Supabase Insert 類型（使用 order_members 表）
 type OrderMemberInsert = Database['public']['Tables']['order_members']['Insert']
@@ -111,6 +113,18 @@ export function useMemberActions(): MemberActionsReturn {
     // 同步更新訂單的 member_count
     if (data.order_id) {
       await syncOrderMemberCount(data.order_id)
+
+      // 重算團人數
+      const { data: order } = await supabase
+        .from('orders')
+        .select('tour_id')
+        .eq('id', data.order_id)
+        .single()
+      if (order?.tour_id) {
+        recalculateParticipants(order.tour_id).catch(err => {
+          logger.error('重算團人數失敗:', err)
+        })
+      }
     }
 
     return newMember
@@ -152,9 +166,20 @@ export function useMemberActions(): MemberActionsReturn {
 
     mutate(SWR_KEY)
 
-    // 同步更新訂單的 member_count
+    // 同步更新訂單的 member_count 和團人數
     if (memberOrderId) {
       await syncOrderMemberCount(memberOrderId)
+
+      const { data: order } = await supabase
+        .from('orders')
+        .select('tour_id')
+        .eq('id', memberOrderId)
+        .single()
+      if (order?.tour_id) {
+        recalculateParticipants(order.tour_id).catch(err => {
+          logger.error('重算團人數失敗:', err)
+        })
+      }
     }
   }
 

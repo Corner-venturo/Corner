@@ -8,6 +8,7 @@ import { getGenderFromIdNumber, calculateAge } from '@/lib/utils'
 import { supabase } from '@/lib/supabase/client'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { COMP_TOURS_LABELS } from '../constants/labels'
+import { recalculateParticipants } from '@/features/tours/services/tour-stats.service'
 
 export interface EditingMember {
   id?: string
@@ -292,6 +293,11 @@ export function useTourMemberEditor(
       const updatedMembers = [...tableMembers]
       updatedMembers[index] = { ...member, id: newMember.id, isNew: false }
       setTableMembers(updatedMembers)
+
+      // 重算團人數
+      recalculateParticipants(tour.id).catch(err => {
+        logger.error('重算團人數失敗:', err)
+      })
     } else if (member.id && !member.isNew) {
       const {
         isNew,
@@ -329,6 +335,10 @@ export function useTourMemberEditor(
 
     if (member.id && !member.isNew) {
       deleteMember(member.id)
+      // 重算團人數
+      recalculateParticipants(tour.id).catch(err => {
+        logger.error('重算團人數失敗:', err)
+      })
     }
     const updatedMembers = tableMembers.filter((_, i) => i !== index)
     setTableMembers(updatedMembers)

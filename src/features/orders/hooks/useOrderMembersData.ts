@@ -21,6 +21,7 @@ import type { OrderMember } from '../types/order-member.types'
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 import { deleteMember } from '@/data'
 import { COMP_ORDERS_LABELS } from '../constants/labels'
+import { recalculateParticipants } from '@/features/tours/services/tour-stats.service'
 
 // 快取已同步的顧客 ID，避免重複同步
 const syncedCustomerIds = new Set<string>()
@@ -333,6 +334,13 @@ export function useOrderMembersData({
     try {
       await deleteMember(memberId)
       setMembers(members.filter(m => m.id !== memberId))
+
+      // 重算團人數
+      if (tourId) {
+        recalculateParticipants(tourId).catch(err => {
+          logger.error('重算團人數失敗:', err)
+        })
+      }
     } catch (error) {
       logger.error(COMP_ORDERS_LABELS.刪除成員失敗, error)
       await alert(COMP_ORDERS_LABELS.刪除失敗, 'error')

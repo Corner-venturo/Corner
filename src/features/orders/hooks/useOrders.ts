@@ -11,6 +11,8 @@ import { orderService } from '../services/order.service'
 import { addMembersToTourChannel } from '@/features/tours/services/tour-channel.service'
 import { Order } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
+import { recalculateParticipants } from '@/features/tours/services/tour-stats.service'
+import { recalculateReceiptStats } from '@/features/finance/payments/services/receipt-core.service'
 
 export const useOrdersFeature = () => {
   const { items: orders } = useOrdersData()
@@ -25,6 +27,13 @@ export const useOrdersFeature = () => {
      */
     createOrder: async (data: Omit<Order, 'id' | 'created_at' | 'updated_at'>) => {
       const newOrder = await createOrderData(data as Parameters<typeof createOrderData>[0])
+
+      // 重算團人數（背景執行）
+      if (newOrder && newOrder.tour_id) {
+        recalculateParticipants(newOrder.tour_id).catch(error => {
+          logger.error('[useOrders] 重算團人數失敗:', error)
+        })
+      }
 
       // 自動將業務和助理加入旅遊團頻道（背景執行）
       if (newOrder && newOrder.tour_id) {
@@ -64,7 +73,23 @@ export const useOrdersFeature = () => {
     },
 
     deleteOrder: async (id: string) => {
-      return await deleteOrderData(id)
+      // 先取得訂單的 tour_id，用於刪除後重算統計
+      const order = orders.find(o => o.id === id)
+      const tour_id = order?.tour_id
+
+      const result = await deleteOrderData(id)
+
+      // 刪除後重算團人數和收入
+      if (tour_id) {
+        recalculateParticipants(tour_id).catch(error => {
+          logger.error('[useOrders] 刪除後重算團人數失敗:', error)
+        })
+        recalculateReceiptStats(null, tour_id).catch(error => {
+          logger.error('[useOrders] 刪除後重算團收入失敗:', error)
+        })
+      }
+
+      return result
     },
 
     loadOrders: async () => {

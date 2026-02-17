@@ -9,6 +9,8 @@ import { logger } from '@/lib/utils/logger'
 import { confirm } from '@/lib/ui/alert-dialog'
 import type { OrderMember, CustomCostField } from '../types/order-member.types'
 import { COMP_ORDERS_LABELS } from '../constants/labels'
+import { recalculateParticipants } from '@/features/tours/services/tour-stats.service'
+import { recalculateOrderTotal } from '@/features/orders/services/order-stats.service'
 
 interface UseOrderMembersParams {
   orderId?: string
@@ -246,11 +248,18 @@ export function useOrderMembers({
       if (data) {
         setMembers(prev => [...prev, ...data])
       }
+
+      // 重算團人數
+      if (tourId) {
+        recalculateParticipants(tourId).catch(err => {
+          logger.error('重算團人數失敗:', err)
+        })
+      }
     } catch (error) {
       logger.error(COMP_ORDERS_LABELS.新增成員失敗, error)
       throw error
     }
-  }, [orderId, workspaceId])
+  }, [orderId, workspaceId, tourId])
 
   // 刪除成員
   const deleteMember = useCallback(async (memberId: string): Promise<boolean> => {
@@ -270,12 +279,20 @@ export function useOrderMembers({
       if (error) throw error
 
       setMembers(prev => prev.filter(m => m.id !== memberId))
+
+      // 重算團人數
+      if (tourId) {
+        recalculateParticipants(tourId).catch(err => {
+          logger.error('重算團人數失敗:', err)
+        })
+      }
+
       return true
     } catch (error) {
       logger.error(COMP_ORDERS_LABELS.刪除成員失敗, error)
       return false
     }
-  }, [])
+  }, [tourId])
 
   // 更新成員單一欄位
   const updateMember = useCallback(async (
@@ -294,10 +311,20 @@ export function useOrderMembers({
       setMembers(prev => prev.map(m =>
         m.id === memberId ? { ...m, [field]: value } : m
       ))
+
+      // 如果修改了金額欄位，重算訂單金額
+      if (field === 'total_payable' || field === 'selling_price') {
+        const member = members.find(m => m.id === memberId)
+        if (member?.order_id) {
+          recalculateOrderTotal(member.order_id).catch(err => {
+            logger.error('重算訂單金額失敗:', err)
+          })
+        }
+      }
     } catch (error) {
       logger.error(COMP_ORDERS_LABELS.更新成員失敗, error)
     }
-  }, [])
+  }, [members])
 
   // 更新成員多個欄位
   const updateMemberData = useCallback(async (
@@ -315,11 +342,21 @@ export function useOrderMembers({
       setMembers(prev => prev.map(m =>
         m.id === memberId ? { ...m, ...data } : m
       ))
+
+      // 如果修改了金額欄位，重算訂單金額
+      if ('total_payable' in data || 'selling_price' in data) {
+        const member = members.find(m => m.id === memberId)
+        if (member?.order_id) {
+          recalculateOrderTotal(member.order_id).catch(err => {
+            logger.error('重算訂單金額失敗:', err)
+          })
+        }
+      }
     } catch (error) {
       logger.error(COMP_ORDERS_LABELS.更新成員失敗, error)
       throw error
     }
-  }, [])
+  }, [members])
 
   // 設定 PNR 值
   const setPnrValue = useCallback((memberId: string, value: string) => {
