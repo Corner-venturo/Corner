@@ -9,8 +9,7 @@ import { alert } from '@/lib/ui/alert-dialog'
 import { useOrdersSlim, useTourDictionary, useEmployeeDictionary, useReceipts, createReceipt, updateReceipt, deleteReceipt, invalidateReceipts, useLinkPayLogs } from '@/data'
 import { sendPaymentAbnormalNotification } from '@/lib/utils/bot-notification'
 import { generateReceiptNumber } from '@/lib/utils/receipt-number-generator'
-import { generateVoucherFromPayment, generateVoucherFromCardPayment } from '@/services/voucher-auto-generator'
-import { useAccountingModule } from '@/hooks/useAccountingModule'
+import { recalculateReceiptStats } from '@/features/finance/payments/services/receipt-core.service'
 import type { ReceiptItem } from '@/stores'
 import { ReceiptType } from '@/types/receipt.types'
 
@@ -21,7 +20,7 @@ export function usePaymentData() {
   const { get: getTour } = useTourDictionary()
   const { user } = useAuthStore()
   const { get: getEmployee } = useEmployeeDictionary()
-  const { hasAccounting, isExpired } = useAccountingModule()
+  // 會計模組已停用
 
   // 過濾可用訂單（未收款或部分收款）
   const availableOrders = useMemo(() => {
@@ -123,55 +122,14 @@ export function usePaymentData() {
         updated_by: user.id,
       })
 
-      // ✅ 自動產生會計傳票（如果啟用會計模組）
-      if (hasAccounting && !isExpired && user.workspace_id) {
-        try {
-          // 判斷收款方式
-          if (item.receipt_type === ReceiptType.CREDIT_CARD) {
-            // V2: 刷卡收款使用 4 筆分錄
-            // 預設費率：銀行實扣 1.68%，團成本固定 2%
-            const feeRateDeducted = item.fees ? item.fees / item.amount : 0.0168
-
-            await generateVoucherFromCardPayment({
-              workspace_id: user.workspace_id,
-              order_id: selectedOrderId,
-              payment_date: item.transaction_date,
-              gross_amount: item.amount,
-              fee_rate_deducted: feeRateDeducted,
-              description: `${selectedOrder?.order_number || ''} - ${receiptNumber} 刷卡收款`,
-            })
-
-            logger.info('✅ 刷卡收款傳票已自動產生 (V2)', {
-              receiptNumber,
-              grossAmount: item.amount,
-              feeRateDeducted,
-            })
-          } else {
-            // 現金/匯款收款使用傳統 2 筆分錄
-            const paymentMethod = item.receipt_type === ReceiptType.CASH ? 'cash' : 'bank'
-
-            await generateVoucherFromPayment({
-              workspace_id: user.workspace_id,
-              order_id: selectedOrderId,
-              payment_amount: item.amount,
-              payment_date: item.transaction_date,
-              payment_method: paymentMethod,
-              description: `${selectedOrder?.order_number || ''} - ${receiptNumber} 收款`,
-            })
-
-            logger.info('✅ 收款傳票已自動產生', { receiptNumber, amount: item.amount })
-          }
-        } catch (error) {
-          logger.error('❌ 傳票產生失敗（不影響收款單建立）:', error)
-          // 不阻斷收款流程
-        }
-      }
-
       // 如果是 LinkPay，呼叫 API 生成付款連結
       if (item.receipt_type === ReceiptType.LINK_PAY) {
         await handleCreateLinkPay(receiptNumber, item)
       }
     }
+
+    // 重算訂單付款狀態 + 團財務數據
+    await recalculateReceiptStats(selectedOrderId, selectedOrder?.tour_id || null)
 
     // 重新載入資料
     await invalidateReceipts()
@@ -227,6 +185,11 @@ export function usePaymentData() {
       logger.info('⚠️ 收款金額異常已記錄', { receiptId, actualAmount, expectedAmount: receipt?.receipt_amount })
     }
 
+    // 重算訂單付款狀態 + 團財務數據
+    if (receipt) {
+      await recalculateReceiptStats(receipt.order_id, receipt.tour_id || null)
+    }
+
     // 重新載入資料
     await invalidateReceipts()
   }
@@ -259,6 +222,11 @@ export function usePaymentData() {
     }
 
     await deleteReceipt(receiptId)
+
+    // 重算訂單付款狀態 + 團財務數據
+    if (receipt) {
+      await recalculateReceiptStats(receipt.order_id, receipt.tour_id || null)
+    }
 
     // 重新載入資料
     await invalidateReceipts()

@@ -17,7 +17,8 @@ import { confirm } from '@/lib/ui/alert-dialog'
 import { cn } from '@/lib/utils'
 import { RECEIPT_TYPE_OPTIONS } from '../types'
 import { useAuthStore } from '@/stores'
-import { deleteReceipt } from '@/data'
+import { deleteReceipt, invalidateReceipts } from '@/data'
+import { recalculateReceiptStats } from '../services/receipt-core.service'
 import type { Receipt } from '@/types/receipt.types'
 import { ADD_RECEIPT_DIALOG_LABELS, RECEIPT_CONFIRM_DIALOG_LABELS } from '../../constants/labels';
 
@@ -131,6 +132,8 @@ export function ReceiptConfirmDialog({
     setIsDeleting(true)
     try {
       await deleteReceipt(receipt.id)
+      await recalculateReceiptStats(receipt.order_id, receipt.tour_id || null)
+      await invalidateReceipts()
       toast({
         title: ADD_RECEIPT_DIALOG_LABELS.刪除成功,
         description: `收款單 ${receipt.receipt_number} 已刪除`,

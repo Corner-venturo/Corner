@@ -23,7 +23,6 @@ import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   useOrdersSlim,
-  updateOrder,
   useReceipts,
   updateReceipt,
   invalidateReceipts,
@@ -38,6 +37,7 @@ import { RECEIPT_TYPE_LABELS, ReceiptType } from '@/types/receipt.types'
 import { CurrencyCell } from '@/components/table-cells'
 import type { DbReceiptItem } from '@/types/receipt.types'
 import { logger } from '@/lib/utils/logger'
+import { recalculateReceiptStats } from '@/features/finance/payments/services/receipt-core.service'
 import { BATCH_CONFIRM_LABELS } from '../../constants/labels'
 
 interface BatchConfirmReceiptDialogProps {
@@ -232,38 +232,17 @@ export function BatchConfirmReceiptDialog({
       }
     }
 
-    // 更新訂單的已收款金額和狀態
-    for (const [orderId, confirmedAmount] of orderUpdates) {
+    // 重算每個受影響訂單的付款狀態 + 團財務數據
+    const processedOrders = new Set<string>()
+    for (const [orderId] of orderUpdates) {
+      if (processedOrders.has(orderId)) continue
+      processedOrders.add(orderId)
       try {
         const order = orders.find(o => o.id === orderId)
-        if (order) {
-          // 計算該訂單所有已確認收款品項的總金額
-          const allConfirmedItems = receiptItems.filter(
-            ri => ri.order_id === orderId && ri.status === '1'
-          )
-          const previousConfirmed = allConfirmedItems.reduce(
-            (sum, ri) => sum + (ri.actual_amount || 0),
-            0
-          )
-          const newPaidAmount = previousConfirmed + confirmedAmount
-
-          // 計算付款狀態
-          const totalAmount = order.total_amount || 0
-          let paymentStatus: 'unpaid' | 'partial' | 'paid' = 'unpaid'
-          if (newPaidAmount >= totalAmount) {
-            paymentStatus = 'paid'
-          } else if (newPaidAmount > 0) {
-            paymentStatus = 'partial'
-          }
-
-          await updateOrder(orderId, {
-            paid_amount: newPaidAmount,
-            remaining_amount: Math.max(0, totalAmount - newPaidAmount),
-            payment_status: paymentStatus,
-          })
-        }
+        const tourId = order?.tour_id || null
+        await recalculateReceiptStats(orderId, tourId)
       } catch (error) {
-        logger.error(`更新訂單 ${orderId} 付款狀態失敗:`, error)
+        logger.error(`重算訂單 ${orderId} 統計失敗:`, error)
       }
     }
 

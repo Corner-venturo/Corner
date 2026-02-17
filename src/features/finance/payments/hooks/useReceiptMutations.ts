@@ -9,11 +9,7 @@ import { useToast } from '@/components/ui/use-toast'
 import type { PaymentItem, PaymentFormData } from '../types'
 import { RECEIPT_TYPES } from '../types'
 import type { Receipt } from '@/types/receipt.types'
-import {
-  updateOrderPaymentStatus,
-  updateTourFinancials,
-  invalidateFinanceCache,
-} from '../utils/receipt-financials.utils'
+import { recalculateReceiptStats } from '../services/receipt-core.service'
 
 /** 收款方式對應 payment_method 字串 */
 const PAYMENT_METHOD_MAP: Record<number, string> = {
@@ -256,18 +252,8 @@ export function useReceiptMutations() {
       }
     }
 
-    // 3. 更新訂單付款狀態
-    if (formData.order_id && totalAmount > 0) {
-      await updateOrderPaymentStatus(supabase, formData.order_id, totalAmount)
-    }
-
-    // 4. 更新團財務數據
-    if (tourId) {
-      await updateTourFinancials(supabase, tourId)
-    }
-
-    // 5. 刷新 SWR 快取
-    await invalidateFinanceCache(tourId)
+    // 3. 重算訂單付款狀態 + 團財務數據 + 刷新快取
+    await recalculateReceiptStats(formData.order_id, tourId || null)
 
     return {
       success: true,

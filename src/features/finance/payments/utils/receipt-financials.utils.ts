@@ -13,6 +13,7 @@ interface UpdateOrderPaymentStatusResult {
 }
 
 /**
+ * @deprecated 請改用 recalculateReceiptStats from receipt-core.service.ts
  * 更新訂單的已收金額和付款狀態
  */
 export async function updateOrderPaymentStatus(
@@ -86,6 +87,7 @@ interface UpdateTourFinancialsResult {
 }
 
 /**
+ * @deprecated 請改用 recalculateReceiptStats from receipt-core.service.ts
  * 更新團的財務數據（總收入和利潤）
  */
 export async function updateTourFinancials(
