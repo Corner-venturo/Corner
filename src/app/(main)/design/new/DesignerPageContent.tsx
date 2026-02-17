@@ -22,6 +22,7 @@ import * as fabric from 'fabric'
 import { Button } from '@/components/ui/button'
 import { useDocumentStore, type BrochureEntityType } from '@/stores/document-store'
 import { useAuthStore } from '@/stores/auth-store'
+import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import {
   SIDEBAR_WIDTH_EXPANDED_PX,
@@ -35,6 +36,7 @@ import { LoadingOverlay, SavingIndicator } from '@/features/designer/components/
 import { ElementLibrary } from '@/features/designer/components/ElementLibrary'
 import { ComponentLibrary } from '@/features/designer/components/ComponentLibrary'
 import { DesignerToolbar } from '@/features/designer/components/DesignerToolbar'
+import { ContextMenu } from '@/features/designer/components/ContextMenu'
 import { LayerPanel } from '@/features/designer/components/LayerPanel'
 import { TemplateSelector } from '@/features/designer/components/TemplateSelector'
 import { PageListSidebar } from '@/features/designer/components/PageListSidebar'
@@ -538,11 +540,25 @@ export default function DesignerPageContent() {
 
     const dbDesignType = selectedDesignType?.id?.replace(/-/g, '_')
 
-    await saveVersion(
-      documentData as unknown as Parameters<typeof saveVersion>[0],
-      undefined,
-      dbDesignType
-    )
+    try {
+      await saveVersion(
+        documentData as unknown as Parameters<typeof saveVersion>[0],
+        undefined,
+        dbDesignType
+      )
+      // 清除 localStorage 備份
+      try { localStorage.removeItem('designer-backup') } catch { /* ignore */ }
+    } catch (saveError) {
+      // 儲存失敗時備份到 localStorage
+      try {
+        localStorage.setItem('designer-backup', JSON.stringify({
+          timestamp: Date.now(),
+          data: documentData,
+        }))
+        toast.error('儲存失敗，資料已暫存到本地。請檢查網路連線後重試。')
+      } catch { /* ignore */ }
+      throw saveError
+    }
 
     setGeneratedPages(updatedPages as CanvasPage[])
   }, [isCanvasReady, isSaving, exportCanvasData, saveVersion, generatedPages, currentPageIndex, templateData, selectedStyle, selectedDesignType])
@@ -581,6 +597,29 @@ export default function DesignerPageContent() {
       setIsExporting(false)
     }
   }, [generatedPages, isExporting, storeDocument?.name])
+
+  // ============================================
+  // PNG Export Handler
+  // ============================================
+  const handleExportPNG = useCallback(() => {
+    if (!canvas) return
+
+    try {
+      const dataURL = canvas.toDataURL({
+        format: 'png',
+        multiplier: 2,
+      })
+
+      const a = document.createElement('a')
+      a.href = dataURL
+      a.download = `${storeDocument?.name || '設計'}-第${currentPageIndex + 1}頁.png`
+      a.click()
+      toast.success('已匯出 PNG 圖片')
+    } catch (err) {
+      logger.error('[PNG Export] Failed:', err)
+      toast.error('PNG 匯出失敗')
+    }
+  }, [canvas, storeDocument?.name, currentPageIndex])
 
   // ============================================
   // Template Data Change Handler
@@ -802,6 +841,7 @@ export default function DesignerPageContent() {
         pageCount={generatedPages.length}
         onSave={handleSave}
         onExportPDF={handleExportPDF}
+        onExportPNG={handleExportPNG}
       />
 
       {/* Toolbar */}
@@ -1007,6 +1047,28 @@ export default function DesignerPageContent() {
         showBlockLibrary={showBlockLibrary}
         setShowBlockLibrary={setShowBlockLibrary}
         onInsertBlock={createBlockInsertHandler(canvas)}
+      />
+
+      {/* 右鍵選單 */}
+      <ContextMenu
+        selectedElementId={selectedObjectIds[0] ?? null}
+        clipboard={[]}
+        onCopy={() => copySelected()}
+        onPaste={() => pasteClipboard()}
+        onCut={() => cutSelected()}
+        onDelete={deleteSelected}
+        onBringForward={bringForward}
+        onSendBackward={sendBackward}
+        onBringToFront={bringToFront}
+        onSendToBack={sendToBack}
+        onToggleLock={toggleLock}
+        onGroup={groupSelected}
+        onUngroup={ungroupSelected}
+        multipleSelected={selectedObjectIds.length > 1}
+        isGroup={selectedObject?.type === 'group'}
+        onAlignLeft={alignLeft}
+        onAlignCenterH={alignCenterH}
+        onAlignRight={alignRight}
       />
     </div>
   )

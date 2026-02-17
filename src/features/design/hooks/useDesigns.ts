@@ -204,6 +204,51 @@ export function useDesigns() {
     logger.log('Design deleted successfully:', id)
   }
 
+  const duplicateDesign = async (design: Design) => {
+    if (!workspaceId) throw new Error('No workspace')
+
+    // 1. 複製文件記錄
+    const { data: newDoc, error: docError } = await supabase
+      .from('brochure_documents')
+      .insert({
+        design_type: design.design_type,
+        tour_id: design.tour_id || null,
+        tour_code: design.tour_code || null,
+        tour_name: design.tour_name || null,
+        itinerary_id: design.itinerary_id || null,
+        itinerary_name: design.itinerary_name || null,
+        name: `${design.name} (副本)`,
+        status: 'draft',
+        type: 'full',
+        thumbnail_url: design.thumbnail_url || null,
+      })
+      .select()
+      .single()
+
+    if (docError) throw docError
+
+    // 2. 複製最新版本
+    const { data: latestVersion } = await supabase
+      .from('brochure_versions')
+      .select('*')
+      .eq('document_id', design.id)
+      .order('version_number', { ascending: false })
+      .limit(1)
+      .single()
+
+    if (latestVersion) {
+      await supabase.from('brochure_versions').insert({
+        document_id: newDoc.id,
+        version_number: 1,
+        data: latestVersion.data,
+        thumbnail_url: latestVersion.thumbnail_url,
+      })
+    }
+
+    await mutate()
+    return newDoc as Design
+  }
+
   return {
     designs: data || [],
     isLoading,
@@ -211,6 +256,7 @@ export function useDesigns() {
     createDesign,
     updateDesign,
     deleteDesign,
+    duplicateDesign,
     refresh: mutate,
   }
 }

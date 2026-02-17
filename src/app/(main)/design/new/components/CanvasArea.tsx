@@ -5,9 +5,9 @@
  */
 
 
-import { forwardRef } from 'react'
+import { forwardRef, useState, useEffect } from 'react'
 import * as fabric from 'fabric'
-import { Upload } from 'lucide-react'
+import { Upload, MousePointerClick } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CanvasWithRulers } from '@/features/designer/components/CanvasWithRulers'
 import { DualPagePreview } from '@/features/designer/components/DualPagePreview'
@@ -56,6 +56,20 @@ export const CanvasArea = forwardRef<HTMLDivElement, CanvasAreaProps>(
     },
     ref
   ) {
+    // Track whether canvas is empty
+    const [isCanvasEmpty, setIsCanvasEmpty] = useState(true)
+    useEffect(() => {
+      if (!canvas) return
+      const checkEmpty = () => setIsCanvasEmpty(canvas.getObjects().length === 0)
+      checkEmpty()
+      canvas.on('object:added', checkEmpty)
+      canvas.on('object:removed', checkEmpty)
+      return () => {
+        canvas.off('object:added', checkEmpty)
+        canvas.off('object:removed', checkEmpty)
+      }
+    }, [canvas])
+
     return (
       <main ref={ref} className="flex-1 relative overflow-hidden bg-morandi-container/20">
         {/* Canvas Container - 可滾動容器 */}
@@ -114,6 +128,17 @@ export const CanvasArea = forwardRef<HTMLDivElement, CanvasAreaProps>(
             )}
           </div>
         </div>
+
+        {/* Empty Canvas Guide */}
+        {isCanvasEmpty && !isDualPageMode && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+            <div className="text-center text-morandi-secondary/60">
+              <MousePointerClick size={40} className="mx-auto mb-3 opacity-40" />
+              <p className="text-sm font-medium">從左側元件庫點選元件開始設計</p>
+              <p className="text-xs mt-1 opacity-60">或拖入圖片、使用快捷鍵新增元素</p>
+            </div>
+          </div>
+        )}
 
         {/* Mask Edit Mode Indicator */}
         {isEditingMask && (

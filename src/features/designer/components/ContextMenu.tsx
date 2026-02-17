@@ -19,6 +19,8 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
+  Group,
+  Ungroup,
 } from 'lucide-react'
 import type { CanvasElement } from './types'
 
@@ -37,6 +39,11 @@ interface ContextMenuProps {
   onBringToFront: () => void
   onSendToBack: () => void
   onToggleLock: () => void
+  // 群組操作
+  onGroup?: () => void
+  onUngroup?: () => void
+  isGroup?: boolean
+  multipleSelected?: boolean
   // 對齊操作
   onAlignLeft: () => void
   onAlignCenterH: () => void
@@ -61,6 +68,10 @@ export function ContextMenu({
   onBringToFront,
   onSendToBack,
   onToggleLock,
+  onGroup,
+  onUngroup,
+  isGroup,
+  multipleSelected,
   onAlignLeft,
   onAlignCenterH,
   onAlignRight,
@@ -184,6 +195,22 @@ export function ContextMenu({
       icon: isLocked ? Unlock : Lock,
       onClick: onToggleLock,
       disabled: !hasSelection,
+    },
+    { type: 'separator' as const },
+    // 群組
+    {
+      label: '群組',
+      icon: Group,
+      shortcut: 'Ctrl+G',
+      onClick: () => onGroup?.(),
+      disabled: !multipleSelected,
+    },
+    {
+      label: '取消群組',
+      icon: Ungroup,
+      shortcut: '⇧Ctrl+G',
+      onClick: () => onUngroup?.(),
+      disabled: !isGroup,
     },
     { type: 'separator' as const },
     // 刪除

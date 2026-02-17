@@ -54,6 +54,7 @@ interface DesignerHeaderProps {
   // 操作
   onSave: () => void
   onExportPDF: () => void
+  onExportPNG?: () => void
 }
 
 export function DesignerHeader({
@@ -80,6 +81,7 @@ export function DesignerHeader({
   pageCount,
   onSave,
   onExportPDF,
+  onExportPNG,
 }: DesignerHeaderProps) {
   const router = useRouter()
 
@@ -208,6 +210,19 @@ export function DesignerHeader({
           <FileDown size={14} />
           {DESIGNER_LABELS.EXPORT_PDF}
         </Button>
+
+        {onExportPNG && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onExportPNG}
+            disabled={pageCount === 0}
+            className="gap-1"
+          >
+            <FileDown size={14} />
+            匯出 PNG
+          </Button>
+        )}
       </div>
     </header>
   )

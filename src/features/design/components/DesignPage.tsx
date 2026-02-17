@@ -18,7 +18,7 @@ import { logger } from '@/lib/utils/logger'
  */
 export function DesignPage() {
   const router = useRouter()
-  const { deleteDesign } = useDesigns()
+  const { deleteDesign, duplicateDesign } = useDesigns()
 
   // 新增設計 - 直接跳轉到設計工具
   const handleCreate = useCallback(() => {
@@ -38,6 +38,17 @@ export function DesignPage() {
     }
     router.push(`/design/new?${params.toString()}`)
   }, [router])
+
+  // 處理複製
+  const handleDuplicate = useCallback(async (design: Design) => {
+    try {
+      await duplicateDesign(design)
+      toast.success('已複製設計')
+    } catch (error) {
+      logger.error('複製設計失敗:', error)
+      toast.error('複製失敗，請稍後再試')
+    }
+  }, [duplicateDesign])
 
   // 處理刪除
   const handleDelete = useCallback(async (design: Design) => {
@@ -77,6 +88,7 @@ export function DesignPage() {
       <DesignList
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onDuplicate={handleDuplicate}
       />
     </ContentPageLayout>
   )

@@ -40,6 +40,7 @@ export interface Design {
 
   // 版本
   current_version_id: string | null
+  thumbnail_url: string | null
 
   // 標準欄位
   created_at: string

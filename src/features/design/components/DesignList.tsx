@@ -1,6 +1,6 @@
 'use client'
 
-import { MoreHorizontal, Trash2, Edit2, FileText } from 'lucide-react'
+import { MoreHorizontal, Trash2, Edit2, FileText, Copy, Image as ImageIcon } from 'lucide-react'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { DateCell } from '@/components/table-cells'
 import { Button } from '@/components/ui/button'
@@ -18,15 +18,30 @@ import { LABELS } from '../constants/labels'
 interface DesignListProps {
   onEdit?: (design: Design) => void
   onDelete?: (design: Design) => void
+  onDuplicate?: (design: Design) => void
 }
 
 /**
  * 設計列表組件
  */
-export function DesignList({ onEdit, onDelete }: DesignListProps) {
+export function DesignList({ onEdit, onDelete, onDuplicate }: DesignListProps) {
   const { designs, isLoading, error } = useDesigns()
 
   const columns: TableColumn<Design>[] = [
+    {
+      key: 'thumbnail',
+      label: '',
+      width: '60',
+      render: (_, row) => (
+        <div className="w-10 h-14 rounded overflow-hidden bg-morandi-container flex items-center justify-center">
+          {row.thumbnail_url ? (
+            <img src={row.thumbnail_url} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <ImageIcon size={16} className="text-morandi-muted" />
+          )}
+        </div>
+      ),
+    },
     {
       key: 'tour',
       label: LABELS.tourName,
@@ -94,6 +109,12 @@ export function DesignList({ onEdit, onDelete }: DesignListProps) {
               <Edit2 size={14} className="mr-2" />
               {LABELS.edit}
             </DropdownMenuItem>
+            {onDuplicate && (
+              <DropdownMenuItem onClick={() => onDuplicate(row)}>
+                <Copy size={14} className="mr-2" />
+                複製
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem
               onClick={() => onDelete?.(row)}
               className="text-morandi-red"
