@@ -1,5 +1,0 @@
-export { Text } from './Text'
-export { Divider } from './Divider'
-export { Image } from './Image'
-export { Page, PageHalf } from './Page'
-export { QRCode } from './QRCode'

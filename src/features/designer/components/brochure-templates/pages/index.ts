@@ -1,5 +1,0 @@
-export { Cover } from './Cover'
-export { Toc } from './Toc'
-export { Daily } from './Daily'
-export { Hotel } from './Hotel'
-export { Memo } from './Memo'
