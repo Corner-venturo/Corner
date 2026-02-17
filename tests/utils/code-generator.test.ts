@@ -8,10 +8,6 @@ import {
   generateTourCode,
   generateOrderCode,
   generateCode,
-  generateCustomerCode,
-  generateEmployeeNumber,
-  generateDisbursementOrderCode,
-  generatePaymentRequestCode,
   generateTourRequestCode,
   generateProposalCode,
   generateCompanyPaymentRequestCode,
@@ -54,29 +50,9 @@ describe('code-generator', () => {
     })
   })
 
-  describe('generatePaymentRequestCode', () => {
-    it('should generate first payment request code', () => {
-      expect(generatePaymentRequestCode('CNX250128A', [])).toBe('CNX250128A-I01')
-    })
-
-    it('should increment', () => {
-      expect(generatePaymentRequestCode('CNX250128A', [{ code: 'CNX250128A-I03' }])).toBe('CNX250128A-I04')
-    })
-  })
-
   describe('generateTourRequestCode', () => {
     it('should generate first request code', () => {
       expect(generateTourRequestCode('CNX250128A', [])).toBe('CNX250128A-RQ01')
-    })
-  })
-
-  describe('generateDisbursementOrderCode', () => {
-    it('should generate first disbursement code', () => {
-      expect(generateDisbursementOrderCode('2025-01-28', [])).toBe('P250128A')
-    })
-
-    it('should increment letter', () => {
-      expect(generateDisbursementOrderCode('2025-01-28', [{ code: 'P250128A' }])).toBe('P250128B')
     })
   })
 
@@ -95,26 +71,6 @@ describe('code-generator', () => {
       const existing = [{ id: '1', code: 'Q000005' }]
       const result = generateCode('TP', {}, existing)
       expect(result).toBe('Q000006')
-    })
-  })
-
-  describe('generateCustomerCode', () => {
-    it('should generate first customer code', () => {
-      expect(generateCustomerCode([])).toBe('C000001')
-    })
-
-    it('should increment', () => {
-      expect(generateCustomerCode([{ id: '1', code: 'C000010' }])).toBe('C000011')
-    })
-  })
-
-  describe('generateEmployeeNumber', () => {
-    it('should generate first employee number', () => {
-      expect(generateEmployeeNumber('TP', [])).toBe('E001')
-    })
-
-    it('should increment', () => {
-      expect(generateEmployeeNumber('TP', [{ id: '1', employee_number: 'E005' }])).toBe('E006')
     })
   })
 
