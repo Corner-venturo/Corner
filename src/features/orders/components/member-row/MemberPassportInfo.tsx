@@ -12,6 +12,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip
 import type { OrderMember } from '../../types/order-member.types'
 import type { ColumnVisibility } from '../OrderMembersExpandable'
 import { COMP_ORDERS_LABELS } from '../../constants/labels'
+import { MEMBER_DATA_LABELS } from '../../constants/labels'
 
 interface MemberPassportInfoProps {
   member: OrderMember
@@ -113,7 +114,7 @@ export function MemberPassportInfo({
                 }
                 // 詳細說明
                 const detailLabel = expiryInfo.statusLabel === COMP_ORDERS_LABELS.效期不足
-                  ? `護照需有效至 ${getRequiredDate()}`
+                  ? MEMBER_DATA_LABELS.PASSPORT_REQUIRED_DATE(getRequiredDate())
                   : COMP_ORDERS_LABELS.護照已過期
                 return (
                   <Tooltip>

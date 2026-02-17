@@ -314,6 +314,39 @@ export const EXPORT_DIALOG_LABELS = {
   team_member_list: '團員名單',
   gender_male: '男',
   gender_female: '女',
+
+  // Column labels for export
+  COL_IDENTITY: '身份',
+  COL_CHINESE_NAME: '中文姓名',
+  COL_PASSPORT_NAME: '護照姓名',
+  COL_BIRTHDAY: '生日',
+  COL_GENDER: '性別',
+  COL_ID_NUMBER: '身分證號',
+  COL_PASSPORT_NUMBER: '護照號碼',
+  COL_PASSPORT_EXPIRY: '護照效期',
+  COL_PHONE: '手機',
+  COL_SPECIAL_REQUESTS: '特殊需求',
+  COL_ROOM_TYPE: '房型',
+  COL_COMPANION: '同房',
+  COL_DIET: '餐食',
+  COL_REMARKS: '備註',
+  COL_VISA_STATUS: '簽證狀態',
+  COL_PASSPORT_PINYIN: '護照拼音',
+  COL_BIRTHDATE: '出生年月日',
+  COL_PASSPORT_ISSUE_DATE: '護照發照日',
+  COL_PASSPORT_ISSUE_PLACE: '護照發照地',
+  GENDER_MALE: '男',
+  GENDER_FEMALE: '女',
+  IDENTITY_ADULT: '成人',
+  IDENTITY_CHILD: '小孩',
+  IDENTITY_INFANT: '嬰兒',
+  IDENTITY_CHILD_NO_BED: '小孩不佔床',
+  EXPORT_FAILED: '匯出失敗',
+  EXPORT_SUCCESS: '已匯出團員名單',
+  VISA_CHILD: '兒童',
+  VISA_FIRST: '首辦',
+  VISA_TW_PASS: '台胞證',
+  VISA_LOST: '遺失件',
 };
 
 // 護照衝突 Dialog 標籤
@@ -353,3 +386,55 @@ export const BATCH_VISA_LABELS = {
   toast_fail: '批次建立簽證失敗，請稍後再試',
   toast_no_selection: '請至少勾選一位團員的一種簽證',
 };
+
+// ============================================================
+// Order Service
+// ============================================================
+export const ORDER_SERVICE_LABELS = {
+  MUST_ASSOCIATE_TOUR: '必須關聯旅遊團',
+  AMOUNT_NOT_NEGATIVE: '訂單金額不能為負數',
+}
+
+// ============================================================
+// Passport Upload
+// ============================================================
+export const PASSPORT_UPLOAD_LABELS = {
+  UPDATE_FAILED: (fileName: string) => `${fileName} (更新失敗)`,
+  CREATE_FAILED: (fileName: string) => `${fileName} (建立失敗)`,
+  RECOGNIZE_FAILED: (fileName: string) => `${fileName} (辨識失敗)`,
+  SUCCESS_SUMMARY: (success: number, total: number) => `成功辨識 ${success}/${total} 張護照`,
+  CREATED_MEMBERS: (count: number) => `\n成功建立 ${count} 位成員`,
+  UPDATED_MEMBERS: (count: number, items: string) => `\n已更新 ${count} 位現有成員：\n${items}`,
+  MATCHED_CUSTOMERS: (count: number) => `\n已比對 ${count} 位現有顧客`,
+  NEW_CUSTOMERS: (count: number) => `\n已新增 ${count} 位顧客資料`,
+}
+
+// ============================================================
+// Simple Order Table
+// ============================================================
+export const SIMPLE_ORDER_TABLE_LABELS = {
+  DELETE_CONFIRM: (orderNumber: string) => `確定要刪除訂單「${orderNumber}」嗎？\n\n此操作會影響：\n- 團員名單將被移除\n- 收款記錄將被刪除\n- 旅遊團人數統計將更新\n\n此操作無法復原！`,
+}
+
+// ============================================================
+// Member Data
+// ============================================================
+export const MEMBER_DATA_LABELS = {
+  DELETE_CONFIRM: (name: string) => `確定要刪除「${name}」嗎？`,
+  PASSPORT_REQUIRED_DATE: (date: string) => `護照需有效至 ${date}`,
+  AGE_NO_BED_FULL_ROOM: (ageText: string) => `${ageText}不佔床，已加入已滿房間`,
+}
+
+// ============================================================
+// Orders Page
+// ============================================================
+export const ORDERS_PAGE_LABELS = {
+  BREADCRUMB_HOME: '首頁',
+  BREADCRUMB_ORDERS: '訂單管理',
+  TAB_ALL: '全部',
+  TAB_UNPAID: '未收款',
+  TAB_PARTIAL: '部分收款',
+  TAB_PAID: '已收款',
+  VISA_TOUR: '簽證專用團',
+  ESIM_TOUR: '網卡專用團',
+}

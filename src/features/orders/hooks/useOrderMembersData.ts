@@ -22,6 +22,7 @@ import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 import { deleteMember } from '@/data'
 import { COMP_ORDERS_LABELS } from '../constants/labels'
 import { recalculateParticipants } from '@/features/tours/services/tour-stats.service'
+import { MEMBER_DATA_LABELS } from '../constants/labels'
 
 // 快取已同步的顧客 ID，避免重複同步
 const syncedCustomerIds = new Set<string>()
@@ -325,7 +326,7 @@ export function useOrderMembersData({
     const memberToDelete = members.find(m => m.id === memberId)
     const memberName = memberToDelete?.chinese_name || memberToDelete?.passport_name || COMP_ORDERS_LABELS.此成員
 
-    const confirmed = await confirm(`確定要刪除「${memberName}」嗎？`, {
+    const confirmed = await confirm(MEMBER_DATA_LABELS.DELETE_CONFIRM(memberName), {
       title: COMP_ORDERS_LABELS.刪除成員,
       type: 'warning',
     })

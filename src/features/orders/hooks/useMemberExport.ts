@@ -3,21 +3,22 @@
 import { useState } from 'react'
 import { alert } from '@/lib/ui/alert-dialog'
 import type { OrderMember } from '@/features/orders/types/order-member.types'
+import { EXPORT_DIALOG_LABELS } from '../constants/labels'
 
 export type ExportColumns = Record<string, boolean>
 
 export const EXPORT_COLUMN_LABELS: Record<string, string> = {
-  identity: '身份',
-  chinese_name: '中文姓名',
-  passport_name: '護照拼音',
-  birth_date: '出生年月日',
-  gender: '性別',
-  id_number: '身分證號',
-  passport_number: '護照號碼',
-  passport_expiry: '護照效期',
+  identity: EXPORT_DIALOG_LABELS.COL_IDENTITY,
+  chinese_name: EXPORT_DIALOG_LABELS.COL_CHINESE_NAME,
+  passport_name: EXPORT_DIALOG_LABELS.COL_PASSPORT_PINYIN,
+  birth_date: EXPORT_DIALOG_LABELS.COL_BIRTHDATE,
+  gender: EXPORT_DIALOG_LABELS.COL_GENDER,
+  id_number: EXPORT_DIALOG_LABELS.COL_ID_NUMBER,
+  passport_number: EXPORT_DIALOG_LABELS.COL_PASSPORT_NUMBER,
+  passport_expiry: EXPORT_DIALOG_LABELS.COL_PASSPORT_EXPIRY,
   special_meal: '飲食禁忌',
   hotel_confirmation: '訂房代號',
-  remarks: '備註',
+  remarks: EXPORT_DIALOG_LABELS.COL_REMARKS,
   // 金額相關欄位放最後
   total_payable: '應付金額',
   deposit_amount: '訂金',
@@ -97,7 +98,7 @@ export function useMemberExport(members: OrderMember[]) {
                 ${selectedCols.map(col => {
                   let value = ''
                   if (col === 'gender') {
-                    value = member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '-'
+                    value = member.gender === 'M' ? EXPORT_DIALOG_LABELS.GENDER_MALE : member.gender === 'F' ? EXPORT_DIALOG_LABELS.GENDER_FEMALE : '-'
                   } else if (col === 'balance') {
                     value = ((member.total_payable || 0) - (member.deposit_amount || 0)).toLocaleString()
                   } else if (col === 'total_payable' || col === 'deposit_amount') {
@@ -161,7 +162,7 @@ export function useMemberExport(members: OrderMember[]) {
       selectedCols.forEach(col => {
         const label = EXPORT_COLUMN_LABELS[col]
         if (col === 'gender') {
-          row[label] = member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : ''
+          row[label] = member.gender === 'M' ? EXPORT_DIALOG_LABELS.GENDER_MALE : member.gender === 'F' ? EXPORT_DIALOG_LABELS.GENDER_FEMALE : ''
         } else if (col === 'balance') {
           row[label] = (member.total_payable || 0) - (member.deposit_amount || 0)
         } else if (col === 'total_payable' || col === 'deposit_amount') {

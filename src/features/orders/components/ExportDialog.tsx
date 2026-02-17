@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import type { OrderMember, ExportColumnsConfig } from '../types/order-member.types'
 import { ORDERS_LABELS } from './constants/labels'
+import { EXPORT_DIALOG_LABELS } from '../constants/labels'
 
 interface ExportDialogProps {
   isOpen: boolean
@@ -24,17 +25,17 @@ interface ExportDialogProps {
 
 // 欄位標籤對照
 const COLUMN_LABELS: Record<keyof ExportColumnsConfig, string> = {
-  identity: '身份',
-  chinese_name: '中文姓名',
-  passport_name: '護照姓名',
-  birth_date: '生日',
-  gender: '性別',
-  id_number: '身分證號',
-  passport_number: '護照號碼',
-  passport_expiry: '護照效期',
+  identity: EXPORT_DIALOG_LABELS.COL_IDENTITY,
+  chinese_name: EXPORT_DIALOG_LABELS.COL_CHINESE_NAME,
+  passport_name: EXPORT_DIALOG_LABELS.COL_PASSPORT_NAME,
+  birth_date: EXPORT_DIALOG_LABELS.COL_BIRTHDAY,
+  gender: EXPORT_DIALOG_LABELS.COL_GENDER,
+  id_number: EXPORT_DIALOG_LABELS.COL_ID_NUMBER,
+  passport_number: EXPORT_DIALOG_LABELS.COL_PASSPORT_NUMBER,
+  passport_expiry: EXPORT_DIALOG_LABELS.COL_PASSPORT_EXPIRY,
   special_meal: '特殊餐食',
   hotel_confirmation: '訂房代號',
-  remarks: '備註',
+  remarks: EXPORT_DIALOG_LABELS.COL_REMARKS,
   // 金額相關欄位放最後
   total_payable: '應付金額',
   deposit_amount: '已付訂金',
@@ -93,7 +94,7 @@ export function ExportDialog({
             value = member.birth_date || ''
             break
           case 'gender':
-            value = member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : ''
+            value = member.gender === 'M' ? EXPORT_DIALOG_LABELS.GENDER_MALE : member.gender === 'F' ? EXPORT_DIALOG_LABELS.GENDER_FEMALE : ''
             break
           case 'id_number':
             value = member.id_number || ''
@@ -201,7 +202,7 @@ export function ExportDialog({
         const label = COLUMN_LABELS[col]
         switch (col) {
           case 'gender':
-            row[label] = member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : ''
+            row[label] = member.gender === 'M' ? EXPORT_DIALOG_LABELS.GENDER_MALE : member.gender === 'F' ? EXPORT_DIALOG_LABELS.GENDER_FEMALE : ''
             break
           case 'balance':
             row[label] = (member.total_payable || 0) - (member.deposit_amount || 0)

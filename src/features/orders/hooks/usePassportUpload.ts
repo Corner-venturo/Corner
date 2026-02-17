@@ -24,6 +24,7 @@ import { usePassportFiles } from './passport/usePassportFiles'
 import { usePassportOcr } from './passport/usePassportOcr'
 import { usePassportValidation } from './passport/usePassportValidation'
 import { COMP_ORDERS_LABELS, PASSPORT_CONFLICT_LABELS } from '../constants/labels'
+import { PASSPORT_UPLOAD_LABELS } from '../constants/labels'
 import {
   syncPassportToCustomer,
   findActiveOrderConflicts,
@@ -156,7 +157,7 @@ export function usePassportUpload({
               const displayName = item.customer.name || duplicateCheck.matchedMember.chinese_name || item.fileName
               updatedItems.push(displayName)
             } else {
-              failedItems.push(`${item.fileName} (更新失敗)`)
+              failedItems.push(PASSPORT_UPLOAD_LABELS.UPDATE_FAILED(item.fileName))
             }
             continue
           }
@@ -175,10 +176,10 @@ export function usePassportUpload({
             if (createResult.matchedCustomer) matchedCustomerCount++
             if (createResult.newCustomer) newCustomerCount++
           } else {
-            failedItems.push(`${item.fileName} (建立失敗)`)
+            failedItems.push(PASSPORT_UPLOAD_LABELS.CREATE_FAILED(item.fileName))
           }
         } else {
-          failedItems.push(`${item.fileName} (辨識失敗)`)
+          failedItems.push(PASSPORT_UPLOAD_LABELS.RECOGNIZE_FAILED(item.fileName))
         }
       }
 
@@ -251,18 +252,18 @@ export function usePassportUpload({
       }
 
       // 顯示結果
-      let message = `成功辨識 ${result.successful}/${result.total} 張護照`
+      let message = PASSPORT_UPLOAD_LABELS.SUCCESS_SUMMARY(result.successful, result.total)
       if (successCount > 0) {
-        message += `\n成功建立 ${successCount} 位成員`
+        message += PASSPORT_UPLOAD_LABELS.CREATED_MEMBERS(successCount)
       }
       if (updatedCount > 0) {
         message += `\n已更新 ${updatedCount} 位現有成員：\n${updatedItems.join('、')}`
       }
       if (matchedCustomerCount > 0) {
-        message += `\n已比對 ${matchedCustomerCount} 位現有顧客`
+        message += PASSPORT_UPLOAD_LABELS.MATCHED_CUSTOMERS(matchedCustomerCount)
       }
       if (newCustomerCount > 0) {
-        message += `\n已新增 ${newCustomerCount} 位顧客資料`
+        message += PASSPORT_UPLOAD_LABELS.NEW_CUSTOMERS(newCustomerCount)
       }
       if (duplicateCount > 0) {
         message += `\n\n跳過 ${duplicateCount} 位重複成員：\n${duplicateItems.join('\n')}`

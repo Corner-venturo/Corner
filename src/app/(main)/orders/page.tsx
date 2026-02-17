@@ -17,6 +17,7 @@ import { BatchVisaDialog } from '@/features/orders/components/BatchVisaDialog'
 import type { Order } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 import { alert as showAlert } from '@/lib/ui/alert-dialog'
+import { ORDERS_PAGE_LABELS } from '@/features/orders/constants/labels'
 
 export default function OrdersPage() {
   const { items: orders, create: addOrder } = useOrdersListSlim()
@@ -62,13 +63,13 @@ export default function OrdersPage() {
     let matchesFilter: boolean
     switch (statusFilter) {
       case 'all':
-        matchesFilter = !(order.tour_name?.includes('簽證專用團') || order.tour_name?.includes('網卡專用團'))
+        matchesFilter = !(order.tour_name?.includes(ORDERS_PAGE_LABELS.VISA_TOUR) || order.tour_name?.includes(ORDERS_PAGE_LABELS.ESIM_TOUR))
         break
       case 'visa-only':
-        matchesFilter = order.tour_name?.includes('簽證專用團') ?? false
+        matchesFilter = order.tour_name?.includes(ORDERS_PAGE_LABELS.VISA_TOUR) ?? false
         break
       case 'sim-only':
-        matchesFilter = order.tour_name?.includes('網卡專用團') ?? false
+        matchesFilter = order.tour_name?.includes(ORDERS_PAGE_LABELS.ESIM_TOUR) ?? false
         break
       default:
         matchesFilter = order.payment_status === statusFilter
@@ -152,18 +153,18 @@ export default function OrdersPage() {
       title={LABELS.MANAGE_949}
       icon={ShoppingCart}
       breadcrumb={[
-        { label: '首頁', href: '/' },
-        { label: '訂單管理', href: '/orders' },
+        { label: ORDERS_PAGE_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: ORDERS_PAGE_LABELS.BREADCRUMB_ORDERS, href: '/orders' },
       ]}
       showSearch={true}
       searchTerm={searchQuery}
       onSearchChange={setSearchQuery}
       searchPlaceholder={LABELS.SEARCH_PLACEHOLDER}
       tabs={[
-        { value: 'all', label: '全部', icon: ShoppingCart },
-        { value: 'unpaid', label: '未收款', icon: AlertCircle },
-        { value: 'partial', label: '部分收款', icon: Clock },
-        { value: 'paid', label: '已收款', icon: CheckCircle },
+        { value: 'all', label: ORDERS_PAGE_LABELS.TAB_ALL, icon: ShoppingCart },
+        { value: 'unpaid', label: ORDERS_PAGE_LABELS.TAB_UNPAID, icon: AlertCircle },
+        { value: 'partial', label: ORDERS_PAGE_LABELS.TAB_PARTIAL, icon: Clock },
+        { value: 'paid', label: ORDERS_PAGE_LABELS.TAB_PAID, icon: CheckCircle },
         { value: 'visa-only', label: '簽證專用', icon: Shield },
         { value: 'sim-only', label: '網卡專用', icon: Wifi },
       ]}

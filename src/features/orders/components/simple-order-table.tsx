@@ -14,6 +14,7 @@ import { Order, Tour } from '@/stores/types'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { OrderMembersExpandable } from '@/features/orders/components/OrderMembersExpandable'
 import { COMP_ORDERS_LABELS } from '../constants/labels'
+import { SIMPLE_ORDER_TABLE_LABELS } from '../constants/labels'
 
 interface SimpleOrderTableProps {
   orders: Order[]
@@ -50,7 +51,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
   const handleDeleteOrder = async (order: Order, e: React.MouseEvent) => {
     e.stopPropagation()
 
-    const confirmMessage = `確定要刪除訂單「${order.order_number}」嗎？\n\n此操作會影響：\n- 團員名單將被移除\n- 收款記錄將被刪除\n- 旅遊團人數統計將更新\n\n此操作無法復原！`
+    const confirmMessage = SIMPLE_ORDER_TABLE_LABELS.DELETE_CONFIRM(order.order_number || '')
 
     const confirmed = await confirm(confirmMessage, {
       title: COMP_ORDERS_LABELS.刪除訂單,

@@ -6,6 +6,7 @@ import { insertRoomAssignments } from '@/features/orders/services/order_member.s
 import { logger } from '@/lib/utils/logger'
 import { toast } from 'sonner'
 import { COMP_ORDERS_LABELS } from '../constants/labels'
+import { MEMBER_DATA_LABELS } from '../constants/labels'
 
 interface UseRoomVehicleAssignmentsParams {
   tourId: string
@@ -507,7 +508,7 @@ export function useRoomVehicleAssignments({
               // 幼童可以加入已滿房間，但顯示提示
               const age = calculateAge(memberBirthDate, departureDate)
               const ageText = age !== null && age < 2 ? COMP_ORDERS_LABELS.嬰兒 : `${age}歲幼童`
-              toast.info(`${ageText}不佔床，已加入已滿房間`, { duration: 3000 })
+              toast.info(MEMBER_DATA_LABELS.AGE_NO_BED_FULL_ROOM(ageText), { duration: 3000 })
             } else if (!memberBirthDate) {
               // 沒有出生日期資料，顯示錯誤
               toast.error(COMP_ORDERS_LABELS.此房間已滿_無法分配_如為幼童請先填寫出生日期)

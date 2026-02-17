@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import { BATCH_VISA_LABELS as L } from '../constants/labels'
 import type { Order } from '@/stores/types'
+import { EXPORT_DIALOG_LABELS } from '../constants/labels'
 
 interface MemberRow {
   id: string
@@ -25,9 +26,9 @@ interface VisaSelection {
  */
 function calculateFee(visaType: string): number {
   if (visaType.includes('ESTA')) return 1000
-  if (visaType.includes('兒童')) return 1500
-  if (visaType.includes('首辦')) return 800
-  if (visaType.includes('台胞證') && visaType.includes('遺失件')) return 2900
+  if (visaType.includes(EXPORT_DIALOG_LABELS.VISA_CHILD)) return 1500
+  if (visaType.includes(EXPORT_DIALOG_LABELS.VISA_FIRST)) return 800
+  if (visaType.includes(EXPORT_DIALOG_LABELS.VISA_TW_PASS) && visaType.includes(EXPORT_DIALOG_LABELS.VISA_LOST)) return 2900
   return 1800
 }
 
