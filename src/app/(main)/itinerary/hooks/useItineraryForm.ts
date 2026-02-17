@@ -7,6 +7,7 @@ import { logger } from '@/lib/utils/logger'
 import { formatDateCompact, formatWeekday, formatDateTW, formatDateCompactPadded } from '@/lib/utils/format-date'
 import type { Itinerary } from '@/stores/types'
 import type { FlightInfo } from '@/types/flight.types'
+import { ITINERARY_ACTIONS_LABELS } from '../constants/labels'
 
 interface DailyData {
   title: string

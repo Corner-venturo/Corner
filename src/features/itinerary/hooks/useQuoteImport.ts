@@ -6,6 +6,7 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
+import { ITINERARY_HOOKS_LABELS } from '../constants/labels'
 
 interface MealData {
   day: number

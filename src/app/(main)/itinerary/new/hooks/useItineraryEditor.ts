@@ -20,6 +20,7 @@ import type {
 } from '@/components/editor/tour-form/types'
 import type { ItineraryVersionRecord, PricingDetails, PriceTier, FAQ } from '@/stores/types'
 import type { TierPricing } from '@/stores/types/quote.types'
+import { ITINERARY_EDITOR_LABELS } from '../../constants/labels'
 
 // Local tour data interface
 export interface LocalTourData {
@@ -175,8 +176,8 @@ export function useItineraryEditor() {
           if (!existingLeader) {
             // 詢問是否要新增到領隊資料庫
             const shouldSave = await confirm(
-              `要將「${leader.name}」新增到領隊資料庫嗎？\n下次可以直接搜尋選用。`,
-              { title: '儲存領隊資料', type: 'info' }
+              ITINERARY_EDITOR_LABELS.SAVE_LEADER_CONFIRM(leader.name),
+              { title: ITINERARY_EDITOR_LABELS.SAVE_LEADER_TITLE, type: 'info' }
             )
 
             if (shouldSave) {
@@ -214,7 +215,7 @@ export function useItineraryEditor() {
     } catch (error) {
       logger.error('自動存檔失敗:', error)
       setAutoSaveStatus('error')
-      toast.error('自動存檔失敗，請手動儲存')
+      toast.error(ITINERARY_EDITOR_LABELS.AUTO_SAVE_FAILED)
     }
   }, [isDirty, currentItineraryId, convertDataForSave, updateItinerary, createItinerary, user?.id])
 
@@ -254,7 +255,7 @@ export function useItineraryEditor() {
       if (isDirtyRef.current) {
         performAutoSaveRef.current()
         e.preventDefault()
-        e.returnValue = '您有未儲存的變更，確定要離開嗎？'
+        e.returnValue = ITINERARY_EDITOR_LABELS.UNSAVED_CHANGES
         return e.returnValue
       }
     }
@@ -307,7 +308,7 @@ function getEmptyTourData(): LocalTourData {
     coverImage: '',
     country: '',
     city: '',
-    status: '提案',
+    status: ITINERARY_EDITOR_LABELS.STATUS_PROPOSAL,
     outboundFlight: {
       airline: '',
       flightNumber: '',

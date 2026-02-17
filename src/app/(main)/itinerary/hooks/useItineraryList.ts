@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores'
 import type { Itinerary } from '@/stores/types'
 import { stripHtml } from '@/lib/utils/string-utils'
+import { ITINERARY_ACTIONS_LABELS } from '../constants/labels'
 
 export function useItineraryList() {
   const router = useRouter()

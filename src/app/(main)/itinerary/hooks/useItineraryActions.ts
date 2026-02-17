@@ -6,6 +6,7 @@ import type { Itinerary } from '@/stores/types'
 import type { Quote } from '@/types/quote.types'
 import { confirm, alertSuccess, alertError } from '@/lib/ui/alert-dialog'
 import type { PageStateApi } from './useItineraryPageState'
+import { ITINERARY_ACTIONS_LABELS } from '../constants/labels'
 
 // 公司密碼（統編）
 const COMPANY_PASSWORD = '83212711'
@@ -70,7 +71,7 @@ export function useItineraryActions({
 
     if (!duplicateSource) return
     if (!duplicateTourCode.trim() || !duplicateTitle.trim()) {
-      await alertError('請填寫行程編號和行程名稱')
+      await alertError(ITINERARY_ACTIONS_LABELS.FILL_CODE_AND_NAME)
       return
     }
 
@@ -108,7 +109,7 @@ export function useItineraryActions({
         const newQuote: Partial<Quote> = {
           code: quote.code,
           quote_type: quote.quote_type,
-          customer_name: '（待填寫）',
+          customer_name: ITINERARY_ACTIONS_LABELS.TO_BE_FILLED,
           itinerary_id: createdItinerary?.id,
           destination: quote.destination,
           start_date: quote.start_date,
@@ -135,15 +136,15 @@ export function useItineraryActions({
       }
 
       const successMsg = quoteCopiedCount > 0
-        ? `行程已複製成功！同時複製了 ${quoteCopiedCount} 個報價單（客戶資料已清空）`
-        : '行程已複製成功！'
+        ? ITINERARY_ACTIONS_LABELS.COPY_WITH_QUOTES(quoteCopiedCount)
+        : ITINERARY_ACTIONS_LABELS.COPY_SUCCESS
       await alertSuccess(successMsg)
       setIsDuplicateDialogOpen(false)
       setDuplicateSource(null)
       setDuplicateTourCode('')
       setDuplicateTitle('')
     } catch {
-      await alertError('複製失敗，請稍後再試')
+      await alertError(ITINERARY_ACTIONS_LABELS.COPY_FAILED)
     } finally {
       setIsDuplicating(false)
     }
@@ -164,14 +165,14 @@ export function useItineraryActions({
 
       if (hasLinkedQuotes) {
         const result = await confirm(
-          `此行程有 ${linkedQuotes.length} 個關聯的報價單。\n\n請選擇封存方式：\n• 同步封存：報價單也一併封存\n• 僅封存行程：斷開關聯，報價單保留`,
+          ITINERARY_ACTIONS_LABELS.ARCHIVE_WITH_QUOTES(linkedQuotes.length),
           {
             type: 'warning',
-            title: '封存行程',
-            confirmText: '同步封存',
+            title: ITINERARY_ACTIONS_LABELS.ARCHIVE_TITLE,
+            confirmText: ITINERARY_ACTIONS_LABELS.ARCHIVE_SYNC,
             cancelText: '取消',
             showThirdOption: true,
-            thirdOptionText: '僅封存行程',
+            thirdOptionText: ITINERARY_ACTIONS_LABELS.ARCHIVE_ONLY,
           }
         )
 
@@ -185,7 +186,7 @@ export function useItineraryActions({
       } else {
         const confirmed = await confirm('確定要封存這個行程嗎？封存後可在「封存」分頁中找到。', {
           type: 'warning',
-          title: '封存行程',
+          title: ITINERARY_ACTIONS_LABELS.ARCHIVE_TITLE,
         })
         if (!confirmed) return
         syncAction = 'sync'

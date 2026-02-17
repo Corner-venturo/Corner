@@ -75,3 +75,105 @@ export const ITINERARY_LABELS = {
   AI_GENERATE_DESC: 'AI 生成描述',
   AI_GENERATE_IMAGE: 'AI 生成圖片',
 };
+// Template styles
+export const TEMPLATE_LABELS = {
+  CLASSIC: '經典',
+  CLASSIC_DESC: '簡約經典風格',
+  NATURE: '自然',
+  NATURE_DESC: '清新自然風格',
+  LUXURY: '奢華',
+  LUXURY_DESC: '高端奢華風格',
+  ART: '藝術',
+  ART_DESC: '藝術創意風格',
+  SAKURA: '櫻花',
+  SAKURA_DESC: '浪漫櫻花主題',
+  OCEAN: '海洋',
+  OCEAN_DESC: '藍色海洋風格',
+  TEMPLATE_UPDATED: '模板已更新',
+  TEMPLATE_UPDATE_FAILED: '更新模板失敗',
+  TEMPLATE_APPLIED: '模板已套用',
+  TEMPLATE_APPLY_FAILED: '套用模板失敗',
+  TEMPLATE_SAVED: '已儲存為模板',
+  TEMPLATE_SAVE_FAILED: '儲存模板失敗',
+  TEMPLATE_DELETED: '模板已刪除',
+  TEMPLATE_DELETE_FAILED: '刪除模板失敗',
+  TEMPLATE_DELETE_CONFIRM: '確定要刪除此模板嗎？',
+  RENAME_TITLE: '重新命名',
+  RENAME_PLACEHOLDER: '模板名稱',
+  CUSTOM_CSS_SAVED: '自訂 CSS 已儲存',
+  CUSTOM_CSS_FAILED: '儲存自訂 CSS 失敗',
+  CUSTOM_CSS_RESTORED: '已恢復預設 CSS',
+}
+
+// Corner Flight Itinerary
+export const FLIGHT_ITINERARY_LABELS = {
+  TITLE: '航班行程表',
+  PASSENGER: '旅客',
+  FLIGHT: '航班',
+  DEPARTURE: '出發',
+  ARRIVAL: '抵達',
+  CLASS: '艙等',
+  DATE: '日期',
+  TERMINAL: '航廈',
+  BAGGAGE: '行李',
+  GENERATE_FAILED: '產生失敗',
+  GENERATE_SUCCESS: '航班行程表已產生',
+}
+
+// Gemini Itinerary
+export const GEMINI_LABELS = {
+  GENERATE: '用 AI 生成行程',
+  GENERATING: '生成中...',
+  GENERATE_FAILED: '生成失敗',
+  PLACEHOLDER_DEST: '例：日本東京',
+  PLACEHOLDER_DAYS: '例：5',
+  PLACEHOLDER_STYLE: '例：美食之旅、文化深度',
+  IMPORT_SUCCESS: '已匯入 AI 行程',
+  IMPORT_FAILED: '匯入失敗',
+  PREVIEW_TITLE: 'AI 行程預覽',
+}
+
+// Itinerary hooks messages
+export const ITINERARY_HOOKS_LABELS = {
+  // useItineraryForm
+  LOAD_FAILED: '載入行程表失敗',
+  SAVE_SUCCESS: '行程表已儲存',
+  SAVE_FAILED: '儲存失敗',
+  WORKSPACE_ERROR: '無法取得 workspace code',
+
+  // useItineraryTableColumns
+  COL_CODE: '行程編號',
+  COL_NAME: '行程名稱',
+  COL_STATUS: '狀態',
+  COL_DAYS: '天數',
+  COL_COUNTRY: '國家',
+  COL_UPDATED: '更新日期',
+
+  // useItineraryList
+  LIST_LOAD_FAILED: '載入行程列表失敗',
+  DELETE_SUCCESS: '行程已刪除',
+  DELETE_FAILED: '刪除失敗',
+
+  // useItineraryFilters
+  FILTER_ALL: '全部',
+  FILTER_DRAFT: '草稿',
+  FILTER_ACTIVE: '進行中',
+  FILTER_ARCHIVED: '已封存',
+
+  // useQuoteImport
+  IMPORT_SUCCESS: '已匯入報價單',
+  IMPORT_FAILED: '匯入報價單失敗',
+  NO_QUOTES: '沒有可匯入的報價單',
+
+  // useItineraryDialogs
+  CREATE_ITINERARY_FAILED: '建立行程表失敗',
+  CREATE_ITINERARY_SUCCESS: '行程表已建立',
+}
+
+// Itinerary page
+export const ITINERARY_PAGE_LABELS = {
+  BREADCRUMB_HOME: '首頁',
+  BREADCRUMB_ITINERARY: '行程管理',
+  NEW_ITINERARY: '新增行程',
+  SEARCH_PLACEHOLDER: '搜尋行程...',
+}

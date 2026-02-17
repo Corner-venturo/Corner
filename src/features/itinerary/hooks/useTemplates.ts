@@ -1,4 +1,5 @@
 'use client'
+import { TEMPLATE_LABELS } from '../constants/labels'
 
 /**
  * 範本 Hook - 提供行程範本資料
@@ -33,20 +34,20 @@ export function getTemplateColor(templateId: string): string {
 export function useTemplates() {
   // 預設範本資料
   const defaultTemplates: Template[] = [
-    { id: 'original', name: '經典', description: '簡約經典風格' },
-    { id: 'nature', name: '自然', description: '清新自然風格' },
-    { id: 'luxury', name: '奢華', description: '高端奢華風格' },
-    { id: 'art', name: '藝術', description: '藝術創意風格' },
+    { id: 'original', name: TEMPLATE_LABELS.CLASSIC, description: TEMPLATE_LABELS.CLASSIC_DESC },
+    { id: 'nature', name: TEMPLATE_LABELS.NATURE, description: TEMPLATE_LABELS.NATURE_DESC },
+    { id: 'luxury', name: TEMPLATE_LABELS.LUXURY, description: TEMPLATE_LABELS.LUXURY_DESC },
+    { id: 'art', name: TEMPLATE_LABELS.ART, description: TEMPLATE_LABELS.ART_DESC },
     { id: 'dreamscape', name: '夢幻', description: '夢幻唯美風格' },
     { id: 'collage', name: '拼貼', description: '拼貼混搭風格' },
   ]
 
   const flightDefaultTemplates: Template[] = [
-    { id: 'original', name: '經典', description: '簡約風格' },
+    { id: 'original', name: TEMPLATE_LABELS.CLASSIC, description: '簡約風格' },
     { id: 'chinese', name: '中式', description: '中國風格' },
     { id: 'japanese', name: '日式', description: '日本風格' },
-    { id: 'luxury', name: '奢華', description: '高端風格' },
-    { id: 'art', name: '藝術', description: '藝術風格' },
+    { id: 'luxury', name: TEMPLATE_LABELS.LUXURY, description: '高端風格' },
+    { id: 'art', name: TEMPLATE_LABELS.ART, description: '藝術風格' },
     { id: 'dreamscape', name: '夢幻', description: '夢幻風格' },
     { id: 'collage', name: '拼貼', description: '拼貼風格' },
     { id: 'none', name: '無', description: '不顯示' },

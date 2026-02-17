@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Itinerary } from '@/stores/types'
 import { alertError } from '@/lib/ui/alert-dialog'
+import { ITINERARY_ACTIONS_LABELS } from '../constants/labels'
 
 // 公司密碼（統編）
 const COMPANY_PASSWORD = '83212711'

@@ -138,3 +138,69 @@ export const BLOCK_EDITOR_LABELS = {
   SAVING_4294: '已儲存',
   LABEL_6397: '存檔失敗',
 }
+
+// Itinerary Actions
+export const ITINERARY_ACTIONS_LABELS = {
+  FILL_CODE_AND_NAME: '請填寫行程編號和行程名稱',
+  STATUS_PROPOSAL: '提案',
+  TO_BE_FILLED: '（待填寫）',
+  COPY_WITH_QUOTES: (count: number) => `行程已複製成功！同時複製了 ${count} 個報價單（客戶資料已清空）`,
+  COPY_SUCCESS: '行程已複製成功！',
+  COPY_FAILED: '複製失敗，請稍後再試',
+  ARCHIVE_WITH_QUOTES: (count: number) => `此行程有 ${count} 個關聯的報價單。\n\n請選擇封存方式：\n• 同步封存：報價單也一併封存\n• 僅封存行程：斷開關聯，報價單保留`,
+  ARCHIVE_TITLE: '封存行程',
+  ARCHIVE_SYNC: '同步封存',
+  ARCHIVE_ONLY: '僅封存行程',
+  ARCHIVE_CONFIRM: '確定要封存此行程嗎？',
+  ARCHIVE_SUCCESS: '行程已封存',
+  ARCHIVE_FAILED: '封存失敗',
+  DELETE_FAILED: '刪除失敗',
+  UNARCHIVE_SUCCESS: '行程已取消封存',
+  UNARCHIVE_FAILED: '取消封存失敗',
+  DELETE_WITH_QUOTES: (count: number) => `此行程有 ${count} 個關聯的報價單。\n\n刪除行程會同時刪除這些報價單，確定要刪除嗎？`,
+  DELETE_SIMPLE: '確定要刪除此行程嗎？此操作無法復原。',
+  DELETE_TITLE: '刪除行程',
+  DELETE_SUCCESS: '行程已刪除',
+  DELETE_LINKED_FAILED: '刪除關聯報價單失敗',
+  WORKSPACE_ERROR: '無法取得 workspace code',
+  CREATE_FAILED: '建立行程表失敗',
+  CREATE_SUCCESS: '行程表已建立',
+  SAVE_SUCCESS: '行程表已儲存',
+  SAVE_FAILED: '儲存失敗，請稍後再試',
+  NO_LINKED_QUOTE: '無關聯報價單，跳過同步',
+}
+
+// Itinerary Data Loader
+export const ITINERARY_DATA_LOADER_LABELS = {
+  STATUS_PROPOSAL: '提案',
+  TRANSPORT_COST: '行程表所列之交通費用',
+  ACCOMMODATION_COST: '行程表所列之住宿費用',
+  MEAL_COST: '行程表所列之餐食費用',
+  TICKET_COST: '行程表所列之門票費用',
+  GUIDE_SERVICE: '專業導遊服務',
+  INSURANCE: '旅遊責任險 500 萬元',
+  PASSPORT_VISA: '個人護照及簽證費用',
+  PERSONAL_EXPENSE: '行程中之個人消費',
+  OPTIONAL_TOUR: '非列入行程中之自費活動',
+  AIRPORT_TAX: '機場稅、燃油附加費',
+  TIP: '司機、導遊、領隊小費',
+  LUGGAGE_OVERWEIGHT: '行李超重費',
+  SINGLE_ROOM: '單人房差額',
+}
+
+// Itinerary Editor
+export const ITINERARY_EDITOR_LABELS = {
+  STATUS_PROPOSAL: '提案',
+  STATUS_ACTIVE: '進行中',
+  SAVE_LEADER_CONFIRM: (name: string) => `要將「${name}」新增到領隊資料庫嗎？\n下次可以直接搜尋選用。`,
+  SAVE_LEADER_TITLE: '儲存領隊資料',
+  AUTO_SAVE_FAILED: '自動存檔失敗，請手動儲存',
+  UNSAVED_CHANGES: '您有未儲存的變更，確定要離開嗎？',
+  LOAD_FAILED: '載入行程表失敗',
+  VERSION_SAVE_SUCCESS: '版本已儲存',
+  VERSION_SAVE_FAILED: '版本儲存失敗',
+  VERSION_CREATED: '已建立新版本',
+  VERSION_CREATE_FAILED: '建立版本失敗',
+  ITINERARY_CREATED: '行程表已建立',
+  CREATE_FAILED: '建立行程表失敗',
+}

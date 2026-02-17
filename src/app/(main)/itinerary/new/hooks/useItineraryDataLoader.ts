@@ -10,6 +10,7 @@ import type { LocalTourData } from './useItineraryEditor'
 import type { DailyItinerary, HotelInfo, FlightInfo } from '@/components/editor/tour-form/types'
 import type { TierPricing } from '@/stores/types/quote.types'
 import type { Itinerary } from '@/stores/types'
+import { ITINERARY_DATA_LOADER_LABELS } from '../../constants/labels'
 
 interface UseItineraryDataLoaderProps {
   setTourData: (data: LocalTourData) => void
@@ -76,7 +77,7 @@ export function useItineraryDataLoader({
       priceNote: itinerary.price_note || '',
       country: itinerary.country || '',
       city: itinerary.city || '',
-      status: itinerary.status || '提案',
+      status: itinerary.status || ITINERARY_DATA_LOADER_LABELS.STATUS_PROPOSAL,
       outboundFlight: itinerary.outbound_flight || itinerary.flight_info?.outbound || {
         airline: '',
         flightNumber: '',
@@ -132,15 +133,15 @@ export function useItineraryDataLoader({
         show_pricing_details: false,
         insurance_amount: '500',
         included_items: [
-          { text: '行程表所列之交通費用', included: true },
-          { text: '行程表所列之住宿費用', included: true },
-          { text: '行程表所列之餐食費用', included: true },
-          { text: '行程表所列之門票費用', included: true },
-          { text: '專業導遊服務', included: true },
-          { text: '旅遊責任險 500 萬元', included: true },
+          { text: ITINERARY_DATA_LOADER_LABELS.TRANSPORT_COST, included: true },
+          { text: ITINERARY_DATA_LOADER_LABELS.ACCOMMODATION_COST, included: true },
+          { text: ITINERARY_DATA_LOADER_LABELS.MEAL_COST, included: true },
+          { text: ITINERARY_DATA_LOADER_LABELS.TICKET_COST, included: true },
+          { text: ITINERARY_DATA_LOADER_LABELS.GUIDE_SERVICE, included: true },
+          { text: ITINERARY_DATA_LOADER_LABELS.INSURANCE, included: true },
         ],
         excluded_items: [
-          { text: '個人護照及簽證費用', included: false },
+          { text: ITINERARY_DATA_LOADER_LABELS.PASSPORT_VISA, included: false },
           { text: '行程外之自費行程', included: false },
           { text: '個人消費及小費', included: false },
           { text: '行李超重費用', included: false },
@@ -276,7 +277,7 @@ export function useItineraryDataLoader({
             coverImage: '',
             country: '',
             city: '',
-            status: '提案',
+            status: ITINERARY_DATA_LOADER_LABELS.STATUS_PROPOSAL,
             outboundFlight: {
               airline: '',
               flightNumber: '',
@@ -356,7 +357,7 @@ export function useItineraryDataLoader({
         coverImage: '', // 封面圖片由 AirportImageLibrary 從 airport_images 表選擇
         country: country?.name || tour.location || '',
         city: city?.name || tour.location || '',
-        status: '提案',
+        status: ITINERARY_DATA_LOADER_LABELS.STATUS_PROPOSAL,
         outboundFlight: {
           airline: tourOutboundFlight?.airline || '',
           flightNumber: tourOutboundFlight?.flightNumber || '',

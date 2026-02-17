@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useMemo } from 'react'
 import type { Itinerary } from '@/stores/types'
+import { ITINERARY_ACTIONS_LABELS } from '../constants/labels'
 
 /**
  * Hook for managing itinerary page state
