@@ -21,6 +21,7 @@ export async function updateOrderPaymentStatus(
   orderId: string,
   newReceiptAmount: number
 ): Promise<UpdateOrderPaymentStatusResult> {
+  logger.warn('[DEPRECATED] updateOrderPaymentStatus 已棄用，請改用 recalculateReceiptStats from receipt-core.service.ts')
   // 先取得訂單的總金額
   const { data: orderData } = await supabase
     .from('orders')
@@ -94,6 +95,7 @@ export async function updateTourFinancials(
   supabase: SupabaseClient,
   tourId: string
 ): Promise<UpdateTourFinancialsResult> {
+  logger.warn('[DEPRECATED] updateTourFinancials 已棄用，請改用 recalculateReceiptStats from receipt-core.service.ts')
   // 取得該團所有訂單 ID
   const { data: tourOrdersData } = await supabase
     .from('orders')

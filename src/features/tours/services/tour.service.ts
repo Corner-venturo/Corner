@@ -128,8 +128,12 @@ class TourService extends BaseService<Tour & BaseEntity> {
     return code
   }
 
-  // 計算團體財務摘要
+  /**
+   * @deprecated 此方法使用假邏輯（收入的70%估算成本），不應在生產環境使用。
+   * 真實成本請查詢 payment_request_items，或使用 recalculateExpenseStats。
+   */
   async calculateFinancialSummary(tour_id: string): Promise<TourFinancialSummary> {
+    logger.warn('[DEPRECATED] calculateFinancialSummary 使用假邏輯，不應在生產環境使用')
     const tour = await this.getById(tour_id)
     if (!tour) {
       throw new Error('Tour not found')
