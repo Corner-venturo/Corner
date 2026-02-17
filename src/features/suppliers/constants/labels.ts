@@ -30,3 +30,26 @@ export const LABELS = {
   deleteSupplier: '刪除供應商',
 }
 
+
+// Supplier types
+export const SUPPLIER_TYPE_LABELS = {
+  HOTEL: '飯店',
+  RESTAURANT: '餐廳',
+  TRANSPORTATION: '交通',
+  ATTRACTION: '景點',
+  GUIDE: '導遊',
+  TRAVEL_AGENCY: '旅行社',
+  TICKETING: '票務',
+  EMPLOYEE: '員工',
+  OTHER: '其他',
+}
+
+// SuppliersPage toast messages
+export const SUPPLIERS_PAGE_LABELS = {
+  DELETE_CONFIRM: (name: string) => `確定要刪除供應商「${name}」嗎？`,
+  DELETE_SUCCESS: '供應商已刪除',
+  DELETE_FAILED: '刪除失敗，請稍後再試',
+  UPDATE_SUCCESS: '供應商更新成功',
+  CREATE_SUCCESS: '供應商建立成功',
+  SAVE_FAILED: '儲存失敗，請稍後再試',
+}

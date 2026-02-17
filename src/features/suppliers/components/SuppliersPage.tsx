@@ -19,6 +19,7 @@ import {
 import type { Supplier } from '@/types/supplier.types'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { LABELS } from '../constants/labels'
+import { SUPPLIERS_PAGE_LABELS } from '../constants/labels'
 
 export const SuppliersPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -64,7 +65,7 @@ export const SuppliersPage: React.FC = () => {
   }, [])
 
   const handleDelete = useCallback(async (supplier: Supplier) => {
-    const confirmed = await confirm(`確定要刪除供應商「${supplier.name}」嗎？`, {
+    const confirmed = await confirm(SUPPLIERS_PAGE_LABELS.DELETE_CONFIRM(supplier.name), {
       title: LABELS.deleteSupplier,
       type: 'warning',
     })
@@ -72,10 +73,10 @@ export const SuppliersPage: React.FC = () => {
 
     try {
       await deleteSupplierApi(supplier.id)
-      await alert('供應商已刪除', 'success')
+      await alert(SUPPLIERS_PAGE_LABELS.DELETE_SUCCESS, 'success')
     } catch (error) {
       logger.error('❌ Delete Supplier Error:', error)
-      await alert('刪除失敗，請稍後再試', 'error')
+      await alert(SUPPLIERS_PAGE_LABELS.DELETE_FAILED, 'error')
     }
   }, [])
 
@@ -108,7 +109,7 @@ export const SuppliersPage: React.FC = () => {
           bank_account: formData.bank_account,
           notes: formData.notes,
         })
-        await alert('供應商更新成功', 'success')
+        await alert(SUPPLIERS_PAGE_LABELS.UPDATE_SUCCESS, 'success')
       } else {
         // 新增模式
         await createSupplier({
@@ -118,12 +119,12 @@ export const SuppliersPage: React.FC = () => {
           notes: formData.notes || null,
           type: 'other', // 預設型別
         })
-        await alert('供應商建立成功', 'success')
+        await alert(SUPPLIERS_PAGE_LABELS.CREATE_SUCCESS, 'success')
       }
       handleCloseDialog()
     } catch (error) {
       logger.error('❌ Save Supplier Error:', error)
-      await alert('儲存失敗，請稍後再試', 'error')
+      await alert(SUPPLIERS_PAGE_LABELS.SAVE_FAILED, 'error')
     }
   }, [formData, isEditMode, editingSupplier, handleCloseDialog])
 

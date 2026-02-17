@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Pencil, Trash2 } from 'lucide-react'
 import { Supplier } from '../types'
 import { LABELS } from '../constants/labels'
+import { SUPPLIER_TYPE_LABELS } from '../constants/labels'
 
 interface SuppliersListProps {
   suppliers: Supplier[]
@@ -21,15 +22,15 @@ interface SuppliersListProps {
 
 // 供應商類型中文對應
 const TYPE_LABELS: Record<string, string> = {
-  hotel: '飯店',
-  restaurant: '餐廳',
-  transport: '交通',
-  attraction: '景點',
-  guide: '導遊',
-  agency: '旅行社',
-  ticketing: '票務',
-  employee: '員工',
-  other: '其他',
+  hotel: SUPPLIER_TYPE_LABELS.HOTEL,
+  restaurant: SUPPLIER_TYPE_LABELS.RESTAURANT,
+  transport: SUPPLIER_TYPE_LABELS.TRANSPORTATION,
+  attraction: SUPPLIER_TYPE_LABELS.ATTRACTION,
+  guide: SUPPLIER_TYPE_LABELS.GUIDE,
+  agency: SUPPLIER_TYPE_LABELS.TRAVEL_AGENCY,
+  ticketing: SUPPLIER_TYPE_LABELS.TICKETING,
+  employee: SUPPLIER_TYPE_LABELS.EMPLOYEE,
+  other: SUPPLIER_TYPE_LABELS.OTHER,
 }
 
 export const SuppliersList: React.FC<SuppliersListProps> = ({
