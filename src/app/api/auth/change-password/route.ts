@@ -3,13 +3,8 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 import { checkRateLimit } from '@/lib/rate-limit'
-
-interface ChangePasswordRequest {
-  employee_number: string
-  workspace_code: string
-  current_password: string
-  new_password: string
-}
+import { validateBody } from '@/lib/api/validation'
+import { changePasswordSchema } from '@/lib/validations/api-schemas'
 
 /**
  * 用戶自行更改密碼
@@ -22,16 +17,9 @@ export async function POST(request: NextRequest) {
     const rateLimited = checkRateLimit(request, 'change-password', 5, 60_000)
     if (rateLimited) return rateLimited
 
-    const body: ChangePasswordRequest = await request.json()
-    const { employee_number, workspace_code, current_password, new_password } = body
-
-    if (!employee_number || !current_password || !new_password) {
-      return errorResponse('缺少必要參數', 400, ErrorCode.MISSING_FIELD)
-    }
-
-    if (new_password.length < 8) {
-      return errorResponse('密碼至少需要 8 個字元', 400, ErrorCode.VALIDATION_ERROR)
-    }
+    const validation = await validateBody(request, changePasswordSchema)
+    if (!validation.success) return validation.error
+    const { employee_number, workspace_code, current_password, new_password } = validation.data
 
     const supabaseAdmin = getSupabaseAdminClient()
 

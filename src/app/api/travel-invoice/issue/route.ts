@@ -9,6 +9,8 @@ import { issueInvoice } from '@/lib/newebpay'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
 import { getServerAuth } from '@/lib/auth/server-auth'
+import { validateBody } from '@/lib/api/validation'
+import { issueInvoiceSchema } from '@/lib/validations/api-schemas'
 
 export async function POST(request: NextRequest) {
   // 認證檢查
@@ -18,20 +20,12 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json()
-    const { invoice_date, total_amount, tax_type, buyerInfo, items, order_id, orders, tour_id, created_by, workspace_id } = body
+    const validation = await validateBody(request, issueInvoiceSchema)
+    if (!validation.success) return validation.error
+    const { invoice_date, total_amount, tax_type, buyerInfo, items, order_id, orders, tour_id, created_by, workspace_id } = validation.data
 
     // 支援向後兼容：如果只有 order_id，轉換為 orders 格式
     const orderItems = orders || (order_id ? [{ order_id, amount: total_amount }] : [])
-
-    // 驗證必要欄位
-    if (!invoice_date || !total_amount || !buyerInfo?.buyerName || !items?.length) {
-      return ApiError.validation('缺少必要欄位')
-    }
-
-    if (!tour_id) {
-      return ApiError.validation('缺少團別 ID')
-    }
 
     // 取得 Supabase client
     const supabase = getSupabaseAdminClient()
@@ -116,7 +110,7 @@ export async function POST(request: NextRequest) {
       tour_id: tour_id || null,
       workspace_id: finalWorkspaceId || null,
       is_batch: orderItems.length > 1,
-      created_by,
+      created_by: created_by || auth.data.employeeId,
     }
 
     const { data: invoiceRecord, error } = await supabase
@@ -139,8 +133,8 @@ export async function POST(request: NextRequest) {
           invoice_id: invoiceRecord.id,
           order_id: o.order_id,
           amount: o.amount,
-          workspace_id: finalWorkspaceId,
-          created_by,
+          workspace_id: finalWorkspaceId!,
+          created_by: created_by || auth.data.employeeId,
         }))
 
         const { error: ioError } = await supabase

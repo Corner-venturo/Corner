@@ -9,6 +9,8 @@ import { issueInvoice } from '@/lib/newebpay'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
 import { getServerAuth } from '@/lib/auth/server-auth'
+import { validateBody } from '@/lib/api/validation'
+import { batchIssueInvoiceSchema } from '@/lib/validations/api-schemas'
 
 export async function POST(request: NextRequest) {
   // 認證檢查
@@ -18,13 +20,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json()
-    const { tour_id, order_ids, invoice_date, buyerInfo, created_by, workspace_id } = body
-
-    // 驗證必要欄位
-    if (!tour_id || !order_ids?.length || !invoice_date || !buyerInfo?.buyerName) {
-      return ApiError.validation('缺少必要欄位')
-    }
+    const validation = await validateBody(request, batchIssueInvoiceSchema)
+    if (!validation.success) return validation.error
+    const { tour_id, order_ids, invoice_date, buyerInfo, created_by, workspace_id } = validation.data
 
     const supabase = getSupabaseAdminClient()
 
@@ -102,7 +100,7 @@ export async function POST(request: NextRequest) {
       tour_id,
       workspace_id: workspace_id || null,
       is_batch: true,
-      created_by,
+      created_by: created_by || auth.data.employeeId,
     }
 
     const { data: invoiceRecord, error } = await supabase
@@ -127,8 +125,8 @@ export async function POST(request: NextRequest) {
       invoice_id: invoiceRecord.id,
       order_id: o.order_id,
       amount: o.amount,
-      workspace_id: orderWorkspaceId,
-      created_by,
+      workspace_id: orderWorkspaceId || '',
+      created_by: created_by || auth.data.employeeId,
     }))
 
     const { error: ioError } = await supabase

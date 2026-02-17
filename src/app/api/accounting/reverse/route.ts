@@ -3,6 +3,8 @@ import { reverseVoucher } from '@/features/erp-accounting/services/posting-servi
 import { logger } from '@/lib/utils/logger'
 import { getServerAuth } from '@/lib/auth/server-auth'
 import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
+import { validateBody } from '@/lib/api/validation'
+import { reverseVoucherSchema } from '@/lib/validations/api-schemas'
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,16 +15,9 @@ export async function POST(request: NextRequest) {
     }
     const { employeeId } = auth.data
 
-    const body = await request.json() as {
-      voucher_id: string
-      reason: string
-    }
-
-    const { voucher_id, reason } = body
-
-    if (!voucher_id || !reason) {
-      return ApiError.validation('缺少傳票 ID 或反沖原因')
-    }
+    const validation = await validateBody(request, reverseVoucherSchema)
+    if (!validation.success) return validation.error
+    const { voucher_id, reason } = validation.data
 
     const result = await reverseVoucher(employeeId, voucher_id, reason)
 
