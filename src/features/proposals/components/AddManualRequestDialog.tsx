@@ -518,7 +518,6 @@ export function AddManualRequestDialog({
             <X size={16} />
             {PROPOSAL_FORM_LABELS.CANCEL}
           </Button>
-          {/* eslint-disable-next-line venturo/button-requires-icon -- 三元運算式中有圖標 */}
           <Button
             onClick={handleSave}
             disabled={saving || !formData.title.trim()}
