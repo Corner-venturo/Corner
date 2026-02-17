@@ -291,6 +291,7 @@ export const ADD_REQUEST_FORM_LABELS = {
   LABEL_6198: '需求單項目',
   ADD_3774: '點擊「新增旅遊團」開始分配',
   CANCEL: '取消',
+  處理中: '處理中...',
 };
 
 // RequestDetailDialog 額外標籤

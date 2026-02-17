@@ -140,6 +140,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
   const [batchTotalAmount, setBatchTotalAmount] = useState(0)
   const [batchNote, setBatchNote] = useState('')
   const [tourAllocations, setTourAllocations] = useState<TourAllocation[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // === 計算值 ===
 
@@ -337,6 +338,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
     setBatchDescription('')
     setBatchTotalAmount(0)
     setBatchNote('')
+    setIsSubmitting(false)
     setTourAllocations([
       { tour_id: '', tour_code: '', tour_name: '', allocated_amount: 0 },
       { tour_id: '', tour_code: '', tour_name: '', allocated_amount: 0 },
@@ -345,6 +347,8 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
   }
 
   const handleSubmit = async () => {
+    if (isSubmitting) return
+    setIsSubmitting(true)
     try {
       // 檢查 workspace_id
       if (!workspaceId) {
@@ -468,6 +472,8 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
       logger.error('新增請款單失敗:', error)
       const message = error instanceof Error ? error.message : '新增請款單失敗'
       void alert(message, 'error')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -831,16 +837,16 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
             <Button
               onClick={handleSubmit}
               disabled={
-                activeTab === 'batch'
+                isSubmitting || (activeTab === 'batch'
                   ? unallocatedAmount !== 0 || tourAllocations.filter(a => a.tour_id).length === 0
                   : activeTab === 'company'
                     ? !formData.expense_type || !formData.request_date || requestItems.length === 0
-                    : !formData.tour_id || (importFromRequests ? selectedRequestCount === 0 : requestItems.length === 0)
+                    : !formData.tour_id || (importFromRequests ? selectedRequestCount === 0 : requestItems.length === 0))
               }
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md gap-2"
             >
               <Plus size={16} />
-              {activeTab === 'batch' ? '建立批次請款' : ADD_REQUEST_DIALOG_LABELS.新增請款單}
+              {isSubmitting ? ADD_REQUEST_FORM_LABELS.處理中 : activeTab === 'batch' ? '建立批次請款' : ADD_REQUEST_DIALOG_LABELS.新增請款單}
             </Button>
           </div>
         </div>
