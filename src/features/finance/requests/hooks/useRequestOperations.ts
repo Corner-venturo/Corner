@@ -7,7 +7,7 @@ import { EXPENSE_TYPE_CONFIG, CompanyExpenseType } from '@/stores/types/finance.
 import { recalculateExpenseStats } from '@/features/finance/payments/services/expense-core.service'
 
 export function useRequestOperations() {
-  const { payment_requests, createPaymentRequest, addPaymentItem } = usePayments()
+  const { payment_requests, createPaymentRequest, addPaymentItem, addPaymentItems } = usePayments()
   const workspaceId = useWorkspaceId()
 
   // 根據團號生成請款單編號：團號-I01, 團號-I02, ...
@@ -78,21 +78,18 @@ export function useRequestOperations() {
           is_special_billing: formData.is_special_billing,
         })
 
-        // Add all items sequentially
-        for (let i = 0; i < items.length; i++) {
-          const item = items[i]
-          await addPaymentItem(request.id, {
-            category: item.category,
-            supplier_id: item.supplier_id,
-            supplier_name: item.supplierName,
-            description: item.description,
-            unit_price: item.unit_price,
-            quantity: item.quantity,
-            notes: '',
-            sort_order: i + 1,
-            tour_request_id: item.tour_request_id || null, // 關聯需求單
-          })
-        }
+        // Batch insert all items
+        await addPaymentItems(request.id, items.map((item, i) => ({
+          category: item.category,
+          supplier_id: item.supplier_id,
+          supplier_name: item.supplierName,
+          description: item.description,
+          unit_price: item.unit_price,
+          quantity: item.quantity,
+          notes: '',
+          sort_order: i + 1,
+          tour_request_id: item.tour_request_id || null,
+        })))
 
         return request
       } else {
@@ -122,23 +119,20 @@ export function useRequestOperations() {
           is_special_billing: formData.is_special_billing,
         })
 
-        // Add all items sequentially
-        for (let i = 0; i < items.length; i++) {
-          const item = items[i]
-          await addPaymentItem(request.id, {
-            category: item.category,
-            supplier_id: item.supplier_id,
-            supplier_name: item.supplierName,
-            description: item.description,
-            unit_price: item.unit_price,
-            quantity: item.quantity,
-            notes: '',
-            sort_order: i + 1,
-            tour_request_id: item.tour_request_id || null, // 關聯需求單
-          })
-        }
+        // Batch insert all items
+        await addPaymentItems(request.id, items.map((item, i) => ({
+          category: item.category,
+          supplier_id: item.supplier_id,
+          supplier_name: item.supplierName,
+          description: item.description,
+          unit_price: item.unit_price,
+          quantity: item.quantity,
+          notes: '',
+          sort_order: i + 1,
+          tour_request_id: item.tour_request_id || null,
+        })))
 
-        // 重算團成本
+        // 重算團成本 (already handled inside addItems, but ensure for tour)
         if (formData.tour_id) {
           await recalculateExpenseStats(formData.tour_id)
         }
@@ -146,7 +140,7 @@ export function useRequestOperations() {
         return request
       }
     },
-    [createPaymentRequest, addPaymentItem, generateRequestCode, generateCompanyRequestCode, workspaceId]
+    [createPaymentRequest, addPaymentItems, generateRequestCode, generateCompanyRequestCode, workspaceId]
   )
 
   // Create batch requests
@@ -183,31 +177,28 @@ export function useRequestOperations() {
           request_type: '供應商支出', // Default value for now
         })
 
-        // Add all items
-        for (let i = 0; i < items.length; i++) {
-          const item = items[i]
-          await addPaymentItem(request.id, {
-            category: item.category,
-            supplier_id: item.supplier_id,
-            supplier_name: item.supplierName,
-            description: item.description,
-            unit_price: item.unit_price,
-            quantity: item.quantity,
-            notes: '',
-            sort_order: i + 1,
-            tour_request_id: item.tour_request_id || null, // 關聯需求單
-          })
-        }
+        // Batch insert all items
+        await addPaymentItems(request.id, items.map((item, i) => ({
+          category: item.category,
+          supplier_id: item.supplier_id,
+          supplier_name: item.supplierName,
+          description: item.description,
+          unit_price: item.unit_price,
+          quantity: item.quantity,
+          notes: '',
+          sort_order: i + 1,
+          tour_request_id: item.tour_request_id || null,
+        })))
 
         createdRequests.push(request)
 
-        // 重算團成本
+        // 重算團成本 (already handled inside addItems)
         await recalculateExpenseStats(tourId)
       }
 
       return createdRequests
     },
-    [createPaymentRequest, addPaymentItem, generateRequestCode, workspaceId]
+    [createPaymentRequest, addPaymentItems, generateRequestCode, workspaceId]
   )
 
   return {

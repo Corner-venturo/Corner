@@ -29,9 +29,9 @@ interface UnpaidOrder {
 }
 
 const PAYMENT_STATUS_MAP: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
-  unpaid: { label: '未付款', variant: 'destructive' },
-  partial: { label: '部分付款', variant: 'secondary' },
-  pending_deposit: { label: '待收訂金', variant: 'outline' },
+  unpaid: { label: UNPAID_ORDERS_LABELS.STATUS_UNPAID, variant: 'destructive' },
+  partial: { label: UNPAID_ORDERS_LABELS.STATUS_PARTIAL, variant: 'secondary' },
+  pending_deposit: { label: UNPAID_ORDERS_LABELS.STATUS_PENDING_DEPOSIT, variant: 'outline' },
 }
 
 export default function UnpaidOrdersPage() {
@@ -89,7 +89,7 @@ export default function UnpaidOrdersPage() {
       setData(mapped)
     } catch (err) {
       logger.error('Failed to fetch unpaid orders:', err)
-      toast.error('載入未收款資料失敗')
+      toast.error(UNPAID_ORDERS_LABELS.TOAST_LOAD_FAILED)
     } finally {
       setLoading(false)
     }
@@ -107,24 +107,24 @@ export default function UnpaidOrdersPage() {
   )
 
   const columns: TableColumn<UnpaidOrder>[] = [
-    { key: 'order_number', label: '訂單編號', sortable: true },
-    { key: 'contact_person', label: '聯絡人', sortable: true },
-    { key: 'tour_code', label: '團號', sortable: true },
-    { key: 'departure_date', label: '出發日', sortable: true, render: (value) => <DateCell date={value as string} /> },
+    { key: 'order_number', label: UNPAID_ORDERS_LABELS.COL_ORDER_NUMBER, sortable: true },
+    { key: 'contact_person', label: UNPAID_ORDERS_LABELS.COL_CONTACT_PERSON, sortable: true },
+    { key: 'tour_code', label: UNPAID_ORDERS_LABELS.COL_TOUR_CODE, sortable: true },
+    { key: 'departure_date', label: UNPAID_ORDERS_LABELS.COL_DEPARTURE_DATE, sortable: true, render: (value) => <DateCell date={value as string} /> },
     {
       key: 'payment_status',
-      label: '付款狀態',
+      label: UNPAID_ORDERS_LABELS.COL_PAYMENT_STATUS,
       sortable: true,
       render: (_value, row) => {
         const info = PAYMENT_STATUS_MAP[row.payment_status]
         return info ? <Badge variant={info.variant}>{info.label}</Badge> : <span>{row.payment_status}</span>
       },
     },
-    { key: 'total_amount', label: '訂單金額', sortable: true, align: 'right', render: (value) => <CurrencyCell amount={Number(value)} /> },
-    { key: 'paid_amount', label: '已收金額', sortable: true, align: 'right', render: (value) => <CurrencyCell amount={Number(value)} /> },
+    { key: 'total_amount', label: UNPAID_ORDERS_LABELS.COL_TOTAL_AMOUNT, sortable: true, align: 'right', render: (value) => <CurrencyCell amount={Number(value)} /> },
+    { key: 'paid_amount', label: UNPAID_ORDERS_LABELS.COL_PAID_AMOUNT, sortable: true, align: 'right', render: (value) => <CurrencyCell amount={Number(value)} /> },
     {
       key: 'remaining_amount',
-      label: '未收金額',
+      label: UNPAID_ORDERS_LABELS.COL_REMAINING_AMOUNT,
       sortable: true,
       align: 'right',
       render: (_value, row) => (
@@ -135,7 +135,7 @@ export default function UnpaidOrdersPage() {
     },
     {
       key: 'days_since_departure',
-      label: '出發後天數',
+      label: UNPAID_ORDERS_LABELS.COL_DAYS_SINCE_DEPARTURE,
       sortable: true,
       align: 'center',
       render: (_value, row) => {
@@ -152,16 +152,16 @@ export default function UnpaidOrdersPage() {
     <ListPageLayout
       title={UNPAID_ORDERS_LABELS.LABEL_1474}
       breadcrumb={[
-        { label: '首頁', href: '/' },
-        { label: '財務', href: '/finance' },
-        { label: '報表管理', href: '/finance/reports' },
-        { label: '未收款報表', href: '/finance/reports/unpaid-orders' },
+        { label: UNPAID_ORDERS_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: UNPAID_ORDERS_LABELS.BREADCRUMB_FINANCE, href: '/finance' },
+        { label: UNPAID_ORDERS_LABELS.BREADCRUMB_REPORTS, href: '/finance/reports' },
+        { label: UNPAID_ORDERS_LABELS.LABEL_1474, href: '/finance/reports/unpaid-orders' },
       ]}
       headerActions={
         <div className="flex items-center gap-3">
           <div className="text-sm text-muted-foreground">
             {UNPAID_ORDERS_LABELS.TOTAL_REMAINING_PREFIX}<span className="font-semibold text-foreground">NT${totalRemaining.toLocaleString()}</span>
-            （{filtered.length} 筆）
+            （{filtered.length}{UNPAID_ORDERS_LABELS.COUNT_SUFFIX}）
           </div>
           <Select value={filter} onValueChange={setFilter}>
             <SelectTrigger className="w-[160px]">
@@ -180,7 +180,7 @@ export default function UnpaidOrdersPage() {
       loading={loading}
       columns={columns}
       data={filtered}
-      searchPlaceholder="搜尋訂單編號、聯絡人、團號..."
+      searchPlaceholder={UNPAID_ORDERS_LABELS.SEARCH_PLACEHOLDER}
     />
   )
 }

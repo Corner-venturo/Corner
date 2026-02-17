@@ -143,10 +143,41 @@ export const TOUR_PNL_LABELS = {
   CLOSED: '已結案',
 
   TOTAL_2832: '團收支總覽',
+
+  // Status map
+  STATUS_DRAFT: '草稿',
+  STATUS_CONFIRMED: '已確認',
+  STATUS_OPERATING: '出團中',
+  STATUS_COMPLETED: '已完成',
+  STATUS_CLOSED: '已結案',
+  STATUS_CANCELLED: '已取消',
+
+  // Column labels
+  COL_TOUR_CODE: '團號',
+  COL_TOUR_NAME: '團名',
+  COL_DEPARTURE_DATE: '出發日',
+  COL_PARTICIPANTS: '人數',
+  COL_STATUS: '狀態',
+  COL_REVENUE: '收入',
+  COL_COST: '成本',
+  COL_PROFIT: '毛利',
+  COL_MARGIN: '毛利率',
+
+  // Breadcrumb
+  BREADCRUMB_HOME: '首頁',
+  BREADCRUMB_FINANCE: '財務',
+  BREADCRUMB_REPORTS: '報表管理',
+
+  // Toast
+  TOAST_LOAD_FAILED: '載入團收支資料失敗',
+
+  // Search
+  SEARCH_PLACEHOLDER: '搜尋團號、團名...',
 }
 
 export const UNCLOSED_TOURS_LABELS = {
   DESCRIPTION: '此報表顯示<strong>回程日 + 7 天已過</strong>但尚未執行結案的團體。',
+  DESCRIPTION_SUFFIX: '建議儘快完成結案作業以確保財務數據準確。',
 
   LABEL_996: '未結案團體報表',
   LABEL_9947: '未結案團體數',
@@ -154,6 +185,28 @@ export const UNCLOSED_TOURS_LABELS = {
   TOTAL_582: '總支出',
   TOTAL_8800: '總利潤',
   LABEL_332: '未結案團體列表',
+
+  // Column labels
+  COL_TOUR_CODE: '團號',
+  COL_TOUR_NAME: '團名',
+  COL_RETURN_DATE: '回程日',
+  COL_EXPECTED_CLOSING_DATE: '應結案日',
+  COL_DAYS_OVERDUE: '逾期天數',
+  COL_TOTAL_REVENUE: '總收入',
+  COL_TOTAL_COST: '總支出',
+  COL_PROFIT: '利潤',
+  COL_STATUS: '狀態',
+  DAYS_SUFFIX: ' 天',
+  STATUS_DEFAULT: '進行中',
+
+  // Breadcrumb
+  BREADCRUMB_HOME: '首頁',
+  BREADCRUMB_FINANCE: '財務',
+  BREADCRUMB_REPORTS: '報表管理',
+
+  // Table
+  EMPTY_MESSAGE: '目前沒有需要結案的團體',
+  SEARCH_PLACEHOLDER: '搜尋團號或團名...',
 }
 
 export const UNPAID_ORDERS_LABELS = {
@@ -168,6 +221,36 @@ export const UNPAID_ORDERS_LABELS = {
   LABEL_1474: '未收款報表',
   DAYS_SUFFIX: ' 天',
   TOTAL_REMAINING_PREFIX: '未收總額：',
+
+  // Payment status map
+  STATUS_UNPAID: '未付款',
+  STATUS_PARTIAL: '部分付款',
+  STATUS_PENDING_DEPOSIT: '待收訂金',
+
+  // Column labels
+  COL_ORDER_NUMBER: '訂單編號',
+  COL_CONTACT_PERSON: '聯絡人',
+  COL_TOUR_CODE: '團號',
+  COL_DEPARTURE_DATE: '出發日',
+  COL_PAYMENT_STATUS: '付款狀態',
+  COL_TOTAL_AMOUNT: '訂單金額',
+  COL_PAID_AMOUNT: '已收金額',
+  COL_REMAINING_AMOUNT: '未收金額',
+  COL_DAYS_SINCE_DEPARTURE: '出發後天數',
+
+  // Breadcrumb
+  BREADCRUMB_HOME: '首頁',
+  BREADCRUMB_FINANCE: '財務',
+  BREADCRUMB_REPORTS: '報表管理',
+
+  // Toast
+  TOAST_LOAD_FAILED: '載入未收款資料失敗',
+
+  // Search
+  SEARCH_PLACEHOLDER: '搜尋訂單編號、聯絡人、團號...',
+
+  // Count suffix
+  COUNT_SUFFIX: ' 筆',
 }
 
 export const REQUESTS_PAGE_LABELS = {

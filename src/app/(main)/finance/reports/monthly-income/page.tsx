@@ -31,7 +31,7 @@ function getMonthRange(yearMonth: string): { startDate: string; endDate: string 
 // 格式化月份顯示
 function formatYearMonth(yearMonth: string): string {
   const [year, month] = yearMonth.split('-')
-  return `${year} 年 ${parseInt(month)} 月`
+  return `${year}${MONTHLY_INCOME_LABELS.YEAR_SUFFIX}${parseInt(month)}${MONTHLY_INCOME_LABELS.MONTH_SUFFIX}`
 }
 
 // 月份選擇器
@@ -144,7 +144,7 @@ export default function MonthlyIncomeReportPage() {
   const columns: TableColumn<ReceiptOrder>[] = [
     {
       key: 'code',
-      label: '收款單號',
+      label: MONTHLY_INCOME_LABELS.COL_RECEIPT_CODE,
       width: '150',
       render: value => (
         <span className="font-mono text-sm">{String(value || '')}</span>
@@ -152,13 +152,13 @@ export default function MonthlyIncomeReportPage() {
     },
     {
       key: 'receipt_date',
-      label: '收款日期',
+      label: MONTHLY_INCOME_LABELS.COL_RECEIPT_DATE,
       width: '120',
       render: value => <DateCell date={value as string} />,
     },
     {
       key: 'payment_method',
-      label: '付款方式',
+      label: MONTHLY_INCOME_LABELS.COL_PAYMENT_METHOD,
       width: '100',
       render: value => {
         const method = String(value || '')
@@ -171,13 +171,13 @@ export default function MonthlyIncomeReportPage() {
     },
     {
       key: 'amount',
-      label: '金額',
+      label: MONTHLY_INCOME_LABELS.COL_AMOUNT,
       width: '120',
       render: value => <CurrencyCell amount={Number(value) || 0} variant="income" />,
     },
     {
       key: 'handled_by',
-      label: '經手人',
+      label: MONTHLY_INCOME_LABELS.COL_HANDLED_BY,
       width: '100',
       render: value => (
         <span className="text-sm">{String(value || '-')}</span>
@@ -185,7 +185,7 @@ export default function MonthlyIncomeReportPage() {
     },
     {
       key: 'notes',
-      label: '備註',
+      label: MONTHLY_INCOME_LABELS.COL_NOTES,
       width: '150',
       render: value => (
         <span className="text-sm truncate">{String(value || '-')}</span>
@@ -197,10 +197,10 @@ export default function MonthlyIncomeReportPage() {
     <ContentPageLayout
       title={MONTHLY_INCOME_LABELS.LABEL_120}
       breadcrumb={[
-        { label: '首頁', href: '/' },
-        { label: '財務', href: '/finance' },
-        { label: '報表管理', href: '/finance/reports' },
-        { label: '每月收入報表', href: '/finance/reports/monthly-income' },
+        { label: MONTHLY_INCOME_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: MONTHLY_INCOME_LABELS.BREADCRUMB_FINANCE, href: '/finance' },
+        { label: MONTHLY_INCOME_LABELS.BREADCRUMB_REPORTS, href: '/finance/reports' },
+        { label: MONTHLY_INCOME_LABELS.LABEL_120, href: '/finance/reports/monthly-income' },
       ]}
       headerActions={<MonthSelector value={selectedMonth} onChange={setSelectedMonth} />}
       className="space-y-6"
@@ -244,7 +244,7 @@ export default function MonthlyIncomeReportPage() {
                   {RECEIPT_PAYMENT_METHOD_LABELS[method] || method}
                 </p>
                 <p className="text-lg font-semibold text-morandi-primary">
-                  {data.count} 筆
+                  {data.count}{MONTHLY_INCOME_LABELS.COUNT_SUFFIX}
                 </p>
                 <CurrencyCell amount={data.amount} variant="income" className="text-sm" />
               </div>
@@ -261,7 +261,7 @@ export default function MonthlyIncomeReportPage() {
         <EnhancedTable
           columns={columns}
           data={filteredReceiptOrders}
-          emptyMessage="此月份沒有收款單"
+          emptyMessage={MONTHLY_INCOME_LABELS.EMPTY_MESSAGE}
         />
       </ContentContainer>
     </ContentPageLayout>

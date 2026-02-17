@@ -191,6 +191,76 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
   }
 
   /**
+   * 批次新增請款項目（batch insert，效能優化）
+   */
+  async addItems(
+    requestId: string,
+    itemsData: Array<Omit<
+      PaymentRequestItem,
+      'id' | 'request_id' | 'item_number' | 'subtotal' | 'created_at' | 'updated_at'
+    >>
+  ): Promise<PaymentRequestItem[]> {
+    if (itemsData.length === 0) return []
+
+    const request = await this.getById(requestId)
+    if (!request) {
+      throw new Error(`找不到請款單: ${requestId}`)
+    }
+
+    const existingItems = await this.getItemsByRequestIdAsync(requestId)
+    const now = this.now()
+
+    const rows = itemsData.map((itemData, idx) => {
+      const itemIndex = existingItems.length + idx + 1
+      const itemNumber = `${request.code}-${itemIndex}`
+      return {
+        id: crypto.randomUUID(),
+        request_id: requestId,
+        item_number: itemNumber,
+        category: itemData.category,
+        supplier_id: itemData.supplier_id,
+        supplier_name: itemData.supplier_name,
+        description: itemData.description,
+        unitprice: itemData.unit_price, // 資料庫欄位名稱
+        quantity: itemData.quantity,
+        subtotal: itemData.unit_price * itemData.quantity,
+        notes: itemData.notes,
+        sort_order: itemData.sort_order,
+        tour_request_id: itemData.tour_request_id || null,
+        created_at: now,
+        updated_at: now,
+      }
+    })
+
+    const { data: createdItems, error } = await supabase
+      .from('payment_request_items')
+      .insert(rows)
+      .select()
+
+    if (error) throw error
+    await invalidatePaymentRequestItems()
+
+    // 更新 request 的總金額
+    const allItems = [
+      ...existingItems,
+      ...(createdItems as unknown as PaymentRequestItem[]),
+    ]
+    const totalAmount = allItems.reduce((sum, i) => sum + (i.subtotal || 0), 0)
+
+    await this.update(requestId, {
+      amount: totalAmount,
+      updated_at: now,
+    })
+
+    // 重算團成本
+    if (request.tour_id) {
+      await recalculateExpenseStats(request.tour_id)
+    }
+
+    return createdItems as unknown as PaymentRequestItem[]
+  }
+
+  /**
    * 更新請款項目
    */
   async updateItem(

@@ -31,7 +31,7 @@ function getMonthRange(yearMonth: string): { startDate: string; endDate: string 
 // 格式化月份顯示
 function formatYearMonth(yearMonth: string): string {
   const [year, month] = yearMonth.split('-')
-  return `${year} 年 ${parseInt(month)} 月`
+  return `${year}${MONTHLY_DISBURSEMENT_LABELS.YEAR_SUFFIX}${parseInt(month)}${MONTHLY_DISBURSEMENT_LABELS.MONTH_SUFFIX}`
 }
 
 // 月份選擇器
@@ -148,7 +148,7 @@ export default function MonthlyDisbursementReportPage() {
   const paymentColumns: TableColumn<PaymentRequest>[] = [
     {
       key: 'code',
-      label: '請款單號',
+      label: MONTHLY_DISBURSEMENT_LABELS.COL_PAYMENT_CODE,
       width: '150',
       render: value => (
         <span className="font-mono text-sm">{String(value || '')}</span>
@@ -156,20 +156,20 @@ export default function MonthlyDisbursementReportPage() {
     },
     {
       key: 'request_date',
-      label: '請款日期',
+      label: MONTHLY_DISBURSEMENT_LABELS.COL_PAYMENT_DATE,
       width: '120',
       render: value => <DateCell date={value as string} />,
     },
     {
       key: 'request_category',
-      label: '類別',
+      label: MONTHLY_DISBURSEMENT_LABELS.COL_CATEGORY,
       width: '100',
       render: (value, row) => {
         if (value === 'company') {
           const expenseType = row.expense_type as CompanyExpenseType | undefined
           const typeName = expenseType
             ? EXPENSE_TYPE_CONFIG[expenseType]?.name || expenseType
-            : '公司'
+            : MONTHLY_DISBURSEMENT_LABELS.CATEGORY_COMPANY
           return (
             <span className="px-2 py-1 text-xs rounded-full bg-morandi-gold/10 text-morandi-gold">
               {typeName}
@@ -185,19 +185,19 @@ export default function MonthlyDisbursementReportPage() {
     },
     {
       key: 'request_type',
-      label: '類型',
+      label: MONTHLY_DISBURSEMENT_LABELS.COL_TYPE,
       width: '100',
       render: value => <span className="text-sm">{String(value || '-')}</span>,
     },
     {
       key: 'amount',
-      label: '金額',
+      label: MONTHLY_DISBURSEMENT_LABELS.COL_AMOUNT,
       width: '120',
       render: value => <CurrencyCell amount={Number(value) || 0} />,
     },
     {
       key: 'status',
-      label: '狀態',
+      label: MONTHLY_DISBURSEMENT_LABELS.COL_STATUS,
       width: '100',
       render: value => <StatusCell type="payment" status={value as string} />,
     },
@@ -207,7 +207,7 @@ export default function MonthlyDisbursementReportPage() {
   const disbursementColumns: TableColumn<DisbursementOrder>[] = [
     {
       key: 'order_number',
-      label: '出納單號',
+      label: MONTHLY_DISBURSEMENT_LABELS.COL_DISBURSEMENT_CODE,
       width: '150',
       render: value => (
         <span className="font-mono text-sm">{String(value || '')}</span>
@@ -215,29 +215,29 @@ export default function MonthlyDisbursementReportPage() {
     },
     {
       key: 'disbursement_date',
-      label: '出帳日期',
+      label: MONTHLY_DISBURSEMENT_LABELS.COL_DISBURSEMENT_DATE,
       width: '120',
       render: value => <DateCell date={value as string} />,
     },
     {
       key: 'payment_request_ids',
-      label: '請款單數',
+      label: MONTHLY_DISBURSEMENT_LABELS.COL_PAYMENT_COUNT,
       width: '100',
       render: value => (
         <span className="text-sm">
-          {Array.isArray(value) ? value.length : 0} 筆
+          {Array.isArray(value) ? value.length : 0}{MONTHLY_DISBURSEMENT_LABELS.COUNT_SUFFIX}
         </span>
       ),
     },
     {
       key: 'amount',
-      label: '金額',
+      label: MONTHLY_DISBURSEMENT_LABELS.COL_AMOUNT,
       width: '120',
       render: value => <CurrencyCell amount={Number(value) || 0} />,
     },
     {
       key: 'status',
-      label: '狀態',
+      label: MONTHLY_DISBURSEMENT_LABELS.COL_STATUS,
       width: '100',
       render: value => <StatusCell type="payment" status={value as string} />,
     },
@@ -247,10 +247,10 @@ export default function MonthlyDisbursementReportPage() {
     <ContentPageLayout
       title={MONTHLY_DISBURSEMENT_LABELS.LABEL_3446}
       breadcrumb={[
-        { label: '首頁', href: '/' },
-        { label: '財務', href: '/finance' },
-        { label: '報表管理', href: '/finance/reports' },
-        { label: '每月出帳報表', href: '/finance/reports/monthly-disbursement' },
+        { label: MONTHLY_DISBURSEMENT_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: MONTHLY_DISBURSEMENT_LABELS.BREADCRUMB_FINANCE, href: '/finance' },
+        { label: MONTHLY_DISBURSEMENT_LABELS.BREADCRUMB_REPORTS, href: '/finance/reports' },
+        { label: MONTHLY_DISBURSEMENT_LABELS.LABEL_3446, href: '/finance/reports/monthly-disbursement' },
       ]}
       headerActions={<MonthSelector value={selectedMonth} onChange={setSelectedMonth} />}
       className="space-y-6"
@@ -296,7 +296,7 @@ export default function MonthlyDisbursementReportPage() {
         <EnhancedTable
           columns={paymentColumns}
           data={filteredPaymentRequests}
-          emptyMessage="此月份沒有請款單"
+          emptyMessage={MONTHLY_DISBURSEMENT_LABELS.EMPTY_PAYMENT_MESSAGE}
         />
       </ContentContainer>
 
@@ -308,7 +308,7 @@ export default function MonthlyDisbursementReportPage() {
         <EnhancedTable
           columns={disbursementColumns}
           data={filteredDisbursementOrders}
-          emptyMessage="此月份沒有出納單"
+          emptyMessage={MONTHLY_DISBURSEMENT_LABELS.EMPTY_DISBURSEMENT_MESSAGE}
         />
       </ContentContainer>
     </ContentPageLayout>

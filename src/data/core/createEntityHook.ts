@@ -231,6 +231,7 @@ export function createEntityHook<T extends BaseEntity>(
           throw error
         }
 
+        // Supabase returns Database row types; cast to app-level T (safe: T mirrors DB schema)
         return (data || []) as unknown as T[]
       },
       {

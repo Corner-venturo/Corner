@@ -77,7 +77,7 @@ export default function UnclosedToursReportPage() {
   const columns: TableColumn<UnclosedTourData>[] = [
     {
       key: 'code',
-      label: '團號',
+      label: UNCLOSED_TOURS_LABELS.COL_TOUR_CODE,
       width: '120',
       render: value => (
         <span className="font-mono text-sm font-medium">{String(value || '')}</span>
@@ -85,7 +85,7 @@ export default function UnclosedToursReportPage() {
     },
     {
       key: 'name',
-      label: '團名',
+      label: UNCLOSED_TOURS_LABELS.COL_TOUR_NAME,
       width: '180',
       render: value => (
         <span className="text-sm truncate">{String(value || '-')}</span>
@@ -93,19 +93,19 @@ export default function UnclosedToursReportPage() {
     },
     {
       key: 'return_date',
-      label: '回程日',
+      label: UNCLOSED_TOURS_LABELS.COL_RETURN_DATE,
       width: '120',
       render: value => <DateCell date={value as string} />,
     },
     {
       key: 'expected_closing_date',
-      label: '應結案日',
+      label: UNCLOSED_TOURS_LABELS.COL_EXPECTED_CLOSING_DATE,
       width: '120',
       render: value => <DateCell date={value as string} />,
     },
     {
       key: 'days_overdue',
-      label: '逾期天數',
+      label: UNCLOSED_TOURS_LABELS.COL_DAYS_OVERDUE,
       width: '100',
       render: value => {
         const days = Number(value) || 0
@@ -113,14 +113,14 @@ export default function UnclosedToursReportPage() {
           <span
             className={`font-medium ${days > 14 ? 'text-morandi-red' : days > 7 ? 'text-morandi-gold' : 'text-morandi-secondary'}`}
           >
-            {days} 天
+            {days}{UNCLOSED_TOURS_LABELS.DAYS_SUFFIX}
           </span>
         )
       },
     },
     {
       key: 'total_revenue',
-      label: '總收入',
+      label: UNCLOSED_TOURS_LABELS.COL_TOTAL_REVENUE,
       width: '120',
       render: value => (
         <CurrencyCell amount={Number(value) || 0} variant="income" />
@@ -128,7 +128,7 @@ export default function UnclosedToursReportPage() {
     },
     {
       key: 'total_cost',
-      label: '總支出',
+      label: UNCLOSED_TOURS_LABELS.COL_TOTAL_COST,
       width: '120',
       render: value => (
         <CurrencyCell amount={Number(value) || 0} variant="expense" />
@@ -136,7 +136,7 @@ export default function UnclosedToursReportPage() {
     },
     {
       key: 'profit',
-      label: '利潤',
+      label: UNCLOSED_TOURS_LABELS.COL_PROFIT,
       width: '120',
       render: (_, row) => {
         const profit = (row.total_revenue || 0) - (row.total_cost || 0)
@@ -151,11 +151,11 @@ export default function UnclosedToursReportPage() {
     },
     {
       key: 'status',
-      label: '狀態',
+      label: UNCLOSED_TOURS_LABELS.COL_STATUS,
       width: '100',
       render: value => (
         <span className="px-2 py-1 text-xs rounded-full bg-morandi-gold/10 text-morandi-gold">
-          {String(value || '進行中')}
+          {String(value || UNCLOSED_TOURS_LABELS.STATUS_DEFAULT)}
         </span>
       ),
     },
@@ -165,10 +165,10 @@ export default function UnclosedToursReportPage() {
     <ContentPageLayout
       title={UNCLOSED_TOURS_LABELS.LABEL_996}
       breadcrumb={[
-        { label: '首頁', href: '/' },
-        { label: '財務', href: '/finance' },
-        { label: '報表管理', href: '/finance/reports' },
-        { label: '未結案團體報表', href: '/finance/reports/unclosed-tours' },
+        { label: UNCLOSED_TOURS_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: UNCLOSED_TOURS_LABELS.BREADCRUMB_FINANCE, href: '/finance' },
+        { label: UNCLOSED_TOURS_LABELS.BREADCRUMB_REPORTS, href: '/finance/reports' },
+        { label: UNCLOSED_TOURS_LABELS.LABEL_996, href: '/finance/reports/unclosed-tours' },
       ]}
       className="space-y-6"
     >
@@ -180,7 +180,7 @@ export default function UnclosedToursReportPage() {
           <div>
             <p className="text-sm text-morandi-primary">
               {UNCLOSED_TOURS_LABELS.DESCRIPTION}
-              建議儘快完成結案作業以確保財務數據準確。
+              {UNCLOSED_TOURS_LABELS.DESCRIPTION_SUFFIX}
             </p>
           </div>
         </div>
@@ -230,10 +230,10 @@ export default function UnclosedToursReportPage() {
         <EnhancedTable
           columns={columns}
           data={unclosedTours}
-          emptyMessage="目前沒有需要結案的團體"
+          emptyMessage={UNCLOSED_TOURS_LABELS.EMPTY_MESSAGE}
           searchable
           searchableFields={['code', 'name']}
-          searchPlaceholder="搜尋團號或團名..."
+          searchPlaceholder={UNCLOSED_TOURS_LABELS.SEARCH_PLACEHOLDER}
         />
       </ContentContainer>
     </ContentPageLayout>

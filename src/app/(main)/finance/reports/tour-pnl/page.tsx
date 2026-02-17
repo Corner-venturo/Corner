@@ -28,12 +28,12 @@ interface TourPnL {
 }
 
 const STATUS_MAP: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
-  draft: { label: '草稿', variant: 'outline' },
-  confirmed: { label: '已確認', variant: 'secondary' },
-  operating: { label: '出團中', variant: 'default' },
-  completed: { label: '已完成', variant: 'default' },
-  closed: { label: '已結案', variant: 'secondary' },
-  cancelled: { label: '已取消', variant: 'destructive' },
+  draft: { label: TOUR_PNL_LABELS.STATUS_DRAFT, variant: 'outline' },
+  confirmed: { label: TOUR_PNL_LABELS.STATUS_CONFIRMED, variant: 'secondary' },
+  operating: { label: TOUR_PNL_LABELS.STATUS_OPERATING, variant: 'default' },
+  completed: { label: TOUR_PNL_LABELS.STATUS_COMPLETED, variant: 'default' },
+  closed: { label: TOUR_PNL_LABELS.STATUS_CLOSED, variant: 'secondary' },
+  cancelled: { label: TOUR_PNL_LABELS.STATUS_CANCELLED, variant: 'destructive' },
 }
 
 export default function TourPnLPage() {
@@ -86,7 +86,7 @@ export default function TourPnLPage() {
       setData(mapped)
     } catch (err) {
       logger.error('Failed to fetch tour P&L:', err)
-      toast.error('載入團收支資料失敗')
+      toast.error(TOUR_PNL_LABELS.TOAST_LOAD_FAILED)
     } finally {
       setLoading(false)
     }
@@ -109,24 +109,24 @@ export default function TourPnLPage() {
   const years = Array.from({ length: 5 }, (_, i) => String(currentYear - i))
 
   const columns: TableColumn<TourPnL>[] = [
-    { key: 'code', label: '團號', sortable: true },
-    { key: 'name', label: '團名', sortable: true },
-    { key: 'departure_date', label: '出發日', sortable: true, render: (value) => <DateCell date={value as string} /> },
-    { key: 'max_participants', label: '人數', sortable: true, align: 'center' },
+    { key: 'code', label: TOUR_PNL_LABELS.COL_TOUR_CODE, sortable: true },
+    { key: 'name', label: TOUR_PNL_LABELS.COL_TOUR_NAME, sortable: true },
+    { key: 'departure_date', label: TOUR_PNL_LABELS.COL_DEPARTURE_DATE, sortable: true, render: (value) => <DateCell date={value as string} /> },
+    { key: 'max_participants', label: TOUR_PNL_LABELS.COL_PARTICIPANTS, sortable: true, align: 'center' },
     {
       key: 'status',
-      label: '狀態',
+      label: TOUR_PNL_LABELS.COL_STATUS,
       sortable: true,
       render: (_value, row) => {
         const info = STATUS_MAP[row.status]
         return info ? <Badge variant={info.variant}>{info.label}</Badge> : <span>{row.status}</span>
       },
     },
-    { key: 'total_revenue', label: '收入', sortable: true, align: 'right', render: (value) => <CurrencyCell amount={Number(value)} variant="income" /> },
-    { key: 'total_cost', label: '成本', sortable: true, align: 'right', render: (value) => <CurrencyCell amount={Number(value)} variant="expense" /> },
+    { key: 'total_revenue', label: TOUR_PNL_LABELS.COL_REVENUE, sortable: true, align: 'right', render: (value) => <CurrencyCell amount={Number(value)} variant="income" /> },
+    { key: 'total_cost', label: TOUR_PNL_LABELS.COL_COST, sortable: true, align: 'right', render: (value) => <CurrencyCell amount={Number(value)} variant="expense" /> },
     {
       key: 'profit',
-      label: '毛利',
+      label: TOUR_PNL_LABELS.COL_PROFIT,
       sortable: true,
       align: 'right',
       render: (value) => {
@@ -140,7 +140,7 @@ export default function TourPnLPage() {
     },
     {
       key: 'margin',
-      label: '毛利率',
+      label: TOUR_PNL_LABELS.COL_MARGIN,
       sortable: true,
       align: 'center',
       render: (value) => {
@@ -158,10 +158,10 @@ export default function TourPnLPage() {
     <ListPageLayout
       title={TOUR_PNL_LABELS.TOTAL_2832}
       breadcrumb={[
-        { label: '首頁', href: '/' },
-        { label: '財務', href: '/finance' },
-        { label: '報表管理', href: '/finance/reports' },
-        { label: '團收支總覽', href: '/finance/reports/tour-pnl' },
+        { label: TOUR_PNL_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: TOUR_PNL_LABELS.BREADCRUMB_FINANCE, href: '/finance' },
+        { label: TOUR_PNL_LABELS.BREADCRUMB_REPORTS, href: '/finance/reports' },
+        { label: TOUR_PNL_LABELS.TOTAL_2832, href: '/finance/reports/tour-pnl' },
       ]}
       headerActions={
         <div className="flex items-center gap-3 flex-wrap">
@@ -202,7 +202,7 @@ export default function TourPnLPage() {
       loading={loading}
       columns={columns}
       data={filtered}
-      searchPlaceholder="搜尋團號、團名..."
+      searchPlaceholder={TOUR_PNL_LABELS.SEARCH_PLACEHOLDER}
     />
   )
 }

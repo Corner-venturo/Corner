@@ -35,7 +35,8 @@ export function EnhancedTable<T extends RowData = RowData>({
   hoverable = true,
   isLoading,
 }: EnhancedTableProps<T>) {
-  // 將泛型 props 轉換為 RowData 類型以便內部使用
+  // Generic type erasure: EnhancedTable accepts T extends RowData but internal
+  // hooks/state use RowData. These casts are safe because T extends RowData.
   const typedColumns = columns as unknown as TableColumn<RowData>[]
   const typedData = data as unknown as RowData[]
   const typedSelection = selection as unknown as SelectionConfig<RowData> | undefined

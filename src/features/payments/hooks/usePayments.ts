@@ -49,6 +49,16 @@ export const usePayments = () => {
       return await paymentRequestService.addItem(requestId, item)
     },
 
+    addPaymentItems: async (
+      requestId: string,
+      items: Array<Omit<
+        PaymentRequestItem,
+        'id' | 'request_id' | 'item_number' | 'subtotal' | 'created_at' | 'updated_at'
+      >>
+    ) => {
+      return await paymentRequestService.addItems(requestId, items)
+    },
+
     updatePaymentItem: async (
       requestId: string,
       itemId: string,
