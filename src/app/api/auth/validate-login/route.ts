@@ -3,6 +3,7 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import bcrypt from 'bcryptjs'
 import { logger } from '@/lib/utils/logger'
 import { ApiError, successResponse } from '@/lib/api/response'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 interface ValidateLoginRequest {
   username: string
@@ -12,6 +13,10 @@ interface ValidateLoginRequest {
 
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 Rate limiting: 10 requests per minute (login attempts)
+    const rateLimited = checkRateLimit(request, 'validate-login', 10, 60_000)
+    if (rateLimited) return rateLimited
+
     const body: ValidateLoginRequest = await request.json()
     const { username, password, code } = body
 

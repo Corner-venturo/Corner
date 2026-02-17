@@ -16,6 +16,7 @@ import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { getServerAuth } from '@/lib/auth/server-auth'
 import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 // ============================================
 // 型別定義
@@ -116,6 +117,10 @@ function formatEndDate(dateStr: string): string {
 
 export async function POST(req: NextRequest) {
   try {
+    // 🔒 Rate limiting: 10 requests per minute
+    const rateLimited = checkRateLimit(req, 'linkpay', 10, 60_000)
+    if (rateLimited) return rateLimited
+
     // 驗證登入狀態
     const auth = await getServerAuth()
     if (!auth.success) {

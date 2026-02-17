@@ -3,6 +3,7 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 import { getServerAuth } from '@/lib/auth/server-auth'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 /**
  * 檢查員工是否為管理員或超級管理員
@@ -28,6 +29,10 @@ async function checkIsAdmin(employeeId: string): Promise<boolean> {
  */
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 Rate limiting: 5 requests per minute
+    const rateLimited = checkRateLimit(request, 'admin-reset-password', 5, 60_000)
+    if (rateLimited) return rateLimited
+
     // 🔒 安全檢查：需要已登入用戶
     const auth = await getServerAuth()
     if (!auth.success) {

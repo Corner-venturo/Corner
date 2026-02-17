@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 interface ChangePasswordRequest {
   employee_number: string
@@ -17,6 +18,10 @@ interface ChangePasswordRequest {
  */
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 Rate limiting: 5 requests per minute
+    const rateLimited = checkRateLimit(request, 'change-password', 5, 60_000)
+    if (rateLimited) return rateLimited
+
     const body: ChangePasswordRequest = await request.json()
     const { employee_number, workspace_code, current_password, new_password } = body
 
