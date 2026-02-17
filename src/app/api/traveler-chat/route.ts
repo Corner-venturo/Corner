@@ -5,6 +5,8 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { getServerAuth } from '@/lib/auth/server-auth'
 import { successResponse, ApiError } from '@/lib/api/response'
 import { logger } from '@/lib/utils/logger'
+import { validateBody } from '@/lib/api/validation'
+import { travelerChatSchema } from '@/lib/validations/api-schemas'
 
 /**
  * GET /api/traveler-chat
@@ -47,18 +49,20 @@ export async function POST(request: NextRequest) {
       return ApiError.unauthorized()
     }
 
-    const body = await request.json()
+    const validation = await validateBody(request, travelerChatSchema)
+    if (!validation.success) return validation.error
+    const body = validation.data
     const { action } = body
     const supabase = getSupabaseAdminClient()
 
     switch (action) {
       case 'toggle': {
-        const { tourId, isOpen, sendWelcome = true } = body
+        const { tourId, isOpen, sendWelcome } = body
 
         const { error } = await supabase.rpc('toggle_tour_conversation', {
-          p_tour_id: tourId,
-          p_is_open: isOpen,
-          p_send_welcome: sendWelcome,
+          p_tour_id: tourId as string,
+          p_is_open: isOpen as boolean,
+          p_send_welcome: sendWelcome ?? true,
         })
 
         if (error) {
@@ -70,13 +74,13 @@ export async function POST(request: NextRequest) {
       }
 
       case 'send_message': {
-        const { conversationId, content, type = 'text', attachments = [] } = body
+        const { conversationId, content, type, attachments } = body
 
         const { data, error } = await supabase.rpc('send_tour_message', {
-          p_conversation_id: conversationId,
-          p_content: content,
-          p_type: type,
-          p_attachments: attachments,
+          p_conversation_id: conversationId as string,
+          p_content: content as string,
+          p_type: type || 'text',
+          p_attachments: (attachments || []) as unknown as import('@/lib/supabase/types').Json,
         })
 
         if (error) {
@@ -88,12 +92,12 @@ export async function POST(request: NextRequest) {
       }
 
       case 'add_employee': {
-        const { tourId, employeeId, role = 'member' } = body
+        const { tourId, employeeId, role } = body
 
         const { error } = await supabase.rpc('add_employee_to_tour_conversation', {
-          p_tour_id: tourId,
-          p_employee_id: employeeId,
-          p_role: role,
+          p_tour_id: tourId as string,
+          p_employee_id: employeeId as string,
+          p_role: role || 'member',
         })
 
         if (error) {
@@ -108,7 +112,7 @@ export async function POST(request: NextRequest) {
         const { conversationId } = body
 
         const { error } = await supabase.rpc('mark_conversation_read', {
-          p_conversation_id: conversationId,
+          p_conversation_id: conversationId as string,
         })
 
         if (error) {

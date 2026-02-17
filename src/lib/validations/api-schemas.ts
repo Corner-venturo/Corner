@@ -90,11 +90,11 @@ export const createLinkPaySchema = z.object({
   receipt_number: z.string().min(1, '缺少收款單號'),
   user_name: z.string().min(1, '缺少付款人姓名'),
   email: z.string().email('Email 格式錯誤'),
-  payment_name: z.string().min(1, '缺少付款名稱'),
+  payment_name: z.string().optional(),
   create_user: z.string().optional(),
   amount: z.number().positive('金額必須大於 0'),
   end_date: z.string().min(1, '缺少付款期限'),
-  gender: z.string().optional(),
+  gender: z.number().optional(),
 })
 
 // ==========================================
@@ -137,6 +137,295 @@ export const generateItinerarySchema = z.object({
   }).optional(),
   departureTime: z.string().optional(),
   preferences: z.record(z.string(), z.unknown()).optional(),
+})
+
+// ==========================================
+// 會計過帳
+// ==========================================
+
+export const postCustomerReceiptSchema = z.object({
+  receipt_id: z.string().min(1, '缺少收款單 ID'),
+  amount: z.number().positive('金額必須大於 0'),
+  payment_method: z.string().min(1, '缺少付款方式'),
+}).passthrough()
+
+export const postGroupSettlementSchema = z.object({
+  tour_id: z.string().min(1, '缺少團別 ID'),
+  bank_account_id: z.string().min(1, '缺少銀行帳戶 ID'),
+}).passthrough()
+
+export const postSupplierPaymentSchema = z.object({
+  payout_id: z.string().min(1, '缺少出納單 ID'),
+  amount: z.number().positive('金額必須大於 0'),
+  bank_account_id: z.string().min(1, '缺少銀行帳戶 ID'),
+}).passthrough()
+
+// ==========================================
+// 報價確認
+// ==========================================
+
+export const revokeQuoteConfirmationSchema = z.object({
+  quote_id: z.string().min(1, '缺少報價單 ID'),
+  staff_id: z.string().min(1, '缺少員工 ID'),
+  staff_name: z.string().min(1, '缺少員工姓名'),
+  reason: z.string().min(1, '請填寫撤銷原因'),
+})
+
+export const staffConfirmQuoteSchema = z.object({
+  quote_id: z.string().min(1, '缺少報價單 ID'),
+  staff_id: z.string().min(1, '缺少員工 ID'),
+  staff_name: z.string().min(1, '缺少員工姓名'),
+  notes: z.string().optional(),
+})
+
+export const sendQuoteConfirmationSchema = z.object({
+  quote_id: z.string().min(1, '缺少報價單 ID'),
+  expires_in_days: z.number().int().positive().default(7),
+  staff_id: z.string().optional(),
+})
+
+export const customerConfirmQuoteSchema = z.object({
+  token: z.string().min(1, '缺少確認 Token'),
+  name: z.string().min(1, '請填寫您的姓名'),
+  email: z.string().email('Email 格式錯誤').optional().or(z.literal('')),
+  phone: z.string().optional(),
+  notes: z.string().optional(),
+})
+
+// ==========================================
+// 認證模組（擴充）
+// ==========================================
+
+export const syncEmployeeSchema = z.object({
+  employee_id: z.string().min(1, '缺少員工 ID'),
+  supabase_user_id: z.string().min(1, '缺少 Supabase User ID'),
+  workspace_id: z.string().optional(),
+  access_token: z.string().optional(),
+})
+
+export const getEmployeeDataSchema = z.object({
+  username: z.string().min(1, '缺少帳號'),
+  code: z.string().min(1, '缺少代號'),
+})
+
+export const createEmployeeAuthSchema = z.object({
+  employee_number: z.string().min(1, '缺少員工編號'),
+  password: z.string().min(1, '缺少密碼'),
+  workspace_code: z.string().optional(),
+})
+
+export const resetEmployeePasswordSchema = z.object({
+  employee_id: z.string().min(1, '缺少員工 ID'),
+  new_password: z.string().min(8, '密碼至少需要 8 個字元'),
+})
+
+export const adminResetPasswordSchema = z.object({
+  email: z.string().min(1, '缺少電子郵件'),
+  new_password: z.string().min(6, '密碼至少需要 6 個字元'),
+})
+
+export const validateLoginSchema = z.object({
+  username: z.string().min(1, '請填寫帳號'),
+  password: z.string().min(1, '請填寫密碼'),
+  code: z.string().min(1, '請填寫代號'),
+})
+
+// ==========================================
+// 發票折讓
+// ==========================================
+
+export const issueAllowanceSchema = z.object({
+  invoiceId: z.string().min(1, '缺少發票 ID'),
+  allowanceAmount: z.number().positive('折讓金額必須大於 0'),
+  allowanceItems: z.array(z.object({
+    item_name: z.string(),
+    item_count: z.number(),
+    item_unit: z.string(),
+    item_price: z.number(),
+    itemAmt: z.number(),
+  })).min(1, '至少需要一個折讓項目'),
+  operatedBy: z.string().optional(),
+})
+
+// ==========================================
+// 提案轉團（擴充）
+// ==========================================
+
+export const convertToTourFullSchema = z.object({
+  proposal_id: z.string().min(1, '缺少提案 ID'),
+  package_id: z.string().min(1, '缺少套件 ID'),
+  city_code: z.string().min(1, '缺少城市代碼'),
+  departure_date: z.string().min(1, '缺少出發日期'),
+  tour_name: z.string().optional(),
+  contact_person: z.string().optional(),
+  contact_phone: z.string().optional(),
+})
+
+// ==========================================
+// Logan Chat
+// ==========================================
+
+export const loganChatSchema = z.object({
+  message: z.string().optional(),
+  action: z.enum(['chat', 'teach']).default('chat'),
+  title: z.string().optional(),
+  content: z.string().optional(),
+  category: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+  importance: z.number().optional(),
+})
+
+// ==========================================
+// Gemini 圖片生成
+// ==========================================
+
+export const generateImageSchema = z.object({
+  prompt: z.string().min(1, '請提供 Prompt'),
+  style: z.string().optional(),
+  aspectRatio: z.string().default('16:9'),
+})
+
+// ==========================================
+// OCR 批次重處理
+// ==========================================
+
+export const batchReprocessSchema = z.object({
+  table: z.enum(['all', 'customers', 'order_members']).default('all'),
+  limit: z.number().int().positive().max(100).default(10),
+})
+
+// ==========================================
+// 頻道成員
+// ==========================================
+
+export const addChannelMembersSchema = z.object({
+  employeeIds: z.array(z.string()).min(1, '至少選擇一位成員'),
+  role: z.string().default('member'),
+})
+
+export const removeChannelMemberSchema = z.object({
+  memberId: z.string().min(1, '缺少成員 ID'),
+})
+
+// ==========================================
+// Bot 通知
+// ==========================================
+
+export const botNotificationRequestSchema = z.object({
+  recipient_id: z.string().min(1, '缺少收件人 ID'),
+  message: z.string().min(1, '訊息不能為空'),
+  type: z.enum(['info', 'warning', 'error']).default('info'),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+})
+
+// ==========================================
+// 行程生成
+// ==========================================
+
+export const generateItineraryRequestSchema = z.object({
+  cityId: z.string().optional(),
+  countryId: z.string().optional(),
+  destination: z.string().optional(),
+  numDays: z.number().int().min(1).max(30, '天數必須在 1-30 天之間'),
+  departureDate: z.string().min(1, '請提供出發日期'),
+  outboundFlight: z.object({ arrivalTime: z.string().optional() }).optional(),
+  returnFlight: z.object({ departureTime: z.string().optional() }).optional(),
+  arrivalTime: z.string().optional(),
+  departureTime: z.string().optional(),
+  accommodations: z.array(z.unknown()).optional(),
+  style: z.string().optional(),
+  theme: z.string().optional(),
+})
+
+// ==========================================
+// 旅客對話
+// ==========================================
+
+export const travelerChatSchema = z.object({
+  action: z.enum(['toggle', 'send_message', 'add_employee', 'mark_read']),
+  tourId: z.string().optional(),
+  isOpen: z.boolean().optional(),
+  sendWelcome: z.boolean().optional(),
+  conversationId: z.string().optional(),
+  content: z.string().optional(),
+  type: z.string().optional(),
+  attachments: z.array(z.unknown()).optional(),
+  employeeId: z.string().optional(),
+  role: z.string().optional(),
+})
+
+// ==========================================
+// AI 景點補充
+// ==========================================
+
+export const suggestAttractionSchema = z.object({
+  name: z.string().min(1, '請提供景點名稱'),
+  city: z.string().optional(),
+  country: z.string().optional(),
+  category: z.string().optional(),
+  existingData: z.object({
+    latitude: z.number().optional(),
+    longitude: z.number().optional(),
+    duration_minutes: z.number().optional(),
+    ticket_price: z.string().optional(),
+    opening_hours: z.string().optional(),
+    description: z.string().optional(),
+  }).optional(),
+})
+
+// ==========================================
+// AI 圖片編輯
+// ==========================================
+
+export const editImageSchema = z.object({
+  imageUrl: z.string().min(1, '請提供圖片 URL'),
+  action: z.string().optional(),
+  customPrompt: z.string().optional(),
+})
+
+// ==========================================
+// 圖片代理
+// ==========================================
+
+export const fetchImageSchema = z.object({
+  url: z.string().url('無效的 URL'),
+})
+
+// ==========================================
+// Bot 開票狀態
+// ==========================================
+
+export const ticketStatusPostSchema = z.object({
+  workspace_id: z.string().optional(),
+  channel_id: z.string().optional(),
+  notify_sales: z.boolean().default(true),
+  days: z.number().int().positive().default(14),
+})
+
+export const ticketStatusPatchSchema = z.object({
+  member_ids: z.array(z.string()).optional(),
+  order_id: z.string().optional(),
+  flight_self_arranged: z.boolean(),
+})
+
+// ==========================================
+// 錯誤日誌
+// ==========================================
+
+export const logErrorSchema = z.object({
+  message: z.string().optional(),
+  stack: z.string().optional(),
+  componentStack: z.string().optional(),
+  url: z.string().optional(),
+}).passthrough()
+
+// ==========================================
+// 檔案上傳（query params for DELETE）
+// ==========================================
+
+export const storageDeleteQuerySchema = z.object({
+  bucket: z.string().min(1, '缺少 bucket'),
+  path: z.string().min(1, '缺少路徑'),
 })
 
 // Type exports

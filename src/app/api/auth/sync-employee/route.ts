@@ -13,14 +13,14 @@ import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
+import { validateBody } from '@/lib/api/validation'
+import { syncEmployeeSchema } from '@/lib/validations/api-schemas'
 
 export async function POST(request: NextRequest) {
   try {
-    const { employee_id, supabase_user_id, workspace_id, access_token } = await request.json()
-
-    if (!employee_id || !supabase_user_id) {
-      return errorResponse('Missing employee_id or supabase_user_id', 400, ErrorCode.MISSING_FIELD)
-    }
+    const validation = await validateBody(request, syncEmployeeSchema)
+    if (!validation.success) return validation.error
+    const { employee_id, supabase_user_id, workspace_id, access_token } = validation.data
 
     // 驗證請求者身份
     // 方法1: 使用 access_token 驗證（登入後 session cookie 可能還沒設好）

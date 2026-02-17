@@ -3,11 +3,8 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { withAuth } from '@/lib/api/with-auth'
 import { successResponse, ApiError } from '@/lib/api/response'
 import { logger } from '@/lib/utils/logger'
-
-interface GetEmployeeRequest {
-  username: string
-  code: string
-}
+import { validateBody } from '@/lib/api/validation'
+import { getEmployeeDataSchema } from '@/lib/validations/api-schemas'
 
 /**
  * 取得員工資料 API
@@ -15,12 +12,9 @@ interface GetEmployeeRequest {
  * 不驗證密碼（密碼已由 Supabase Auth 驗證）
  */
 export const POST = withAuth(async (request: NextRequest) => {
-  const body: GetEmployeeRequest = await request.json()
-  const { username, code } = body
-
-  if (!username || !code) {
-    return ApiError.missingField('username, code')
-  }
+  const validation = await validateBody(request, getEmployeeDataSchema)
+  if (!validation.success) return validation.error
+  const { username, code } = validation.data
 
   const supabase = getSupabaseAdminClient()
 

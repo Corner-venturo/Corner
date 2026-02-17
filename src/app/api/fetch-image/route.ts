@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { logger } from '@/lib/utils/logger'
 import { errorResponse, ErrorCode } from '@/lib/api/response'
 import { getServerAuth } from '@/lib/auth/server-auth'
+import { validateBody } from '@/lib/api/validation'
+import { fetchImageSchema } from '@/lib/validations/api-schemas'
 
 /**
  * 後端 API 代理下載圖片
@@ -17,16 +19,9 @@ export async function POST(request: NextRequest) {
       return errorResponse(auth.error.error, 401, ErrorCode.UNAUTHORIZED)
     }
 
-    const { url } = await request.json()
-
-    if (!url || typeof url !== 'string') {
-      return errorResponse('缺少 URL 參數', 400, ErrorCode.MISSING_FIELD)
-    }
-
-    // 驗證 URL 格式
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      return errorResponse('無效的 URL', 400, ErrorCode.INVALID_FORMAT)
-    }
+    const validation = await validateBody(request, fetchImageSchema)
+    if (!validation.success) return validation.error
+    const { url } = validation.data
 
     // 下載圖片
     const response = await fetch(url, {

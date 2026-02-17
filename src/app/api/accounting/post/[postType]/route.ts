@@ -10,22 +10,21 @@ import type {
 import { logger } from '@/lib/utils/logger'
 import { getServerAuth } from '@/lib/auth/server-auth'
 import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
+import { validateBody } from '@/lib/api/validation'
+import {
+  postCustomerReceiptSchema,
+  postGroupSettlementSchema,
+  postSupplierPaymentSchema,
+} from '@/lib/validations/api-schemas'
+import type { ZodSchema } from 'zod'
 
 const VALID_POST_TYPES = ['customer-receipt', 'group-settlement', 'supplier-payment'] as const
 type PostType = (typeof VALID_POST_TYPES)[number]
 
-function validateRequest(postType: PostType, data: Record<string, unknown>): string | null {
-  switch (postType) {
-    case 'customer-receipt':
-      if (!data['receipt_id'] || !data['amount'] || !data['payment_method']) return '缺少必要欄位'
-      return null
-    case 'group-settlement':
-      if (!data['tour_id'] || !data['bank_account_id']) return '缺少必要欄位'
-      return null
-    case 'supplier-payment':
-      if (!data['payout_id'] || !data['amount'] || !data['bank_account_id']) return '缺少必要欄位'
-      return null
-  }
+const SCHEMAS: Record<PostType, ZodSchema> = {
+  'customer-receipt': postCustomerReceiptSchema,
+  'group-settlement': postGroupSettlementSchema,
+  'supplier-payment': postSupplierPaymentSchema,
 }
 
 async function dispatchPost(postType: PostType, employeeId: string, data: unknown) {
@@ -64,12 +63,9 @@ export async function POST(
     }
     const { employeeId } = auth.data
 
-    const requestData: unknown = await request.json()
-
-    const validationError = validateRequest(validPostType, requestData as Record<string, unknown>)
-    if (validationError) {
-      return ApiError.validation(validationError)
-    }
+    const validation = await validateBody(request, SCHEMAS[validPostType])
+    if (!validation.success) return validation.error
+    const requestData = validation.data
 
     const result = await dispatchPost(validPostType, employeeId, requestData)
 

@@ -8,17 +8,16 @@
 import { logger } from '@/lib/utils/logger'
 import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
-import type { CustomerConfirmParams, ConfirmationResult } from '@/types/quote.types'
+import type { ConfirmationResult } from '@/types/quote.types'
 import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
+import { validateBody } from '@/lib/api/validation'
+import { customerConfirmQuoteSchema } from '@/lib/validations/api-schemas'
 
 export async function POST(request: NextRequest) {
   try {
-    const body: CustomerConfirmParams = await request.json()
-    const { token, name, email, phone, notes } = body
-
-    if (!token || !name) {
-      return ApiError.validation('請填寫您的姓名')
-    }
+    const validation = await validateBody(request, customerConfirmQuoteSchema)
+    if (!validation.success) return validation.error
+    const { token, name, email, phone, notes } = validation.data
 
     // 取得客戶端資訊（稽核用）
     const ip = request.headers.get('x-forwarded-for') ||

@@ -11,6 +11,8 @@ import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 import { checkApiUsage, updateApiUsage, API_LIMITS } from '@/lib/api-usage'
 import { getServerAuth } from '@/lib/auth/server-auth'
+import { validateBody } from '@/lib/api/validation'
+import { editImageSchema } from '@/lib/validations/api-schemas'
 
 // Gemini API 設定（複用多 Key 機制）
 const GEMINI_API_KEYS = [
@@ -229,11 +231,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const body: EditImageRequest = await request.json()
-
-    if (!body.imageUrl) {
-      return errorResponse('請提供圖片 URL', 400, ErrorCode.MISSING_FIELD)
-    }
+    const validation = await validateBody(request, editImageSchema)
+    if (!validation.success) return validation.error
+    const body = validation.data as EditImageRequest
 
     if (!body.action && !body.customPrompt) {
       return errorResponse('請選擇編輯動作', 400, ErrorCode.MISSING_FIELD)

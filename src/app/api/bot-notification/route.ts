@@ -7,16 +7,11 @@ import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { ApiError, successResponse } from '@/lib/api/response'
+import { validateBody } from '@/lib/api/validation'
+import { botNotificationRequestSchema } from '@/lib/validations/api-schemas'
 
 // 系統機器人 ID
 const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
-
-interface NotificationRequest {
-  recipient_id: string       // 接收者員工 ID
-  message: string           // 通知內容
-  type?: 'info' | 'warning' | 'error'  // 通知類型
-  metadata?: Record<string, unknown>   // 額外資料
-}
 
 export async function POST(request: NextRequest) {
   // Bot API 驗證
@@ -33,12 +28,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json() as NotificationRequest
-    const { recipient_id, message, type = 'info', metadata } = body
-
-    if (!recipient_id || !message) {
-      return ApiError.validation('缺少必要參數')
-    }
+    const validation = await validateBody(request, botNotificationRequestSchema)
+    if (!validation.success) return validation.error
+    const { recipient_id, message, type, metadata } = validation.data
 
     const supabase = getSupabaseAdminClient()
 

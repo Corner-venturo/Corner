@@ -8,6 +8,8 @@ import { chatWithLogan, teachLogan, isLoganAvailable, type MemoryCategory } from
 import { getServerAuth } from '@/lib/auth/server-auth'
 import { logger } from '@/lib/utils/logger'
 import { ApiError, successResponse } from '@/lib/api/response'
+import { validateBody } from '@/lib/api/validation'
+import { loganChatSchema } from '@/lib/validations/api-schemas'
 
 // TODO: withAuth 無法直接適用，因為此 route 需要 getServerAuth (workspaceId, employeeId)
 
@@ -25,8 +27,10 @@ export async function POST(request: NextRequest) {
     }
 
     const { workspaceId, employeeId } = auth.data
-    const body = await request.json()
-    const { message, action = 'chat' } = body
+    const validation = await validateBody(request, loganChatSchema)
+    if (!validation.success) return validation.error
+    const { message, action } = validation.data
+    const body = validation.data
 
     // 根據 action 處理
     switch (action) {

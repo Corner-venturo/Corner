@@ -9,6 +9,8 @@ import { issueAllowance } from '@/lib/newebpay'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
 import { getServerAuth } from '@/lib/auth/server-auth'
+import { validateBody } from '@/lib/api/validation'
+import { issueAllowanceSchema } from '@/lib/validations/api-schemas'
 
 export async function POST(request: NextRequest) {
   // 認證檢查
@@ -18,13 +20,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json()
-    const { invoiceId, allowanceAmount, allowanceItems, operatedBy } = body
-
-    // 驗證必要欄位
-    if (!invoiceId || !allowanceAmount || !allowanceItems?.length) {
-      return ApiError.validation('缺少必要欄位')
-    }
+    const validation = await validateBody(request, issueAllowanceSchema)
+    if (!validation.success) return validation.error
+    const { invoiceId, allowanceAmount, allowanceItems, operatedBy } = validation.data
 
     const supabase = getSupabaseAdminClient()
 

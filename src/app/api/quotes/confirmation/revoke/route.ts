@@ -9,13 +9,8 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { getServerAuth } from '@/lib/auth/server-auth'
 import type { ConfirmationResult } from '@/types/quote.types'
 import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
-
-interface RevokeParams {
-  quote_id: string
-  staff_id: string
-  staff_name: string
-  reason: string
-}
+import { validateBody } from '@/lib/api/validation'
+import { revokeQuoteConfirmationSchema } from '@/lib/validations/api-schemas'
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,12 +20,9 @@ export async function POST(request: NextRequest) {
       return errorResponse('請先登入', 401, ErrorCode.UNAUTHORIZED)
     }
 
-    const body: RevokeParams = await request.json()
-    const { quote_id, staff_id, staff_name, reason } = body
-
-    if (!quote_id || !staff_id || !staff_name || !reason) {
-      return ApiError.validation('缺少必要參數（包含撤銷原因）')
-    }
+    const validation = await validateBody(request, revokeQuoteConfirmationSchema)
+    if (!validation.success) return validation.error
+    const { quote_id, staff_id, staff_name, reason } = validation.data
 
     const supabase = getSupabaseAdminClient()
 

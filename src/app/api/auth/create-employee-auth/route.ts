@@ -10,6 +10,8 @@ import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 import { getServerAuth } from '@/lib/auth/server-auth'
+import { validateBody } from '@/lib/api/validation'
+import { createEmployeeAuthSchema } from '@/lib/validations/api-schemas'
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,11 +21,9 @@ export async function POST(request: NextRequest) {
       return errorResponse('請先登入才能建立員工帳號', 401, ErrorCode.UNAUTHORIZED)
     }
 
-    const { employee_number, password, workspace_code } = await request.json()
-
-    if (!employee_number || !password) {
-      return errorResponse('Missing employee_number or password', 400, ErrorCode.MISSING_FIELD)
-    }
+    const validation = await validateBody(request, createEmployeeAuthSchema)
+    if (!validation.success) return validation.error
+    const { employee_number, password, workspace_code } = validation.data
 
     const supabaseAdmin = getSupabaseAdminClient()
     // Email 格式：{workspace_code}_{employee_number}@venturo.com（區分不同公司的同編號員工）

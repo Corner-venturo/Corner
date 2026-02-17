@@ -3,6 +3,8 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { getServerAuth } from '@/lib/auth/server-auth'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
+import { validateBody } from '@/lib/api/validation'
+import { batchReprocessSchema } from '@/lib/validations/api-schemas'
 
 /**
  * 批次重新處理護照 OCR
@@ -67,8 +69,9 @@ export async function POST(request: NextRequest) {
       return errorResponse('OCR API Key 未設定', 500, ErrorCode.INTERNAL_ERROR)
     }
 
-    const body = await request.json()
-    const { table = 'all', limit = 10 } = body
+    const validation = await validateBody(request, batchReprocessSchema)
+    if (!validation.success) return validation.error
+    const { table, limit } = validation.data
 
     const supabase = getSupabaseAdminClient()
     const results = {

@@ -11,6 +11,8 @@ import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 import { checkApiUsage, updateApiUsage, API_LIMITS } from '@/lib/api-usage'
 import { getServerAuth } from '@/lib/auth/server-auth'
+import { validateBody } from '@/lib/api/validation'
+import { suggestAttractionSchema } from '@/lib/validations/api-schemas'
 
 // Gemini API 設定
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY
@@ -68,11 +70,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const body: SuggestAttractionRequest = await request.json()
-
-    if (!body.name) {
-      return errorResponse('請提供景點名稱', 400, ErrorCode.MISSING_FIELD)
-    }
+    const validation = await validateBody(request, suggestAttractionSchema)
+    if (!validation.success) return validation.error
+    const body = validation.data
 
     // 構建 prompt
     const location = [body.city, body.country].filter(Boolean).join(', ')

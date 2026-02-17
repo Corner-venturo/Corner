@@ -4,12 +4,8 @@ import bcrypt from 'bcryptjs'
 import { logger } from '@/lib/utils/logger'
 import { ApiError, successResponse } from '@/lib/api/response'
 import { checkRateLimit } from '@/lib/rate-limit'
-
-interface ValidateLoginRequest {
-  username: string
-  password: string
-  code: string
-}
+import { validateBody } from '@/lib/api/validation'
+import { validateLoginSchema } from '@/lib/validations/api-schemas'
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,12 +13,9 @@ export async function POST(request: NextRequest) {
     const rateLimited = checkRateLimit(request, 'validate-login', 10, 60_000)
     if (rateLimited) return rateLimited
 
-    const body: ValidateLoginRequest = await request.json()
-    const { username, password, code } = body
-
-    if (!username || !password || !code) {
-      return ApiError.validation('請填寫所有欄位')
-    }
+    const validation = await validateBody(request, validateLoginSchema)
+    if (!validation.success) return validation.error
+    const { username, password, code } = validation.data
 
     const supabase = getSupabaseAdminClient()
 

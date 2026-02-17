@@ -4,6 +4,8 @@ import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 import { getServerAuth } from '@/lib/auth/server-auth'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { validateBody } from '@/lib/api/validation'
+import { adminResetPasswordSchema } from '@/lib/validations/api-schemas'
 
 /**
  * 檢查員工是否為管理員或超級管理員
@@ -45,15 +47,9 @@ export async function POST(request: NextRequest) {
       return errorResponse('需要管理員權限', 403, ErrorCode.FORBIDDEN)
     }
 
-    const { email, new_password } = await request.json()
-
-    if (!email || !new_password) {
-      return errorResponse('缺少必要參數', 400, ErrorCode.MISSING_FIELD)
-    }
-
-    if (new_password.length < 6) {
-      return errorResponse('密碼至少需要 6 個字元', 400, ErrorCode.VALIDATION_ERROR)
-    }
+    const validation = await validateBody(request, adminResetPasswordSchema)
+    if (!validation.success) return validation.error
+    const { email, new_password } = validation.data
 
     const supabaseAdmin = getSupabaseAdminClient()
 

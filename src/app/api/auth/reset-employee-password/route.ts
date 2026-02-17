@@ -3,6 +3,8 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 import { getServerAuth } from '@/lib/auth/server-auth'
+import { validateBody } from '@/lib/api/validation'
+import { resetEmployeePasswordSchema } from '@/lib/validations/api-schemas'
 
 /**
  * 重設員工密碼 API
@@ -16,15 +18,9 @@ export async function POST(request: NextRequest) {
       return errorResponse('請先登入', 401, ErrorCode.UNAUTHORIZED)
     }
 
-    const { employee_id, new_password } = await request.json()
-
-    if (!employee_id || !new_password) {
-      return errorResponse('缺少必要參數', 400, ErrorCode.MISSING_FIELD)
-    }
-
-    if (new_password.length < 8) {
-      return errorResponse('密碼至少需要 8 個字元', 400, ErrorCode.VALIDATION_ERROR)
-    }
+    const validation = await validateBody(request, resetEmployeePasswordSchema)
+    if (!validation.success) return validation.error
+    const { employee_id, new_password } = validation.data
 
     const supabaseAdmin = getSupabaseAdminClient()
 

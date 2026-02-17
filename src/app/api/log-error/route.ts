@@ -4,6 +4,8 @@ import { join } from 'path'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 import { getServerAuth } from '@/lib/auth/server-auth'
+import { validateBody } from '@/lib/api/validation'
+import { logErrorSchema } from '@/lib/validations/api-schemas'
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +15,9 @@ export async function POST(request: NextRequest) {
       return errorResponse(auth.error.error, 401, ErrorCode.UNAUTHORIZED)
     }
 
-    const errorData = await request.json()
+    const validation = await validateBody(request, logErrorSchema)
+    if (!validation.success) return validation.error
+    const errorData = validation.data
 
     // 創建 logs 目錄（如果不存在）
     const logsDir = join(process.cwd(), 'logs')

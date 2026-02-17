@@ -2,6 +2,7 @@ import { logger } from '@/lib/utils/logger'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { getServerAuth } from '@/lib/auth/server-auth'
 import { ApiError, successResponse } from '@/lib/api/response'
+import { addChannelMembersSchema, removeChannelMemberSchema } from '@/lib/validations/api-schemas'
 
 // TODO: withAuth 無法直接適用，因為此 route 需要 getServerAuth (workspaceId) + admin client
 
@@ -107,11 +108,11 @@ export async function POST(request: Request, { params }: RouteParams) {
   }
 
   const body = await request.json().catch(() => ({}))
-  const { employeeIds, role = 'member' } = body
-
-  if (!employeeIds || !Array.isArray(employeeIds) || employeeIds.length === 0) {
-    return ApiError.validation('employeeIds array is required')
+  const parsed = addChannelMembersSchema.safeParse(body)
+  if (!parsed.success) {
+    return ApiError.validation(parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; '))
   }
+  const { employeeIds, role } = parsed.data
 
   try {
     const supabase = getSupabaseAdminClient()
@@ -167,11 +168,12 @@ export async function DELETE(request: Request, { params }: RouteParams) {
     return ApiError.forbidden('無權存取此 workspace')
   }
 
-  const { memberId } = await request.json().catch(() => ({ memberId: undefined }))
-
-  if (!memberId) {
+  const body = await request.json().catch(() => ({}))
+  const parsed = removeChannelMemberSchema.safeParse(body)
+  if (!parsed.success) {
     return ApiError.missingField('memberId')
   }
+  const { memberId } = parsed.data
 
   try {
     const supabase = getSupabaseAdminClient()

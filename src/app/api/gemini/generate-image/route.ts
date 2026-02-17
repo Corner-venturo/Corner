@@ -2,6 +2,8 @@ import { NextRequest } from 'next/server'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 import { getServerAuth } from '@/lib/auth/server-auth'
+import { validateBody } from '@/lib/api/validation'
+import { generateImageSchema } from '@/lib/validations/api-schemas'
 
 // 多 API Key 輪替機制
 const GEMINI_API_KEYS = [
@@ -54,11 +56,9 @@ export async function POST(request: NextRequest) {
       return errorResponse(auth.error.error, 401, ErrorCode.UNAUTHORIZED)
     }
 
-    const { prompt, style, aspectRatio = '16:9' } = await request.json()
-
-    if (!prompt) {
-      return errorResponse('Prompt is required', 400, ErrorCode.MISSING_FIELD)
-    }
+    const validation = await validateBody(request, generateImageSchema)
+    if (!validation.success) return validation.error
+    const { prompt, style, aspectRatio } = validation.data
 
     if (GEMINI_API_KEYS.length === 0) {
       return errorResponse('No Gemini API keys configured', 500, ErrorCode.INTERNAL_ERROR)

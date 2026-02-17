@@ -7,8 +7,10 @@ import { logger } from '@/lib/utils/logger'
 import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { getServerAuth } from '@/lib/auth/server-auth'
-import type { StaffConfirmParams, ConfirmationResult } from '@/types/quote.types'
+import type { ConfirmationResult } from '@/types/quote.types'
 import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
+import { validateBody } from '@/lib/api/validation'
+import { staffConfirmQuoteSchema } from '@/lib/validations/api-schemas'
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,12 +20,9 @@ export async function POST(request: NextRequest) {
       return errorResponse('請先登入', 401, ErrorCode.UNAUTHORIZED)
     }
 
-    const body: StaffConfirmParams = await request.json()
-    const { quote_id, staff_id, staff_name, notes } = body
-
-    if (!quote_id || !staff_id || !staff_name) {
-      return ApiError.validation('缺少必要參數')
-    }
+    const validation = await validateBody(request, staffConfirmQuoteSchema)
+    if (!validation.success) return validation.error
+    const { quote_id, staff_id, staff_name, notes } = validation.data
 
     const supabase = getSupabaseAdminClient()
 

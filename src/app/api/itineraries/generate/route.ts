@@ -19,6 +19,8 @@ import {
   type ItineraryStyle,
 } from '@/lib/itinerary-generator'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
+import { validateBody } from '@/lib/api/validation'
+import { generateItineraryRequestSchema } from '@/lib/validations/api-schemas'
 import type { Attraction } from '@/features/attractions/types'
 
 // 每天最少需要的景點數量，低於此值會切換到 Gemini
@@ -54,8 +56,10 @@ export async function POST(request: NextRequest) {
       return errorResponse('請先登入', 401, ErrorCode.UNAUTHORIZED)
     }
 
-    // 1. 解析請求
-    const body: RequestBody = await request.json()
+    // 1. 解析請求（Zod 驗證）
+    const validation = await validateBody(request, generateItineraryRequestSchema)
+    if (!validation.success) return validation.error
+    const body: RequestBody = validation.data as RequestBody
     const supabase = getSupabaseAdminClient()
 
     // 2. 處理城市 ID（支持 UUID、城市代碼、或名稱）
@@ -174,15 +178,7 @@ export async function POST(request: NextRequest) {
     // 4. 處理風格（支持 style 或 theme）
     const style = body.style || (body.theme as ItineraryStyle | undefined)
 
-    // 5. 驗證必要參數
-    if (!body.numDays || body.numDays < 1 || body.numDays > 30) {
-      return errorResponse('天數必須在 1-30 天之間', 400, ErrorCode.VALIDATION_ERROR)
-    }
-
-    if (!body.departureDate) {
-      return errorResponse('請提供出發日期', 400, ErrorCode.MISSING_FIELD)
-    }
-
+    // 5. 驗證（numDays/departureDate 已由 Zod 驗證）
     // 如果沒有城市 ID，使用一個預設邏輯或返回特殊結果
     if (!cityId) {
       logger.warn('無法找到城市 ID，使用目的地名稱:', body.destination)

@@ -4,17 +4,8 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { getServerAuth } from '@/lib/auth/server-auth'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 import { generateTourCode, generateOrderCode } from '@/stores/utils/code-generator'
-
-interface ConvertToTourRequest {
-  proposal_id: string
-  package_id: string
-  city_code: string
-  departure_date: string
-  tour_name?: string
-  contact_person?: string
-  contact_phone?: string
-  // workspace_id 和 user_id 改由 getServerAuth() 取得，不信任前端傳入
-}
+import { validateBody } from '@/lib/api/validation'
+import { convertToTourFullSchema } from '@/lib/validations/api-schemas'
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,7 +17,8 @@ export async function POST(request: NextRequest) {
 
     const { workspaceId: workspace_id, employeeId: user_id } = auth.data
 
-    const data: ConvertToTourRequest = await request.json()
+    const validation = await validateBody(request, convertToTourFullSchema)
+    if (!validation.success) return validation.error
     const {
       proposal_id,
       package_id,
@@ -35,7 +27,7 @@ export async function POST(request: NextRequest) {
       tour_name,
       contact_person,
       contact_phone,
-    } = data
+    } = validation.data
 
     const supabase = getSupabaseAdminClient()
 

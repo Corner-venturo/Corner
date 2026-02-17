@@ -7,8 +7,10 @@ import { logger } from '@/lib/utils/logger'
 import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { getServerAuth } from '@/lib/auth/server-auth'
-import type { SendConfirmationLinkParams, ConfirmationResult } from '@/types/quote.types'
+import type { ConfirmationResult } from '@/types/quote.types'
 import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
+import { validateBody } from '@/lib/api/validation'
+import { sendQuoteConfirmationSchema } from '@/lib/validations/api-schemas'
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,12 +20,9 @@ export async function POST(request: NextRequest) {
       return errorResponse('請先登入', 401, ErrorCode.UNAUTHORIZED)
     }
 
-    const body: SendConfirmationLinkParams = await request.json()
-    const { quote_id, expires_in_days = 7, staff_id } = body
-
-    if (!quote_id) {
-      return ApiError.missingField('quote_id')
-    }
+    const validation = await validateBody(request, sendQuoteConfirmationSchema)
+    if (!validation.success) return validation.error
+    const { quote_id, expires_in_days, staff_id } = validation.data
 
     const supabase = getSupabaseAdminClient()
 

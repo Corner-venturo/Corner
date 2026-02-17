@@ -13,6 +13,8 @@ import { ApiError, successResponse } from '@/lib/api/response'
 import { format, addDays } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 import { parseLocalDate } from '@/lib/utils/format-date'
+import { validateBody } from '@/lib/api/validation'
+import { ticketStatusPostSchema, ticketStatusPatchSchema } from '@/lib/validations/api-schemas'
 
 // 系統機器人 ID
 const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
@@ -349,8 +351,9 @@ export async function POST(request: NextRequest) {
 
   try {
     const supabase = getSupabaseAdminClient()
-    const body = await request.json()
-    const { workspace_id, channel_id, notify_sales = true, days = 14 } = body
+    const validation = await validateBody(request, ticketStatusPostSchema)
+    if (!validation.success) return validation.error
+    const { workspace_id, channel_id, notify_sales, days } = validation.data
 
     // 先取得狀態
     const statusUrl = new URL(request.url)
@@ -665,8 +668,9 @@ export async function PATCH(request: NextRequest) {
 
   try {
     const supabase = getSupabaseAdminClient()
-    const body = await request.json()
-    const { member_ids, order_id, flight_self_arranged } = body
+    const validation = await validateBody(request, ticketStatusPatchSchema)
+    if (!validation.success) return validation.error
+    const { member_ids, order_id, flight_self_arranged } = validation.data
 
     let query = supabase.from('order_members').update({ flight_self_arranged })
 

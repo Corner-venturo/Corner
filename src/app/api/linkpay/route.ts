@@ -17,6 +17,8 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { getServerAuth } from '@/lib/auth/server-auth'
 import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { validateBody } from '@/lib/api/validation'
+import { createLinkPaySchema as createLinkPayRequestSchema } from '@/lib/validations/api-schemas'
 
 // ============================================
 // 型別定義
@@ -127,13 +129,9 @@ export async function POST(req: NextRequest) {
       return ApiError.unauthorized(auth.error.error)
     }
 
-    const body: CreateLinkPayRequest = await req.json()
-    const { receipt_number, user_name, email, payment_name, create_user, amount, end_date, gender } = body
-
-    // 驗證必填欄位
-    if (!receipt_number || !user_name || !email || !amount) {
-      return ApiError.validation('缺少必填欄位：receipt_number, user_name, email, amount')
-    }
+    const validation = await validateBody(req, createLinkPayRequestSchema)
+    if (!validation.success) return validation.error
+    const { receipt_number, user_name, email, payment_name, create_user, amount, end_date, gender } = validation.data
 
     const supabase = getSupabaseAdminClient()
 
