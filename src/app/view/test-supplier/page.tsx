@@ -304,7 +304,7 @@ export default function TestSupplierPage() {
                             value={item.reply_note}
                             onChange={(e) => updateItem(item.id, 'reply_note', e.target.value)}
                             className="h-7 text-sm border-[#d5d0ca] bg-white"
-                            placeholder="備註"
+                            placeholder={TEST_SUPPLIER_LABELS.REMARKS}
                           />
                         )}
                       </td>
@@ -342,7 +342,7 @@ export default function TestSupplierPage() {
                         <tr key={pax} className={idx % 2 === 0 ? 'bg-white' : 'bg-[#fdfcfb]'}>
                           <td className="border-b border-r border-[#e8e4df] px-2 py-1.5 text-[#4a4540]">{pax} 人</td>
                           <td className="border-b border-[#e8e4df] px-1.5 py-1">
-                            <Input className="h-7 text-sm border-[#d5d0ca] bg-white" placeholder="金額" />
+                            <Input className="h-7 text-sm border-[#d5d0ca] bg-white" placeholder={TEST_SUPPLIER_LABELS.AMOUNT} />
                           </td>
                         </tr>
                       ))}
@@ -398,8 +398,8 @@ export default function TestSupplierPage() {
               <tr className="bg-[#f0ece7]">
                 <th className="border-b border-[#d5d0ca] px-4 py-2.5 text-left font-semibold text-[#4a4540]">{TEST_SUPPLIER_LABELS.LABEL_7885}</th>
                 <th className="border-b border-[#d5d0ca] px-4 py-2.5 text-left font-semibold text-[#4a4540]">{TEST_SUPPLIER_LABELS.LABEL_1594}</th>
-                <th className="border-b border-[#d5d0ca] px-4 py-2.5 text-center font-semibold text-[#4a4540] w-[70px]">人數</th>
-                <th className="border-b border-[#d5d0ca] px-4 py-2.5 text-center font-semibold text-[#4a4540] w-[70px]">項目</th>
+                <th className="border-b border-[#d5d0ca] px-4 py-2.5 text-center font-semibold text-[#4a4540] w-[70px]">{TEST_SUPPLIER_LABELS.LABEL_1251}</th>
+                <th className="border-b border-[#d5d0ca] px-4 py-2.5 text-center font-semibold text-[#4a4540] w-[70px]">{TEST_SUPPLIER_LABELS.LABEL_2283}</th>
                 <th className="border-b border-[#d5d0ca] px-4 py-2.5 text-center font-semibold text-[#4a4540] w-[80px]">{TEST_SUPPLIER_LABELS.STATUS}</th>
                 <th className="border-b border-[#d5d0ca] px-4 py-2.5 text-center font-semibold text-[#4a4540] w-[80px]">{TEST_SUPPLIER_LABELS.LABEL_5510}</th>
                 <th className="border-b border-[#d5d0ca] px-4 py-2.5 text-center font-semibold text-[#4a4540] w-[60px]"></th>
