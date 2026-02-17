@@ -43,6 +43,15 @@ npm run dev
 http://localhost:3000
 ```
 
+### 測試
+
+```bash
+npm test             # 執行所有測試
+npm run test:watch   # 監看模式
+npm run test:ui      # Vitest UI
+npm run test:coverage # 覆蓋率報告
+```
+
 ### 建置生產版本
 
 ```bash
