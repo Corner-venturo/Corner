@@ -28,6 +28,18 @@ import { logger } from '@/lib/utils/logger'
 import { cn } from '@/lib/utils'
 import { DESIGNER_LABELS } from './constants/labels'
 
+/** 風格描述與代表色系 */
+const STYLE_DESCRIPTIONS: Record<string, { description: string; colors: string[] }> = {
+  'japanese-style-v1': {
+    description: '留白、優雅的日系排版，適合高品質旅遊手冊',
+    colors: ['#f5f0eb', '#c9aa7c', '#6b5b4a', '#e8dcc8'],
+  },
+  'corner-travel-v1': {
+    description: '正式、專業的跨頁排版，Corner Travel 官方風格',
+    colors: ['#1a365d', '#c9aa7c', '#f7f5f0', '#2d5a87'],
+  },
+}
+
 interface TemplateSelectorProps {
   itineraryId?: string | null
   tourId?: string | null
@@ -272,40 +284,67 @@ export function TemplateSelector({
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {styleSeries.map((style) => (
-              <button
-                key={style.id}
-                onClick={() => setSelectedStyle(style)}
-                className={cn(
-                  'flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left',
-                  selectedStyle?.id === style.id
-                    ? 'border-morandi-gold bg-morandi-gold/5'
-                    : 'border-border hover:border-morandi-gold/50'
-                )}
-              >
-                {/* 預覽縮圖 */}
-                <div className="w-16 h-24 rounded-lg bg-morandi-container flex items-center justify-center overflow-hidden">
-                  <div className="w-12 h-18 bg-white rounded shadow-sm flex flex-col items-center justify-center p-1">
-                    <div className="w-full h-1 bg-morandi-gold/30 rounded mb-1" />
-                    <div className="w-8 h-8 bg-morandi-container rounded" />
-                    <div className="w-full h-1 bg-morandi-primary/20 rounded mt-1" />
-                    <div className="w-6 h-0.5 bg-morandi-primary/20 rounded mt-0.5" />
+            {styleSeries.map((style) => {
+              const styleInfo = STYLE_DESCRIPTIONS[style.id] || { description: '', colors: ['#e8dcc8', '#c9aa7c', '#6b5b4a'] }
+              return (
+                <button
+                  key={style.id}
+                  onClick={() => setSelectedStyle(style)}
+                  className={cn(
+                    'flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left',
+                    selectedStyle?.id === style.id
+                      ? 'border-morandi-gold bg-morandi-gold/5'
+                      : 'border-border hover:border-morandi-gold/50'
+                  )}
+                >
+                  {/* 風格化封面預覽 */}
+                  <div className="w-16 h-24 rounded-lg bg-morandi-container flex items-center justify-center overflow-hidden flex-shrink-0">
+                    <div
+                      className="w-12 h-[72px] rounded shadow-sm flex flex-col overflow-hidden"
+                      style={{ backgroundColor: styleInfo.colors[0] || '#f5f0eb' }}
+                    >
+                      {/* 模擬封面 header */}
+                      <div
+                        className="w-full h-2 mt-1 mx-auto rounded-sm"
+                        style={{ backgroundColor: styleInfo.colors[1] || '#c9aa7c', width: '80%', marginLeft: '10%' }}
+                      />
+                      {/* 模擬圖片區域 */}
+                      <div
+                        className="mx-1 mt-1 h-6 rounded-sm"
+                        style={{ backgroundColor: styleInfo.colors[2] || '#8b7d6b', opacity: 0.6 }}
+                      />
+                      {/* 模擬標題文字 */}
+                      <div className="flex flex-col items-center gap-0.5 mt-1 px-1">
+                        <div className="w-full h-1 rounded-sm" style={{ backgroundColor: styleInfo.colors[1] || '#c9aa7c' }} />
+                        <div className="w-3/4 h-0.5 rounded-sm" style={{ backgroundColor: styleInfo.colors[2] || '#6b5b4a', opacity: 0.5 }} />
+                      </div>
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-morandi-primary">{style.name}</h3>
-                    {selectedStyle?.id === style.id && (
-                      <Check size={16} className="text-morandi-gold" />
-                    )}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-morandi-primary">{style.name}</h3>
+                      {selectedStyle?.id === style.id && (
+                        <Check size={16} className="text-morandi-gold" />
+                      )}
+                    </div>
+                    <p className="text-sm text-morandi-secondary mt-1">
+                      {styleInfo.description}
+                    </p>
+                    {/* 色系預覽 */}
+                    <div className="flex gap-1 mt-2">
+                      {styleInfo.colors.map((color, i) => (
+                        <div
+                          key={i}
+                          className="w-4 h-4 rounded-full border border-border/50"
+                          style={{ backgroundColor: color }}
+                        />
+                      ))}
+                    </div>
                   </div>
-                  <p className="text-sm text-morandi-secondary mt-1">
-                    {DESIGNER_LABELS.LABEL_6962}
-                  </p>
-                </div>
-              </button>
-            ))}
+                </button>
+              )
+            })}
           </div>
         </div>
 

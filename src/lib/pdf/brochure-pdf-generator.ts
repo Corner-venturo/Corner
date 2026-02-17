@@ -99,6 +99,7 @@ function parseOpacity(color: string): number {
 function renderText(doc: jsPDF, el: TextElement): void {
   const x = pxToMm(el.x)
   const y = pxToMm(el.y)
+  const maxWidth = el.width ? pxToMm(el.width) : 0
   const fontSize = pxToMm(el.style.fontSize) * 2.83 // pt to mm adjustment
 
   // 設定字體
@@ -128,19 +129,94 @@ function renderText(doc: jsPDF, el: TextElement): void {
   if (el.style.textAlign === 'center') align = 'center'
   if (el.style.textAlign === 'right') align = 'right'
 
-  // 處理多行文字
-  const lines = el.content.split('\n')
+  // 計算對齊用的 x 座標
+  let textX = x
+  if (maxWidth > 0) {
+    if (align === 'center') textX = x + maxWidth / 2
+    else if (align === 'right') textX = x + maxWidth
+  }
+
+  // 處理多行文字（自動換行）
+  let lines: string[]
+  if (maxWidth > 0) {
+    // 先按 \n 分行，再用 jsPDF 根據寬度自動換行
+    lines = el.content.split('\n').flatMap(line =>
+      line === '' ? [''] : doc.splitTextToSize(line, maxWidth) as string[]
+    )
+  } else {
+    lines = el.content.split('\n')
+  }
+
   const lineHeight = fontSize * (el.style.lineHeight || 1.2)
+
+  // 旋轉處理
+  const rotation = el.rotation || 0
+  if (rotation) {
+    const cx = maxWidth > 0 ? x + maxWidth / 2 : x
+    const cy = y + (lines.length * lineHeight) / 2
+    doc.saveGraphicsState()
+    const rad = (-rotation * Math.PI) / 180
+    const cos = Math.cos(rad)
+    const sin = Math.sin(rad)
+    // PDF transform matrix: translate to center, rotate, translate back
+    const tmx = cx - cx * cos + cy * sin
+    const tmy = cy - cx * sin - cy * cos
+    // jsPDF internal coordinate system uses bottom-left origin in PDF,
+    // but the write method handles the conversion
+    const pageHeight = doc.internal.pageSize.getHeight()
+    const pdfCx = cx
+    const pdfCy = pageHeight - cy
+    const pdfTmx = pdfCx - pdfCx * cos + pdfCy * sin
+    const pdfTmy = pdfCy - pdfCx * sin - pdfCy * cos
+    pdfWrite(doc,
+      `${cos.toFixed(6)} ${sin.toFixed(6)} ${(-sin).toFixed(6)} ${cos.toFixed(6)} ${pdfTmx.toFixed(4)} ${pdfTmy.toFixed(4)} cm`
+    )
+  }
 
   lines.forEach((line, index) => {
     const lineY = y + (index * lineHeight) + fontSize // 加上 fontSize 是因為 jsPDF 的 y 是基線位置
-    doc.text(line, x, lineY, { align })
+    doc.text(line, textX, lineY, { align })
   })
+
+  // 重置旋轉
+  if (rotation) {
+    doc.restoreGraphicsState()
+  }
 
   // 重置透明度
   if (el.opacity !== undefined && el.opacity < 1) {
     doc.setGState(doc.GState({ opacity: 1 }))
   }
+}
+
+/**
+ * 套用旋轉變換（繞元素中心旋轉）
+ */
+/**
+ * 寫入 PDF 內部指令（jsPDF 類型定義中未包含 write 方法）
+ */
+function pdfWrite(doc: jsPDF, content: string): void {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(doc.internal as unknown as { write: (s: string) => void }).write(content)
+}
+
+function applyRotation(doc: jsPDF, x: number, y: number, width: number, height: number, rotation: number): boolean {
+  if (!rotation) return false
+  const cx = x + width / 2
+  const cy = y + height / 2
+  doc.saveGraphicsState()
+  const rad = (-rotation * Math.PI) / 180
+  const cos = Math.cos(rad)
+  const sin = Math.sin(rad)
+  const pageHeight = doc.internal.pageSize.getHeight()
+  const pdfCx = cx
+  const pdfCy = pageHeight - cy
+  const tmx = pdfCx - pdfCx * cos + pdfCy * sin
+  const tmy = pdfCy - pdfCx * sin - pdfCy * cos
+  pdfWrite(doc,
+    `${cos.toFixed(6)} ${sin.toFixed(6)} ${(-sin).toFixed(6)} ${cos.toFixed(6)} ${tmx.toFixed(4)} ${tmy.toFixed(4)} cm`
+  )
+  return true
 }
 
 /**
@@ -151,6 +227,9 @@ async function renderShape(doc: jsPDF, el: ShapeElement): Promise<void> {
   const y = pxToMm(el.y)
   const width = pxToMm(el.width)
   const height = pxToMm(el.height)
+
+  // 旋轉處理
+  const rotated = applyRotation(doc, x, y, width, height, el.rotation || 0)
 
   // 設定透明度
   if (el.opacity !== undefined && el.opacity < 1) {
@@ -217,6 +296,11 @@ async function renderShape(doc: jsPDF, el: ShapeElement): Promise<void> {
     })
   }
 
+  // 重置旋轉
+  if (rotated) {
+    doc.restoreGraphicsState()
+  }
+
   // 重置透明度
   if (el.opacity !== undefined && el.opacity < 1) {
     doc.setGState(doc.GState({ opacity: 1 }))
@@ -233,13 +317,15 @@ async function renderImage(doc: jsPDF, el: ImageElement): Promise<void> {
   const height = pxToMm(el.height)
 
   try {
+    // 旋轉處理
+    const rotated = applyRotation(doc, x, y, width, height, el.rotation || 0)
+
     // 設定透明度
     if (el.opacity !== undefined && el.opacity < 1) {
       doc.setGState(doc.GState({ opacity: el.opacity }))
     }
 
-    // 直接嵌入圖片
-    // jsPDF 會自動處理 base64 和 URL
+    // 直接嵌入圖片（jsPDF addImage 自動裁切到指定尺寸）
     if (el.src.startsWith('data:')) {
       // Base64 圖片
       const format = el.src.includes('image/png') ? 'PNG' : 'JPEG'
@@ -251,6 +337,11 @@ async function renderImage(doc: jsPDF, el: ImageElement): Promise<void> {
       const base64 = await blobToBase64(blob)
       const format = blob.type.includes('png') ? 'PNG' : 'JPEG'
       doc.addImage(base64, format, x, y, width, height)
+    }
+
+    // 重置旋轉
+    if (rotated) {
+      doc.restoreGraphicsState()
     }
 
     // 重置透明度
