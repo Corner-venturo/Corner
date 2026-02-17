@@ -1,10 +1,6 @@
 import Link from 'next/link'
 import { ERROR_PAGE_LABELS } from './constants/labels'
 
-export const dynamic = 'force-dynamic'
-export const dynamicParams = true
-export const revalidate = 0
-
 export default function NotFound() {
   return (
     <div

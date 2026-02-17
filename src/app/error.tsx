@@ -3,7 +3,6 @@
 import { useEffect } from 'react'
 import { logger } from '@/lib/utils/logger'
 
-export const dynamic = 'force-dynamic'
 import { Button } from '@/components/ui/button'
 import { AlertCircle, RefreshCw, Home } from 'lucide-react'
 import { ERROR_PAGE_LABELS as L } from './constants/labels'
