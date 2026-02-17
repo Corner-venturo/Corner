@@ -225,3 +225,52 @@ export const COMPANY_LABELS = {
     `此企業有 ${count} 位關聯的聯絡人（${names}），刪除企業將同時刪除這些聯絡人。\n\n確定要刪除企業「${companyName}」嗎？`,
   confirm_delete_simple: (name: string) => `確定要刪除企業「${name}」嗎？`,
 }
+
+// ============================================================
+// Passport Upload
+// ============================================================
+export const CUSTOMER_PASSPORT_UPLOAD_LABELS = {
+  COMPRESS_FAILED: '壓縮失敗',
+  MALE: '男',
+  FEMALE: '女',
+  SELECT_FILE: '請選擇至少一個檔案',
+  OCR_FAILED: 'OCR 辨識失敗',
+  BATCH_DUPLICATE: (name: string) => `${name} (本次批次重複)`,
+  MATCH_ID: (id: string) => `身分證 ${id}`,
+  MATCH_BIRTHDAY: (date: string) => `生日 ${date}`,
+  MATCH_BIRTHDAY_NAME: '生日+姓名',
+  MATCH_NAME: (name: string) => `姓名 ${name}`,
+  PASSPORT_EXISTS: (fileName: string, name: string) => `${fileName} (護照已存在: ${name})`,
+  INFO_PASSPORT: (num: string) => `護照號碼: ${num}`,
+  INFO_EXPIRY: (date: string) => `效期: ${date}`,
+  INFO_PINYIN: (name: string) => `拼音: ${name}`,
+  INFO_ID_NEW: (id: string) => `身分證: 新增 ${id}`,
+  INFO_BIRTHDAY_NEW: (date: string) => `生日: 新增 ${date}`,
+  INFO_GENDER_NEW: (gender: string) => `性別: 新增 ${gender}`,
+  RECOGNIZE_FAILED: (name: string) => `${name} (辨識失敗)`,
+  PROCESS_FAILED: (name: string) => `${name} (處理失敗)`,
+  PASSPORT_IMAGE_UPDATE: '護照圖片更新',
+  CONFIRM_UPDATE: (count: number) => `${count} 位客戶資料有變更，是否更新？`,
+  UPDATE_FAILED: (fileName: string, err: string) => `${fileName} (更新失敗: ${err})`,
+  UPDATE_FAILED_SIMPLE: (fileName: string) => `${fileName} (更新失敗)`,
+  UNNAMED: '未命名',
+  CREATE_FAILED: (fileName: string) => `${fileName} (新增失敗)`,
+  SUCCESS_SUMMARY: (success: number, total: number) => `成功辨識 ${success}/${total} 張護照`,
+  NEW_CUSTOMERS: (count: number) => `\n新增 ${count} 位客戶`,
+  AUTO_UPDATE: (count: number) => `\n自動更新 ${count} 位客戶護照圖片（資料無變更）`,
+  CONFIRMED_UPDATE: (count: number) => `\n更新 ${count} 位客戶護照資料`,
+  SKIPPED: (count: number) => `\n跳過 ${count} 位客戶（使用者取消）`,
+  SKIPPED_DUPLICATE: (count: number) => `\n跳過 ${count} 筆重複護照`,
+  VERIFY_REMINDER: '\n\n重要提醒：\n• 所有 OCR 辨識的資料已標記為「待驗證」\n• 請務必人工檢查護照資訊',
+  FAILED_ITEMS: (items: string) => `\n\n失敗項目：\n${items}`,
+  BATCH_FAILED_PREFIX: '批次上傳失敗：',
+  UNKNOWN_ERROR: '未知錯誤',
+}
+
+// ============================================================
+// Customer Verify
+// ============================================================
+export const CUSTOMER_VERIFY_LABELS = {
+  VERIFY_SUCCESS: '已驗證',
+  VERIFY_FAILED: '驗證失敗',
+}

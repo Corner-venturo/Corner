@@ -16,6 +16,7 @@ import { logger } from '@/lib/utils/logger'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 // 不再自動同步到訂單成員，讓訂單那邊手動處理
 import type { Customer } from '@/types/customer.types'
+import { CUSTOMER_PASSPORT_UPLOAD_LABELS as CPL } from '../constants/labels'
 
 // 常用簡體→繁體對照表（人名常用字）
 const SIMPLIFIED_TO_TRADITIONAL: Record<string, string> = {
@@ -201,7 +202,7 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
                   resolve(compressedFile)
                 }
               } else {
-                reject(new Error('壓縮失敗'))
+                reject(new Error(CPL.COMPRESS_FAILED))
               }
             },
             'image/jpeg',
@@ -226,7 +227,7 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
   // 📤 批次上傳
   const handleBatchUpload = useCallback(async () => {
     if (files.length === 0) {
-      void alert('請選擇至少一個檔案', 'error')
+      void alert(CPL.SELECT_FILE, 'error')
       return
     }
 
@@ -274,7 +275,7 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
           })
 
           if (!ocrResponse.ok) {
-            throw new Error('OCR 辨識失敗')
+            throw new Error(CPL.OCR_FAILED)
           }
 
           const ocrResult = await ocrResponse.json()
@@ -291,7 +292,7 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
 
             // 檢查本次批次內重複
             if (passportNumber && processedPassports.has(passportNumber)) {
-              duplicateItems.push(`${file.name} (本次批次重複)`)
+              duplicateItems.push(CPL.BATCH_DUPLICATE(file.name))
               continue
             }
 
@@ -302,7 +303,7 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
             // 1. 身分證字號比對
             if (nationalId) {
               existingCustomer = customers.find(c => c.national_id === nationalId)
-              if (existingCustomer) matchReason = `身分證 ${nationalId}`
+              if (existingCustomer) matchReason = CPL.MATCH_ID(nationalId)
             }
 
             // 2. 生日比對
@@ -310,26 +311,26 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
               const sameBirthday = customers.filter(c => c.birth_date === birthDate)
               if (sameBirthday.length === 1) {
                 existingCustomer = sameBirthday[0]
-                matchReason = `生日 ${birthDate}`
+                matchReason = CPL.MATCH_BIRTHDAY(birthDate)
               } else if (sameBirthday.length > 1 && chineseName) {
                 existingCustomer = sameBirthday.find(c =>
                   c.name?.includes(chineseName) || chineseName.includes(c.name || '')
                 )
-                if (existingCustomer) matchReason = `生日+姓名`
+                if (existingCustomer) matchReason = CPL.MATCH_BIRTHDAY_NAME
               }
             }
 
             // 3. 姓名比對
             if (!existingCustomer && chineseName && chineseName.length >= 2) {
               existingCustomer = customers.find(c => c.name === chineseName)
-              if (existingCustomer) matchReason = `姓名 ${chineseName}`
+              if (existingCustomer) matchReason = CPL.MATCH_NAME(chineseName)
             }
 
             // 4. 護照號碼比對（完全重複）
             if (!existingCustomer && passportNumber) {
               existingCustomer = customers.find(c => c.passport_number === passportNumber)
               if (existingCustomer) {
-                duplicateItems.push(`${file.name} (護照已存在: ${existingCustomer.name})`)
+                duplicateItems.push(CPL.PASSPORT_EXISTS(file.name, existingCustomer.name))
                 processedPassports.add(passportNumber)
                 continue
               }
@@ -361,33 +362,33 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
             if (existingCustomer) {
               // 比較護照號碼
               if (passportNumber && existingCustomer.passport_number !== passportNumber) {
-                differences.push(`護照號碼: ${existingCustomer.passport_number || '無'} → ${passportNumber}`)
+                differences.push(CPL.INFO_PASSPORT(`${existingCustomer.passport_number || '無'} → ${passportNumber}`))
                 hasRealDifference = true
               }
               // 比較護照效期
               if (ocrData.passport_expiry && existingCustomer.passport_expiry !== ocrData.passport_expiry) {
-                differences.push(`效期: ${existingCustomer.passport_expiry || '無'} → ${ocrData.passport_expiry}`)
+                differences.push(CPL.INFO_EXPIRY(`${existingCustomer.passport_expiry || '無'} → ${ocrData.passport_expiry}`))
                 hasRealDifference = true
               }
               // 比較護照拼音
               if (ocrData.passport_name && existingCustomer.passport_name !== ocrData.passport_name) {
-                differences.push(`拼音: ${existingCustomer.passport_name || '無'} → ${ocrData.passport_name}`)
+                differences.push(CPL.INFO_PINYIN(`${existingCustomer.passport_name || '無'} → ${ocrData.passport_name}`))
                 hasRealDifference = true
               }
               // 比較身分證（如果現有的為空才算更新）
               if (nationalId && !existingCustomer.national_id) {
-                differences.push(`身分證: 新增 ${nationalId}`)
+                differences.push(CPL.INFO_ID_NEW(nationalId))
                 hasRealDifference = true
               }
               // 比較生日（如果現有的為空才算更新）
               if (birthDate && !existingCustomer.birth_date) {
-                differences.push(`生日: 新增 ${birthDate}`)
+                differences.push(CPL.INFO_BIRTHDAY_NEW(birthDate))
                 hasRealDifference = true
               }
               // 比較性別（如果現有的為空才算更新）
               const normalizedGenderValue = normalizeGender(gender)
               if (normalizedGenderValue && !existingCustomer.gender) {
-                differences.push(`性別: 新增 ${normalizedGenderValue === 'M' ? '男' : '女'}`)
+                differences.push(CPL.INFO_GENDER_NEW(normalizedGenderValue === 'M' ? CPL.MALE : CPL.FEMALE))
                 hasRealDifference = true
               }
             }
@@ -416,11 +417,11 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
               processedPassports.add(passportNumber)
             }
           } else {
-            failedItems.push(`${file.name} (辨識失敗)`)
+            failedItems.push(CPL.RECOGNIZE_FAILED(file.name))
           }
         } catch (error) {
           logger.error(`❌ 處理失敗: ${file.name}`, error)
-          failedItems.push(`${file.name} (處理失敗)`)
+          failedItems.push(CPL.PROCESS_FAILED(file.name))
         }
       }
 
@@ -439,7 +440,7 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
                 ${item.existingCustomer?.name} (${item.matchReason})
               </div>
               <div style="color: #dc2626; font-size: 11px;">
-                ${item.differences?.join(' | ') || '護照圖片更新'}
+                ${item.differences?.join(' | ') || CPL.PASSPORT_IMAGE_UPDATE}
               </div>
             </div>
           </div>
@@ -455,7 +456,7 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
         `
 
         const shouldUpdate = await confirm(
-          `${needConfirmItems.length} 位客戶資料有變更，是否更新？`,
+          CPL.CONFIRM_UPDATE(needConfirmItems.length),
           'warning',
           confirmHtml
         )
@@ -504,7 +505,7 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
         } catch (error) {
           const errMsg = error instanceof Error ? error.message : JSON.stringify(error)
           logger.error(`自動更新失敗: ${item.existingCustomer?.name}`, errMsg, error)
-          failedItems.push(`${item.fileName} (更新失敗: ${errMsg})`)
+          failedItems.push(CPL.UPDATE_FAILED(item.fileName, errMsg))
         }
       }
 
@@ -541,7 +542,7 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
           }
         } catch (error) {
           logger.error(`更新失敗: ${item.existingCustomer?.name}`, error)
-          failedItems.push(`${item.fileName} (更新失敗)`)
+          failedItems.push(CPL.UPDATE_FAILED_SIMPLE(item.fileName))
         }
       }
 
@@ -549,7 +550,7 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
       for (const item of newCustomerItems) {
         try {
           await addCustomer({
-            name: item.chineseName || item.ocrData.name || '未命名',
+            name: item.chineseName || item.ocrData.name || CPL.UNNAMED,
             passport_number: item.ocrData.passport_number,
             passport_name: item.ocrData.passport_name,
             passport_expiry: item.ocrData.passport_expiry,
@@ -564,7 +565,7 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
           successCount++
         } catch (error) {
           logger.error(`新增失敗: ${item.fileName}`, error)
-          failedItems.push(`${item.fileName} (新增失敗)`)
+          failedItems.push(CPL.CREATE_FAILED(item.fileName))
           // 刪除已上傳但未使用的圖片
           await supabase.storage.from('passport-images').remove([item.storageFileName])
         }
@@ -573,25 +574,25 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
       // === 階段 5: 顯示結果 ===
       const skippedConfirmCount = needConfirmItems.length - confirmedUpdateSuccessCount
 
-      let message = `成功辨識 ${allFiles.length - failedItems.length}/${allFiles.length} 張護照`
+      let message = CPL.SUCCESS_SUMMARY(allFiles.length - failedItems.length, allFiles.length)
       if (successCount > 0) {
-        message += `\n新增 ${successCount} 位客戶`
+        message += CPL.NEW_CUSTOMERS(successCount)
       }
       if (autoUpdateSuccessCount > 0) {
-        message += `\n自動更新 ${autoUpdateSuccessCount} 位客戶護照圖片（資料無變更）`
+        message += CPL.AUTO_UPDATE(autoUpdateSuccessCount)
       }
       if (confirmedUpdateSuccessCount > 0) {
-        message += `\n更新 ${confirmedUpdateSuccessCount} 位客戶護照資料`
+        message += CPL.CONFIRMED_UPDATE(confirmedUpdateSuccessCount)
       }
       if (skippedConfirmCount > 0) {
-        message += `\n跳過 ${skippedConfirmCount} 位客戶（使用者取消）`
+        message += CPL.SKIPPED(skippedConfirmCount)
       }
       if (duplicateItems.length > 0) {
-        message += `\n跳過 ${duplicateItems.length} 筆重複護照`
+        message += CPL.SKIPPED_DUPLICATE(duplicateItems.length)
       }
-      message += `\n\n重要提醒：\n• 所有 OCR 辨識的資料已標記為「待驗證」\n• 請務必人工檢查護照資訊`
+      message += CPL.VERIFY_REMINDER
       if (failedItems.length > 0) {
-        message += `\n\n失敗項目：\n${failedItems.join('\n')}`
+        message += CPL.FAILED_ITEMS(failedItems.join('\n'))
       }
       await alert(message, failedItems.length > 0 ? 'warning' : 'success')
 
@@ -604,7 +605,7 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
       }
     } catch (error) {
       logger.error('批次上傳失敗:', error)
-      await alert('批次上傳失敗：' + (error instanceof Error ? error.message : '未知錯誤'), 'error')
+      await alert(CPL.BATCH_FAILED_PREFIX + (error instanceof Error ? error.message : CPL.UNKNOWN_ERROR), 'error')
     } finally {
       setIsUploading(false)
     }

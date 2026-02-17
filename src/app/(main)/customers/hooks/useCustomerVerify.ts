@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import type { Customer, UpdateCustomerData } from '@/types/customer.types'
+import { CUSTOMER_VERIFY_LABELS } from '../constants/labels'
 
 interface UseCustomerVerifyProps {
   onSuccess?: () => void
@@ -79,7 +80,7 @@ export function useCustomerVerify({ onSuccess }: UseCustomerVerifyProps = {}) {
 
       if (error) throw error
 
-      toast.success('儲存成功')
+      toast.success(CUSTOMER_VERIFY_LABELS.VERIFY_SUCCESS)
       closeDialog()
 
       // 觸發成功回調
@@ -88,7 +89,7 @@ export function useCustomerVerify({ onSuccess }: UseCustomerVerifyProps = {}) {
       }
     } catch (error) {
       logger.error('儲存失敗:', error)
-      toast.error('儲存失敗')
+      toast.error(CUSTOMER_VERIFY_LABELS.VERIFY_FAILED)
     } finally {
       setIsSaving(false)
     }
