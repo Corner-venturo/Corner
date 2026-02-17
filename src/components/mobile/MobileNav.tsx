@@ -27,52 +27,53 @@ import {
   CheckCircle,
 } from 'lucide-react'
 import { MOBILE_LABELS } from './constants/labels'
+import { MOBILE_NAV_LABELS } from './constants/labels'
 
 // 底部導航項目
 const NAV_ITEMS = [
-  { id: 'home', icon: Home, label: '首頁', href: '/m' },
-  { id: 'search', icon: Search, label: '搜尋', href: '/m/search' },
-  { id: 'todos', icon: ClipboardList, label: '待辦', href: '/m/todos' },
-  { id: 'workbench', icon: LayoutGrid, label: '工作台', href: '/m/workbench' },
-  { id: 'profile', icon: User, label: '我的', href: '/m/profile' },
+  { id: 'home', icon: Home, label: MOBILE_NAV_LABELS.HOME, href: '/m' },
+  { id: 'search', icon: Search, label: MOBILE_NAV_LABELS.SEARCH, href: '/m/search' },
+  { id: 'todos', icon: ClipboardList, label: MOBILE_NAV_LABELS.TODO, href: '/m/todos' },
+  { id: 'workbench', icon: LayoutGrid, label: MOBILE_NAV_LABELS.WORKSPACE, href: '/m/workbench' },
+  { id: 'profile', icon: User, label: MOBILE_NAV_LABELS.MY, href: '/m/profile' },
 ]
 
 // 工作台功能分類
 const WORKBENCH_CATEGORIES = [
   {
-    title: '常用功能',
+    title: MOBILE_NAV_LABELS.COMMON_FEATURES,
     items: [
-      { icon: MapPin, label: '旅遊團', href: '/m/tours', color: 'text-blue-600' },
-      { icon: ShoppingCart, label: '訂單', href: '/m/orders', color: 'text-green-600' },
-      { icon: Users, label: '成員', href: '/m/members', color: 'text-purple-600' },
-      { icon: CheckCircle, label: '報到', href: '/m/checkin', color: 'text-orange-600' },
+      { icon: MapPin, label: MOBILE_NAV_LABELS.TOURS, href: '/m/tours', color: 'text-blue-600' },
+      { icon: ShoppingCart, label: MOBILE_NAV_LABELS.ORDERS, href: '/m/orders', color: 'text-green-600' },
+      { icon: Users, label: MOBILE_NAV_LABELS.MEMBERS, href: '/m/members', color: 'text-purple-600' },
+      { icon: CheckCircle, label: MOBILE_NAV_LABELS.CHECK_IN, href: '/m/checkin', color: 'text-orange-600' },
     ],
   },
   {
-    title: '財務相關',
+    title: MOBILE_NAV_LABELS.FINANCE,
     items: [
-      { icon: CreditCard, label: '請款', href: '/m/payments', color: 'text-emerald-600' },
-      { icon: FileText, label: '出納', href: '/m/treasury', color: 'text-cyan-600' },
-      { icon: FileCheck, label: '收款', href: '/m/receipts', color: 'text-teal-600' },
+      { icon: CreditCard, label: MOBILE_NAV_LABELS.PAYMENT_REQUEST, href: '/m/payments', color: 'text-emerald-600' },
+      { icon: FileText, label: MOBILE_NAV_LABELS.TREASURY, href: '/m/treasury', color: 'text-cyan-600' },
+      { icon: FileCheck, label: MOBILE_NAV_LABELS.RECEIPT, href: '/m/receipts', color: 'text-teal-600' },
     ],
   },
   {
-    title: '行政作業',
+    title: MOBILE_NAV_LABELS.ADMIN,
     items: [
-      { icon: Calendar, label: '行事曆', href: '/calendar', color: 'text-red-600' },
-      { icon: Stamp, label: '簽證', href: '/m/visas', color: 'text-amber-600' },
-      { icon: FileCheck, label: '確認單', href: '/m/confirmations', color: 'text-indigo-600' },
+      { icon: Calendar, label: MOBILE_NAV_LABELS.CALENDAR, href: '/calendar', color: 'text-red-600' },
+      { icon: Stamp, label: MOBILE_NAV_LABELS.VISA, href: '/m/visas', color: 'text-amber-600' },
+      { icon: FileCheck, label: MOBILE_NAV_LABELS.CONFIRMATION, href: '/m/confirmations', color: 'text-indigo-600' },
       // 旅伴通訊已整合到工作頻道中
       // { icon: MessageCircle, label: '通訊', href: '/traveler-chat', color: 'text-pink-600' },
     ],
   },
   {
-    title: '資料庫',
+    title: MOBILE_NAV_LABELS.DATABASE,
     items: [
-      { icon: Hotel, label: '飯店', href: '/database/hotels', color: 'text-violet-600' },
-      { icon: Truck, label: '供應商', href: '/database/suppliers', color: 'text-slate-600' },
-      { icon: MapPinned, label: '景點', href: '/database/attractions', color: 'text-lime-600' },
-      { icon: UserCheck, label: '領隊', href: '/database/tour-leaders', color: 'text-rose-600' },
+      { icon: Hotel, label: MOBILE_NAV_LABELS.HOTELS, href: '/database/hotels', color: 'text-violet-600' },
+      { icon: Truck, label: MOBILE_NAV_LABELS.SUPPLIERS, href: '/database/suppliers', color: 'text-slate-600' },
+      { icon: MapPinned, label: MOBILE_NAV_LABELS.ATTRACTIONS, href: '/database/attractions', color: 'text-lime-600' },
+      { icon: UserCheck, label: MOBILE_NAV_LABELS.LEADERS, href: '/database/tour-leaders', color: 'text-rose-600' },
     ],
   },
 ]
