@@ -6,6 +6,7 @@ import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { Quote, QuickQuoteItem, QuoteVersion } from '@/stores/types'
 import { alert } from '@/lib/ui/alert-dialog'
+import { QUOTE_HOOKS_LABELS } from '../constants/labels'
 
 interface UseQuickQuoteDetailProps {
   quote: Quote

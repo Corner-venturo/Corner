@@ -6,6 +6,7 @@ import { UI_DELAYS } from '@/lib/constants/timeouts'
 import { logger } from '@/lib/utils/logger'
 import { CostCategory, ParticipantCounts, SellingPrices } from '../types'
 import type { Quote, QuoteVersion } from '@/stores/types'
+import { QUOTE_HOOKS_LABELS } from '../constants/labels'
 
 interface UseQuoteVersionProps {
   quote: Quote | null | undefined

@@ -11,6 +11,7 @@ import { QuickQuoteDetail } from '@/features/quotes/components'
 import { NotFoundState } from '@/components/ui/not-found-state'
 import { Loader2 } from 'lucide-react'
 import { ID_LABELS } from './constants/labels'
+import { QUOTE_PAGE_LABELS } from '@/app/(main)/quotes/[id]/constants/labels'
 
 export default function QuickQuoteDetailPage() {
   const params = useParams()
@@ -35,7 +36,7 @@ export default function QuickQuoteDetailPage() {
         <NotFoundState
           title={ID_LABELS.NOT_FOUND_4550}
           description={ID_LABELS.DELETE_642}
-          backButtonLabel="返回報價單列表"
+          backButtonLabel={QUOTE_PAGE_LABELS.BACK_TO_LIST}
           backHref="/quotes"
         />
       </div>

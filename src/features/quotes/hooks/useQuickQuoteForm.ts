@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/stores'
 import { supabase } from '@/lib/supabase/client'
 import { Quote } from '@/stores/types'
+import { QUOTE_HOOKS_LABELS } from '../constants/labels'
 
 interface QuickQuoteItem {
   id: string

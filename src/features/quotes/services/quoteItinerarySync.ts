@@ -16,6 +16,7 @@ interface DailyItineraryItem {
   [key: string]: unknown
 }
 import type { Json } from '@/lib/supabase/types'
+import { QUOTE_ITINERARY_SYNC_LABELS } from '../constants/labels'
 
 interface SyncResult {
   success: boolean
@@ -39,7 +40,7 @@ export async function syncHotelsFromQuoteToItinerary(
       .single()
 
     if (quoteError || !quote) {
-      return { success: false, message: '找不到報價單' }
+      return { success: false, message: QUOTE_ITINERARY_SYNC_LABELS.QUOTE_NOT_FOUND }
     }
 
     // 優先用 itinerary_id，否則從 tour_id 找
@@ -57,7 +58,7 @@ export async function syncHotelsFromQuoteToItinerary(
 
     if (!itineraryId) {
       // 沒有關聯的行程表，不需要同步
-      return { success: true, message: '無關聯行程表，跳過同步' }
+      return { success: true, message: QUOTE_ITINERARY_SYNC_LABELS.NO_LINKED_ITINERARY }
     }
 
     // 2. 取得行程表
@@ -68,7 +69,7 @@ export async function syncHotelsFromQuoteToItinerary(
       .single()
 
     if (itineraryError || !itinerary) {
-      return { success: false, message: '找不到行程表' }
+      return { success: false, message: QUOTE_ITINERARY_SYNC_LABELS.ITINERARY_NOT_FOUND }
     }
 
     const dailyItinerary = (itinerary.daily_itinerary || []) as unknown as DailyItineraryItem[]
@@ -102,7 +103,7 @@ export async function syncHotelsFromQuoteToItinerary(
     })
 
     if (!updated) {
-      return { success: true, message: '無需更新' }
+      return { success: true, message: QUOTE_ITINERARY_SYNC_LABELS.NO_UPDATE_NEEDED }
     }
 
     // 4. 更新行程表
@@ -120,10 +121,10 @@ export async function syncHotelsFromQuoteToItinerary(
     }
 
     logger.info(`報價單 ${quoteId} 飯店已同步到行程表 ${itineraryId}`)
-    return { success: true, message: '同步成功' }
+    return { success: true, message: QUOTE_ITINERARY_SYNC_LABELS.SYNC_SUCCESS }
   } catch (error) {
     logger.error('同步飯店時發生錯誤:', error)
-    return { success: false, message: '同步失敗' }
+    return { success: false, message: QUOTE_ITINERARY_SYNC_LABELS.SYNC_FAILED }
   }
 }
 
@@ -144,7 +145,7 @@ export async function syncHotelsFromItineraryToQuote(
       .single()
 
     if (itineraryError || !itinerary) {
-      return { success: false, message: '找不到行程表' }
+      return { success: false, message: QUOTE_ITINERARY_SYNC_LABELS.ITINERARY_NOT_FOUND }
     }
 
     // 從 tour_id 找報價單，或直接用 itinerary_id 找
@@ -172,7 +173,7 @@ export async function syncHotelsFromItineraryToQuote(
 
     if (!quoteId) {
       // 沒有關聯的報價單，不需要同步
-      return { success: true, message: '無關聯報價單，跳過同步' }
+      return { success: true, message: QUOTE_ITINERARY_SYNC_LABELS.NO_LINKED_QUOTE }
     }
 
     // 2. 取得報價單的 categories
@@ -183,7 +184,7 @@ export async function syncHotelsFromItineraryToQuote(
       .single()
 
     if (quoteError || !quote) {
-      return { success: false, message: '找不到報價單資料' }
+      return { success: false, message: QUOTE_ITINERARY_SYNC_LABELS.QUOTE_DATA_NOT_FOUND }
     }
 
     // 3. 更新 categories 中的 accommodation 項目
@@ -191,7 +192,7 @@ export async function syncHotelsFromItineraryToQuote(
     const accommodationCategoryIndex = categories.findIndex(cat => cat.id === 'accommodation')
 
     if (accommodationCategoryIndex === -1) {
-      return { success: true, message: '報價單無住宿類別，跳過同步' }
+      return { success: true, message: QUOTE_ITINERARY_SYNC_LABELS.NO_ACCOMMODATION_CATEGORY }
     }
 
     let updated = false
@@ -220,7 +221,7 @@ export async function syncHotelsFromItineraryToQuote(
     })
 
     if (!updated) {
-      return { success: true, message: '無需更新' }
+      return { success: true, message: QUOTE_ITINERARY_SYNC_LABELS.NO_UPDATE_NEEDED }
     }
 
     accommodationCategory.items = updatedItems
@@ -256,9 +257,9 @@ export async function syncHotelsFromItineraryToQuote(
     }
 
     logger.info(`行程表 ${itineraryId} 飯店已同步到報價單 ${quoteId}`)
-    return { success: true, message: '同步成功' }
+    return { success: true, message: QUOTE_ITINERARY_SYNC_LABELS.SYNC_SUCCESS }
   } catch (error) {
     logger.error('同步飯店時發生錯誤:', error)
-    return { success: false, message: '同步失敗' }
+    return { success: false, message: QUOTE_ITINERARY_SYNC_LABELS.SYNC_FAILED }
   }
 }

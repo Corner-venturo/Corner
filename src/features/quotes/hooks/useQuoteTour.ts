@@ -10,6 +10,7 @@ import { useToursSlim } from '@/data'
 import { CostCategory, ParticipantCounts, SellingPrices } from '../types'
 import type { Quote, Tour, QuoteVersion } from '@/stores/types'
 import type { CreateInput } from '@/stores/core/types'
+import { QUOTE_HOOKS_LABELS } from '../constants/labels'
 
 interface UseQuoteTourProps {
   quote: Quote | null | undefined

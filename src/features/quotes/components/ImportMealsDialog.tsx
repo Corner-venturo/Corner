@@ -18,6 +18,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Loader2, UtensilsCrossed, Sun, Cloud, Moon, X, Download } from 'lucide-react'
 import { CostItem } from '../types'
 import { IMPORT_ACTIVITIES_DIALOG_LABELS, IMPORT_MEALS_DIALOG_LABELS } from '../constants/labels';
+import { QUOTE_COMPONENT_LABELS } from '../constants/labels'
 
 interface MealItem {
   day: number

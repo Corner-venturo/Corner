@@ -48,6 +48,7 @@ import {
 } from '@/features/quotes/utils/priceCalculations'
 import { costCategories, TierPricing } from '@/features/quotes/types'
 import { QUOTE_DETAIL_EMBED_LABELS } from '../constants/labels';
+import { QUOTE_COMPONENT_LABELS } from '../constants/labels'
 
 interface QuoteDetailEmbedProps {
   quoteId: string

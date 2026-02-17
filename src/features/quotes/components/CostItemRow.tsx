@@ -3,6 +3,7 @@ import { CostItem } from '../types'
 import { ResourceSelectButton } from './ResourceSelectButton'
 import { CalcInput } from '@/components/ui/calc-input'
 import { ACCOMMODATION_ITEM_ROW_LABELS, CATEGORY_SECTION_LABELS, COST_ITEM_ROW_LABELS } from '../constants/labels';
+import { QUOTE_COMPONENT_LABELS } from '../constants/labels'
 
 interface CostItemRowProps {
   item: CostItem

@@ -10,6 +10,7 @@ import { logger } from '@/lib/utils/logger'
 import { DEFAULT_CATEGORIES } from '../constants'
 import { Quote } from '@/stores/types'
 import type { CostItem } from '../types'
+import { QUOTE_HOOKS_LABELS } from '../constants/labels'
 
 interface QuoteFormData {
   name: string

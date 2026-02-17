@@ -24,6 +24,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
 import { ACCOMMODATION_ITEM_ROW_LABELS, QUICK_QUOTE_DIALOG_LABELS, QUICK_QUOTE_ITEMS_TABLE_LABELS } from '../../constants/labels';
+import { QUOTE_COMPONENT_LABELS } from '../../constants/labels'
 
 interface QuickQuoteItemsTableProps {
   items: QuickQuoteItem[]

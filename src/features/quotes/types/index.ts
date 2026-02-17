@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import { QUOTE_CATEGORY_LABELS } from '../constants/labels'
 
 // 資源類型
 export type CostItemResourceType = 'restaurant' | 'hotel' | 'attraction' | 'supplier'
@@ -136,13 +137,13 @@ export interface VersionRecord {
 }
 
 export const costCategories: CostCategory[] = [
-  { id: 'transport', name: '交通', items: [], total: 0 },
-  { id: 'group-transport', name: '團體分攤', items: [], total: 0 },
-  { id: 'accommodation', name: '住宿', items: [], total: 0 },
-  { id: 'meals', name: '餐飲', items: [], total: 0 },
-  { id: 'activities', name: '活動', items: [], total: 0 },
-  { id: 'others', name: '其他', items: [], total: 0 },
-  { id: 'guide', name: '領隊導遊', items: [], total: 0 },
+  { id: 'transport', name: QUOTE_CATEGORY_LABELS.TRANSPORT, items: [], total: 0 },
+  { id: 'group-transport', name: QUOTE_CATEGORY_LABELS.GROUP_SHARE, items: [], total: 0 },
+  { id: 'accommodation', name: QUOTE_CATEGORY_LABELS.ACCOMMODATION, items: [], total: 0 },
+  { id: 'meals', name: QUOTE_CATEGORY_LABELS.MEALS, items: [], total: 0 },
+  { id: 'activities', name: QUOTE_CATEGORY_LABELS.ACTIVITIES, items: [], total: 0 },
+  { id: 'others', name: QUOTE_CATEGORY_LABELS.OTHER, items: [], total: 0 },
+  { id: 'guide', name: QUOTE_CATEGORY_LABELS.LEADER_GUIDE, items: [], total: 0 },
 ]
 
 export const categoryIcons: Record<string, string> = {

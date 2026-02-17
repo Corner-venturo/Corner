@@ -7,6 +7,7 @@ import { useWorkspaceChannels } from '@/stores/workspace'
 import { CostCategory, ParticipantCounts, SellingPrices, costCategories, TierPricing, CostItem } from '../types'
 import { QuickQuoteItem } from '@/types/quote.types'
 import type { FlightInfo } from '@/stores/types/tour.types'
+import { QUOTE_HOOKS_LABELS } from '../constants/labels'
 
 export const useQuoteState = () => {
   const params = useParams()

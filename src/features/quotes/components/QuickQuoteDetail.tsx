@@ -21,6 +21,7 @@ import {
 } from './quick-quote'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { QUICK_QUOTE_DETAIL_LABELS } from '../constants/labels';
+import { QUOTE_COMPONENT_LABELS } from '../constants/labels'
 
 interface QuickQuoteDetailProps {
   quote: Quote

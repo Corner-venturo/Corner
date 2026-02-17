@@ -7,6 +7,7 @@ import { CostCategory, ParticipantCounts, SellingPrices, TierPricing } from '../
 import type { Quote, QuoteVersion } from '@/stores/types'
 import type { QuickQuoteItem } from '@/types/quote.types'
 import { syncHotelsFromQuoteToItinerary } from '../services/quoteItinerarySync'
+import { QUOTE_HOOKS_LABELS } from '../constants/labels'
 
 interface QuickQuoteCustomerInfo {
   customer_name: string

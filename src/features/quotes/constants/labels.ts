@@ -450,3 +450,145 @@ export const QUICK_QUOTE_LABELS = {
   TOTAL_2585: '總成本',
   TOTAL_8800: '總利潤',
 }
+
+// Quote-Itinerary Sync
+export const QUOTE_ITINERARY_SYNC_LABELS = {
+  QUOTE_NOT_FOUND: '找不到報價單',
+  NO_LINKED_ITINERARY: '無關聯行程表，跳過同步',
+  ITINERARY_NOT_FOUND: '找不到行程表',
+  NO_UPDATE_NEEDED: '無需更新',
+  SYNC_SUCCESS: '同步成功',
+  SYNC_FAILED: '同步失敗',
+  NO_LINKED_QUOTE: '無關聯報價單，跳過同步',
+  QUOTE_DATA_NOT_FOUND: '找不到報價單資料',
+  NO_ACCOMMODATION_CATEGORY: '報價單無住宿類別，跳過同步',
+}
+
+// Quote category types
+export const QUOTE_CATEGORY_LABELS = {
+  TRANSPORT: '交通',
+  GROUP_SHARE: '團體分攤',
+  ACCOMMODATION: '住宿',
+  MEALS: '餐飲',
+  ACTIVITIES: '活動',
+  OTHER: '其他',
+  LEADER_GUIDE: '領隊導遊',
+}
+
+// Quote hooks messages
+export const QUOTE_HOOKS_LABELS = {
+  // useQuoteState
+  QUOTE_NOT_FOUND: '找不到報價單',
+  WORKSPACE_ERROR: '無法取得 workspace code',
+  SAVE_FAILED: '儲存失敗',
+  LOAD_FAILED: '載入報價單失敗',
+  VERSION_SAVED: '版本已儲存',
+  VERSION_SAVE_FAILED: '版本儲存失敗',
+
+  // useTransportOperations
+  DEPARTURE_TIME: '出發時間',
+  ARRIVAL_TIME: '抵達時間',
+  LOAD_TRANSPORT_FAILED: '載入交通資料失敗',
+  SAVE_TRANSPORT_SUCCESS: '交通資料已儲存',
+  SAVE_TRANSPORT_FAILED: '儲存交通資料失敗',
+  DELETE_TRANSPORT_SUCCESS: '已刪除交通項目',
+  DELETE_TRANSPORT_FAILED: '刪除失敗',
+  ADD_TRANSPORT_FAILED: '新增失敗',
+
+  // useQuickQuoteDetail
+  QUICK_QUOTE_NOT_FOUND: '找不到報價單',
+  QUICK_QUOTE_LOAD_FAILED: '載入報價單失敗',
+  QUICK_QUOTE_SAVE_SUCCESS: '報價單已儲存',
+  QUICK_QUOTE_SAVE_FAILED: '儲存失敗',
+  QUICK_QUOTE_DELETE_SUCCESS: '已刪除報價單',
+
+  // useQuickQuoteForm
+  CREATE_SUCCESS: '報價單已建立',
+  CREATE_FAILED: '建立報價單失敗',
+  UPDATE_SUCCESS: '報價單已更新',
+  UPDATE_FAILED: '更新報價單失敗',
+
+  // useQuoteForm
+  ITINERARY_LOAD_FAILED: '載入行程表失敗',
+
+  // useCategoryItems
+  DELETE_ITEM_SUCCESS: '已刪除項目',
+  DELETE_ITEM_FAILED: '刪除項目失敗',
+  ADD_ITEM_FAILED: '新增項目失敗',
+  UPDATE_ITEM_FAILED: '更新項目失敗',
+
+  // useQuoteCalculations
+  CALC_FAILED: '計算失敗',
+
+  // useQuoteTour
+  LINK_TOUR_SUCCESS: '已關聯旅遊團',
+  LINK_TOUR_FAILED: '關聯旅遊團失敗',
+  UNLINK_TOUR_SUCCESS: '已取消關聯',
+  UNLINK_TOUR_FAILED: '取消關聯失敗',
+
+  // useQuoteSave
+  QUOTE_SAVE_SUCCESS: '報價單已儲存',
+
+  // useQuoteVersion
+  VERSION_CREATE_SUCCESS: '新版本已建立',
+  VERSION_CREATE_FAILED: '建立版本失敗',
+
+  // useQuoteGroupCostUpdate
+  COST_UPDATE_SUCCESS: '成本已更新',
+  COST_UPDATE_FAILED: '更新成本失敗',
+
+  // calculateTierPricing
+  TIER_CALC_ERROR: '計算檻次價格失敗',
+  NO_CATEGORIES: '報價單沒有類別',
+  NO_ITEMS: '類別沒有項目',
+}
+
+// Quote components
+export const QUOTE_COMPONENT_LABELS = {
+  // QuoteDetailEmbed
+  LINK_ITINERARY: '連結行程表',
+  CREATE_ITINERARY: '建立行程表',
+  ITINERARY_LINKED: '行程表已連結',
+  LINK_FAILED: '連結失敗',
+  CREATE_ITINERARY_FAILED: '建立行程表失敗',
+
+  // ImportMealsDialog
+  IMPORT_MEALS: '匯入餐飲',
+  NO_MEALS_DATA: '此行程表沒有餐飲資料',
+  SELECT_ALL: '全選',
+  DESELECT_ALL: '取消全選',
+  IMPORT: '匯入',
+  CANCEL: '取消',
+  IMPORTING: '匯入中...',
+
+  // QuoteConfirmationSection
+  CONFIRM_VERSION: '確認此版本',
+  CONFIRMED: '已確認',
+
+  // QuickQuoteItemsTable
+  ADD_ITEM: '新增項目',
+  ITEM_NAME: '品名',
+  UNIT_PRICE: '單價',
+  QUANTITY: '數量',
+  SUBTOTAL: '小計',
+  NO_ITEMS: '尚無項目',
+
+  // QuickQuoteVersionPanel
+  VERSIONS: '版本紀錄',
+  CURRENT: '(目前)',
+  CREATE_VERSION: '建立新版本',
+  BACK_TO_LIST: '返回',
+
+  // CostItemRow
+  DELETE_CONFIRM: '確定要刪除此項目嗎？',
+
+  // PrintableQuickQuote
+  QUOTATION: '報價單',
+}
+
+// quote.service.ts
+export const QUOTE_SERVICE_LABELS = {
+  MUST_BELONG_TO_WORKSPACE: '必須屬於工作空間',
+  AMOUNT_NOT_NEGATIVE: '報價金額不能為負數',
+  STATUS_INVALID: '無效的狀態值',
+}

@@ -14,6 +14,7 @@ import { Quote, QuickQuoteItem } from '@/types/quote.types'
 import { supabase } from '@/lib/supabase/client'
 import { COMPANY } from '@/lib/constants/company'
 import { PRINTABLE_QUICK_QUOTE_LABELS, PAYMENT_INFO_LABELS, DIALOGS_CONTAINER_LABELS, ACCOMMODATION_ITEM_ROW_LABELS, QUOTES_PAGE_LABELS, QUOTES_LIST_LABELS, QUICK_QUOTE_SECTION_LABELS } from '@/constants/labels';
+import { QUOTE_COMPONENT_LABELS } from '../constants/labels'
 
 interface PrintableQuickQuoteProps {
   quote: Quote

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback } from 'react'
 import { CostCategory } from '../types'
+import { QUOTE_HOOKS_LABELS } from '../constants/labels'
 
 interface UseQuoteGroupCostUpdateProps {
   groupSize: number

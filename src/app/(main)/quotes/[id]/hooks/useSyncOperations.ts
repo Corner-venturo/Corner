@@ -6,6 +6,7 @@ import type { Quote, Itinerary } from '@/stores/types'
 import type { CostCategory, CostItem } from '@/features/quotes/types'
 import type { MealDiff } from '@/features/quotes/components'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
+import { QUOTE_SYNC_LABELS } from '../constants/labels'
 
 interface UseSyncOperationsProps {
   quote: Quote | null
@@ -133,7 +134,7 @@ export function useSyncOperations({
       const match = item.name.match(/Day\s*(\d+)\s*(午餐|晚餐)\s*-?\s*(.*)/)
       if (match) {
         const day = parseInt(match[1])
-        const type = match[2] === '午餐' ? 'lunch' : 'dinner'
+        const type = match[2] === QUOTE_SYNC_LABELS.MEAL_LUNCH ? 'lunch' : 'dinner'
         const name = match[3].trim()
         const isSelfArranged = item.is_self_arranged || false
 
@@ -152,13 +153,13 @@ export function useSyncOperations({
       if (!updates) return
 
       if (updates.lunch) {
-        const newValue = updates.lunch.isSelfArranged ? '自理' : (updates.lunch.name || '')
+        const newValue = updates.lunch.isSelfArranged ? QUOTE_SYNC_LABELS.MEAL_SELF : (updates.lunch.name || '')
         const oldValue = day.meals.lunch || ''
         if (newValue && newValue !== oldValue) {
           diffs.push({
             day: dayNumber,
             type: 'lunch',
-            typeLabel: '午餐',
+            typeLabel: QUOTE_SYNC_LABELS.MEAL_LUNCH,
             oldValue,
             newValue,
           })
@@ -166,13 +167,13 @@ export function useSyncOperations({
       }
 
       if (updates.dinner) {
-        const newValue = updates.dinner.isSelfArranged ? '自理' : (updates.dinner.name || '')
+        const newValue = updates.dinner.isSelfArranged ? QUOTE_SYNC_LABELS.MEAL_SELF : (updates.dinner.name || '')
         const oldValue = day.meals.dinner || ''
         if (newValue && newValue !== oldValue) {
           diffs.push({
             day: dayNumber,
             type: 'dinner',
-            typeLabel: '晚餐',
+            typeLabel: QUOTE_SYNC_LABELS.MEAL_DINNER,
             oldValue,
             newValue,
           })
@@ -211,19 +212,19 @@ export function useSyncOperations({
       daily_itinerary: updatedDailyItinerary,
     })
 
-    toast.success('已同步餐飲資料到行程表')
+    toast.success(QUOTE_SYNC_LABELS.SYNC_MEALS_SUCCESS)
   }, [quote, itineraries, updateItinerary])
 
   // 從行程表同步住宿名稱
   const handleSyncAccommodationFromItinerary = useCallback(() => {
     if (!quote?.itinerary_id) {
-      toast.error('此報價單沒有連結行程表')
+      toast.error(QUOTE_SYNC_LABELS.NO_LINKED_ITINERARY)
       return
     }
 
     const itinerary = itineraries.find(i => i.id === quote.itinerary_id)
     if (!itinerary?.daily_itinerary) {
-      toast.error('找不到連結的行程表')
+      toast.error(QUOTE_SYNC_LABELS.ITINERARY_NOT_FOUND)
       return
     }
 
@@ -237,7 +238,7 @@ export function useSyncOperations({
     })
 
     if (itineraryHotels.length === 0) {
-      toast.info('行程表沒有住宿資料')
+      toast.info(QUOTE_SYNC_LABELS.NO_ACCOMMODATION_DATA)
       return
     }
 
@@ -285,7 +286,7 @@ export function useSyncOperations({
       }
 
       if (!hasChanges) {
-        toast.info('住宿名稱已是最新')
+        toast.info(QUOTE_SYNC_LABELS.ACCOMMODATION_UP_TO_DATE)
         return prev
       }
 
@@ -293,7 +294,7 @@ export function useSyncOperations({
       if (maxDay > accommodationDays) {
         setAccommodationDays(maxDay)
       }
-      toast.success(`已從行程表同步 ${itineraryHotels.length} 天住宿`)
+      toast.success(QUOTE_SYNC_LABELS.SYNC_ACCOMMODATION(itineraryHotels.length))
       return newCategories
     })
   }, [quote, itineraries, accommodationDays, setCategories, setAccommodationDays])
@@ -307,13 +308,13 @@ export function useSyncOperations({
     const meals: Array<{ day: number; type: '早餐' | '午餐' | '晚餐'; name: string }> = []
     itinerary.daily_itinerary.forEach((day, index) => {
       const dayNumber = index + 1
-      if (day.meals?.breakfast && !day.meals.breakfast.includes('自理')) {
+      if (day.meals?.breakfast && !day.meals.breakfast.includes(QUOTE_SYNC_LABELS.MEAL_SELF)) {
         meals.push({ day: dayNumber, type: '早餐', name: day.meals.breakfast })
       }
-      if (day.meals?.lunch && !day.meals.lunch.includes('自理')) {
+      if (day.meals?.lunch && !day.meals.lunch.includes(QUOTE_SYNC_LABELS.MEAL_SELF)) {
         meals.push({ day: dayNumber, type: '午餐', name: day.meals.lunch })
       }
-      if (day.meals?.dinner && !day.meals.dinner.includes('自理')) {
+      if (day.meals?.dinner && !day.meals.dinner.includes(QUOTE_SYNC_LABELS.MEAL_SELF)) {
         meals.push({ day: dayNumber, type: '晚餐', name: day.meals.dinner })
       }
     })

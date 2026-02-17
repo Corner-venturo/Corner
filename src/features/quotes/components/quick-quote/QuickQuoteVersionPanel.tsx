@@ -23,6 +23,7 @@ import { confirm } from '@/lib/ui/alert-dialog'
 import { stripHtml } from '@/lib/utils/string-utils'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { QUICK_QUOTE_DETAIL_LABELS, QUICK_QUOTE_VERSION_PANEL_LABELS } from '../../constants/labels';
+import { QUOTE_COMPONENT_LABELS } from '../../constants/labels'
 
 interface QuickQuoteVersionPanelProps {
   versions: QuoteVersion[]

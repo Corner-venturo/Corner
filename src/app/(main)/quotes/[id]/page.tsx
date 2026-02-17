@@ -39,6 +39,7 @@ import {
   generateUniqueId,
 } from '@/features/quotes/utils/priceCalculations'
 import { ID_LABELS } from './constants/labels'
+import { QUOTE_PAGE_LABELS, QUOTE_SYNC_LABELS } from './constants/labels'
 
 export default function QuoteDetailPage() {
 
@@ -97,7 +98,7 @@ export default function QuoteDetailPage() {
       await updateQuote(quote.id, { confirmation_status: status })
     } catch (error) {
       const { toast } = await import('sonner')
-      toast.error('更新狀態失敗，請稍後再試')
+      toast.error(QUOTE_PAGE_LABELS.UPDATE_STATUS_FAILED)
     }
   }, [quote, updateQuote])
 
@@ -168,18 +169,18 @@ export default function QuoteDetailPage() {
   // 開啟同步對話框
   const handleSyncToItinerary = useCallback(() => {
     if (!quote?.itinerary_id) {
-      toast.error('此報價單沒有連結行程表')
+      toast.error(QUOTE_SYNC_LABELS.NO_LINKED_ITINERARY)
       return
     }
 
     const result = syncOps.calculateSyncDiffs()
     if (!result) {
-      toast.error('找不到連結的行程表')
+      toast.error(QUOTE_SYNC_LABELS.ITINERARY_NOT_FOUND)
       return
     }
 
     if (result.diffs.length === 0) {
-      toast.info('沒有需要同步的變更')
+      toast.info(QUOTE_PAGE_LABELS.NO_SYNC_CHANGES)
       return
     }
 
@@ -257,7 +258,7 @@ export default function QuoteDetailPage() {
     // 更新旅遊團的 quote_id
     const { updateTour } = await import('@/data')
     await updateTour(tour.id, { quote_id: quote.id })
-    toast.success(`已關聯旅遊團：${tour.code}`)
+    toast.success(QUOTE_PAGE_LABELS.TOUR_LINKED(tour.code))
   }, [quote, updateQuote])
 
   // 處理匯入餐飲
@@ -271,7 +272,7 @@ export default function QuoteDetailPage() {
       }
       return newCategories
     })
-    toast.success(`已匯入 ${items.length} 筆餐飲`)
+    toast.success(QUOTE_PAGE_LABELS.IMPORTED_MEALS(items.length))
   }, [setCategories])
 
   // 處理匯入景點
@@ -285,13 +286,13 @@ export default function QuoteDetailPage() {
       }
       return newCategories
     })
-    toast.success(`已匯入 ${items.length} 筆景點`)
+    toast.success(QUOTE_PAGE_LABELS.IMPORTED_ATTRACTIONS(items.length))
   }, [setCategories])
 
   // 開啟匯入對話框（需要先有關聯的行程表）
   const handleOpenMealsImportDialog = React.useCallback(() => {
     if (!quote?.itinerary_id) {
-      toast.error('此報價單沒有關聯的行程表')
+      toast.error(QUOTE_PAGE_LABELS.NO_LINKED_ITINERARY)
       return
     }
     setShowImportMealsDialog(true)
@@ -299,7 +300,7 @@ export default function QuoteDetailPage() {
 
   const handleOpenActivitiesImportDialog = React.useCallback(() => {
     if (!quote?.itinerary_id) {
-      toast.error('此報價單沒有關聯的行程表')
+      toast.error(QUOTE_PAGE_LABELS.NO_LINKED_ITINERARY)
       return
     }
     setShowImportActivitiesDialog(true)
@@ -369,13 +370,13 @@ export default function QuoteDetailPage() {
       if (groupTransportCategory) {
         // 移除舊的 Local 報價項目
         groupTransportCategory.items = groupTransportCategory.items.filter(
-          item => !item.name.startsWith('Local 報價')
+          item => !item.name.startsWith(QUOTE_PAGE_LABELS.LOCAL_QUOTE)
         )
 
         // 新增 Local 報價項目（顯示用）
         const newItem: CostItem = {
           id: `local-${Date.now()}`,
-          name: 'Local 報價',
+          name: QUOTE_PAGE_LABELS.LOCAL_QUOTE,
           quantity: 1,
           unit_price: currentLocalPrice,
           total: 0, // 不參與計算，砍次表會單獨處理
@@ -387,7 +388,7 @@ export default function QuoteDetailPage() {
     })
 
     setTierPricings(newTierPricings)
-    toast.success(`Local 報價已套用，產生 ${newTierPricings.length} 個檻次`)
+    toast.success(QUOTE_PAGE_LABELS.LOCAL_APPLIED(newTierPricings.length))
   }, [totalParticipants, participantCounts, categories, sellingPrices, setCategories, setTierPricings])
   const [previewParticipantCounts, setPreviewParticipantCounts] =
     React.useState<ParticipantCounts | null>(null)
@@ -472,7 +473,7 @@ export default function QuoteDetailPage() {
         <NotFoundState
           title={ID_LABELS.NOT_FOUND_4550}
           description={ID_LABELS.DELETE_642}
-          backButtonLabel="返回報價單列表"
+          backButtonLabel={QUOTE_PAGE_LABELS.BACK_TO_LIST}
           backHref="/quotes"
         />
       </div>
@@ -490,7 +491,7 @@ export default function QuoteDetailPage() {
       <EditingWarningBanner
         resourceType="quote"
         resourceId={quote.id}
-        resourceName="此報價單"
+        resourceName={QUOTE_PAGE_LABELS.THIS_QUOTE}
       />
 
       <QuoteHeader

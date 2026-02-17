@@ -24,6 +24,7 @@ import { logger } from '@/lib/utils/logger'
 import type { QuoteConfirmationStatus, QuoteConfirmationLog, ConfirmationResult } from '@/types/quote.types'
 import { DateCell } from '@/components/table-cells'
 import { QUOTE_CONFIRMATION_SECTION_LABELS } from '../constants/labels';
+import { QUOTE_COMPONENT_LABELS } from '../constants/labels'
 
 interface QuoteConfirmationSectionProps {
   quoteId: string

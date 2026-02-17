@@ -3,6 +3,7 @@ import { Quote, QuoteVersion } from '@/stores/types/quote.types'
 import { useQuoteStore } from '@/stores'
 import { ValidationError } from '@/core/errors/app-errors'
 import { generateId } from '@/lib/data/create-data-store'
+import { QUOTE_SERVICE_LABELS } from '../constants/labels'
 
 class QuoteService extends BaseService<Quote> {
   protected resourceName = 'quotes'
