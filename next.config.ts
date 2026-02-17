@@ -32,9 +32,20 @@ const nextConfig: NextConfig = {
   },
 
   eslint: {
-    // 暫時忽略 ESLint 錯誤（主要是 import/order 和 quotes）
     ignoreDuringBuilds: true,
   },
+
+  headers: async () => [
+    {
+      source: '/(.*)',
+      headers: [
+        { key: 'X-Frame-Options', value: 'DENY' },
+        { key: 'X-Content-Type-Options', value: 'nosniff' },
+        { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        { key: 'X-XSS-Protection', value: '1; mode=block' },
+      ],
+    },
+  ],
 
   // TypeScript 錯誤已全部修復，不再需要忽略
   // typescript: {
