@@ -196,7 +196,6 @@ function renderText(doc: jsPDF, el: TextElement): void {
  * 寫入 PDF 內部指令（jsPDF 類型定義中未包含 write 方法）
  */
 function pdfWrite(doc: jsPDF, content: string): void {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ;(doc.internal as unknown as { write: (s: string) => void }).write(content)
 }
 

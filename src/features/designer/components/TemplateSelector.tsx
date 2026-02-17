@@ -305,18 +305,18 @@ export function TemplateSelector({
                     >
                       {/* 模擬封面 header */}
                       <div
-                        className="w-full h-2 mt-1 mx-auto rounded-sm"
+                        className="w-full h-2 mt-1 mx-auto rounded-md"
                         style={{ backgroundColor: styleInfo.colors[1] || '#c9aa7c', width: '80%', marginLeft: '10%' }}
                       />
                       {/* 模擬圖片區域 */}
                       <div
-                        className="mx-1 mt-1 h-6 rounded-sm"
+                        className="mx-1 mt-1 h-6 rounded-md"
                         style={{ backgroundColor: styleInfo.colors[2] || '#8b7d6b', opacity: 0.6 }}
                       />
                       {/* 模擬標題文字 */}
                       <div className="flex flex-col items-center gap-0.5 mt-1 px-1">
-                        <div className="w-full h-1 rounded-sm" style={{ backgroundColor: styleInfo.colors[1] || '#c9aa7c' }} />
-                        <div className="w-3/4 h-0.5 rounded-sm" style={{ backgroundColor: styleInfo.colors[2] || '#6b5b4a', opacity: 0.5 }} />
+                        <div className="w-full h-1 rounded-md" style={{ backgroundColor: styleInfo.colors[1] || '#c9aa7c' }} />
+                        <div className="w-3/4 h-0.5 rounded-md" style={{ backgroundColor: styleInfo.colors[2] || '#6b5b4a', opacity: 0.5 }} />
                       </div>
                     </div>
                   </div>
