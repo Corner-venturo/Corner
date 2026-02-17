@@ -12,6 +12,14 @@ if ! npm run type-check --silent; then
   exit 1
 fi
 
+# 單元測試
+echo ""
+echo "🧪 執行單元測試..."
+if ! npx vitest run --silent; then
+  echo "❌ 單元測試失敗！"
+  exit 1
+fi
+
 # ESLint 檢查
 echo ""
 echo "📋 執行 ESLint 檢查..."

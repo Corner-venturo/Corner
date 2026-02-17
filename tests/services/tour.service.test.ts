@@ -11,6 +11,8 @@ describe('TourService - updateTourStatus', () => {
   beforeEach(() => {
     // Reset mocks before each test to ensure a clean state
     vi.resetAllMocks()
+    // Re-setup the default update mock after reset
+    updateMock.mockResolvedValue({} as Tour)
   })
 
   const mockTour = (status: Tour['status']): Tour => ({
@@ -27,9 +29,6 @@ describe('TourService - updateTourStatus', () => {
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   })
-
-  // Test setup for a successful update
-  updateMock.mockResolvedValue({} as Tour)
 
   describe('Valid Transitions', () => {
     it('should allow transition from "提案" to "進行中"', async () => {

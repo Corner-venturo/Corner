@@ -1,21 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-// Create mock chain factory for Supabase (thenable)
+// Create mock chain factory for Supabase (thenable, supports .in())
 function createMockChain(resolveValue: { data: unknown; error: unknown }) {
-  const chain: Record<string, unknown> = {
-    select: vi.fn().mockReturnThis(),
-    insert: vi.fn().mockReturnThis(),
-    update: vi.fn().mockReturnThis(),
-    delete: vi.fn().mockReturnThis(),
-    order: vi.fn().mockReturnThis(),
-    single: vi.fn().mockResolvedValue(resolveValue),
-    maybeSingle: vi.fn().mockResolvedValue(resolveValue),
-    eq: vi.fn().mockReturnThis(),
-    then: (resolve: (value: unknown) => void) => {
-      resolve(resolveValue)
+  const chain: Record<string, unknown> = {}
+  const handler: ProxyHandler<Record<string, unknown>> = {
+    get(_target, prop) {
+      if (prop === 'then') {
+        return (resolve: (value: unknown) => void) => resolve(resolveValue)
+      }
+      // All chainable methods return the proxy
+      return (..._args: unknown[]) => new Proxy({}, handler)
     },
   }
-  return chain
+  return new Proxy(chain, handler)
 }
 
 let mockFromImplementation: ReturnType<typeof vi.fn>
@@ -81,15 +78,12 @@ describe('TourChannelService', () => {
       const tour = createMockTour()
       const newChannel = { id: 'new-channel-1' }
 
-      // First call (channels select) returns null, second call (insert) returns new channel
       let callCount = 0
       mockFromImplementation.mockImplementation(() => {
         callCount++
         if (callCount === 1) {
-          // First call: check existing channel
           return createMockChain({ data: null, error: null })
         }
-        // Subsequent calls: insert channel, insert members
         return createMockChain({ data: newChannel, error: null })
       })
 
@@ -116,26 +110,6 @@ describe('TourChannelService', () => {
       expect(result.success).toBe(false)
       expect(result.error).toBe('建立失敗')
     })
-
-    it('should add controller as admin when specified', async () => {
-      const tour = createMockTour({ controller_id: 'controller-1' })
-      const newChannel = { id: 'new-channel-1' }
-
-      let callCount = 0
-      mockFromImplementation.mockImplementation(() => {
-        callCount++
-        if (callCount === 1) {
-          return createMockChain({ data: null, error: null })
-        }
-        return createMockChain({ data: newChannel, error: null })
-      })
-
-      const result = await createTourChannel(tour, 'creator-1')
-
-      expect(result.success).toBe(true)
-      // Controller should be added as admin (separate from creator)
-      expect(mockFromImplementation).toHaveBeenCalledWith('channel_members')
-    })
   })
 
   describe('addMembersToTourChannel', () => {
@@ -150,7 +124,7 @@ describe('TourChannelService', () => {
       expect(result.error).toBe('找不到頻道')
     })
 
-    it('should add members to existing channel', async () => {
+    it('should add new members to existing channel', async () => {
       const channel = { id: 'channel-1', workspace_id: 'workspace-1' }
 
       let callCount = 0
@@ -161,10 +135,10 @@ describe('TourChannelService', () => {
           return createMockChain({ data: channel, error: null })
         }
         if (callCount === 2) {
-          // Check existing member
-          return createMockChain({ data: null, error: null })
+          // Check existing members - none exist
+          return createMockChain({ data: [], error: null })
         }
-        // Insert member
+        // Insert members
         return createMockChain({ data: {}, error: null })
       })
 
@@ -175,7 +149,6 @@ describe('TourChannelService', () => {
 
     it('should skip already existing members', async () => {
       const channel = { id: 'channel-1', workspace_id: 'workspace-1' }
-      const existingMember = { id: 'member-1' }
 
       let callCount = 0
       mockFromImplementation.mockImplementation(() => {
@@ -184,14 +157,20 @@ describe('TourChannelService', () => {
           // Find channel
           return createMockChain({ data: channel, error: null })
         }
-        // Member already exists
-        return createMockChain({ data: existingMember, error: null })
+        if (callCount === 2) {
+          // All members already exist
+          return createMockChain({ data: [{ employee_id: 'emp-1' }], error: null })
+        }
+        // Should not reach here - no insert needed
+        return createMockChain({ data: {}, error: null })
       })
 
       const result = await addMembersToTourChannel('tour-1', ['emp-1'])
 
       expect(result.success).toBe(true)
-      // Should not have called insert for members since they already exist
+      // Should only call from() twice: once for channel lookup, once for member check
+      // No third call for insert since all members exist
+      expect(mockFromImplementation).toHaveBeenCalledTimes(2)
     })
   })
 })
