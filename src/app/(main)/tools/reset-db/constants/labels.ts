@@ -23,4 +23,16 @@ export const RESET_DB_LABELS = {
   REBUILD_VERSION_VALUE: 'v6 (46 個表格)',
   CLEARING: '清空中...',
   CLEAR_INDEXEDDB: '清空 IndexedDB',
+
+  // Process messages
+  DB_LOCKED: (dbName: string) => `${dbName} 被其他連線鎖定`,
+  STEP_1: '步驟 1/4: 正在關閉所有資料庫連線...',
+  STEP_2: '步驟 2/4: 等待連線完全關閉...',
+  STEP_3: '步驟 3/4: 正在刪除舊資料庫 (venturo-db)...',
+  STEP_4: '步驟 4/4: 正在刪除當前資料庫 (VenturoOfflineDB)...',
+  SUCCESS: '✅ 所有資料庫已清空！請點擊下方按鈕重新整理頁面。',
+  TIMEOUT: '⏱️ 清空超時！請嘗試以下步驟：\n1. 完全關閉瀏覽器\n2. 重新開啟瀏覽器\n3. 只開這個頁面再試一次',
+  LOCKED_LABEL: '鎖定',
+  LOCKED_MSG: '⚠️ 資料庫被鎖定！請完全關閉瀏覽器（包括所有分頁），然後重新開啟再試。',
+  EXEC_FAILED: '❌ 執行失敗：',
 }

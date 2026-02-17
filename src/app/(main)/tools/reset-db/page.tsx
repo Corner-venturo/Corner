@@ -27,7 +27,7 @@ export default function ResetDBPage() {
 
       deleteRequest.onblocked = () => {
         logger.warn(`⚠️ ${dbName} 被鎖定`)
-        reject(new Error(`${dbName} 被其他連線鎖定`))
+        reject(new Error(RESET_DB_LABELS.DB_LOCKED(dbName)))
       }
     })
   }
@@ -37,7 +37,7 @@ export default function ResetDBPage() {
       setStatus('deleting')
 
       // Step 1: 關閉所有現有連線
-      setMessage('步驟 1/4: 正在關閉所有資料庫連線...')
+      setMessage(RESET_DB_LABELS.STEP_1)
       const dbNames = ['VenturoOfflineDB', 'venturo-db']
 
       for (const dbName of dbNames) {
@@ -61,11 +61,11 @@ export default function ResetDBPage() {
       }
 
       // Step 2: 等待連線完全關閉
-      setMessage('步驟 2/4: 等待連線完全關閉...')
+      setMessage(RESET_DB_LABELS.STEP_2)
       await new Promise(resolve => setTimeout(resolve, 500))
 
       // Step 3: 刪除舊資料庫 (venturo-db)
-      setMessage('步驟 3/4: 正在刪除舊資料庫 (venturo-db)...')
+      setMessage(RESET_DB_LABELS.STEP_3)
       try {
         await Promise.race([
           deleteSingleDB('venturo-db'),
@@ -79,7 +79,7 @@ export default function ResetDBPage() {
       }
 
       // Step 4: 刪除當前資料庫 (VenturoOfflineDB)
-      setMessage('步驟 4/4: 正在刪除當前資料庫 (VenturoOfflineDB)...')
+      setMessage(RESET_DB_LABELS.STEP_4)
 
       await Promise.race([
         deleteSingleDB('VenturoOfflineDB'),
@@ -89,18 +89,18 @@ export default function ResetDBPage() {
       ])
 
       setStatus('success')
-      setMessage('✅ 所有資料庫已清空！請點擊下方按鈕重新整理頁面。')
+      setMessage(RESET_DB_LABELS.SUCCESS)
 
     } catch (error) {
       setStatus('error')
       if (error instanceof Error && error.message === 'timeout') {
-        setMessage('⏱️ 清空超時！請嘗試以下步驟：\n1. 完全關閉瀏覽器\n2. 重新開啟瀏覽器\n3. 只開這個頁面再試一次')
-      } else if (error instanceof Error && error.message.includes('鎖定')) {
-        setMessage('⚠️ 資料庫被鎖定！請完全關閉瀏覽器（包括所有分頁），然後重新開啟再試。')
+        setMessage(RESET_DB_LABELS.TIMEOUT)
+      } else if (error instanceof Error && error.message.includes(RESET_DB_LABELS.LOCKED_LABEL)) {
+        setMessage(RESET_DB_LABELS.LOCKED_MSG)
       } else {
-        setMessage('❌ 執行失敗：' + (error as Error).message)
+        setMessage(RESET_DB_LABELS.EXEC_FAILED + (error as Error).message)
       }
-      logger.error('❌ 執行失敗：', error)
+      logger.error(RESET_DB_LABELS.EXEC_FAILED, error)
     }
   }
 
