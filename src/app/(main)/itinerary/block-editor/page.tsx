@@ -9,7 +9,7 @@
 
 import { BLOCK_EDITOR_LABELS } from '../constants/labels'
 
-import { useState, useEffect, useCallback, Suspense } from 'react'
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { TourPreview } from '@/components/editor/TourPreview'
@@ -48,9 +48,11 @@ function BlockEditorPageContent() {
 
   // 版本控制（簡化版，區塊編輯器暫不支援版本切換）
   const [currentVersionIndex] = useState(-1)
+  const initialLoadDone = useRef(false)
 
   // 載入現有行程或創建新行程
   useEffect(() => {
+    if (initialLoadDone.current) return
     if (itineraryId && itineraries.length > 0) {
       const itinerary = itineraries.find(i => i.id === itineraryId)
       if (itinerary) {
@@ -134,6 +136,7 @@ function BlockEditorPageContent() {
       }
       setBlocks(tourDataToBlocks(defaultData))
     }
+    initialLoadDone.current = true
     setLoading(false)
   }, [itineraryId, itineraries])
 
