@@ -5,8 +5,26 @@ import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 import { getServerAuth } from '@/lib/auth/server-auth'
 
 /**
+ * 檢查員工是否為管理員或超級管理員
+ */
+async function checkIsAdmin(employeeId: string): Promise<boolean> {
+  const adminClient = getSupabaseAdminClient()
+  const { data, error } = await adminClient
+    .from('employees')
+    .select('roles')
+    .eq('id', employeeId)
+    .single()
+
+  if (error || !data) return false
+
+  const roles = data.roles as string[] | null
+  return roles?.some((r) => r === 'admin' || r === 'super_admin') ?? false
+}
+
+/**
  * 管理員重置會員密碼
- * 🔒 安全修復 2026-01-12：需要已登入用戶（未來應限制為管理員）
+ * 🔒 安全修復 2026-01-12：需要已登入用戶
+ * 🔒 安全修復 2026-02-18：恢復管理員權限檢查
  */
 export async function POST(request: NextRequest) {
   try {
@@ -16,11 +34,11 @@ export async function POST(request: NextRequest) {
       return errorResponse('請先登入', 401, ErrorCode.UNAUTHORIZED)
     }
 
-    // [Planned] 管理員權限檢查 - 待 RBAC 模組完成後啟用
-    // const isAdmin = await checkIsAdmin(auth.data.employeeId)
-    // if (!isAdmin) {
-    //   return errorResponse('需要管理員權限', 403, ErrorCode.FORBIDDEN)
-    // }
+    // 🔒 管理員權限檢查
+    const isAdmin = await checkIsAdmin(auth.data.employeeId)
+    if (!isAdmin) {
+      return errorResponse('需要管理員權限', 403, ErrorCode.FORBIDDEN)
+    }
 
     const { email, new_password } = await request.json()
 
