@@ -67,6 +67,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
   const [totalAmount, setTotalAmount] = useState(0)
   // 訂單分配列表
   const [orderAllocations, setOrderAllocations] = useState<OrderAllocationWithNote[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // 可用訂單（未收款或部分收款）
   const availableOrders = useMemo(() => {
@@ -166,6 +167,8 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
 
   // 儲存
   const handleSave = async () => {
+    if (isSubmitting) return
+    setIsSubmitting(true)
     // 過濾有選擇訂單且金額 > 0 的分配
     const validAllocations = orderAllocations.filter(a => a.order_id && a.allocated_amount > 0)
 
@@ -261,6 +264,8 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
     } catch (error) {
       logger.error('批量收款建立失敗:', error)
       void alert(BATCH_RECEIPT_DIALOG_LABELS.建立失敗_請稍後再試, 'error')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -439,7 +444,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
             <Button
               onClick={handleSave}
               className="bg-morandi-gold hover:bg-morandi-gold-hover gap-1"
-              disabled={unallocatedAmount !== 0 || orderAllocations.filter(a => a.order_id).length === 0 || totalAmount === 0}
+              disabled={isSubmitting || unallocatedAmount !== 0 || orderAllocations.filter(a => a.order_id).length === 0 || totalAmount === 0}
             >
               <Check size={16} />
               {BATCH_RECEIPT_FORM_LABELS.LABEL_7330}
