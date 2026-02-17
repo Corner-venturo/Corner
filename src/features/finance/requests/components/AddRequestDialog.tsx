@@ -421,7 +421,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
       } else if (activeTab === 'company') {
         // 公司請款
         if (!formData.expense_type) {
-          logger.error('公司請款必須選擇費用類型')
+          void alert(ADD_REQUEST_DIALOG_LABELS.請選擇費用類型和日期, 'warning')
           return
         }
         await createRequest(formData, requestItems, '', '', undefined, currentUser?.display_name || currentUser?.chinese_name || '')
@@ -433,7 +433,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
         const selectedOrder = orders.find(o => o.id === formData.order_id)
 
         if (!selectedTour) {
-          logger.error('找不到選擇的旅遊團:', formData.tour_id)
+          void alert(ADD_REQUEST_DIALOG_LABELS.請先選擇旅遊團, 'warning')
           return
         }
 
@@ -466,6 +466,8 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
       }
     } catch (error) {
       logger.error('新增請款單失敗:', error)
+      const message = error instanceof Error ? error.message : '新增請款單失敗'
+      void alert(message, 'error')
     }
   }
 
