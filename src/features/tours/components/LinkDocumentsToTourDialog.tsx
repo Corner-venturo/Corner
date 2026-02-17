@@ -41,7 +41,7 @@ import { syncTimelineToQuote } from '@/lib/utils/itinerary-quote-sync'
 import dynamic from 'next/dynamic'
 
 const ItineraryDialog = dynamic(() => import('@/features/proposals/components/ItineraryDialog').then(m => m.ItineraryDialog), { ssr: false })
-import { PackageItineraryDialog } from '@/features/proposals/components/PackageItineraryDialog'
+import { PackageItineraryDialog } from '@/features/proposals/components/package-itinerary'
 import { toast } from 'sonner'
 import type { Proposal } from '@/types/proposal.types'
 import { TOURS_LABELS } from './constants/labels'

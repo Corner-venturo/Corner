@@ -178,65 +178,6 @@ export type SupplierFormData = Omit<Supplier, keyof BaseEntity> & {
 export type CostTemplateFormData = Omit<CostTemplate, keyof BaseEntity>
 
 // ============================================
-// 向後相容型別（標記為 deprecated）
-// ============================================
-
-/**
- * @deprecated 使用 Supplier 替代
- */
-export interface SupplierContact {
-  contact_person: string
-  phone: string
-  email?: string
-  address?: string
-  website?: string
-}
-
-/**
- * @deprecated 改用 supplier_service_areas 表管理付款帳戶
- */
-export interface SupplierPaymentAccount extends BaseEntity {
-  supplier_id: string
-  account_name: string
-  account_holder: string
-  bank_name: string
-  bank_code?: string
-  bank_branch?: string
-  account_number: string
-  swift_code?: string
-  currency?: string
-  account_type?: 'checking' | 'savings'
-  is_default: boolean
-  is_active: boolean
-  note?: string
-}
-
-/**
- * @deprecated 使用 Supplier 內的欄位替代
- */
-export interface SupplierBankInfo {
-  bank_name: string
-  account_number: string
-  account_name: string
-  branch?: string
-}
-
-/**
- * @deprecated 使用 CostTemplate 替代
- */
-export interface PriceListItem extends BaseEntity {
-  supplier_id: string
-  item_name: string
-  category: string
-  unit_price: number
-  unit: string
-  seasonality?: 'peak' | 'regular' | 'off'
-  valid_from?: string
-  valid_to?: string
-  note?: string
-}
-
-// ============================================
 // CRUD 型別
 // ============================================
 

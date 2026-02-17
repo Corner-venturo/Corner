@@ -121,13 +121,7 @@ export interface Widget {
   size?: WidgetSize
 }
 
-/** @deprecated 使用 @/features/dashboard/types */
-export type WidgetType = 'calculator' | 'weather' | 'map' | 'todo' | 'calendar' | 'clock' | 'notes'
 
-/** @deprecated 使用 @/features/dashboard/types */
-export interface WidgetConfig {
-  [key: string]: unknown
-}
 
 export interface WidgetPosition {
   x: number

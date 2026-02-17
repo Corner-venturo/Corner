@@ -57,8 +57,6 @@ export type {
 
   // Widget
   Widget,
-  WidgetType,
-  WidgetConfig,
   WidgetPosition,
   WidgetSize,
 

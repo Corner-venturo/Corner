@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { useProposalPackages } from '@/data'
 import { PackageListPanel } from './PackageListPanel'
-import { PackageItineraryDialog } from './PackageItineraryDialog'
+import { PackageItineraryDialog } from './package-itinerary'
 import type { Proposal, ProposalStatus, ProposalPackage } from '@/types/proposal.types'
 import { PROPOSAL_LABELS } from '../constants'
 

@@ -26,7 +26,7 @@ import {
   deletePackage,
 } from '@/services/proposal.service'
 import { PackageDialog } from './PackageDialog'
-import { PackageItineraryDialog } from './PackageItineraryDialog'
+import { PackageItineraryDialog } from './package-itinerary'
 import { BrochurePreviewDialog } from './BrochurePreviewDialog'
 import { RequirementSyncDialog } from './RequirementSyncDialog'
 import type { Proposal, ProposalPackage, CreatePackageData } from '@/types/proposal.types'
