@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase/client'
 import { useDocumentStore, type BrochureEntityType } from '@/stores/document-store'
 import { logger } from '@/lib/utils/logger'
 import {
-  generatePageFromTemplate,
+  generateFullBrochure,
   styleSeries,
   itineraryToTemplateData,
 } from '@/features/designer/templates/engine'
@@ -146,10 +146,10 @@ export function useDesignerSetup({
           }
         }
 
-        const coverTemplateId = style.templates.cover
-        const coverPage = generatePageFromTemplate(coverTemplateId, data)
+        // 生成完整手冊（封面 + 目錄 + 行程總覽 + 每日行程 + 備忘錄）
+        const pages = generateFullBrochure(style, data)
 
-        setGeneratedPages([coverPage])
+        setGeneratedPages(pages)
         setCurrentPageIndex(0)
         setTemplateData(data as Record<string, unknown>)
 

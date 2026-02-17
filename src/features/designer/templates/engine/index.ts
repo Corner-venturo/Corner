@@ -28,6 +28,7 @@ import {
   cornerTravelV1MemoLeft,
   cornerTravelV1MemoRight,
 } from '../definitions/corner-travel-v1-memo'
+import { logger } from '@/lib/utils/logger'
 import type { PageTemplate, TemplateData, TemplateOption, DailyItinerary, DailyDetailData, MemoSettings, CountryCode, HotelData, VehicleData } from '../definitions/types'
 import type { CanvasPage, CanvasElement } from '@/features/designer/components/types'
 import type { TimelineItineraryData, TimelineDay } from '@/types/timeline-itinerary.types'
@@ -226,6 +227,68 @@ export function generatePageFromTemplate(
     backgroundColor: '#ffffff',
     elements,
   }
+}
+
+/**
+ * 根據風格系列和行程資料，一次生成完整手冊（封面 + 目錄 + 行程總覽 + 每日行程 + 備忘錄）
+ *
+ * 這是給「新建手冊」時使用的，讓使用者一開始就能看到完整的模板效果。
+ */
+export function generateFullBrochure(
+  style: StyleSeries,
+  data: TemplateData
+): CanvasPage[] {
+  const pages: CanvasPage[] = []
+
+  // 1. 封面
+  try {
+    pages.push(generatePageFromTemplate(style.templates.cover, data))
+  } catch (err) {
+    // cover is required, but don't crash
+    logger.error('[generateFullBrochure] cover failed:', err)
+  }
+
+  // 2. 目錄
+  try {
+    pages.push(generatePageFromTemplate(style.templates.toc, data))
+  } catch {
+    // optional
+  }
+
+  // 3. 行程總覽
+  try {
+    pages.push(generatePageFromTemplate(style.templates.itinerary, data))
+  } catch {
+    // optional
+  }
+
+  // 4. 每日行程（根據天數）
+  const totalDays = data.dailyItineraries?.length || data.dailyDetails?.length || 0
+  if (totalDays > 0 && style.templates.daily) {
+    for (let i = 0; i < totalDays; i++) {
+      try {
+        const dayData: TemplateData = {
+          ...data,
+          currentDayIndex: i,
+        }
+        const dailyPage = generatePageFromTemplate(style.templates.daily, dayData)
+        // 標記 dayIndex
+        ;(dailyPage as CanvasPage & { dayIndex?: number }).dayIndex = i
+        pages.push(dailyPage)
+      } catch {
+        // skip failed day
+      }
+    }
+  }
+
+  // 5. 備忘錄
+  try {
+    pages.push(generatePageFromTemplate(style.templates.memo, data))
+  } catch {
+    // optional
+  }
+
+  return pages
 }
 
 // 定義行程表中的 JSON 欄位類型

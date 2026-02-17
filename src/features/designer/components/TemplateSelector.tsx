@@ -17,7 +17,7 @@ import {
 import { Button } from '@/components/ui/button'
 import {
   styleSeries,
-  generatePageFromTemplate,
+  generateFullBrochure,
   itineraryToTemplateData,
   type StyleSeries,
 } from '../templates/engine'
@@ -200,12 +200,11 @@ export function TemplateSelector({
         companyName: 'Corner Travel',
       }
 
-      // 只生成封面頁
-      const coverTemplateId = selectedStyle.templates.cover
-      const coverPage = generatePageFromTemplate(coverTemplateId, data)
+      // 生成完整手冊（封面 + 目錄 + 行程總覽 + 每日行程 + 備忘錄）
+      const pages = generateFullBrochure(selectedStyle, data as TemplateData)
 
       // 傳遞 data 而不是 itineraryData，確保即使沒有載入行程資料也有預設值
-      onComplete([coverPage], data as TemplateData, selectedStyle)
+      onComplete(pages, data as TemplateData, selectedStyle)
     } catch (err) {
       logger.error('Failed to generate cover:', err)
     } finally {
