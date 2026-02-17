@@ -217,6 +217,8 @@ export const COMPANY_LABELS = {
   alert_create_failed: '新增企業客戶失敗',
   alert_delete_success: '企業客戶刪除成功',
   alert_delete_failed: '刪除企業客戶失敗',
+  alert_invalid_email: 'Email 格式不正確',
+  alert_invalid_phone: '電話格式不正確（台灣手機或市話）',
   confirm_delete_title: '刪除企業客戶',
   confirm_delete_btn: '確定刪除',
   confirm_delete_with_contacts: (count: number, names: string, companyName: string) =>

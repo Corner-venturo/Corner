@@ -116,6 +116,27 @@ export function CompanyFormDialog({
       return
     }
 
+    // Email 格式驗證（非必填，但填了要格式對）
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (formData.email && !emailRegex.test(formData.email)) {
+      await alert(L.alert_invalid_email, 'warning')
+      return
+    }
+    if (formData.invoice_email && !emailRegex.test(formData.invoice_email)) {
+      await alert(L.alert_invalid_email, 'warning')
+      return
+    }
+
+    // 電話格式驗證（非必填，但填了要格式對：台灣手機 09 開頭 10 碼，或市話 02-08 開頭）
+    const phoneRegex = /^(09\d{8}|0[2-8]\d{7,8})$/
+    if (formData.phone) {
+      const cleanPhone = formData.phone.replace(/[-\s()]/g, '')
+      if (!phoneRegex.test(cleanPhone)) {
+        await alert(L.alert_invalid_phone, 'warning')
+        return
+      }
+    }
+
     await onSubmit(formData)
     onClose()
   }
