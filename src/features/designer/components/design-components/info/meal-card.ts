@@ -31,7 +31,7 @@ export const mealCard: DesignComponent = {
       x: x + 12, y: y + 8, width: 100, height: 16,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: '🍽 餐食安排',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '600', fontStyle: 'normal', color: COLORS.gold, textAlign: 'left', lineHeight: 1, letterSpacing: 0.5 },
+      style: { fontFamily: 'Noto Sans TC', fontSize: 12, fontWeight: '600', fontStyle: 'normal', color: COLORS.gold, textAlign: 'left', lineHeight: 1, letterSpacing: 0.5 },
     } as TextElement)
 
     // 三餐
@@ -48,7 +48,7 @@ export const mealCard: DesignComponent = {
         x: x + 12 + i * (mealWidth + 12), y: y + 32, width: mealWidth, height: 28,
         zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
         content: `${meal.label}｜${meal.value}`,
-        style: { fontFamily: 'Noto Sans TC', fontSize: 9, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.3 },
+        style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.3 },
       } as TextElement)
     })
 

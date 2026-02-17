@@ -32,7 +32,7 @@ export const dailyCard: DesignComponent = {
       x: x + 65, y: y + 8, width: 60, height: 20,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: `DAY ${data.dayNumber || 1}`,
-      style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: COLORS.gray, textAlign: 'left', lineHeight: 1, letterSpacing: 1 },
+      style: { fontFamily: 'Noto Sans TC', fontSize: 11, fontWeight: '400', fontStyle: 'normal', color: COLORS.gray, textAlign: 'left', lineHeight: 1, letterSpacing: 1 },
     } as TextElement)
 
     // 日期
@@ -41,7 +41,7 @@ export const dailyCard: DesignComponent = {
       x: x + 65, y: y + 22, width: 120, height: 16,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.date as string) || '2025/01/15（三）',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 8, fontWeight: '400', fontStyle: 'normal', color: COLORS.gray, textAlign: 'left', lineHeight: 1, letterSpacing: 0.5 },
+      style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: COLORS.gray, textAlign: 'left', lineHeight: 1, letterSpacing: 0.5 },
     } as TextElement)
 
     // 行程標題
@@ -67,7 +67,7 @@ export const dailyCard: DesignComponent = {
       x, y: y + 90, width, height: 80,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.content as string) || '● 淺草寺・雷門\n● 東京晴空塔展望台\n● 仲見世通商店街\n● 隅田川散步',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.8, letterSpacing: 0.3 },
+      style: { fontFamily: 'Noto Sans TC', fontSize: 11, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.8, letterSpacing: 0.3 },
     } as TextElement)
 
     return elements

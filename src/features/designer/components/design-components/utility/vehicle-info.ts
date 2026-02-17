@@ -30,7 +30,7 @@ export const vehicleInfo: DesignComponent = {
         x: x + 16, y: y + 12, width: 200, height: 18,
         zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
         content: '🚌 交通資訊',
-        style: { fontFamily: 'Noto Sans TC', fontSize: 11, fontWeight: '600', fontStyle: 'normal', color: COLORS.gold, textAlign: 'left', lineHeight: 1, letterSpacing: 0.5 },
+        style: { fontFamily: 'Noto Sans TC', fontSize: 13, fontWeight: '600', fontStyle: 'normal', color: COLORS.gold, textAlign: 'left', lineHeight: 1, letterSpacing: 0.5 },
       } as TextElement,
       // 車輛
       {

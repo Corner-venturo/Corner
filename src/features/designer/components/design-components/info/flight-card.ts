@@ -31,7 +31,7 @@ export const flightCard: DesignComponent = {
       x: x + 16, y: y + 12, width: 150, height: 18,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: '✈ 航班資訊 FLIGHT',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 11, fontWeight: '600', fontStyle: 'normal', color: COLORS.gold, textAlign: 'left', lineHeight: 1, letterSpacing: 0.5 },
+      style: { fontFamily: 'Noto Sans TC', fontSize: 13, fontWeight: '600', fontStyle: 'normal', color: COLORS.gold, textAlign: 'left', lineHeight: 1, letterSpacing: 0.5 },
     } as TextElement)
 
     // 分隔線
@@ -48,7 +48,7 @@ export const flightCard: DesignComponent = {
       x: x + 16, y: y + 46, width: width - 32, height: 18,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.outbound as string) || '去程｜CI100  桃園 TPE 08:30 → 成田 NRT 12:30',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.3 },
+      style: { fontFamily: 'Noto Sans TC', fontSize: 11, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.3 },
     } as TextElement)
 
     // 回程
@@ -57,7 +57,7 @@ export const flightCard: DesignComponent = {
       x: x + 16, y: y + 72, width: width - 32, height: 18,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.returnFlight as string) || '回程｜CI101  成田 NRT 14:00 → 桃園 TPE 17:00',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.3 },
+      style: { fontFamily: 'Noto Sans TC', fontSize: 11, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.3 },
     } as TextElement)
 
     return elements

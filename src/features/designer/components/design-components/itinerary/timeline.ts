@@ -60,7 +60,7 @@ export const timelineComponent: DesignComponent = {
         x, y: py - 2, width: 40, height: 16,
         zIndex: 2, rotation: 0, opacity: 1, locked: false, visible: true,
         content: pt.time,
-        style: { fontFamily: 'Noto Sans TC', fontSize: 9, fontWeight: '600', fontStyle: 'normal', color: COLORS.gold, textAlign: 'right', lineHeight: 1, letterSpacing: 0 },
+        style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '600', fontStyle: 'normal', color: COLORS.gold, textAlign: 'right', lineHeight: 1, letterSpacing: 0 },
       } as TextElement)
 
       // 活動
@@ -69,7 +69,7 @@ export const timelineComponent: DesignComponent = {
         x: x + 68, y: py - 2, width: width - 68, height: 16,
         zIndex: 2, rotation: 0, opacity: 1, locked: false, visible: true,
         content: pt.text,
-        style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1, letterSpacing: 0.3 },
+        style: { fontFamily: 'Noto Sans TC', fontSize: 11, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.2, letterSpacing: 0.3 },
       } as TextElement)
     })
 

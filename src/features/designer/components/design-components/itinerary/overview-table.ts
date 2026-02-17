@@ -24,7 +24,7 @@ export const overviewTable: DesignComponent = {
       x, y, width: 200, height: 24,
       zIndex: 2, rotation: 0, opacity: 1, locked: false, visible: true,
       content: '行程總覽 ITINERARY',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 12, fontWeight: '700', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.2, letterSpacing: 1 },
+      style: { fontFamily: 'Noto Sans TC', fontSize: 16, fontWeight: '700', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.2, letterSpacing: 1.5 },
     } as TextElement)
 
     // 表頭背景
@@ -49,7 +49,7 @@ export const overviewTable: DesignComponent = {
         x: colX + 4, y: y + 34, width: col.w - 8, height: 20,
         zIndex: 3, rotation: 0, opacity: 1, locked: false, visible: true,
         content: col.label,
-        style: { fontFamily: 'Noto Sans TC', fontSize: 9, fontWeight: '600', fontStyle: 'normal', color: '#ffffff', textAlign: 'left', lineHeight: 1, letterSpacing: 0.5 },
+        style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '600', fontStyle: 'normal', color: '#ffffff', textAlign: 'left', lineHeight: 1, letterSpacing: 0.5 },
       } as TextElement)
       colX += col.w
     })
@@ -84,7 +84,7 @@ export const overviewTable: DesignComponent = {
           x: cx + 4, y: rowY + 8, width: col.w - 8, height: 16,
           zIndex: 2, rotation: 0, opacity: 1, locked: false, visible: true,
           content: values[ci],
-          style: { fontFamily: 'Noto Sans TC', fontSize: 9, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.2, letterSpacing: 0.3 },
+          style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.2, letterSpacing: 0.3 },
         } as TextElement)
         cx += col.w
       })

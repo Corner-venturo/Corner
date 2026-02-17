@@ -31,7 +31,7 @@ export const attractionCard: DesignComponent = {
       x, y: y + 130, width, height: 22,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.attractionName as string) || '淺草寺',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 13, fontWeight: '700', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.3, letterSpacing: 0.5 },
+      style: { fontFamily: 'Noto Sans TC', fontSize: 15, fontWeight: '700', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.3, letterSpacing: 0.5 },
     } as TextElement)
 
     // 介紹
@@ -40,7 +40,7 @@ export const attractionCard: DesignComponent = {
       x, y: y + 156, width, height: 36,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.attractionDesc as string) || '東京最古老的寺院，以雷門大燈籠聞名。仲見世通商店街長約250公尺，販售各式傳統小吃與紀念品。',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 9, fontWeight: '400', fontStyle: 'normal', color: COLORS.gray, textAlign: 'left', lineHeight: 1.6, letterSpacing: 0.3 },
+      style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: COLORS.gray, textAlign: 'left', lineHeight: 1.6, letterSpacing: 0.3 },
     } as TextElement)
 
     return elements

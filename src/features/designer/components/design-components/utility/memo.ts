@@ -49,7 +49,7 @@ export const memoComponent: DesignComponent = {
         x: x + 8, y: iy + 4, width: 180, height: 16,
         zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
         content: `${item.icon} ${item.title}`,
-        style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '600', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1, letterSpacing: 0.3 },
+        style: { fontFamily: 'Noto Sans TC', fontSize: 11, fontWeight: '600', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1, letterSpacing: 0.3 },
       } as TextElement)
 
       // 內容
@@ -58,7 +58,7 @@ export const memoComponent: DesignComponent = {
         x: x + 28, y: iy + 22, width: width - 36, height: 14,
         zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
         content: item.content,
-        style: { fontFamily: 'Noto Sans TC', fontSize: 9, fontWeight: '400', fontStyle: 'normal', color: COLORS.gray, textAlign: 'left', lineHeight: 1.2, letterSpacing: 0.3 },
+        style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: COLORS.gray, textAlign: 'left', lineHeight: 1.3, letterSpacing: 0.3 },
       } as TextElement)
     })
 

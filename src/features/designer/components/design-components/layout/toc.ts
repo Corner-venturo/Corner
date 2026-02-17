@@ -22,7 +22,7 @@ export const tocComponent: DesignComponent = {
       x, y, width, height: 30,
       zIndex: 2, rotation: 0, opacity: 1, locked: false, visible: true,
       content: 'CONTENTS',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 16, fontWeight: '800', fontStyle: 'normal', color: COLORS.black, textAlign: 'center', lineHeight: 1, letterSpacing: 4 },
+      style: { fontFamily: 'Noto Sans TC', fontSize: 20, fontWeight: '800', fontStyle: 'normal', color: COLORS.black, textAlign: 'center', lineHeight: 1, letterSpacing: 6 },
     } as TextElement)
 
     // 裝飾線
@@ -53,7 +53,7 @@ export const tocComponent: DesignComponent = {
         x: x + 20, y: iy, width: width - 80, height: 18,
         zIndex: 2, rotation: 0, opacity: 1, locked: false, visible: true,
         content: item.name,
-        style: { fontFamily: 'Noto Sans TC', fontSize: 11, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.2, letterSpacing: 0.5 },
+        style: { fontFamily: 'Noto Sans TC', fontSize: 12, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.2, letterSpacing: 0.5 },
       } as TextElement)
 
       // 頁碼
@@ -62,7 +62,7 @@ export const tocComponent: DesignComponent = {
         x: x + width - 50, y: iy, width: 30, height: 18,
         zIndex: 2, rotation: 0, opacity: 1, locked: false, visible: true,
         content: item.page,
-        style: { fontFamily: 'Noto Sans TC', fontSize: 11, fontWeight: '600', fontStyle: 'normal', color: COLORS.gold, textAlign: 'right', lineHeight: 1.2, letterSpacing: 0 },
+        style: { fontFamily: 'Noto Sans TC', fontSize: 12, fontWeight: '600', fontStyle: 'normal', color: COLORS.gold, textAlign: 'right', lineHeight: 1.2, letterSpacing: 0 },
       } as TextElement)
 
       // 點線

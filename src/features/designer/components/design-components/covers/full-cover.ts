@@ -22,12 +22,12 @@ export const fullCover: DesignComponent = {
       id: `comp-fc-company-${ts}`,
       type: 'text',
       name: '公司名稱',
-      x: 0, y: 80, width: A5_WIDTH, height: 20,
+      x: 0, y: 72, width: A5_WIDTH, height: 24,
       zIndex: 10, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.companyName as string) || 'Corner Travel',
       style: {
-        fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '800', fontStyle: 'normal',
-        textAlign: 'center', lineHeight: 1.2, letterSpacing: 2.4, color: '#181511',
+        fontFamily: 'Noto Sans TC', fontSize: 12, fontWeight: '800', fontStyle: 'normal',
+        textAlign: 'center', lineHeight: 1.2, letterSpacing: 3, color: '#181511',
       },
     } as TextElement)
 
@@ -44,7 +44,7 @@ export const fullCover: DesignComponent = {
     elements.push({
       id: `comp-fc-placeholder-${ts}`,
       type: 'shape', name: '封面圖片區', variant: 'rectangle',
-      x: 32, y: 140, width: A5_WIDTH - 64, height: 350,
+      x: 40, y: 140, width: A5_WIDTH - 80, height: 350,
       zIndex: 3, rotation: 0, opacity: 1, locked: false, visible: true,
       fill: '#f0ebe4', stroke: '#c9aa7c', strokeWidth: 1,
       borderRadius: { topLeft: 100, topRight: 100, bottomLeft: 4, bottomRight: 4 },
@@ -54,12 +54,12 @@ export const fullCover: DesignComponent = {
     elements.push({
       id: `comp-fc-title-${ts}`,
       type: 'text', name: '主標題',
-      x: 32, y: 530, width: A5_WIDTH - 64, height: 40,
+      x: 40, y: 524, width: A5_WIDTH - 80, height: 48,
       zIndex: 12, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.tourName as string) || '東京五日遊',
       style: {
-        fontFamily: 'Noto Sans TC', fontSize: 24, fontWeight: '900', fontStyle: 'normal',
-        textAlign: 'center', lineHeight: 1.3, letterSpacing: 2, color: '#181511',
+        fontFamily: 'Noto Sans TC', fontSize: 30, fontWeight: '900', fontStyle: 'normal',
+        textAlign: 'center', lineHeight: 1.3, letterSpacing: 3, color: '#181511',
       },
     } as TextElement)
 
@@ -67,12 +67,12 @@ export const fullCover: DesignComponent = {
     elements.push({
       id: `comp-fc-subtitle-${ts}`,
       type: 'text', name: '副標題',
-      x: 32, y: 580, width: A5_WIDTH - 64, height: 20,
+      x: 40, y: 580, width: A5_WIDTH - 80, height: 24,
       zIndex: 12, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.subtitle as string) || 'TRAVEL GUIDE',
       style: {
-        fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '400', fontStyle: 'normal',
-        textAlign: 'center', lineHeight: 1.4, letterSpacing: 3, color: '#666666',
+        fontFamily: 'Noto Sans TC', fontSize: 12, fontWeight: '400', fontStyle: 'normal',
+        textAlign: 'center', lineHeight: 1.4, letterSpacing: 4, color: '#666666',
       },
     } as TextElement)
 
@@ -89,12 +89,12 @@ export const fullCover: DesignComponent = {
     elements.push({
       id: `comp-fc-date-${ts}`,
       type: 'text', name: '日期',
-      x: 32, y: 625, width: A5_WIDTH - 64, height: 20,
+      x: 40, y: 625, width: A5_WIDTH - 80, height: 22,
       zIndex: 12, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.dateRange as string) || '2025.01.15 — 2025.01.19',
       style: {
-        fontFamily: 'Noto Sans TC', fontSize: 9, fontWeight: '400', fontStyle: 'normal',
-        textAlign: 'center', lineHeight: 1.4, letterSpacing: 1.5, color: '#666666',
+        fontFamily: 'Noto Sans TC', fontSize: 11, fontWeight: '400', fontStyle: 'normal',
+        textAlign: 'center', lineHeight: 1.4, letterSpacing: 2, color: '#666666',
       },
     } as TextElement)
 
@@ -102,12 +102,12 @@ export const fullCover: DesignComponent = {
     elements.push({
       id: `comp-fc-tour-code-${ts}`,
       type: 'text', name: '團號',
-      x: 32, y: 650, width: A5_WIDTH - 64, height: 16,
+      x: 40, y: 652, width: A5_WIDTH - 80, height: 18,
       zIndex: 12, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.tourCode as string) || 'TYO250115A',
       style: {
-        fontFamily: 'Noto Sans TC', fontSize: 8, fontWeight: '500', fontStyle: 'normal',
-        textAlign: 'center', lineHeight: 1.2, letterSpacing: 2, color: '#999999',
+        fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '500', fontStyle: 'normal',
+        textAlign: 'center', lineHeight: 1.2, letterSpacing: 3, color: '#999999',
       },
     } as TextElement)
 
