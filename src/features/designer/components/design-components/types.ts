@@ -8,10 +8,7 @@ import type { CanvasElement } from '../types'
 /** 元件分類 */
 export type ComponentCategory = 'cover' | 'itinerary' | 'info' | 'layout' | 'utility'
 
-/** 元件風格 */
-export type ComponentStyle = 'japanese' | 'modern'
-
-/** 風格色盤 */
+/** 色盤 */
 export interface StylePalette {
   primary: string
   secondary: string
@@ -23,33 +20,16 @@ export interface StylePalette {
   fontFamily: string
 }
 
-/** 日系風格色盤 */
-export const JAPANESE_PALETTE: StylePalette = {
-  primary: '#181511',
+/** 中性預設色盤（使用者可在屬性面板自行調整） */
+export const DEFAULT_PALETTE: StylePalette = {
+  primary: '#333333',
   secondary: '#666666',
   accent: '#c9aa7c',
-  background: '#faf8f5',
-  lightBg: '#f0ebe4',
-  border: '#e8e4df',
+  background: '#ffffff',
+  lightBg: '#f5f5f5',
+  border: '#e0e0e0',
   muted: '#999999',
   fontFamily: 'Noto Sans TC',
-}
-
-/** 現代簡約風格色盤 */
-export const MODERN_PALETTE: StylePalette = {
-  primary: '#1a1a1a',
-  secondary: '#666666',
-  accent: '#2563eb',
-  background: '#ffffff',
-  lightBg: '#f8fafc',
-  border: '#e2e8f0',
-  muted: '#94a3b8',
-  fontFamily: 'Noto Sans TC',
-}
-
-/** 取得風格色盤 */
-export function getStylePalette(style?: ComponentStyle): StylePalette {
-  return style === 'modern' ? MODERN_PALETTE : JAPANESE_PALETTE
 }
 
 /** 元件生成選項 */
@@ -62,8 +42,6 @@ export interface ComponentGenerateOptions {
   y: number
   /** 行程資料（可選） */
   data?: Record<string, unknown>
-  /** 風格（可選，預設 japanese） */
-  style?: ComponentStyle
 }
 
 /** 設計元件定義 */

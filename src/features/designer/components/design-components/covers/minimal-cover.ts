@@ -1,5 +1,5 @@
 import type { DesignComponent, ComponentGenerateOptions } from '../types'
-import { getStylePalette } from '../types'
+import { DEFAULT_PALETTE } from '../types'
 import type { CanvasElement, TextElement, ShapeElement } from '../../types'
 
 const A5_WIDTH = 559
@@ -15,7 +15,7 @@ export const minimalCover: DesignComponent = {
   generate: (options: ComponentGenerateOptions): CanvasElement[] => {
     const ts = Date.now()
     const data = options.data || {}
-    const p = getStylePalette(options.style)
+    const p = DEFAULT_PALETTE
     const elements: CanvasElement[] = []
 
     // 背景色塊

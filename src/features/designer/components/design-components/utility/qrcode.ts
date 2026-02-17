@@ -1,5 +1,5 @@
 import type { DesignComponent, ComponentGenerateOptions } from '../types'
-import { getStylePalette } from '../types'
+import { DEFAULT_PALETTE } from '../types'
 import type { CanvasElement, TextElement, ShapeElement } from '../../types'
 
 export const qrcodeComponent: DesignComponent = {
@@ -13,7 +13,7 @@ export const qrcodeComponent: DesignComponent = {
   generate: (options: ComponentGenerateOptions): CanvasElement[] => {
     const { x, y } = options
     const ts = Date.now()
-    const p = getStylePalette(options.style)
+    const p = DEFAULT_PALETTE
 
     return [
       // QR 佔位框

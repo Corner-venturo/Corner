@@ -1,5 +1,5 @@
 import type { DesignComponent, ComponentGenerateOptions } from '../types'
-import { getStylePalette } from '../types'
+import { DEFAULT_PALETTE } from '../types'
 import type { CanvasElement, ShapeElement, TextElement } from '../../types'
 
 export const dividerComponent: DesignComponent = {
@@ -13,7 +13,7 @@ export const dividerComponent: DesignComponent = {
   generate: (options: ComponentGenerateOptions): CanvasElement[] => {
     const { x, y, width } = options
     const ts = Date.now()
-    const p = getStylePalette(options.style)
+    const p = DEFAULT_PALETTE
 
     return [
       {

@@ -1,5 +1,5 @@
 import type { DesignComponent, ComponentGenerateOptions } from '../types'
-import { getStylePalette } from '../types'
+import { DEFAULT_PALETTE } from '../types'
 import type { CanvasElement, TextElement, ShapeElement } from '../../types'
 
 export const flightCard: DesignComponent = {
@@ -14,7 +14,7 @@ export const flightCard: DesignComponent = {
     const { x, y, width } = options
     const ts = Date.now()
     const data = options.data || {}
-    const p = getStylePalette(options.style)
+    const p = DEFAULT_PALETTE
     const elements: CanvasElement[] = []
 
     // 背景
