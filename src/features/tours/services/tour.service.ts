@@ -11,13 +11,6 @@ import { supabase } from '@/lib/supabase/client'
 import { invalidateTours } from '@/data'
 import { useTourStore } from '@/stores'
 
-interface TourFinancialSummary {
-  total_revenue: number
-  total_cost: number
-  profit: number
-  profitMargin: number
-}
-
 class TourService extends BaseService<Tour & BaseEntity> {
   protected resourceName = 'tours'
 
@@ -126,32 +119,6 @@ class TourService extends BaseService<Tour & BaseEntity> {
     }
 
     return code
-  }
-
-  /**
-   * @deprecated 此方法使用假邏輯（收入的70%估算成本），不應在生產環境使用。
-   * 真實成本請查詢 payment_request_items，或使用 recalculateExpenseStats。
-   */
-  async calculateFinancialSummary(tour_id: string): Promise<TourFinancialSummary> {
-    logger.warn('[DEPRECATED] calculateFinancialSummary 使用假邏輯，不應在生產環境使用')
-    const tour = await this.getById(tour_id)
-    if (!tour) {
-      throw new Error('Tour not found')
-    }
-
-    // 這裡需要獲取相關訂單資料來計算
-    // 目前先使用模擬邏輯
-    const total_revenue = (tour.price || 0) * (tour.current_participants || 0)
-    const estimatedCost = total_revenue * 0.7 // 假設成本為收入的70%
-    const profit = total_revenue - estimatedCost
-    const profitMargin = total_revenue > 0 ? (profit / total_revenue) * 100 : 0
-
-    return {
-      total_revenue,
-      total_cost: estimatedCost,
-      profit,
-      profitMargin,
-    }
   }
 
   // 檢查團體是否可以取消

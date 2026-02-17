@@ -71,10 +71,6 @@ export const useTours = () => {
       return await tourService.isTourCodeExists(code)
     },
 
-    calculateFinancialSummary: async (tour_id: string) => {
-      return await tourService.calculateFinancialSummary(tour_id)
-    },
-
     updateTourStatus: async (tour_id: string, status: Tour['status']) => {
       return await tourService.updateTourStatus(tour_id, status)
     },
