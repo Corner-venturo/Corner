@@ -75,7 +75,7 @@ const CATEGORY_ICONS: Record<ComponentCategory, React.ComponentType<{ className?
 }
 
 interface ComponentLibraryProps {
-  onInsertComponent: (elements: CanvasElement[]) => void
+  onInsertComponent: (elements: CanvasElement[], componentName?: string) => void
   templateData?: Record<string, unknown> | null
 }
 
@@ -110,7 +110,7 @@ export function ComponentLibrary({ onInsertComponent, templateData }: ComponentL
       y: 100,
       data: templateData || undefined,
     })
-    onInsertComponent(elements)
+    onInsertComponent(elements, component.name)
   }
 
   const renderComponentItem = (comp: DesignComponent) => {

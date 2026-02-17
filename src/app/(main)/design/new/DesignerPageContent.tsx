@@ -228,6 +228,7 @@ export default function DesignerPageContent() {
     pasteClipboard,
     cutSelected,
     moveSelected,
+    selectAll,
     bringForward,
     sendBackward,
     bringToFront,
@@ -627,6 +628,9 @@ export default function DesignerPageContent() {
     zoomIn,
     zoomOut,
     resetZoom,
+    selectAll,
+    groupSelected,
+    ungroupSelected,
     canvasContainerRef,
     scrollContainerRef,
   })
@@ -867,9 +871,9 @@ export default function DesignerPageContent() {
         {/* Left Panel - Component Library or Element Library */}
         {showLeftPanel && leftPanelMode === 'components' && (
           <ComponentLibrary
-            onInsertComponent={(elements) => {
+            onInsertComponent={(elements, componentName) => {
               const handler = createBlockInsertHandler(canvas)
-              handler(elements)
+              handler(elements, componentName)
             }}
             templateData={templateData}
           />

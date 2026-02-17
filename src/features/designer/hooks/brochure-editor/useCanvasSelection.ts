@@ -28,6 +28,7 @@ interface UseCanvasSelectionReturn {
   pasteClipboard: () => Promise<void>
   cutSelected: () => void
   moveSelected: (dx: number, dy: number) => void
+  selectAll: () => void
   updateElementByName: (elementName: string, updates: { text?: string }) => boolean
   removeObjectByName: (elementName: string) => boolean
   getObjectByName: (elementName: string) => fabric.FabricObject | null
@@ -117,6 +118,26 @@ export function useCanvasSelection(options: UseCanvasSelectionOptions): UseCanva
     markDirty()
     saveToHistory()
   }, [getCanvas, markDirty, saveToHistory])
+
+  // ============================================
+  // Select All
+  // ============================================
+  const selectAll = useCallback(() => {
+    const canvas = getCanvas()
+    if (!canvas) return
+
+    const objects = canvas.getObjects().filter(obj => !obj.isType('line') || !((obj as unknown as { isGuideLine?: boolean }).isGuideLine))
+    if (objects.length === 0) return
+
+    canvas.discardActiveObject()
+    if (objects.length === 1) {
+      canvas.setActiveObject(objects[0])
+    } else {
+      const selection = new fabric.ActiveSelection(objects, { canvas })
+      canvas.setActiveObject(selection)
+    }
+    canvas.renderAll()
+  }, [getCanvas])
 
   // ============================================
   // Update Element by Name
@@ -209,6 +230,7 @@ export function useCanvasSelection(options: UseCanvasSelectionOptions): UseCanva
     pasteClipboard,
     cutSelected,
     moveSelected,
+    selectAll,
     updateElementByName,
     removeObjectByName,
     getObjectByName,

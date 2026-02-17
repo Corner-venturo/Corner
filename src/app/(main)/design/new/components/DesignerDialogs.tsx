@@ -10,6 +10,7 @@ import { ImagePickerDialog } from '@/components/ui/image-uploader'
 import { ImageEditor, type ImageEditorSettings } from '@/components/ui/image-editor'
 import { ImageMaskFillDialog } from '@/features/designer/components/ImageMaskFill'
 import { BlockLibrary } from '@/features/designer/components/BlockLibrary'
+import { toast } from 'sonner'
 import type { CanvasElement, TextElement, ShapeElement, ImageElement } from '@/features/designer/components/types'
 import { DESIGNER_LABELS } from '../constants/labels'
 
@@ -157,17 +158,26 @@ export function DesignerDialogs({
   )
 }
 
+// 插入偏移追蹤（避免同位置重疊）
+let insertOffsetCounter = 0
+
 // 區塊插入處理函數
 export function createBlockInsertHandler(canvas: fabric.Canvas | null) {
-  return (elements: CanvasElement[]) => {
+  return (elements: CanvasElement[], componentName?: string) => {
     if (!canvas) return
+
+    // 計算偏移量避免重疊
+    const offset = (insertOffsetCounter % 5) * 20
+    insertOffsetCounter++
+
+    const addedObjects: fabric.FabricObject[] = []
 
     elements.forEach(el => {
       if (el.type === 'text') {
         const textEl = el as TextElement
         const text = new fabric.Textbox(textEl.content || '', {
-          left: textEl.x,
-          top: textEl.y,
+          left: textEl.x + offset,
+          top: textEl.y + offset,
           width: textEl.width,
           fontSize: textEl.style?.fontSize || 12,
           fontFamily: textEl.style?.fontFamily || 'Noto Sans TC',
@@ -176,11 +186,12 @@ export function createBlockInsertHandler(canvas: fabric.Canvas | null) {
           textAlign: textEl.style?.textAlign || 'left',
         })
         canvas.add(text)
+        addedObjects.push(text)
       } else if (el.type === 'shape') {
         const shapeEl = el as ShapeElement
         const rect = new fabric.Rect({
-          left: shapeEl.x,
-          top: shapeEl.y,
+          left: shapeEl.x + offset,
+          top: shapeEl.y + offset,
           width: shapeEl.width,
           height: shapeEl.height,
           fill: shapeEl.fill || '#ccc',
@@ -188,11 +199,12 @@ export function createBlockInsertHandler(canvas: fabric.Canvas | null) {
           strokeWidth: shapeEl.strokeWidth || 0,
         })
         canvas.add(rect)
+        addedObjects.push(rect)
       } else if (el.type === 'image') {
         const imgEl = el as ImageElement
         const placeholder = new fabric.Rect({
-          left: imgEl.x,
-          top: imgEl.y,
+          left: imgEl.x + offset,
+          top: imgEl.y + offset,
           width: imgEl.width,
           height: imgEl.height,
           fill: '#e8e4df',
@@ -203,8 +215,23 @@ export function createBlockInsertHandler(canvas: fabric.Canvas | null) {
         })
         ;(placeholder as fabric.Rect & { isImagePlaceholder: boolean }).isImagePlaceholder = true
         canvas.add(placeholder)
+        addedObjects.push(placeholder)
       }
     })
+
+    // 自動選取插入的元素
+    if (addedObjects.length === 1) {
+      canvas.setActiveObject(addedObjects[0])
+    } else if (addedObjects.length > 1) {
+      const selection = new fabric.ActiveSelection(addedObjects, { canvas })
+      canvas.setActiveObject(selection)
+    }
+
     canvas.renderAll()
+
+    // Toast 反饋
+    if (componentName) {
+      toast.success(`已插入「${componentName}」`)
+    }
   }
 }

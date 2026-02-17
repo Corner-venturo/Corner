@@ -22,6 +22,9 @@ interface UseKeyboardAndPanProps {
   zoomIn: () => void
   zoomOut: () => void
   resetZoom: () => void
+  selectAll?: () => void
+  groupSelected?: () => void
+  ungroupSelected?: () => void
   // Refs
   canvasContainerRef: React.RefObject<HTMLDivElement | null>
   scrollContainerRef: React.RefObject<HTMLDivElement | null>
@@ -42,6 +45,9 @@ export function useKeyboardAndPan({
   zoomIn,
   zoomOut,
   resetZoom,
+  selectAll,
+  groupSelected,
+  ungroupSelected,
   canvasContainerRef,
   scrollContainerRef,
 }: UseKeyboardAndPanProps) {
@@ -105,6 +111,22 @@ export function useKeyboardAndPan({
         return
       }
 
+      if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+        e.preventDefault()
+        selectAll?.()
+        return
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.key === 'g') {
+        e.preventDefault()
+        if (e.shiftKey) {
+          ungroupSelected?.()
+        } else {
+          groupSelected?.()
+        }
+        return
+      }
+
       if (e.key === 'Delete' || e.key === 'Backspace') {
         e.preventDefault()
         deleteSelected()
@@ -155,7 +177,7 @@ export function useKeyboardAndPan({
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [selectedDesignType, handleSave, undo, redo, copySelected, pasteClipboard, cutSelected, deleteSelected, moveSelected, zoomIn, zoomOut, resetZoom])
+  }, [selectedDesignType, handleSave, undo, redo, copySelected, pasteClipboard, cutSelected, deleteSelected, moveSelected, zoomIn, zoomOut, resetZoom, selectAll, groupSelected, ungroupSelected])
 
   // 滾輪縮放（Ctrl/Cmd + 滾輪）
   useEffect(() => {

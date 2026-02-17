@@ -88,6 +88,7 @@ interface UseBrochureEditorV2Return {
   pasteClipboard: () => void
   cutSelected: () => void
   moveSelected: (dx: number, dy: number) => void
+  selectAll: () => void
 
   // 圖層操作
   bringForward: () => void
@@ -327,6 +328,7 @@ export function useBrochureEditorV2(
     pasteClipboard: selection.pasteClipboard,
     cutSelected: selection.cutSelected,
     moveSelected: selection.moveSelected,
+    selectAll: selection.selectAll,
 
     bringForward: layers.bringForward,
     sendBackward: layers.sendBackward,
