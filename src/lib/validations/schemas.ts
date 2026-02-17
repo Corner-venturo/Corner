@@ -23,7 +23,13 @@ export const createTourSchema = z.object({
   name: z.string().min(1, '請填寫團名'),
   departure_date: z.string().min(1, '請選擇出發日期'),
   return_date: z.string().min(1, '請選擇回程日期'),
-})
+}).refine(
+  (data) => {
+    if (!data.departure_date || !data.return_date) return true
+    return new Date(data.departure_date) <= new Date(data.return_date)
+  },
+  { message: '回程日期不可早於出發日期', path: ['return_date'] }
+)
 
 // ==========================================
 // Payment Request (from advance items)
