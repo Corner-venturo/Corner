@@ -50,6 +50,7 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
         setOrders((data || []) as Order[])
       } catch (err) {
         logger.error(COMP_TOURS_LABELS.載入訂單失敗, err)
+        setOrders([])
       } finally {
         setLoading(false)
       }
