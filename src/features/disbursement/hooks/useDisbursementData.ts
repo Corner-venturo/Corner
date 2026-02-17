@@ -16,6 +16,7 @@ import {
 } from '@/data'
 import { PaymentRequest, DisbursementOrder } from '../types'
 import { DISBURSEMENT_LABELS } from '../constants/labels'
+import { recalculateExpenseStats } from '@/features/finance/payments/services/expense-core.service'
 
 // 計算下一個週四
 function getNextThursday(): Date {
@@ -203,6 +204,12 @@ export function useDisbursementData() {
 
     // 將請款單狀態改回 pending
     await updatePaymentRequestApi(requestId, { status: 'pending' })
+
+    // 重算團成本
+    const request = payment_requests.find(r => r.id === requestId)
+    if (request?.tour_id) {
+      await recalculateExpenseStats(request.tour_id)
+    }
   }, [disbursement_orders, payment_requests])
 
   // 確認出帳
@@ -218,13 +225,24 @@ export function useDisbursementData() {
 
     // 更新所有請款單狀態為 paid
     const requestIds = order.payment_request_ids || []
+    const tour_ids_to_recalculate = new Set<string>()
+
     for (const requestId of requestIds) {
       await updatePaymentRequestApi(requestId, {
         status: 'paid',
         paid_at: new Date().toISOString(),
       })
+      const request = payment_requests.find(r => r.id === requestId)
+      if (request?.tour_id) {
+        tour_ids_to_recalculate.add(request.tour_id)
+      }
     }
-  }, [disbursement_orders])
+
+    // 重算相關團的成本
+    for (const tour_id of tour_ids_to_recalculate) {
+      await recalculateExpenseStats(tour_id)
+    }
+  }, [disbursement_orders, payment_requests])
 
   // 建立新出納單
   const createNewDisbursementOrder = useCallback(async (requestIds: string[]) => {
@@ -243,8 +261,18 @@ export function useDisbursementData() {
     })
 
     // 更新請款單狀態為 processing
+    const tour_ids_to_recalculate = new Set<string>()
     for (const id of requestIds) {
       await updatePaymentRequestApi(id, { status: 'processing' })
+      const request = payment_requests.find(r => r.id === id)
+      if (request?.tour_id) {
+        tour_ids_to_recalculate.add(request.tour_id)
+      }
+    }
+
+    // 重算相關團的成本（processing 不計入成本）
+    for (const tour_id of tour_ids_to_recalculate) {
+      await recalculateExpenseStats(tour_id)
     }
   }, [payment_requests, disbursement_orders, nextThursday])
 

@@ -4,6 +4,7 @@ import { useWorkspaceId } from '@/lib/workspace-context'
 import { RequestFormData, BatchRequestFormData, RequestItem } from '../types'
 import { generateCompanyPaymentRequestCode } from '@/stores/utils/code-generator'
 import { EXPENSE_TYPE_CONFIG, CompanyExpenseType } from '@/stores/types/finance.types'
+import { recalculateExpenseStats } from '@/features/finance/payments/services/expense-core.service'
 
 export function useRequestOperations() {
   const { payment_requests, createPaymentRequest, addPaymentItem } = usePayments()
@@ -137,6 +138,11 @@ export function useRequestOperations() {
           })
         }
 
+        // 重算團成本
+        if (formData.tour_id) {
+          await recalculateExpenseStats(formData.tour_id)
+        }
+
         return request
       }
     },
@@ -194,6 +200,9 @@ export function useRequestOperations() {
         }
 
         createdRequests.push(request)
+
+        // 重算團成本
+        await recalculateExpenseStats(tourId)
       }
 
       return createdRequests

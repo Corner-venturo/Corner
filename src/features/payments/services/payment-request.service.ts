@@ -1,7 +1,6 @@
 import { BaseService, StoreOperations } from '@/core/services/base.service'
 import { PaymentRequest, PaymentRequestItem } from '@/stores/types'
 import { ValidationError } from '@/core/errors/app-errors'
-import { generateVoucherFromPaymentRequest } from '@/services/voucher-auto-generator'
 import { logger } from '@/lib/utils/logger'
 import { getRequiredWorkspaceId } from '@/lib/workspace-context'
 import { supabase } from '@/lib/supabase/client'
@@ -10,6 +9,7 @@ import {
   invalidatePaymentRequestItems,
 } from '@/data'
 import { PAYMENTS_LABELS } from '../constants/labels'
+import { recalculateExpenseStats } from '@/features/finance/payments/services/expense-core.service'
 
 class PaymentRequestService extends BaseService<PaymentRequest> {
   protected resourceName = 'payment_requests'
@@ -182,6 +182,11 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       updated_at: now,
     })
 
+    // 重算團成本
+    if (request.tour_id) {
+      await recalculateExpenseStats(request.tour_id)
+    }
+
     return createdItem as unknown as PaymentRequestItem
   }
 
@@ -240,6 +245,11 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       amount: totalAmount,
       updated_at: now,
     })
+
+    // 重算團成本
+    if (request.tour_id) {
+      await recalculateExpenseStats(request.tour_id)
+    }
   }
 
   /**
@@ -270,6 +280,11 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       amount: totalAmount,
       updated_at: now,
     })
+
+    // 重算團成本
+    if (request.tour_id) {
+      await recalculateExpenseStats(request.tour_id)
+    }
   }
 
   // ========== 業務邏輯方法 ==========
@@ -395,16 +410,9 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
   }
 
   /**
-   * ✅ 付款確認（標記為已付款，並自動產生會計傳票）
+   * ✅ 付款確認（標記為已付款）
    */
-  async markAsPaid(
-    requestId: string,
-    options?: {
-      hasAccounting?: boolean
-      isExpired?: boolean
-      workspaceId?: string
-    }
-  ): Promise<void> {
+  async markAsPaid(requestId: string): Promise<void> {
     const request = await this.getById(requestId)
     if (!request) {
       throw new Error(`找不到請款單: ${requestId}`)
@@ -416,39 +424,15 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
 
     const now = this.now()
 
-    // 1. 更新請款單狀態為已付款
     await this.update(requestId, {
       status: 'paid',
       paid_at: now,
       updated_at: now,
     })
 
-    // 2. 如果啟用會計模組，自動產生傳票
-    if (options?.hasAccounting && !options?.isExpired && options?.workspaceId) {
-      try {
-        // 判斷供應商類型（從第一個項目）
-        const items = await this.getItemsByRequestIdAsync(requestId)
-        const firstItem = items[0]
-        const supplierType = firstItem?.category || 'other'
-
-        await generateVoucherFromPaymentRequest({
-          workspace_id: options.workspaceId,
-          payment_request_id: requestId,
-          payment_amount: request.amount || 0,
-          payment_date: now.split('T')[0], // YYYY-MM-DD
-          supplier_type: supplierType as 'transportation' | 'accommodation' | 'meal' | 'ticket' | 'insurance' | 'other',
-          description: `${request.request_number || ''} - 付款`,
-        })
-
-        logger.info(PAYMENTS_LABELS.付款傳票已自動產生, {
-          requestId,
-          requestNumber: request.request_number,
-          amount: request.amount,
-        })
-      } catch (error) {
-        logger.error(PAYMENTS_LABELS.傳票產生失敗_不影響付款確認, error)
-        // 不阻斷付款流程
-      }
+    // 重算團成本
+    if (request.tour_id) {
+      await recalculateExpenseStats(request.tour_id)
     }
   }
 
@@ -471,7 +455,12 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       updated_at: this.now(),
     })
 
-    logger.warn(PAYMENTS_LABELS.付款已取消_請手動作廢相關傳票, { requestId })
+    // 重算團成本
+    if (request.tour_id) {
+      await recalculateExpenseStats(request.tour_id)
+    }
+
+    logger.warn(PAYMENTS_LABELS.付款已取消, { requestId })
   }
 }
 

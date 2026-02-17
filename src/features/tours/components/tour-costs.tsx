@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState } from 'react'
 import { logger } from '@/lib/utils/logger'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,8 +15,7 @@ import {
   invalidatePaymentRequests,
 } from '@/data'
 import type { PaymentRequestItem } from '@/stores/types'
-import { supabase } from '@/lib/supabase/client'
-import { mutate } from 'swr'
+import { recalculateExpenseStats } from '@/features/finance/payments/services/expense-core.service'
 
 // 擴展 PaymentRequest 型別以包含 items
 interface PaymentRequestWithItems {
@@ -54,81 +53,6 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
   const { items: paymentRequests } = usePaymentRequests()
   const { items: suppliers } = useSuppliersSlim()
   const { toast } = useToast()
-
-  // 更新 tour 的成本財務欄位
-  const updateTourCostFinancials = useCallback(async () => {
-    try {
-      // 🔧 優化：一請款就計入成本（pending/confirmed/paid 都算），除非被取消
-      // 注意：必須過濾已刪除的請款單
-      const { data: requestsData } = await supabase
-        .from('payment_requests')
-        .select('id, status')
-        .eq('tour_id', tour.id)
-        .is('deleted_at', null) // 過濾已刪除的請款單
-        .in('status', ['pending', 'approved', 'confirmed', 'paid']) // pending 也計入（取消/rejected 不計）
-
-      if (!requestsData || requestsData.length === 0) {
-        // 如果沒有已確認的請款單，設成本為 0
-        const { data: currentTour } = await supabase
-          .from('tours')
-          .select('total_revenue')
-          .eq('id', tour.id)
-          .single()
-
-        await supabase
-          .from('tours')
-          .update({
-            total_cost: 0,
-            profit: currentTour?.total_revenue || 0,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', tour.id)
-
-        // 刷新 SWR 快取
-        await mutate(`tour-${tour.id}`)
-        await mutate('tours')
-        return
-      }
-
-      const requestIds = requestsData.map(r => r.id)
-
-      // 取得已確認請款單的所有項目
-      const { data: itemsData } = await supabase
-        .from('payment_request_items')
-        .select('subtotal')
-        .in('request_id', requestIds)
-
-      const totalCost = (itemsData || []).reduce((sum, item) => sum + (item.subtotal || 0), 0)
-
-      // 取得當前收入
-      const { data: currentTour } = await supabase
-        .from('tours')
-        .select('total_revenue')
-        .eq('id', tour.id)
-        .single()
-
-      const totalRevenue = currentTour?.total_revenue || 0
-      const profit = totalRevenue - totalCost
-
-      // 更新 tour
-      await supabase
-        .from('tours')
-        .update({
-          total_cost: totalCost,
-          profit: profit,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', tour.id)
-
-      // 刷新 SWR 快取讓 UI 更新
-      await mutate(`tour-${tour.id}`)
-      await mutate('tours')
-
-      logger.log('Tour 成本數據已更新:', { total_cost: totalCost, profit })
-    } catch (error) {
-      logger.error(COMP_TOURS_LABELS.更新成本數據失敗, error)
-    }
-  }, [tour.id])
 
   const addPayment = async (data: {
     tour_id: string
@@ -191,7 +115,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
       await invalidatePaymentRequests()
 
       // 同步更新 tour 的成本數據
-      await updateTourCostFinancials()
+      await recalculateExpenseStats(tour.id)
 
       toast({
         title: COMP_TOURS_LABELS.成功,

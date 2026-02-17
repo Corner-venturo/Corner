@@ -18,6 +18,7 @@ import { PaymentRequest, PaymentRequestItem } from '@/stores/types'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { statusLabels, statusColors, categoryOptions } from '../types'
 import { paymentRequestService } from '@/features/payments/services/payment-request.service'
+import { recalculateExpenseStats } from '@/features/finance/payments/services/expense-core.service'
 import { logger } from '@/lib/utils/logger'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'
@@ -152,6 +153,12 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
 
     try {
       await deletePaymentRequestApi(currentRequest.id)
+
+      // 重算團成本
+      if (currentRequest.tour_id) {
+        await recalculateExpenseStats(currentRequest.tour_id)
+      }
+
       await alert(REQUEST_DETAIL_DIALOG_LABELS.請款單已刪除, 'success')
 
       // 如果是批次且還有其他請款單，切換到下一個
@@ -189,6 +196,12 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
       })
 
       await refreshRequestItems()
+
+      // 重算團成本
+      if (currentRequest.tour_id) {
+        await recalculateExpenseStats(currentRequest.tour_id)
+      }
+
       setIsAddingItem(false)
       setNewItem({
         category: '其他',
@@ -229,6 +242,11 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
       })
       await refreshRequestItems()
       setEditingItemId(null)
+
+      // 重算團成本
+      if (currentRequest.tour_id) {
+        await recalculateExpenseStats(currentRequest.tour_id)
+      }
     } catch (error) {
       logger.error('更新項目失敗:', error)
       await alert(REQUEST_DETAIL_DIALOG_LABELS.更新項目失敗, 'error')
@@ -246,6 +264,11 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
     try {
       await paymentRequestService.deleteItem(currentRequest.id, itemId)
       await refreshRequestItems()
+
+      // 重算團成本
+      if (currentRequest.tour_id) {
+        await recalculateExpenseStats(currentRequest.tour_id)
+      }
     } catch (error) {
       logger.error('刪除項目失敗:', error)
       await alert(REQUEST_DETAIL_DIALOG_LABELS.刪除項目失敗, 'error')

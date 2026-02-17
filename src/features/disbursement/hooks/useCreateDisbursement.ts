@@ -19,6 +19,7 @@ import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { createDisbursementSchema } from '@/lib/validations/schemas'
 import { DISBURSEMENT_LABELS } from '../constants/labels'
+import { recalculateExpenseStats } from '@/features/finance/payments/services/expense-core.service'
 
 // 計算下一個週四
 function getNextThursday(): Date {
@@ -177,8 +178,18 @@ export function useCreateDisbursement({ pendingRequests, onSuccess }: UseCreateD
       }
 
       // 更新請款單狀態為 approved（已確認，已加入出納單）
+      const tour_ids_to_recalculate = new Set<string>()
       for (const id of selectedRequestIds) {
         await updatePaymentRequestApi(id, { status: 'approved' })
+        const req = pendingRequests.find(r => r.id === id)
+        if (req?.tour_id) {
+          tour_ids_to_recalculate.add(req.tour_id)
+        }
+      }
+
+      // 重算相關團的成本
+      for (const tour_id of tour_ids_to_recalculate) {
+        await recalculateExpenseStats(tour_id)
       }
 
       // 重新載入出納單列表（SWR 快取失效）

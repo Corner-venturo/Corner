@@ -30,6 +30,7 @@ import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { DISBURSEMENT_STATUS } from '../constants'
 import { DISBURSEMENT_LABELS } from '../constants/labels'
+import { recalculateExpenseStats } from '@/features/finance/payments/services/expense-core.service'
 
 interface DisbursementDetailDialogProps {
   order: DisbursementOrder | null
@@ -96,8 +97,18 @@ export function DisbursementDetailDialog({
       })
 
       // 更新追加的請款單狀態為 approved
+      const tour_ids_to_recalculate = new Set<string>()
       for (const id of selectedToAdd) {
         await updatePaymentRequestApi(id, { status: 'approved' })
+        const req = payment_requests.find(r => r.id === id)
+        if (req?.tour_id) {
+          tour_ids_to_recalculate.add(req.tour_id)
+        }
+      }
+
+      // 重算相關團的成本
+      for (const tour_id of tour_ids_to_recalculate) {
+        await recalculateExpenseStats(tour_id)
       }
 
       // SWR 快取失效，自動重新載入
@@ -145,6 +156,11 @@ export function DisbursementDetailDialog({
       // 將請款單狀態改回 pending
       await updatePaymentRequestApi(requestId, { status: 'pending' })
 
+      // 重算團成本
+      if (request.tour_id) {
+        await recalculateExpenseStats(request.tour_id)
+      }
+
       // SWR 快取失效，自動重新載入
       await invalidateDisbursementOrders()
 
@@ -172,11 +188,21 @@ export function DisbursementDetailDialog({
 
       // 更新所有請款單狀態為 paid
       const requestIds = order.payment_request_ids || []
+      const tour_ids_to_recalculate = new Set<string>()
       for (const requestId of requestIds) {
         await updatePaymentRequestApi(requestId, {
           status: 'paid',
           paid_at: new Date().toISOString(),
         })
+        const req = payment_requests.find(r => r.id === requestId)
+        if (req?.tour_id) {
+          tour_ids_to_recalculate.add(req.tour_id)
+        }
+      }
+
+      // 重算相關團的成本
+      for (const tour_id of tour_ids_to_recalculate) {
+        await recalculateExpenseStats(tour_id)
       }
 
       await alert(DISBURSEMENT_LABELS.出納單已標記為已出帳, 'success')
