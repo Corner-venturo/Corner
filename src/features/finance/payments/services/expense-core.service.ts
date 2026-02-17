@@ -46,7 +46,7 @@ export async function recalculateExpenseStats(tour_id: string): Promise<void> {
     const profit = total_revenue - total_cost
 
     // 4. 更新 tours: total_cost, profit
-    await supabase
+    const { error: updateError } = await supabase
       .from('tours')
       .update({
         total_cost,
@@ -54,6 +54,11 @@ export async function recalculateExpenseStats(tour_id: string): Promise<void> {
         updated_at: new Date().toISOString(),
       })
       .eq('id', tour_id)
+
+    if (updateError) {
+      logger.error('更新團成本失敗:', updateError)
+      throw updateError
+    }
 
     // 5. 刷新 SWR 快取
     await mutate(`tour-${tour_id}`)
