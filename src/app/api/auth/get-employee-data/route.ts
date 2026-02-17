@@ -11,7 +11,7 @@ import { getEmployeeDataSchema } from '@/lib/validations/api-schemas'
  * 用於登入成功後取得員工詳細資料
  * 不驗證密碼（密碼已由 Supabase Auth 驗證）
  */
-export const POST = withAuth(async (request: NextRequest) => {
+export async function POST(request: NextRequest) {
   const validation = await validateBody(request, getEmployeeDataSchema)
   if (!validation.success) return validation.error
   const { username, code } = validation.data
@@ -64,4 +64,4 @@ export const POST = withAuth(async (request: NextRequest) => {
     workspaceId: workspace.id,
     workspaceCode: workspace.code,
   })
-})
+}

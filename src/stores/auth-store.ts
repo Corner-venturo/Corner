@@ -228,7 +228,7 @@ export const useAuthStore = create<AuthState>()(
             return { success: false, message: result.message || '找不到員工資料' }
           }
 
-          const employeeData = result.employee as EmployeeRow
+          const employeeData = (result.data?.employee ?? result.employee) as EmployeeRow
 
           // 3. 確保 Auth 同步（處理 RLS 所需的 supabase_user_id）
           await ensureAuthSync({
