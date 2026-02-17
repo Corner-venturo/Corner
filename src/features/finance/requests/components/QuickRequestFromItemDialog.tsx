@@ -18,20 +18,20 @@ import { PaymentItemCategory } from '@/stores/types'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import { cn } from '@/lib/utils'
-import { ADD_REQUEST_DIALOG_LABELS, QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS } from '../../constants/labels';
+import { ADD_REQUEST_DIALOG_LABELS, QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS, REQUEST_TYPE_LABELS } from '../../constants/labels';
 
 // 類別對應的圖標和顏色
 const CATEGORY_CONFIG: Record<string, { icon: string; color: string }> = {
-  '住宿': { icon: '🏨', color: 'text-blue-600' },
+  [REQUEST_TYPE_LABELS.CAT_ACCOMMODATION]: { icon: '🏨', color: 'text-blue-600' },
   'accommodation': { icon: '🏨', color: 'text-blue-600' },
-  '交通': { icon: '🚌', color: 'text-green-600' },
+  [REQUEST_TYPE_LABELS.CAT_TRANSPORTATION]: { icon: '🚌', color: 'text-green-600' },
   'transportation': { icon: '🚌', color: 'text-green-600' },
-  '門票': { icon: '🎫', color: 'text-purple-600' },
+  [REQUEST_TYPE_LABELS.CAT_TICKET]: { icon: '🎫', color: 'text-purple-600' },
   'ticket': { icon: '🎫', color: 'text-purple-600' },
   'activity': { icon: '🎫', color: 'text-purple-600' },
-  '餐食': { icon: '🍽️', color: 'text-orange-600' },
+  [REQUEST_TYPE_LABELS.CAT_MEAL]: { icon: '🍽️', color: 'text-orange-600' },
   'meal': { icon: '🍽️', color: 'text-orange-600' },
-  '其他': { icon: '📦', color: 'text-morandi-secondary' },
+  [REQUEST_TYPE_LABELS.CAT_OTHER]: { icon: '📦', color: 'text-morandi-secondary' },
 }
 
 function getCategoryConfig(category: string) {

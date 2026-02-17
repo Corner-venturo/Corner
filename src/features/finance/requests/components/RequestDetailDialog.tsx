@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Combobox } from '@/components/ui/combobox'
 import { Trash2, Plus, Pencil, X, Save, Layers } from 'lucide-react'
 import { useToursSlim, useSuppliersSlim, usePaymentRequestItems, deletePaymentRequest as deletePaymentRequestApi } from '@/data'
-import { PaymentRequest, PaymentRequestItem } from '@/stores/types'
+import { PaymentRequest, PaymentRequestItem, PaymentItemCategory } from '@/stores/types'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { statusLabels, statusColors, categoryOptions } from '../types'
 import { paymentRequestService } from '@/features/payments/services/payment-request.service'
@@ -23,7 +23,7 @@ import { logger } from '@/lib/utils/logger'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
-import { ADD_REQUEST_DIALOG_LABELS, REQUEST_DETAIL_DIALOG_LABELS, REQUEST_DETAIL_FORM_LABELS } from '../../constants/labels';
+import { ADD_REQUEST_DIALOG_LABELS, REQUEST_DETAIL_DIALOG_LABELS, REQUEST_DETAIL_FORM_LABELS, REQUEST_LABELS, REQUEST_TYPE_LABELS } from '../../constants/labels';
 
 interface RequestDetailDialogProps {
   request: PaymentRequest | null
@@ -101,7 +101,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
       setEditingItemId(null)
       setIsAddingItem(false)
       setNewItem({
-        category: '其他',
+        category: REQUEST_TYPE_LABELS.CAT_OTHER as PaymentItemCategory,
         supplier_id: '',
         supplier_name: '',
         description: '',
@@ -142,7 +142,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
   const handleDelete = async () => {
     if (is_submitting) return
     const deleteMessage = isBatch
-      ? `確定要刪除此請款單（${currentRequest.code}）嗎？此操作無法復原。\n\n注意：只會刪除當前選中的請款單，同批次的其他請款單不受影響。`
+      ? REQUEST_LABELS.確定要刪除此請款單(currentRequest.code)
       : REQUEST_DETAIL_DIALOG_LABELS.確定要刪除此請款單嗎_此操作無法復原
 
     const confirmed = await confirm(deleteMessage, {
@@ -210,7 +210,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
 
       setIsAddingItem(false)
       setNewItem({
-        category: '其他',
+        category: REQUEST_TYPE_LABELS.CAT_OTHER as PaymentItemCategory,
         supplier_id: '',
         supplier_name: '',
         description: '',
@@ -318,7 +318,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
               </DialogTitle>
               <p className="text-sm text-morandi-muted mt-1">
                 {currentRequest.tour_code ? `團號：${currentRequest.tour_code}` : REQUEST_DETAIL_DIALOG_LABELS.無關聯團號}
-                {currentRequest.order_number && ` | 訂單：${currentRequest.order_number}`}
+                {currentRequest.order_number && REQUEST_LABELS.訂單(currentRequest.order_number)}
               </p>
             </div>
             <Badge className={statusColors[(currentRequest.status || 'pending') as 'pending' | 'approved' | 'paid']}>

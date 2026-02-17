@@ -31,7 +31,7 @@ import { alert } from '@/lib/ui/alert-dialog'
 import { formatDate } from '@/lib/utils/format-date'
 import { useWorkspaceId } from '@/lib/workspace-context'
 import type { UserRole } from '@/lib/rbac-config'
-import { ADD_RECEIPT_DIALOG_LABELS, ADD_REQUEST_DIALOG_LABELS, BATCH_RECEIPT_DIALOG_LABELS, PAYMENT_ITEM_ROW_LABELS, ADD_REQUEST_FORM_LABELS } from '../../constants/labels';
+import { ADD_RECEIPT_DIALOG_LABELS, ADD_REQUEST_DIALOG_LABELS, BATCH_RECEIPT_DIALOG_LABELS, PAYMENT_ITEM_ROW_LABELS, ADD_REQUEST_FORM_LABELS, REQUEST_TYPE_LABELS, REQUEST_LABELS, ADD_REQUEST_EXTRA_LABELS } from '../../constants/labels';
 
 /**
  * 可以建立公司請款的角色
@@ -50,16 +50,16 @@ interface AddRequestDialogProps {
 
 // 類別對應的圖標和顏色
 const CATEGORY_CONFIG: Record<string, { icon: string; color: string }> = {
-  '住宿': { icon: '🏨', color: 'text-blue-600' },
+  [REQUEST_TYPE_LABELS.CAT_ACCOMMODATION]: { icon: '🏨', color: 'text-blue-600' },
   'accommodation': { icon: '🏨', color: 'text-blue-600' },
-  '交通': { icon: '🚌', color: 'text-green-600' },
+  [REQUEST_TYPE_LABELS.CAT_TRANSPORTATION]: { icon: '🚌', color: 'text-green-600' },
   'transportation': { icon: '🚌', color: 'text-green-600' },
-  '門票': { icon: '🎫', color: 'text-purple-600' },
+  [REQUEST_TYPE_LABELS.CAT_TICKET]: { icon: '🎫', color: 'text-purple-600' },
   'ticket': { icon: '🎫', color: 'text-purple-600' },
   'activity': { icon: '🎫', color: 'text-purple-600' },
-  '餐食': { icon: '🍽️', color: 'text-orange-600' },
+  [REQUEST_TYPE_LABELS.CAT_MEAL]: { icon: '🍽️', color: 'text-orange-600' },
   'meal': { icon: '🍽️', color: 'text-orange-600' },
-  '其他': { icon: '📦', color: 'text-morandi-secondary' },
+  [REQUEST_TYPE_LABELS.CAT_OTHER]: { icon: '📦', color: 'text-morandi-secondary' },
 }
 
 function getCategoryConfig(category: string) {
@@ -134,7 +134,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
 
   // === 批量請款狀態 ===
   const [batchDate, setBatchDate] = useState(getNextThursdayDate())
-  const [batchCategory, setBatchCategory] = useState<PaymentItemCategory>('其他')
+  const [batchCategory, setBatchCategory] = useState<PaymentItemCategory>(REQUEST_TYPE_LABELS.CAT_OTHER as PaymentItemCategory)
   const [batchSupplierId, setBatchSupplierId] = useState('')
   const [batchDescription, setBatchDescription] = useState('')
   const [batchTotalAmount, setBatchTotalAmount] = useState(0)
@@ -264,7 +264,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
 
     // 重置批量請款（預設兩個空白行）
     setBatchDate(getNextThursdayDate())
-    setBatchCategory('其他')
+    setBatchCategory(REQUEST_TYPE_LABELS.CAT_OTHER as PaymentItemCategory)
     setBatchSupplierId('')
     setBatchDescription('')
     setBatchTotalAmount(0)
@@ -333,7 +333,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
     setImportFromRequests(false)
     setSelectedRequestItems({})
     setBatchDate(getNextThursdayDate())
-    setBatchCategory('其他')
+    setBatchCategory(REQUEST_TYPE_LABELS.CAT_OTHER as PaymentItemCategory)
     setBatchSupplierId('')
     setBatchDescription('')
     setBatchTotalAmount(0)
@@ -416,9 +416,9 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
         }
 
         if (errorCount > 0) {
-          await alert(`建立完成：成功 ${successCount} 筆，失敗 ${errorCount} 筆。請檢查失敗的請款單品項。`, 'warning')
+          await alert(REQUEST_LABELS.建立完成(successCount, errorCount), 'warning')
         } else {
-          await alert(`成功建立 ${successCount} 筆請款單（批次 ID: ${batchId.slice(0, 8)}...）`, 'success')
+          await alert(REQUEST_LABELS.成功建立(successCount, batchId), 'success')
         }
         handleCancel()
         onSuccess?.()
@@ -470,7 +470,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
       }
     } catch (error) {
       logger.error('新增請款單失敗:', error)
-      const message = error instanceof Error ? error.message : '新增請款單失敗'
+      const message = error instanceof Error ? error.message : ADD_REQUEST_EXTRA_LABELS.CREATE_FAILED
       void alert(message, 'error')
     } finally {
       setIsSubmitting(false)
@@ -534,7 +534,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                   options={orderOptions}
                   value={formData.order_id}
                   onChange={value => setFormData(prev => ({ ...prev, order_id: value }))}
-                  placeholder={!formData.tour_id ? '請先選擇旅遊團' : BATCH_RECEIPT_DIALOG_LABELS.搜尋訂單}
+                  placeholder={!formData.tour_id ? ADD_REQUEST_DIALOG_LABELS.請先選擇旅遊團 : BATCH_RECEIPT_DIALOG_LABELS.搜尋訂單}
                   disabled={!formData.tour_id}
                   className="mt-1"
                 />
@@ -606,7 +606,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                               </div>
                               {(item.estimatedCost > 0 || item.finalCost) && (
                                 <div className="text-xs text-morandi-secondary mt-1">
-                                  {item.finalCost ? `確認成本：NT$ ${item.finalCost.toLocaleString()}` : `預估成本：NT$ ${item.estimatedCost.toLocaleString()}`}
+                                  {item.finalCost ? ADD_REQUEST_EXTRA_LABELS.CONFIRMED_COST(item.finalCost.toLocaleString()) : ADD_REQUEST_EXTRA_LABELS.ESTIMATED_COST(item.estimatedCost.toLocaleString())}
                                 </div>
                               )}
                             </div>
@@ -768,7 +768,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                     <span>{unallocatedAmount > 0 ? ADD_REQUEST_FORM_LABELS.還有金額未分配 : BATCH_RECEIPT_DIALOG_LABELS.分配金額超過總金額}</span>
                   </div>
                   <div className="font-medium">
-                    未分配：<CurrencyCell amount={Math.abs(unallocatedAmount)} className="inline" />
+                    {ADD_REQUEST_FORM_LABELS.未分配}：<CurrencyCell amount={Math.abs(unallocatedAmount)} className="inline" />
                   </div>
                 </div>
               )}
@@ -816,7 +816,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
             <span className="text-morandi-secondary">
               {activeTab === 'batch'
                 ? ADD_REQUEST_FORM_LABELS.共N筆總金額(tourAllocations.filter(a => a.tour_id).length)
-                : `共 ${activeTab === 'tour' && importFromRequests ? selectedRequestCount : requestItems.length} 項，總金額`
+                : REQUEST_LABELS.共N項總金額(activeTab === 'tour' && importFromRequests ? selectedRequestCount : requestItems.length)
               }
             </span>
             <span className="inline-block min-w-[120px] text-right font-semibold text-morandi-gold">
@@ -846,7 +846,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md gap-2"
             >
               <Plus size={16} />
-              {isSubmitting ? ADD_REQUEST_FORM_LABELS.處理中 : activeTab === 'batch' ? '建立批次請款' : ADD_REQUEST_DIALOG_LABELS.新增請款單}
+              {isSubmitting ? ADD_REQUEST_FORM_LABELS.處理中 : activeTab === 'batch' ? ADD_REQUEST_EXTRA_LABELS.BATCH_CREATE_LABEL : ADD_REQUEST_DIALOG_LABELS.新增請款單}
             </Button>
           </div>
         </div>

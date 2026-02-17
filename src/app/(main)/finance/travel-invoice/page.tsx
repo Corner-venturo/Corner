@@ -22,13 +22,13 @@ import { ContentPageLayout } from '@/components/layout/content-page-layout'
 
 // 狀態標籤定義
 const statusTabs = [
-  { value: 'all', label: '全部' },
-  { value: 'pending', label: '待處理' },
-  { value: 'scheduled', label: '預約中' },
-  { value: 'issued', label: '已開立' },
-  { value: 'voided', label: '已作廢' },
-  { value: 'allowance', label: '已折讓' },
-  { value: 'failed', label: '失敗' },
+  { value: 'all', label: TRAVEL_INVOICE_LABELS.STATUS_ALL },
+  { value: 'pending', label: TRAVEL_INVOICE_LABELS.STATUS_PENDING },
+  { value: 'scheduled', label: TRAVEL_INVOICE_LABELS.STATUS_SCHEDULED },
+  { value: 'issued', label: TRAVEL_INVOICE_LABELS.STATUS_ISSUED },
+  { value: 'voided', label: TRAVEL_INVOICE_LABELS.STATUS_VOIDED },
+  { value: 'allowance', label: TRAVEL_INVOICE_LABELS.STATUS_ALLOWANCE },
+  { value: 'failed', label: TRAVEL_INVOICE_LABELS.STATUS_FAILED },
 ]
 
 export default function TravelInvoicePage() {
@@ -55,26 +55,26 @@ export default function TravelInvoicePage() {
   const columns: Column<TravelInvoice>[] = [
     {
       key: 'transactionNo',
-      label: '交易編號',
+      label: TRAVEL_INVOICE_LABELS.COL_TRANSACTION_NO,
       width: '160px',
       render: (value: unknown, row: TravelInvoice) => (
         <div>
           <div className="font-medium text-morandi-primary">{String(value)}</div>
           <div className="text-xs text-morandi-secondary">
-            {row.invoice_number || '尚未取得發票號碼'}
+            {row.invoice_number || TRAVEL_INVOICE_LABELS.NO_INVOICE_NUMBER}
           </div>
         </div>
       ),
     },
     {
       key: 'invoice_date',
-      label: '開立日期',
+      label: TRAVEL_INVOICE_LABELS.COL_INVOICE_DATE,
       width: '120px',
       render: (value: unknown) => <DateCell date={value as string} />,
     },
     {
       key: 'buyerInfo',
-      label: '買受人',
+      label: TRAVEL_INVOICE_LABELS.COL_BUYER,
       width: '150px',
       render: (value: unknown) => (
         <span className="text-morandi-primary">{(value as { buyerName?: string })?.buyerName || '-'}</span>
@@ -82,14 +82,14 @@ export default function TravelInvoicePage() {
     },
     {
       key: 'total_amount',
-      label: '金額',
+      label: TRAVEL_INVOICE_LABELS.COL_AMOUNT,
       width: '120px',
       align: 'right',
       render: (value: unknown) => <CurrencyCell amount={value as number} />,
     },
     {
       key: 'status',
-      label: '狀態',
+      label: TRAVEL_INVOICE_LABELS.COL_STATUS,
       width: '100px',
       render: (value: unknown) => (
         <StatusCell
@@ -112,7 +112,7 @@ export default function TravelInvoicePage() {
       actions={[
         {
           icon: Eye,
-          label: '查看',
+          label: TRAVEL_INVOICE_LABELS.VIEW,
           onClick: () => handleViewDetail(row),
         },
       ]}
@@ -153,11 +153,11 @@ export default function TravelInvoicePage() {
         loading={isLoading}
         columns={columns}
         searchFields={['transactionNo', 'invoice_number']}
-        searchPlaceholder="搜尋交易編號、發票號碼、買受人..."
+        searchPlaceholder={TRAVEL_INVOICE_LABELS.SEARCH_PLACEHOLDER}
         statusTabs={statusTabs}
         statusField="status"
         onAdd={handleAdd}
-        addLabel="開立新發票"
+        addLabel={TRAVEL_INVOICE_LABELS.ADD_INVOICE}
         onRowClick={handleRowClick}
         renderActions={renderActions}
         headerActions={

@@ -8,6 +8,7 @@ import { useState, useCallback, useMemo } from 'react'
 import { useToursSlim, useOrdersSlim } from '@/data'
 import type { PaymentFormData, PaymentItem } from '../types'
 import { RECEIPT_TYPES } from '../types'
+import { PAYMENT_FORM_LABELS } from '../../constants/labels'
 
 export function usePaymentForm() {
   const { items: tours } = useToursSlim()
@@ -92,38 +93,38 @@ export function usePaymentForm() {
     const errors: string[] = []
 
     if (!formData.tour_id) {
-      errors.push('請選擇團體')
+      errors.push(PAYMENT_FORM_LABELS.SELECT_TOUR)
     }
 
     if (!formData.order_id) {
-      errors.push('請選擇訂單')
+      errors.push(PAYMENT_FORM_LABELS.SELECT_ORDER)
     }
 
     if (paymentItems.length === 0) {
-      errors.push('至少需要一個收款項目')
+      errors.push(PAYMENT_FORM_LABELS.AT_LEAST_ONE_ITEM)
     }
 
     if (totalAmount <= 0) {
-      errors.push('總收款金額必須大於 0')
+      errors.push(PAYMENT_FORM_LABELS.TOTAL_MUST_GT_ZERO)
     }
 
     // 驗證每個收款項目
     paymentItems.forEach((item, index) => {
       if (!item.amount || item.amount <= 0) {
-        errors.push(`收款項目 ${index + 1}: 金額必須大於 0`)
+        errors.push(PAYMENT_FORM_LABELS.ITEM_AMOUNT_GT_ZERO(index + 1))
       }
 
       if (!item.transaction_date) {
-        errors.push(`收款項目 ${index + 1}: 請選擇交易日期`)
+        errors.push(PAYMENT_FORM_LABELS.ITEM_SELECT_DATE(index + 1))
       }
 
       // LinkPay 專屬驗證
       if (item.receipt_type === RECEIPT_TYPES.LINK_PAY) {
         if (!item.email) {
-          errors.push(`收款項目 ${index + 1}: LinkPay 需要 Email`)
+          errors.push(PAYMENT_FORM_LABELS.ITEM_LINKPAY_EMAIL(index + 1))
         }
         if (!item.pay_dateline) {
-          errors.push(`收款項目 ${index + 1}: LinkPay 需要付款截止日`)
+          errors.push(PAYMENT_FORM_LABELS.ITEM_LINKPAY_DEADLINE(index + 1))
         }
       }
 

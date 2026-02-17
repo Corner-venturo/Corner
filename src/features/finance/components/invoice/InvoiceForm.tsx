@@ -84,8 +84,8 @@ export function InvoiceForm({
                         setSelectedOrderId('')
                       }}
                       options={tourOptions}
-                      placeholder={toursLoading ? "載入中..." : "搜尋團號..."}
-                      emptyMessage={toursLoading ? "載入中..." : "找不到符合的團"}
+                      placeholder={toursLoading ? INVOICE_LABELS.LOADING : INVOICE_LABELS.SEARCH_TOUR}
+                      emptyMessage={toursLoading ? INVOICE_LABELS.LOADING : INVOICE_LABELS.TOUR_NOT_FOUND}
                       showSearchIcon={true}
                       showClearButton={true}
                       disabled={toursLoading}
@@ -104,8 +104,8 @@ export function InvoiceForm({
                       value={selectedOrderId}
                       onChange={setSelectedOrderId}
                       options={orderOptions}
-                      placeholder={ordersLoading ? "載入中..." : (selectedTourId || fixedTour ? "搜尋訂單..." : "請先選擇團")}
-                      emptyMessage={ordersLoading ? "載入中..." : "找不到符合的訂單"}
+                      placeholder={ordersLoading ? INVOICE_LABELS.LOADING : (selectedTourId || fixedTour ? INVOICE_LABELS.SEARCH_ORDER : INVOICE_LABELS.SELECT_TOUR_FIRST)}
+                      emptyMessage={ordersLoading ? INVOICE_LABELS.LOADING : INVOICE_LABELS.ORDER_NOT_FOUND}
                       showSearchIcon={true}
                       showClearButton={true}
                       disabled={(!selectedTourId && !fixedTour) || ordersLoading}
@@ -131,14 +131,14 @@ export function InvoiceForm({
               />
             </td>
             <td className="w-24 py-2 px-3 border border-border bg-muted/30 text-sm font-medium text-morandi-primary">
-              {isB2B ? '公司名稱 *' : '買受人 *'}
+              {isB2B ? INVOICE_LABELS.COMPANY_NAME_REQUIRED : INVOICE_LABELS.BUYER_REQUIRED}
             </td>
             <td className="py-1 px-2 border border-border">
               <input
                 type="text"
                 value={buyerInfo.buyerName}
                 onChange={e => setBuyerInfo({ ...buyerInfo, buyerName: e.target.value })}
-                placeholder={isB2B ? '公司名稱' : '買受人名稱'}
+                placeholder={isB2B ? INVOICE_LABELS.COMPANY_NAME_PLACEHOLDER : INVOICE_LABELS.BUYER_NAME_PLACEHOLDER}
                 className="input-no-focus w-full h-9 px-2 bg-transparent text-sm"
               />
             </td>

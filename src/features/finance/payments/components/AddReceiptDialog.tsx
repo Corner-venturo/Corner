@@ -27,7 +27,7 @@ import { useReceiptMutations, type LinkPayResult } from '../hooks/useReceiptMuta
 import { PaymentItemRow } from './PaymentItemRow'
 import { Input } from '@/components/ui/input'
 import type { Receipt } from '@/stores'
-import { ADD_RECEIPT_DIALOG_LABELS } from '../../constants/labels';
+import { ADD_RECEIPT_DIALOG_LABELS, ADD_RECEIPT_TOAST_LABELS } from '../../constants/labels';
 
 interface AddReceiptDialogProps {
   open: boolean
@@ -250,7 +250,7 @@ export function AddReceiptDialog({
 
         toast({
           title: ADD_RECEIPT_DIALOG_LABELS.收款單更新成功,
-          description: `已更新收款單 ${editingReceipt.receipt_number}（${result.itemCount} 個項目）`,
+          description: ADD_RECEIPT_TOAST_LABELS.UPDATED(editingReceipt.receipt_number, result.itemCount),
         })
         resetForm()
         onOpenChange(false)
@@ -288,15 +288,15 @@ export function AddReceiptDialog({
         setLinkPayResults(result.linkPayResults)
         toast({
           title: ADD_RECEIPT_DIALOG_LABELS.收款單建立成功,
-          description: `已新增 ${result.itemCount} 項收款，其中 ${result.linkPayResults.length} 項 LinkPay 已產生連結`,
+          description: ADD_RECEIPT_TOAST_LABELS.CREATED_WITH_LINKPAY(result.itemCount, result.linkPayResults.length),
         })
         resetForm()
         onSuccess?.()
         // 不關閉對話框，讓使用者複製連結
       } else {
         toast({
-          title: '收款單建立成功',
-          description: `已新增 ${result.itemCount} 項收款，總金額 NT$ ${result.totalAmount.toLocaleString()}`,
+          title: ADD_RECEIPT_TOAST_LABELS.CREATE_SUCCESS,
+          description: ADD_RECEIPT_TOAST_LABELS.CREATED(result.itemCount, result.totalAmount.toLocaleString()),
         })
         resetForm()
         onOpenChange(false)
@@ -318,7 +318,7 @@ export function AddReceiptDialog({
         } else if (err.details) {
           errorMessage = err.details
         } else if (err.code) {
-          errorMessage = `錯誤代碼: ${err.code}`
+          errorMessage = ADD_RECEIPT_TOAST_LABELS.ERROR_CODE(err.code)
         } else if (Object.keys(error).length > 0) {
           errorMessage = JSON.stringify(error)
         }
@@ -345,7 +345,7 @@ export function AddReceiptDialog({
     if (!editingReceipt || !onDelete) return
 
     const confirmed = await confirm(
-      `確定要刪除收款單 ${editingReceipt.receipt_number} 嗎？此操作無法復原。`,
+      ADD_RECEIPT_TOAST_LABELS.DELETE_CONFIRM(editingReceipt.receipt_number),
       { type: 'warning', title: ADD_RECEIPT_DIALOG_LABELS.刪除收款單 }
     )
 
@@ -356,7 +356,7 @@ export function AddReceiptDialog({
       await onDelete(editingReceipt.id)
       toast({
         title: ADD_RECEIPT_DIALOG_LABELS.刪除成功,
-        description: `收款單 ${editingReceipt.receipt_number} 已刪除`,
+        description: ADD_RECEIPT_TOAST_LABELS.DELETED(editingReceipt.receipt_number),
       })
       resetForm()
       onOpenChange(false)
@@ -388,9 +388,9 @@ export function AddReceiptDialog({
           </DialogTitle>
           <p className="text-sm text-muted-foreground">
             {isConfirmed
-              ? `${editingReceipt?.receipt_number} - 已確認的收款單無法編輯或刪除`
+              ? ADD_RECEIPT_TOAST_LABELS.CONFIRMED_READONLY(editingReceipt?.receipt_number || '')
               : isEditMode
-                ? `編輯 ${editingReceipt?.receipt_number}`
+                ? ADD_RECEIPT_TOAST_LABELS.EDIT_TITLE(editingReceipt?.receipt_number || '')
                 : ADD_RECEIPT_DIALOG_LABELS.收款單號將自動產生}
           </p>
         </DialogHeader>
@@ -637,7 +637,7 @@ export function AddReceiptDialog({
                     : ADD_RECEIPT_DIALOG_LABELS.建立中
                   : isEditMode
                     ? ADD_RECEIPT_DIALOG_LABELS.更新收款單
-                    : `新增收款單 (共 ${paymentItems.length} 項)`}
+                    : ADD_RECEIPT_TOAST_LABELS.ADD_TITLE(paymentItems.length)}
               </Button>
             )}
           </div>

@@ -11,4 +11,8 @@ export const REPORTS_LABELS = {
   LABEL_5090: '尚有未收款項的訂單，含已出發逾期提醒',
   TOTAL_2832: '團收支總覽',
   LABEL_7727: '每團收入、成本、毛利與毛利率一覽',
+
+  BREADCRUMB_HOME: '首頁',
+  BREADCRUMB_FINANCE: '財務',
+  BREADCRUMB_REPORTS: '報表管理',
 }

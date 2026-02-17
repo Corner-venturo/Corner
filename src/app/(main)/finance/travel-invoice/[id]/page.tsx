@@ -54,7 +54,7 @@ export default function InvoiceDetailPage() {
   const handleVoid = async () => {
     if (!currentInvoice) return
     if (!voidReason.trim()) {
-      await alert('請填寫作廢原因', 'error')
+      await alert(TRAVEL_INVOICE_LABELS.FILL_VOID_REASON, 'error')
       return
     }
 
@@ -63,17 +63,17 @@ export default function InvoiceDetailPage() {
       setShowVoidDialog(false)
       setVoidReason('')
     } catch (error) {
-      await alert(error instanceof Error ? error.message : '發生未知錯誤', 'error')
+      await alert(error instanceof Error ? error.message : TRAVEL_INVOICE_LABELS.UNKNOWN_ERROR, 'error')
     }
   }
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
-      pending: { label: '待處理', variant: 'secondary' },
-      issued: { label: '已開立', variant: 'default' },
-      voided: { label: '已作廢', variant: 'destructive' },
-      allowance: { label: '已折讓', variant: 'outline' },
-      failed: { label: '失敗', variant: 'destructive' },
+      pending: { label: TRAVEL_INVOICE_LABELS.STATUS_PENDING, variant: 'secondary' },
+      issued: { label: TRAVEL_INVOICE_LABELS.STATUS_ISSUED, variant: 'default' },
+      voided: { label: TRAVEL_INVOICE_LABELS.STATUS_VOIDED, variant: 'destructive' },
+      allowance: { label: TRAVEL_INVOICE_LABELS.STATUS_ALLOWANCE, variant: 'outline' },
+      failed: { label: TRAVEL_INVOICE_LABELS.STATUS_FAILED, variant: 'destructive' },
     }
     const config = statusMap[status] || { label: status, variant: 'secondary' as const }
     return <Badge variant={config.variant}>{config.label}</Badge>
@@ -108,7 +108,7 @@ export default function InvoiceDetailPage() {
           <NotFoundState
             title={TRAVEL_INVOICE_DETAIL_LABELS.NOT_FOUND_6549}
             description={TRAVEL_INVOICE_DETAIL_LABELS.DELETE_4958}
-            backButtonLabel="返回發票列表"
+            backButtonLabel={TRAVEL_INVOICE_LABELS.BACK_TO_LIST}
             backHref="/finance/travel-invoice"
           />
       </ContentPageLayout>
@@ -153,7 +153,7 @@ export default function InvoiceDetailPage() {
               <div>
                 <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.INVOICE_NUMBER}</p>
                 <p className="font-medium text-morandi-primary">
-                  {currentInvoice.invoice_number || '尚未取得'}
+                  {currentInvoice.invoice_number || TRAVEL_INVOICE_LABELS.NOT_OBTAINED}
                 </p>
               </div>
               <div>
@@ -164,10 +164,10 @@ export default function InvoiceDetailPage() {
                 <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.TAX_TYPE}</p>
                 <p className="font-medium text-morandi-primary">
                   {currentInvoice.tax_type === 'dutiable'
-                    ? '應稅'
+                    ? TRAVEL_INVOICE_LABELS.TAX_DUTIABLE
                     : currentInvoice.tax_type === 'zero'
-                      ? '零稅率'
-                      : '免稅'}
+                      ? TRAVEL_INVOICE_LABELS.TAX_ZERO_RATE
+                      : TRAVEL_INVOICE_LABELS.TAX_FREE}
                 </p>
               </div>
               <div>

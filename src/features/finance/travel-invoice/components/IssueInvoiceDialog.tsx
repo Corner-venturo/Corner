@@ -14,7 +14,7 @@ import { useAuthStore } from '@/stores'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
-import { BATCH_INVOICE_DIALOG_LABELS, ISSUE_INVOICE_DIALOG_LABELS } from '../../constants/labels';
+import { BATCH_INVOICE_DIALOG_LABELS, ISSUE_INVOICE_DIALOG_LABELS, ISSUE_INVOICE_EXTRA_LABELS } from '../../constants/labels';
 
 interface IssueInvoiceDialogProps {
   open: boolean
@@ -102,7 +102,7 @@ export function IssueInvoiceDialog({
     }
 
     if (summary && amount > summary.invoiceable_amount) {
-      toast.error(`發票金額不能超過可開金額 ${summary.invoiceable_amount}`)
+      toast.error(ISSUE_INVOICE_EXTRA_LABELS.EXCEED_AVAILABLE(summary.invoiceable_amount))
       return
     }
 
@@ -115,7 +115,7 @@ export function IssueInvoiceDialog({
 
       const items: TravelInvoiceItem[] = [
         {
-          item_name: itemName || '旅遊服務費',
+          item_name: itemName || ISSUE_INVOICE_EXTRA_LABELS.TRAVEL_SERVICE_FEE,
           item_count: 1,
           item_unit: ISSUE_INVOICE_DIALOG_LABELS.式,
           item_price: amount,

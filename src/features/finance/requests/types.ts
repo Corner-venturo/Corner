@@ -41,10 +41,12 @@ export interface NewItemFormData {
   quantity: number
 }
 
+import { REQUEST_TYPE_LABELS } from '../constants/labels'
+
 export const statusLabels: Record<'pending' | 'approved' | 'paid', string> = {
-  pending: '請款中',
-  approved: '已確認',
-  paid: '已付款',
+  pending: REQUEST_TYPE_LABELS.STATUS_PENDING,
+  approved: REQUEST_TYPE_LABELS.STATUS_APPROVED,
+  paid: REQUEST_TYPE_LABELS.STATUS_PAID,
 }
 
 export const statusColors: Record<'pending' | 'approved' | 'paid', string> = {
@@ -54,18 +56,18 @@ export const statusColors: Record<'pending' | 'approved' | 'paid', string> = {
 }
 
 export const categoryOptions = [
-  { value: '住宿', label: '住宿' },
-  { value: '交通', label: '交通' },
-  { value: '餐食', label: '餐食' },
-  { value: '門票', label: '門票' },
-  { value: '導遊', label: '導遊' },
-  { value: '保險', label: '保險' },
-  { value: '出團款', label: '出團款' },
-  { value: '回團款', label: '回團款' },
-  { value: '員工代墊', label: '員工代墊' },
+  { value: REQUEST_TYPE_LABELS.CAT_ACCOMMODATION, label: REQUEST_TYPE_LABELS.CAT_ACCOMMODATION },
+  { value: REQUEST_TYPE_LABELS.CAT_TRANSPORTATION, label: REQUEST_TYPE_LABELS.CAT_TRANSPORTATION },
+  { value: REQUEST_TYPE_LABELS.CAT_MEAL, label: REQUEST_TYPE_LABELS.CAT_MEAL },
+  { value: REQUEST_TYPE_LABELS.CAT_TICKET, label: REQUEST_TYPE_LABELS.CAT_TICKET },
+  { value: REQUEST_TYPE_LABELS.CAT_GUIDE, label: REQUEST_TYPE_LABELS.CAT_GUIDE },
+  { value: REQUEST_TYPE_LABELS.CAT_INSURANCE, label: REQUEST_TYPE_LABELS.CAT_INSURANCE },
+  { value: REQUEST_TYPE_LABELS.CAT_TOUR_ADVANCE, label: REQUEST_TYPE_LABELS.CAT_TOUR_ADVANCE },
+  { value: REQUEST_TYPE_LABELS.CAT_TOUR_RETURN, label: REQUEST_TYPE_LABELS.CAT_TOUR_RETURN },
+  { value: REQUEST_TYPE_LABELS.CAT_EMPLOYEE_ADVANCE, label: REQUEST_TYPE_LABELS.CAT_EMPLOYEE_ADVANCE },
   { value: 'ESIM', label: 'ESIM' },
-  { value: '同業', label: '同業' },
-  { value: '其他', label: '其他' },
+  { value: REQUEST_TYPE_LABELS.CAT_PEER, label: REQUEST_TYPE_LABELS.CAT_PEER },
+  { value: REQUEST_TYPE_LABELS.CAT_OTHER, label: REQUEST_TYPE_LABELS.CAT_OTHER },
 ] as const
 
 

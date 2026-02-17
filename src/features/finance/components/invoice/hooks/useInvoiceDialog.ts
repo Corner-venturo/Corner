@@ -11,6 +11,7 @@ import type { Order } from '@/types/order.types'
 import type { Tour } from '@/types/tour.types'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { ComboboxOption } from '@/components/ui/combobox'
+import { INVOICE_LABELS } from '../constants/labels'
 
 interface UseInvoiceDialogProps {
   open: boolean
@@ -47,7 +48,7 @@ export function useInvoiceDialog({
     buyerMobile: '',
   })
   const [items, setItems] = useState<TravelInvoiceItem[]>([
-    { item_name: '', item_count: 1, item_unit: '式', item_price: 0, itemAmt: 0 },
+    { item_name: '', item_count: 1, item_unit: INVOICE_LABELS.UNIT, item_price: 0, itemAmt: 0 },
   ])
   const [remark, setRemark] = useState('')
 
@@ -99,7 +100,7 @@ export function useInvoiceDialog({
       setInvoiceDate(getTodayString())
       setReportStatus('unreported')
       setRemark('')
-      setItems([{ item_name: '', item_count: 1, item_unit: '式', item_price: 0, itemAmt: 0 }])
+      setItems([{ item_name: '', item_count: 1, item_unit: INVOICE_LABELS.UNIT, item_price: 0, itemAmt: 0 }])
 
       if (fixedOrder) {
         setBuyerInfo({
@@ -147,7 +148,7 @@ export function useInvoiceDialog({
 
   // 商品明細操作
   const addItem = () => {
-    setItems([...items, { item_name: '', item_count: 1, item_unit: '式', item_price: 0, itemAmt: 0 }])
+    setItems([...items, { item_name: '', item_count: 1, item_unit: INVOICE_LABELS.UNIT, item_price: 0, itemAmt: 0 }])
   }
 
   const removeItem = (index: number) => {
@@ -172,11 +173,11 @@ export function useInvoiceDialog({
   // 開立發票
   const handleSubmit = async () => {
     if (!buyerInfo.buyerName) {
-      toast({ title: '錯誤', description: '請輸入買受人名稱', variant: 'destructive' })
+      toast({ title: INVOICE_LABELS.ERROR, description: INVOICE_LABELS.ENTER_BUYER_NAME, variant: 'destructive' })
       return
     }
     if (items.some(item => !item.item_name || item.item_price <= 0)) {
-      toast({ title: '錯誤', description: '請完整填寫商品資訊', variant: 'destructive' })
+      toast({ title: INVOICE_LABELS.ERROR, description: INVOICE_LABELS.FILL_PRODUCT_INFO, variant: 'destructive' })
       return
     }
 
@@ -186,8 +187,8 @@ export function useInvoiceDialog({
     // 檢查超開提醒
     if (currentOrder && totalAmount > (currentOrder.paid_amount ?? 0)) {
       const confirmed = await confirm(
-        `發票金額 NT$ ${totalAmount.toLocaleString()} 超過已收款金額 NT$ ${(currentOrder.paid_amount ?? 0).toLocaleString()}，確定要開立嗎？`,
-        { title: '金額超開提醒', type: 'warning' }
+        INVOICE_LABELS.AMOUNT_EXCEED_CONFIRM(totalAmount.toLocaleString(), (currentOrder.paid_amount ?? 0).toLocaleString()),
+        { title: INVOICE_LABELS.AMOUNT_EXCEED_TITLE, type: 'warning' }
       )
       if (!confirmed) return
     }
@@ -206,16 +207,16 @@ export function useInvoiceDialog({
 
       // 根據是否預約顯示不同訊息
       const isScheduled = result?.isScheduled
-      const message = result?.message || (isScheduled ? `已預約於 ${invoiceDate} 開立` : '開立成功')
+      const message = result?.message || (isScheduled ? INVOICE_LABELS.SCHEDULED_MESSAGE(invoiceDate) : INVOICE_LABELS.ISSUE_SUCCESS)
       toast({
-        title: isScheduled ? '預約成功' : '開立成功',
-        description: `代轉發票 ${customNo} ${message}`,
+        title: isScheduled ? INVOICE_LABELS.SCHEDULE_SUCCESS : INVOICE_LABELS.ISSUE_SUCCESS,
+        description: INVOICE_LABELS.PROXY_INVOICE(customNo, message),
       })
       onOpenChange(false)
     } catch (error) {
       toast({
-        title: '錯誤',
-        description: error instanceof Error ? error.message : '開立發票失敗',
+        title: INVOICE_LABELS.ERROR,
+        description: error instanceof Error ? error.message : INVOICE_LABELS.ISSUE_FAILED,
         variant: 'destructive',
       })
     }

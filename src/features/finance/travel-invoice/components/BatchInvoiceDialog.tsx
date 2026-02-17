@@ -13,7 +13,7 @@ import { useTravelInvoiceStore } from '@/stores/travel-invoice-store'
 import { useAuthStore } from '@/stores'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import { BATCH_INVOICE_DIALOG_LABELS } from '../../constants/labels';
+import { BATCH_INVOICE_DIALOG_LABELS, BATCH_INVOICE_TOAST_LABELS } from '../../constants/labels';
 
 interface BatchInvoiceDialogProps {
   open: boolean
@@ -78,7 +78,7 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
         workspace_id: workspaceId,
       })
 
-      toast.success(`成功開立 ${selectedOrderIds.length} 筆訂單的發票`)
+      toast.success(BATCH_INVOICE_TOAST_LABELS.SUCCESS(selectedOrderIds.length))
       onOpenChange(false)
       onSuccess?.()
 
@@ -260,7 +260,7 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
             <Check size={16} />
-            {isLoading ? '開立中...' : `開立 ${selectedOrderIds.length} 張發票`}
+            {isLoading ? BATCH_INVOICE_TOAST_LABELS.ISSUING : BATCH_INVOICE_TOAST_LABELS.ISSUE_N(selectedOrderIds.length)}
           </Button>
         </DialogFooter>
       </DialogContent>

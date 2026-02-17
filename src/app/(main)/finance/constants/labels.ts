@@ -73,6 +73,29 @@ export const FINANCE_PAGE_LABELS = {
   MANAGE_8421: '財務管理中心',
   LABEL_5163: '上一頁',
   LABEL_9383: '下一頁',
+
+  // Column labels
+  COL_TYPE: '類型',
+  COL_DESCRIPTION: '說明',
+  COL_AMOUNT: '金額',
+  COL_DATE: '日期',
+  TYPE_INCOME: '收入',
+  TYPE_EXPENSE: '支出',
+  TYPE_TRANSFER: '轉帳',
+
+  // Module cards
+  MODULE_FINANCE_TITLE: '財務管理',
+  MODULE_FINANCE_DESC: '管理所有收款和請款記錄',
+  MODULE_FINANCE_STATS: (count: number) => `${count} 筆記錄`,
+  MODULE_TREASURY_TITLE: '出納管理',
+  MODULE_TREASURY_DESC: '日常收支與現金流管理',
+  MODULE_TREASURY_STATS: '即時現金流',
+  MODULE_REPORTS_TITLE: '報表管理',
+  MODULE_REPORTS_DESC: '財務分析與統計報表',
+  MODULE_REPORTS_STATS: '即時財務分析',
+
+  // Pagination
+  PAGINATION_SUMMARY: (total: number, page: number, totalPages: number) => `共 ${total} 筆交易，目前在第 ${page} / ${totalPages} 頁`,
 }
 
 export const BATCH_CONFIRM_LABELS = {
@@ -88,6 +111,17 @@ export const BATCH_CONFIRM_LABELS = {
   LABEL_8417: '實收金額',
   CONFIRM_4237: '部分收款品項的實收金額與應收金額不同，請確認',
   CANCEL: '取消',
+
+  SELECT_AT_LEAST_ONE: '請至少選擇一筆收款品項',
+  ACTUAL_AMOUNT_ZERO: '實收金額不能為 0',
+  UNKNOWN_ERROR: '未知錯誤',
+  CONFIRM_SUCCESS: (count: number) => `成功確認 ${count} 筆收款品項`,
+  CONFIRM_FAILED: (numbers: string) => `確認失敗：${numbers}`,
+  CONFIRM_PARTIAL: (success: number, failed: number, numbers: string) => `成功確認 ${success} 筆\n失敗 ${failed} 筆：${numbers}`,
+  CONFIRMING: '確認中...',
+  CONFIRM_N_RECEIPTS: (count: number) => `確認 ${count} 筆收款`,
+  SELECTED_STATS: (selected: number, total: number) => `已選擇 ${selected} / ${total} 筆`,
+  TOTAL_PREFIX: '總計：',
 }
 
 export const CREATE_RECEIPT_LABELS = {
@@ -97,7 +131,11 @@ export const CREATE_RECEIPT_LABELS = {
   TOTAL_AMOUNT: '總收款金額',
 
   SELECT_1269: '選擇團體 *',
-  SELECT_8066: '請先選擇團體...',
+  SELECT_8066: '請先選擇團體',
+  NO_ORDERS: '此團體沒有訂單',
+  SELECT_ORDER_PLACEHOLDER: '請選擇訂單...',
+  SUBMITTING: '處理中...',
+  SAVE_RECEIPT: '儲存收款單',
   SELECT_8775: '選擇訂單 *',
   LABEL_6150: '待收金額',
   ADD_2089: '新增項目',
@@ -253,6 +291,18 @@ export const UNPAID_ORDERS_LABELS = {
   COUNT_SUFFIX: ' 筆',
 }
 
+export const PAYMENT_DATA_LABELS = {
+  LINKPAY_SUCCESS: 'LinkPay 付款連結生成成功',
+  LINKPAY_FAILED: (message: string) => `LinkPay 生成失敗: ${message}`,
+  LINKPAY_ERROR: 'LinkPay 連結生成失敗',
+  FILL_COMPLETE_INFO: '請填寫完整資訊',
+  CANNOT_GET_TOUR_CODE: '無法取得團號，請確認訂單已關聯旅遊團',
+  PLEASE_LOGIN: '請先登入',
+  AMOUNT_ABNORMAL_NOTE: (expected: string, actual: string) => `[金額異常] 應收 NT$ ${expected}，實收 NT$ ${actual}`,
+  ACCOUNTANT: '會計',
+  CONFIRMED_CANNOT_DELETE: '已確認的收款單無法刪除',
+}
+
 export const REQUESTS_PAGE_LABELS = {
   LOADING: '載入中',
 
@@ -271,6 +321,23 @@ export const TRAVEL_INVOICE_LABELS = {
   NAME: '名稱',
   TAX_ID: '統一編號',
   MOBILE: '手機',
+
+  // Status
+  STATUS_PENDING: '待處理',
+  STATUS_ISSUED: '已開立',
+  STATUS_VOIDED: '已作廢',
+  STATUS_ALLOWANCE: '已折讓',
+  STATUS_FAILED: '失敗',
+
+  // Detail
+  FILL_VOID_REASON: '請填寫作廢原因',
+  UNKNOWN_ERROR: '發生未知錯誤',
+  BACK_TO_LIST: '返回發票列表',
+  NOT_OBTAINED: '尚未取得',
+  TAX_DUTIABLE: '應稅',
+  TAX_ZERO_RATE: '零稅率',
+  TAX_FREE: '免稅',
+  UNIT_LABEL: '式',
 }
 
 // Additional TRAVEL_INVOICE_LABELS - append to existing

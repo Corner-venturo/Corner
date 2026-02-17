@@ -58,9 +58,9 @@ export default function ReportsPage() {
     <ContentPageLayout
       title={REPORTS_LABELS.MANAGE_3253}
       breadcrumb={[
-        { label: '首頁', href: '/' },
-        { label: '財務', href: '/finance' },
-        { label: '報表管理', href: '/finance/reports' },
+        { label: REPORTS_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: REPORTS_LABELS.BREADCRUMB_FINANCE, href: '/finance' },
+        { label: REPORTS_LABELS.BREADCRUMB_REPORTS, href: '/finance/reports' },
       ]}
       className="space-y-6"
     >

@@ -2,6 +2,8 @@ import { useState, useCallback, useMemo } from 'react'
 import { useToursSlim, useOrders, useSuppliersSlim, useEmployeesSlim } from '@/data'
 import { useAuthStore } from '@/stores'
 import { RequestFormData, RequestItem } from '../types'
+import type { PaymentItemCategory } from '@/stores/types'
+import { REQUEST_FORM_HOOK_LABELS } from '../../constants/labels'
 
 export function useRequestForm() {
   // 使用 @/data 的 SWR hooks（和 usePaymentForm 一致）
@@ -27,7 +29,7 @@ export function useRequestForm() {
   const [requestItems, setRequestItems] = useState<RequestItem[]>(() => [
     {
       id: Math.random().toString(36).substr(2, 9),
-      category: '其他', // Default category
+      category: REQUEST_FORM_HOOK_LABELS.OTHER as PaymentItemCategory, // Default category
       supplier_id: '',
       supplierName: '',
       description: '',
@@ -93,7 +95,7 @@ export function useRequestForm() {
       id: s.id,
       name: s.name,
       type: 'supplier' as const,
-      group: '供應商',
+      group: REQUEST_FORM_HOOK_LABELS.SUPPLIER,
     }))
 
     // 過濾掉機器人（BOT001）
@@ -103,7 +105,7 @@ export function useRequestForm() {
         id: e.id,
         name: e.display_name,
         type: 'employee' as const,
-        group: '員工',
+        group: REQUEST_FORM_HOOK_LABELS.EMPLOYEE,
       }))
 
     return [...supplierList, ...employeeList]
@@ -113,7 +115,7 @@ export function useRequestForm() {
   const addNewEmptyItem = useCallback(() => {
     const newItem: RequestItem = {
       id: Math.random().toString(36).substr(2, 9),
-      category: '其他',
+      category: REQUEST_FORM_HOOK_LABELS.OTHER as PaymentItemCategory,
       supplier_id: '',
       supplierName: '',
       description: '',
@@ -150,7 +152,7 @@ export function useRequestForm() {
     setRequestItems([
       {
         id: Math.random().toString(36).substr(2, 9),
-        category: '其他', // Default category
+        category: REQUEST_FORM_HOOK_LABELS.OTHER as PaymentItemCategory, // Default category
         supplier_id: '',
         supplierName: '',
         description: '',

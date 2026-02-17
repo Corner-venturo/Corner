@@ -55,7 +55,7 @@ export default function FinancePage() {
     () => [
       {
         key: 'type',
-        label: '類型',
+        label: FINANCE_PAGE_LABELS.COL_TYPE,
         sortable: true,
         render: (_value, transaction) => {
           const typeIcons: Record<string, React.ReactNode> = {
@@ -64,9 +64,9 @@ export default function FinancePage() {
             transfer: <DollarSign size={16} className="text-morandi-gold" />,
           }
           const typeLabels: Record<string, string> = {
-            income: '收入',
-            expense: '支出',
-            transfer: '轉帳',
+            income: FINANCE_PAGE_LABELS.TYPE_INCOME,
+            expense: FINANCE_PAGE_LABELS.TYPE_EXPENSE,
+            transfer: FINANCE_PAGE_LABELS.TYPE_TRANSFER,
           }
           return (
             <div className="flex items-center space-x-2">
@@ -78,7 +78,7 @@ export default function FinancePage() {
       },
       {
         key: 'description',
-        label: '說明',
+        label: FINANCE_PAGE_LABELS.COL_DESCRIPTION,
         sortable: true,
         render: (_value, transaction) => (
           <span className="text-sm text-morandi-primary">{transaction.description}</span>
@@ -86,7 +86,7 @@ export default function FinancePage() {
       },
       {
         key: 'amount',
-        label: '金額',
+        label: FINANCE_PAGE_LABELS.COL_AMOUNT,
         sortable: true,
         render: (_value, transaction) => (
           <CurrencyCell
@@ -98,7 +98,7 @@ export default function FinancePage() {
       },
       {
         key: 'date',
-        label: '日期',
+        label: FINANCE_PAGE_LABELS.COL_DATE,
         sortable: true,
         render: (_value, transaction) => (
           <DateCell date={transaction.date} showIcon={false} />
@@ -110,29 +110,29 @@ export default function FinancePage() {
 
   const financeModules = [
     {
-      title: '財務管理',
-      description: '管理所有收款和請款記錄',
+      title: FINANCE_PAGE_LABELS.MODULE_FINANCE_TITLE,
+      description: FINANCE_PAGE_LABELS.MODULE_FINANCE_DESC,
       icon: CreditCard,
       href: '/finance/payments',
-      stats: `${transactionsCount} 筆記錄`,
+      stats: FINANCE_PAGE_LABELS.MODULE_FINANCE_STATS(transactionsCount),
       color: 'text-morandi-green',
       bgColor: 'bg-morandi-green/10',
     },
     {
-      title: '出納管理',
-      description: '日常收支與現金流管理',
+      title: FINANCE_PAGE_LABELS.MODULE_TREASURY_TITLE,
+      description: FINANCE_PAGE_LABELS.MODULE_TREASURY_DESC,
       icon: Wallet,
       href: '/finance/treasury',
-      stats: '即時現金流',
+      stats: FINANCE_PAGE_LABELS.MODULE_TREASURY_STATS,
       color: 'text-morandi-gold',
       bgColor: 'bg-morandi-gold/10',
     },
     {
-      title: '報表管理',
-      description: '財務分析與統計報表',
+      title: FINANCE_PAGE_LABELS.MODULE_REPORTS_TITLE,
+      description: FINANCE_PAGE_LABELS.MODULE_REPORTS_DESC,
       icon: BarChart3,
       href: '/finance/reports',
-      stats: '即時財務分析',
+      stats: FINANCE_PAGE_LABELS.MODULE_REPORTS_STATS,
       color: 'text-morandi-primary',
       bgColor: 'bg-morandi-primary/10',
     },
@@ -235,7 +235,7 @@ export default function FinancePage() {
             {/* Pagination Controls */}
             <div className="flex items-center justify-between pt-4">
               <div className="text-sm text-morandi-secondary">
-                共 {transactionsCount} 筆交易，目前在第 {transactionsPage} / {totalPages} 頁
+                {FINANCE_PAGE_LABELS.PAGINATION_SUMMARY(transactionsCount, transactionsPage, totalPages)}
               </div>
               <div className="flex gap-2">
                 <Button

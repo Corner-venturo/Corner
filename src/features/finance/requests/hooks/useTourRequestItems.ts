@@ -8,6 +8,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
+import { TOUR_REQUEST_ITEMS_LABELS } from '../../constants/labels'
 import { logger } from '@/lib/utils/logger'
 import type { Database } from '@/lib/supabase/types'
 
@@ -47,7 +48,7 @@ function transformToRequestItem(request: TourRequest): TourRequestItem | null {
     id: request.id,
     category: request.category,
     title: request.title,
-    supplierName: request.supplier_name || '未知供應商',
+    supplierName: request.supplier_name || TOUR_REQUEST_ITEMS_LABELS.UNKNOWN_SUPPLIER,
     supplierId: request.supplier_id,
     estimatedCost: request.estimated_cost || 0,
     finalCost: request.final_cost,
@@ -95,7 +96,7 @@ export function useTourRequestItems(tourId: string | null): UseTourRequestItemsR
 
       setItems(transformedItems)
     } catch (err) {
-      const message = err instanceof Error ? err.message : '載入需求單失敗'
+      const message = err instanceof Error ? err.message : TOUR_REQUEST_ITEMS_LABELS.LOAD_FAILED
       logger.error('載入需求單失敗:', err)
       setError(message)
       setItems([])
@@ -151,7 +152,7 @@ export function useTourRequestItemsByPackage(packageId: string | null): UseTourR
 
       setItems(transformedItems)
     } catch (err) {
-      const message = err instanceof Error ? err.message : '載入需求單失敗'
+      const message = err instanceof Error ? err.message : TOUR_REQUEST_ITEMS_LABELS.LOAD_FAILED
       logger.error('載入需求單失敗:', err)
       setError(message)
       setItems([])

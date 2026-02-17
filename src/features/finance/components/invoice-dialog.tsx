@@ -126,7 +126,7 @@ export function InvoiceDialog({
               disabled={isLoading}
               className="min-w-[100px] bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
-              {isLoading ? '開立中...' : '開立發票'}
+              {isLoading ? FINANCE_LABELS.ISSUING : FINANCE_LABELS.ISSUE_INVOICE}
             </Button>
           </div>
         </div>

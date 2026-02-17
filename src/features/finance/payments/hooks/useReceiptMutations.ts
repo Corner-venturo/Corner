@@ -6,6 +6,7 @@
 import { logger } from '@/lib/utils/logger'
 import { useCallback } from 'react'
 import { useToast } from '@/components/ui/use-toast'
+import { RECEIPT_MUTATION_LABELS } from '../../constants/labels'
 import type { PaymentItem, PaymentFormData } from '../types'
 import { RECEIPT_TYPES } from '../types'
 import type { Receipt } from '@/types/receipt.types'
@@ -139,7 +140,7 @@ export function useReceiptMutations() {
     const tourCode = tourInfo?.code || ''
 
     if (!tourCode) {
-      throw new Error('無法取得團號，請確認訂單已關聯旅遊團')
+      throw new Error(RECEIPT_MUTATION_LABELS.CANNOT_GET_TOUR_CODE)
     }
 
     // 查詢已存在的收款單編號（用於生成編號）
@@ -196,7 +197,7 @@ export function useReceiptMutations() {
     })
 
     if (!createdReceipt?.id) {
-      throw new Error('建立收款單失敗')
+      throw new Error(RECEIPT_MUTATION_LABELS.CREATE_FAILED)
     }
 
     // 2. 為每個項目建立 receipt_item

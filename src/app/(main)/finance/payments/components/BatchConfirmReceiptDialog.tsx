@@ -152,14 +152,14 @@ export function BatchConfirmReceiptDialog({
     const selectedItems = Array.from(confirmItems.values()).filter(item => item.selected)
 
     if (selectedItems.length === 0) {
-      void alert('請至少選擇一筆收款品項', 'warning')
+      void alert(BATCH_CONFIRM_LABELS.SELECT_AT_LEAST_ONE, 'warning')
       return
     }
 
     // 檢查是否有金額為 0 的項目
     const zeroAmountItems = selectedItems.filter(item => item.actualAmount <= 0)
     if (zeroAmountItems.length > 0) {
-      void alert('實收金額不能為 0', 'warning')
+      void alert(BATCH_CONFIRM_LABELS.ACTUAL_AMOUNT_ZERO, 'warning')
       return
     }
 
@@ -197,7 +197,7 @@ export function BatchConfirmReceiptDialog({
           orderUpdates.set(orderId, currentAmount + confirmItem.actualAmount)
         }
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : '未知錯誤'
+        const errorMessage = error instanceof Error ? error.message : BATCH_CONFIRM_LABELS.UNKNOWN_ERROR
         failedItems.push({ item: confirmItem, error: errorMessage })
         logger.error(`確認收款品項 ${confirmItem.receiptNumber} 失敗:`, error)
       }
@@ -252,18 +252,18 @@ export function BatchConfirmReceiptDialog({
     // 顯示結果摘要
     if (failedItems.length === 0) {
       // 全部成功
-      await alert(`成功確認 ${successItems.length} 筆收款品項`, 'success')
+      await alert(BATCH_CONFIRM_LABELS.CONFIRM_SUCCESS(successItems.length), 'success')
       onOpenChange(false)
       onSuccess?.()
     } else if (successItems.length === 0) {
       // 全部失敗
       const failedNumbers = failedItems.map(f => f.item.receiptNumber).join('、')
-      void alert(`確認失敗：${failedNumbers}`, 'error')
+      void alert(BATCH_CONFIRM_LABELS.CONFIRM_FAILED(failedNumbers), 'error')
     } else {
       // 部分成功
       const failedNumbers = failedItems.map(f => f.item.receiptNumber).join('、')
       await alert(
-        `成功確認 ${successItems.length} 筆\n失敗 ${failedItems.length} 筆：${failedNumbers}`,
+        BATCH_CONFIRM_LABELS.CONFIRM_PARTIAL(successItems.length, failedItems.length, failedNumbers),
         'warning'
       )
       onSuccess?.()
@@ -302,13 +302,13 @@ export function BatchConfirmReceiptDialog({
                     onCheckedChange={toggleSelectAll}
                   />
                   <span className="text-sm text-morandi-secondary">
-                    已選擇 {stats.selected} / {stats.total} 筆
+                    {BATCH_CONFIRM_LABELS.SELECTED_STATS(stats.selected, stats.total)}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <DollarSign className="h-4 w-4 text-morandi-gold" />
                   <span className="text-sm font-medium flex items-center gap-1">
-                    總計：<CurrencyCell amount={stats.totalAmount} />
+                    {BATCH_CONFIRM_LABELS.TOTAL_PREFIX}<CurrencyCell amount={stats.totalAmount} />
                   </span>
                 </div>
               </div>
@@ -422,7 +422,7 @@ export function BatchConfirmReceiptDialog({
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
             <Check size={16} />
-            {isSubmitting ? '確認中...' : `確認 ${stats.selected} 筆收款`}
+            {isSubmitting ? BATCH_CONFIRM_LABELS.CONFIRMING : BATCH_CONFIRM_LABELS.CONFIRM_N_RECEIPTS(stats.selected)}
           </Button>
         </DialogFooter>
       </DialogContent>

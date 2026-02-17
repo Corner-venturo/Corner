@@ -26,7 +26,7 @@ import { useAuthStore } from '@/stores'
 import { generateReceiptNumber } from '@/lib/utils/receipt-number-generator'
 import { logger } from '@/lib/utils/logger'
 import { PaymentMethod } from '@/stores/types'
-import { ADD_RECEIPT_DIALOG_LABELS, BATCH_RECEIPT_DIALOG_LABELS, BATCH_RECEIPT_FORM_LABELS } from '../../constants/labels';
+import { ADD_RECEIPT_DIALOG_LABELS, BATCH_RECEIPT_DIALOG_LABELS, BATCH_RECEIPT_FORM_LABELS, BATCH_RECEIPT_TOAST_LABELS } from '../../constants/labels';
 
 // 擴展 OrderAllocation 加入備註
 interface OrderAllocationWithNote {
@@ -258,7 +258,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
       // 刷新資料
       await invalidateReceipts()
 
-      await alert(`成功建立 ${validAllocations.length} 筆收款單`, 'success')
+      await alert(BATCH_RECEIPT_TOAST_LABELS.SUCCESS(validAllocations.length), 'success')
       onOpenChange(false)
       resetForm()
     } catch (error) {

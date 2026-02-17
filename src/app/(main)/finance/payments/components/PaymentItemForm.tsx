@@ -20,10 +20,7 @@ import { isFeatureAvailable } from '@/lib/feature-restrictions'
 import { ReceiptType, RECEIPT_TYPE_OPTIONS } from '@/types/receipt.types'
 import { PAYMENT_ITEM_LABELS } from '../../constants/labels'
 
-const BANK_ACCOUNTS = [
-  { value: '國泰', label: '國泰銀行' },
-  { value: '合庫', label: '合作金庫' },
-]
+import { BANK_ACCOUNTS } from '@/features/finance/payments/types'
 
 interface PaymentItemFormProps {
   item: ReceiptItem

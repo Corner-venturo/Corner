@@ -152,10 +152,10 @@ export function CreateReceiptDialog({
                     <SelectValue
                       placeholder={
                         !selectedTourId
-                          ? '請先選擇團體'
+                          ? CREATE_RECEIPT_LABELS.SELECT_8066
                           : filteredOrders.length === 0
-                            ? '此團體沒有訂單'
-                            : '請選擇訂單...'
+                            ? CREATE_RECEIPT_LABELS.NO_ORDERS
+                            : CREATE_RECEIPT_LABELS.SELECT_ORDER_PLACEHOLDER
                       }
                     />
                   </SelectTrigger>
@@ -233,7 +233,7 @@ export function CreateReceiptDialog({
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
             >
               <Save size={16} />
-              {isSubmitting ? '處理中...' : '儲存收款單'}
+              {isSubmitting ? CREATE_RECEIPT_LABELS.SUBMITTING : CREATE_RECEIPT_LABELS.SAVE_RECEIPT}
             </Button>
           </div>
         </div>

@@ -20,7 +20,7 @@ import { useAuthStore } from '@/stores'
 import { deleteReceipt, invalidateReceipts } from '@/data'
 import { recalculateReceiptStats } from '../services/receipt-core.service'
 import type { Receipt } from '@/types/receipt.types'
-import { ADD_RECEIPT_DIALOG_LABELS, RECEIPT_CONFIRM_DIALOG_LABELS } from '../../constants/labels';
+import { ADD_RECEIPT_DIALOG_LABELS, RECEIPT_CONFIRM_DIALOG_LABELS, RECEIPT_CONFIRM_TOAST_LABELS } from '../../constants/labels';
 
 interface ReceiptConfirmDialogProps {
   open: boolean
@@ -96,15 +96,15 @@ export function ReceiptConfirmDialog({
     try {
       await onConfirm(receipt.id, amount, true)
       toast({
-        title: '確認成功',
+        title: RECEIPT_CONFIRM_TOAST_LABELS.CONFIRM_SUCCESS,
         description: RECEIPT_CONFIRM_DIALOG_LABELS.已記錄實際收款金額_並通知建立者,
       })
       onSuccess?.()
       onOpenChange(false)
     } catch (error) {
       toast({
-        title: '確認失敗',
-        description: error instanceof Error ? error.message : '請稍後再試',
+        title: RECEIPT_CONFIRM_TOAST_LABELS.CONFIRM_FAILED,
+        description: error instanceof Error ? error.message : RECEIPT_CONFIRM_TOAST_LABELS.PLEASE_TRY_LATER,
         variant: 'destructive',
       })
     } finally {
@@ -123,7 +123,7 @@ export function ReceiptConfirmDialog({
   // 刪除收款單
   const handleDelete = async () => {
     const confirmed = await confirm(
-      `確定要刪除收款單 ${receipt.receipt_number} 嗎？此操作無法復原。`,
+      RECEIPT_CONFIRM_TOAST_LABELS.DELETE_CONFIRM(receipt.receipt_number),
       { title: ADD_RECEIPT_DIALOG_LABELS.刪除收款單, type: 'error' }
     )
 
@@ -136,14 +136,14 @@ export function ReceiptConfirmDialog({
       await invalidateReceipts()
       toast({
         title: ADD_RECEIPT_DIALOG_LABELS.刪除成功,
-        description: `收款單 ${receipt.receipt_number} 已刪除`,
+        description: RECEIPT_CONFIRM_TOAST_LABELS.DELETED(receipt.receipt_number),
       })
       onSuccess?.()
       onOpenChange(false)
     } catch (error) {
       toast({
         title: ADD_RECEIPT_DIALOG_LABELS.刪除失敗,
-        description: error instanceof Error ? error.message : '請稍後再試',
+        description: error instanceof Error ? error.message : RECEIPT_CONFIRM_TOAST_LABELS.PLEASE_TRY_LATER,
         variant: 'destructive',
       })
     } finally {

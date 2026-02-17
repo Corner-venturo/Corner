@@ -10,7 +10,7 @@ import { getTodayString } from '@/lib/utils/format-date'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, Trash2, FileText } from 'lucide-react'
-import { FinanceLabels } from '../../constants/labels'
+import { FinanceLabels, TRAVEL_INVOICE_LABELS } from '../../constants/labels'
 import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { ContentContainer } from '@/components/layout/content-container'
 import { Button } from '@/components/ui/button'
@@ -51,7 +51,7 @@ export default function CreateInvoicePage() {
     {
       item_name: '',
       item_count: 1,
-      item_unit: '式',
+      item_unit: TRAVEL_INVOICE_LABELS.UNIT_LABEL,
       item_price: 0,
       itemAmt: 0,
       itemWord: '',
@@ -64,7 +64,7 @@ export default function CreateInvoicePage() {
       {
         item_name: '',
         item_count: 1,
-        item_unit: '式',
+        item_unit: TRAVEL_INVOICE_LABELS.UNIT_LABEL,
         item_price: 0,
         itemAmt: 0,
         itemWord: '',

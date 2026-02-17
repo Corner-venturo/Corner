@@ -362,4 +362,117 @@ export const RECEIPT_CONFIRM_LABELS = {
 export const FINANCE_LABELS = {
   LABEL_953: '開立代轉發票',
   CANCEL: '取消',
+  ISSUING: '開立中...',
+  ISSUE_INVOICE: '開立發票',
+}
+
+// AddReceiptDialog
+export const ADD_RECEIPT_TOAST_LABELS = {
+  UPDATED: (receiptNumber: string, itemCount: number) => `已更新收款單 ${receiptNumber}（${itemCount} 個項目）`,
+  CREATED_WITH_LINKPAY: (itemCount: number, linkPayCount: number) => `已新增 ${itemCount} 項收款，其中 ${linkPayCount} 項 LinkPay 已產生連結`,
+  CREATE_SUCCESS: '收款單建立成功',
+  CREATED: (itemCount: number, totalAmount: string) => `已新增 ${itemCount} 項收款，總金額 NT$ ${totalAmount}`,
+  ERROR_CODE: (code: string) => `錯誤代碼: ${code}`,
+  DELETE_CONFIRM: (receiptNumber: string) => `確定要刪除收款單 ${receiptNumber} 嗎？此操作無法復原。`,
+  DELETED: (receiptNumber: string) => `收款單 ${receiptNumber} 已刪除`,
+  CONFIRMED_READONLY: (receiptNumber: string) => `${receiptNumber} - 已確認的收款單無法編輯或刪除`,
+  EDIT_TITLE: (receiptNumber: string) => `編輯 ${receiptNumber}`,
+  ADD_TITLE: (itemCount: number) => `新增收款單 (共 ${itemCount} 項)`,
+}
+
+// BatchReceiptDialog
+export const BATCH_RECEIPT_TOAST_LABELS = {
+  SUCCESS: (count: number) => `成功建立 ${count} 筆收款單`,
+}
+
+// ReceiptConfirmDialog
+export const RECEIPT_CONFIRM_TOAST_LABELS = {
+  CONFIRM_SUCCESS: '確認成功',
+  CONFIRM_FAILED: '確認失敗',
+  PLEASE_TRY_LATER: '請稍後再試',
+  DELETE_CONFIRM: (receiptNumber: string) => `確定要刪除收款單 ${receiptNumber} 嗎？此操作無法復原。`,
+  DELETED: (receiptNumber: string) => `收款單 ${receiptNumber} 已刪除`,
+}
+
+// usePaymentForm validation
+export const PAYMENT_FORM_LABELS = {
+  SELECT_TOUR: '請選擇團體',
+  SELECT_ORDER: '請選擇訂單',
+  AT_LEAST_ONE_ITEM: '至少需要一個收款項目',
+  TOTAL_MUST_GT_ZERO: '總收款金額必須大於 0',
+  ITEM_AMOUNT_GT_ZERO: (index: number) => `收款項目 ${index}: 金額必須大於 0`,
+  ITEM_SELECT_DATE: (index: number) => `收款項目 ${index}: 請選擇交易日期`,
+  ITEM_LINKPAY_EMAIL: (index: number) => `收款項目 ${index}: LinkPay 需要 Email`,
+  ITEM_LINKPAY_DEADLINE: (index: number) => `收款項目 ${index}: LinkPay 需要付款截止日`,
+}
+
+// useReceiptMutations
+export const RECEIPT_MUTATION_LABELS = {
+  CANNOT_GET_TOUR_CODE: '無法取得團號，請確認訂單已關聯旅遊團',
+  CREATE_FAILED: '建立收款單失敗',
+}
+
+// useUnclosedTours
+export const UNCLOSED_TOURS_HOOK_LABELS = {
+  CLOSED: '結案',
+  CANCELLED: '取消',
+}
+
+// useRequestForm
+export const REQUEST_FORM_HOOK_LABELS = {
+  SUPPLIER: '供應商',
+  EMPLOYEE: '員工',
+  OTHER: '其他',
+}
+
+// useRequestOperations
+export const REQUEST_OPERATIONS_LABELS = {
+  CANNOT_GET_WORKSPACE: '無法取得 workspace_id，請重新登入',
+  COMPANY_EXPENSE_TYPE_REQUIRED: '公司請款必須選擇費用類型',
+  SUPPLIER_EXPENSE: '供應商支出',
+}
+
+// useTourRequestItems
+export const TOUR_REQUEST_ITEMS_LABELS = {
+  UNKNOWN_SUPPLIER: '未知供應商',
+  LOAD_FAILED: '載入需求單失敗',
+}
+
+// Request types
+export const REQUEST_TYPE_LABELS = {
+  STATUS_PENDING: '請款中',
+  STATUS_APPROVED: '已確認',
+  STATUS_PAID: '已付款',
+  CAT_ACCOMMODATION: '住宿',
+  CAT_TRANSPORTATION: '交通',
+  CAT_MEAL: '餐食',
+  CAT_TICKET: '門票',
+  CAT_GUIDE: '導遊',
+  CAT_INSURANCE: '保險',
+  CAT_TOUR_ADVANCE: '出團款',
+  CAT_TOUR_RETURN: '回團款',
+  CAT_EMPLOYEE_ADVANCE: '員工代墊',
+  CAT_PEER: '同業',
+  CAT_OTHER: '其他',
+}
+
+// AddRequestDialog extra
+export const ADD_REQUEST_EXTRA_LABELS = {
+  CREATE_FAILED: '新增請款單失敗',
+  CONFIRMED_COST: (amount: string) => `確認成本：NT$ ${amount}`,
+  ESTIMATED_COST: (amount: string) => `預估成本：NT$ ${amount}`,
+  BATCH_CREATE_LABEL: '建立批次請款',
+}
+
+// BatchInvoiceDialog
+export const BATCH_INVOICE_TOAST_LABELS = {
+  SUCCESS: (count: number) => `成功開立 ${count} 筆訂單的發票`,
+  ISSUING: '開立中...',
+  ISSUE_N: (count: number) => `開立 ${count} 張發票`,
+}
+
+// IssueInvoiceDialog
+export const ISSUE_INVOICE_EXTRA_LABELS = {
+  EXCEED_AVAILABLE: (amount: number) => `發票金額不能超過可開金額 ${amount}`,
+  TRAVEL_SERVICE_FEE: '旅遊服務費',
 }
