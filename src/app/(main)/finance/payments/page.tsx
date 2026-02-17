@@ -148,6 +148,7 @@ export default function PaymentsPage() {
         searchPlaceholder={FinanceLabels.searchReceiptPlaceholder}
         onRowClick={handleRowClick}
         defaultSort={{ key: 'receipt_date', direction: 'desc' }}
+        initialPageSize={30}
         headerActions={
           <div className="flex gap-2">
             <Button

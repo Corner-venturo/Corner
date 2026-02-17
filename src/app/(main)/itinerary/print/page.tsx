@@ -97,15 +97,42 @@ function ItineraryPrintContent() {
       {/* A4 列印內容 */}
       <div className="max-w-[210mm] mx-auto bg-card shadow-lg print:shadow-none print:max-w-none">
         <div className="p-8 print:p-6">
+          {/* 封面圖（如果有） */}
+          {itinerary.cover_image && (
+            <div className="mb-6 -mx-8 -mt-8 print:-mx-6 print:-mt-6 relative overflow-hidden" style={{ height: '280px' }}>
+              <img
+                src={itinerary.cover_image}
+                alt={itinerary.title || ''}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute bottom-6 left-8 right-8 text-white">
+                <h1 className="text-3xl font-bold mb-1">{itinerary.title || '行程表'}</h1>
+                {itinerary.subtitle && (
+                  <p className="text-sm opacity-90">{itinerary.subtitle}</p>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* 標題區 */}
           <div className="border-b-2 border-morandi-gold pb-4 mb-6">
             <div className="flex items-start justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-morandi-primary mb-1">
-                  {itinerary.title || '行程表'}
-                </h1>
-                {itinerary.subtitle && (
-                  <p className="text-sm text-morandi-secondary">{itinerary.subtitle}</p>
+                {!itinerary.cover_image && (
+                  <>
+                    <h1 className="text-2xl font-bold text-morandi-primary mb-1">
+                      {itinerary.title || '行程表'}
+                    </h1>
+                    {itinerary.subtitle && (
+                      <p className="text-sm text-morandi-secondary">{itinerary.subtitle}</p>
+                    )}
+                  </>
+                )}
+                {itinerary.cover_image && (
+                  <h1 className="text-lg font-bold text-morandi-primary">
+                    {itinerary.title || '行程表'}
+                  </h1>
                 )}
               </div>
               <div className="text-right text-sm text-morandi-secondary">
