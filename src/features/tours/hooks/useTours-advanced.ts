@@ -12,6 +12,7 @@ import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
 import { generateUUID } from '@/lib/utils/uuid'
 import type { Database } from '@/lib/supabase/types'
 import { logger } from '@/lib/utils/logger'
+import { TOURS_ADVANCED_LABELS, TOUR_SERVICE_LABELS, TOUR_OPERATIONS_LABELS } from '../constants/labels'
 
 const TOURS_KEY = 'tours'
 
@@ -149,7 +150,7 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
       .neq('payment_status', 'unpaid')
 
     if (paidOrders && paidOrders.length > 0) {
-      throw new Error(`此團有 ${paidOrders.length} 筆已付款訂單，無法刪除`)
+      throw new Error(TOUR_OPERATIONS_LABELS.CANNOT_DELETE_PAID_ORDERS(paidOrders.length))
     }
 
     // 樂觀更新：使用 functional update 避免 stale closure 問題
@@ -243,11 +244,11 @@ export function useTourDetails(tour_id: string) {
       .eq('id', tour_id)
       .single()
 
-    if (fetchError || !current) throw new Error('無法取得目前狀態')
+    if (fetchError || !current) throw new Error(TOURS_ADVANCED_LABELS.CANNOT_GET_STATUS)
 
     const currentStatus = current.status ?? ''
     if (!currentStatus || !VALID_TOUR_TRANSITIONS[currentStatus]?.includes(newStatus)) {
-      throw new Error(`無法從「${currentStatus || '未知'}」轉為「${newStatus}」`)
+      throw new Error(TOURS_ADVANCED_LABELS.INVALID_STATUS_TRANSITION(currentStatus || '', newStatus))
     }
 
     const now = new Date().toISOString()
@@ -268,7 +269,7 @@ export function useTourDetails(tour_id: string) {
   const generateTourCode = async (cityCode: string, date: Date, isSpecial?: boolean) => {
     const workspaceCode = getCurrentWorkspaceCode()
     if (!workspaceCode) {
-      throw new Error('無法取得 workspace code，請重新登入')
+      throw new Error(TOUR_SERVICE_LABELS.CANNOT_GET_WORKSPACE)
     }
 
     // 獲取現有 tours 來避免重複

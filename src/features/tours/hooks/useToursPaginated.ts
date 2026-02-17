@@ -21,11 +21,12 @@ import { logger } from '@/lib/utils/logger'
 import { deleteTour as deleteTourEntity } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { formatDate } from '@/lib/utils/format-date'
+import { TOUR_SERVICE_LABELS, TOURS_ADVANCED_LABELS } from '../constants/labels'
 
 export interface UseToursPaginatedParams {
   page: number
   pageSize: number
-  status?: string // 'all' | 'planning' | 'confirmed' | 'in_progress' | 'completed' | 'archived' | '特殊團'
+  status?: string // 'all' | 'planning' | 'confirmed' | 'in_progress' | 'completed' | 'archived' | TOUR_SERVICE_LABELS.STATUS_SPECIAL
   search?: string
   sortBy?: string
   sortOrder?: 'asc' | 'desc'
@@ -78,19 +79,19 @@ export function useToursPaginated(params: UseToursPaginatedParams): UseToursPagi
         if (status === 'archived') {
           // Show archived tours
           query = query.eq('archived', true)
-        } else if (status === '特殊團') {
+        } else if (status === TOUR_SERVICE_LABELS.STATUS_SPECIAL) {
           // Show special tours (not archived)
-          query = query.eq('status', '特殊團').neq('archived', true)
+          query = query.eq('status', TOUR_SERVICE_LABELS.STATUS_SPECIAL).neq('archived', true)
         } else {
           // Show specific status (not archived, not special)
           query = query
             .eq('status', status)
             .neq('archived', true)
-            .neq('status', '特殊團')
+            .neq('status', TOUR_SERVICE_LABELS.STATUS_SPECIAL)
         }
       } else {
         // 'all' tab: exclude archived and special tours
-        query = query.neq('archived', true).neq('status', '特殊團')
+        query = query.neq('archived', true).neq('status', TOUR_SERVICE_LABELS.STATUS_SPECIAL)
       }
 
       // ✅ Server-side search
@@ -200,7 +201,7 @@ export function useToursPaginated(params: UseToursPaginatedParams): UseToursPagi
   const generateTourCode = async (cityCode: string, date: Date): Promise<string> => {
     const workspaceCode = getCurrentWorkspaceCode()
     if (!workspaceCode) {
-      throw new Error('無法取得 workspace code，請重新登入')
+      throw new Error(TOUR_SERVICE_LABELS.CANNOT_GET_WORKSPACE)
     }
 
     // Get existing tour codes to avoid duplicates
@@ -275,7 +276,7 @@ export function useTourDetailsPaginated(tourId: string | null) {
     const VALID_TOUR_TRANSITIONS: Record<string, string[]> = {
       'draft': ['published', 'cancelled'],
       'proposed': ['draft', 'cancelled'],
-      '提案': ['draft', 'cancelled'],
+      [TOUR_SERVICE_LABELS.STATUS_PROPOSAL]: ['draft', 'cancelled'],
       'published': ['departed', 'cancelled', 'draft'],
       'departed': ['completed'],
       'completed': ['archived'],
@@ -289,11 +290,11 @@ export function useTourDetailsPaginated(tourId: string | null) {
       .eq('id', tourId)
       .single()
 
-    if (fetchError || !current) throw new Error('無法取得目前狀態')
+    if (fetchError || !current) throw new Error(TOURS_ADVANCED_LABELS.CANNOT_GET_STATUS)
 
     const currentStatus = current.status ?? ''
     if (!currentStatus || !VALID_TOUR_TRANSITIONS[currentStatus]?.includes(newStatus)) {
-      throw new Error(`無法從「${currentStatus || '未知'}」轉為「${newStatus}」`)
+      throw new Error(TOURS_ADVANCED_LABELS.INVALID_STATUS_TRANSITION(currentStatus || '', newStatus))
     }
 
     const { data, error: updateError } = await supabase

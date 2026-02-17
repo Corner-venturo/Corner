@@ -25,6 +25,7 @@ import { formatCurrency } from '@/lib/utils/format-currency'
 import { generateTourClosingPDF } from '@/lib/pdf/tour-closing-pdf'
 import { supabase } from '@/lib/supabase/client'
 import { TOURS_LABELS } from './constants/labels'
+import { TOUR_CLOSING_LABELS, TOUR_SERVICE_LABELS } from '../constants/labels'
 
 interface TourClosingDialogProps {
   open: boolean
@@ -63,8 +64,8 @@ export function TourClosingDialog({
   const tourCosts = useMemo(() => {
     return paymentRequests.filter(
       pr => pr.tour_id === tour.id &&
-        pr.request_type !== '業務獎金' &&
-        pr.request_type !== 'OP獎金'
+        pr.request_type !== TOUR_CLOSING_LABELS.SALES_BONUS &&
+        pr.request_type !== TOUR_CLOSING_LABELS.OP_BONUS
     )
   }, [paymentRequests, tour.id])
 
@@ -72,7 +73,7 @@ export function TourClosingDialog({
   const tourBonuses = useMemo(() => {
     return paymentRequests.filter(
       pr => pr.tour_id === tour.id &&
-        (pr.request_type === '業務獎金' || pr.request_type === 'OP獎金')
+        (pr.request_type === TOUR_CLOSING_LABELS.SALES_BONUS || pr.request_type === TOUR_CLOSING_LABELS.OP_BONUS)
     )
   }, [paymentRequests, tour.id])
 
@@ -109,10 +110,10 @@ export function TourClosingDialog({
           tour_code: tour.code,
           tour_name: tour.name || tour.location || '',
           request_date: now.split('T')[0],
-          request_type: '業務獎金',
+          request_type: TOUR_CLOSING_LABELS.SALES_BONUS,
           amount: salesBonus,
           status: 'pending',
-          notes: `${tour.code} 結案獎金 - 業務 ${salesBonusPercent}%`,
+          notes: TOUR_CLOSING_LABELS.SALES_BONUS_DESC(tour.code, salesBonusPercent),
         })
       }
 
@@ -125,16 +126,16 @@ export function TourClosingDialog({
           tour_code: tour.code,
           tour_name: tour.name || tour.location || '',
           request_date: now.split('T')[0],
-          request_type: 'OP獎金',
+          request_type: TOUR_CLOSING_LABELS.OP_BONUS,
           amount: opBonus,
           status: 'pending',
-          notes: `${tour.code} 結案獎金 - OP ${opBonusPercent}%`,
+          notes: TOUR_CLOSING_LABELS.OP_BONUS_DESC(tour.code, opBonusPercent),
         })
       }
 
       // 3. 更新團狀態為結案
       await updateTour(tour.id, {
-        status: '結案',
+        status: TOUR_SERVICE_LABELS.STATUS_CLOSED,
         closing_status: 'closed',
         closing_date: now,
         updated_at: now,
@@ -161,12 +162,12 @@ export function TourClosingDialog({
         logger.warn('封存頻道時發生錯誤:', error)
       }
 
-      toast.success('結案完成，獎金請款單已產生')
+      toast.success(TOUR_CLOSING_LABELS.CLOSING_SUCCESS)
       onOpenChange(false)
       onSuccess?.()
     } catch (error) {
       logger.error('結案失敗:', error)
-      toast.error('結案失敗')
+      toast.error(TOUR_CLOSING_LABELS.CLOSING_FAILED)
     } finally {
       setIsSubmitting(false)
     }
@@ -182,10 +183,10 @@ export function TourClosingDialog({
         costs: tourCosts,
         bonuses: tourBonuses,
       })
-      toast.success('報表已生成')
+      toast.success(TOUR_CLOSING_LABELS.REPORT_GENERATED)
     } catch (error) {
       logger.error('生成報表失敗:', error)
-      toast.error('生成報表失敗')
+      toast.error(TOUR_CLOSING_LABELS.REPORT_FAILED)
     } finally {
       setIsPrinting(false)
     }

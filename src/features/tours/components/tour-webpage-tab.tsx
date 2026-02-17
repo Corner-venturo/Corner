@@ -39,6 +39,7 @@ const ItineraryPreview = dynamic(
 // 從 useItineraryEditor 複製的類型和初始值
 import type { LocalTourData, AutoSaveStatus } from '@/app/(main)/itinerary/new/hooks/useItineraryEditor'
 import { COMP_TOURS_LABELS } from '../constants/labels'
+import { TOUR_WEBPAGE_TAB_LABELS, TOUR_SERVICE_LABELS } from '../constants/labels'
 
 function getEmptyTourData(): LocalTourData {
   return {
@@ -304,8 +305,8 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
 
           if (!existingLeader) {
             const shouldSave = await confirm(
-              `要將「${leader.name}」新增到領隊資料庫嗎？\n下次可以直接搜尋選用。`,
-              { title: '儲存領隊資料', type: 'info' }
+              TOUR_WEBPAGE_TAB_LABELS.SAVE_LEADER_CONFIRM(leader.name),
+              { title: TOUR_WEBPAGE_TAB_LABELS.SAVE_LEADER_TITLE, type: 'info' }
             )
 
             if (shouldSave) {
@@ -342,7 +343,7 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
     } catch (error) {
       logger.error('自動存檔失敗:', error)
       setAutoSaveStatus('error')
-      toast.error('自動存檔失敗，請手動儲存')
+      toast.error(TOUR_WEBPAGE_TAB_LABELS.AUTO_SAVE_FAILED)
     }
   }, [currentItineraryId, convertDataForSave, user?.id])
 
@@ -419,11 +420,11 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
 
       if (newItinerary?.id) {
         setCurrentItineraryId(newItinerary.id)
-        toast.success('行程表已建立')
+        toast.success(TOUR_WEBPAGE_TAB_LABELS.ITINERARY_CREATED)
       }
     } catch (error) {
       logger.error('建立行程表失敗:', error)
-      toast.error('建立行程表失敗')
+      toast.error(TOUR_WEBPAGE_TAB_LABELS.CREATE_ITINERARY_FAILED)
     } finally {
       setCreating(false)
     }

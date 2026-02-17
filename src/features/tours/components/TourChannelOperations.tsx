@@ -9,6 +9,7 @@ import { Tour } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 import { confirm } from '@/lib/ui/alert-dialog'
+import { TOUR_CHANNEL_LABELS } from '../constants/labels'
 
 export interface TourStoreActions {
   fetchAll: () => Promise<void>
@@ -27,8 +28,8 @@ export function useTourChannelOperations({ actions }: UseTourChannelOperationsPa
 
     // 先確認是否要建立頻道
     const channelName = `${tour.code} ${tour.name}`
-    const confirmed = await confirm(`是否要為「${tour.name}」建立工作頻道？\n\n頻道名稱：${channelName}\n\n建立後可在工作空間中與團隊成員討論此旅遊團事宜。`, {
-      title: '建立頻道',
+    const confirmed = await confirm(TOUR_CHANNEL_LABELS.CREATE_CONFIRM(tour.name, channelName), {
+      title: TOUR_CHANNEL_LABELS.CREATE_CHANNEL,
       type: 'info',
     })
     if (!confirmed) {
@@ -36,7 +37,7 @@ export function useTourChannelOperations({ actions }: UseTourChannelOperationsPa
     }
 
     // 立即顯示載入提示
-    const loadingToast = toast.loading('正在建立頻道...')
+    const loadingToast = toast.loading(TOUR_CHANNEL_LABELS.CREATING)
 
     try {
       const { supabase } = await import('@/lib/supabase/client')
@@ -64,7 +65,7 @@ export function useTourChannelOperations({ actions }: UseTourChannelOperationsPa
       if (wsError || !workspaces) {
         logger.error('❌ [建立頻道] 找不到工作空間:', wsError)
         toast.dismiss(loadingToast)
-        toast.error('找不到工作空間')
+        toast.error(TOUR_CHANNEL_LABELS.WORKSPACE_NOT_FOUND)
         return
       }
 
@@ -85,7 +86,7 @@ export function useTourChannelOperations({ actions }: UseTourChannelOperationsPa
       if (existingChannel) {
         logger.log('ℹ️ [建立頻道] 頻道已存在:', existingChannel.name)
         toast.dismiss(loadingToast)
-        toast.info(`頻道已存在：${existingChannel.name}`)
+        toast.info(TOUR_CHANNEL_LABELS.CHANNEL_EXISTS(existingChannel.name))
         return
       }
 
@@ -129,12 +130,12 @@ export function useTourChannelOperations({ actions }: UseTourChannelOperationsPa
       }
 
       toast.dismiss(loadingToast)
-      toast.success(`已建立頻道：${channelName}`)
+      toast.success(TOUR_CHANNEL_LABELS.CHANNEL_CREATED(channelName))
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : '未知錯誤'
+      const errorMessage = error instanceof Error ? error.message : TOUR_CHANNEL_LABELS.UNKNOWN_ERROR
       logger.error('❌ [建立頻道] 發生錯誤:', error)
       toast.dismiss(loadingToast)
-      toast.error(`建立頻道失敗：${errorMessage}`)
+      toast.error(TOUR_CHANNEL_LABELS.CREATE_FAILED(errorMessage))
     }
   }, [])
 

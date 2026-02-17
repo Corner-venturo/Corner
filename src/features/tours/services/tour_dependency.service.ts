@@ -7,6 +7,7 @@
 
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import { TOUR_DEPENDENCY_LABELS, TOUR_SERVICE_LABELS } from '../constants/labels'
 
 export interface TourDependencyCheck {
   blockers: string[]
@@ -27,10 +28,10 @@ export async function checkTourDependencies(tourId: string): Promise<TourDepende
   const [members, receipts, payments, pnrs] = checks
   const blockers: string[] = []
 
-  if (members.count && members.count > 0) blockers.push(`${members.count} 位團員`)
-  if (receipts.count && receipts.count > 0) blockers.push(`${receipts.count} 筆收款單`)
-  if (payments.count && payments.count > 0) blockers.push(`${payments.count} 筆請款單`)
-  if (pnrs.count && pnrs.count > 0) blockers.push(`${pnrs.count} 筆 PNR`)
+  if (members.count && members.count > 0) blockers.push(TOUR_DEPENDENCY_LABELS.MEMBERS_COUNT(members.count))
+  if (receipts.count && receipts.count > 0) blockers.push(TOUR_DEPENDENCY_LABELS.RECEIPTS_COUNT(receipts.count))
+  if (payments.count && payments.count > 0) blockers.push(TOUR_DEPENDENCY_LABELS.PAYMENTS_COUNT(payments.count))
+  if (pnrs.count && pnrs.count > 0) blockers.push(TOUR_DEPENDENCY_LABELS.PNRS_COUNT(pnrs.count))
 
   return { blockers, hasBlockers: blockers.length > 0 }
 }
@@ -58,7 +59,7 @@ export async function deleteTourEmptyOrders(tourId: string): Promise<void> {
   const { error } = await supabase.from('orders').delete().eq('tour_id', tourId)
   if (error) {
     logger.error('刪除空訂單失敗:', error)
-    throw new Error(`刪除空訂單失敗: ${error.message}`)
+    throw new Error(TOUR_DEPENDENCY_LABELS.DELETE_EMPTY_ORDER_FAILED(error.message))
   }
 }
 

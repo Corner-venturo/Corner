@@ -6,6 +6,7 @@ import { useState, useCallback } from 'react'
 import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
 import { toast } from 'sonner'
 import type { NewTourData } from '../types'
+import { TOUR_FORM_LABELS } from '../constants/labels'
 
 interface UseTourFormProps {
   newTour: NewTourData
@@ -24,7 +25,7 @@ export function useTourForm({
   const handleSearchOutbound = useCallback(async () => {
     const flightNumber = newTour.outbound_flight_number
     if (!flightNumber) {
-      toast.warning('請先輸入航班號碼')
+      toast.warning(TOUR_FORM_LABELS.ENTER_FLIGHT_NUMBER)
       return
     }
 
@@ -48,11 +49,11 @@ export function useTourForm({
         if (result.warning) {
           toast.warning(result.warning, { duration: 5000 })
         } else {
-          toast.success(`已查詢到航班: ${result.data.airline} ${result.data.flightNumber}`)
+          toast.success(TOUR_FORM_LABELS.FLIGHT_FOUND(result.data.airline, result.data.flightNumber))
         }
       }
     } catch {
-      toast.error('查詢航班時發生錯誤')
+      toast.error(TOUR_FORM_LABELS.FLIGHT_QUERY_ERROR)
     } finally {
       setLoadingOutbound(false)
     }
@@ -62,7 +63,7 @@ export function useTourForm({
   const handleSearchReturn = useCallback(async () => {
     const flightNumber = newTour.return_flight_number
     if (!flightNumber) {
-      toast.warning('請先輸入航班號碼')
+      toast.warning(TOUR_FORM_LABELS.ENTER_FLIGHT_NUMBER)
       return
     }
 
@@ -86,11 +87,11 @@ export function useTourForm({
         if (result.warning) {
           toast.warning(result.warning, { duration: 5000 })
         } else {
-          toast.success(`已查詢到航班: ${result.data.airline} ${result.data.flightNumber}`)
+          toast.success(TOUR_FORM_LABELS.FLIGHT_FOUND(result.data.airline, result.data.flightNumber))
         }
       }
     } catch {
-      toast.error('查詢航班時發生錯誤')
+      toast.error(TOUR_FORM_LABELS.FLIGHT_QUERY_ERROR)
     } finally {
       setLoadingReturn(false)
     }

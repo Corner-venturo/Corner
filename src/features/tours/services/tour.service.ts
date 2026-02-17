@@ -10,6 +10,7 @@ import { BaseEntity } from '@/core/types/common'
 import { supabase } from '@/lib/supabase/client'
 import { invalidateTours } from '@/data'
 import { useTourStore } from '@/stores'
+import { TOUR_SERVICE_LABELS } from '../constants/labels'
 
 class TourService extends BaseService<Tour & BaseEntity> {
   protected resourceName = 'tours'
@@ -42,15 +43,15 @@ class TourService extends BaseService<Tour & BaseEntity> {
     super.validate(data)
 
     if (data.name && data.name.trim().length < 2) {
-      throw new ValidationError('name', '旅遊團名稱至少需要 2 個字符')
+      throw new ValidationError('name', TOUR_SERVICE_LABELS.NAME_MIN_LENGTH)
     }
 
     if (data.max_participants && data.max_participants < 1) {
-      throw new ValidationError('max_participants', '最大參與人數必須大於 0')
+      throw new ValidationError('max_participants', TOUR_SERVICE_LABELS.MAX_PARTICIPANTS_GT_ZERO)
     }
 
     if (data.price && data.price < 0) {
-      throw new ValidationError('price', '價格不能為負數')
+      throw new ValidationError('price', TOUR_SERVICE_LABELS.PRICE_NOT_NEGATIVE)
     }
 
     // 移除過去日期驗證 - 允許建立歷史旅遊團資料
@@ -68,7 +69,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
       const retDate = new Date(data.return_date)
 
       if (retDate < depDate) {
-        throw new ValidationError('return_date', '返回日期不能早於出發日期')
+        throw new ValidationError('return_date', TOUR_SERVICE_LABELS.RETURN_BEFORE_DEPARTURE)
       }
     }
   }
@@ -94,7 +95,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
     // 取得當前 workspace code (用於向後相容，新格式不需要)
     const workspaceCode = getCurrentWorkspaceCode()
     if (!workspaceCode) {
-      throw new Error('無法取得 workspace code，請重新登入')
+      throw new Error(TOUR_SERVICE_LABELS.CANNOT_GET_WORKSPACE)
     }
 
     // 獲取所有現有 tours
@@ -125,12 +126,12 @@ class TourService extends BaseService<Tour & BaseEntity> {
   async canCancelTour(tour_id: string): Promise<{ canCancel: boolean; reason?: string }> {
     const tour = await this.getById(tour_id)
     if (!tour) {
-      return { canCancel: false, reason: '找不到該旅遊團' }
+      return { canCancel: false, reason: TOUR_SERVICE_LABELS.TOUR_NOT_FOUND }
     }
 
     // Tour 狀態檢查
-    if (tour.status === '結案') {
-      return { canCancel: false, reason: '該旅遊團已經結案，無法取消' }
+    if (tour.status === TOUR_SERVICE_LABELS.STATUS_CLOSED) {
+      return { canCancel: false, reason: TOUR_SERVICE_LABELS.TOUR_ALREADY_CLOSED }
     }
 
     const departure_date = new Date(tour.departure_date)
@@ -138,7 +139,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
     const daysDiff = Math.ceil((departure_date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
 
     if (daysDiff < 3) {
-      return { canCancel: false, reason: '出發前3天內無法取消' }
+      return { canCancel: false, reason: TOUR_SERVICE_LABELS.CANNOT_CANCEL_WITHIN_3_DAYS }
     }
 
     return { canCancel: true }
@@ -202,17 +203,17 @@ class TourService extends BaseService<Tour & BaseEntity> {
       'cancelled': ['draft'],
       'archived': [],
       // 相容舊中文狀態值
-      '提案': ['進行中', '取消', 'draft', 'cancelled'],
-      '進行中': ['結案', '取消', '提案', 'completed', 'cancelled'],
-      '結案': [],
-      '取消': [],
+      [TOUR_SERVICE_LABELS.STATUS_PROPOSAL]: [TOUR_SERVICE_LABELS.STATUS_ACTIVE, TOUR_SERVICE_LABELS.STATUS_CANCELLED, 'draft', 'cancelled'],
+      [TOUR_SERVICE_LABELS.STATUS_ACTIVE]: [TOUR_SERVICE_LABELS.STATUS_CLOSED, TOUR_SERVICE_LABELS.STATUS_CANCELLED, TOUR_SERVICE_LABELS.STATUS_PROPOSAL, 'completed', 'cancelled'],
+      [TOUR_SERVICE_LABELS.STATUS_CLOSED]: [],
+      [TOUR_SERVICE_LABELS.STATUS_CANCELLED]: [],
     };
 
     const allowedTransitions = ALLOWED_STATUS_TRANSITIONS[currentStatus || ''] || [];
     if (!newStatus || !allowedTransitions.includes(newStatus)) {
       throw new ValidationError(
         'status',
-        `不允許的狀態轉換：無法從 "${currentStatus}" 更新為 "${newStatus}"`
+        TOUR_SERVICE_LABELS.INVALID_STATUS_TRANSITION(currentStatus || '', newStatus || '')
       );
     }
 
@@ -223,7 +224,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
     })
 
     // 當旅遊團結案或取消時，自動封存相關頻道
-    if (newStatus === '結案' || newStatus === '取消') {
+    if (newStatus === TOUR_SERVICE_LABELS.STATUS_CLOSED || newStatus === TOUR_SERVICE_LABELS.STATUS_CANCELLED) {
       await this.archiveTourChannel(tour_id)
     }
 
@@ -297,10 +298,10 @@ class TourService extends BaseService<Tour & BaseEntity> {
 
     const specialTour: Partial<Tour> = {
       code: tourCode,
-      name: `${targetYear}年度${type.name}`,
+      name: TOUR_SERVICE_LABELS.YEAR_TOUR_NAME(targetYear, type.name),
       departure_date: formatDate(departureDate),
       return_date: `${targetYear}-12-31`,
-      status: '特殊團',
+      status: TOUR_SERVICE_LABELS.STATUS_SPECIAL,
       location: type.location,
       price: 0,
       max_participants: 9999,
@@ -322,7 +323,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
    */
   async getOrCreateVisaTour(year?: number): Promise<Tour> {
     return this.getOrCreateSpecialTour(
-      { prefix: 'VISA', name: '簽證專用團', location: '簽證專用' },
+      { prefix: 'VISA', name: TOUR_SERVICE_LABELS.VISA_TOUR_NAME, location: TOUR_SERVICE_LABELS.VISA_TOUR_LOCATION },
       year
     )
   }
@@ -334,7 +335,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
    */
   async getOrCreateEsimTour(year?: number): Promise<Tour> {
     return this.getOrCreateSpecialTour(
-      { prefix: 'ESIM', name: '網卡專用團', location: '網卡專用' },
+      { prefix: 'ESIM', name: TOUR_SERVICE_LABELS.ESIM_TOUR_NAME, location: TOUR_SERVICE_LABELS.ESIM_TOUR_LOCATION },
       year
     )
   }
@@ -347,7 +348,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
     const allTours = await this.list()
     return {
       ...allTours,
-      data: allTours.data.filter(tour => tour.status !== '特殊團'),
+      data: allTours.data.filter(tour => tour.status !== TOUR_SERVICE_LABELS.STATUS_SPECIAL),
     }
   }
 

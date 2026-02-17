@@ -31,6 +31,7 @@ import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { TOUR_WIZARD } from '../constants'
+import { TOUR_CONFIRMATION_LABELS, TOUR_SERVICE_LABELS } from '../constants/labels'
 
 // 報價單資訊
 interface QuoteInfo {
@@ -137,7 +138,7 @@ export function TourConfirmationWizard({
       }
     } catch (error) {
       logger.error('載入資料失敗:', error)
-      toast.error('載入資料失敗')
+      toast.error(TOUR_CONFIRMATION_LABELS.LOAD_DATA_FAILED)
     } finally {
       setLoading(false)
     }
@@ -146,13 +147,13 @@ export function TourConfirmationWizard({
   const handleNext = () => {
     if (currentStep === 'quote') {
       if (!selectedQuoteId && quotes.length > 0) {
-        toast.error('請選擇報價單版本')
+        toast.error(TOUR_CONFIRMATION_LABELS.SELECT_QUOTE_VERSION)
         return
       }
       setCurrentStep('itinerary')
     } else if (currentStep === 'itinerary') {
       if (!selectedItineraryId && itineraries.length > 0) {
-        toast.error('請選擇行程版本')
+        toast.error(TOUR_CONFIRMATION_LABELS.SELECT_ITINERARY_VERSION)
         return
       }
       setCurrentStep('confirm')
@@ -177,19 +178,19 @@ export function TourConfirmationWizard({
       const { error } = await supabase
         .from('tours')
         .update({
-          status: '進行中',
+          status: TOUR_SERVICE_LABELS.STATUS_ACTIVE,
           updated_at: new Date().toISOString(),
         })
         .eq('id', tour.id)
 
       if (error) throw error
 
-      toast.success('已確認！')
+      toast.success(TOUR_CONFIRMATION_LABELS.CONFIRMED)
       onOpenChange(false)
       onConfirmed?.()
     } catch (error) {
       logger.error('鎖定失敗:', error)
-      toast.error('鎖定失敗，請稍後再試')
+      toast.error(TOUR_CONFIRMATION_LABELS.LOCK_FAILED)
     } finally {
       setSubmitting(false)
     }

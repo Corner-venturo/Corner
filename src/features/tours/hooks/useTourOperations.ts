@@ -10,6 +10,7 @@ import { OrderFormData } from '@/features/orders/components/add-order-form'
 import type { CreateInput, UpdateInput } from '@/stores/core/types'
 import { useCountries, useCities, updateCountry, updateCity, updateQuote } from '@/data'
 import { createOrder } from '@/data/entities/orders'
+import { TOUR_OPERATIONS_LABELS } from '../constants/labels'
 import {
   checkTourDependencies,
   checkTourPaidOrders,
@@ -84,19 +85,19 @@ export function useTourOperations(params: UseTourOperationsParams) {
       // Check custom destination
       if (newTour.countryCode === '__custom__') {
         if (!newTour.customCountry?.trim()) {
-          alert('請填寫國家名稱')
+          alert(TOUR_OPERATIONS_LABELS.FILL_COUNTRY_NAME)
           return
         }
         if (!newTour.customLocation?.trim()) {
-          alert('請填寫城市名稱')
+          alert(TOUR_OPERATIONS_LABELS.FILL_CITY_NAME)
           return
         }
         if (!newTour.customCityCode?.trim()) {
-          alert('請填寫城市代號')
+          alert(TOUR_OPERATIONS_LABELS.FILL_CITY_CODE)
           return
         }
         if (newTour.customCityCode.length !== 3) {
-          alert('城市代號必須是 3 碼')
+          alert(TOUR_OPERATIONS_LABELS.CITY_CODE_3_CHARS)
           return
         }
       }
@@ -117,7 +118,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
 
         // 驗證城市代碼（團號需要 3 碼英文城市代碼）
         if (!cityCode || cityCode.length < 2) {
-          setFormError('請選擇城市，或在「系統設定 > 地區管理」中為該城市設定機場代碼')
+          setFormError(TOUR_OPERATIONS_LABELS.SELECT_CITY_OR_SET_AIRPORT)
           setSubmitting(false)
           return
         }
@@ -217,7 +218,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
         // 開團成功後跳轉到詳情頁
         router.push(`/tours/${code}`)
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : '建立旅遊團失敗'
+        const errorMessage = err instanceof Error ? err.message : TOUR_OPERATIONS_LABELS.CREATE_TOUR_FAILED
         setFormError(errorMessage)
         logger.error('Failed to create tour:', err)
       } finally {
@@ -240,14 +241,14 @@ export function useTourOperations(params: UseTourOperationsParams) {
 
   const handleDeleteTour = useCallback(
     async (tour: Tour | null): Promise<{ success: boolean; error?: string }> => {
-      if (!tour) return { success: false, error: '無效的旅遊團' }
+      if (!tour) return { success: false, error: TOUR_OPERATIONS_LABELS.INVALID_TOUR }
 
       try {
         // 檢查是否有關聯資料（團員、收款單、請款單、PNR 不能刪）
         const { blockers, hasBlockers } = await checkTourDependencies(tour.id)
 
         if (hasBlockers) {
-          const errorMsg = `無法刪除：此旅遊團有 ${blockers.join('、')}，請先刪除相關資料`
+          const errorMsg = TOUR_OPERATIONS_LABELS.CANNOT_DELETE_HAS_DEPS(blockers.join('、'))
           logger.warn(`刪除旅遊團 ${tour.code} 失敗：${errorMsg}`)
           return { success: false, error: errorMsg }
         }
@@ -255,7 +256,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
         // 檢查是否有已付款訂單
         const { hasPaidOrders, count: paidCount } = await checkTourPaidOrders(tour.id)
         if (hasPaidOrders) {
-          return { success: false, error: `此團有 ${paidCount} 筆已付款訂單，無法刪除` }
+          return { success: false, error: TOUR_OPERATIONS_LABELS.CANNOT_DELETE_PAID_ORDERS(paidCount) }
         }
 
         // 刪除關聯的訂單（沒有團員的空訂單可以刪）
@@ -271,7 +272,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
         logger.info(`已刪除旅遊團 ${tour.code}，斷開 ${linkedQuotesCount} 個報價單和 ${linkedItinerariesCount} 個行程表的連結`)
         return { success: true }
       } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : '刪除旅遊團失敗'
+        const errorMsg = err instanceof Error ? err.message : TOUR_OPERATIONS_LABELS.DELETE_TOUR_FAILED
         logger.error('刪除旅遊團失敗:', JSON.stringify(err, null, 2))
         return { success: false, error: errorMsg }
       }

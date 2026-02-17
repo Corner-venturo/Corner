@@ -781,6 +781,11 @@ export const TOUR_ITINERARY_TAB_LABELS = {
   T2: 'T2',
   行程表: '行程表',
   出發日期: '出發日期',
+
+  // Extra labels
+  TAIWAN: '台灣',
+  WEEKDAYS: ['日', '一', '二', '三', '四', '五', '六'] as readonly string[],
+  TRAVEL_AGENCY: '旅行社',
 };
 
 // TourCosts 模組的 UI 標籤
@@ -840,6 +845,15 @@ export const TOUR_COSTS_LABELS = {
   景點: '景點',
   其他: '其他',
   已付款: '已付款',
+
+  // Category labels (for cost charts)
+  CAT_ACCOMMODATION: '住宿',
+  CAT_TRANSPORTATION: '交通',
+  CAT_MEAL: '餐食',
+  CAT_TICKET: '門票',
+  CAT_GUIDE: '導遊',
+  CAT_OTHER: '其他',
+  UPLOADED: '已上傳',
 };
 
 // FlightInfoSection 模組的 UI 標籤  
@@ -919,4 +933,214 @@ export const FLIGHT_SECTION_LABELS = {
   ARRIVAL_TIME: '抵達時間',
   FLIGHT_DURATION: '飛行時間',
   RETURN_FLIGHT: '回程航班',
+}
+
+// ============================================================
+// Tour Service
+// ============================================================
+export const TOUR_SERVICE_LABELS = {
+  NAME_MIN_LENGTH: '旅遊團名稱至少需要 2 個字符',
+  MAX_PARTICIPANTS_GT_ZERO: '最大參與人數必須大於 0',
+  PRICE_NOT_NEGATIVE: '價格不能為負數',
+  RETURN_BEFORE_DEPARTURE: '返回日期不能早於出發日期',
+  CANNOT_GET_WORKSPACE: '無法取得 workspace code，請重新登入',
+  TOUR_NOT_FOUND: '找不到該旅遊團',
+  STATUS_CLOSED: '結案',
+  TOUR_ALREADY_CLOSED: '該旅遊團已經結案，無法取消',
+  CANNOT_CANCEL_WITHIN_3_DAYS: '出發前3天內無法取消',
+  STATUS_PROPOSAL: '提案',
+  STATUS_ACTIVE: '進行中',
+  STATUS_CANCELLED: '取消',
+  STATUS_SPECIAL: '特殊團',
+  INVALID_STATUS_TRANSITION: (from: string, to: string) => `不允許的狀態轉換：無法從 "${from}" 更新為 "${to}"`,
+  YEAR_TOUR_NAME: (year: number, name: string) => `${year}年度${name}`,
+  VISA_TOUR_NAME: '簽證專用團',
+  VISA_TOUR_LOCATION: '簽證專用',
+  ESIM_TOUR_NAME: '網卡專用團',
+  ESIM_TOUR_LOCATION: '網卡專用',
+}
+
+// ============================================================
+// Tour Payments Hook
+// ============================================================
+export const TOUR_PAYMENTS_LABELS = {
+  CONFIRMED: '已確認',
+  PENDING: '待確認',
+  UNIT: '式',
+  SUCCESS: '成功',
+  RECEIPT_CREATED: '收款單建立成功',
+  ERROR: '錯誤',
+  CREATE_RECEIPT_FAILED: '建立收款單失敗',
+  ENTER_BUYER_NAME: '請輸入買受人名稱',
+  FILL_PRODUCT_INFO: '請完整填寫商品資訊',
+  AMOUNT_EXCEED_CONFIRM: (invoiceAmount: string, paidAmount: string) => `發票金額 NT$ ${invoiceAmount} 超過已收款金額 NT$ ${paidAmount}，確定要開立嗎？`,
+  AMOUNT_EXCEED_TITLE: '金額超開提醒',
+  INVOICE_SUCCESS: '代轉發票開立成功',
+  INVOICE_FAILED: '開立發票失敗',
+}
+
+// ============================================================
+// Tour Operations Hook
+// ============================================================
+export const TOUR_OPERATIONS_LABELS = {
+  FILL_COUNTRY_NAME: '請填寫國家名稱',
+  FILL_CITY_NAME: '請填寫城市名稱',
+  FILL_CITY_CODE: '請填寫城市代號',
+  CITY_CODE_3_CHARS: '城市代號必須是 3 碼',
+  SELECT_CITY_OR_SET_AIRPORT: '請選擇城市，或在「系統設定 > 地區管理」中為該城市設定機場代碼',
+  CREATE_TOUR_FAILED: '建立旅遊團失敗',
+  INVALID_TOUR: '無效的旅遊團',
+  CANNOT_DELETE_HAS_DEPS: (blockers: string) => `無法刪除：此旅遊團有 ${blockers}，請先刪除相關資料`,
+  CANNOT_DELETE_PAID_ORDERS: (count: number) => `此團有 ${count} 筆已付款訂單，無法刪除`,
+  DELETE_TOUR_FAILED: '刪除旅遊團失敗',
+}
+
+// ============================================================
+// Tours Advanced Hook
+// ============================================================
+export const TOURS_ADVANCED_LABELS = {
+  CANNOT_GET_STATUS: '無法取得目前狀態',
+  INVALID_STATUS_TRANSITION: (from: string, to: string) => `無法從「${from}」轉為「${to}」`,
+}
+
+// ============================================================
+// Tour Form Hook
+// ============================================================
+export const TOUR_FORM_LABELS = {
+  ENTER_FLIGHT_NUMBER: '請先輸入航班號碼',
+  FLIGHT_FOUND: (airline: string, flightNumber: string) => `已查詢到航班: ${airline} ${flightNumber}`,
+  FLIGHT_QUERY_ERROR: '查詢航班時發生錯誤',
+}
+
+// ============================================================
+// Tour Closing Dialog
+// ============================================================
+export const TOUR_CLOSING_LABELS = {
+  SALES_BONUS: '業務獎金',
+  OP_BONUS: 'OP獎金',
+  SALES_BONUS_DESC: (tourCode: string, percent: number) => `${tourCode} 結案獎金 - 業務 ${percent}%`,
+  OP_BONUS_DESC: (tourCode: string, percent: number) => `${tourCode} 結案獎金 - OP ${percent}%`,
+  CLOSING_SUCCESS: '結案完成，獎金請款單已產生',
+  CLOSING_FAILED: '結案失敗',
+  REPORT_GENERATED: '報表已生成',
+  REPORT_FAILED: '生成報表失敗',
+}
+
+// ============================================================
+// Tour Confirmation Wizard
+// ============================================================
+export const TOUR_CONFIRMATION_LABELS = {
+  LOAD_DATA_FAILED: '載入資料失敗',
+  SELECT_QUOTE_VERSION: '請選擇報價單版本',
+  SELECT_ITINERARY_VERSION: '請選擇行程版本',
+  CONFIRMED: '已確認！',
+  LOCK_FAILED: '鎖定失敗，請稍後再試',
+}
+
+// ============================================================
+// Tour Channel Operations
+// ============================================================
+export const TOUR_CHANNEL_LABELS = {
+  CREATE_CONFIRM: (tourName: string, channelName: string) => `是否要為「${tourName}」建立工作頻道？\n\n頻道名稱：${channelName}\n\n建立後可在工作空間中與團隊成員討論此旅遊團事宜。`,
+  CREATE_CHANNEL: '建立頻道',
+  CREATING: '正在建立頻道...',
+  WORKSPACE_NOT_FOUND: '找不到工作空間',
+  CHANNEL_EXISTS: (name: string) => `頻道已存在：${name}`,
+  DEPARTURE_SUFFIX: '} 出發',
+  CHANNEL_CREATED: (name: string) => `已建立頻道：${name}`,
+  UNKNOWN_ERROR: '未知錯誤',
+  CREATE_FAILED: (message: string) => `建立頻道失敗：${message}`,
+}
+
+// ============================================================
+// Link Documents Dialog
+// ============================================================
+export const LINK_DOCUMENTS_LABELS = {
+  CREATE_QUOTE_FAILED: '建立團體報價單失敗',
+  CREATE_QUICK_QUOTE_FAILED: '建立快速報價單失敗',
+  QUOTE_DELETED: '報價單已刪除',
+  DELETE_QUOTE_FAILED: '刪除報價單失敗',
+  CREATE_ITINERARY_FAILED: '建立行程表失敗',
+}
+
+// ============================================================
+// Tour Webpage Tab
+// ============================================================
+export const TOUR_WEBPAGE_TAB_LABELS = {
+  SAVE_LEADER_CONFIRM: (name: string) => `要將「${name}」新增到領隊資料庫嗎？\n下次可以直接搜尋選用。`,
+  SAVE_LEADER_TITLE: '儲存領隊資料',
+  AUTO_SAVE_FAILED: '自動存檔失敗，請手動儲存',
+  ITINERARY_CREATED: '行程表已建立',
+  CREATE_ITINERARY_FAILED: '建立行程表失敗',
+}
+
+// ============================================================
+// Tour Navigation
+// ============================================================
+export const TOUR_NAVIGATION_LABELS = {
+  HOME: '首頁',
+  FLIGHT: '航班',
+  FEATURES: '特色',
+  ITINERARY: '行程',
+  LEADER: '領隊',
+  ACCOMMODATION: '住宿',
+  PRICE: '價格',
+  TOUR_FEE: '團費',
+  NOTES: '須知',
+}
+
+// ============================================================
+// Tour Leader Section
+// ============================================================
+export const TOUR_LEADER_LABELS = {
+  TBD: '待定',
+  WEEKDAYS: ['日', '一', '二', '三', '四', '五', '六'] as const,
+  LEADER: '領隊',
+  LEADER_NAME_TBD: '領隊姓名待定',
+  DATE_TBD: '日期待定',
+  TIME_TBD: '時間待定',
+  MEETING_POINT_TBD: '集合地點待定',
+  AIRPORT: '機場',
+}
+
+// ============================================================
+// Tour Itinerary Section
+// ============================================================
+export const TOUR_ITINERARY_SECTION_LABELS = {
+  SELF_ARRANGED: '敬請自理',
+}
+
+// ============================================================
+// PNR Tool Dialog
+// ============================================================
+export const PNR_TOOL_LABELS = {
+  DAYS_WITHIN: (days: number) => `${days} 天內`,
+  DAYS_AFTER: (days: number) => `${days} 天後`,
+  PNR_OVERWRITE_CONFIRM: (names: string) => `以下團員的 PNR 將被覆蓋：\n${names}\n\n確定要繼續嗎？`,
+  PNR_EXISTS_UPDATED: (pnr: string) => `PNR ${pnr} 已存在，已更新資料`,
+  UPDATE_START: (count: number, pnr: string) => `開始更新 ${count} 位團員的 PNR: ${pnr}`,
+  TICKET_INFO: (ticketNumber: string) => `, 票號=${ticketNumber}`,
+  MEMBER_UPDATED: (name: string, pnr: string, ticketInfo: string) => `${name} 已更新: pnr=${pnr}${ticketInfo}`,
+  MEMBER_NOT_FOUND: (name: string, memberId: string) => `${name}: 找不到該團員(${memberId})`,
+  UPDATE_FAILED: (errors: string) => `更新失敗: ${errors}`,
+  PNR_SAVED: (pnr: string, count: number) => `PNR ${pnr} 已儲存，更新 ${count} 位團員`,
+}
+
+// ============================================================
+// Tour Dependency Service
+// ============================================================
+export const TOUR_DEPENDENCY_LABELS = {
+  MEMBERS_COUNT: (count: number) => `${count} 位團員`,
+  RECEIPTS_COUNT: (count: number) => `${count} 筆收款單`,
+  PAYMENTS_COUNT: (count: number) => `${count} 筆請款單`,
+  PNRS_COUNT: (count: number) => `${count} 筆 PNR`,
+  DELETE_EMPTY_ORDER_FAILED: (message: string) => `刪除空訂單失敗: ${message}`,
+}
+
+// ============================================================
+// Tour Detail Page
+// ============================================================
+export const TOUR_DETAIL_PAGE_LABELS = {
+  BREADCRUMB_HOME: '首頁',
+  BREADCRUMB_TOURS: '旅遊團管理',
 }

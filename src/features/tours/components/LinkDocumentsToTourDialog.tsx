@@ -45,6 +45,7 @@ import { PackageItineraryDialog } from '@/features/proposals/components/PackageI
 import { toast } from 'sonner'
 import type { Proposal } from '@/types/proposal.types'
 import { TOURS_LABELS } from './constants/labels'
+import { LINK_DOCUMENTS_LABELS } from '../constants/labels'
 
 /**
  * 生成團號為基礎的報價單編號
@@ -220,7 +221,7 @@ export function LinkDocumentsToTourDialog({
       }
     } catch (error) {
       logger.error('建立團體報價單失敗:', error)
-      toast.error('建立團體報價單失敗')
+      toast.error(LINK_DOCUMENTS_LABELS.CREATE_QUOTE_FAILED)
     } finally {
       setIsCreatingStandardQuote(false)
     }
@@ -262,7 +263,7 @@ export function LinkDocumentsToTourDialog({
       }
     } catch (error) {
       logger.error('建立快速報價單失敗:', error)
-      toast.error('建立快速報價單失敗')
+      toast.error(LINK_DOCUMENTS_LABELS.CREATE_QUICK_QUOTE_FAILED)
     } finally {
       setIsCreatingQuickQuote(false)
     }
@@ -290,10 +291,10 @@ export function LinkDocumentsToTourDialog({
     try {
       setIsDeletingQuote(true)
       await deleteQuote(quote.id)
-      toast.success('報價單已刪除')
+      toast.success(LINK_DOCUMENTS_LABELS.QUOTE_DELETED)
     } catch (error) {
       logger.error('刪除報價單失敗:', error)
-      toast.error('刪除報價單失敗')
+      toast.error(LINK_DOCUMENTS_LABELS.DELETE_QUOTE_FAILED)
     } finally {
       setIsDeletingQuote(false)
     }
@@ -352,7 +353,7 @@ export function LinkDocumentsToTourDialog({
 
       if (error) {
         logger.error('建立 proposal_package 失敗:', error)
-        toast.error('建立行程表失敗')
+        toast.error(LINK_DOCUMENTS_LABELS.CREATE_ITINERARY_FAILED)
         return null
       }
 
@@ -370,7 +371,7 @@ export function LinkDocumentsToTourDialog({
       return newPackage as ProposalPackage
     } catch (err) {
       logger.error('建立 package 錯誤:', err)
-      toast.error('建立行程表失敗')
+      toast.error(LINK_DOCUMENTS_LABELS.CREATE_ITINERARY_FAILED)
       return null
     } finally {
       setIsCreatingPackage(false)

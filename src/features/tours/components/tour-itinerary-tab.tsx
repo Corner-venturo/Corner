@@ -82,7 +82,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
   // 判斷是否為國內旅遊
   const isDomestic = useMemo(() => {
     const dest = (tour.location || '').toLowerCase()
-    return dest.includes('台灣') || dest.includes('taiwan') || dest === 'tw'
+    return dest.includes(TOUR_ITINERARY_TAB_LABELS.TAIWAN) || dest.includes('taiwan') || dest === 'tw'
   }, [tour.location])
 
   // 計算天數
@@ -250,7 +250,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
         if (tour.departure_date) {
           const date = new Date(tour.departure_date)
           date.setDate(date.getDate() + idx)
-          const weekdays = ['日', '一', '二', '三', '四', '五', '六']
+          const weekdays = TOUR_ITINERARY_TAB_LABELS.WEEKDAYS
           dateLabel = `${date.getMonth() + 1}/${date.getDate()} (${weekdays[date.getDay()]})`
         }
 
@@ -349,7 +349,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
     const dailyData = getPreviewDailyData()
     const printContent = generatePrintHtml({
       title: title || TOUR_ITINERARY_TAB_LABELS.行程表,
-      companyName: currentUser?.workspace_code || '旅行社',
+      companyName: currentUser?.workspace_code || TOUR_ITINERARY_TAB_LABELS.TRAVEL_AGENCY,
       destination: tour.location || '',
       startDate: tour.departure_date || null,
       isDomestic,
@@ -397,7 +397,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
           <div className="border-b-2 border-morandi-gold pb-4 mb-6">
             <div className="flex items-start justify-between">
               <h1 className="text-xl font-bold text-morandi-primary">{title || TOUR_ITINERARY_TAB_LABELS.行程表}</h1>
-              <span className="text-sm font-semibold text-morandi-gold">{currentUser?.workspace_code || '旅行社'}</span>
+              <span className="text-sm font-semibold text-morandi-gold">{currentUser?.workspace_code || TOUR_ITINERARY_TAB_LABELS.TRAVEL_AGENCY}</span>
             </div>
             <div className="mt-4 grid grid-cols-3 gap-4 text-sm">
               <div><span className="text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.目的地_冒號}</span>{tour.location || '-'}</div>

@@ -13,6 +13,7 @@ import { useTourDetails } from '@/features/tours/hooks/useTours-advanced'
 import { useWorkspaceChannels } from '@/stores/workspace-store'
 import { TOUR_TABS, TourTabContent } from '@/features/tours/components/TourTabs'
 import { CODE_LABELS } from './constants/labels'
+import { TOUR_DETAIL_PAGE_LABELS } from '@/features/tours/constants/labels'
 
 const TourRequestFormDialog = dynamic(
   () => import('@/features/proposals/components/TourRequestFormDialog').then(m => m.TourRequestFormDialog),
@@ -79,8 +80,8 @@ export default function TourDetailPage() {
         title={CODE_LABELS.LOADING_6912}
         icon={MapPin}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '旅遊團管理', href: '/tours' },
+          { label: TOUR_DETAIL_PAGE_LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: TOUR_DETAIL_PAGE_LABELS.BREADCRUMB_TOURS, href: '/tours' },
           { label: code, href: `/tours/${code}` },
         ]}
         showBackButton={true}
@@ -100,8 +101,8 @@ export default function TourDetailPage() {
         title={CODE_LABELS.NOT_FOUND_9865}
         icon={MapPin}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '旅遊團管理', href: '/tours' },
+          { label: TOUR_DETAIL_PAGE_LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: TOUR_DETAIL_PAGE_LABELS.BREADCRUMB_TOURS, href: '/tours' },
           { label: code, href: `/tours/${code}` },
         ]}
         showBackButton={true}
@@ -122,8 +123,8 @@ export default function TourDetailPage() {
       title={tour.name}
       icon={MapPin}
       breadcrumb={[
-        { label: '首頁', href: '/' },
-        { label: '旅遊團管理', href: '/tours' },
+        { label: TOUR_DETAIL_PAGE_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: TOUR_DETAIL_PAGE_LABELS.BREADCRUMB_TOURS, href: '/tours' },
         { label: `${tour.code} ${tour.name}`, href: `/tours/${code}` },
       ]}
       showBackButton={true}
