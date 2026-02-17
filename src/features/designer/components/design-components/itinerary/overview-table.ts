@@ -1,7 +1,6 @@
 import type { DesignComponent, ComponentGenerateOptions } from '../types'
+import { getStylePalette } from '../types'
 import type { CanvasElement, TextElement, ShapeElement } from '../../types'
-
-const COLORS = { gold: '#c9aa7c', black: '#181511', gray: '#666666', lightGray: '#f5f3f0' }
 
 export const overviewTable: DesignComponent = {
   id: 'overview-table',
@@ -14,6 +13,7 @@ export const overviewTable: DesignComponent = {
   generate: (options: ComponentGenerateOptions): CanvasElement[] => {
     const { x, y, width } = options
     const ts = Date.now()
+    const p = getStylePalette(options.style)
     const elements: CanvasElement[] = []
     const rowHeight = 32
     const headerHeight = 28
@@ -24,7 +24,7 @@ export const overviewTable: DesignComponent = {
       x, y, width: 200, height: 24,
       zIndex: 2, rotation: 0, opacity: 1, locked: false, visible: true,
       content: '行程總覽 ITINERARY',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 16, fontWeight: '700', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.2, letterSpacing: 1.5 },
+      style: { fontFamily: p.fontFamily, fontSize: 16, fontWeight: '700', fontStyle: 'normal', color: p.primary, textAlign: 'left', lineHeight: 1.2, letterSpacing: 1.5 },
     } as TextElement)
 
     // 表頭背景
@@ -32,7 +32,7 @@ export const overviewTable: DesignComponent = {
       id: `comp-ot-header-bg-${ts}`, type: 'shape', name: '表頭背景', variant: 'rectangle',
       x, y: y + 30, width, height: headerHeight,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
-      fill: COLORS.gold, stroke: 'transparent', strokeWidth: 0,
+      fill: p.accent, stroke: 'transparent', strokeWidth: 0,
     } as ShapeElement)
 
     // 表頭文字
@@ -49,7 +49,7 @@ export const overviewTable: DesignComponent = {
         x: colX + 4, y: y + 34, width: col.w - 8, height: 20,
         zIndex: 3, rotation: 0, opacity: 1, locked: false, visible: true,
         content: col.label,
-        style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '600', fontStyle: 'normal', color: '#ffffff', textAlign: 'left', lineHeight: 1, letterSpacing: 0.5 },
+        style: { fontFamily: p.fontFamily, fontSize: 10, fontWeight: '600', fontStyle: 'normal', color: '#ffffff', textAlign: 'left', lineHeight: 1, letterSpacing: 0.5 },
       } as TextElement)
       colX += col.w
     })
@@ -72,7 +72,7 @@ export const overviewTable: DesignComponent = {
           id: `comp-ot-row-bg-${ri}-${ts}`, type: 'shape', name: `第${ri + 1}行背景`, variant: 'rectangle',
           x, y: rowY, width, height: rowHeight,
           zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
-          fill: COLORS.lightGray, stroke: 'transparent', strokeWidth: 0,
+          fill: p.lightBg, stroke: 'transparent', strokeWidth: 0,
         } as ShapeElement)
       }
 
@@ -84,7 +84,7 @@ export const overviewTable: DesignComponent = {
           x: cx + 4, y: rowY + 8, width: col.w - 8, height: 16,
           zIndex: 2, rotation: 0, opacity: 1, locked: false, visible: true,
           content: values[ci],
-          style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.2, letterSpacing: 0.3 },
+          style: { fontFamily: p.fontFamily, fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: p.primary, textAlign: 'left', lineHeight: 1.2, letterSpacing: 0.3 },
         } as TextElement)
         cx += col.w
       })

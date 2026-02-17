@@ -1,5 +1,6 @@
 import type { DesignComponent, ComponentGenerateOptions } from '../types'
-import type { CanvasElement, TextElement, ShapeElement, ImageElement } from '../../types'
+import { getStylePalette } from '../types'
+import type { CanvasElement, TextElement, ShapeElement } from '../../types'
 
 const A5_WIDTH = 559
 const A5_HEIGHT = 794
@@ -15,6 +16,7 @@ export const fullCover: DesignComponent = {
   generate: (options: ComponentGenerateOptions): CanvasElement[] => {
     const ts = Date.now()
     const data = options.data || {}
+    const p = getStylePalette(options.style)
     const elements: CanvasElement[] = []
 
     // 公司名稱
@@ -26,8 +28,8 @@ export const fullCover: DesignComponent = {
       zIndex: 10, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.companyName as string) || 'Corner Travel',
       style: {
-        fontFamily: 'Noto Sans TC', fontSize: 12, fontWeight: '800', fontStyle: 'normal',
-        textAlign: 'center', lineHeight: 1.2, letterSpacing: 3, color: '#181511',
+        fontFamily: p.fontFamily, fontSize: 12, fontWeight: '800', fontStyle: 'normal',
+        textAlign: 'center', lineHeight: 1.2, letterSpacing: 3, color: p.primary,
       },
     } as TextElement)
 
@@ -37,7 +39,7 @@ export const fullCover: DesignComponent = {
       type: 'shape', name: '公司底線', variant: 'rectangle',
       x: (A5_WIDTH - 50) / 2, y: 100, width: 50, height: 2,
       zIndex: 11, rotation: 0, opacity: 1, locked: false, visible: true,
-      fill: '#c9aa7c', stroke: 'transparent', strokeWidth: 0,
+      fill: p.accent, stroke: 'transparent', strokeWidth: 0,
     } as ShapeElement)
 
     // 封面圖片佔位
@@ -46,7 +48,7 @@ export const fullCover: DesignComponent = {
       type: 'shape', name: '封面圖片區', variant: 'rectangle',
       x: 40, y: 140, width: A5_WIDTH - 80, height: 350,
       zIndex: 3, rotation: 0, opacity: 1, locked: false, visible: true,
-      fill: '#f0ebe4', stroke: '#c9aa7c', strokeWidth: 1,
+      fill: p.lightBg, stroke: p.accent, strokeWidth: 1,
       borderRadius: { topLeft: 100, topRight: 100, bottomLeft: 4, bottomRight: 4 },
     } as ShapeElement)
 
@@ -58,8 +60,8 @@ export const fullCover: DesignComponent = {
       zIndex: 12, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.tourName as string) || '東京五日遊',
       style: {
-        fontFamily: 'Noto Sans TC', fontSize: 30, fontWeight: '900', fontStyle: 'normal',
-        textAlign: 'center', lineHeight: 1.3, letterSpacing: 3, color: '#181511',
+        fontFamily: p.fontFamily, fontSize: 30, fontWeight: '900', fontStyle: 'normal',
+        textAlign: 'center', lineHeight: 1.3, letterSpacing: 3, color: p.primary,
       },
     } as TextElement)
 
@@ -71,18 +73,18 @@ export const fullCover: DesignComponent = {
       zIndex: 12, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.subtitle as string) || 'TRAVEL GUIDE',
       style: {
-        fontFamily: 'Noto Sans TC', fontSize: 12, fontWeight: '400', fontStyle: 'normal',
-        textAlign: 'center', lineHeight: 1.4, letterSpacing: 4, color: '#666666',
+        fontFamily: p.fontFamily, fontSize: 12, fontWeight: '400', fontStyle: 'normal',
+        textAlign: 'center', lineHeight: 1.4, letterSpacing: 4, color: p.secondary,
       },
     } as TextElement)
 
-    // 金色裝飾線
+    // 裝飾線
     elements.push({
       id: `comp-fc-gold-line-${ts}`,
       type: 'shape', name: '裝飾線', variant: 'rectangle',
       x: (A5_WIDTH - 80) / 2, y: 610, width: 80, height: 1,
       zIndex: 12, rotation: 0, opacity: 1, locked: false, visible: true,
-      fill: '#c9aa7c', stroke: 'transparent', strokeWidth: 0,
+      fill: p.accent, stroke: 'transparent', strokeWidth: 0,
     } as ShapeElement)
 
     // 日期
@@ -93,8 +95,8 @@ export const fullCover: DesignComponent = {
       zIndex: 12, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.dateRange as string) || '2025.01.15 — 2025.01.19',
       style: {
-        fontFamily: 'Noto Sans TC', fontSize: 11, fontWeight: '400', fontStyle: 'normal',
-        textAlign: 'center', lineHeight: 1.4, letterSpacing: 2, color: '#666666',
+        fontFamily: p.fontFamily, fontSize: 11, fontWeight: '400', fontStyle: 'normal',
+        textAlign: 'center', lineHeight: 1.4, letterSpacing: 2, color: p.secondary,
       },
     } as TextElement)
 
@@ -106,8 +108,8 @@ export const fullCover: DesignComponent = {
       zIndex: 12, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.tourCode as string) || 'TYO250115A',
       style: {
-        fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '500', fontStyle: 'normal',
-        textAlign: 'center', lineHeight: 1.2, letterSpacing: 3, color: '#999999',
+        fontFamily: p.fontFamily, fontSize: 10, fontWeight: '500', fontStyle: 'normal',
+        textAlign: 'center', lineHeight: 1.2, letterSpacing: 3, color: p.muted,
       },
     } as TextElement)
 

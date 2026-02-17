@@ -1,7 +1,6 @@
 import type { DesignComponent, ComponentGenerateOptions } from '../types'
+import { getStylePalette } from '../types'
 import type { CanvasElement, TextElement, ShapeElement } from '../../types'
-
-const COLORS = { gold: '#c9aa7c', black: '#181511', gray: '#666666' }
 
 export const attractionCard: DesignComponent = {
   id: 'attraction-card',
@@ -15,6 +14,7 @@ export const attractionCard: DesignComponent = {
     const { x, y, width } = options
     const ts = Date.now()
     const data = options.data || {}
+    const p = getStylePalette(options.style)
     const elements: CanvasElement[] = []
 
     // 照片佔位
@@ -22,7 +22,7 @@ export const attractionCard: DesignComponent = {
       id: `comp-at-img-${ts}`, type: 'shape', name: '景點照片', variant: 'rectangle',
       x, y, width, height: 120,
       zIndex: 0, rotation: 0, opacity: 1, locked: false, visible: true,
-      fill: '#e8e4df', stroke: 'transparent', strokeWidth: 0, cornerRadius: 8,
+      fill: p.lightBg, stroke: 'transparent', strokeWidth: 0, cornerRadius: 8,
     } as ShapeElement)
 
     // 景點名稱
@@ -31,7 +31,7 @@ export const attractionCard: DesignComponent = {
       x, y: y + 130, width, height: 22,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.attractionName as string) || '淺草寺',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 15, fontWeight: '700', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.3, letterSpacing: 0.5 },
+      style: { fontFamily: p.fontFamily, fontSize: 15, fontWeight: '700', fontStyle: 'normal', color: p.primary, textAlign: 'left', lineHeight: 1.3, letterSpacing: 0.5 },
     } as TextElement)
 
     // 介紹
@@ -40,7 +40,7 @@ export const attractionCard: DesignComponent = {
       x, y: y + 156, width, height: 36,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.attractionDesc as string) || '東京最古老的寺院，以雷門大燈籠聞名。仲見世通商店街長約250公尺，販售各式傳統小吃與紀念品。',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: COLORS.gray, textAlign: 'left', lineHeight: 1.6, letterSpacing: 0.3 },
+      style: { fontFamily: p.fontFamily, fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: p.secondary, textAlign: 'left', lineHeight: 1.6, letterSpacing: 0.3 },
     } as TextElement)
 
     return elements

@@ -1,7 +1,6 @@
 import type { DesignComponent, ComponentGenerateOptions } from '../types'
+import { getStylePalette } from '../types'
 import type { CanvasElement, TextElement, ShapeElement } from '../../types'
-
-const COLORS = { gold: '#c9aa7c', black: '#181511' }
 
 export const headerComponent: DesignComponent = {
   id: 'page-header',
@@ -15,6 +14,7 @@ export const headerComponent: DesignComponent = {
     const { x, y, width } = options
     const ts = Date.now()
     const data = options.data || {}
+    const p = getStylePalette(options.style)
 
     return [
       {
@@ -22,20 +22,20 @@ export const headerComponent: DesignComponent = {
         x, y, width: width / 2, height: 36,
         zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
         content: (data.headerText as string) || 'TRAVEL GUIDE\nTOKYO',
-        style: { fontFamily: 'Noto Sans TC', fontSize: 9, fontWeight: '600', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.4, letterSpacing: 1.5 },
+        style: { fontFamily: p.fontFamily, fontSize: 9, fontWeight: '600', fontStyle: 'normal', color: p.primary, textAlign: 'left', lineHeight: 1.4, letterSpacing: 1.5 },
       } as TextElement,
       {
         id: `comp-hdr-right-${ts}`, type: 'text', name: '頁眉右',
         x: x + width / 2, y, width: width / 2, height: 36,
         zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
         content: (data.tourName as string) || '東京五日遊',
-        style: { fontFamily: 'Noto Sans TC', fontSize: 9, fontWeight: '500', fontStyle: 'normal', color: '#999999', textAlign: 'right', lineHeight: 1.4, letterSpacing: 0.5 },
+        style: { fontFamily: p.fontFamily, fontSize: 9, fontWeight: '500', fontStyle: 'normal', color: p.muted, textAlign: 'right', lineHeight: 1.4, letterSpacing: 0.5 },
       } as TextElement,
       {
         id: `comp-hdr-line-${ts}`, type: 'shape', name: '頁眉底線', variant: 'rectangle',
         x, y: y + 40, width: 80, height: 1,
         zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
-        fill: COLORS.gold, stroke: 'transparent', strokeWidth: 0,
+        fill: p.accent, stroke: 'transparent', strokeWidth: 0,
       } as ShapeElement,
     ]
   },

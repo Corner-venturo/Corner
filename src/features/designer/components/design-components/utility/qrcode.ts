@@ -1,7 +1,6 @@
 import type { DesignComponent, ComponentGenerateOptions } from '../types'
+import { getStylePalette } from '../types'
 import type { CanvasElement, TextElement, ShapeElement } from '../../types'
-
-const COLORS = { gold: '#c9aa7c', black: '#181511', gray: '#666666' }
 
 export const qrcodeComponent: DesignComponent = {
   id: 'qrcode-block',
@@ -14,6 +13,7 @@ export const qrcodeComponent: DesignComponent = {
   generate: (options: ComponentGenerateOptions): CanvasElement[] => {
     const { x, y } = options
     const ts = Date.now()
+    const p = getStylePalette(options.style)
 
     return [
       // QR 佔位框
@@ -21,7 +21,7 @@ export const qrcodeComponent: DesignComponent = {
         id: `comp-qr-box-${ts}`, type: 'shape', name: 'QR Code', variant: 'rectangle',
         x: x + 20, y, width: 120, height: 120,
         zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
-        fill: '#f0ebe4', stroke: COLORS.gold, strokeWidth: 1, cornerRadius: 4,
+        fill: p.lightBg, stroke: p.accent, strokeWidth: 1, cornerRadius: 4,
       } as ShapeElement,
       // 提示文字
       {
@@ -29,7 +29,7 @@ export const qrcodeComponent: DesignComponent = {
         x: x + 20, y: y + 40, width: 120, height: 40,
         zIndex: 2, rotation: 0, opacity: 1, locked: false, visible: true,
         content: 'QR Code\n（使用元素庫生成）',
-        style: { fontFamily: 'Noto Sans TC', fontSize: 9, fontWeight: '400', fontStyle: 'normal', color: COLORS.gray, textAlign: 'center', lineHeight: 1.6, letterSpacing: 0 },
+        style: { fontFamily: p.fontFamily, fontSize: 9, fontWeight: '400', fontStyle: 'normal', color: p.secondary, textAlign: 'center', lineHeight: 1.6, letterSpacing: 0 },
       } as TextElement,
       // 說明
       {
@@ -37,7 +37,7 @@ export const qrcodeComponent: DesignComponent = {
         x, y: y + 128, width: 160, height: 16,
         zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
         content: '掃描查看更多資訊',
-        style: { fontFamily: 'Noto Sans TC', fontSize: 8, fontWeight: '400', fontStyle: 'normal', color: COLORS.gray, textAlign: 'center', lineHeight: 1, letterSpacing: 0.5 },
+        style: { fontFamily: p.fontFamily, fontSize: 8, fontWeight: '400', fontStyle: 'normal', color: p.secondary, textAlign: 'center', lineHeight: 1, letterSpacing: 0.5 },
       } as TextElement,
     ]
   },

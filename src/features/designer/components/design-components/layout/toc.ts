@@ -1,7 +1,6 @@
 import type { DesignComponent, ComponentGenerateOptions } from '../types'
+import { getStylePalette } from '../types'
 import type { CanvasElement, TextElement, ShapeElement } from '../../types'
-
-const COLORS = { gold: '#c9aa7c', black: '#181511', gray: '#666666' }
 
 export const tocComponent: DesignComponent = {
   id: 'toc',
@@ -14,6 +13,7 @@ export const tocComponent: DesignComponent = {
   generate: (options: ComponentGenerateOptions): CanvasElement[] => {
     const { x, y, width } = options
     const ts = Date.now()
+    const p = getStylePalette(options.style)
     const elements: CanvasElement[] = []
 
     // 標題
@@ -22,7 +22,7 @@ export const tocComponent: DesignComponent = {
       x, y, width, height: 30,
       zIndex: 2, rotation: 0, opacity: 1, locked: false, visible: true,
       content: 'CONTENTS',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 20, fontWeight: '800', fontStyle: 'normal', color: COLORS.black, textAlign: 'center', lineHeight: 1, letterSpacing: 6 },
+      style: { fontFamily: p.fontFamily, fontSize: 20, fontWeight: '800', fontStyle: 'normal', color: p.primary, textAlign: 'center', lineHeight: 1, letterSpacing: 6 },
     } as TextElement)
 
     // 裝飾線
@@ -30,7 +30,7 @@ export const tocComponent: DesignComponent = {
       id: `comp-toc-line-${ts}`, type: 'shape', name: '裝飾線', variant: 'rectangle',
       x: x + (width - 60) / 2, y: y + 36, width: 60, height: 1,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
-      fill: COLORS.gold, stroke: 'transparent', strokeWidth: 0,
+      fill: p.accent, stroke: 'transparent', strokeWidth: 0,
     } as ShapeElement)
 
     // 目錄項目
@@ -53,7 +53,7 @@ export const tocComponent: DesignComponent = {
         x: x + 20, y: iy, width: width - 80, height: 18,
         zIndex: 2, rotation: 0, opacity: 1, locked: false, visible: true,
         content: item.name,
-        style: { fontFamily: 'Noto Sans TC', fontSize: 12, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.2, letterSpacing: 0.5 },
+        style: { fontFamily: p.fontFamily, fontSize: 12, fontWeight: '400', fontStyle: 'normal', color: p.primary, textAlign: 'left', lineHeight: 1.2, letterSpacing: 0.5 },
       } as TextElement)
 
       // 頁碼
@@ -62,7 +62,7 @@ export const tocComponent: DesignComponent = {
         x: x + width - 50, y: iy, width: 30, height: 18,
         zIndex: 2, rotation: 0, opacity: 1, locked: false, visible: true,
         content: item.page,
-        style: { fontFamily: 'Noto Sans TC', fontSize: 12, fontWeight: '600', fontStyle: 'normal', color: COLORS.gold, textAlign: 'right', lineHeight: 1.2, letterSpacing: 0 },
+        style: { fontFamily: p.fontFamily, fontSize: 12, fontWeight: '600', fontStyle: 'normal', color: p.accent, textAlign: 'right', lineHeight: 1.2, letterSpacing: 0 },
       } as TextElement)
 
       // 點線
@@ -70,7 +70,7 @@ export const tocComponent: DesignComponent = {
         id: `comp-toc-dots-${i}-${ts}`, type: 'shape', name: `點線-${item.name}`, variant: 'rectangle',
         x: x + 20, y: iy + 18, width: width - 40, height: 1,
         zIndex: 1, rotation: 0, opacity: 0.3, locked: false, visible: true,
-        fill: COLORS.gray, stroke: 'transparent', strokeWidth: 0,
+        fill: p.secondary, stroke: 'transparent', strokeWidth: 0,
         strokeDashArray: [2, 2],
       } as ShapeElement)
     })

@@ -1,7 +1,6 @@
 import type { DesignComponent, ComponentGenerateOptions } from '../types'
+import { getStylePalette } from '../types'
 import type { CanvasElement, TextElement, ShapeElement } from '../../types'
-
-const COLORS = { gold: '#c9aa7c', black: '#181511', gray: '#666666', lightBg: '#faf8f5' }
 
 export const hotelCard: DesignComponent = {
   id: 'hotel-card',
@@ -15,6 +14,7 @@ export const hotelCard: DesignComponent = {
     const { x, y, width } = options
     const ts = Date.now()
     const data = options.data || {}
+    const p = getStylePalette(options.style)
     const elements: CanvasElement[] = []
 
     // 背景
@@ -22,7 +22,7 @@ export const hotelCard: DesignComponent = {
       id: `comp-ht-bg-${ts}`, type: 'shape', name: '飯店背景', variant: 'rectangle',
       x, y, width, height: 150,
       zIndex: 0, rotation: 0, opacity: 1, locked: false, visible: true,
-      fill: COLORS.lightBg, stroke: COLORS.gold, strokeWidth: 1, cornerRadius: 8,
+      fill: p.background, stroke: p.accent, strokeWidth: 1, cornerRadius: 8,
     } as ShapeElement)
 
     // 圖片佔位
@@ -30,7 +30,7 @@ export const hotelCard: DesignComponent = {
       id: `comp-ht-img-${ts}`, type: 'shape', name: '飯店照片', variant: 'rectangle',
       x: x + 12, y: y + 12, width: 126, height: 126,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
-      fill: '#e8e4df', stroke: 'transparent', strokeWidth: 0, cornerRadius: 6,
+      fill: p.lightBg, stroke: 'transparent', strokeWidth: 0, cornerRadius: 6,
     } as ShapeElement)
 
     // 飯店名稱
@@ -39,7 +39,7 @@ export const hotelCard: DesignComponent = {
       x: x + 152, y: y + 16, width: width - 168, height: 22,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.hotelName as string) || '東京新宿華盛頓飯店',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 14, fontWeight: '700', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.3, letterSpacing: 0.5 },
+      style: { fontFamily: p.fontFamily, fontSize: 14, fontWeight: '700', fontStyle: 'normal', color: p.primary, textAlign: 'left', lineHeight: 1.3, letterSpacing: 0.5 },
     } as TextElement)
 
     // 星級
@@ -48,7 +48,7 @@ export const hotelCard: DesignComponent = {
       x: x + 152, y: y + 42, width: 100, height: 16,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: '★★★★☆',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 11, fontWeight: '400', fontStyle: 'normal', color: COLORS.gold, textAlign: 'left', lineHeight: 1, letterSpacing: 2 },
+      style: { fontFamily: p.fontFamily, fontSize: 11, fontWeight: '400', fontStyle: 'normal', color: p.accent, textAlign: 'left', lineHeight: 1, letterSpacing: 2 },
     } as TextElement)
 
     // 地址
@@ -57,7 +57,7 @@ export const hotelCard: DesignComponent = {
       x: x + 152, y: y + 64, width: width - 168, height: 30,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.address as string) || '〒160-0023 東京都新宿区西新宿3-2-9',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: COLORS.gray, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.3 },
+      style: { fontFamily: p.fontFamily, fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: p.secondary, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.3 },
     } as TextElement)
 
     // 電話
@@ -66,7 +66,7 @@ export const hotelCard: DesignComponent = {
       x: x + 152, y: y + 96, width: width - 168, height: 16,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.phone as string) || 'TEL: +81-3-3343-3111',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: COLORS.gray, textAlign: 'left', lineHeight: 1, letterSpacing: 0.3 },
+      style: { fontFamily: p.fontFamily, fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: p.secondary, textAlign: 'left', lineHeight: 1, letterSpacing: 0.3 },
     } as TextElement)
 
     // 入住日期
@@ -75,7 +75,7 @@ export const hotelCard: DesignComponent = {
       x: x + 152, y: y + 116, width: width - 168, height: 16,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.stayDates as string) || '入住：Day 1 ~ Day 3',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '500', fontStyle: 'normal', color: COLORS.gold, textAlign: 'left', lineHeight: 1, letterSpacing: 0.3 },
+      style: { fontFamily: p.fontFamily, fontSize: 10, fontWeight: '500', fontStyle: 'normal', color: p.accent, textAlign: 'left', lineHeight: 1, letterSpacing: 0.3 },
     } as TextElement)
 
     return elements

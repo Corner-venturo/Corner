@@ -1,7 +1,6 @@
 import type { DesignComponent, ComponentGenerateOptions } from '../types'
+import { getStylePalette } from '../types'
 import type { CanvasElement, TextElement, ShapeElement } from '../../types'
-
-const COLORS = { gold: '#c9aa7c', black: '#181511', gray: '#666666', lightBg: '#faf8f5' }
 
 export const vehicleInfo: DesignComponent = {
   id: 'vehicle-info',
@@ -15,6 +14,7 @@ export const vehicleInfo: DesignComponent = {
     const { x, y, width } = options
     const ts = Date.now()
     const data = options.data || {}
+    const p = getStylePalette(options.style)
 
     return [
       // 背景
@@ -22,7 +22,7 @@ export const vehicleInfo: DesignComponent = {
         id: `comp-vh-bg-${ts}`, type: 'shape', name: '交通背景', variant: 'rectangle',
         x, y, width, height: 90,
         zIndex: 0, rotation: 0, opacity: 1, locked: false, visible: true,
-        fill: COLORS.lightBg, stroke: COLORS.gold, strokeWidth: 1, cornerRadius: 8,
+        fill: p.background, stroke: p.accent, strokeWidth: 1, cornerRadius: 8,
       } as ShapeElement,
       // 標題
       {
@@ -30,7 +30,7 @@ export const vehicleInfo: DesignComponent = {
         x: x + 16, y: y + 12, width: 200, height: 18,
         zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
         content: '🚌 交通資訊',
-        style: { fontFamily: 'Noto Sans TC', fontSize: 13, fontWeight: '600', fontStyle: 'normal', color: COLORS.gold, textAlign: 'left', lineHeight: 1, letterSpacing: 0.5 },
+        style: { fontFamily: p.fontFamily, fontSize: 13, fontWeight: '600', fontStyle: 'normal', color: p.accent, textAlign: 'left', lineHeight: 1, letterSpacing: 0.5 },
       } as TextElement,
       // 車輛
       {
@@ -38,7 +38,7 @@ export const vehicleInfo: DesignComponent = {
         x: x + 16, y: y + 38, width: width / 2 - 20, height: 18,
         zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
         content: (data.vehicleType as string) || '車型：45 座大巴',
-        style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.3 },
+        style: { fontFamily: p.fontFamily, fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: p.primary, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.3 },
       } as TextElement,
       // 司機
       {
@@ -46,7 +46,7 @@ export const vehicleInfo: DesignComponent = {
         x: x + width / 2, y: y + 38, width: width / 2 - 16, height: 18,
         zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
         content: (data.driverInfo as string) || '司機：田中先生',
-        style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.3 },
+        style: { fontFamily: p.fontFamily, fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: p.primary, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.3 },
       } as TextElement,
       // 車牌
       {
@@ -54,7 +54,7 @@ export const vehicleInfo: DesignComponent = {
         x: x + 16, y: y + 60, width: width - 32, height: 18,
         zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
         content: (data.plateNumber as string) || '車牌：品川 300 あ 12-34',
-        style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: COLORS.gray, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.3 },
+        style: { fontFamily: p.fontFamily, fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: p.secondary, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.3 },
       } as TextElement,
     ]
   },

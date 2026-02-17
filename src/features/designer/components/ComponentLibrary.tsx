@@ -31,6 +31,7 @@ import {
   Clock,
   Table,
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -40,8 +41,15 @@ import {
   getComponentsByCategory,
   searchComponents,
 } from './design-components'
-import type { DesignComponent, ComponentCategory } from './design-components'
+import type { DesignComponent, ComponentCategory, ComponentStyle } from './design-components'
 import type { CanvasElement } from './types'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 // 圖示映射
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string; size?: number }>> = {
@@ -79,8 +87,14 @@ interface ComponentLibraryProps {
   templateData?: Record<string, unknown> | null
 }
 
+const STYLE_OPTIONS: { value: ComponentStyle; label: string }[] = [
+  { value: 'japanese', label: '日系' },
+  { value: 'modern', label: '現代' },
+]
+
 export function ComponentLibrary({ onInsertComponent, templateData }: ComponentLibraryProps) {
   const [searchQuery, setSearchQuery] = useState('')
+  const [componentStyle, setComponentStyle] = useState<ComponentStyle>('japanese')
   const [expandedCategories, setExpandedCategories] = useState<Set<ComponentCategory>>(
     new Set(['cover', 'itinerary', 'info', 'layout', 'utility'])
   )
@@ -109,6 +123,7 @@ export function ComponentLibrary({ onInsertComponent, templateData }: ComponentL
       x: BLEED,
       y: 100,
       data: templateData || undefined,
+      style: componentStyle,
     })
     onInsertComponent(elements, component.name)
   }
@@ -123,8 +138,13 @@ export function ComponentLibrary({ onInsertComponent, templateData }: ComponentL
         onClick={() => handleInsert(comp)}
         title={comp.description}
       >
-        <div className="w-8 h-8 rounded-md bg-amber-50 flex items-center justify-center flex-shrink-0 group-hover:bg-amber-100 transition-colors">
-          {IconComp ? <IconComp size={16} className="text-amber-600" /> : <LayoutTemplate size={16} className="text-amber-600" />}
+        <div className={cn(
+          'w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 transition-colors',
+          componentStyle === 'modern' ? 'bg-blue-50 group-hover:bg-blue-100' : 'bg-amber-50 group-hover:bg-amber-100'
+        )}>
+          {IconComp
+            ? <IconComp size={16} className={componentStyle === 'modern' ? 'text-blue-600' : 'text-amber-600'} />
+            : <LayoutTemplate size={16} className={componentStyle === 'modern' ? 'text-blue-600' : 'text-amber-600'} />}
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-sm font-medium text-morandi-primary truncate">{comp.name}</div>
@@ -141,16 +161,30 @@ export function ComponentLibrary({ onInsertComponent, templateData }: ComponentL
         <h3 className="font-medium text-sm text-morandi-primary">元件庫</h3>
       </div>
 
-      {/* 搜尋 */}
-      <div className="px-3 py-2 border-b border-border/50">
-        <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-morandi-secondary" />
-          <Input
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            placeholder="搜尋元件..."
-            className="pl-8 h-8 text-xs"
-          />
+      {/* 風格切換 + 搜尋 */}
+      <div className="px-3 py-2 border-b border-border/50 space-y-2">
+        <div className="flex items-center gap-2">
+          <Select value={componentStyle} onValueChange={(v) => setComponentStyle(v as ComponentStyle)}>
+            <SelectTrigger className="h-8 w-[80px] text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {STYLE_OPTIONS.map(opt => (
+                <SelectItem key={opt.value} value={opt.value} className="text-xs">
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-morandi-secondary" />
+            <Input
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="搜尋元件..."
+              className="pl-8 h-8 text-xs"
+            />
+          </div>
         </div>
       </div>
 

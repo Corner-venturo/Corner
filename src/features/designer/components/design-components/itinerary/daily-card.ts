@@ -1,7 +1,6 @@
 import type { DesignComponent, ComponentGenerateOptions } from '../types'
+import { getStylePalette } from '../types'
 import type { CanvasElement, TextElement, ShapeElement } from '../../types'
-
-const COLORS = { gold: '#c9aa7c', black: '#181511', gray: '#666666' }
 
 export const dailyCard: DesignComponent = {
   id: 'daily-card',
@@ -15,6 +14,7 @@ export const dailyCard: DesignComponent = {
     const { x, y, width } = options
     const ts = Date.now()
     const data = options.data || {}
+    const p = getStylePalette(options.style)
     const elements: CanvasElement[] = []
 
     // 天數大字
@@ -23,7 +23,7 @@ export const dailyCard: DesignComponent = {
       x, y, width: 60, height: 40,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: String(data.dayNumber || '01').padStart(2, '0'),
-      style: { fontFamily: 'Noto Sans TC', fontSize: 28, fontWeight: '900', fontStyle: 'normal', color: COLORS.gold, textAlign: 'left', lineHeight: 1, letterSpacing: 0 },
+      style: { fontFamily: p.fontFamily, fontSize: 28, fontWeight: '900', fontStyle: 'normal', color: p.accent, textAlign: 'left', lineHeight: 1, letterSpacing: 0 },
     } as TextElement)
 
     // DAY 標籤
@@ -32,7 +32,7 @@ export const dailyCard: DesignComponent = {
       x: x + 65, y: y + 8, width: 60, height: 20,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: `DAY ${data.dayNumber || 1}`,
-      style: { fontFamily: 'Noto Sans TC', fontSize: 11, fontWeight: '400', fontStyle: 'normal', color: COLORS.gray, textAlign: 'left', lineHeight: 1, letterSpacing: 1 },
+      style: { fontFamily: p.fontFamily, fontSize: 11, fontWeight: '400', fontStyle: 'normal', color: p.secondary, textAlign: 'left', lineHeight: 1, letterSpacing: 1 },
     } as TextElement)
 
     // 日期
@@ -41,7 +41,7 @@ export const dailyCard: DesignComponent = {
       x: x + 65, y: y + 22, width: 120, height: 16,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.date as string) || '2025/01/15（三）',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: COLORS.gray, textAlign: 'left', lineHeight: 1, letterSpacing: 0.5 },
+      style: { fontFamily: p.fontFamily, fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: p.secondary, textAlign: 'left', lineHeight: 1, letterSpacing: 0.5 },
     } as TextElement)
 
     // 行程標題
@@ -50,7 +50,7 @@ export const dailyCard: DesignComponent = {
       x, y: y + 50, width, height: 24,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.title as string) || '東京市區觀光・淺草寺・晴空塔',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 14, fontWeight: '700', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.5 },
+      style: { fontFamily: p.fontFamily, fontSize: 14, fontWeight: '700', fontStyle: 'normal', color: p.primary, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.5 },
     } as TextElement)
 
     // 分隔線
@@ -58,7 +58,7 @@ export const dailyCard: DesignComponent = {
       id: `comp-dc-divider-${ts}`, type: 'shape', name: '分隔線', variant: 'rectangle',
       x, y: y + 80, width, height: 2,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
-      fill: COLORS.gold, stroke: 'transparent', strokeWidth: 0,
+      fill: p.accent, stroke: 'transparent', strokeWidth: 0,
     } as ShapeElement)
 
     // 行程內容
@@ -67,7 +67,7 @@ export const dailyCard: DesignComponent = {
       x, y: y + 90, width, height: 80,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.content as string) || '● 淺草寺・雷門\n● 東京晴空塔展望台\n● 仲見世通商店街\n● 隅田川散步',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 11, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.8, letterSpacing: 0.3 },
+      style: { fontFamily: p.fontFamily, fontSize: 11, fontWeight: '400', fontStyle: 'normal', color: p.primary, textAlign: 'left', lineHeight: 1.8, letterSpacing: 0.3 },
     } as TextElement)
 
     return elements

@@ -1,7 +1,6 @@
 import type { DesignComponent, ComponentGenerateOptions } from '../types'
+import { getStylePalette } from '../types'
 import type { CanvasElement, TextElement, ShapeElement } from '../../types'
-
-const COLORS = { gold: '#c9aa7c', black: '#181511', gray: '#666666', lightBg: '#faf8f5' }
 
 export const flightCard: DesignComponent = {
   id: 'flight-card',
@@ -15,6 +14,7 @@ export const flightCard: DesignComponent = {
     const { x, y, width } = options
     const ts = Date.now()
     const data = options.data || {}
+    const p = getStylePalette(options.style)
     const elements: CanvasElement[] = []
 
     // 背景
@@ -22,7 +22,7 @@ export const flightCard: DesignComponent = {
       id: `comp-fl-bg-${ts}`, type: 'shape', name: '航班背景', variant: 'rectangle',
       x, y, width, height: 110,
       zIndex: 0, rotation: 0, opacity: 1, locked: false, visible: true,
-      fill: COLORS.lightBg, stroke: COLORS.gold, strokeWidth: 1, cornerRadius: 8,
+      fill: p.background, stroke: p.accent, strokeWidth: 1, cornerRadius: 8,
     } as ShapeElement)
 
     // 標題
@@ -31,7 +31,7 @@ export const flightCard: DesignComponent = {
       x: x + 16, y: y + 12, width: 150, height: 18,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: '✈ 航班資訊 FLIGHT',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 13, fontWeight: '600', fontStyle: 'normal', color: COLORS.gold, textAlign: 'left', lineHeight: 1, letterSpacing: 0.5 },
+      style: { fontFamily: p.fontFamily, fontSize: 13, fontWeight: '600', fontStyle: 'normal', color: p.accent, textAlign: 'left', lineHeight: 1, letterSpacing: 0.5 },
     } as TextElement)
 
     // 分隔線
@@ -39,7 +39,7 @@ export const flightCard: DesignComponent = {
       id: `comp-fl-div-${ts}`, type: 'shape', name: '分隔線', variant: 'rectangle',
       x: x + 16, y: y + 36, width: width - 32, height: 1,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
-      fill: '#e8e4df', stroke: 'transparent', strokeWidth: 0,
+      fill: p.border, stroke: 'transparent', strokeWidth: 0,
     } as ShapeElement)
 
     // 去程
@@ -48,7 +48,7 @@ export const flightCard: DesignComponent = {
       x: x + 16, y: y + 46, width: width - 32, height: 18,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.outbound as string) || '去程｜CI100  桃園 TPE 08:30 → 成田 NRT 12:30',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 11, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.3 },
+      style: { fontFamily: p.fontFamily, fontSize: 11, fontWeight: '400', fontStyle: 'normal', color: p.primary, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.3 },
     } as TextElement)
 
     // 回程
@@ -57,7 +57,7 @@ export const flightCard: DesignComponent = {
       x: x + 16, y: y + 72, width: width - 32, height: 18,
       zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
       content: (data.returnFlight as string) || '回程｜CI101  成田 NRT 14:00 → 桃園 TPE 17:00',
-      style: { fontFamily: 'Noto Sans TC', fontSize: 11, fontWeight: '400', fontStyle: 'normal', color: COLORS.black, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.3 },
+      style: { fontFamily: p.fontFamily, fontSize: 11, fontWeight: '400', fontStyle: 'normal', color: p.primary, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.3 },
     } as TextElement)
 
     return elements
