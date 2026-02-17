@@ -19,7 +19,7 @@ function RichText({ html, className }: { html: string | null | undefined; classN
 // Brutalist 陰影
 const brutalistShadow = '6px 6px 0px 0px rgba(28,28,28,1)'
 
-// 預設封面圖片（當城市沒有設定圖片時顯示空白）
+// 無封面時不顯示圖片
 const DEFAULT_COVER = ''
 
 interface TourHeroArtProps {
@@ -206,11 +206,15 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
                   className="absolute top-0 left-0 right-4 bottom-4 border overflow-hidden"
                   style={{ borderColor: ART.ink, backgroundColor: '#e5e5e5' }}
                 >
-                  <img
-                    src={coverImage}
-                    alt={data.title}
-                    className="w-full h-full object-cover"
-                  />
+                  {coverImage ? (
+                    <img
+                      src={coverImage}
+                      alt={data.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full" style={{ background: `linear-gradient(135deg, ${ART.clay}33, ${ART.ink}11)` }} />
+                  )}
                 </div>
 
                 {/* 引言卡片 */}
@@ -331,11 +335,15 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
                 className="absolute top-0 left-0 right-3 bottom-3 border overflow-hidden"
                 style={{ borderColor: ART.ink }}
               >
-                <img
-                  src={coverImage}
-                  alt={data.title}
-                  className="w-full h-full object-cover"
-                />
+                {coverImage ? (
+                  <img
+                    src={coverImage}
+                    alt={data.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full" style={{ background: `linear-gradient(135deg, ${ART.clay}33, ${ART.ink}11)` }} />
+                )}
               </div>
             </motion.div>
           </div>

@@ -27,7 +27,7 @@ const POP = {
   dark: '#121212',
 }
 
-// 預設封面圖片（當城市沒有設定圖片時顯示空白）
+// 無封面時不顯示圖片
 const DEFAULT_COVER = ''
 
 interface TourHeroCollageProps {
@@ -193,12 +193,19 @@ export function TourHeroCollage({ data, viewMode }: TourHeroCollageProps) {
             whileHover={{ rotate: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <img
-              src={coverImage}
-              alt={data.title}
-              className="w-full h-full object-cover border border-black"
-              style={{ filter: 'grayscale(100%) contrast(1.25)' }}
-            />
+            {coverImage ? (
+              <img
+                src={coverImage}
+                alt={data.title}
+                className="w-full h-full object-cover border border-black"
+                style={{ filter: 'grayscale(100%) contrast(1.25)' }}
+              />
+            ) : (
+              <div
+                className="w-full h-full border border-black"
+                style={{ background: `repeating-linear-gradient(45deg, ${POP.yellow}22, ${POP.yellow}22 10px, ${POP.pink}11 10px, ${POP.pink}11 20px)` }}
+              />
+            )}
             {/* 手寫文字 */}
             <div
               className="absolute bottom-4 left-0 w-full text-center"

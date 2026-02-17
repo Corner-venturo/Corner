@@ -255,6 +255,11 @@ function ItineraryPrintContent() {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }
+          table { page-break-inside: auto; }
+          tr { page-break-inside: avoid; page-break-after: auto; }
+          thead { display: table-header-group; }
+          h1, h2, h3 { page-break-after: avoid; }
+          img { page-break-inside: avoid; }
         }
       `}</style>
     </div>

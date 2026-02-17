@@ -134,11 +134,18 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
           {/* 右側：主視覺圖片 */}
           <div className={`${isMobile ? '' : 'lg:col-span-7'} relative`}>
             <div className="relative h-[400px] lg:h-[600px] rounded-2xl overflow-hidden shadow-lg">
-              <img
-                src={data.coverImage || ''}
-                alt={data.title}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
+              {data.coverImage ? (
+                <img
+                  src={data.coverImage}
+                  alt={data.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              ) : (
+                <div
+                  className="absolute inset-0 w-full h-full"
+                  style={{ background: `linear-gradient(135deg, ${LUXURY.primary}33, ${LUXURY.secondary}44, ${LUXURY.background})` }}
+                />
+              )}
               {/* 漸層遮罩 */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 

@@ -28,12 +28,16 @@ export function TourHeroSection({ data, viewMode }: TourHeroSectionProps) {
     <section id="top" className="relative h-screen overflow-hidden bg-morandi-primary">
       {/* 動態背景 */}
       <div className="absolute inset-0">
-        <img
-          src={data.coverImage || ''}
-          alt="Cover"
-          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
-          style={{ filter: 'brightness(0.7)' }}
-        />
+        {data.coverImage ? (
+          <img
+            src={data.coverImage}
+            alt="Cover"
+            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
+            style={{ filter: 'brightness(0.7)' }}
+          />
+        ) : (
+          <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-morandi-primary via-morandi-gold/30 to-morandi-primary" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/70" />
       </div>
 

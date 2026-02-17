@@ -28,7 +28,7 @@ const DREAM = {
   sand: '#fcf6e9',
 }
 
-// 預設封面圖片（當城市沒有設定圖片時顯示空白）
+// 無封面時不顯示圖片
 const DEFAULT_COVER = ''
 
 interface TourHeroDreamscapeProps {
@@ -255,12 +255,19 @@ export function TourHeroDreamscape({ data, viewMode }: TourHeroDreamscapeProps) 
               }}
               transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
             >
-              <img
-                src={coverImage}
-                alt={data.title}
-                className="w-full h-full object-cover scale-110"
-                style={{ filter: 'brightness(1.05) contrast(1.1)' }}
-              />
+              {coverImage ? (
+                <img
+                  src={coverImage}
+                  alt={data.title}
+                  className="w-full h-full object-cover scale-110"
+                  style={{ filter: 'brightness(1.05) contrast(1.1)' }}
+                />
+              ) : (
+                <div
+                  className="w-full h-full scale-110"
+                  style={{ background: `linear-gradient(135deg, ${DREAM.lavender}, ${DREAM.peach}, ${DREAM.sky})` }}
+                />
+              )}
               <div
                 className="absolute inset-0 mix-blend-overlay"
                 style={{ background: `linear-gradient(to top, ${DREAM.purple}33, transparent)` }}

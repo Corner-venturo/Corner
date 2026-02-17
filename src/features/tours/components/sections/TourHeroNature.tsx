@@ -116,11 +116,15 @@ export function TourHeroNature({ data, viewMode }: TourHeroNatureProps) {
               <div className="absolute inset-0 bg-[#30abe8]/10 mix-blend-overlay z-10" />
 
               {/* 主圖 */}
-              <img
-                src={data.coverImage || ''}
-                alt={data.title}
-                className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-105"
-              />
+              {data.coverImage ? (
+                <img
+                  src={data.coverImage}
+                  alt={data.title}
+                  className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-105"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-[#667a6e] via-[#8b9d83] to-[#c9aa7c] transition-transform duration-[2s] group-hover:scale-105" />
+              )}
 
               {/* 底部標籤區：位置 + tagline */}
               <div className={`absolute z-20 flex items-center gap-2 ${
