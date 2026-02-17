@@ -14,6 +14,7 @@ export const mealCard: DesignComponent = {
   generate: (options: ComponentGenerateOptions): CanvasElement[] => {
     const { x, y, width } = options
     const ts = Date.now()
+    const data = options.data || {}
     const elements: CanvasElement[] = []
 
     // 背景
@@ -36,9 +37,9 @@ export const mealCard: DesignComponent = {
     // 三餐
     const mealWidth = (width - 48) / 3
     const meals = [
-      { label: '早餐', value: '飯店內' },
-      { label: '午餐', value: '日式定食' },
-      { label: '晚餐', value: '敬請自理' },
+      { label: '早餐', value: (data.breakfast as string) || '飯店內' },
+      { label: '午餐', value: (data.lunch as string) || '日式定食' },
+      { label: '晚餐', value: (data.dinner as string) || '敬請自理' },
     ]
 
     meals.forEach((meal, i) => {
