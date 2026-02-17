@@ -55,7 +55,11 @@ export async function checkTourPaidOrders(tourId: string): Promise<{ hasPaidOrde
  * 刪除旅遊團的空訂單（沒有團員的）
  */
 export async function deleteTourEmptyOrders(tourId: string): Promise<void> {
-  await supabase.from('orders').delete().eq('tour_id', tourId)
+  const { error } = await supabase.from('orders').delete().eq('tour_id', tourId)
+  if (error) {
+    logger.error('刪除空訂單失敗:', error)
+    throw new Error(`刪除空訂單失敗: ${error.message}`)
+  }
 }
 
 /**
