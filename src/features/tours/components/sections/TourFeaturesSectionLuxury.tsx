@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, ArrowRight, ChevronDown } from 'lucide-react'
@@ -362,12 +363,12 @@ function FeatureCard({
                   <button
                     key={idx}
                     onClick={() => setCurrentImageIndex(idx)}
-                    className={`flex-shrink-0 w-16 h-16 rounded overflow-hidden border-2 transition-all ${
+                    className={`relative flex-shrink-0 w-16 h-16 rounded overflow-hidden border-2 transition-all ${
                       idx === currentImageIndex ? 'border-secondary opacity-100' : 'border-transparent opacity-60 hover:opacity-100'
                     }`}
                     style={{ borderColor: idx === currentImageIndex ? LUXURY.secondary : 'transparent' }}
                   >
-                    <img src={img} alt={`縮圖 ${idx + 1}`} className="w-full h-full object-cover" />
+                    <Image src={img} alt={`縮圖 ${idx + 1}`} fill className="object-cover" />
                   </button>
                 ))}
               </div>

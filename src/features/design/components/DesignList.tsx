@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { MoreHorizontal, Trash2, Edit2, FileText, Copy, Image as ImageIcon } from 'lucide-react'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { DateCell } from '@/components/table-cells'
@@ -33,9 +34,9 @@ export function DesignList({ onEdit, onDelete, onDuplicate }: DesignListProps) {
       label: '',
       width: '60',
       render: (_, row) => (
-        <div className="w-10 h-14 rounded overflow-hidden bg-morandi-container flex items-center justify-center">
+        <div className="relative w-10 h-14 rounded overflow-hidden bg-morandi-container flex items-center justify-center">
           {row.thumbnail_url ? (
-            <img src={row.thumbnail_url} alt="" className="w-full h-full object-cover" />
+            <Image src={row.thumbnail_url} alt="" fill className="object-cover" />
           ) : (
             <ImageIcon size={16} className="text-morandi-muted" />
           )}

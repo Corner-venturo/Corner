@@ -10,6 +10,7 @@
  */
 
 
+import NextImage from 'next/image'
 import React from 'react'
 import {
   Dialog,
@@ -419,7 +420,7 @@ export function ItineraryDialog({
                 {h.activeDay.attractions.map((attraction, attrIndex) =>
                   attraction.images.map((img) => (
                     <div key={img.id} className="relative group">
-                      <img src={img.url} alt="" className="w-16 h-16 object-cover rounded border border-border" />
+                      <NextImage src={img.url} alt="" width={64} height={64} className="object-cover rounded border border-border" />
                       <button onClick={() => h.removeImage(attrIndex, img.id)}
                         className="absolute -top-1 -right-1 h-4 w-4 bg-morandi-red text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <X size={10} />

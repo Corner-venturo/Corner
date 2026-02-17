@@ -1,5 +1,6 @@
 'use client'
 
+import NextImage from 'next/image'
 import React, { useEffect, useState } from 'react'
 import { InputIME } from '@/components/ui/input-ime'
 import { Button } from '@/components/ui/button'
@@ -586,7 +587,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
               />
               {spot.imageUrl && (
                 <div className="mb-2">
-                  <img src={spot.imageUrl} alt={spot.name} className="w-full h-24 object-cover rounded" />
+                  <NextImage src={spot.imageUrl} alt={spot.name} width={300} height={96} className="w-full h-24 object-cover rounded" />
                 </div>
               )}
               <textarea
@@ -692,7 +693,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
               />
               {sight.imageUrl && (
                 <div className="mb-2">
-                  <img src={sight.imageUrl} alt={sight.name} className="w-full h-32 object-cover rounded" />
+                  <NextImage src={sight.imageUrl} alt={sight.name} width={300} height={128} className="w-full h-32 object-cover rounded" />
                 </div>
               )}
               <textarea

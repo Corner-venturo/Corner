@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { MutableRefObject, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
@@ -242,7 +243,7 @@ function BlobRightLayout({
         {!isMobile && images[0] && (
           <div className="lg:col-span-3 lg:col-start-1 lg:row-start-1 h-[400px] relative transform hover:-translate-y-4 transition-transform duration-700">
             <div className="absolute inset-0 rounded-[50px] overflow-hidden rotate-[-3deg] shadow-lg">
-              <img className="w-full h-full object-cover" src={images[0]} alt="" />
+              <Image className="object-cover" src={images[0]} alt="" fill />
             </div>
             {day.activities?.[0]?.title && (
               <div
@@ -260,7 +261,7 @@ function BlobRightLayout({
         {!isMobile && images[1] && (
           <div className="lg:col-span-4 lg:col-start-9 lg:row-start-1 h-[500px] relative mt-24 transform hover:translate-y-4 transition-transform duration-700">
             <div className="absolute inset-0 rounded-t-full rounded-b-[200px] overflow-hidden rotate-[2deg] shadow-lg">
-              <img className="w-full h-full object-cover" src={images[1]} alt="" />
+              <Image className="object-cover" src={images[1]} alt="" fill />
             </div>
             {day.activities?.[1]?.title && (
               <div
@@ -278,8 +279,8 @@ function BlobRightLayout({
         {isMobile && images.length > 0 && (
           <div className="flex gap-4 overflow-x-auto pb-4">
             {images.map((img, i) => (
-              <div key={i} className="flex-shrink-0 w-64 h-48 rounded-2xl overflow-hidden shadow-lg">
-                <img className="w-full h-full object-cover" src={img || ''} alt="" />
+              <div key={i} className="relative flex-shrink-0 w-64 h-48 rounded-2xl overflow-hidden shadow-lg">
+                {img && <Image className="object-cover" src={img} alt="" fill />}
               </div>
             ))}
           </div>

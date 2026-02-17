@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
@@ -35,8 +36,8 @@ function ImageCarousel({ images, hotelName }: { images: string[]; hotelName: str
 
   if (images.length === 1) {
     return (
-      <div className="aspect-video w-full overflow-hidden">
-        <img src={images[0]} alt={hotelName} className="w-full h-full object-cover" />
+      <div className="relative aspect-video w-full overflow-hidden">
+        <Image src={images[0]} alt={hotelName} fill className="object-cover" />
       </div>
     )
   }
@@ -51,10 +52,11 @@ function ImageCarousel({ images, hotelName }: { images: string[]; hotelName: str
 
   return (
     <div className="relative aspect-video w-full overflow-hidden group">
-      <img
+      <Image
         src={images[currentIndex]}
         alt={`${hotelName} ${currentIndex + 1}`}
-        className="w-full h-full object-cover transition-opacity duration-300"
+        fill
+        className="object-cover transition-opacity duration-300"
       />
 
       {/* 左右箭頭 */}

@@ -12,6 +12,7 @@
  * - 右鍵選單
  */
 
+import NextImage from 'next/image'
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { 
   Folder, 
@@ -114,8 +115,8 @@ function getItemIcon(item: FinderItem): React.ReactNode {
   
   if (item.thumbnailUrl) {
     return (
-      <div className="w-12 h-12 rounded overflow-hidden bg-morandi-container">
-        <img src={item.thumbnailUrl} alt="" className="w-full h-full object-cover" />
+      <div className="relative w-12 h-12 rounded overflow-hidden bg-morandi-container">
+        <NextImage src={item.thumbnailUrl} alt="" fill className="object-cover" />
       </div>
     )
   }
