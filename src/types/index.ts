@@ -55,10 +55,6 @@ export type {
   Message,
   Attachment,
 
-  // Widget
-  Widget,
-  WidgetPosition,
-  WidgetSize,
 
   // 同步
   SyncStatus,

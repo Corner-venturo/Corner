@@ -107,33 +107,8 @@ export interface Attachment {
   type: string
 }
 
-// ==================== Widget 相關 ====================
-
-/**
- * 首頁小工具
- */
-export interface Widget {
-  id: string
-  type: WidgetType
-  title: string
-  config?: WidgetConfig
-  position?: WidgetPosition
-  size?: WidgetSize
-}
 
 
-
-export interface WidgetPosition {
-  x: number
-  y: number
-}
-
-export interface WidgetSize {
-  width: number
-  height: number
-  minHeight?: number
-  preferredAspectRatio?: number
-}
 
 // ==================== 同步相關 ====================
 
