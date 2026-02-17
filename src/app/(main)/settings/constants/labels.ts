@@ -244,6 +244,9 @@ export const NEWEBPAY_LABELS = {
   SAVING: '儲存中...',
   SAVE: '儲存設定',
   GUIDE_2: 'HashKey 和 HashIV 是加密用金鑰，請妥善保管',
+  LOAD_FAILED: '載入設定失敗',
+  SAVE_SUCCESS: '設定已儲存',
+  SAVE_FAILED: '儲存設定失敗',
 }
 
 export const OTHER_SETTINGS_LABELS = {
@@ -373,4 +376,35 @@ export const MODULES_PAGE_LABELS = {
   LABEL_5213: '停用模組',
   SELECT_5234: '選擇日期',
   CANCEL: '取消',
+
+  // Module info
+  ACCOUNTING_NAME: '會計模組',
+  ACCOUNTING_DESC: '完整的會計傳票系統，支援自動拋轉與財務報表',
+  ACCOUNTING_FEATURES: ['自動產生會計傳票', '收款/付款自動拋轉', '結團自動產生收入與成本傳票', '手工傳票輸入', '傳票過帳與作廢', '借貸平衡檢查'] as const,
+  INVENTORY_NAME: '庫存模組',
+  INVENTORY_DESC: '庫存管理系統（開發中）',
+  INVENTORY_FEATURES: ['庫存追蹤', '進銷存管理', '盤點功能', '庫存警報'] as const,
+  BI_NAME: 'BI 分析模組',
+  BI_DESC: 'Business Intelligence 商業智能分析（開發中）',
+  BI_FEATURES: ['銷售分析', '成本分析', '利潤分析', '自訂報表'] as const,
+
+  // Toast messages
+  MODULE_ENABLED: (name: string) => `${name} 已啟用`,
+  ENABLE_FAILED: '啟用失敗，請稍後再試',
+  DISABLE_CONFIRM: (name: string) => `確定要停用 ${name} 嗎？\n\n停用後相關功能將無法使用。`,
+  DISABLE_MODULE: '停用模組',
+  MODULE_DISABLED: (name: string) => `${name} 已停用`,
+  DISABLE_FAILED: '停用失敗，請稍後再試',
+  UNKNOWN_WORKSPACE: '未知工作空間',
+
+  // Breadcrumb
+  BREADCRUMB_HOME: '首頁',
+  BREADCRUMB_SETTINGS: '設定',
+  BREADCRUMB_MODULES: '模組管理',
+
+  // Buttons
+  RE_ENABLE: '重新啟用',
+  ENABLE_MODULE: '啟用模組',
+  PROCESSING: '處理中...',
+  CONFIRM_ENABLE: '確認啟用',
 }

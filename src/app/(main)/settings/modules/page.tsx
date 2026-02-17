@@ -39,38 +39,31 @@ import { MODULES_PAGE_LABELS } from '../constants/labels'
 
 const MODULE_INFO = {
   accounting: {
-    name: '會計模組',
-    description: '完整的會計傳票系統，支援自動拋轉與財務報表',
+    name: MODULES_PAGE_LABELS.ACCOUNTING_NAME,
+    description: MODULES_PAGE_LABELS.ACCOUNTING_DESC,
     icon: FileText,
     color: 'text-status-info',
     bgColor: 'bg-status-info-bg',
     borderColor: 'border-status-info/30',
-    features: [
-      '自動產生會計傳票',
-      '收款/付款自動拋轉',
-      '結團自動產生收入與成本傳票',
-      '手工傳票輸入',
-      '傳票過帳與作廢',
-      '借貸平衡檢查',
-    ],
+    features: [...MODULES_PAGE_LABELS.ACCOUNTING_FEATURES],
   },
   inventory: {
-    name: '庫存模組',
-    description: '庫存管理系統（開發中）',
+    name: MODULES_PAGE_LABELS.INVENTORY_NAME,
+    description: MODULES_PAGE_LABELS.INVENTORY_DESC,
     icon: Package,
     color: 'text-morandi-green',
     bgColor: 'bg-status-success-bg',
     borderColor: 'border-status-success/30',
-    features: ['庫存追蹤', '進銷存管理', '盤點功能', '庫存警報'],
+    features: [...MODULES_PAGE_LABELS.INVENTORY_FEATURES],
   },
   bi_analytics: {
-    name: 'BI 分析模組',
-    description: 'Business Intelligence 商業智能分析（開發中）',
+    name: MODULES_PAGE_LABELS.BI_NAME,
+    description: MODULES_PAGE_LABELS.BI_DESC,
     icon: BarChart3,
     color: 'text-purple-600',
     bgColor: 'bg-purple-50',
     borderColor: 'border-purple-600/30',
-    features: ['銷售分析', '成本分析', '利潤分析', '自訂報表'],
+    features: [...MODULES_PAGE_LABELS.BI_FEATURES],
   },
 } as const
 
@@ -143,11 +136,11 @@ export default function ModulesManagementPage() {
         })
       }
 
-      toast.success(`${MODULE_INFO[selectedModule].name} 已啟用`)
+      toast.success(MODULES_PAGE_LABELS.MODULE_ENABLED(MODULE_INFO[selectedModule].name))
       setShowEnableDialog(false)
       setSelectedModule(null)
     } catch (error) {
-      toast.error('啟用失敗，請稍後再試')
+      toast.error(MODULES_PAGE_LABELS.ENABLE_FAILED)
     } finally {
       setLoading(false)
     }
@@ -163,8 +156,8 @@ export default function ModulesManagementPage() {
     if (!module) return
 
     const confirmed = await confirm(
-      `確定要停用 ${MODULE_INFO[moduleName].name} 嗎？\n\n停用後相關功能將無法使用。`,
-      { title: '停用模組', type: 'warning' }
+      MODULES_PAGE_LABELS.DISABLE_CONFIRM(MODULE_INFO[moduleName].name),
+      { title: MODULES_PAGE_LABELS.DISABLE_MODULE, type: 'warning' }
     )
     if (!confirmed) {
       return
@@ -176,9 +169,9 @@ export default function ModulesManagementPage() {
         is_enabled: false,
       })
 
-      toast.success(`${MODULE_INFO[moduleName].name} 已停用`)
+      toast.success(MODULES_PAGE_LABELS.MODULE_DISABLED(MODULE_INFO[moduleName].name))
     } catch (error) {
-      toast.error('停用失敗，請稍後再試')
+      toast.error(MODULES_PAGE_LABELS.DISABLE_FAILED)
     } finally {
       setLoading(false)
     }
@@ -189,9 +182,9 @@ export default function ModulesManagementPage() {
       <ContentPageLayout
         title={MODULES_PAGE_LABELS.MANAGE_8474}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '設定', href: '/settings' },
-          { label: '模組管理', href: '/settings/modules' },
+          { label: MODULES_PAGE_LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: MODULES_PAGE_LABELS.BREADCRUMB_SETTINGS, href: '/settings' },
+          { label: MODULES_PAGE_LABELS.BREADCRUMB_MODULES, href: '/settings/modules' },
         ]}
         className=""
       >
@@ -207,7 +200,7 @@ export default function ModulesManagementPage() {
             </CardHeader>
             <CardContent>
               <div className="text-lg font-semibold text-[#333333]">
-                {currentWorkspace?.name || '未知工作空間'}
+                {currentWorkspace?.name || MODULES_PAGE_LABELS.UNKNOWN_WORKSPACE}
               </div>
               <div className="text-sm text-[#8C8C8C] mt-1">
                 工作空間 ID: {user?.workspace_id}
@@ -317,7 +310,7 @@ export default function ModulesManagementPage() {
                           className="w-full bg-[#B8A99A] hover:bg-[#9E8C7A] text-white"
                           disabled={loading}
                         >
-                          {status.enabled && status.expired ? '重新啟用' : '啟用模組'}
+                          {status.enabled && status.expired ? MODULES_PAGE_LABELS.RE_ENABLE : MODULES_PAGE_LABELS.ENABLE_MODULE}
                         </Button>
                       )}
                     </div>
@@ -397,7 +390,7 @@ export default function ModulesManagementPage() {
               className="bg-[#B8A99A] hover:bg-[#9E8C7A] text-white"
               disabled={loading}
             >
-              {loading ? '處理中...' : '確認啟用'}
+              {loading ? MODULES_PAGE_LABELS.PROCESSING : MODULES_PAGE_LABELS.CONFIRM_ENABLE}
             </Button>
           </DialogFooter>
         </DialogContent>

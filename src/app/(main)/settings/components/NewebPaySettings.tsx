@@ -58,7 +58,7 @@ export function NewebPaySettings() {
       }
     } catch (error) {
       logger.error('載入設定失敗:', error)
-      setMessage({ type: 'error', text: '載入設定失敗' })
+      setMessage({ type: 'error', text: NEWEBPAY_LABELS.LOAD_FAILED })
     } finally {
       setLoading(false)
     }
@@ -74,7 +74,7 @@ export function NewebPaySettings() {
         .upsert({
           category: 'newebpay',
           settings: config as unknown as Json,
-          description: '藍新金流旅行業代轉發票設定',
+          description: NEWEBPAY_LABELS.TITLE,
           updated_at: new Date().toISOString(),
         }, {
           onConflict: 'category',
@@ -82,11 +82,11 @@ export function NewebPaySettings() {
 
       if (error) throw error
 
-      setMessage({ type: 'success', text: '設定已儲存' })
+      setMessage({ type: 'success', text: NEWEBPAY_LABELS.SAVE_SUCCESS })
       setTimeout(() => setMessage(null), 3000)
     } catch (error) {
       logger.error('儲存設定失敗:', error)
-      setMessage({ type: 'error', text: '儲存設定失敗' })
+      setMessage({ type: 'error', text: NEWEBPAY_LABELS.SAVE_FAILED })
     } finally {
       setSaving(false)
     }
