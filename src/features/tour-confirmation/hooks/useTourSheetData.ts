@@ -270,19 +270,25 @@ export function useTourSheetData({ tourId, quoteId, departureDate }: UseTourShee
           .order('created_at')
 
         if (orders && orders.length > 0) {
-          // 載入每個訂單的成員
-          const ordersWithMembers: TourOrder[] = []
-          for (const order of orders) {
-            const { data: members } = await supabase
-              .from('order_members')
-              .select('id, chinese_name, birth_date')
-              .eq('order_id', order.id)
+          // 一次查詢所有訂單的成員（避免 N+1）
+          const orderIds = orders.map(o => o.id)
+          const { data: allMembers } = await supabase
+            .from('order_members')
+            .select('id, chinese_name, birth_date, order_id')
+            .in('order_id', orderIds)
 
-            ordersWithMembers.push({
-              ...order,
-              members: members || [],
-            })
+          // 按 order_id 分組
+          const membersByOrder = new Map<string, OrderMember[]>()
+          for (const member of allMembers || []) {
+            const existing = membersByOrder.get(member.order_id) || []
+            existing.push({ id: member.id, chinese_name: member.chinese_name, birth_date: member.birth_date })
+            membersByOrder.set(member.order_id, existing)
           }
+
+          const ordersWithMembers: TourOrder[] = orders.map(order => ({
+            ...order,
+            members: membersByOrder.get(order.id) || [],
+          }))
           setTourOrders(ordersWithMembers)
         }
       } finally {
