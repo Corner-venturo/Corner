@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Image from 'next/image'
 import { Upload, Loader2, ImageIcon } from 'lucide-react'
 import { DAY_TEMPLATE_LABELS } from './constants/labels'
 
@@ -32,7 +33,7 @@ export function UploadableImage({
         className={`relative group cursor-pointer overflow-hidden ${className}`}
         onClick={() => triggerUpload(targetKey)}
       >
-        <img src={src} alt={alt} className="w-full h-full object-cover" />
+        <Image src={src} alt={alt} fill className="object-cover" />
         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
           {isUploading ? (
             <Loader2 size={24} className="text-white animate-spin" />

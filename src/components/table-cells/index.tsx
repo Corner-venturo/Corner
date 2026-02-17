@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Image from 'next/image'
 import { Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
@@ -408,7 +409,7 @@ export function AvatarCell({ name, imageUrl, subtitle, className }: AvatarCellPr
     <div className={cn('flex items-center gap-2', className)}>
       <div className="flex-shrink-0 w-8 h-8 rounded-full bg-morandi-gold/20 flex items-center justify-center">
         {imageUrl ? (
-          <img src={imageUrl} alt={name} className="w-full h-full rounded-full object-cover" />
+          <Image src={imageUrl} alt={name || ''} width={32} height={32} className="w-full h-full rounded-full object-cover" />
         ) : (
           <span className="text-sm font-medium text-morandi-gold">{initial}</span>
         )}

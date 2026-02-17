@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
+import Image from 'next/image'
 import { logger } from '@/lib/utils/logger'
 import { TourFormData, MeetingPoint } from '../types'
 import { Plus, X, Upload, User, Loader2, Search } from 'lucide-react'
@@ -298,7 +299,7 @@ export function LeaderMeetingSection({
                       className="w-full px-3 py-2 text-left hover:bg-morandi-container/30 transition-colors flex items-center gap-3"
                     >
                       {leader.photo ? (
-                        <img src={leader.photo} alt="" className="w-8 h-8 rounded-full object-cover" />
+                        <Image src={leader.photo} alt={leader.name || ''} width={32} height={32} className="w-8 h-8 rounded-full object-cover" />
                       ) : (
                         <div className="w-8 h-8 rounded-full bg-morandi-container/50 flex items-center justify-center">
                           <User size={14} className="text-morandi-secondary" />
