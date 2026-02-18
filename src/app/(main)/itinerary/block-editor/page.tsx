@@ -322,7 +322,7 @@ function BlockEditorPageContent() {
                       : 'text-morandi-secondary hover:text-morandi-primary'
                   }`}
                 >
-                  💻 電腦
+                  {BLOCK_EDITOR_LABELS.DEVICE_DESKTOP}
                 </button>
                 <button
                   onClick={() => setViewMode('mobile')}
@@ -332,7 +332,7 @@ function BlockEditorPageContent() {
                       : 'text-morandi-secondary hover:text-morandi-primary'
                   }`}
                 >
-                  📱 手機
+                  {BLOCK_EDITOR_LABELS.DEVICE_MOBILE}
                 </button>
               </div>
             </div>

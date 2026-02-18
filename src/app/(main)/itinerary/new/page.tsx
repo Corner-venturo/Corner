@@ -193,9 +193,9 @@ function NewItineraryPageContent() {
       <ContentPageLayout
         title={EDITOR_LABELS.ADD_9998}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '行程管理', href: '/itinerary' },
-          { label: '新增紙本行程表', href: '#' },
+          { label: EDITOR_LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: EDITOR_LABELS.BREADCRUMB_ITINERARY_MGMT, href: '/itinerary' },
+          { label: EDITOR_LABELS.ADD_9998, href: '#' },
         ]}
         showBackButton={true}
         onBack={() => router.back()}
@@ -250,7 +250,7 @@ function NewItineraryPageContent() {
       />
 
       {currentItineraryId && (
-        <EditingWarningBanner resourceType="itinerary" resourceId={currentItineraryId} resourceName="此行程" />
+        <EditingWarningBanner resourceType="itinerary" resourceId={currentItineraryId} resourceName={EDITOR_LABELS.THIS_ITINERARY} />
       )}
 
       {/* 交接唯讀提示 */}

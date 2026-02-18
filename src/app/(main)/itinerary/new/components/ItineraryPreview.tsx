@@ -70,7 +70,7 @@ export function ItineraryPreview({ tourData, isDirty, autoSaveStatus, onSave }: 
                   : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50'
               }`}
             >
-              💻 電腦
+              {NEW_LABELS.DEVICE_DESKTOP}
             </button>
             <button
               onClick={() => setViewMode('mobile')}
@@ -80,7 +80,7 @@ export function ItineraryPreview({ tourData, isDirty, autoSaveStatus, onSave }: 
                   : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50'
               }`}
             >
-              📱 手機
+              {NEW_LABELS.DEVICE_MOBILE}
             </button>
           </div>
         </div>

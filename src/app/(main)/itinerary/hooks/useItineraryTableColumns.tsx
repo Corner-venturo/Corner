@@ -56,7 +56,7 @@ export function useItineraryTableColumns({
     () => [
       {
         key: 'tour_code',
-        label: '行程編號',
+        label: ITINERARY_LABELS.COL_TOUR_CODE,
         sortable: true,
         render: (_value, itinerary) => {
           const linkedTourCode = getLinkedTourCode(itinerary.tour_id)
@@ -78,7 +78,7 @@ export function useItineraryTableColumns({
       },
       {
         key: 'title',
-        label: '行程名稱',
+        label: ITINERARY_LABELS.COL_TITLE,
         sortable: true,
         render: (_value, itinerary) => {
           const versionRecords = itinerary.version_records as Array<unknown> | undefined
@@ -99,7 +99,7 @@ export function useItineraryTableColumns({
       },
       {
         key: 'destination',
-        label: '目的地',
+        label: ITINERARY_LABELS.COL_DESTINATION,
         sortable: true,
         render: (_value, itinerary) => (
           <div className="flex items-center text-sm text-morandi-secondary">
@@ -111,21 +111,21 @@ export function useItineraryTableColumns({
       },
       {
         key: 'days',
-        label: '天數',
+        label: ITINERARY_LABELS.COL_DAYS,
         sortable: true,
         render: (_value, itinerary) => {
           const dailyItinerary = itinerary.daily_itinerary as Array<{ isAlternative?: boolean }> | undefined
           const mainDays = dailyItinerary?.filter(d => !d.isAlternative).length || 0
           return (
             <span className="text-sm text-morandi-secondary">
-              {mainDays} 天 {Math.max(0, mainDays - 1)} 夜
+              {mainDays} {ITINERARY_LABELS.DAY_UNIT} {Math.max(0, mainDays - 1)} {ITINERARY_LABELS.NIGHT_UNIT}
             </span>
           )
         },
       },
       {
         key: 'status',
-        label: '狀態',
+        label: ITINERARY_LABELS.COL_STATUS,
         sortable: true,
         render: (_value, itinerary) => {
           const isClosed = isItineraryClosed(itinerary)
@@ -146,7 +146,7 @@ export function useItineraryTableColumns({
               </span>
             )
           }
-          if (itinerary.status === '進行中') {
+          if (itinerary.status === ITINERARY_LABELS.LABEL_555) {
             return (
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-morandi-green/10 text-morandi-green">
                 {ITINERARY_LABELS.LABEL_555}
@@ -162,7 +162,7 @@ export function useItineraryTableColumns({
       },
       {
         key: 'created_by',
-        label: '作者',
+        label: ITINERARY_LABELS.COL_AUTHOR,
         sortable: true,
         render: (_value, itinerary) => (
           <span className="text-sm text-morandi-secondary">
@@ -172,7 +172,7 @@ export function useItineraryTableColumns({
       },
       {
         key: 'created_at',
-        label: '建立時間',
+        label: ITINERARY_LABELS.COL_CREATED_AT,
         sortable: true,
         render: (_value, itinerary) => (
           <DateCell date={itinerary.created_at} showIcon={false} className="text-morandi-muted" />
@@ -180,7 +180,7 @@ export function useItineraryTableColumns({
       },
       {
         key: 'actions',
-        label: '操作',
+        label: ITINERARY_LABELS.COL_ACTIONS,
         render: (_value, itinerary) => {
           const isArchived = !!itinerary.archived_at
           const isClosed = isItineraryClosed(itinerary)
@@ -201,10 +201,10 @@ export function useItineraryTableColumns({
                   navigator.clipboard
                     .writeText(shareUrl)
                     .then(() => {
-                      alertSuccess('分享連結已複製！\n\n' + shareUrl)
+                      alertSuccess(ITINERARY_LABELS.SHARE_LINK_COPIED(shareUrl))
                     })
                     .catch(() => {
-                      alertError('複製失敗，請手動複製：\n' + shareUrl)
+                      alertError(ITINERARY_LABELS.COPY_FAILED(shareUrl))
                     })
                 }}
                 className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors"

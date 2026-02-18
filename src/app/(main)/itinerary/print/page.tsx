@@ -78,7 +78,7 @@ function ItineraryPrintContent() {
   }
 
   const dailyItinerary = itinerary.daily_itinerary || []
-  const companyName = user?.workspace_code || '旅行社'
+  const companyName = user?.workspace_code || PRINT_LABELS.DEFAULT_COMPANY
 
   return (
     <div className="min-h-screen bg-morandi-container">
@@ -107,7 +107,7 @@ function ItineraryPrintContent() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <div className="absolute bottom-6 left-8 right-8 text-white">
-                <h1 className="text-3xl font-bold mb-1">{itinerary.title || '行程表'}</h1>
+                <h1 className="text-3xl font-bold mb-1">{itinerary.title || PRINT_LABELS.DEFAULT_TITLE}</h1>
                 {itinerary.subtitle && (
                   <p className="text-sm opacity-90">{itinerary.subtitle}</p>
                 )}
@@ -122,7 +122,7 @@ function ItineraryPrintContent() {
                 {!itinerary.cover_image && (
                   <>
                     <h1 className="text-2xl font-bold text-morandi-primary mb-1">
-                      {itinerary.title || '行程表'}
+                      {itinerary.title || PRINT_LABELS.DEFAULT_TITLE}
                     </h1>
                     {itinerary.subtitle && (
                       <p className="text-sm text-morandi-secondary">{itinerary.subtitle}</p>
@@ -131,7 +131,7 @@ function ItineraryPrintContent() {
                 )}
                 {itinerary.cover_image && (
                   <h1 className="text-lg font-bold text-morandi-primary">
-                    {itinerary.title || '行程表'}
+                    {itinerary.title || PRINT_LABELS.DEFAULT_TITLE}
                   </h1>
                 )}
               </div>
@@ -155,7 +155,7 @@ function ItineraryPrintContent() {
               </div>
               <div className="flex gap-2">
                 <span className="text-morandi-secondary">{PRINT_LABELS.TRIP_DAYS}</span>
-                <span className="font-medium">{dailyItinerary.length} 天</span>
+                <span className="font-medium">{dailyItinerary.length} {PRINT_LABELS.DAY_UNIT}</span>
               </div>
               {tour && (
                 <div className="flex gap-2">

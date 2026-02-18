@@ -4,6 +4,7 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { PublishButton } from '@/components/editor/PublishButton'
 import type { LocalTourData } from '../hooks/useItineraryEditor'
 import type { ItineraryVersionRecord } from '@/stores/types'
+import { NEW_LABELS } from './constants/labels'
 
 interface ItineraryHeaderProps {
   tourData: LocalTourData
@@ -24,11 +25,11 @@ export function ItineraryHeader({
 }: ItineraryHeaderProps) {
   return (
     <ResponsiveHeader
-      title={tourData.tourCode ? `編輯行程 - ${tourData.tourCode}` : '新增網頁行程'}
+      title={tourData.tourCode ? NEW_LABELS.EDIT_ITINERARY_TITLE(tourData.tourCode) : NEW_LABELS.NEW_WEB_ITINERARY}
       breadcrumb={[
-        { label: '首頁', href: '/' },
-        { label: '行程管理', href: '/itinerary' },
-        { label: tourData.tourCode ? `編輯 - ${tourData.tourCode}` : '新增網頁行程', href: '#' },
+        { label: NEW_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: NEW_LABELS.BREADCRUMB_ITINERARY_MGMT, href: '/itinerary' },
+        { label: tourData.tourCode ? NEW_LABELS.EDIT_BREADCRUMB(tourData.tourCode) : NEW_LABELS.NEW_WEB_ITINERARY, href: '#' },
       ]}
       showBackButton={true}
       onBack={onBack}

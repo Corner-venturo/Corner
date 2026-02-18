@@ -1,4 +1,12 @@
 export const LABELS = {
+  // Status filters
+  ALL: '全部',
+  STATUS_PROPOSAL: '提案',
+  STATUS_ACTIVE: '進行中',
+  STATUS_TEMPLATE: '公司範例',
+  STATUS_CLOSED: '結案',
+  SEARCH_ITINERARY: '搜尋行程...',
+
   // 页面标题和导航
   ITINERARY: '行程',
   ITINERARY_MANAGEMENT: '行程管理',
@@ -96,6 +104,9 @@ export const LABELS = {
 }
 
 export const PRINT_LABELS = {
+  DEFAULT_COMPANY: '旅行社',
+  DEFAULT_TITLE: '行程表',
+  DAY_UNIT: '天',
   NOT_FOUND: '找不到行程表',
   DESTINATION: '目的地：',
   DEPARTURE_DATE: '出發日期：',
@@ -127,12 +138,17 @@ export const EDITOR_LABELS = {
   ADD_9998: '新增紙本行程表',
   PRINT: '列印',
   A4_SIZE: 'A4 尺寸 (210mm × 297mm)',
+  BREADCRUMB_HOME: '首頁',
+  BREADCRUMB_ITINERARY_MGMT: '行程管理',
+  THIS_ITINERARY: '此行程',
 }
 
 export const BLOCK_EDITOR_LABELS = {
   LOADING: '載入中...',
   BLOCK_EDITOR: '區塊編輯器',
   LIVE_PREVIEW: '即時預覽',
+  DEVICE_DESKTOP: '💻 電腦',
+  DEVICE_MOBILE: '📱 手機',
 
   LABEL_2827: '存檔中...',
   SAVING_4294: '已儲存',

@@ -32,7 +32,7 @@ import { useItineraryFilters } from './hooks/useItineraryFilters'
 import { stripHtml } from '@/lib/utils/string-utils'
 import { LABELS } from './constants/labels'
 
-const statusFilters = ['全部', '提案', '進行中', '公司範例', '結案']
+const statusFilters = [LABELS.ALL, LABELS.STATUS_PROPOSAL, LABELS.STATUS_ACTIVE, LABELS.STATUS_TEMPLATE, LABELS.STATUS_CLOSED]
 
 export default function ItineraryPage() {
   const router = useRouter()
@@ -133,7 +133,7 @@ export default function ItineraryPage() {
       showSearch={true}
       searchTerm={pageState.searchTerm}
       onSearchChange={pageState.setSearchTerm}
-      searchPlaceholder="搜尋行程..."
+      searchPlaceholder={LABELS.SEARCH_ITINERARY}
       contentClassName="flex-1 overflow-hidden"
       headerChildren={
         <div className="flex items-center gap-4">
@@ -349,7 +349,7 @@ function CreateItineraryDialog({
                     <SelectContent>
                       {[3, 4, 5, 6, 7, 8, 9, 10].map(day => (
                         <SelectItem key={day} value={String(day)}>
-                          {day} 天
+                          {day} {LABELS.DAY_SUFFIX}
                         </SelectItem>
                       ))}
                     </SelectContent>
