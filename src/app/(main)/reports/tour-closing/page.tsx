@@ -54,7 +54,7 @@ export default function TourClosingReportPage() {
         .single()
 
       if (!workspace) {
-        toast.error('找不到工作空間')
+        toast.error(TOUR_CLOSING_LABELS.WORKSPACE_NOT_FOUND)
         return
       }
 
@@ -184,19 +184,19 @@ export default function TourClosingReportPage() {
             const percentageMatch = bonus.notes?.match(/(\d+\.?\d*)%/)
             const percentage = percentageMatch ? parseFloat(percentageMatch[1]) : 0
 
-            if (bonus.supplier_name === '業務業績') {
+            if (bonus.supplier_name === TOUR_CLOSING_LABELS.BONUS_SALES) {
               salesBonuses.push({
-                employee_name: bonus.notes?.replace(/業務業績\s*\d+\.?\d*%/, '').trim() || '未知',
+                employee_name: bonus.notes?.replace(/業務業績\s*\d+\.?\d*%/, '').trim() || TOUR_CLOSING_LABELS.UNKNOWN_EMPLOYEE,
                 percentage,
                 amount: bonus.amount || 0,
               })
-            } else if (bonus.supplier_name === 'OP 獎金') {
+            } else if (bonus.supplier_name === TOUR_CLOSING_LABELS.BONUS_OP) {
               opBonuses.push({
-                employee_name: bonus.notes?.replace(/OP 獎金\s*\d+\.?\d*%/, '').trim() || '未知',
+                employee_name: bonus.notes?.replace(/OP 獎金\s*\d+\.?\d*%/, '').trim() || TOUR_CLOSING_LABELS.UNKNOWN_EMPLOYEE,
                 percentage,
                 amount: bonus.amount || 0,
               })
-            } else if (bonus.supplier_name === '團體獎金') {
+            } else if (bonus.supplier_name === TOUR_CLOSING_LABELS.BONUS_TEAM) {
               teamBonus = bonus.amount || 0
             }
           })
@@ -225,7 +225,7 @@ export default function TourClosingReportPage() {
       setReports(reportsData)
     } catch (error) {
       logger.error('載入結團報表失敗:', error)
-      toast.error('載入報表失敗')
+      toast.error(TOUR_CLOSING_LABELS.LOAD_FAILED)
     } finally {
       setLoading(false)
     }
@@ -248,7 +248,7 @@ export default function TourClosingReportPage() {
       : filteredReports
 
     if (dataToExport.length === 0) {
-      toast.error('沒有資料可匯出')
+      toast.error(TOUR_CLOSING_LABELS.NO_DATA_TO_EXPORT)
       return
     }
 
@@ -257,22 +257,22 @@ export default function TourClosingReportPage() {
 
     // 準備 Excel 資料
     const excelData = dataToExport.map(report => ({
-      團號: report.code,
-      團名: report.name,
-      出發日: report.departure_date,
-      返回日: report.return_date,
-      結團日: report.closing_date,
-      業務: report.sales_bonuses.map(s => `${s.employee_name}(${s.percentage}%)`).join(', ') || '-',
-      OP: report.op_bonuses.map(o => `${o.employee_name}(${o.percentage}%)`).join(', ') || '-',
-      訂單金額: report.total_revenue,
-      成本: report.total_cost,
-      '行政費(人數×10)': report.misc_expense,
-      '扣稅12%': report.tax,
-      團體獎金: report.team_bonus,
-      業務獎金: report.sales_bonuses.reduce((sum: number, s: { amount: number }) => sum + s.amount, 0),
-      'OP獎金': report.op_bonuses.reduce((sum: number, o: { amount: number }) => sum + o.amount, 0),
-      毛利: report.gross_profit,
-      淨利: report.net_profit,
+      [TOUR_CLOSING_LABELS.EXCEL_TOUR_CODE]: report.code,
+      [TOUR_CLOSING_LABELS.EXCEL_TOUR_NAME]: report.name,
+      [TOUR_CLOSING_LABELS.EXCEL_DEPARTURE]: report.departure_date,
+      [TOUR_CLOSING_LABELS.EXCEL_RETURN]: report.return_date,
+      [TOUR_CLOSING_LABELS.EXCEL_CLOSING]: report.closing_date,
+      [TOUR_CLOSING_LABELS.EXCEL_SALES]: report.sales_bonuses.map(s => `${s.employee_name}(${s.percentage}%)`).join(', ') || '-',
+      [TOUR_CLOSING_LABELS.EXCEL_OP]: report.op_bonuses.map(o => `${o.employee_name}(${o.percentage}%)`).join(', ') || '-',
+      [TOUR_CLOSING_LABELS.EXCEL_ORDER_AMOUNT]: report.total_revenue,
+      [TOUR_CLOSING_LABELS.EXCEL_COST]: report.total_cost,
+      [TOUR_CLOSING_LABELS.EXCEL_ADMIN_FEE]: report.misc_expense,
+      [TOUR_CLOSING_LABELS.EXCEL_TAX]: report.tax,
+      [TOUR_CLOSING_LABELS.EXCEL_TEAM_BONUS]: report.team_bonus,
+      [TOUR_CLOSING_LABELS.EXCEL_SALES_BONUS]: report.sales_bonuses.reduce((sum: number, s: { amount: number }) => sum + s.amount, 0),
+      [TOUR_CLOSING_LABELS.EXCEL_OP_BONUS]: report.op_bonuses.reduce((sum: number, o: { amount: number }) => sum + o.amount, 0),
+      [TOUR_CLOSING_LABELS.EXCEL_GROSS_PROFIT]: report.gross_profit,
+      [TOUR_CLOSING_LABELS.EXCEL_NET_PROFIT]: report.net_profit,
     }))
 
     // 建立工作表
@@ -304,10 +304,10 @@ export default function TourClosingReportPage() {
     XLSX.utils.book_append_sheet(wb, ws, monthLabel)
 
     // 匯出檔案
-    const fileName = `結團報表_${monthLabel}_${getTodayString()}.xlsx`
+    const fileName = `${TOUR_CLOSING_LABELS.EXCEL_FILENAME_PREFIX}_${monthLabel}_${getTodayString()}.xlsx`
     XLSX.writeFile(wb, fileName)
 
-    toast.success('報表已匯出')
+    toast.success(TOUR_CLOSING_LABELS.REPORT_EXPORTED)
   }
 
   // 取得可用的月份列表

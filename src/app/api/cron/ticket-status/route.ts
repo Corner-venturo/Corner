@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(process.env.BOT_API_SECRET && { 'authorization': process.env.BOT_API_SECRET }),
+        ...(process.env.BOT_API_SECRET && { 'x-bot-secret': process.env.BOT_API_SECRET }),
       },
       body: JSON.stringify({
         notify_sales: true,

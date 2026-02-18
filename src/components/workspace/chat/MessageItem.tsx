@@ -89,7 +89,7 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, e
             {formatMessageTime(message.created_at)}
           </span>
           {message.edited_at && (
-            <span className="text-[11px] text-morandi-secondary/60">(已編輯)</span>
+            <span className="text-[11px] text-morandi-secondary/60">{COMP_WORKSPACE_LABELS.已編輯}</span>
           )}
         </div>
 
@@ -212,7 +212,7 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, e
             className="flex items-center gap-1.5 mt-2 text-xs text-morandi-gold hover:text-morandi-gold/80 hover:underline transition-colors"
           >
             <MessageSquare size={14} />
-            <span>{replyCount} 則回覆</span>
+            <span>{replyCount} {COMP_WORKSPACE_LABELS.回覆討論串}</span>
           </button>
         )}
 

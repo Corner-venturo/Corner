@@ -86,7 +86,7 @@ export const useMembersStore = () => {
         const members = await fetchChannelMembers(workspaceId, channelId)
         uiStore.setChannelMembers(channelId, members)
       } catch (error) {
-        uiStore.setError(error instanceof Error ? error.message : '無法載入頻道成員')
+        uiStore.setError(error instanceof Error ? error.message : 'Failed to load channel members')
       }
     },
 
@@ -101,7 +101,7 @@ export const useMembersStore = () => {
           currentMembers.filter(member => member.id !== memberId)
         )
       } catch (error) {
-        uiStore.setError(error instanceof Error ? error.message : '移除頻道成員失敗')
+        uiStore.setError(error instanceof Error ? error.message : 'Failed to remove channel member')
       }
     },
 

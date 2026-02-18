@@ -113,7 +113,7 @@ export function ChannelChat() {
     if (!selectedChannel) return ''
     if (selectedChannel.type !== 'direct') return selectedChannel.name
 
-    const fallbackName = '私訊'
+    const fallbackName = COMP_WORKSPACE_LABELS.私訊
 
     // Try dm_target_id first
     if (selectedChannel.dm_target_id) {

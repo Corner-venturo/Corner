@@ -22,7 +22,7 @@ export const ensureMessageAttachments = (attachments: unknown): MessageAttachmen
         ? attachment.fileName
         : typeof attachment.name === 'string'
           ? attachment.name
-          : '未命名檔案'
+          : 'Untitled'
 
     const mimeType =
       typeof attachment.mimeType === 'string'

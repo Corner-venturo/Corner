@@ -148,7 +148,11 @@ export const useChatStore = () => {
         if (error) throw error
 
         // 更新 store 中該頻道的訊息（不影響其他頻道）
-        const channelMessages = (data || []) as unknown as Message[]
+        // 🔥 DB 使用 created_by 而非 author_id，需要轉換
+        const channelMessages = (data || []).map((row: Record<string, unknown>) => ({
+          ...row,
+          author_id: row.created_by as string,
+        })) as unknown as Message[]
         uiStore.setCurrentChannelMessages(channelId, channelMessages)
         uiStore.setMessagesLoading(channelId, false)
       } catch (error) {
@@ -428,7 +432,8 @@ export const useChatStore = () => {
           },
           (payload) => {
             logger.log('[ChatStore] Realtime 收到新訊息:', payload.new)
-            const newMessage = payload.new as Message
+            const raw = payload.new as Record<string, unknown>
+            const newMessage = { ...raw, author_id: raw.created_by as string } as unknown as Message
 
             // 檢查是否已存在（避免重複）
             const currentMessages = uiStore.channelMessages[channelId] || []
@@ -449,7 +454,8 @@ export const useChatStore = () => {
           },
           (payload) => {
             logger.log('[ChatStore] Realtime 訊息更新:', payload.new)
-            const updatedMessage = payload.new as Message
+            const rawUpdated = payload.new as Record<string, unknown>
+            const updatedMessage = { ...rawUpdated, author_id: rawUpdated.created_by as string } as unknown as Message
             const currentMessages = uiStore.channelMessages[channelId] || []
             const updatedMessages = currentMessages.map(m =>
               m.id === updatedMessage.id ? updatedMessage : m

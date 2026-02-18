@@ -1,6 +1,5 @@
 import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
-import { withAuth } from '@/lib/api/with-auth'
 import { successResponse, ApiError } from '@/lib/api/response'
 import { logger } from '@/lib/utils/logger'
 import { validateBody } from '@/lib/api/validation'
@@ -12,56 +11,61 @@ import { getEmployeeDataSchema } from '@/lib/validations/api-schemas'
  * 不驗證密碼（密碼已由 Supabase Auth 驗證）
  */
 export async function POST(request: NextRequest) {
-  const validation = await validateBody(request, getEmployeeDataSchema)
-  if (!validation.success) return validation.error
-  const { username, code } = validation.data
+  try {
+    const validation = await validateBody(request, getEmployeeDataSchema)
+    if (!validation.success) return validation.error
+    const { username, code } = validation.data
 
-  const supabase = getSupabaseAdminClient()
+    const supabase = getSupabaseAdminClient()
 
-  // 1. 查詢 workspace（統一大寫）
-  const { data: workspace, error: wsError } = await supabase
-    .from('workspaces')
-    .select('id, code')
-    .eq('code', code.trim().toUpperCase())
-    .maybeSingle()
+    // 1. 查詢 workspace（統一大寫）
+    const { data: workspace, error: wsError } = await supabase
+      .from('workspaces')
+      .select('id, code')
+      .eq('code', code.trim().toUpperCase())
+      .maybeSingle()
 
-  if (wsError) {
-    logger.error('Workspace query error:', wsError)
-    return ApiError.database('系統錯誤')
+    if (wsError) {
+      logger.error('Workspace query error:', wsError)
+      return ApiError.database('系統錯誤')
+    }
+
+    if (!workspace) {
+      return ApiError.validation('找不到此代號')
+    }
+
+    // 2. 查詢員工（大小寫不敏感）
+    const { data: employee, error: empError } = await supabase
+      .from('employees')
+      .select('*')
+      .ilike('employee_number', username)
+      .eq('workspace_id', workspace.id)
+      .maybeSingle()
+
+    if (empError) {
+      logger.error('Employee query error:', empError)
+      return ApiError.database('系統錯誤')
+    }
+
+    if (!employee) {
+      return ApiError.notFound('員工')
+    }
+
+    // 3. 檢查帳號狀態
+    if (employee.status === 'terminated') {
+      return ApiError.unauthorized('此帳號已停用')
+    }
+
+    // 4. 回傳員工資料（不含密碼）
+    const { password_hash: _, ...employeeData } = employee
+
+    return successResponse({
+      employee: employeeData,
+      workspaceId: workspace.id,
+      workspaceCode: workspace.code,
+    })
+  } catch (error) {
+    logger.error('Get employee data error:', error)
+    return ApiError.internal('系統錯誤')
   }
-
-  if (!workspace) {
-    return ApiError.validation('找不到此代號')
-  }
-
-  // 2. 查詢員工（大小寫不敏感）
-  const { data: employee, error: empError } = await supabase
-    .from('employees')
-    .select('*')
-    .ilike('employee_number', username)
-    .eq('workspace_id', workspace.id)
-    .maybeSingle()
-
-  if (empError) {
-    logger.error('Employee query error:', empError)
-    return ApiError.database('系統錯誤')
-  }
-
-  if (!employee) {
-    return ApiError.notFound('員工')
-  }
-
-  // 3. 檢查帳號狀態
-  if (employee.status === 'terminated') {
-    return ApiError.unauthorized('此帳號已停用')
-  }
-
-  // 4. 回傳員工資料（不含密碼）
-  const { password_hash: _, ...employeeData } = employee
-
-  return successResponse({
-    employee: employeeData,
-    workspaceId: workspace.id,
-    workspaceCode: workspace.code,
-  })
 }
