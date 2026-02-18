@@ -20,6 +20,10 @@ export interface Order extends BaseEntity {
   customer_id?: string | null // 客戶 ID（可選）
   contact_person: string // 聯絡人
   contact_phone?: string | null // 聯絡電話（可選）
+  contact_email?: string | null // 聯絡 Email
+  adult_count?: number | null // 成人人數
+  child_count?: number | null // 兒童人數
+  infant_count?: number | null // 嬰兒人數
   sales_person: string | null // 業務人員
   assistant: string | null // 助理
   member_count: number | null // 團員人數
@@ -29,6 +33,8 @@ export interface Order extends BaseEntity {
   paid_amount: number // 已付金額
   remaining_amount: number // 待付金額
   notes?: string | null // 備註
+  is_active?: boolean | null // 是否啟用
+  identity_options?: unknown // 身份選項（JSONB）
 }
 
 // ============================================

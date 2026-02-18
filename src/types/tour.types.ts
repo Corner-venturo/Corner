@@ -73,7 +73,6 @@ export interface Member {
   hotel_2_name: string | null
   hotel_2_checkin: string | null
   hotel_2_checkout: string | null
-  hotel_confirmation: string | null // 訂房確認代號
   assigned_room?: string // 向下相容
 
   // 報到資訊
@@ -82,8 +81,11 @@ export interface Member {
 
   // 財務資訊
   cost_price: number | null // 成本價
+  selling_price: number | null // 售價
   flight_cost: number | null // 機票成本
+  transport_cost: number | null // 交通成本
   misc_cost: number | null // 雜費
+  total_payable: number | null // 應付總額
   profit: number | null // 利潤
   deposit_amount: number | null // 訂金
   deposit_receipt_no: string | null // 訂金收據號
@@ -93,6 +95,17 @@ export interface Member {
   // 關聯
   customer_id: string | null
 
+  // 機票相關
+  ticket_number: string | null // 機票號碼
+  ticketing_deadline: string | null // 開票截止日
+  flight_self_arranged: boolean | null // 自理機票
+
+  // 護照列印
+  passport_name_print: string | null // 護照姓名列印格式（行李吊牌用）
+
+  // 排序
+  sort_order: number | null // 排序順序
+
   // 其他
   is_child_no_bed?: boolean // 小孩不佔床
   add_ons?: string[] // 加購項目IDs
@@ -100,7 +113,7 @@ export interface Member {
   custom_fields?: Record<string, unknown> // 自定義欄位數據 {fieldId: value}
   passport_image_url?: string | null // 護照照片 URL
   created_at: string | null
-  updated_at: string | null
+  updated_at: string | null // BaseEntity 相容（DB order_members 表無此欄位，由 trigger 或前端填入）
 }
 
 export interface TourAddOn {

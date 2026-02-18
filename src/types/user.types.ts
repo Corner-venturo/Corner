@@ -74,6 +74,7 @@ export interface User {
   status: 'active' | 'probation' | 'leave' | 'terminated'
   employee_type?: 'human' | 'bot' // 員工類型：人類或機器人
   avatar?: string
+  avatar_url?: string | null // 頭像 URL（DB 標準欄位）
   workspace_id?: string // 所屬工作空間 ID
   workspace_code?: string // 所屬工作空間代碼（TP, TC 等）- 登入時一併取得
   workspace_name?: string // 所屬工作空間名稱

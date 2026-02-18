@@ -44,6 +44,14 @@ export interface Customer extends BaseEntity {
   last_order_date?: string | null // 最後訂單日期（統計用）
   verification_status: VerificationStatus // 人工驗證狀態
   dietary_restrictions?: string | null // 飲食禁忌/特殊飲食需求
+  emergency_contact?: Record<string, unknown> | null // 緊急聯絡人（JSONB）
+  nationality?: string | null // 國籍
+  sex?: string | null // 生理性別（與 gender 並存）
+  avatar_url?: string | null // 頭像 URL
+  total_points?: number | null // 累積點數
+  linked_at?: string | null // Online 帳號連動時間
+  linked_method?: string | null // 連動方式
+  online_user_id?: string | null // Online 用戶 ID
 }
 
 // ============================================
