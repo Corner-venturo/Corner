@@ -143,6 +143,8 @@ export const LABELS = {
   PNR_CONTENT_LABEL: 'PNR 內容',
   PARSING: '解析中...',
   PARSE_PNR: '解析 PNR',
+  AMADEUS_FORMAT_ERROR: '請貼上機票確認單 HTML，而非 Amadeus 電報',
+  PNR_PLACEHOLDER: `貼上完整的 HTML 或文字內容，例如：\n\n電腦代號:DMTQ65 - 亞瑪迪斯\n旅客姓名:01. WU/MINGTUNG\n長榮航空(BR801)\n12月04日(四) 10:00 出發:臺灣桃園機場...`,
   PARSE_SUCCESS_TITLE: '解析成功',
   RE_INPUT: '重新輸入',
   COMPUTER_CODE: '電腦代號：',

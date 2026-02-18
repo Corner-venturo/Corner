@@ -167,7 +167,7 @@ export function CreateReceiptDialog({
                             {order.order_number} - {order.contact_person}
                           </div>
                           <div className="text-sm text-morandi-secondary flex items-center gap-1">
-                            待收: <CurrencyCell amount={order.remaining_amount || 0} />
+                            {CREATE_RECEIPT_LABELS.REMAINING_PREFIX}<CurrencyCell amount={order.remaining_amount || 0} />
                           </div>
                         </div>
                       </SelectItem>

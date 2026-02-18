@@ -140,6 +140,7 @@ export const CREATE_RECEIPT_LABELS = {
   LABEL_6150: '待收金額',
   ADD_2089: '新增項目',
   CANCEL: '取消',
+  REMAINING_PREFIX: '待收: ',
 }
 
 export const PAYMENT_ITEM_LABELS = {

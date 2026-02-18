@@ -35,7 +35,7 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
       // 如果是 Amadeus 格式，轉換成 HTML 格式
       if ('ticketingDeadline' in parsed) {
         // 這是 Amadeus 格式，需要轉換
-        toast.error('請貼上機票確認單 HTML，而非 Amadeus 電報')
+        toast.error(LABELS.AMADEUS_FORMAT_ERROR)
         return
       }
 
@@ -89,12 +89,7 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
                   {LABELS.PNR_CONTENT_LABEL}
                 </label>
                 <Textarea
-                  placeholder={`貼上完整的 HTML 或文字內容，例如：
-
-電腦代號:DMTQ65 - 亞瑪迪斯
-旅客姓名:01. WU/MINGTUNG
-長榮航空(BR801)
-12月04日(四) 10:00 出發:臺灣桃園機場...`}
+                  placeholder={LABELS.PNR_PLACEHOLDER}
                   rows={12}
                   className="shadow-sm text-sm font-mono"
                   value={rawInput}
