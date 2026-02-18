@@ -117,7 +117,7 @@ export function BlockWrapper({
           {config.canReorder && !isFirst && (
             <Button
               variant="ghost"
-              size="icon"
+              size="icon" aria-label="Button"
               className="h-6 w-6"
               onClick={(e) => {
                 e.stopPropagation()
@@ -132,7 +132,7 @@ export function BlockWrapper({
           {config.canReorder && !isLast && (
             <Button
               variant="ghost"
-              size="icon"
+              size="icon" aria-label="Button"
               className="h-6 w-6"
               onClick={(e) => {
                 e.stopPropagation()
@@ -146,7 +146,7 @@ export function BlockWrapper({
           {/* 顯示/隱藏 */}
           <Button
             variant="ghost"
-            size="icon"
+            size="icon" aria-label="Toggle menu"
             className="h-6 w-6"
             onClick={(e) => {
               e.stopPropagation()
@@ -160,7 +160,7 @@ export function BlockWrapper({
           {config.canRemove && (
             <Button
               variant="ghost"
-              size="icon"
+              size="icon" aria-label="Delete"
               className="h-6 w-6 text-status-danger hover:text-status-danger hover:bg-status-danger-bg"
               onClick={(e) => {
                 e.stopPropagation()
@@ -174,7 +174,7 @@ export function BlockWrapper({
           {/* 收合 */}
           <Button
             variant="ghost"
-            size="icon"
+            size="icon" aria-label="Button"
             className="h-6 w-6"
             onClick={(e) => {
               e.stopPropagation()

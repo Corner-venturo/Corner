@@ -171,7 +171,7 @@ export function MessageInput({
     // 1. 優先嘗試從瀏覽器拖曳的圖片 URL
     const html = e.dataTransfer.getData('text/html')
     if (html) {
-      const imgMatch = html.match(/<img[^>]+src=["']([^"']+)["']/i)
+      const imgMatch = html.match(/<img alt=""[^>]+src=["']([^"']+)["']/i)
       if (imgMatch && imgMatch[1]) {
         const imageUrl = imgMatch[1]
         // 跳過 data: URL 和 blob: URL
@@ -401,7 +401,7 @@ export function MessageInput({
           <Button
             type="button"
             variant="ghost"
-            size="icon"
+            size="icon" aria-label="Toggle menu"
             className="w-9 h-9 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10"
             onClick={() => setShowQuickMenu(!showQuickMenu)}
             disabled={isDisabled}

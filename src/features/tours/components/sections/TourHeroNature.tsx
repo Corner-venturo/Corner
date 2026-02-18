@@ -117,8 +117,7 @@ export function TourHeroNature({ data, viewMode }: TourHeroNatureProps) {
 
               {/* 主圖 */}
               {data.coverImage ? (
-                <img
-                  src={data.coverImage}
+                <img src={data.coverImage}
                   alt={data.title}
                   className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-105"
                 />

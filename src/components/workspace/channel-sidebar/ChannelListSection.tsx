@@ -67,7 +67,7 @@ export function ChannelListSection({
         {showAddButton && onAddClick && (
           <Button
             variant="ghost"
-            size="icon"
+            size="icon" aria-label="Add"
             className="h-5 w-5 opacity-0 group-hover/section:opacity-100 transition-opacity"
             onClick={onAddClick}
           >

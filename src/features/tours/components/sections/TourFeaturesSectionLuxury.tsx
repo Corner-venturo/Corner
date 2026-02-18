@@ -184,8 +184,7 @@ export function TourFeaturesSectionLuxury({ data, viewMode }: TourFeaturesSectio
                 exit={{ opacity: 0, scale: 0.9 }}
                 className="flex items-center justify-center px-16"
               >
-                <img
-                  src={lightboxImages[lightboxIndex]}
+                <img src={lightboxImages[lightboxIndex]}
                   alt={`圖片 ${lightboxIndex + 1}`}
                   className="max-w-full max-h-[85vh] object-contain rounded-lg"
                 />
@@ -264,8 +263,7 @@ function FeatureCard({
         onClick={() => hasImages && onImageClick(validImages, currentImageIndex)}
       >
         {hasImages ? (
-          <img
-            src={validImages[isExpanded ? currentImageIndex : 0]}
+          <img src={validImages[isExpanded ? currentImageIndex : 0]}
             alt={feature.title}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />

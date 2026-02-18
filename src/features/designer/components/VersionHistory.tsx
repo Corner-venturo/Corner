@@ -50,7 +50,7 @@ export function VersionHistory({ onClose, onPreview }: VersionHistoryProps) {
           <Clock size={18} className="text-morandi-gold" />
           <h3 className="font-semibold text-morandi-primary">{DESIGNER_LABELS.LABEL_3328}</h3>
         </div>
-        <Button variant="ghost" size="icon" onClick={onClose}>
+        <Button variant="ghost" size="icon" aria-label="Close" onClick={onClose}>
           <X size={18} />
         </Button>
       </div>
@@ -84,8 +84,7 @@ export function VersionHistory({ onClose, onPreview }: VersionHistoryProps) {
                   <div className="flex gap-3">
                     <div className="w-16 h-20 bg-morandi-container rounded overflow-hidden flex-shrink-0">
                       {version.thumbnail_url ? (
-                        <img
-                          src={version.thumbnail_url}
+                        <img src={version.thumbnail_url}
                           alt={`版本 ${version.version_number}`}
                           className="w-full h-full object-cover"
                         />

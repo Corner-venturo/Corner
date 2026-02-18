@@ -146,8 +146,7 @@ export function TimelineLayout({
             onMouseLeave={(e) => { e.currentTarget.style.filter = 'grayscale(100%)' }}
             onClick={() => onImageClick(allImages, 0, day.title)}
           >
-            <img
-              src={allImages[0]}
+            <img src={allImages[0]}
               alt=""
               className="w-full h-full object-cover"
             />

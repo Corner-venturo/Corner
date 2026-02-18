@@ -73,7 +73,7 @@ export function TravelerMessageInput({
             'bg-violet-500 hover:bg-violet-600 text-white',
             'disabled:bg-violet-500/30 disabled:text-violet-300/50'
           )}
-          size="icon"
+          size="icon" aria-label="Send"
         >
           <Send size={18} />
         </Button>

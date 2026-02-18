@@ -180,8 +180,7 @@ export function TravelerMessageList({
                   )}
                 >
                   {senderInfo.avatar ? (
-                    <img
-                      src={senderInfo.avatar}
+                    <img src={senderInfo.avatar}
                       alt={senderInfo.name}
                       className="w-full h-full rounded-full object-cover"
                     />

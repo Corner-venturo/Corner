@@ -475,10 +475,10 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                     </div>
                     {canEdit && (
                       <div className="flex items-center justify-center gap-1">
-                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={handleAddItem}>
+                        <Button size="icon" aria-label="Close" variant="ghost" className="h-6 w-6" onClick={handleAddItem}>
                           <Save size={14} className="text-status-success" />
                         </Button>
-                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setIsAddingItem(false)}>
+                        <Button size="icon" aria-label="Close" variant="ghost" className="h-6 w-6" onClick={() => setIsAddingItem(false)}>
                           <X size={14} className="text-status-danger" />
                         </Button>
                       </div>
@@ -555,10 +555,10 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                             <CurrencyCell amount={(editItem.unit_price || 0) * (editItem.quantity || 0)} className="text-morandi-gold text-sm" />
                           </div>
                           <div className="flex items-center justify-center gap-1">
-                            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => handleSaveEdit(item.id)}>
+                            <Button size="icon" aria-label="Close" variant="ghost" className="h-6 w-6" onClick={() => handleSaveEdit(item.id)}>
                               <Save size={14} className="text-status-success" />
                             </Button>
-                            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setEditingItemId(null)}>
+                            <Button size="icon" aria-label="Close" variant="ghost" className="h-6 w-6" onClick={() => setEditingItemId(null)}>
                               <X size={14} className="text-status-danger" />
                             </Button>
                           </div>
@@ -580,10 +580,10 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                           </div>
                           {canEdit && (
                             <div className="flex items-center justify-center gap-1">
-                              <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => startEditItem(item)}>
+                              <Button size="icon" aria-label="Delete" variant="ghost" className="h-6 w-6" onClick={() => startEditItem(item)}>
                                 <Pencil size={14} className="text-morandi-secondary" />
                               </Button>
-                              <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => handleDeleteItem(item.id)}>
+                              <Button size="icon" aria-label="Delete" variant="ghost" className="h-6 w-6" onClick={() => handleDeleteItem(item.id)}>
                                 <Trash2 size={14} className="text-status-danger" />
                               </Button>
                             </div>

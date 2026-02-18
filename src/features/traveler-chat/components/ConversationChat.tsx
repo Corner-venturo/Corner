@@ -242,8 +242,7 @@ function MessageBubble({
         )}
       >
         {senderAvatar ? (
-          <img
-            src={senderAvatar}
+          <img src={senderAvatar}
             alt={senderName}
             className="w-full h-full rounded-full object-cover"
           />

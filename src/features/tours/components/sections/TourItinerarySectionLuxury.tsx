@@ -286,8 +286,7 @@ export function TourItinerarySectionLuxury({
                                 className={`relative ${isMobile ? 'h-48' : 'h-56'} overflow-hidden rounded-md cursor-pointer group/img`}
                                 onClick={() => openImageGallery(allImages, 0)}
                               >
-                                <img
-                                  src={allImages[0].url}
+                                <img src={allImages[0].url}
                                   alt={allImages[0].title || TOURS_LABELS.ITINERARY_IMAGE}
                                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105"
                                 />
@@ -355,8 +354,7 @@ export function TourItinerarySectionLuxury({
                                     className="relative h-44 overflow-hidden rounded-md cursor-pointer group/img"
                                     onClick={() => openImageGallery(allImages, imgIdx)}
                                   >
-                                    <img
-                                      src={img.url}
+                                    <img src={img.url}
                                       alt={img.title || ''}
                                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105"
                                     />

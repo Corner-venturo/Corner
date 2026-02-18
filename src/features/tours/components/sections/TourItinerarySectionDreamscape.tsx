@@ -148,8 +148,7 @@ function BlobLeftLayout({
       >
         {imageUrl ? (
           <>
-            <img
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-[3s] group-hover:scale-110"
+            <img className="absolute inset-0 w-full h-full object-cover transition-transform duration-[3s] group-hover:scale-110"
               src={imageUrl}
               alt={day.title || ''}
             />
@@ -493,8 +492,7 @@ function GlassCardLayout({
                 {/* 圖片區 */}
                 <div className="h-1/2 w-full rounded-2xl overflow-hidden mb-6 relative">
                   {imageUrl ? (
-                    <img
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                       src={imageUrl}
                       alt={day.title || ''}
                     />

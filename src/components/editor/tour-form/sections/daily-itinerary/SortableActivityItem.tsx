@@ -112,8 +112,7 @@ export function SortableActivityItem({
         >
           {activity.image ? (
             <>
-              <img
-                src={activity.image}
+              <img src={activity.image}
                 alt={activity.title || COMP_EDITOR_LABELS.活動圖片}
                 className="w-full h-full object-cover cursor-pointer"
                 style={getImagePositionStyle(activity.imagePosition)}

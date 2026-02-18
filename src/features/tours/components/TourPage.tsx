@@ -274,8 +274,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
           <div className="text-center">
             <div className="flex justify-center mb-3">
               {companyLogoUrl ? (
-                <img
-                  src={companyLogoUrl}
+                <img src={companyLogoUrl}
                   alt="Company Logo"
                   className={`w-auto object-contain ${viewMode === 'mobile' ? 'h-6' : 'h-8'}`}
                 />

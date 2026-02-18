@@ -46,7 +46,7 @@ export function DayHeader({ dayIndex, currentStyle, onStyleChange, onSave, onClo
             <Save size={16} />
             {COMP_EDITOR_LABELS.SAVE}
           </Button>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button variant="ghost" size="icon" aria-label="Close" onClick={onClose}>
             <X size={20} />
           </Button>
         </div>

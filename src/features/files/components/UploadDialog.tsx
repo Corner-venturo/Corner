@@ -256,7 +256,7 @@ export function UploadDialog({ open, onClose }: UploadDialogProps) {
                   {pending.status === 'pending' && (
                     <Button
                       variant="ghost"
-                      size="icon"
+                      size="icon" aria-label="Close"
                       className="h-7 w-7 shrink-0"
                       onClick={() => removeFile(index)}
                     >

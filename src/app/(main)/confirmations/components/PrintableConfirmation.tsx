@@ -194,8 +194,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
                         className="absolute left-0 top-0"
                         style={{ width: '120px', height: '40px' }}
                       >
-                        <img
-                          src={logoUrl}
+                        <img src={logoUrl}
                           alt="Company Logo"
                           style={{
                             width: '100%',
@@ -290,8 +289,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
                   className="absolute left-0 top-0"
                   style={{ width: '120px', height: '40px' }}
                 >
-                  <img
-                    src={logoUrl}
+                  <img src={logoUrl}
                     alt="Company Logo"
                     style={{
                       width: '100%',

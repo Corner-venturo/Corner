@@ -252,7 +252,7 @@ export function AttractionsDialog({
     // 從 HTML 解析圖片 URL
     const html = e.dataTransfer.getData('text/html')
     if (html) {
-      const match = html.match(/<img[^>]+src="([^"]+)"/)
+      const match = html.match(/<img alt=""[^>]+src="([^"]+)"/)
       if (match && match[1]) {
         await fetchAndUploadImage(match[1])
         return

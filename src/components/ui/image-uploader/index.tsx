@@ -329,8 +329,7 @@ export function MultiImageUploader({
               className="relative group rounded-lg overflow-hidden border border-morandi-container"
               style={{ width: previewHeight, height: previewHeight }}
             >
-              <img
-                src={url}
+              <img src={url}
                 alt={`圖片 ${index + 1}`}
                 className="w-full h-full object-cover"
               />

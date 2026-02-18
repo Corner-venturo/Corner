@@ -353,8 +353,7 @@ export function AddCustomerFormDialog({
             >
               {formData.passport_image_url ? (
                 <>
-                  <img
-                    src={formData.passport_image_url}
+                  <img src={formData.passport_image_url}
                     alt={FL.alt_passport_scan}
                     className="w-full h-full object-contain rounded-lg"
                     style={{ maxHeight: '280px' }}

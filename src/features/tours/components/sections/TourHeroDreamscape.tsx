@@ -256,8 +256,7 @@ export function TourHeroDreamscape({ data, viewMode }: TourHeroDreamscapeProps) 
               transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
             >
               {coverImage ? (
-                <img
-                  src={coverImage}
+                <img src={coverImage}
                   alt={data.title}
                   className="w-full h-full object-cover scale-110"
                   style={{ filter: 'brightness(1.05) contrast(1.1)' }}

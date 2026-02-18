@@ -431,8 +431,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
           <div className="header" style={{ position: 'relative', paddingBottom: '16px', marginBottom: '24px', borderBottom: '1px solid #B8A99A' }}>
             {logoUrl ? (
               <div className="logo" style={{ position: 'absolute', left: 0, top: 0, width: '120px', height: '40px' }}>
-                <img
-                  src={logoUrl}
+                <img src={logoUrl}
                   alt={PRINTABLE_QUICK_QUOTE_LABELS.角落旅行社_Logo}
                   style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left top' }}
                 />

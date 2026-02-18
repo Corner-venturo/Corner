@@ -94,8 +94,7 @@ export function TourLeaderSectionCollage({ data, viewMode }: TourLeaderSectionCo
 
               <div className="h-48 bg-morandi-container border border-black mb-2 overflow-hidden">
                 {data.leader?.photo ? (
-                  <img
-                    src={data.leader.photo}
+                  <img src={data.leader.photo}
                     alt={data.leader?.name || '領隊'}
                     className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all"
                   />

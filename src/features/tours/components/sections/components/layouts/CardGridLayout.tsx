@@ -45,8 +45,7 @@ export function CardGridLayout({
         {/* 左側大圖 */}
         <div className="relative h-[400px] w-full">
           {hasImage ? (
-            <img
-              src={mainImage}
+            <img src={mainImage}
               alt={day.title || ''}
               className="absolute inset-0 w-full h-full object-cover shadow-lg cursor-pointer"
               style={{ filter: 'contrast(125%) sepia(30%)' }}

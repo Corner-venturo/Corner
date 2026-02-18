@@ -220,8 +220,7 @@ export const CompanyAssetsPage: React.FC = () => {
           {/* 預覽內容 */}
           <div className="flex items-center justify-center bg-morandi-container/20 min-h-[300px] max-h-[60vh] rounded-lg">
             {previewAsset?.asset_type === 'image' ? (
-              <img
-                src={supabase.storage.from('company-assets').getPublicUrl(previewAsset.file_path).data.publicUrl}
+              <img src={supabase.storage.from('company-assets').getPublicUrl(previewAsset.file_path).data.publicUrl}
                 alt={previewAsset.name}
                 className="max-w-full max-h-[55vh] object-contain"
               />

@@ -331,8 +331,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
                               : 'border-morandi-container'
                           }`}
                         >
-                          <img
-                            src={imageUrl}
+                          <img src={imageUrl}
                             alt={`${hotel.name || COMP_EDITOR_LABELS.飯店} 圖片 ${imageIndex + 1}`}
                             className="w-full h-full object-cover"
                           />

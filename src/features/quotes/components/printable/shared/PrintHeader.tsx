@@ -30,8 +30,7 @@ export const PrintHeader: React.FC<PrintHeaderProps> = ({
           className="absolute left-0 top-0"
           style={{ width: '120px', height: '40px' }}
         >
-          <img
-            src={logoUrl}
+          <img src={logoUrl}
             alt={PRINTABLE_QUICK_QUOTE_LABELS.角落旅行社_Logo}
             style={{
               width: '100%',

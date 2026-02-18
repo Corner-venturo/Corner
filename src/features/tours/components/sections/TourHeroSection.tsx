@@ -29,8 +29,7 @@ export function TourHeroSection({ data, viewMode }: TourHeroSectionProps) {
       {/* 動態背景 */}
       <div className="absolute inset-0">
         {data.coverImage ? (
-          <img
-            src={data.coverImage}
+          <img src={data.coverImage}
             alt="Cover"
             className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
             style={{ filter: 'brightness(0.7)' }}

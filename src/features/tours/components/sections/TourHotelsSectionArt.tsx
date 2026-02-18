@@ -45,8 +45,7 @@ function ImageCarousel({ images, hotelName }: { images: string[]; hotelName: str
   if (images.length === 1) {
     return (
       <div className="aspect-[4/3] w-full overflow-hidden">
-        <img
-          src={images[0]}
+        <img src={images[0]}
           alt={hotelName}
           className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
         />
@@ -56,8 +55,7 @@ function ImageCarousel({ images, hotelName }: { images: string[]; hotelName: str
 
   return (
     <div className="relative aspect-[4/3] w-full overflow-hidden group">
-      <img
-        src={images[currentIndex]}
+      <img src={images[currentIndex]}
         alt={`${hotelName} ${currentIndex + 1}`}
         className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
       />

@@ -88,8 +88,7 @@ export function MultiImageLayout({
                 className="overflow-hidden aspect-square cursor-pointer"
                 onClick={() => onImageClick(allImages, 0, day.title)}
               >
-                <img
-                  src={allImages[0]}
+                <img src={allImages[0]}
                   alt=""
                   className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                   style={{ filter: 'grayscale(100%)' }}
@@ -101,8 +100,7 @@ export function MultiImageLayout({
                 className="overflow-hidden aspect-square translate-y-8 cursor-pointer"
                 onClick={() => onImageClick(allImages, allImages.length > 1 ? 1 : 0, day.title)}
               >
-                <img
-                  src={allImages[1] || allImages[0]}
+                <img src={allImages[1] || allImages[0]}
                   alt=""
                   className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                   style={{ filter: 'grayscale(100%)' }}

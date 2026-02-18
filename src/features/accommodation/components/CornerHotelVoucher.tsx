@@ -138,8 +138,7 @@ export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, la
       <div className="flex gap-4 mb-6 p-4 border border-[#E5E7EB] rounded-lg">
         {data.hotel_image && (
           <div className="flex-shrink-0">
-            <img
-              src={data.hotel_image}
+            <img src={data.hotel_image}
               alt={data.hotel_name}
               className="w-[120px] h-[90px] object-cover rounded-md"
             />

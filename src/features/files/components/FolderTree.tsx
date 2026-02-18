@@ -142,7 +142,7 @@ export function FolderTree() {
         <h2 className="font-medium text-sm">{LABELS.fileManager}</h2>
         <Button
           variant="ghost"
-          size="icon"
+          size="icon" aria-label="Add"
           className="h-7 w-7"
           onClick={() => setCreateFolderDialogOpen(true)}
         >

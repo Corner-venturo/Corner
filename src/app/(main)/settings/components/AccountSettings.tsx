@@ -193,8 +193,7 @@ export function AccountSettings({
               <div className="relative">
                 <div className="w-20 h-20 rounded-full overflow-hidden bg-morandi-container flex items-center justify-center border-2 border-morandi-gold/20">
                   {currentAvatarUrl ? (
-                    <img
-                      src={currentAvatarUrl}
+                    <img src={currentAvatarUrl}
                       alt={LABELS.AVATAR}
                       className="w-full h-full object-cover"
                     />

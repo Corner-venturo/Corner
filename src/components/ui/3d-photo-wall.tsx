@@ -159,8 +159,7 @@ function MarqueeColumn({
             }}
             transition={{ duration: 0.2 }}
           >
-            <img
-              src={image}
+            <img src={image}
               alt=""
               className="w-full h-full object-cover"
               loading="lazy"

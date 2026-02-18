@@ -24,8 +24,7 @@ export function ActivityDetailModal({
       <DialogContent level={1} className="max-w-lg p-0 overflow-hidden rounded-2xl">
         {activity?.image && (
           <div className="relative h-48">
-            <img
-              src={activity.image}
+            <img src={activity.image}
               alt={activity.title}
               className="w-full h-full object-cover"
             />

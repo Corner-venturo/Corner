@@ -72,8 +72,7 @@ export function ImagePreviewModal({
 
           {/* 圖片 */}
           <div className="flex items-center justify-center min-h-[60vh] p-4">
-            <img
-              src={imageUrl}
+            <img src={imageUrl}
               alt={`圖片 ${currentIndex + 1}`}
               className="max-w-full max-h-[80vh] object-contain rounded-lg"
             />
@@ -212,8 +211,7 @@ export function ImagePositionEditor({
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
         >
-          <img
-            src={imageUrl}
+          <img src={imageUrl}
             alt={COMP_EDITOR_LABELS.調整位置}
             className="w-full h-full object-cover"
             style={{ objectPosition: position }}

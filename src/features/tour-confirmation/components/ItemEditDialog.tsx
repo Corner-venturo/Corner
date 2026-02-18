@@ -433,8 +433,7 @@ export function ItemEditDialog({
                 <div className="mt-2 flex flex-wrap gap-2">
                   {receiptImages.map((url, index) => (
                     <div key={index} className="relative group">
-                      <img
-                        src={url}
+                      <img src={url}
                         alt={`${ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.收據} ${index + 1}`}
                         className="w-20 h-20 object-cover rounded-lg border border-border"
                       />

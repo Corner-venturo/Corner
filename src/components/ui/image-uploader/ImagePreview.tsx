@@ -50,8 +50,7 @@ export function ImagePreview({
       )}
       style={{ height: previewHeight }}
     >
-      <img
-        src={value}
+      <img src={value}
         alt={IMAGE_UPLOADER_LABELS.PREVIEW}
         className="w-full h-full object-cover"
         style={getImagePositionStyle(position)}

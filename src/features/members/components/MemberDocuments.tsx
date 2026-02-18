@@ -113,8 +113,7 @@ export function MemberDocuments({
                     key={index}
                     className="flex items-center gap-2 p-2 bg-morandi-container/20 rounded"
                   >
-                    <img
-                      src={pf.preview}
+                    <img src={pf.preview}
                       alt={pf.file.name}
                       className="w-12 h-12 object-cover rounded flex-shrink-0"
                     />

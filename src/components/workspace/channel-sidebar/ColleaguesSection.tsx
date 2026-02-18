@@ -151,8 +151,7 @@ export function ColleaguesSection({
                         )}
                       >
                         {emp.avatar ? (
-                          <img
-                            src={emp.avatar}
+                          <img src={emp.avatar}
                             alt=""
                             className="w-5 h-5 rounded-full object-cover"
                           />

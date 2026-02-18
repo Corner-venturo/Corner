@@ -69,8 +69,7 @@ export function MobileDaySection({
           className="relative aspect-[16/9] mb-4 cursor-pointer"
           onClick={() => onImageClick(allImages, 0, day.title)}
         >
-          <img
-            src={mainImage}
+          <img src={mainImage}
             alt=""
             className="w-full h-full object-cover"
           />

@@ -110,8 +110,7 @@ function PolaroidCard({
           onClick={() => image && onImageClick(feature.images || [], 0)}
         >
           {image ? (
-            <img
-              src={image}
+            <img src={image}
               alt={feature.title}
               className="w-full h-full object-cover border border-border grayscale group-hover:grayscale-0 transition-all duration-500"
             />
@@ -193,8 +192,7 @@ function DiptychCard({
                 className="overflow-hidden border border-border/50"
                 onClick={() => onImageClick(images, 0)}
               >
-                <img
-                  src={images[0]}
+                <img src={images[0]}
                   alt={`${feature.title} 1`}
                   className="w-full h-full object-cover"
                 />
@@ -203,8 +201,7 @@ function DiptychCard({
                 className="overflow-hidden border border-border/50"
                 onClick={() => onImageClick(images, 1)}
               >
-                <img
-                  src={images[1]}
+                <img src={images[1]}
                   alt={`${feature.title} 2`}
                   className="w-full h-full object-cover"
                 />
@@ -215,8 +212,7 @@ function DiptychCard({
               className="overflow-hidden border border-border/50"
               onClick={() => onImageClick(images, 0)}
             >
-              <img
-                src={images[0]}
+              <img src={images[0]}
                 alt={feature.title}
                 className="w-full h-full object-cover"
               />
@@ -312,8 +308,7 @@ function FrameCard({
         }}
       >
         {image ? (
-          <img
-            src={image}
+          <img src={image}
             alt={feature.title}
             className="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-700"
           />
@@ -394,8 +389,7 @@ function RecipeCard({
         onClick={() => image && onImageClick(feature.images || [], 0)}
       >
         {image ? (
-          <img
-            src={image}
+          <img src={image}
             alt={feature.title}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
@@ -613,8 +607,7 @@ export function TourFeaturesSectionCollage({
                 transition={{ duration: 0.2 }}
                 className="flex items-center justify-center"
               >
-                <img
-                  src={lightboxImages[lightboxIndex]}
+                <img src={lightboxImages[lightboxIndex]}
                   alt={`圖片 ${lightboxIndex + 1}`}
                   className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg"
                 />

@@ -91,8 +91,7 @@ export function PassportImageEnhancer({
           <div className="space-y-2">
             <p className="text-xs text-morandi-muted">{COMP_ORDERS_LABELS.PREVIEW}</p>
             <div className="relative aspect-[3/2] bg-morandi-container rounded-lg overflow-hidden">
-              <img
-                src={previewSrc}
+              <img src={previewSrc}
                 alt={COMP_ORDERS_LABELS.護照預覽}
                 className="w-full h-full object-contain"
               />

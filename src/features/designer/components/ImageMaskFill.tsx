@@ -131,8 +131,7 @@ export function ImageMaskFillDialog({
           >
             {imageUrl ? (
               <div className="relative">
-                <img
-                  src={imageUrl}
+                <img src={imageUrl}
                   alt={DESIGNER_LABELS.PREVIEW}
                   className="max-h-48 mx-auto rounded"
                 />

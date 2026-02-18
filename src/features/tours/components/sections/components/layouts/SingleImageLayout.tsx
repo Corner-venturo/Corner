@@ -72,8 +72,7 @@ export function SingleImageLayout({
         >
           {hasImage ? (
             <>
-              <img
-                src={mainImage}
+              <img src={mainImage}
                 alt={day.title || ''}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-105"
               />

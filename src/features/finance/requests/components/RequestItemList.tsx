@@ -164,7 +164,7 @@ export function EditableRequestItemList({
               {index === 0 ? (
                 <Button
                   variant="ghost"
-                  size="icon"
+                  size="icon" aria-label="Button"
                   onClick={addNewEmptyItem}
                   className="h-8 w-8 text-morandi-gold hover:bg-morandi-gold/10"
                   title={REQUEST_ITEM_LIST_LABELS.新增項目}
@@ -174,7 +174,7 @@ export function EditableRequestItemList({
               ) : (
                 <Button
                   variant="ghost"
-                  size="icon"
+                  size="icon" aria-label="Delete"
                   onClick={() => removeItem(item.id)}
                   className="h-8 w-8 text-morandi-secondary hover:text-morandi-red hover:bg-morandi-red/10"
                   title={REQUEST_DETAIL_DIALOG_LABELS.刪除項目}

@@ -129,8 +129,7 @@ export const CornerFlightItinerary: React.FC<CornerFlightItineraryProps> = ({
           left: 0,
           top: 0,
         }}>
-          <img
-            src="/corner-logo.png"
+          <img src="/corner-logo.png"
             alt="Corner Travel"
             style={{
               height: '35px',

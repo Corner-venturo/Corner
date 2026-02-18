@@ -221,8 +221,7 @@ export function LeaderMeetingSection({
             <div className="relative group">
               {data.leader?.photo ? (
                 <div className="relative">
-                  <img
-                    src={data.leader.photo}
+                  <img src={data.leader.photo}
                     alt={COMP_EDITOR_LABELS.領隊頭像}
                     className="w-20 h-20 rounded-full object-cover border-2 border-morandi-container"
                   />

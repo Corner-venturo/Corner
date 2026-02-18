@@ -37,8 +37,7 @@ export function SortableActivityGridItem({
       className="relative aspect-square rounded-lg overflow-hidden border border-morandi-container bg-morandi-container/20 cursor-grab active:cursor-grabbing group"
     >
       {activity.image ? (
-        <img
-          src={activity.image}
+        <img src={activity.image}
           alt={activity.title || COMP_EDITOR_LABELS.活動圖片}
           className="w-full h-full object-cover"
         />

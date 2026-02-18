@@ -135,8 +135,7 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
           <div className={`${isMobile ? '' : 'lg:col-span-7'} relative`}>
             <div className="relative h-[400px] lg:h-[600px] rounded-2xl overflow-hidden shadow-lg">
               {data.coverImage ? (
-                <img
-                  src={data.coverImage}
+                <img src={data.coverImage}
                   alt={data.title}
                   className="absolute inset-0 w-full h-full object-cover"
                 />

@@ -821,8 +821,7 @@ export function OrderMembersExpandable({
           </DialogHeader>
           {previewMember?.passport_image_url && (
             <div className="flex justify-center">
-              <img
-                src={previewMember.passport_image_url}
+              <img src={previewMember.passport_image_url}
                 alt={COMP_ORDERS_LABELS.護照照片}
                 className="max-w-full max-h-[70vh] object-contain rounded-lg"
               />

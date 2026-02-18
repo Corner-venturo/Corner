@@ -128,8 +128,7 @@ function SingleHotelLayout({ hotel }: { hotel: HotelInfo }) {
       {/* 左側：圖片輪播 */}
       <div className="relative aspect-[4/3] rounded-lg overflow-hidden shadow-lg group">
         {currentImage ? (
-          <img
-            src={currentImage}
+          <img src={currentImage}
             alt={hotel.name || TOURS_LABELS.HOTEL}
             className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
           />
@@ -278,8 +277,7 @@ function HotelCard({
       {/* 圖片區 */}
       <div className="relative h-64 rounded-md overflow-hidden mb-6 shadow-lg">
         {currentImage ? (
-          <img
-            src={currentImage}
+          <img src={currentImage}
             alt={hotel.name || TOURS_LABELS.HOTEL}
             className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
           />

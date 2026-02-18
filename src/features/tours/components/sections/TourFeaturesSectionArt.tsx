@@ -100,8 +100,7 @@ export function TourFeaturesSectionArt({ data, viewMode }: TourFeaturesSectionAr
                   {/* 圖片區 */}
                   <div className="aspect-[16/10] overflow-hidden relative">
                     {hasImage ? (
-                      <img
-                        src={feature.images![0]}
+                      <img src={feature.images![0]}
                         alt={feature.title}
                         className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                       />

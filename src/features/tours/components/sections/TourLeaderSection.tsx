@@ -73,8 +73,7 @@ export function TourLeaderSection({ data, viewMode, coverStyle = 'original' }: T
             <div className={viewMode === 'mobile' ? 'flex items-start gap-4' : 'flex items-start gap-6'}>
               {/* 領隊頭像 */}
               {data.leader?.photo ? (
-                <img
-                  src={data.leader.photo}
+                <img src={data.leader.photo}
                   alt={data.leader?.name || 'Tour Leader'}
                   className={viewMode === 'mobile' ? 'w-16 h-16 rounded-full object-cover flex-shrink-0 border-2 border-morandi-container' : 'w-20 h-20 rounded-full object-cover flex-shrink-0 border-2 border-morandi-container'}
                 />

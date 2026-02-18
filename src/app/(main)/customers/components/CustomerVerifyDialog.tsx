@@ -288,8 +288,7 @@ export function CustomerVerifyDialog({
                   style={{ height: '320px' }}
                   onClick={() => setIsEditorOpen(true)}
                 >
-                  <img
-                    src={currentImageUrl}
+                  <img src={currentImageUrl}
                     alt={t('passport.title')}
                     className="w-full h-full object-contain"
                     draggable={false}

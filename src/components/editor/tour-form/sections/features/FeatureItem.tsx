@@ -182,8 +182,7 @@ export function FeatureItem({
                   </div>
                 ) : (
                   <>
-                    <img
-                      src={imageUrl}
+                    <img src={imageUrl}
                       alt={`特色圖片 ${imgIndex + 1}`}
                       className="w-full h-full object-cover"
                     />

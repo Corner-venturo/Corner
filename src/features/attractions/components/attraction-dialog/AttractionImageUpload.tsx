@@ -101,8 +101,7 @@ function ImagePositionAdjuster({
         className="w-full h-24 rounded-md border border-border overflow-hidden cursor-pointer"
         onDoubleClick={handleDoubleClick}
       >
-        <img
-          src={url}
+        <img src={url}
           alt={ATTRACTION_IMAGE_UPLOAD_LABELS.景點圖片}
           className="w-full h-full object-cover"
           style={{

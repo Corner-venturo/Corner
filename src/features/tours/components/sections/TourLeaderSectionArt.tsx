@@ -99,8 +99,7 @@ export function TourLeaderSectionArt({ data, viewMode }: TourLeaderSectionArtPro
               {/* 領隊照片 */}
               <div className="aspect-[4/5] w-full relative overflow-hidden">
                 {data.leader?.photo ? (
-                  <img
-                    src={data.leader.photo}
+                  <img src={data.leader.photo}
                     alt={data.leader?.name || '領隊'}
                     className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
                   />

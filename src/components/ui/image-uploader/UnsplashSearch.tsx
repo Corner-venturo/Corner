@@ -135,8 +135,7 @@ export function UnsplashSearch({ onSelect, className }: UnsplashSearchProps) {
                 onClick={() => handleSelect(image)}
                 className="relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-morandi-gold transition-all group"
               >
-                <img
-                  src={image.urls.small}
+                <img src={image.urls.small}
                   alt={image.alt_description || '圖片'}
                   className="w-full h-full object-cover"
                   loading="lazy"

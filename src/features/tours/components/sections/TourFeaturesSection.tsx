@@ -141,8 +141,7 @@ export function TourFeaturesSection({ data, viewMode, coverStyle = 'original', f
                               className="overflow-hidden rounded-lg aspect-[16/9] cursor-pointer hover:opacity-90 transition-opacity"
                               onClick={() => openLightbox(validImages, 0)}
                             >
-                              <img
-                                src={validImages[0]}
+                              <img src={validImages[0]}
                                 alt={feature.title}
                                 className="w-full h-full object-cover"
                               />
@@ -175,8 +174,7 @@ export function TourFeaturesSection({ data, viewMode, coverStyle = 'original', f
                                   className="relative overflow-hidden rounded-lg aspect-[4/3] cursor-pointer hover:opacity-90 transition-opacity"
                                   onClick={() => openLightbox(validImages, imgIndex)}
                                 >
-                                  <img
-                                    src={imgUrl}
+                                  <img src={imgUrl}
                                     alt={`${feature.title} ${imgIndex + 1}`}
                                     className="w-full h-full object-cover"
                                   />
@@ -265,8 +263,7 @@ export function TourFeaturesSection({ data, viewMode, coverStyle = 'original', f
                                     }}
                                     onClick={() => openLightbox(validImages, originalIndex)}
                                   >
-                                    <img
-                                      src={imgUrl}
+                                    <img src={imgUrl}
                                       alt={`${feature.title} ${originalIndex + 1}`}
                                       className="w-full h-full object-cover"
                                     />
@@ -383,8 +380,7 @@ export function TourFeaturesSection({ data, viewMode, coverStyle = 'original', f
                 exit={{ opacity: 0, scale: 0.9 }}
                 className="flex items-center justify-center px-16"
               >
-                <img
-                  src={lightboxImages[lightboxIndex]}
+                <img src={lightboxImages[lightboxIndex]}
                   alt={`圖片 ${lightboxIndex + 1}`}
                   className="max-w-full max-h-[85vh] object-contain rounded-lg"
                 />

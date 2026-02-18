@@ -108,8 +108,7 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
 
               {/* 頭像 */}
               {leader?.photo ? (
-                <img
-                  src={leader.photo}
+                <img src={leader.photo}
                   alt={leader?.name || 'Tour Leader'}
                   className="w-20 h-20 rounded-full object-cover flex-shrink-0 border-2 shadow-sm relative z-10"
                   style={{ borderColor: LUXURY.surface }}

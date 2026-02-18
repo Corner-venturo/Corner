@@ -100,8 +100,7 @@ function ItineraryPrintContent() {
           {/* 封面圖（如果有） */}
           {itinerary.cover_image && (
             <div className="mb-6 -mx-8 -mt-8 print:-mx-6 print:-mt-6 relative overflow-hidden" style={{ height: '280px' }}>
-              <img
-                src={itinerary.cover_image}
+              <img src={itinerary.cover_image}
                 alt={itinerary.title || ''}
                 className="w-full h-full object-cover"
               />

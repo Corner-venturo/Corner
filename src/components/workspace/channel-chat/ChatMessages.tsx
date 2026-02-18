@@ -149,7 +149,7 @@ export function ChatMessages({
 
       // 從 HTML 中提取 img src
       if (html) {
-        const match = html.match(/<img[^>]+src=["']([^"']+)["']/i)
+        const match = html.match(/<img alt=""[^>]+src=["']([^"']+)["']/i)
         if (match && match[1]) {
           // 跳過 data: URL 和 blob: URL
           if (!match[1].startsWith('data:') && !match[1].startsWith('blob:')) {

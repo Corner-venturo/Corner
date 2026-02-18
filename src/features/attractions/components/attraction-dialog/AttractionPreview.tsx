@@ -40,8 +40,7 @@ export function AttractionPreview({
       {uploadedImages.length > 0 && (
         <div className="space-y-2">
           <div className="text-sm font-medium">{ATTRACTION_PREVIEW_LABELS.LABEL_4308}</div>
-          <img
-            src={uploadedImages[0]}
+          <img src={uploadedImages[0]}
             alt={formData.name}
             className={`w-full h-48 object-cover rounded-md ${positionStyles[imagePositions[uploadedImages[0]] || 'center']}`}
           />

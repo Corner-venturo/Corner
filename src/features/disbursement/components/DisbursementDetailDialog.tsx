@@ -311,7 +311,7 @@ export function DisbursementDetailDialog({
                         {order.status === 'pending' && (
                           <td className="py-2 px-3 text-center">
                             <Button
-                              size="icon"
+                              size="icon" aria-label="Delete"
                               variant="ghost"
                               className="h-7 w-7 text-morandi-red hover:bg-morandi-red/10"
                               onClick={() => handleRemoveRequest(request.id)}

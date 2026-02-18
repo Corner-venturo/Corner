@@ -192,8 +192,7 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
             left: 0,
             top: 0,
           }}>
-            <img
-              src="/corner-logo.png"
+            <img src="/corner-logo.png"
               alt={DISBURSEMENT_LABELS.角落旅行社}
               style={{
                 height: '36px',

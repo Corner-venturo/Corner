@@ -71,8 +71,7 @@ export const CompanyAssetsList: React.FC<CompanyAssetsListProps> = ({
             }}
           >
             {asset.asset_type === 'image' ? (
-              <img
-                src={data.publicUrl}
+              <img src={data.publicUrl}
                 alt={asset.name}
                 className="w-full h-full object-cover"
               />

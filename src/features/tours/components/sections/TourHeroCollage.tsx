@@ -194,8 +194,7 @@ export function TourHeroCollage({ data, viewMode }: TourHeroCollageProps) {
             transition={{ duration: 0.5 }}
           >
             {coverImage ? (
-              <img
-                src={coverImage}
+              <img src={coverImage}
                 alt={data.title}
                 className="w-full h-full object-cover border border-black"
                 style={{ filter: 'grayscale(100%) contrast(1.25)' }}

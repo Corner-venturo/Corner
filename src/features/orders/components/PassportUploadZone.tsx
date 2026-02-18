@@ -157,8 +157,7 @@ export function PassportUploadZone({
           <div className="grid grid-cols-4 gap-2 max-h-40 overflow-y-auto">
             {processedFiles.map((pf, index) => (
               <div key={index} className="relative group">
-                <img
-                  src={pf.preview}
+                <img src={pf.preview}
                   alt={pf.originalName}
                   className="w-full h-16 object-cover rounded border border-morandi-border cursor-pointer hover:border-morandi-gold transition-colors"
                   onClick={() => !pf.isPdf && handleOpenEnhancer(index)}

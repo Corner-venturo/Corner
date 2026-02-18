@@ -80,8 +80,7 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
               <div className="relative">
                 {formData.photo ? (
                   <div className="relative">
-                    <img
-                      src={formData.photo}
+                    <img src={formData.photo}
                       alt={TOUR_LEADERS_LABELS.LABEL_2837}
                       className="w-20 h-20 rounded-full object-cover border-2 border-morandi-container"
                     />

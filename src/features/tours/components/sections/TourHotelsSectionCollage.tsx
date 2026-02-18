@@ -92,8 +92,7 @@ export function TourHotelsSectionCollage({ data, viewMode }: TourHotelsSectionCo
                 {/* 圖片區 */}
                 <div className="overflow-hidden h-48 mb-4 border border-border">
                   {image ? (
-                    <img
-                      src={image}
+                    <img src={image}
                       alt={hotel.name || '飯店'}
                       className={`w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 transform ${rotation} group-hover:${hoverRotation}`}
                     />

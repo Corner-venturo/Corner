@@ -37,8 +37,7 @@ export function PickupList({
             {/* 左側：護照圖片預覽 */}
             <div className="flex-shrink-0 w-32">
               {item.ocrResult.imageBase64 ? (
-                <img
-                  src={item.ocrResult.imageBase64}
+                <img src={item.ocrResult.imageBase64}
                   alt={L.alt_passport}
                   className="w-full h-24 object-cover rounded border"
                 />

@@ -203,8 +203,7 @@ export function ImagePositionEditor({
             style={{ aspectRatio: aspectRatio }}
             onMouseDown={handleMouseDown}
           >
-            <img
-              src={imageSrc}
+            <img src={imageSrc}
               alt={UI_LABELS.PREVIEW}
               className="w-full h-full object-cover pointer-events-none"
               style={{

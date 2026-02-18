@@ -81,7 +81,7 @@ export function FilePreview({ onBack }: FilePreviewProps) {
             {LABELS.selectedFiles(selectedFiles.length)}
           </span>
           {onBack && (
-            <Button variant="ghost" size="icon" className="h-7 w-7 lg:hidden" onClick={onBack}>
+            <Button variant="ghost" size="icon" aria-label="Close" className="h-7 w-7 lg:hidden" onClick={onBack}>
               <X className="w-4 h-4" />
             </Button>
           )}
@@ -163,7 +163,7 @@ export function FilePreview({ onBack }: FilePreviewProps) {
         <span className="flex-1 font-medium text-sm truncate">{file.filename}</span>
         <Button
           variant="ghost"
-          size="icon"
+          size="icon" aria-label="Button"
           className="h-7 w-7"
           onClick={() => toggleFileStar(file.id)}
         >
@@ -175,7 +175,7 @@ export function FilePreview({ onBack }: FilePreviewProps) {
           />
         </Button>
         {onBack && (
-          <Button variant="ghost" size="icon" className="h-7 w-7 lg:hidden" onClick={onBack}>
+          <Button variant="ghost" size="icon" aria-label="Close" className="h-7 w-7 lg:hidden" onClick={onBack}>
             <X className="w-4 h-4" />
           </Button>
         )}

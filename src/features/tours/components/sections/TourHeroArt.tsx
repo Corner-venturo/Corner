@@ -207,8 +207,7 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
                   style={{ borderColor: ART.ink, backgroundColor: '#e5e5e5' }}
                 >
                   {coverImage ? (
-                    <img
-                      src={coverImage}
+                    <img src={coverImage}
                       alt={data.title}
                       className="w-full h-full object-cover"
                     />
@@ -336,8 +335,7 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
                 style={{ borderColor: ART.ink }}
               >
                 {coverImage ? (
-                  <img
-                    src={coverImage}
+                  <img src={coverImage}
                     alt={data.title}
                     className="w-full h-full object-cover"
                   />

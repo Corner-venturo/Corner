@@ -107,8 +107,7 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
             onClick={handleImageClick}
           >
             <div className="relative aspect-[16/9] w-full">
-              <img
-                src={getImageUrl(validImages[0])}
+              <img src={getImageUrl(validImages[0])}
                 alt={`${title}${TOURS_LABELS.IMAGE_ALT_SUFFIX}1`}
                 className="h-full w-full object-cover"
                 style={{ objectPosition: getImagePosition(validImages[0]) }}
@@ -165,8 +164,7 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
                 onClick={handleImageClick}
               >
                 <div className="relative aspect-[16/9] w-full">
-                  <img
-                    src={getImageUrl(image)}
+                  <img src={getImageUrl(image)}
                     alt={`${title}${TOURS_LABELS.IMAGE_ALT_SUFFIX}${index + 1}`}
                     className="h-full w-full object-cover"
                     style={{ objectPosition: getImagePosition(image) }}

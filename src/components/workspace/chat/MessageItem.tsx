@@ -135,8 +135,7 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, e
                       rel="noopener noreferrer"
                       className="block max-w-sm rounded-lg overflow-hidden border border-morandi-container hover:border-morandi-gold/40 transition-colors"
                     >
-                      <img
-                        src={imageUrl}
+                      <img src={imageUrl}
                         alt={fileName}
                         className="max-w-full max-h-[300px] object-contain bg-morandi-container/10"
                         loading="lazy"

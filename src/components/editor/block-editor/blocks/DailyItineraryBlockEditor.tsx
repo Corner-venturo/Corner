@@ -136,7 +136,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                 </span>
                 <Button
                   variant="ghost"
-                  size="icon"
+                  size="icon" aria-label="Delete"
                   className="h-6 w-6 text-status-danger hover:text-status-danger hover:bg-status-danger-bg"
                   onClick={(e) => {
                     e.stopPropagation()

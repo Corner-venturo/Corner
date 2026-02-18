@@ -343,8 +343,7 @@ export function ImageEditor({
               onWheel={handleWheel}
               onMouseDown={handleMouseDown}
             >
-              <img
-                src={previewSrc}
+              <img src={previewSrc}
                 alt={tCommon('preview')}
                 className="w-full h-full object-cover pointer-events-none"
                 style={{

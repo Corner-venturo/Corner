@@ -101,8 +101,7 @@ export function ImageGalleryModal(props: ImageGalleryModalProps) {
               transition={{ duration: 0.2 }}
               className={isArt ? 'max-w-5xl max-h-[85vh] mx-6' : 'max-w-5xl max-h-[80vh] relative'}
             >
-              <img
-                src={currentUrl}
+              <img src={currentUrl}
                 alt={currentTitle || ''}
                 className={
                   isArt
@@ -158,8 +157,7 @@ export function ImageGalleryModal(props: ImageGalleryModalProps) {
                       }`}
                       aria-label={`View image ${idx + 1}`}
                     >
-                      <img
-                        src={img.url}
+                      <img src={img.url}
                         alt=""
                         className="w-full h-full object-cover"
                       />

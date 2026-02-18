@@ -138,8 +138,7 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-morandi-container/30 flex items-center justify-center">
               {employee.avatar ? (
-                <img
-                  src={employee.avatar}
+                <img src={employee.avatar}
                   alt={employee.display_name}
                   className="w-12 h-12 rounded-full object-cover"
                 />

@@ -151,7 +151,7 @@ export function AttractionsMap({
               overflow: hidden;
             ">
               ${img ? `
-                <img
+                <img alt=""
                   src="${img}"
                   style="width: ${imgSize}px; height: ${imgSize}px; object-fit: cover; border-radius: 6px;"
                   onerror="this.style.display='none'"
@@ -215,7 +215,7 @@ export function AttractionsMap({
         marker.bindPopup(`
           <div style="min-width: 180px; padding: 4px;">
             ${attraction.thumbnail ? `
-              <img src="${attraction.thumbnail}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;" />
+              <img alt="" src="${attraction.thumbnail}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;" />
             ` : ''}
             <div style="font-weight: 600; font-size: 14px; color: #334155;">${attraction.name}</div>
             <div style="font-size: 12px; color: #64748b; margin-top: 4px;">

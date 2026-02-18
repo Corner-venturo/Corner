@@ -71,8 +71,7 @@ function SortableImageItem({
       style={style}
       className="relative group aspect-video rounded-lg overflow-hidden border border-morandi-container bg-morandi-container/20"
     >
-      <img
-        src={imageUrl}
+      <img src={imageUrl}
         alt={`圖片 ${index + 1}`}
         className="w-full h-full object-cover cursor-pointer"
         style={{ objectPosition: imagePosition }}

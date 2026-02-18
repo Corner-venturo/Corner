@@ -255,8 +255,7 @@ export function DailyItinerarySection({
           <div className="space-y-4 py-4">
             {saveToLibraryDialog?.publicUrl && (
               <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-morandi-container">
-                <img
-                  src={saveToLibraryDialog.publicUrl}
+                <img src={saveToLibraryDialog.publicUrl}
                   alt={COMP_EDITOR_LABELS.預覽}
                   className="w-full h-full object-cover"
                 />

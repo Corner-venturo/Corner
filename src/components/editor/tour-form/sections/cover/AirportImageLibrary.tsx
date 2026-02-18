@@ -155,8 +155,7 @@ export function AirportImageLibrary({
                   : 'border-morandi-container hover:border-morandi-gold/50'
               )}
             >
-              <img
-                src={image.image_url}
+              <img src={image.image_url}
                 alt={image.label || COMP_EDITOR_LABELS.封面圖片}
                 className="w-full h-full object-cover"
               />

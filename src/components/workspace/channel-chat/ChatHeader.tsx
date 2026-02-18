@@ -126,7 +126,7 @@ export function ChatHeader({
       {tourId && (
         <Button
           variant="ghost"
-          size="icon"
+          size="icon" aria-label="Button"
           className="w-8 h-8 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10"
           onClick={() => router.push(`/tours?highlight=${tourId}`)}
           title={COMP_WORKSPACE_LABELS.前往旅遊團詳情}
@@ -141,7 +141,7 @@ export function ChatHeader({
           <PopoverTrigger asChild>
             <Button
               variant="ghost"
-              size="icon"
+              size="icon" aria-label="Button"
               className="w-8 h-8 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10 relative"
               title={COMP_WORKSPACE_LABELS.關聯報價單}
             >
@@ -196,7 +196,7 @@ export function ChatHeader({
         </Popover>
       )}
 
-      <Button variant="ghost" size="icon" className="w-8 h-8" onClick={onToggleMemberSidebar}>
+      <Button variant="ghost" size="icon" aria-label="Toggle menu" className="w-8 h-8" onClick={onToggleMemberSidebar}>
         <Users size={16} />
       </Button>
     </div>

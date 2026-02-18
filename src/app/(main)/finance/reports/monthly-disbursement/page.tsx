@@ -58,13 +58,13 @@ function MonthSelector({
 
   return (
     <div className="flex items-center gap-2">
-      <Button variant="outline" size="icon" onClick={handlePrev}>
+      <Button variant="outline" size="icon" aria-label="Previous" onClick={handlePrev}>
         <ChevronLeft size={16} />
       </Button>
       <span className="min-w-[120px] text-center font-medium text-morandi-primary">
         {formatYearMonth(value)}
       </span>
-      <Button variant="outline" size="icon" onClick={handleNext}>
+      <Button variant="outline" size="icon" aria-label="Next" onClick={handleNext}>
         <ChevronRight size={16} />
       </Button>
     </div>

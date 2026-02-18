@@ -62,8 +62,7 @@ export function AttractionCard({
       {/* 縮圖 */}
       <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-morandi-container/30">
         {image ? (
-          <img
-            src={image}
+          <img src={image}
             alt={attraction.name}
             className="w-full h-full object-cover"
           />

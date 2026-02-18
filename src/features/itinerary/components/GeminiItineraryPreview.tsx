@@ -80,8 +80,7 @@ function HighlightCard({ spot, totalCount }: { spot: HighlightSpot; totalCount: 
         totalCount === 1 ? 'h-64 md:h-72 md:w-1/2' : 'h-48'
       )}>
         {spot.imageUrl ? (
-          <img
-            src={spot.imageUrl}
+          <img src={spot.imageUrl}
             alt={spot.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
           />
@@ -432,8 +431,7 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
                     {/* Image - 晴日風格大圖 */}
                     <div className="md:w-2/5 h-64 md:h-auto relative overflow-hidden flex-shrink-0">
                       {sight.imageUrl ? (
-                        <img
-                          src={sight.imageUrl}
+                        <img src={sight.imageUrl}
                           alt={sight.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                         />

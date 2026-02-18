@@ -65,8 +65,7 @@ export function RestaurantCard({ restaurant, isSelected, onToggle }: RestaurantC
       {/* 縮圖 */}
       <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-morandi-container/30">
         {image ? (
-          <img
-            src={image}
+          <img src={image}
             alt={restaurant.name}
             className="w-full h-full object-cover"
           />

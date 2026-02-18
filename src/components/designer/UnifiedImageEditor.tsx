@@ -269,8 +269,7 @@ export function UnifiedImageEditor({
                 style={{ aspectRatio }}
                 onMouseDown={handlePositionMouseDown}
               >
-                <img
-                  src={imageSrc}
+                <img src={imageSrc}
                   alt={DESIGNER_LABELS.PREVIEW}
                   className="w-full h-full object-cover pointer-events-none"
                   style={{
@@ -300,8 +299,7 @@ export function UnifiedImageEditor({
                 className="relative bg-black rounded-lg overflow-hidden"
                 style={{ aspectRatio }}
               >
-                <img
-                  src={previewImageSrc}
+                <img src={previewImageSrc}
                   alt={DESIGNER_LABELS.PREVIEW}
                   className="w-full h-full object-cover"
                 />

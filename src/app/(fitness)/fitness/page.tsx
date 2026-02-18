@@ -224,7 +224,7 @@ export default function FitnessPage() {
                         />
                         <Button
                           variant="ghost"
-                          size="icon"
+                          size="icon" aria-label="Button"
                           onClick={() =>
                             updateSet(exerciseIndex, setIndex, 'completed', !set.completed)
                           }

@@ -29,7 +29,7 @@ export function MemberInfoCard({ open, member, onClose }: MemberInfoCardProps) {
         <div className="relative">
           <Button
             variant="ghost"
-            size="icon"
+            size="icon" aria-label="Close"
             className="absolute right-2 top-2 z-10 bg-card/80 hover:bg-card"
             onClick={onClose}
           >
@@ -37,8 +37,7 @@ export function MemberInfoCard({ open, member, onClose }: MemberInfoCardProps) {
           </Button>
           {member.passport_image_url ? (
             <div className="relative w-full max-h-[70vh] overflow-auto">
-              <img
-                src={member.passport_image_url}
+              <img src={member.passport_image_url}
                 alt={`${member.name || member.chinese_name} 的護照`}
                 className="w-full h-auto object-contain rounded-lg"
               />

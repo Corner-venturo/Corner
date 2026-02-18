@@ -145,8 +145,7 @@ export function PassportSection({
             style={{ height: '320px' }}
             onClick={() => setIsEditorOpen(true)}
           >
-            <img
-              src={editingMember.passport_image_url}
+            <img src={editingMember.passport_image_url}
               alt={t('passport.image')}
               className="w-full h-full object-contain"
               draggable={false}

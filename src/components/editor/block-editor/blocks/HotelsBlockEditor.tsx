@@ -60,7 +60,7 @@ export function HotelsBlockEditor({ data, onChange }: HotelsBlockEditorProps) {
           </div>
           <Button
             variant="ghost"
-            size="icon"
+            size="icon" aria-label="Delete"
             className="h-8 w-8 text-status-danger hover:text-status-danger hover:bg-status-danger-bg"
             onClick={() => removeHotel(index)}
           >

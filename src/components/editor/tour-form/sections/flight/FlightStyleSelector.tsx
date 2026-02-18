@@ -66,8 +66,7 @@ export function FlightStyleSelector({
               {/* 預覽圖（如果有） */}
               {option.previewImage && (
                 <div className="w-full h-12 mb-2 rounded overflow-hidden bg-morandi-container">
-                  <img
-                    src={option.previewImage}
+                  <img src={option.previewImage}
                     alt={option.label}
                     className="w-full h-full object-cover"
                   />
