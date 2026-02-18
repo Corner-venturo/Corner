@@ -113,10 +113,15 @@ export function ChannelChat() {
     if (!selectedChannel) return ''
     if (selectedChannel.type !== 'direct') return selectedChannel.name
 
+    const fallbackName = '私訊'
+
     // Try dm_target_id first
     if (selectedChannel.dm_target_id) {
-      const target = slimEmployees.find(e => e.id === selectedChannel.dm_target_id)
-      if (target) return target.display_name || target.chinese_name || selectedChannel.name
+      const targetId = selectedChannel.dm_target_id === user?.id
+        ? selectedChannel.created_by
+        : selectedChannel.dm_target_id
+      const target = slimEmployees.find(e => e.id === targetId)
+      if (target) return target.display_name || target.chinese_name || fallbackName
     }
 
     // Parse dm:userA:userB format
@@ -125,11 +130,11 @@ export function ChannelChat() {
       const otherId = ids.find(id => id !== user?.id)
       if (otherId) {
         const target = slimEmployees.find(e => e.id === otherId)
-        if (target) return target.display_name || target.chinese_name || selectedChannel.name
+        if (target) return target.display_name || target.chinese_name || fallbackName
       }
     }
 
-    return selectedChannel.name
+    return fallbackName
   }, [selectedChannel, slimEmployees, user?.id])
 
   // 機器人快捷操作 Dialog 狀態
