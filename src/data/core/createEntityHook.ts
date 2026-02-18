@@ -64,6 +64,8 @@ const WORKSPACE_SCOPED_TABLES = [
   // === 其他 ===
   'airport_images', 'customer_groups', 'leader_availability',
   'request_responses', 'request_response_items',
+  // === 資料庫（景點/飯店等，需要 workspace 隔離寫入）===
+  'attractions',
 ]
 
 // 表格對應的 code prefix（用於自動生成編號）
