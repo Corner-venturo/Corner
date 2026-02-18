@@ -11,15 +11,31 @@ import { mutate } from 'swr'
 
 /**
  * 重算旅遊團的 current_participants
- * 計算該團所有訂單下的 order_members 數量
+ *
+ * @description 查詢該團所有訂單下的 order_members 數量，
+ * 更新 tours.current_participants。這是團員人數的唯一真相源。
+ * 任何 order_members 新增/刪除後都應呼叫此函數。
+ *
+ * @param tour_id - 團 ID
+ * @returns void
+ * @throws 如果 DB 查詢或更新失敗（catch 內部 log 但不會向上拋出）
+ *
+ * @example
+ * // 團員異動後重算
+ * await recalculateParticipants(order.tour_id)
  */
 export async function recalculateParticipants(tour_id: string): Promise<void> {
   try {
     // 查該團所有訂單 ID
-    const { data: orders_data } = await supabase
+    const { data: orders_data, error: ordersError } = await supabase
       .from('orders')
       .select('id')
       .eq('tour_id', tour_id)
+
+    if (ordersError) {
+      logger.error('查詢團訂單失敗:', ordersError)
+      throw ordersError
+    }
 
     const order_ids = (orders_data || []).map(o => o.id)
 
@@ -61,5 +77,6 @@ export async function recalculateParticipants(tour_id: string): Promise<void> {
     logger.log('團人數已重算:', { tour_id, current_participants: participant_count })
   } catch (error) {
     logger.error('recalculateParticipants 失敗:', error)
+    throw error
   }
 }

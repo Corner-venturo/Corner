@@ -1,3 +1,15 @@
+/**
+ * Quote Service - 報價單核心邏輯
+ *
+ * @module quote.service
+ * @description
+ * 報價單的 CRUD 操作、複製、版本管理和成本計算。
+ * 繼承 BaseService 提供基礎 CRUD，額外提供：
+ * - 報價單複製（duplicateQuote）
+ * - 版本控制（createNewVersion）
+ * - 成本計算（calculateTotalCost）
+ */
+
 import { BaseService, StoreOperations } from '@/core/services/base.service'
 import { Quote, QuoteVersion } from '@/stores/types/quote.types'
 import { useQuoteStore } from '@/stores'
@@ -43,6 +55,15 @@ class QuoteService extends BaseService<Quote> {
 
   // ========== 業務邏輯方法 ==========
 
+  /**
+   * 複製報價單
+   *
+   * @description 深複製一份報價單，名稱加「(副本)」後綴，
+   * 狀態重置為 proposed，不保留 code（讓系統自動生成新編號）和 is_pinned。
+   *
+   * @param id - 原始報價單 ID
+   * @returns 複製後的報價單，若原始不存在則返回 undefined
+   */
   async duplicateQuote(id: string): Promise<Quote | undefined> {
     const store = useQuoteStore.getState()
     const original = store.items.find(q => q.id === id)
@@ -69,6 +90,16 @@ class QuoteService extends BaseService<Quote> {
     return duplicated
   }
 
+  /**
+   * 建立報價單新版本
+   *
+   * @description 將當前版本的 categories、pricing 等快照存入 versions 陣列，
+   * 然後套用 updates 更新。version 號自動遞增。
+   *
+   * @param id - 報價單 ID
+   * @param updates - 新版本的更新內容
+   * @returns 更新後的報價單，若不存在則返回 undefined
+   */
   async createNewVersion(id: string, updates: Partial<Quote>): Promise<Quote | undefined> {
     const store = useQuoteStore.getState()
     const current = store.items.find(q => q.id === id)
@@ -116,6 +147,15 @@ class QuoteService extends BaseService<Quote> {
     return store.items.filter(q => q.status === status)
   }
 
+  /**
+   * 計算報價單總成本
+   *
+   * @description 加總所有 categories 的 total 欄位。
+   * 這是報價單成本的計算公式，所有顯示報價金額的地方都應使用此函數。
+   *
+   * @param quote - 報價單物件
+   * @returns 總成本金額
+   */
   calculateTotalCost(quote: Quote): number {
     return (quote.categories || []).reduce((sum, cat) => sum + cat.total, 0)
   }

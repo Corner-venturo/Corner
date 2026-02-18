@@ -1,3 +1,16 @@
+/**
+ * Order Service - 訂單核心邏輯
+ *
+ * @module order.service
+ * @description
+ * 訂單的 CRUD 操作和業務查詢。繼承 BaseService，額外提供：
+ * - 依團、狀態、客戶篩選訂單
+ * - 計算總營收
+ *
+ * 注意：訂單的 paid_amount / payment_status 由 receipt-core.service 的
+ * recalculateReceiptStats 維護，不在此處修改。
+ */
+
 import { BaseService, StoreOperations } from '@/core/services/base.service'
 import { useOrderStore } from '@/stores'
 import { invalidateOrders } from '@/data'

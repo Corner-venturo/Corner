@@ -34,21 +34,31 @@ export async function afterReceiptChange(
  */
 async function recalculateOrderPayment(orderId: string): Promise<void> {
   // 取得訂單總金額
-  const { data: orderData } = await supabase
+  const { data: orderData, error: orderError } = await supabase
     .from('orders')
     .select('total_amount')
     .eq('id', orderId)
     .single()
 
+  if (orderError) {
+    logger.error('查詢訂單總金額失敗:', orderError)
+    throw orderError
+  }
+
   const orderTotalAmount = orderData?.total_amount || 0
 
   // 計算該訂單所有已確認收款的實收總金額（過濾 deleted_at）
-  const { data: confirmedReceipts } = await supabase
+  const { data: confirmedReceipts, error: receiptsError } = await supabase
     .from('receipts')
     .select('actual_amount')
     .eq('order_id', orderId)
     .eq('status', '1')
     .is('deleted_at', null)
+
+  if (receiptsError) {
+    logger.error('查詢已確認收款失敗:', receiptsError)
+    throw receiptsError
+  }
 
   const totalPaid = (confirmedReceipts || []).reduce(
     (sum, r) => sum + (r.actual_amount || 0),
@@ -91,10 +101,15 @@ async function recalculateOrderPayment(orderId: string): Promise<void> {
  */
 async function recalculateTourFinancials(tourId: string): Promise<void> {
   // 取得該團所有訂單 ID
-  const { data: tourOrdersData } = await supabase
+  const { data: tourOrdersData, error: tourOrdersError } = await supabase
     .from('orders')
     .select('id')
     .eq('tour_id', tourId)
+
+  if (tourOrdersError) {
+    logger.error('查詢團訂單失敗:', tourOrdersError)
+    throw tourOrdersError
+  }
 
   const orderIds = (tourOrdersData || []).map(o => o.id)
 
@@ -113,7 +128,12 @@ async function recalculateTourFinancials(tourId: string): Promise<void> {
     receiptsQuery = receiptsQuery.eq('tour_id', tourId)
   }
 
-  const { data: receiptsData } = await receiptsQuery
+  const { data: receiptsData, error: receiptsQueryError } = await receiptsQuery
+
+  if (receiptsQueryError) {
+    logger.error('查詢已確認收款失敗:', receiptsQueryError)
+    throw receiptsQueryError
+  }
 
   const totalRevenue = (receiptsData || []).reduce(
     (sum, r) => sum + (r.actual_amount || 0),
@@ -121,11 +141,16 @@ async function recalculateTourFinancials(tourId: string): Promise<void> {
   )
 
   // 取得當前成本
-  const { data: currentTour } = await supabase
+  const { data: currentTour, error: tourCostError } = await supabase
     .from('tours')
     .select('total_cost')
     .eq('id', tourId)
     .single()
+
+  if (tourCostError) {
+    logger.error('查詢團成本失敗:', tourCostError)
+    throw tourCostError
+  }
 
   const totalCost = currentTour?.total_cost || 0
   const profit = totalRevenue - totalCost

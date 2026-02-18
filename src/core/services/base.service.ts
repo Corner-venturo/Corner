@@ -37,7 +37,15 @@ export abstract class BaseService<T extends BaseEntity> {
     // 基本驗證邏輯，子類可以擴展
   }
 
-  // CREATE
+  /**
+   * 建立新實體
+   *
+   * @description 自動注入 id、created_at、updated_at，經過 validate() 驗證後寫入 Store。
+   *
+   * @param data - 實體資料（不含系統欄位）
+   * @returns 建立後的完整實體
+   * @throws ValidationError 如果驗證失敗
+   */
   async create(data: Omit<T, keyof BaseEntity>): Promise<T> {
     try {
       this.validate(data as Partial<T>)
@@ -62,7 +70,12 @@ export abstract class BaseService<T extends BaseEntity> {
     }
   }
 
-  // READ (List with pagination and filtering)
+  /**
+   * 列表查詢（支援搜尋、排序、分頁）
+   *
+   * @param params - 分頁與篩選參數
+   * @returns 分頁結果，包含 data、total、page、pageSize
+   */
   async list(params?: PageRequest): Promise<PageResponse<T>> {
     try {
       const store = this.getStore()
@@ -104,7 +117,13 @@ export abstract class BaseService<T extends BaseEntity> {
     }
   }
 
-  // READ (Single)
+  /**
+   * 以 ID 查詢單筆實體
+   *
+   * @param id - 實體 ID
+   * @returns 實體或 null
+   * @throws NotFoundError 如果 ID 不存在
+   */
   async getById(id: string): Promise<T | null> {
     try {
       const store = this.getStore()
@@ -120,7 +139,17 @@ export abstract class BaseService<T extends BaseEntity> {
     }
   }
 
-  // UPDATE
+  /**
+   * 更新實體
+   *
+   * @description 自動更新 updated_at，經過 validate() 驗證。ID 不可被覆寫。
+   *
+   * @param id - 實體 ID
+   * @param data - 要更新的欄位
+   * @returns 更新後的完整實體
+   * @throws NotFoundError 如果 ID 不存在
+   * @throws ValidationError 如果驗證失敗
+   */
   async update(id: string, data: Partial<T>): Promise<T> {
     try {
       this.validate(data)
@@ -147,7 +176,13 @@ export abstract class BaseService<T extends BaseEntity> {
     }
   }
 
-  // DELETE
+  /**
+   * 刪除實體
+   *
+   * @param id - 實體 ID
+   * @returns true 表示刪除成功
+   * @throws NotFoundError 如果 ID 不存在
+   */
   async delete(id: string): Promise<boolean> {
     try {
       const store = this.getStore()
@@ -165,7 +200,12 @@ export abstract class BaseService<T extends BaseEntity> {
     }
   }
 
-  // Batch operations
+  /**
+   * 批次建立（錯誤不中斷，繼續處理其餘項目）
+   *
+   * @param items - 要建立的實體陣列
+   * @returns 成功建立的實體陣列
+   */
   async batchCreate(items: Omit<T, keyof BaseEntity>[]): Promise<T[]> {
     const results: T[] = []
 
