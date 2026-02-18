@@ -19,13 +19,14 @@ import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { IntlProvider } from '@/components/providers/IntlProvider'
 import { Toaster } from 'sonner'
+import { LAYOUT_LABELS } from './constants/labels'
 
 export const dynamic = 'force-dynamic'
 export const dynamicParams = true
 
 export const metadata: Metadata = {
-  title: '旅遊團管理系統',
-  description: '專業的旅遊團管理系統',
+  title: LAYOUT_LABELS.TITLE,
+  description: LAYOUT_LABELS.DESCRIPTION,
 }
 
 export default async function RootLayout({

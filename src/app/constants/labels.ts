@@ -14,3 +14,8 @@ export const ERROR_PAGE_LABELS = {
   NOT_FOUND_9250: '找不到頁面',
   LABEL_9421: '很抱歉，您訪問的頁面不存在',
 } as const
+
+export const LAYOUT_LABELS = {
+  TITLE: '旅遊團管理系統',
+  DESCRIPTION: '專業的旅遊團管理系統',
+} as const

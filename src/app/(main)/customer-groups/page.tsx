@@ -1,6 +1,6 @@
 'use client'
 
-import { LABELS as CG_LABELS } from './constants/labels'
+import { LABELS } from './constants/labels'
 
 import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
@@ -24,15 +24,13 @@ import type {
   CustomerGroupType,
 } from '@/stores/types'
 
-// 群組類型標籤
 const GROUP_TYPE_LABELS: Record<CustomerGroupType, string> = {
-  family: '家庭',
-  company: '公司',
-  club: '社團',
-  other: '其他',
+  family: LABELS.TYPE_FAMILY,
+  company: LABELS.TYPE_COMPANY,
+  club: LABELS.TYPE_CLUB,
+  other: LABELS.TYPE_OTHER,
 }
 
-// 群組類型顏色
 const GROUP_TYPE_COLORS: Record<CustomerGroupType, string> = {
   family: 'text-morandi-gold bg-morandi-gold/10',
   company: 'text-status-info bg-status-info-bg',
@@ -51,16 +49,12 @@ export default function CustomerGroupsPage() {
   const deleteMember = deleteCustomerGroupMember
   const { items: customers } = useCustomers()
 
-  // 展開狀態
   const [expandedGroups, setExpandedGroups] = useState<string[]>([])
-
-  // 對話框狀態
   const [addDialogOpen, setAddDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [addMemberDialogOpen, setAddMemberDialogOpen] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState<CustomerGroup | null>(null)
 
-  // 表單狀態
   const [formData, setFormData] = useState<{
     name: string
     type: CustomerGroupType
@@ -72,7 +66,6 @@ export default function CustomerGroupsPage() {
   })
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>('')
 
-  // 取得群組成員
   const getGroupMembers = useCallback(
     (groupId: string) => {
       return allMembers.filter(m => m.group_id === groupId)
@@ -80,26 +73,23 @@ export default function CustomerGroupsPage() {
     [allMembers]
   )
 
-  // 取得客戶名稱
   const getCustomerName = useCallback(
     (customerId: string) => {
       const customer = customers.find(c => c.id === customerId)
-      return customer?.name || '未知客戶'
+      return customer?.name || LABELS.UNKNOWN_CUSTOMER
     },
     [customers]
   )
 
-  // 切換展開/收合
   const toggleExpand = useCallback((groupId: string) => {
     setExpandedGroups(prev =>
       prev.includes(groupId) ? prev.filter(id => id !== groupId) : [...prev, groupId]
     )
   }, [])
 
-  // 處理新增群組
   const handleAddGroup = useCallback(async () => {
     if (!formData.name.trim()) {
-      await alert('請輸入群組名稱', 'warning')
+      await alert(LABELS.ENTER_GROUP_NAME, 'warning')
       return
     }
 
@@ -114,14 +104,13 @@ export default function CustomerGroupsPage() {
       setAddDialogOpen(false)
       setFormData({ name: '', type: 'other', notes: '' })
     } catch (error) {
-      await alert('建立群組失敗', 'error')
+      await alert(LABELS.CREATE_GROUP_FAILED, 'error')
     }
   }, [formData, createGroup, user?.id])
 
-  // 處理編輯群組
   const handleEditGroup = useCallback(async () => {
     if (!selectedGroup || !formData.name.trim()) {
-      await alert('請輸入群組名稱', 'warning')
+      await alert(LABELS.ENTER_GROUP_NAME, 'warning')
       return
     }
 
@@ -136,36 +125,34 @@ export default function CustomerGroupsPage() {
       setSelectedGroup(null)
       setFormData({ name: '', type: 'other', notes: '' })
     } catch (error) {
-      await alert('更新群組失敗', 'error')
+      await alert(LABELS.UPDATE_GROUP_FAILED, 'error')
     }
   }, [selectedGroup, formData, updateGroup])
 
-  // 處理刪除群組
   const handleDeleteGroup = useCallback(
     async (group: CustomerGroup) => {
       const members = getGroupMembers(group.id)
       if (members.length > 0) {
-        await alert(`此群組有 ${members.length} 位成員，請先移除所有成員後再刪除`, 'warning')
+        await alert(`${LABELS.HAS_MEMBERS_PREFIX}${members.length}${LABELS.HAS_MEMBERS_SUFFIX}`, 'warning')
         return
       }
 
-      const confirmed = await confirm(`確定要刪除群組「${group.name}」嗎？`, {
+      const confirmed = await confirm(`${LABELS.CONFIRM_DELETE_PREFIX}${group.name}${LABELS.CONFIRM_DELETE_SUFFIX}`, {
         type: 'warning',
-        title: '刪除群組',
+        title: LABELS.DELETE_GROUP_TITLE,
       })
 
       if (confirmed) {
         try {
           await deleteGroup(group.id)
         } catch (error) {
-          await alert('刪除群組失敗', 'error')
+          await alert(LABELS.DELETE_GROUP_FAILED, 'error')
         }
       }
     },
     [deleteGroup, getGroupMembers]
   )
 
-  // 開啟編輯對話框
   const openEditDialog = useCallback((group: CustomerGroup) => {
     setSelectedGroup(group)
     setFormData({
@@ -176,26 +163,23 @@ export default function CustomerGroupsPage() {
     setEditDialogOpen(true)
   }, [])
 
-  // 開啟新增成員對話框
   const openAddMemberDialog = useCallback((group: CustomerGroup) => {
     setSelectedGroup(group)
     setSelectedCustomerId('')
     setAddMemberDialogOpen(true)
   }, [])
 
-  // 處理新增成員
   const handleAddMember = useCallback(async () => {
     if (!selectedGroup || !selectedCustomerId) {
-      await alert('請選擇客戶', 'warning')
+      await alert(LABELS.SELECT_CUSTOMER, 'warning')
       return
     }
 
-    // 檢查是否已存在
     const existingMember = allMembers.find(
       m => m.group_id === selectedGroup.id && m.customer_id === selectedCustomerId
     )
     if (existingMember) {
-      await alert('此客戶已在群組中', 'warning')
+      await alert(LABELS.CUSTOMER_ALREADY_IN_GROUP, 'warning')
       return
     }
 
@@ -210,31 +194,29 @@ export default function CustomerGroupsPage() {
       setSelectedGroup(null)
       setSelectedCustomerId('')
     } catch (error) {
-      await alert('新增成員失敗', 'error')
+      await alert(LABELS.ADD_MEMBER_FAILED, 'error')
     }
   }, [selectedGroup, selectedCustomerId, allMembers, createMember])
 
-  // 處理移除成員
   const handleRemoveMember = useCallback(
     async (member: CustomerGroupMember) => {
       const customerName = getCustomerName(member.customer_id)
-      const confirmed = await confirm(`確定要從群組中移除「${customerName}」嗎？`, {
+      const confirmed = await confirm(`${LABELS.CONFIRM_REMOVE_PREFIX}${customerName}${LABELS.CONFIRM_REMOVE_SUFFIX}`, {
         type: 'warning',
-        title: '移除成員',
+        title: LABELS.REMOVE_MEMBER_TITLE,
       })
 
       if (confirmed) {
         try {
           await deleteMember(member.id)
         } catch (error) {
-          await alert('移除成員失敗', 'error')
+          await alert(LABELS.REMOVE_MEMBER_FAILED, 'error')
         }
       }
     },
     [deleteMember, getCustomerName]
   )
 
-  // 可選的客戶列表（排除已在群組中的）
   const availableCustomers = useMemo(() => {
     if (!selectedGroup) return customers
     const memberIds = allMembers
@@ -243,7 +225,6 @@ export default function CustomerGroupsPage() {
     return customers.filter(c => !memberIds.includes(c.id))
   }, [selectedGroup, allMembers, customers])
 
-  // 表格欄位定義
   const columns: TableColumn<CustomerGroup>[] = useMemo(
     () => [
       {
@@ -276,7 +257,7 @@ export default function CustomerGroupsPage() {
       },
       {
         key: 'name',
-        label: '群組名稱',
+        label: LABELS.COL_GROUP_NAME,
         sortable: true,
         render: (_, group) => (
           <div className="font-medium text-morandi-primary">{group.name}</div>
@@ -284,7 +265,7 @@ export default function CustomerGroupsPage() {
       },
       {
         key: 'type',
-        label: '類型',
+        label: LABELS.COL_TYPE,
         sortable: true,
         width: '100px',
         render: (_, group) => (
@@ -297,23 +278,23 @@ export default function CustomerGroupsPage() {
       },
       {
         key: 'member_count',
-        label: '成員數',
+        label: LABELS.COL_MEMBER_COUNT,
         width: '80px',
         render: (_, group) => {
           const count = getGroupMembers(group.id).length
-          return <NumberCell value={count} suffix="人" />
+          return <NumberCell value={count} suffix={LABELS.MEMBER_UNIT} />
         },
       },
       {
         key: 'notes',
-        label: '備註',
+        label: LABELS.COL_REMARKS,
         render: (_, group) => (
           <span className="text-sm text-morandi-secondary">{group.notes || '-'}</span>
         ),
       },
       {
         key: 'created_at',
-        label: '建立時間',
+        label: LABELS.COL_CREATED_AT,
         sortable: true,
         width: '120px',
         render: (_, group) => <DateCell date={group.created_at} showIcon={false} />,
@@ -322,24 +303,23 @@ export default function CustomerGroupsPage() {
     [expandedGroups, getGroupMembers, toggleExpand]
   )
 
-  // 渲染操作按鈕
   const renderActions = useCallback(
     (group: CustomerGroup) => (
       <ActionCell
         actions={[
           {
             icon: UserPlus,
-            label: '新增成員',
+            label: LABELS.ACTION_ADD_MEMBER,
             onClick: () => openAddMemberDialog(group),
           },
           {
             icon: Edit2,
-            label: '編輯',
+            label: LABELS.ACTION_EDIT,
             onClick: () => openEditDialog(group),
           },
           {
             icon: Trash2,
-            label: '刪除',
+            label: LABELS.ACTION_DELETE,
             onClick: () => handleDeleteGroup(group),
             variant: 'danger',
           },
@@ -349,19 +329,18 @@ export default function CustomerGroupsPage() {
     [openAddMemberDialog, openEditDialog, handleDeleteGroup]
   )
 
-  // 渲染展開內容（成員列表）
   const renderExpanded = useCallback(
     (group: CustomerGroup) => {
       const members = getGroupMembers(group.id)
       if (members.length === 0) {
         return (
-          <div className="p-4 text-center text-morandi-secondary text-sm">{CG_LABELS.NO_MEMBERS}</div>
+          <div className="p-4 text-center text-morandi-secondary text-sm">{LABELS.NO_MEMBERS}</div>
         )
       }
 
       return (
         <div className="p-4 bg-morandi-container/20">
-          <div className="text-sm font-medium text-morandi-primary mb-2">{CG_LABELS.GROUP_MEMBERS}</div>
+          <div className="text-sm font-medium text-morandi-primary mb-2">{LABELS.GROUP_MEMBERS}</div>
           <div className="flex flex-wrap gap-2">
             {members.map(member => {
               const customerName = getCustomerName(member.customer_id)
@@ -374,7 +353,7 @@ export default function CustomerGroupsPage() {
                   <button
                     onClick={() => handleRemoveMember(member)}
                     className="text-morandi-muted hover:text-morandi-red transition-colors"
-                    title={CG_LABELS.LABEL_2634}
+                    title={LABELS.LABEL_2634}
                   >
                     <Trash2 size={14} />
                   </button>
@@ -388,14 +367,13 @@ export default function CustomerGroupsPage() {
     [getGroupMembers, getCustomerName, handleRemoveMember]
   )
 
-  // 狀態 Tab 配置
   const statusTabs = useMemo(
     () => [
-      { value: 'all', label: '全部' },
-      { value: 'family', label: '家庭' },
-      { value: 'company', label: '公司' },
-      { value: 'club', label: '社團' },
-      { value: 'other', label: '其他' },
+      { value: 'all', label: LABELS.TAB_ALL },
+      { value: 'family', label: LABELS.TYPE_FAMILY },
+      { value: 'company', label: LABELS.TYPE_COMPANY },
+      { value: 'club', label: LABELS.TYPE_CLUB },
+      { value: 'other', label: LABELS.TYPE_OTHER },
     ],
     []
   )
@@ -403,17 +381,17 @@ export default function CustomerGroupsPage() {
   return (
     <>
       <ListPageLayout
-        title={CG_LABELS.LABEL_6845}
+        title={LABELS.LABEL_6845}
         icon={Users}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '顧客管理', href: '/customers' },
-          { label: '客戶群組', href: '/customer-groups' },
+          { label: LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: LABELS.BREADCRUMB_CUSTOMER_MGMT, href: '/customers' },
+          { label: LABELS.BREADCRUMB_CUSTOMER_GROUPS, href: '/customer-groups' },
         ]}
         data={groups}
         columns={columns}
         searchFields={['name', 'notes']}
-        searchPlaceholder="搜尋群組名稱..."
+        searchPlaceholder={LABELS.SEARCH_PLACEHOLDER}
         statusTabs={statusTabs}
         statusField="type"
         defaultStatusTab="all"
@@ -427,32 +405,31 @@ export default function CustomerGroupsPage() {
           setFormData({ name: '', type: 'other', notes: '' })
           setAddDialogOpen(true)
         }}
-        addLabel="新增群組"
+        addLabel={LABELS.ADD_GROUP}
       />
 
-      {/* 新增群組對話框 */}
       <FormDialog
         open={addDialogOpen}
         onOpenChange={setAddDialogOpen}
-        title={CG_LABELS.ADD_9532}
+        title={LABELS.ADD_9532}
         onSubmit={handleAddGroup}
-        submitLabel="建立"
+        submitLabel={LABELS.SUBMIT_CREATE}
         maxWidth="md"
       >
         <div className="space-y-4">
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              群組名稱 <span className="text-morandi-red">*</span>
+              {LABELS.GROUP_NAME_LABEL} <span className="text-morandi-red">*</span>
             </label>
             <Input
               value={formData.name}
               onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder={CG_LABELS.EXAMPLE_933}
+              placeholder={LABELS.EXAMPLE_933}
             />
           </div>
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              {CG_LABELS.LABEL_5116}
+              {LABELS.LABEL_5116}
             </label>
             <Combobox
               value={formData.type}
@@ -463,43 +440,42 @@ export default function CustomerGroupsPage() {
                 value,
                 label,
               }))}
-              placeholder={CG_LABELS.SELECT_7211}
+              placeholder={LABELS.SELECT_7211}
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">{CG_LABELS.REMARKS}</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">{LABELS.REMARKS}</label>
             <Input
               value={formData.notes}
               onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-              placeholder={CG_LABELS.OPTIONAL}
+              placeholder={LABELS.OPTIONAL}
             />
           </div>
         </div>
       </FormDialog>
 
-      {/* 編輯群組對話框 */}
       <FormDialog
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
-        title={CG_LABELS.EDIT_6630}
+        title={LABELS.EDIT_6630}
         onSubmit={handleEditGroup}
-        submitLabel="儲存"
+        submitLabel={LABELS.SUBMIT_SAVE}
         maxWidth="md"
       >
         <div className="space-y-4">
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              群組名稱 <span className="text-morandi-red">*</span>
+              {LABELS.GROUP_NAME_LABEL} <span className="text-morandi-red">*</span>
             </label>
             <Input
               value={formData.name}
               onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder={CG_LABELS.EXAMPLE_933}
+              placeholder={LABELS.EXAMPLE_933}
             />
           </div>
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              {CG_LABELS.LABEL_5116}
+              {LABELS.LABEL_5116}
             </label>
             <Combobox
               value={formData.type}
@@ -510,33 +486,32 @@ export default function CustomerGroupsPage() {
                 value,
                 label,
               }))}
-              placeholder={CG_LABELS.SELECT_7211}
+              placeholder={LABELS.SELECT_7211}
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">{CG_LABELS.REMARKS}</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">{LABELS.REMARKS}</label>
             <Input
               value={formData.notes}
               onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-              placeholder={CG_LABELS.OPTIONAL}
+              placeholder={LABELS.OPTIONAL}
             />
           </div>
         </div>
       </FormDialog>
 
-      {/* 新增成員對話框 */}
       <FormDialog
         open={addMemberDialogOpen}
         onOpenChange={setAddMemberDialogOpen}
-        title={`${CG_LABELS.ADD_MEMBER_PREFIX}${selectedGroup?.name || ''}${CG_LABELS.ADD_MEMBER_SUFFIX}`}
+        title={`${LABELS.ADD_MEMBER_PREFIX}${selectedGroup?.name || ''}${LABELS.ADD_MEMBER_SUFFIX}`}
         onSubmit={handleAddMember}
-        submitLabel={CG_LABELS.ADD}
+        submitLabel={LABELS.ADD}
         maxWidth="md"
       >
         <div className="space-y-4">
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              選擇客戶 <span className="text-morandi-red">*</span>
+              {LABELS.SELECT_CUSTOMER_LABEL} <span className="text-morandi-red">*</span>
             </label>
             <Combobox
               value={selectedCustomerId}
@@ -545,14 +520,14 @@ export default function CustomerGroupsPage() {
                 value: c.id,
                 label: `${c.name}${c.phone ? ` (${c.phone})` : ''}`,
               }))}
-              placeholder={CG_LABELS.SEARCH_1890}
+              placeholder={LABELS.SEARCH_1890}
               showSearchIcon={true}
-              emptyMessage="找不到客戶"
+              emptyMessage={LABELS.CUSTOMER_NOT_FOUND}
             />
           </div>
           {availableCustomers.length === 0 && (
             <p className="text-sm text-morandi-secondary">
-              {CG_LABELS.NOT_FOUND_6103}
+              {LABELS.NOT_FOUND_6103}
             </p>
           )}
         </div>
