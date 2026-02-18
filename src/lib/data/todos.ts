@@ -124,11 +124,12 @@ export async function getTodosByEntity(entityType: string, entityId: string, wor
     return []
   }
 
+  // TODO: related_entity_type/id 欄位不存在，todos 用 related_items (jsonb)
+  // 暫時用 contains 查詢，待確認 related_items 的結構後優化
   const { data, error } = await supabase
     .from('todos')
     .select('*')
-    .eq('related_entity_type', entityType)
-    .eq('related_entity_id', entityId)
+    .contains('related_items', JSON.stringify([{ type: entityType, id: entityId }]))
     .eq('workspace_id', workspaceId)  // 🔒 Workspace 過濾
     .order('created_at', { ascending: false })
 

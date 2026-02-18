@@ -19,16 +19,18 @@ export interface TourDependencyCheck {
  */
 export async function checkTourDependencies(tourId: string): Promise<TourDependencyCheck> {
   const checks = await Promise.all([
-    supabase.from('order_members').select('id', { count: 'exact', head: true }).eq('tour_id', tourId),
-    supabase.from('receipt_orders').select('id', { count: 'exact', head: true }).eq('tour_id', tourId),
+    // order_members 沒有 tour_id，先查該團的 order_ids 再計算成員數
+    supabase.from('orders').select('id', { count: 'exact', head: true }).eq('tour_id', tourId),
+    // receipt_orders 沒有 tour_id，用 receipts 表（有 tour_id）
+    supabase.from('receipts').select('id', { count: 'exact', head: true }).eq('tour_id', tourId),
     supabase.from('payment_requests').select('id', { count: 'exact', head: true }).eq('tour_id', tourId),
     supabase.from('pnrs').select('id', { count: 'exact', head: true }).eq('tour_id', tourId),
   ])
 
-  const [members, receipts, payments, pnrs] = checks
+  const [orders, receipts, payments, pnrs] = checks
   const blockers: string[] = []
 
-  if (members.count && members.count > 0) blockers.push(TOUR_DEPENDENCY_LABELS.MEMBERS_COUNT(members.count))
+  if (orders.count && orders.count > 0) blockers.push(TOUR_DEPENDENCY_LABELS.MEMBERS_COUNT(orders.count))
   if (receipts.count && receipts.count > 0) blockers.push(TOUR_DEPENDENCY_LABELS.RECEIPTS_COUNT(receipts.count))
   if (payments.count && payments.count > 0) blockers.push(TOUR_DEPENDENCY_LABELS.PAYMENTS_COUNT(payments.count))
   if (pnrs.count && pnrs.count > 0) blockers.push(TOUR_DEPENDENCY_LABELS.PNRS_COUNT(pnrs.count))

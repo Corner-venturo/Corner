@@ -155,14 +155,15 @@ export class AnalyticsService {
       const tourMetrics = await this.getTourMetrics(dateRange)
 
       // 取得應收帳款（未收款的收款單）
+      // receipt_orders 沒有 status/workspace_id，改用 receipts 表
       let receiptQuery = supabase
-        .from('receipt_orders')
-        .select('amount')
+        .from('receipts')
+        .select('total_amount')
         .eq('workspace_id', this.workspaceId)
         .neq('status', 'paid')
 
       const { data: receipts } = await receiptQuery
-      const accountsReceivable = (receipts || []).reduce((sum, r) => sum + (r.amount || 0), 0)
+      const accountsReceivable = (receipts || []).reduce((sum, r) => sum + ((r as Record<string, unknown>).total_amount as number || 0), 0)
 
       // 取得應付帳款（未付款的請款單）
       let paymentQuery = supabase
