@@ -69,7 +69,9 @@ export function useCustomerVerify({ onSuccess }: UseCustomerVerifyProps = {}) {
 
     setIsSaving(true)
     try {
-      const { error } = await supabase
+      // 🔒 取得 workspace_id 確保不會跨 workspace 更新
+      const workspaceId = (customer as unknown as Record<string, unknown>).workspace_id
+      let query = supabase
         .from('customers')
         .update({
           ...formData,
@@ -77,6 +79,10 @@ export function useCustomerVerify({ onSuccess }: UseCustomerVerifyProps = {}) {
           updated_at: new Date().toISOString(),
         } as UpdateCustomerData)
         .eq('id', customer.id)
+      if (workspaceId) {
+        query = query.eq('workspace_id', workspaceId as string)
+      }
+      const { error } = await query
 
       if (error) throw error
 

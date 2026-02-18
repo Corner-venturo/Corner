@@ -32,8 +32,8 @@ interface PremiumExperience {
   description?: string
   highlights?: string[]
   duration_hours?: number
-  max_participants?: number
-  min_participants?: number
+  group_size_min?: number
+  group_size_max?: number
   price_per_person_min?: number
   price_per_person_max?: number
   currency?: string
@@ -41,7 +41,6 @@ interface PremiumExperience {
   expert_credentials?: string
   commission_rate?: number
   recommended_for?: string[]
-  sustainability_rating?: string
   is_active: boolean
 }
 
@@ -333,11 +332,11 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
         sortable: false,
         render: (_: unknown, experience: PremiumExperience) => (
           <div className="flex items-center gap-1 text-sm text-morandi-secondary">
-            {experience.min_participants || experience.max_participants ? (
+            {experience.group_size_min || experience.group_size_max ? (
               <>
                 <Users className="w-3 h-3" />
                 <span>
-                  {experience.min_participants || 1}-{experience.max_participants || '∞'}
+                  {experience.group_size_min || 1}-{experience.group_size_max || '∞'}
                 </span>
               </>
             ) : (
