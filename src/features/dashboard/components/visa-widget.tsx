@@ -117,12 +117,12 @@ export function VisaWidget() {
   // 查詢簽證資訊
   const checkVisa = async () => {
     if (!passport || !destination) {
-      setError('請選擇護照國家和目的地')
+      setError(DASHBOARD_LABELS.errorSelectPassportAndDest)
       return
     }
 
     if (passport === destination) {
-      setError('護照國家和目的地不能相同')
+      setError(DASHBOARD_LABELS.errorSamePassportAndDest)
       return
     }
 
@@ -158,7 +158,7 @@ export function VisaWidget() {
       // 儲存查詢記錄
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ passport, destination }))
     } catch (err) {
-      setError(err instanceof Error ? err.message : '查詢失敗，請稍後再試')
+      setError(err instanceof Error ? err.message : DASHBOARD_LABELS.errorQueryFailed)
       setResult(null)
     } finally {
       setLoading(false)

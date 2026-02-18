@@ -1,6 +1,6 @@
 'use client'
 
-import { FLIGHT_WIDGET_LABELS } from '../constants/labels'
+import { FLIGHT_WIDGET_LABELS, DASHBOARD_LABELS } from '../constants/labels'
 
 import { getTodayString } from '@/lib/utils/format-date'
 
@@ -117,7 +117,7 @@ export function FlightWidget() {
   // 查詢航班號
   const handleSearchFlight = () => {
     if (!flightNumber.trim()) {
-      setError('請輸入航班號碼')
+      setError(DASHBOARD_LABELS.errorFlightNumberRequired)
       return
     }
 
@@ -139,7 +139,7 @@ export function FlightWidget() {
   // 查詢機場航班
   const handleSearchAirport = () => {
     if (!airportCode.trim()) {
-      setError('請選擇機場')
+      setError(DASHBOARD_LABELS.errorAirportRequired)
       return
     }
 

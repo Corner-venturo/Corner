@@ -82,7 +82,7 @@ export function PNRWidget() {
   // 解析 PNR
   const handleParse = useCallback(() => {
     if (!rawPNR.trim()) {
-      setError('請貼上 PNR 電報內容')
+      setError(DASHBOARD_LABELS.errorPastePnr)
       setParsedPNR(null)
       return
     }
@@ -97,7 +97,7 @@ export function PNRWidget() {
         setError(result.validation.errors[0])
       }
     } catch (err) {
-      setError('解析失敗：' + (err instanceof Error ? err.message : '未知錯誤'))
+      setError(DASHBOARD_LABELS.errorParseFailed + (err instanceof Error ? err.message : DASHBOARD_LABELS.errorUnknown))
       setParsedPNR(null)
     }
   }, [rawPNR])
@@ -110,7 +110,7 @@ export function PNRWidget() {
       setError(null)
       setParsedPNR(null)
     } catch {
-      setError('無法存取剪貼簿')
+      setError(DASHBOARD_LABELS.errorClipboard)
     }
   }, [])
 
@@ -152,7 +152,7 @@ export function PNRWidget() {
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 3000)
     } catch (err) {
-      setError('儲存失敗：' + (err instanceof Error ? err.message : '未知錯誤'))
+      setError(DASHBOARD_LABELS.errorSaveFailed + (err instanceof Error ? err.message : DASHBOARD_LABELS.errorUnknown))
     } finally {
       setIsSaving(false)
     }
@@ -231,13 +231,7 @@ export function PNRWidget() {
             <textarea
               value={rawPNR}
               onChange={e => setRawPNR(e.target.value)}
-              placeholder={`貼上 Amadeus PNR 電報...
-
-範例:
-RP/TPEW123ML/...   FUM2GY
-1.CHEN/WILLIAM MR
-2  BR 116 Y 15JAN 4 TPECTS HK2  0930 1405
-TK TL20JAN/1200`}
+              placeholder={DASHBOARD_LABELS.pnrPlaceholder}
               className="w-full h-24 px-3 py-2.5 text-xs font-mono border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm placeholder:text-morandi-secondary/40 resize-none"
             />
             <button
@@ -401,7 +395,7 @@ TK TL20JAN/1200`}
                               <div className="flex items-center gap-2 ml-6 mt-0.5 text-morandi-secondary">
                                 <Baby className="w-3 h-3 text-pink-400" />
                                 <span className="text-[10px]">
-                                  嬰兒: {pax.infant.name} ({pax.infant.birthDate})
+                                  {DASHBOARD_LABELS.pnrInfantPrefix}: {pax.infant.name} ({pax.infant.birthDate})
                                 </span>
                               </div>
                             )}
@@ -417,7 +411,7 @@ TK TL20JAN/1200`}
                       <div className="flex items-center gap-2 mb-2">
                         <Plane className="w-3.5 h-3.5 text-morandi-secondary" />
                         <span className="text-xs font-semibold text-morandi-primary">
-                          航班 ({parsedPNR.segments.length})
+                          {DASHBOARD_LABELS.pnrFlightsPrefix} ({parsedPNR.segments.length})
                         </span>
                       </div>
                       <div className="space-y-2">
@@ -496,7 +490,7 @@ TK TL20JAN/1200`}
                       <div className="flex items-center gap-2 mb-2">
                         <Info className="w-3.5 h-3.5 text-morandi-secondary" />
                         <span className="text-xs font-semibold text-morandi-primary">
-                          特殊需求 ({parsedPNR.specialRequests.length})
+                          {DASHBOARD_LABELS.pnrSpecialRequestsPrefix} ({parsedPNR.specialRequests.length})
                         </span>
                       </div>
                       <div className="space-y-1.5">

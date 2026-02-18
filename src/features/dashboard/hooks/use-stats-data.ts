@@ -5,6 +5,7 @@ import { useToursSlim, useOrdersSlim } from '@/data'
 import type { StatConfig, StatType } from '../types'
 import type { Tour, Order } from '@/stores/types'
 import { CheckSquare, TrendingUp, Briefcase, Calendar } from 'lucide-react'
+import { DASHBOARD_LABELS } from '../constants/labels'
 
 // 計算週範圍（weekOffset: 0 = 本週, 1 = 下週, -1 = 上週）
 function getWeekRange(weekOffset = 0): { start: Date; end: Date } {
@@ -103,7 +104,7 @@ export function useStatsData() {
     const allStats: StatConfig[] = [
       {
         id: 'todos',
-        label: '待辦事項',
+        label: DASHBOARD_LABELS.statTodos,
         value: todosCount,
         icon: CheckSquare,
         color: 'text-morandi-gold',
@@ -111,7 +112,7 @@ export function useStatsData() {
       },
       {
         id: 'paymentsThisWeek',
-        label: '本週請款',
+        label: DASHBOARD_LABELS.statPaymentsThisWeek,
         value: `NT$ ${paymentsThisWeek.toLocaleString()}`,
         icon: TrendingUp,
         color: 'text-status-success',
@@ -119,7 +120,7 @@ export function useStatsData() {
       },
       {
         id: 'paymentsNextWeek',
-        label: '下週請款',
+        label: DASHBOARD_LABELS.statPaymentsNextWeek,
         value: `NT$ ${paymentsNextWeek.toLocaleString()}`,
         icon: TrendingUp,
         color: 'text-status-info',
@@ -127,7 +128,7 @@ export function useStatsData() {
       },
       {
         id: 'depositsThisWeek',
-        label: '本週甲存',
+        label: DASHBOARD_LABELS.statDepositsThisWeek,
         value: `NT$ ${depositsThisWeek.toLocaleString()}`,
         icon: Briefcase,
         color: 'text-purple-600',
@@ -135,16 +136,16 @@ export function useStatsData() {
       },
       {
         id: 'toursThisWeek',
-        label: '本週出團',
-        value: `${toursThisWeek} 團`,
+        label: DASHBOARD_LABELS.statToursThisWeek,
+        value: `${toursThisWeek} ${DASHBOARD_LABELS.statTourUnit}`,
         icon: Calendar,
         color: 'text-status-warning',
         bgColor: 'bg-status-warning-bg',
       },
       {
         id: 'toursThisMonth',
-        label: '本月出團',
-        value: `${toursThisMonth} 團`,
+        label: DASHBOARD_LABELS.statToursThisMonth,
+        value: `${toursThisMonth} ${DASHBOARD_LABELS.statTourUnit}`,
         icon: Calendar,
         color: 'text-pink-600',
         bgColor: 'bg-pink-50',

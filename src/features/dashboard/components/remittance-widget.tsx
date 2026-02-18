@@ -39,12 +39,12 @@ export function RemittanceWidget() {
 
   const compareRates = async () => {
     if (!amount || parseFloat(amount) <= 0) {
-      setError('請輸入有效金額')
+      setError(DASHBOARD_LABELS.errorInvalidAmount)
       return
     }
 
     if (from === to) {
-      setError('匯款國家和收款國家不能相同')
+      setError(DASHBOARD_LABELS.errorSameCountry)
       return
     }
 
@@ -91,7 +91,7 @@ export function RemittanceWidget() {
 
       setResults(mockResults)
     } catch (err) {
-      setError(err instanceof Error ? err.message : '查詢失敗，請稍後再試')
+      setError(err instanceof Error ? err.message : DASHBOARD_LABELS.errorQueryFailed)
       setResults([])
     } finally {
       setLoading(false)
@@ -296,7 +296,7 @@ export function RemittanceWidget() {
               {/* 提示 */}
               <div className="bg-status-warning-bg rounded-lg p-3 border border-status-warning/30 mt-3">
                 <p className="text-xs text-morandi-primary">
-                  ⚠️ 此資訊僅供參考，實際費率請以各管道最新公告為準
+                  {DASHBOARD_LABELS.remittanceDisclaimer}
                 </p>
               </div>
             </div>

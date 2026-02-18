@@ -87,7 +87,7 @@ export function TimerWidget() {
               )}
               onClick={() => setIsRunning(!isRunning)}
             >
-              {isRunning ? '暫停' : '開始'}
+              {isRunning ? DASHBOARD_LABELS.stop : DASHBOARD_LABELS.start}
             </Button>
             <Button
               variant="outline"
