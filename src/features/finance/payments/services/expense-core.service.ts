@@ -4,7 +4,7 @@ import { mutate } from 'swr'
 
 /**
  * 請款變動後重算團成本統計
- * - 查 payment_requests (status in pending/approved/confirmed/paid, deleted_at IS NULL)
+ * - 查 payment_requests (status in pending/approved/confirmed/paid)
  * - 加總 payment_request_items.subtotal = total_cost
  * - 更新 tours.total_cost 和 profit
  */
@@ -15,7 +15,6 @@ export async function recalculateExpenseStats(tour_id: string): Promise<void> {
       .from('payment_requests')
       .select('id')
       .eq('tour_id', tour_id)
-      .is('deleted_at', null)
       .in('status', ['pending', 'approved', 'confirmed', 'paid'])
 
     let total_cost = 0

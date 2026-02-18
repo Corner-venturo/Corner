@@ -289,14 +289,25 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
     const quantity = Number(itemData.quantity ?? existingItem?.quantity ?? 0)
     const subtotal = unitPrice * quantity
 
+    // 映射 TypeScript 欄位名到資料庫欄位名，避免寫入不存在的欄位
+    const dbUpdate: Record<string, unknown> = {
+      subtotal,
+      updated_at: now,
+    }
+    if (itemData.category !== undefined) dbUpdate.category = itemData.category
+    if (itemData.supplier_id !== undefined) dbUpdate.supplier_id = itemData.supplier_id
+    if (itemData.supplier_name !== undefined) dbUpdate.supplier_name = itemData.supplier_name
+    if (itemData.description !== undefined) dbUpdate.description = itemData.description
+    if (itemData.quantity !== undefined) dbUpdate.quantity = itemData.quantity
+    if (itemData.notes !== undefined) dbUpdate.notes = itemData.notes
+    if (itemData.sort_order !== undefined) dbUpdate.sort_order = itemData.sort_order
+    // unit_price → unitprice (DB column name)
+    if (itemData.unit_price !== undefined) dbUpdate.unitprice = itemData.unit_price
+
     // 直接使用 Supabase 更新項目
     const { error: updateError } = await supabase
       .from('payment_request_items')
-      .update({
-        ...itemData,
-        subtotal,
-        updated_at: now,
-      })
+      .update(dbUpdate)
       .eq('id', itemId)
 
     if (updateError) throw updateError
