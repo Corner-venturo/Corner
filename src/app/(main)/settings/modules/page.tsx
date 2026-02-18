@@ -203,7 +203,7 @@ export default function ModulesManagementPage() {
                 {currentWorkspace?.name || MODULES_PAGE_LABELS.UNKNOWN_WORKSPACE}
               </div>
               <div className="text-sm text-[#8C8C8C] mt-1">
-                工作空間 ID: {user?.workspace_id}
+                {MODULES_PAGE_LABELS.WORKSPACE_ID_LABEL(user?.workspace_id || '')}
               </div>
             </CardContent>
           </Card>
@@ -346,7 +346,7 @@ export default function ModulesManagementPage() {
         <DialogContent level={1}>
           <DialogHeader>
             <DialogTitle>
-              啟用 {selectedModule && MODULE_INFO[selectedModule].name}
+              {selectedModule && MODULES_PAGE_LABELS.ENABLE_DIALOG_TITLE(MODULE_INFO[selectedModule].name)}
             </DialogTitle>
             <DialogDescription>
               {selectedModule && MODULE_INFO[selectedModule].description}

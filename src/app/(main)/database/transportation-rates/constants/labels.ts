@@ -8,4 +8,9 @@ export const TRANSPORTATION_RATES_LABELS = {
   COUNTRY_NAME_LABEL: '國家名稱',
   COUNTRY_NAME_PLACEHOLDER: '例如：越南、泰國',
   CANCEL: '取消',
+
+  // Toast messages
+  LOAD_ERROR: '載入車資資料失敗',
+  COUNTRY_NAME_REQUIRED: '請輸入國家名稱',
+  COUNTRY_EXISTS: '此國家已存在',
 }

@@ -407,4 +407,6 @@ export const MODULES_PAGE_LABELS = {
   ENABLE_MODULE: '啟用模組',
   PROCESSING: '處理中...',
   CONFIRM_ENABLE: '確認啟用',
+  WORKSPACE_ID_LABEL: (id: string) => `工作空間 ID: ${id}`,
+  ENABLE_DIALOG_TITLE: (name: string) => `啟用 ${name}`,
 }

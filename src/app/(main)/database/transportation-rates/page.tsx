@@ -24,7 +24,7 @@ const fetchRates = async (): Promise<TransportationRate[]> => {
     .order('route')
 
   if (error) {
-    toast.error('載入車資資料失敗')
+    toast.error(TRANSPORTATION_RATES_LABELS.LOAD_ERROR)
     throw error
   }
 
@@ -52,13 +52,13 @@ export default function TransportationRatesPage() {
   // 新增國家
   const handleAddNewCountry = () => {
     if (!newCountryName.trim()) {
-      toast.error('請輸入國家名稱')
+      toast.error(TRANSPORTATION_RATES_LABELS.COUNTRY_NAME_REQUIRED)
       return
     }
 
     // 檢查國家是否已存在
     if (rates.some(rate => rate.country_name === newCountryName.trim())) {
-      toast.error('此國家已存在')
+      toast.error(TRANSPORTATION_RATES_LABELS.COUNTRY_EXISTS)
       return
     }
 

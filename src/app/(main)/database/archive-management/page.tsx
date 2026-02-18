@@ -113,8 +113,8 @@ export default function ArchiveManagementPage() {
       if (closedError) throw closedError
       setClosedTours(closed || [])
     } catch (error) {
-      logger.error('載入封存資料失敗:', error)
-      toast.error('載入封存資料失敗')
+      logger.error('Load archived data failed:', error)
+      toast.error(ARCHIVE_LABELS.LOAD_ERROR)
     } finally {
       setIsLoading(false)
     }
@@ -126,8 +126,8 @@ export default function ArchiveManagementPage() {
 
   // 還原旅遊團
   const handleRestoreTour = async (tour: ArchivedTour) => {
-    const confirmed = await confirm(`確定要還原旅遊團「${tour.code}」嗎？`, {
-      title: '還原旅遊團',
+    const confirmed = await confirm(ARCHIVE_LABELS.CONFIRM_RESTORE_TOUR(tour.code), {
+      title: ARCHIVE_LABELS.CONFIRM_RESTORE_TOUR_TITLE,
       type: 'warning',
     })
     if (!confirmed) return
@@ -139,11 +139,11 @@ export default function ArchiveManagementPage() {
         .eq('id', tour.id)
 
       if (error) throw error
-      toast.success(`已還原旅遊團 ${tour.code}`)
+      toast.success(ARCHIVE_LABELS.TOAST_TOUR_RESTORED(tour.code))
       loadArchivedData()
     } catch (error) {
-      logger.error('還原失敗:', error)
-      toast.error('還原失敗，請稍後再試')
+      logger.error('Restore failed:', error)
+      toast.error(ARCHIVE_LABELS.TOAST_RESTORE_ERROR)
     }
   }
 
@@ -153,38 +153,37 @@ export default function ArchiveManagementPage() {
     const { blockers, hasBlockers } = await checkTourDependencies(tour.id)
 
     if (hasBlockers) {
-      toast.error(`無法刪除：此旅遊團有 ${blockers.join('、')}，請先刪除相關資料`)
+      toast.error(ARCHIVE_LABELS.CANNOT_DELETE_BLOCKERS(blockers.join('、')))
       return
     }
 
     const confirmed = await confirm(
-      `確定要永久刪除旅遊團「${tour.code}」嗎？\n\n⚠️ 此操作無法復原！`,
+      ARCHIVE_LABELS.CONFIRM_DELETE_TOUR(tour.code),
       {
-        title: '永久刪除',
+        title: ARCHIVE_LABELS.CONFIRM_DELETE_TITLE,
         type: 'warning',
       }
     )
     if (!confirmed) return
 
     try {
-      // 先刪除空訂單（沒有團員的）
       await deleteTourEmptyOrders(tour.id)
-
       await deleteTourEntity(tour.id)
-      toast.success(`已永久刪除旅遊團 ${tour.code}`)
+      toast.success(ARCHIVE_LABELS.TOAST_TOUR_DELETED(tour.code))
       loadArchivedData()
     } catch (error) {
-      logger.error('刪除失敗:', error)
-      toast.error('刪除失敗')
+      logger.error('Delete failed:', error)
+      toast.error(ARCHIVE_LABELS.TOAST_DELETE_ERROR)
     }
   }
 
   // 還原行程表
   const handleRestoreItinerary = async (itinerary: ArchivedItinerary) => {
+    const itineraryName = itinerary.title || itinerary.tour_code || ARCHIVE_LABELS.UNNAMED
     const confirmed = await confirm(
-      `確定要還原行程表「${itinerary.title || itinerary.tour_code || '未命名'}」嗎？`,
+      ARCHIVE_LABELS.CONFIRM_RESTORE_ITINERARY(itineraryName),
       {
-        title: '還原行程表',
+        title: ARCHIVE_LABELS.CONFIRM_RESTORE_ITINERARY_TITLE,
         type: 'warning',
       }
     )
@@ -197,20 +196,21 @@ export default function ArchiveManagementPage() {
         .eq('id', itinerary.id)
 
       if (error) throw error
-      toast.success('已還原行程表')
+      toast.success(ARCHIVE_LABELS.TOAST_ITINERARY_RESTORED)
       loadArchivedData()
     } catch (error) {
-      logger.error('還原失敗:', error)
-      toast.error('還原失敗，請稍後再試')
+      logger.error('Restore failed:', error)
+      toast.error(ARCHIVE_LABELS.TOAST_RESTORE_ERROR)
     }
   }
 
   // 永久刪除行程表
   const handleDeleteItinerary = async (itinerary: ArchivedItinerary) => {
+    const itineraryName = itinerary.title || itinerary.tour_code || ARCHIVE_LABELS.UNNAMED
     const confirmed = await confirm(
-      `確定要永久刪除行程表「${itinerary.title || itinerary.tour_code || '未命名'}」嗎？\n\n⚠️ 此操作無法復原！`,
+      ARCHIVE_LABELS.CONFIRM_DELETE_ITINERARY(itineraryName),
       {
-        title: '永久刪除',
+        title: ARCHIVE_LABELS.CONFIRM_DELETE_TITLE,
         type: 'warning',
       }
     )
@@ -223,20 +223,20 @@ export default function ArchiveManagementPage() {
         .eq('id', itinerary.id)
 
       if (error) throw error
-      toast.success('已永久刪除行程表')
+      toast.success(ARCHIVE_LABELS.TOAST_ITINERARY_DELETED)
       loadArchivedData()
     } catch (error) {
-      logger.error('刪除失敗:', error)
-      toast.error('刪除失敗，請稍後再試')
+      logger.error('Delete failed:', error)
+      toast.error(ARCHIVE_LABELS.TOAST_DELETE_RETRY_ERROR)
     }
   }
 
   // 刪除未關聯的報價單
   const handleDeleteOrphanedQuote = async (quote: OrphanedQuote) => {
     const confirmed = await confirm(
-      `確定要刪除報價單「${quote.code}」嗎？\n\n此報價單未關聯任何旅遊團，刪除後無法復原。`,
+      ARCHIVE_LABELS.CONFIRM_DELETE_QUOTE(quote.code || ''),
       {
-        title: '刪除報價單',
+        title: ARCHIVE_LABELS.CONFIRM_DELETE_QUOTE_TITLE,
         type: 'warning',
       }
     )
@@ -249,20 +249,20 @@ export default function ArchiveManagementPage() {
         .eq('id', quote.id)
 
       if (error) throw error
-      toast.success(`已刪除報價單 ${quote.code}`)
+      toast.success(ARCHIVE_LABELS.TOAST_QUOTE_DELETED(quote.code || ''))
       loadArchivedData()
     } catch (error) {
-      logger.error('刪除失敗:', error)
-      toast.error('刪除失敗，請稍後再試')
+      logger.error('Delete failed:', error)
+      toast.error(ARCHIVE_LABELS.TOAST_DELETE_RETRY_ERROR)
     }
   }
 
   // 封存結案的旅遊團
   const handleArchiveClosedTour = async (tour: ClosedTour) => {
     const confirmed = await confirm(
-      `確定要將結案旅遊團「${tour.code}」封存嗎？\n\n封存後可在「封存旅遊團」標籤頁還原。`,
+      ARCHIVE_LABELS.CONFIRM_ARCHIVE_TOUR(tour.code),
       {
-        title: '封存旅遊團',
+        title: ARCHIVE_LABELS.CONFIRM_ARCHIVE_TOUR_TITLE,
         type: 'warning',
       }
     )
@@ -275,11 +275,11 @@ export default function ArchiveManagementPage() {
         .eq('id', tour.id)
 
       if (error) throw error
-      toast.success(`已封存旅遊團 ${tour.code}`)
+      toast.success(ARCHIVE_LABELS.TOAST_TOUR_ARCHIVED(tour.code))
       loadArchivedData()
     } catch (error) {
-      logger.error('封存失敗:', error)
-      toast.error('封存失敗，請稍後再試')
+      logger.error('Archive failed:', error)
+      toast.error(ARCHIVE_LABELS.TOAST_ARCHIVE_ERROR)
     }
   }
 
