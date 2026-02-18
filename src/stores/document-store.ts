@@ -9,6 +9,7 @@
 
 import { create } from 'zustand'
 import { supabase } from '@/lib/supabase/client'
+import { getWorkspaceId } from '@/lib/workspace-context'
 
 // ============================================
 // Types
@@ -596,11 +597,18 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
   fetchTemplates: async (type: DocumentType) => {
     
     try {
-      const { data: templates, error } = await supabase
+      const workspaceId = getWorkspaceId()
+      let query = supabase
         .from('design_templates')
         .select('*')
         .eq('type', type)
         .order('use_count', { ascending: false })
+
+      if (workspaceId) {
+        query = query.eq('workspace_id', workspaceId)
+      }
+
+      const { data: templates, error } = await query
 
       if (error) throw new Error(`載入模板失敗: ${error.message}`)
 

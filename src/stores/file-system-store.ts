@@ -15,6 +15,7 @@ import type {
   FileCategory,
 } from '@/types/file-system.types'
 import { logger } from '@/lib/utils/logger'
+import { getWorkspaceId } from '@/lib/workspace-context'
 
 // ============================================================================
 // Store State
@@ -161,11 +162,17 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
         try {
           const supabase = createSupabaseBrowserClient()
 
+          const workspaceId = getWorkspaceId()
+
           let query = supabase
             .from('folders')
             .select('*, tour:tours(id, code, name)')
             .order('sort_order')
             .order('name')
+
+          if (workspaceId) {
+            query = query.eq('workspace_id', workspaceId)
+          }
 
           if (tourId) {
             query = query.eq('tour_id', tourId)
@@ -198,10 +205,16 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
         try {
           const supabase = createSupabaseBrowserClient()
 
+          const workspaceId = getWorkspaceId()
+
           let query = supabase
             .from('files')
             .select('*, folder:folders(id, name, path), tour:tours(id, code, name)', { count: 'exact' })
             .eq('is_deleted', false)
+
+          if (workspaceId) {
+            query = query.eq('workspace_id', workspaceId)
+          }
 
           // 資料夾篩選
           if (folderId) {
