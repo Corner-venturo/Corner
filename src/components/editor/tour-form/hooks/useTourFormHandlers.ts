@@ -145,10 +145,15 @@ export function useTourFormHandlers(
     })
   }
 
-  const updateDailyItinerary = (index: number, field: string, value: unknown) => {
+  const updateDailyItinerary = (index: number, field: string | Record<string, unknown>, value?: unknown) => {
     logger.log(COMP_EDITOR_LABELS.useTourFormHandlers_updateDailyItinerary_被呼叫, { index, field, value })
     const newItinerary = [...data.dailyItinerary]
-    newItinerary[index] = { ...newItinerary[index], [field]: value }
+    if (typeof field === 'string') {
+      newItinerary[index] = { ...newItinerary[index], [field]: value }
+    } else {
+      // Batch update: field is an object of { key: value } pairs
+      newItinerary[index] = { ...newItinerary[index], ...field }
+    }
     logger.log(COMP_EDITOR_LABELS.useTourFormHandlers_更新後的_day, newItinerary[index])
     onChange({ ...data, dailyItinerary: newItinerary })
   }

@@ -10,7 +10,7 @@ interface DayListProps {
   data: TourFormData
   dayLabels: string[]
   isAccommodationLockedByQuote?: boolean  // 有關聯報價單時鎖定住宿編輯
-  updateDailyItinerary: (index: number, field: string, value: unknown) => void
+  updateDailyItinerary: (index: number, field: string | Record<string, unknown>, value?: unknown) => void
   removeDailyItinerary: (index: number) => void
   swapDailyItinerary?: (fromIndex: number, toIndex: number) => void
   addActivity: (dayIndex: number) => void

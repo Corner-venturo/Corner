@@ -9,7 +9,7 @@ import type { LuxuryHotel } from '../../HotelSelector'
 interface HotelQueryResult {
   id: string
   name: string
-  name_en: string | null
+  english_name: string | null
   brand: string | null
   country_id: string
   region_id: string | null
@@ -176,7 +176,7 @@ export function useHotelSearch({ isOpen, tourCountryName = '' }: UseHotelSearchP
         let query = supabase
           .from('hotels')
           .select(`
-            id, name, name_en, brand, country_id, region_id, city_id,
+            id, name, english_name, brand, country_id, region_id, city_id,
             star_rating, hotel_class, category, description,
             highlights, price_range, avg_price_per_night,
             thumbnail, images, is_active, is_featured,
@@ -211,7 +211,7 @@ export function useHotelSearch({ isOpen, tourCountryName = '' }: UseHotelSearchP
         const formatted = ((data || []) as unknown as HotelQueryResult[]).map((item): LuxuryHotel => ({
           id: item.id,
           name: item.name,
-          name_en: item.name_en,
+          name_en: item.english_name,
           brand: item.brand,
           country_id: item.country_id,
           region_id: item.region_id || null,

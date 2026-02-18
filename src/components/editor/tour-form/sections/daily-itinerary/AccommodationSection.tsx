@@ -13,7 +13,7 @@ interface AccommodationSectionProps {
   day: DailyItinerary
   dayIndex: number
   data: TourFormData
-  updateDailyItinerary: (index: number, field: string, value: unknown) => void
+  updateDailyItinerary: (index: number, field: string | Record<string, unknown>, value?: unknown) => void
   onOpenHotelSelector: (dayIndex: number) => void
   isLockedByQuote?: boolean  // 有關聯報價單時鎖定編輯
 }
@@ -46,12 +46,14 @@ export function AccommodationSection({
             checked={day.isSameAccommodation || false}
             onCheckedChange={checked => {
               if (checked) {
-                // 勾選續住：複製前一天的住宿資料
+                // 勾選續住：一次性複製前一天的住宿資料（避免多次 setState 覆蓋）
                 const prevDay = data.dailyItinerary[dayIndex - 1]
-                updateDailyItinerary(dayIndex, 'isSameAccommodation', true)
-                updateDailyItinerary(dayIndex, 'accommodation', prevDay?.accommodation || '')
-                updateDailyItinerary(dayIndex, 'accommodationUrl', prevDay?.accommodationUrl || '')
-                updateDailyItinerary(dayIndex, 'accommodationRating', prevDay?.accommodationRating ?? 5)
+                updateDailyItinerary(dayIndex, {
+                  isSameAccommodation: true,
+                  accommodation: prevDay?.accommodation || '',
+                  accommodationUrl: prevDay?.accommodationUrl || '',
+                  accommodationRating: prevDay?.accommodationRating ?? 5,
+                })
               } else {
                 // 取消續住
                 updateDailyItinerary(dayIndex, 'isSameAccommodation', false)
