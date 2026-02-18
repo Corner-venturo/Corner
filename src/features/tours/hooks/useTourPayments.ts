@@ -12,6 +12,7 @@ import { useTravelInvoiceStore, TravelInvoiceItem, BuyerInfo } from '@/stores/tr
 import { confirm } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'
 import { mutate } from 'swr'
+import { TOUR_PAYMENTS_LABELS } from '../constants/labels'
 
 interface ReceiptPayment extends Payment {
   method?: string
@@ -42,12 +43,12 @@ export function useTourPayments({
     amount: number
     description: string
     method: string
-    status: '已確認' | '待確認'
+    status: typeof TOUR_PAYMENTS_LABELS.CONFIRMED | typeof TOUR_PAYMENTS_LABELS.PENDING
   }>({
     amount: 0,
     description: '',
     method: 'bank_transfer',
-    status: '已確認',
+    status: TOUR_PAYMENTS_LABELS.CONFIRMED,
   })
 
   // 代轉發票 Dialog 狀態
@@ -218,7 +219,7 @@ export function useTourPayments({
         receipt_type: receiptTypeMap[data.method] || 0,
         receipt_amount: data.amount,
         actual_amount: data.amount,
-        status: data.status === '已確認' ? '1' : '0',
+        status: data.status === TOUR_PAYMENTS_LABELS.CONFIRMED ? '1' : '0',
         notes: data.description,
         receipt_account: order?.contact_person || null,
       }
@@ -230,14 +231,14 @@ export function useTourPayments({
       await updateTourFinancials()
 
       toast({
-        title: '成功',
-        description: '收款單建立成功',
+        title: TOUR_PAYMENTS_LABELS.SUCCESS,
+        description: TOUR_PAYMENTS_LABELS.RECEIPT_CREATED,
       })
     } catch (error) {
-      logger.error('建立收款單失敗:', error instanceof Error ? error.message : String(error))
+      logger.error(TOUR_PAYMENTS_LABELS.CREATE_RECEIPT_FAILED, error instanceof Error ? error.message : String(error))
       toast({
-        title: '錯誤',
-        description: '建立收款單失敗',
+        title: TOUR_PAYMENTS_LABELS.ERROR,
+        description: TOUR_PAYMENTS_LABELS.CREATE_RECEIPT_FAILED,
         variant: 'destructive',
       })
       throw error
@@ -258,7 +259,7 @@ export function useTourPayments({
       amount: 0,
       description: '',
       method: 'bank_transfer',
-      status: '已確認',
+      status: TOUR_PAYMENTS_LABELS.CONFIRMED,
     })
     setSelectedOrderId('')
     setIsAddDialogOpen(false)
@@ -311,11 +312,11 @@ export function useTourPayments({
 
   const handleIssueInvoice = async () => {
     if (!invoiceBuyer.buyerName) {
-      toast({ title: '錯誤', description: '請輸入買受人名稱', variant: 'destructive' })
+      toast({ title: TOUR_PAYMENTS_LABELS.ERROR, description: TOUR_PAYMENTS_LABELS.ENTER_BUYER_NAME, variant: 'destructive' })
       return
     }
     if (invoiceItems.some(item => !item.item_name || item.item_price <= 0)) {
-      toast({ title: '錯誤', description: '請完整填寫商品資訊', variant: 'destructive' })
+      toast({ title: TOUR_PAYMENTS_LABELS.ERROR, description: TOUR_PAYMENTS_LABELS.FILL_PRODUCT_INFO, variant: 'destructive' })
       return
     }
 
@@ -323,8 +324,8 @@ export function useTourPayments({
       const order = tourOrders.find(o => o.id === invoiceOrderId)
       if (order && invoiceTotal > (order.paid_amount ?? 0)) {
         const confirmed = await confirm(
-          `發票金額 NT$ ${invoiceTotal.toLocaleString()} 超過已收款金額 NT$ ${(order.paid_amount ?? 0).toLocaleString()}，確定要開立嗎？`,
-          { title: '金額超開提醒', type: 'warning' }
+          TOUR_PAYMENTS_LABELS.AMOUNT_EXCEED_CONFIRM(invoiceTotal.toLocaleString(), (order.paid_amount ?? 0).toLocaleString()),
+          { title: TOUR_PAYMENTS_LABELS.AMOUNT_EXCEED_TITLE, type: 'warning' }
         )
         if (!confirmed) return
       }
@@ -341,15 +342,15 @@ export function useTourPayments({
         tour_id: tour.id,
         created_by: 'current_user',
       })
-      toast({ title: '成功', description: '代轉發票開立成功' })
+      toast({ title: TOUR_PAYMENTS_LABELS.SUCCESS, description: TOUR_PAYMENTS_LABELS.INVOICE_SUCCESS })
       setIsInvoiceDialogOpen(false)
       setInvoiceBuyer({ buyerName: '', buyerUBN: '', buyerEmail: '', buyerMobile: '' })
       setInvoiceItems([{ item_name: '', item_count: 1, item_unit: '式', item_price: 0, itemAmt: 0 }])
       setInvoiceRemark('')
     } catch (error) {
       toast({
-        title: '錯誤',
-        description: error instanceof Error ? error.message : '開立發票失敗',
+        title: TOUR_PAYMENTS_LABELS.ERROR,
+        description: error instanceof Error ? error.message : TOUR_PAYMENTS_LABELS.INVOICE_FAILED,
         variant: 'destructive',
       })
     }

@@ -510,6 +510,16 @@ export const COMP_TOURS_LABELS = {
   LABEL_5591: '說明',
   LABEL_9767: '餐食表',
   LABEL_6198: '需求單項目',
+  GENERATE_REQUEST: '產生需求單',
+  HOTEL_COUNT: (n: number) => `(${n} 間飯店)`,
+  RESTAURANT_COUNT: (n: number) => `(${n} 間餐廳)`,
+  NIGHT_COUNT: (n: number) => `(${n} 晚)`,
+  MEAL_COUNT: (n: number) => `(${n} 餐)`,
+  PAYABLE_COUNT: (n: number) => `(${n} 項可請款)`,
+  CONFIRMED_COST: (amount: string) => `確認成本：NT$ ${amount}`,
+  ESTIMATED_COST: (amount: string) => `預估成本：NT$ ${amount}`,
+  REQUEST_CREATED_DESC: (name: string) => `${name} 的需求單已建立為草稿`,
+  PAYMENT_CREATED_DESC: (name: string) => `${name} 的請款單已建立`,
 
   EMPTY_3090: '尚無設計',
   LABEL_5671: '可從行程表建立網頁行程設計',
@@ -964,8 +974,8 @@ export const TOUR_SERVICE_LABELS = {
 // Tour Payments Hook
 // ============================================================
 export const TOUR_PAYMENTS_LABELS = {
-  CONFIRMED: '已確認',
-  PENDING: '待確認',
+  CONFIRMED: '已確認' as const,
+  PENDING: '待確認' as const,
   UNIT: '式',
   SUCCESS: '成功',
   RECEIPT_CREATED: '收款單建立成功',
@@ -1045,6 +1055,7 @@ export const TOUR_CHANNEL_LABELS = {
   CREATE_CHANNEL: '建立頻道',
   CREATING: '正在建立頻道...',
   WORKSPACE_NOT_FOUND: '找不到工作空間',
+  CHANNEL_NOT_FOUND: '找不到頻道',
   CHANNEL_EXISTS: (name: string) => `頻道已存在：${name}`,
   DEPARTURE_SUFFIX: '} 出發',
   CHANNEL_CREATED: (name: string) => `已建立頻道：${name}`,

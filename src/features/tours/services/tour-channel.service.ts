@@ -6,6 +6,7 @@
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import type { Tour } from '@/types/tour.types'
+import { TOUR_CHANNEL_LABELS } from '../constants/labels'
 
 interface CreateTourChannelResult {
   success: boolean
@@ -92,7 +93,7 @@ export async function createTourChannel(
 
     return { success: true, channelId: newChannel.id }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : '建立頻道失敗'
+    const errorMessage = error instanceof Error ? error.message : TOUR_CHANNEL_LABELS.UNKNOWN_ERROR
     logger.error('[TourChannel] 發生錯誤:', error)
     return { success: false, error: errorMessage }
   }
@@ -119,7 +120,7 @@ export async function addMembersToTourChannel(
 
     if (!channel) {
       logger.warn(`[TourChannel] 找不到團號 ${tourId} 的頻道`)
-      return { success: false, error: '找不到頻道' }
+      return { success: false, error: TOUR_CHANNEL_LABELS.CHANNEL_NOT_FOUND }
     }
 
     // 2. 批量檢查已存在的成員（1 次查詢取代 N 次）
@@ -159,7 +160,7 @@ export async function addMembersToTourChannel(
 
     return { success: true }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : '加入成員失敗'
+    const errorMessage = error instanceof Error ? error.message : TOUR_CHANNEL_LABELS.UNKNOWN_ERROR
     logger.error('[TourChannel] 發生錯誤:', error)
     return { success: false, error: errorMessage }
   }

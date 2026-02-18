@@ -7,7 +7,7 @@
 
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
-import { TOUR_DEPENDENCY_LABELS, TOUR_SERVICE_LABELS } from '../constants/labels'
+import { TOUR_DEPENDENCY_LABELS } from '../constants/labels'
 
 export interface TourDependencyCheck {
   blockers: string[]
@@ -99,7 +99,7 @@ export async function unlinkTourItineraries(tourId: string): Promise<number> {
   if (linkedItineraries && linkedItineraries.length > 0) {
     const { error } = await supabase
       .from('itineraries')
-      .update({ tour_id: null, tour_code: null, status: '提案', updated_at: new Date().toISOString() })
+      .update({ tour_id: null, tour_code: null, status: 'draft', updated_at: new Date().toISOString() })
       .eq('tour_id', tourId)
     if (error) {
       logger.warn('斷開行程表失敗:', error.message)
