@@ -310,7 +310,6 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
           group_code: finalGroupCode,
           order_number: targetOrderNumber || undefined,
           product_id: item.product_id,
-          product_region: item.product_region,
           quantity: item.quantity,
           price: productPrice,
           email: item.email,

@@ -48,7 +48,7 @@ export default function PNRsPage() {
     },
     {
       key: 'record_locator' as const,
-      label: '訂位代號',
+      label: LABELS.COL_RECORD_LOCATOR,
       sortable: true,
       render: (value: unknown) => (
         <div className="flex items-center gap-2">
@@ -59,12 +59,12 @@ export default function PNRsPage() {
     },
     {
       key: 'passenger_names' as const,
-      label: '旅客姓名',
+      label: LABELS.COL_PASSENGER_NAMES,
       render: (value: unknown) => <TextCell text={Array.isArray(value) ? value.join(', ') : '-'} maxLength={40} />,
     },
     {
       key: 'status' as const,
-      label: '狀態',
+      label: LABELS.COL_STATUS,
       width: '100px',
       render: (value: unknown) => (
         <span className={`px-2 py-0.5 text-xs rounded-full ${
@@ -72,13 +72,13 @@ export default function PNRsPage() {
             ? 'bg-morandi-success/10 text-morandi-success'
             : 'bg-morandi-secondary/10 text-morandi-secondary'
         }`}>
-          {value === 'active' ? '有效' : '已取消'}
+          {value === 'active' ? LABELS.STATUS_ACTIVE : LABELS.STATUS_CANCELLED}
         </span>
       ),
     },
     {
       key: 'ticketing_deadline' as const,
-      label: '出票期限',
+      label: LABELS.COL_TICKETING_DEADLINE,
       sortable: true,
       render: (value: unknown) => {
         const dateStr = value as string | undefined
@@ -95,7 +95,7 @@ export default function PNRsPage() {
     },
     {
       key: 'created_at' as const,
-      label: '建立時間',
+      label: LABELS.COL_CREATED_AT,
       sortable: true,
       render: (value: unknown) => <DateCell date={value as string | null} format="long" />,
     },

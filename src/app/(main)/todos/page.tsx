@@ -52,10 +52,10 @@ import { DatePicker } from '@/components/ui/date-picker'
 export const dynamic = 'force-dynamic'
 
 const statusFilters = [
-  { value: 'active', label: '未完成' },
-  { value: 'pending', label: '待辦' },
-  { value: 'in_progress', label: '進行中' },
-  { value: 'completed', label: '已完成' },
+  { value: 'active', label: LABELS.STATUS_ACTIVE },
+  { value: 'pending', label: LABELS.STATUS_PENDING },
+  { value: 'in_progress', label: LABELS.STATUS_IN_PROGRESS },
+  { value: 'completed', label: LABELS.STATUS_COMPLETED },
 ]
 
 export default function TodosPage() {
@@ -89,7 +89,7 @@ export default function TodosPage() {
       // ✅ 可見性篩選 - 只顯示當前用戶相關的待辦 或 公開待辦
       // 如果使用者尚未登入，暫時顯示所有待辦（等登入後再過濾）
       if (currentUserId) {
-        const isCreator = todo.creator === currentUserId
+        const isCreator = (todo.creator || (todo as unknown as Record<string, unknown>).created_by_legacy) === currentUserId
         const isAssignee = todo.assignee === currentUserId
         const inVisibility = todo.visibility?.includes(currentUserId)
         const isPublic = todo.is_public === true
@@ -125,10 +125,10 @@ export default function TodosPage() {
   // 狀態標籤 - 使用 useCallback 優化
   const getStatusLabel = useCallback((status: Todo['status']) => {
     const statusMap = {
-      pending: '待辦',
-      in_progress: '進行中',
-      completed: '完成',
-      cancelled: '取消',
+      pending: LABELS.STATUS_PENDING,
+      in_progress: LABELS.STATUS_IN_PROGRESS,
+      completed: LABELS.STATUS_DONE,
+      cancelled: LABELS.STATUS_CANCELLED,
     }
     return statusMap[status]
   }, [])
@@ -299,11 +299,11 @@ export default function TodosPage() {
 
       const confirmed = await confirm({
         type: 'danger',
-        title: '刪除待辦事項',
-        message: `確定要刪除待辦事項「${todo.title}」嗎？`,
-        details: ['此操作無法復原'],
-        confirmLabel: '確認刪除',
-        cancelLabel: '取消',
+        title: LABELS.DELETE_TODO_TITLE,
+        message: `${LABELS.DELETE_CONFIRM_PREFIX}${todo.title}${LABELS.DELETE_CONFIRM_SUFFIX}`,
+        details: [LABELS.DELETE_IRREVERSIBLE],
+        confirmLabel: LABELS.CONFIRM_DELETE,
+        cancelLabel: LABELS.CANCEL,
       })
 
       if (!confirmed) {
@@ -318,7 +318,7 @@ export default function TodosPage() {
         }
       } catch (err) {
         logger.error('刪除待辦事項失敗:', err)
-        await alertError('刪除失敗，請稍後再試')
+        await alertError(LABELS.DELETE_FAILED)
       }
     },
     [deleteTodo, expandedTodo, confirm]
@@ -368,7 +368,7 @@ export default function TodosPage() {
         logger.log('✅ 待辦事項新增成功:', formData.title)
       } catch (error) {
         logger.error('新增待辦事項失敗:', error)
-        await alertError('新增失敗，請稍後再試')
+        await alertError(LABELS.ADD_FAILED)
       }
     },
     [addTodo]
@@ -380,9 +380,9 @@ export default function TodosPage() {
       showSearch={true}
       searchTerm={searchTerm}
       onSearchChange={setSearchTerm}
-      searchPlaceholder="搜尋任務..."
+      searchPlaceholder={LABELS.SEARCH_PLACEHOLDER}
       onAdd={() => setIsAddDialogOpen(true)}
-      addLabel="新增任務"
+      addLabel={LABELS.ADD_TASK}
       headerActions={
         <Input
           placeholder={LABELS.ADD_25}
