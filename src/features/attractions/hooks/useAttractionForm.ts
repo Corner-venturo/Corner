@@ -5,6 +5,7 @@ import { Attraction, AttractionFormData } from '../types'
 import { supabase } from '@/lib/supabase/client'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
+import { ATTRACTIONS_FORM_HOOK_LABELS } from '../constants/labels'
 
 export type ImagePosition = 'top' | 'center' | 'bottom'
 
@@ -53,7 +54,7 @@ export function useAttractionForm({ attraction, initialFormData, open }: UseAttr
         country_id: attraction.country_id || '',
         region_id: attraction.region_id || '',
         city_id: attraction.city_id || '',
-        category: attraction.category || '景點',
+        category: attraction.category || ATTRACTIONS_FORM_HOOK_LABELS.DEFAULT_CATEGORY,
         tags: attraction.tags?.join(', ') || '',
         duration_minutes: attraction.duration_minutes || 60,
         address: attraction.address || '',
@@ -128,19 +129,19 @@ export function useAttractionForm({ attraction, initialFormData, open }: UseAttr
         blob = await response.blob()
       } else {
         const directResponse = await fetch(imageUrl, { mode: 'cors' })
-        if (!directResponse.ok) throw new Error('無法下載圖片')
+        if (!directResponse.ok) throw new Error(ATTRACTIONS_FORM_HOOK_LABELS.無法下載圖片)
         blob = await directResponse.blob()
       }
 
       if (!blob.type.startsWith('image/')) {
-        throw new Error('URL 不是圖片')
+        throw new Error(ATTRACTIONS_FORM_HOOK_LABELS.URL_不是圖片)
       }
 
       const file = new File([blob], 'dragged-image.jpg', { type: blob.type || 'image/jpeg' })
       await uploadFiles([file])
     } catch (error) {
       logger.error('下載圖片失敗:', error)
-      void alert('無法從該網址下載圖片（可能有跨域限制），請先下載到本機再上傳', 'warning')
+      void alert(ATTRACTIONS_FORM_HOOK_LABELS.無法從該網址下載圖片, 'warning')
     } finally {
       setIsUploading(false)
     }

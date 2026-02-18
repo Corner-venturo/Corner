@@ -144,6 +144,7 @@ export const MICHELIN_RESTAURANTS_TAB_LABELS = {
 };
 
 export const PREMIUM_EXPERIENCES_TAB_LABELS = {
+  更新失敗: '更新失敗',
   確定要刪除此體驗: '確定要刪除此體驗？',
   刪除體驗: '刪除體驗',
   極致獨家: '極致獨家',
@@ -171,6 +172,29 @@ export const PREMIUM_EXPERIENCES_TAB_LABELS = {
   CANCEL: '取消',
   SAVE: '儲存',
 };
+
+export const ATTRACTIONS_TYPES_LABELS = {
+  座標: '座標',
+  門票: '門票',
+  介紹: '介紹',
+  時長: '時長',
+}
+
+export const ATTRACTIONS_FORM_HOOK_LABELS = {
+  DEFAULT_CATEGORY: '景點',
+  無法下載圖片: '無法下載圖片',
+  URL_不是圖片: 'URL 不是圖片',
+  無法從該網址下載圖片: '無法從該網址下載圖片（可能有跨域限制），請先下載到本機再上傳',
+}
+
+export const ATTRACTIONS_DATA_LABELS = {
+  DEFAULT_CATEGORY: '景點',
+  景點已更新: '景點已更新',
+  更新失敗請稍後再試: '更新失敗，請稍後再試',
+  確定要刪除此景點: '確定要刪除此景點？',
+  刪除景點: '刪除景點',
+  刪除失敗: '刪除失敗',
+}
 
 export const REGIONS_TAB_LABELS = {
   未分類: '未分類',

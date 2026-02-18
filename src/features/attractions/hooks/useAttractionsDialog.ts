@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Attraction, AttractionFormData } from '../types'
+import { ATTRACTIONS_FORM_HOOK_LABELS } from '../constants/labels'
 
 // ============================================
 // Hook: 對話框狀態管理
@@ -12,7 +13,7 @@ const initialFormData: AttractionFormData = {
   country_id: '',
   region_id: '',
   city_id: '',
-  category: '景點',
+  category: ATTRACTIONS_FORM_HOOK_LABELS.DEFAULT_CATEGORY,
   tags: '',
   duration_minutes: 60,
   address: '',

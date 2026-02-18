@@ -169,7 +169,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
           item.id === restaurant.id ? { ...item, is_active: restaurant.is_active } : item
         )
       )
-      toast.error('更新失敗')
+      toast.error(MICHELIN_RESTAURANTS_TAB_LABELS.更新失敗)
     }
   }
 

@@ -34,12 +34,14 @@ export interface Attraction {
 // 檢查景點是否有缺失資料
 export function hasMissingData(attraction: Attraction): string[] {
   const missing: string[] = []
-  if (!attraction.latitude || !attraction.longitude) missing.push('座標')
-  if (!attraction.ticket_price) missing.push('門票')
-  if (!attraction.notes) missing.push('介紹')
-  if (!attraction.duration_minutes) missing.push('時長')
+  if (!attraction.latitude || !attraction.longitude) missing.push(ATTRACTIONS_TYPES_LABELS.座標)
+  if (!attraction.ticket_price) missing.push(ATTRACTIONS_TYPES_LABELS.門票)
+  if (!attraction.notes) missing.push(ATTRACTIONS_TYPES_LABELS.介紹)
+  if (!attraction.duration_minutes) missing.push(ATTRACTIONS_TYPES_LABELS.時長)
   return missing
 }
+
+import { ATTRACTIONS_TYPES_LABELS } from './constants/labels'
 
 export type SortField = 'name' | 'city' | 'category' | 'duration' | 'status'
 export type SortDirection = 'asc' | 'desc' | null

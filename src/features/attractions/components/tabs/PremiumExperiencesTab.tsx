@@ -176,7 +176,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
           item.id === experience.id ? { ...item, is_active: experience.is_active } : item
         )
       )
-      toast.error('更新失敗')
+      toast.error(PREMIUM_EXPERIENCES_TAB_LABELS.更新失敗)
     }
   }
 

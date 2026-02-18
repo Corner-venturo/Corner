@@ -3,6 +3,7 @@ import { useAttractions, createAttraction as createAttractionData, updateAttract
 import { Attraction, AttractionFormData } from '../types'
 import { logger } from '@/lib/utils/logger'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { ATTRACTIONS_DATA_LABELS } from '../constants/labels'
 
 // ============================================
 // Hook: 景點資料管理（使用 SWR 架構）
@@ -54,7 +55,7 @@ export function useAttractionsData() {
           country_id: formData.country_id,
           region_id: formData.region_id || undefined,
           city_id: formData.city_id || undefined,
-          category: formData.category || '景點',
+          category: formData.category || ATTRACTIONS_DATA_LABELS.DEFAULT_CATEGORY,
           tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
           duration_minutes: formData.duration_minutes || 60,
           address: formData.address || undefined,
@@ -75,11 +76,11 @@ export function useAttractionsData() {
         logger.log('[Attractions] 更新成功! 結果:', result)
         // 觸發重新載入以確保 UI 同步
         await invalidateAttractions()
-        void alert('景點已更新', 'success')
+        void alert(ATTRACTIONS_DATA_LABELS.景點已更新, 'success')
         return { success: true }
       } catch (error) {
         logger.error('[Attractions] 更新失敗:', error)
-        const errorMessage = error instanceof Error ? error.message : '更新失敗，請稍後再試'
+        const errorMessage = error instanceof Error ? error.message : ATTRACTIONS_DATA_LABELS.更新失敗請稍後再試
         void alert(errorMessage, 'error')
         return { success: false, error }
       }
@@ -90,8 +91,8 @@ export function useAttractionsData() {
   // 刪除景點
   const deleteAttractionHandler = useCallback(
     async (id: string) => {
-      const confirmed = await confirm('確定要刪除此景點？', {
-        title: '刪除景點',
+      const confirmed = await confirm(ATTRACTIONS_DATA_LABELS.確定要刪除此景點, {
+        title: ATTRACTIONS_DATA_LABELS.刪除景點,
         type: 'warning',
       })
       if (!confirmed) return { success: false, cancelled: true }
@@ -100,7 +101,7 @@ export function useAttractionsData() {
         await deleteAttractionData(id)
         return { success: true }
       } catch (error) {
-        await alert('刪除失敗', 'error')
+        await alert(ATTRACTIONS_DATA_LABELS.刪除失敗, 'error')
         return { success: false, error }
       }
     },
