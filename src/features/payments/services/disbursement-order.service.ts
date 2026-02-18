@@ -150,7 +150,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       payment_request_ids: [...paymentRequestIds],
       amount: totalAmount,
       status: 'pending' as const,
-      note,
+      notes: note,
       created_by: '1', // 使用實際用戶ID
       id: '',
       created_at: this.now(),

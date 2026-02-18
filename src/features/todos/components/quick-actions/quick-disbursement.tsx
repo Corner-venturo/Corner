@@ -169,7 +169,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
           placeholder={PLACEHOLDER_LABELS.disbursementNotes}
           rows={2}
           value={formData.notes}
-          onChange={e => setFormData(prev => ({ ...prev, note: e.target.value }))}
+          onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
           className="border-morandi-container/30"
         />
       </div>

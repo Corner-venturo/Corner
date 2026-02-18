@@ -23,6 +23,7 @@ import {
   updateDisbursementOrder as updateDisbursementOrderApi,
   invalidateDisbursementOrders,
 } from '@/data'
+import { useAuthStore } from '@/stores/auth-store'
 import { cn } from '@/lib/utils'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { DisbursementPrintDialog } from './DisbursementPrintDialog'
@@ -45,6 +46,7 @@ export function DisbursementDetailDialog({
 }: DisbursementDetailDialogProps) {
   // 使用 @/data hooks（SWR 自動載入）
   const { items: payment_requests } = usePaymentRequests()
+  const user = useAuthStore(state => state.user)
 
   // 列印對話框狀態
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false)
@@ -183,6 +185,7 @@ export function DisbursementDetailDialog({
       // 更新出納單狀態
       await updateDisbursementOrderApi(order.id, {
         status: 'paid',
+        confirmed_by: user?.id || null,
         confirmed_at: new Date().toISOString(),
       })
 

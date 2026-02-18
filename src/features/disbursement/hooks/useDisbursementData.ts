@@ -175,9 +175,9 @@ export function useDisbursementData() {
       })
     }
 
-    // 更新請款單狀態為 processing
+    // 更新請款單狀態為 approved（已加入出納單）
     for (const id of requestIds) {
-      await updatePaymentRequestApi(id, { status: 'processing' })
+      await updatePaymentRequestApi(id, { status: 'approved' })
     }
   }, [currentOrder, payment_requests, disbursement_orders, nextThursday])
 
@@ -260,10 +260,10 @@ export function useDisbursementData() {
       status: 'pending',
     })
 
-    // 更新請款單狀態為 processing
+    // 更新請款單狀態為 approved（已加入出納單）
     const tour_ids_to_recalculate = new Set<string>()
     for (const id of requestIds) {
-      await updatePaymentRequestApi(id, { status: 'processing' })
+      await updatePaymentRequestApi(id, { status: 'approved' })
       const request = payment_requests.find(r => r.id === id)
       if (request?.tour_id) {
         tour_ids_to_recalculate.add(request.tour_id)
