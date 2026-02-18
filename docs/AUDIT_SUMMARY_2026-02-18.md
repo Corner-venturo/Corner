@@ -140,3 +140,49 @@
 ## ✅ 結論
 
 系統經過 79 個 commits 的全面審查與修復，從安全性、型別正確性、程式碼品質到測試覆蓋都有顯著提升。所有嚴重 bug 已修復，build 和測試全部通過。剩餘問題均為低優先級技術債，不影響系統正常運作。
+
+---
+
+## 第二波審查（18:40 ~ 22:00）
+
+### 第四批：客戶+供應商+資料管理+行程設計
+- 客戶更新缺 workspace_id（安全漏洞）
+- 景點 Premium Experiences 人數欄位名錯
+- 設計複製寫入不存在的 thumbnail_url
+- 77 個供應商硬編碼中文提取
+
+### 第五批：行事曆+待辦+調度+通訊+提案+網卡+PNR
+- 資源調度缺 workspace_id（跨公司資料外洩）
+- 通訊 author_id 映射缺失（Critical）
+- 待辦 contains 查詢傳錯型別
+- PNR Queue Items interface 完全不對齊 DB
+- 網卡寫入不存在欄位
+- 需求單類別比對錯誤（Critical）
+
+### 第六批：Online 核心+代轉發票+報表+API 安全
+- Online 聊天認證可偽造（Critical）
+- 行程編輯無角色檢查（Critical）
+- Cron→Bot header 不匹配
+- 3 個功能權限定義缺失
+
+### 第七批：基礎設施+Online API+型別比對
+- 型別定義補齊 20+ 個遺漏欄位
+- V2 store 標記
+- conversation API 500 error 修復
+
+### 第八~十二批：品質衝刺
+- V1 Checklist 4 項必做全部完成
+- 硬編碼中文 8 批掃描至零殘留
+- console.log 零殘留
+- any 零殘留
+- 測試 0 → 1063
+- Accessibility（100+ img alt, 30+ aria-label）
+- Performance（EnhancedTable memo 優化）
+- DB Index 建議報告
+- 文件索引整理
+
+### 最終統計
+- ERP: 103 commits + Online: 15 commits = **118 commits**
+- Tests: **1063 passed**（58 files）
+- Build: ✅ 全過
+- Git: ✅ Clean
