@@ -229,7 +229,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
 
       toast({
         title: COMP_TOURS_LABELS.需求單已建立,
-        description: `${supplierName} 的需求單已建立為草稿`,
+        description: COMP_TOURS_LABELS.REQUEST_CREATED_DESC(supplierName),
       })
     } catch (error) {
       toast({
@@ -282,11 +282,11 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
           <div className="flex items-center gap-2 px-4 py-3 bg-blue-500 text-white">
             <Hotel size={18} />
             <span className="font-medium">{COMP_TOURS_LABELS.LABEL_460}</span>
-            <span className="text-blue-100 text-sm">({hotelGroups.length} 間飯店)</span>
+            <span className="text-blue-100 text-sm">{COMP_TOURS_LABELS.HOTEL_COUNT(hotelGroups.length)}</span>
           </div>
           <div className="bg-card p-4 space-y-4">
             {hotelGroups.map(group => {
-              const hasRequest = hasExistingRequest(group.supplierName, 'hotel')
+              const hasRequest = hasExistingRequest(group.supplierName, 'accommodation')
               const isGenerating = generatingFor === `accommodation-${group.supplierName}`
 
               return (
@@ -296,7 +296,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                     <div className="flex items-center gap-2">
                       <Hotel size={14} className="text-morandi-gold" />
                       <span className="font-medium text-morandi-primary">{group.supplierName}</span>
-                      <span className="text-xs text-morandi-secondary">({group.items.length} 晚)</span>
+                      <span className="text-xs text-morandi-secondary">{COMP_TOURS_LABELS.NIGHT_COUNT(group.items.length)}</span>
                     </div>
                     {hasRequest ? (
                       <span className="flex items-center gap-1 text-xs text-morandi-green">
@@ -315,7 +315,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                         ) : (
                           <Plus size={12} className="mr-1" />
                         )}
-                        產生需求單
+                        {COMP_TOURS_LABELS.GENERATE_REQUEST}
                       </Button>
                     )}
                   </div>
@@ -350,11 +350,11 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
           <div className="flex items-center gap-2 px-4 py-3 bg-orange-500 text-white">
             <Utensils size={18} />
             <span className="font-medium">{COMP_TOURS_LABELS.LABEL_9767}</span>
-            <span className="text-orange-100 text-sm">({restaurantGroups.length} 間餐廳)</span>
+            <span className="text-orange-100 text-sm">{COMP_TOURS_LABELS.RESTAURANT_COUNT(restaurantGroups.length)}</span>
           </div>
           <div className="bg-card p-4 space-y-4">
             {restaurantGroups.map(group => {
-              const hasRequest = hasExistingRequest(group.supplierName, 'restaurant')
+              const hasRequest = hasExistingRequest(group.supplierName, 'meal')
               const isGenerating = generatingFor === `meal-${group.supplierName}`
 
               return (
@@ -364,7 +364,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                     <div className="flex items-center gap-2">
                       <Utensils size={14} className="text-morandi-gold" />
                       <span className="font-medium text-morandi-primary">{group.supplierName}</span>
-                      <span className="text-xs text-morandi-secondary">({group.items.length} 餐)</span>
+                      <span className="text-xs text-morandi-secondary">{COMP_TOURS_LABELS.MEAL_COUNT(group.items.length)}</span>
                     </div>
                     {hasRequest ? (
                       <span className="flex items-center gap-1 text-xs text-morandi-green">
@@ -383,7 +383,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                         ) : (
                           <Plus size={12} className="mr-1" />
                         )}
-                        產生需求單
+                        {COMP_TOURS_LABELS.GENERATE_REQUEST}
                       </Button>
                     )}
                   </div>
@@ -418,7 +418,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
           <div className="flex items-center gap-2 px-4 py-3 bg-morandi-gold text-white">
             <DollarSign size={18} />
             <span className="font-medium">{COMP_TOURS_LABELS.LABEL_6198}</span>
-            <span className="text-white/80 text-sm">({requestsWithSupplier.length} 項可請款)</span>
+            <span className="text-white/80 text-sm">{COMP_TOURS_LABELS.PAYABLE_COUNT(requestsWithSupplier.length)}</span>
           </div>
           <div className="bg-card divide-y divide-border">
             {requestsWithSupplier.map(request => (
@@ -464,8 +464,8 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                     {(request.estimated_cost || request.final_cost) && (
                       <div className="text-xs text-morandi-secondary mt-1">
                         {request.final_cost
-                          ? `確認成本：NT$ ${request.final_cost.toLocaleString()}`
-                          : `預估成本：NT$ ${(request.estimated_cost || 0).toLocaleString()}`}
+                          ? COMP_TOURS_LABELS.CONFIRMED_COST(request.final_cost.toLocaleString())
+                          : COMP_TOURS_LABELS.ESTIMATED_COST((request.estimated_cost || 0).toLocaleString())}
                       </div>
                     )}
                   </div>
@@ -496,7 +496,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
             refreshRequests()
             toast({
               title: COMP_TOURS_LABELS.請款單已建立,
-              description: `${quickRequestItem.supplierName} 的請款單已建立`,
+              description: COMP_TOURS_LABELS.PAYMENT_CREATED_DESC(quickRequestItem.supplierName),
             })
           }}
         />
