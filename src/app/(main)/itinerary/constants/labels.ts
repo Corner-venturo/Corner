@@ -137,6 +137,16 @@ export const BLOCK_EDITOR_LABELS = {
   LABEL_2827: '存檔中...',
   SAVING_4294: '已儲存',
   LABEL_6397: '存檔失敗',
+  STATUS_PROPOSAL: '提案',
+  MANUAL_SAVE: '手動存檔',
+  MANUAL_SAVING: '存檔中...',
+  AUTO_SAVE_FAILED: '自動存檔失敗',
+  HOME: '首頁',
+  ITINERARY_MGMT: '行程管理',
+  DESKTOP: '💻 電腦',
+  MOBILE: '📱 手機',
+  PDF_EXPORT_FAILED: 'PDF 匯出失敗，請稍後再試',
+  CREATE_ITINERARY_BTN: '建立行程表',
 }
 
 // Itinerary Actions
@@ -203,4 +213,15 @@ export const ITINERARY_EDITOR_LABELS = {
   VERSION_CREATE_FAILED: '建立版本失敗',
   ITINERARY_CREATED: '行程表已建立',
   CREATE_FAILED: '建立行程表失敗',
+  TRANSPORT_COST: '行程表所列之交通費用',
+  ACCOMMODATION_COST: '行程表所列之住宿費用',
+  MEAL_COST: '行程表所列之餐食費用',
+  TICKET_COST: '行程表所列之門票費用',
+  GUIDE_SERVICE: '專業導遊服務',
+  INSURANCE: '旅遊責任險 500 萬元',
+  PASSPORT_VISA: '個人護照及簽證費用',
+  OPTIONAL_TOUR: '行程外之自費行程',
+  PERSONAL_EXPENSE: '個人消費及小費',
+  LUGGAGE_OVERWEIGHT: '行李超重費用',
+  SINGLE_ROOM: '單人房差價',
 }

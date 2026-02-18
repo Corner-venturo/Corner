@@ -68,9 +68,9 @@ interface Driver {
 }
 
 const DISPATCH_STATUS_CONFIG = {
-  pending: { label: '待派單', variant: 'outline' as const, icon: Clock },
-  assigned: { label: '已派單', variant: 'secondary' as const, icon: Truck },
-  completed: { label: '已完成', variant: 'default' as const, icon: CheckCircle2 },
+  pending: { label: SUPPLIER_LABELS.DISPATCH_PENDING, variant: 'outline' as const, icon: Clock },
+  assigned: { label: SUPPLIER_LABELS.DISPATCH_ASSIGNED, variant: 'secondary' as const, icon: Truck },
+  completed: { label: SUPPLIER_LABELS.DISPATCH_COMPLETED, variant: 'default' as const, icon: CheckCircle2 },
 }
 
 export function SupplierDispatchPage() {
@@ -219,7 +219,7 @@ export function SupplierDispatchPage() {
       setSelectedDriverId('')
     } catch (error) {
       logger.error('派單失敗:', error)
-      alert('派單失敗，請稍後再試')
+      alert(SUPPLIER_LABELS.ASSIGN_FAILED)
     } finally {
       setIsAssigning(false)
     }
@@ -235,7 +235,7 @@ export function SupplierDispatchPage() {
   const columns: TableColumn<ConfirmedRequest>[] = [
     {
       key: 'service_date',
-      label: '服務日期',
+      label: SUPPLIER_LABELS.COL_SERVICE_DATE,
       width: '120px',
       render: (_, row) => (
         <div className="flex items-center gap-2">
@@ -246,7 +246,7 @@ export function SupplierDispatchPage() {
     },
     {
       key: 'tour_code',
-      label: '團號',
+      label: SUPPLIER_LABELS.COL_TOUR_CODE,
       width: '120px',
       render: (_, row) => (
         <span className="font-mono text-sm">{row.tour_code || '-'}</span>
@@ -254,7 +254,7 @@ export function SupplierDispatchPage() {
     },
     {
       key: 'title',
-      label: '服務內容',
+      label: SUPPLIER_LABELS.COL_SERVICE_CONTENT,
       render: (_, row) => (
         <div>
           <div className="font-medium">{row.title}</div>
@@ -268,13 +268,13 @@ export function SupplierDispatchPage() {
     },
     {
       key: 'quantity',
-      label: '數量',
+      label: SUPPLIER_LABELS.COL_QUANTITY,
       width: '80px',
-      render: (_, row) => <span>{row.quantity} 台</span>,
+      render: (_, row) => <span>{row.quantity} {SUPPLIER_LABELS.UNIT_VEHICLE}</span>,
     },
     {
       key: 'dispatch_status',
-      label: '派單狀態',
+      label: SUPPLIER_LABELS.COL_DISPATCH_STATUS,
       width: '100px',
       render: (_, row) => {
         const config = DISPATCH_STATUS_CONFIG[row.dispatch_status]
@@ -289,7 +289,7 @@ export function SupplierDispatchPage() {
     },
     {
       key: 'assigned_driver_name',
-      label: '指派司機',
+      label: SUPPLIER_LABELS.COL_ASSIGNED_DRIVER,
       width: '120px',
       render: (_, row) => (
         <div className="flex items-center gap-2">
@@ -306,7 +306,7 @@ export function SupplierDispatchPage() {
     },
     {
       key: 'actions',
-      label: '操作',
+      label: SUPPLIER_LABELS.COL_ACTIONS,
       width: '100px',
       render: (_, row) => (
         <Button
@@ -315,7 +315,7 @@ export function SupplierDispatchPage() {
           onClick={() => setSelectedRequest(row)}
           disabled={row.dispatch_status === 'completed'}
         >
-          {row.dispatch_status === 'pending' ? '派單' : '修改'}
+          {row.dispatch_status === 'pending' ? SUPPLIER_LABELS.BTN_ASSIGN : SUPPLIER_LABELS.BTN_MODIFY}
         </Button>
       ),
     },
@@ -347,7 +347,7 @@ export function SupplierDispatchPage() {
         <div className="flex-1" />
 
         <div className="text-sm text-morandi-secondary">
-          共 {filteredRequests.length} 筆需求
+          {SUPPLIER_LABELS.TOTAL_REQUESTS(filteredRequests.length)}
         </div>
       </div>
 
@@ -356,7 +356,7 @@ export function SupplierDispatchPage() {
         data={filteredRequests}
         columns={columns}
         isLoading={isLoading}
-        emptyMessage="目前沒有需要派單的需求"
+        emptyMessage={SUPPLIER_LABELS.EMPTY_DISPATCH}
       />
 
       {/* 派單對話框 */}
@@ -384,7 +384,7 @@ export function SupplierDispatchPage() {
                 <div className="font-medium">{selectedRequest.title}</div>
                 {selectedRequest.tour_code && (
                   <div className="text-sm text-morandi-secondary">
-                    團號：{selectedRequest.tour_code}
+                    {SUPPLIER_LABELS.TOUR_CODE_LABEL}{selectedRequest.tour_code}
                   </div>
                 )}
               </div>
@@ -431,7 +431,7 @@ export function SupplierDispatchPage() {
               onClick={handleAssign}
               disabled={!selectedDriverId || isAssigning}
             >
-              {isAssigning ? '派單中...' : '確認派單'}
+              {isAssigning ? SUPPLIER_LABELS.ASSIGNING : SUPPLIER_LABELS.CONFIRM_ASSIGN}
             </Button>
           </DialogFooter>
         </DialogContent>

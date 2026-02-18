@@ -26,6 +26,8 @@ export interface PayrollPeriod {
   status: PayrollPeriodStatus
   confirmed_by: string | null
   confirmed_at: string | null
+  paid_at: string | null
+  notes: string | null
   created_at: string | null
 }
 
@@ -40,12 +42,16 @@ export interface PayrollRecord {
   overtime_pay: number
   bonus: number
   allowances: number
+  meal_allowance: number
+  transportation_allowance: number
   other_additions: number
   // 減項
   unpaid_leave_deduction: number
+  late_deduction: number
   other_deductions: number
   // 計算結果
   gross_salary: number
+  total_deductions: number
   net_salary: number
   // 出勤統計
   work_days: number
@@ -53,6 +59,11 @@ export interface PayrollRecord {
   overtime_hours: number
   paid_leave_days: number
   unpaid_leave_days: number
+  late_count: number
+  // 詳細資料（JSON）
+  overtime_details: Record<string, unknown> | null
+  allowance_details: Record<string, unknown> | null
+  deduction_details: Record<string, unknown> | null
   // 備註
   notes: string | null
   created_at: string | null
@@ -237,16 +248,24 @@ export function usePayroll() {
           overtime_pay: item.overtime_pay || 0,
           bonus: item.bonus || 0,
           allowances: item.allowances || 0,
+          meal_allowance: item.meal_allowance || 0,
+          transportation_allowance: item.transportation_allowance || 0,
           other_additions: item.other_additions || 0,
           unpaid_leave_deduction: item.unpaid_leave_deduction || 0,
+          late_deduction: item.late_deduction || 0,
           other_deductions: item.other_deductions || 0,
           gross_salary: item.gross_salary || 0,
+          total_deductions: item.total_deductions || 0,
           net_salary: item.net_salary || 0,
           work_days: item.work_days || 0,
           actual_work_days: item.actual_work_days || 0,
           overtime_hours: item.overtime_hours || 0,
           paid_leave_days: item.paid_leave_days || 0,
           unpaid_leave_days: item.unpaid_leave_days || 0,
+          late_count: item.late_count || 0,
+          overtime_details: item.overtime_details as Record<string, unknown> | null,
+          allowance_details: item.allowance_details as Record<string, unknown> | null,
+          deduction_details: item.deduction_details as Record<string, unknown> | null,
           notes: item.notes,
           created_at: item.created_at,
           updated_at: item.updated_at,
@@ -354,6 +373,7 @@ export function usePayroll() {
         const empAttendance = (attendanceRecords || []).filter(a => a.employee_id === emp.id)
         const actualWorkDays = empAttendance.filter(a => a.status === 'present' || a.status === 'late').length
         const overtimeHours = empAttendance.reduce((sum, a) => sum + (a.overtime_hours || 0), 0)
+        const lateCount = empAttendance.filter(a => a.status === 'late').length
 
         // 計算請假
         const empLeaves = (leaveRequests || []).filter(l => l.employee_id === emp.id)
@@ -381,8 +401,9 @@ export function usePayroll() {
         const allowances = salaryInfo?.allowances || 0
 
         // 總額計算
+        const totalDeductions = unpaidLeaveDeduction
         const grossSalary = baseSalary + overtimePay + bonus + allowances
-        const netSalary = grossSalary - unpaidLeaveDeduction
+        const netSalary = grossSalary - totalDeductions
 
         payrollRecords.push({
           workspace_id: getRequiredWorkspaceId(),
@@ -392,16 +413,21 @@ export function usePayroll() {
           overtime_pay: overtimePay,
           bonus,
           allowances,
+          meal_allowance: 0,
+          transportation_allowance: 0,
           other_additions: 0,
           unpaid_leave_deduction: unpaidLeaveDeduction,
+          late_deduction: 0,
           other_deductions: 0,
           gross_salary: grossSalary,
+          total_deductions: totalDeductions,
           net_salary: netSalary,
           work_days: workDays,
           actual_work_days: actualWorkDays,
           overtime_hours: overtimeHours,
           paid_leave_days: paidLeaveDays,
           unpaid_leave_days: unpaidLeaveDays,
+          late_count: lateCount,
         })
       }
 
@@ -468,13 +494,15 @@ export function usePayroll() {
       const otherDeductions = input.other_deductions ?? existing.other_deductions ?? 0
 
       const grossSalary = baseSalary + overtimePay + bonus + allowances + otherAdditions
-      const netSalary = grossSalary - unpaidLeaveDeduction - otherDeductions
+      const totalDeductions = unpaidLeaveDeduction + otherDeductions
+      const netSalary = grossSalary - totalDeductions
 
       const { error: updateError } = await supabase
         .from('payroll_records')
         .update({
           ...input,
           gross_salary: grossSalary,
+          total_deductions: totalDeductions,
           net_salary: netSalary,
           updated_at: new Date().toISOString(),
         })
@@ -581,7 +609,10 @@ export function usePayroll() {
 
       const { error: updateError } = await supabase
         .from('payroll_periods')
-        .update({ status: 'paid' })
+        .update({
+          status: 'paid',
+          paid_at: new Date().toISOString(),
+        })
         .eq('id', periodId)
         
 
@@ -608,7 +639,7 @@ export function usePayroll() {
       totalGrossSalary: records.reduce((sum, r) => sum + r.gross_salary, 0),
       totalNetSalary: records.reduce((sum, r) => sum + r.net_salary, 0),
       totalOvertimePay: records.reduce((sum, r) => sum + r.overtime_pay, 0),
-      totalDeductions: records.reduce((sum, r) => sum + r.unpaid_leave_deduction + r.other_deductions, 0),
+      totalDeductions: records.reduce((sum, r) => sum + r.total_deductions, 0),
     }
   }, [])
 

@@ -27,32 +27,32 @@ import { SUPPLIER_LABELS } from './constants/labels'
 // 回覆狀態配置
 const RESPONSE_STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.ReactNode }> = {
   pending: {
-    label: '待回覆',
+    label: SUPPLIER_LABELS.STATUS_PENDING_REPLY,
     variant: 'outline',
     icon: <Clock className="h-3 w-3" />,
   },
   responded: {
-    label: '已回覆',
+    label: SUPPLIER_LABELS.STATUS_RESPONDED,
     variant: 'secondary',
     icon: <Send className="h-3 w-3" />,
   },
   quoted: {
-    label: '已報價',
+    label: SUPPLIER_LABELS.STATUS_QUOTED,
     variant: 'secondary',
     icon: <Send className="h-3 w-3" />,
   },
   accepted: {
-    label: '已確認',
+    label: SUPPLIER_LABELS.STATUS_ACCEPTED,
     variant: 'default',
     icon: <CheckCircle2 className="h-3 w-3" />,
   },
   rejected: {
-    label: '已拒絕',
+    label: SUPPLIER_LABELS.STATUS_REJECTED,
     variant: 'destructive',
     icon: <XCircle className="h-3 w-3" />,
   },
   need_info: {
-    label: '待補資料',
+    label: SUPPLIER_LABELS.STATUS_NEED_INFO,
     variant: 'outline',
     icon: <Clock className="h-3 w-3" />,
   },
@@ -60,12 +60,12 @@ const RESPONSE_STATUS_CONFIG: Record<string, { label: string; variant: 'default'
 
 // 類別配置
 const CATEGORY_CONFIG: Record<string, string> = {
-  transport: '交通（派車）',
-  guide: '領隊',
-  hotel: '住宿',
-  restaurant: '餐食',
-  activity: '門票/活動',
-  other: '其他',
+  transport: SUPPLIER_LABELS.CAT_TRANSPORT,
+  guide: SUPPLIER_LABELS.CAT_GUIDE,
+  hotel: SUPPLIER_LABELS.CAT_HOTEL,
+  restaurant: SUPPLIER_LABELS.CAT_RESTAURANT,
+  activity: SUPPLIER_LABELS.CAT_ACTIVITY,
+  other: SUPPLIER_LABELS.CAT_OTHER,
 }
 
 export function SupplierRequestsPage() {
@@ -103,7 +103,7 @@ export function SupplierRequestsPage() {
   const columns: TableColumn[] = [
     {
       key: 'response_status',
-      label: '狀態',
+      label: SUPPLIER_LABELS.COL_STATUS,
       width: '100px',
       render: (value) => {
         const status = String(value || 'pending')
@@ -118,7 +118,7 @@ export function SupplierRequestsPage() {
     },
     {
       key: 'category',
-      label: '類別',
+      label: SUPPLIER_LABELS.COL_CATEGORY,
       width: '120px',
       render: (value) => (
         <span className="text-morandi-primary">
@@ -128,13 +128,13 @@ export function SupplierRequestsPage() {
     },
     {
       key: 'tour_name',
-      label: '團名/專案',
+      label: SUPPLIER_LABELS.COL_TOUR_NAME,
       render: (value, row) => {
         const request = row as SupplierRequest
         return (
           <div>
             <div className="font-medium text-morandi-primary">
-              {String(value || request.tour_code || '未命名')}
+              {String(value || request.tour_code || SUPPLIER_LABELS.UNNAMED)}
             </div>
             {request.title && (
               <div className="text-xs text-morandi-secondary">{request.title}</div>
@@ -145,7 +145,7 @@ export function SupplierRequestsPage() {
     },
     {
       key: 'service_date',
-      label: '服務日期',
+      label: SUPPLIER_LABELS.COL_SERVICE_DATE_REQ,
       width: '180px',
       render: (value, row) => {
         const request = row as SupplierRequest
@@ -163,7 +163,7 @@ export function SupplierRequestsPage() {
     },
     {
       key: 'quantity',
-      label: '數量',
+      label: SUPPLIER_LABELS.COL_QUANTITY_REQ,
       width: '80px',
       render: (value) => (
         <span className="font-medium text-morandi-primary">{String(value || 1)}</span>
@@ -171,7 +171,7 @@ export function SupplierRequestsPage() {
     },
     {
       key: 'created_at',
-      label: '收到時間',
+      label: SUPPLIER_LABELS.COL_RECEIVED_AT,
       width: '120px',
       render: (value) => (
         <span className="text-morandi-secondary text-sm">
@@ -186,20 +186,20 @@ export function SupplierRequestsPage() {
       title={SUPPLIER_LABELS.LABEL_174}
       icon={ClipboardList}
       breadcrumb={[
-        { label: '首頁', href: '/' },
-        { label: '供應商首頁', href: '/supplier' },
-        { label: '需求收件匣', href: '/supplier/requests' },
+        { label: SUPPLIER_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: SUPPLIER_LABELS.BREADCRUMB_SUPPLIER, href: '/supplier' },
+        { label: SUPPLIER_LABELS.BREADCRUMB_REQUESTS, href: '/supplier/requests' },
       ]}
     >
 
       {/* 篩選 Tabs */}
       <div className="px-4 py-2 border-b border-border bg-card flex gap-2">
         {[
-          { value: 'all', label: '全部', count: requests.length },
-          { value: 'pending', label: '待回覆', count: requests.filter(r => r.response_status === 'pending' || !r.response_status).length },
-          { value: 'quoted', label: '已報價', count: requests.filter(r => r.response_status === 'quoted').length },
-          { value: 'accepted', label: '已確認', count: requests.filter(r => r.response_status === 'accepted').length },
-          { value: 'rejected', label: '已拒絕', count: requests.filter(r => r.response_status === 'rejected').length },
+          { value: 'all', label: SUPPLIER_LABELS.TAB_ALL, count: requests.length },
+          { value: 'pending', label: SUPPLIER_LABELS.TAB_PENDING, count: requests.filter(r => r.response_status === 'pending' || !r.response_status).length },
+          { value: 'quoted', label: SUPPLIER_LABELS.TAB_QUOTED, count: requests.filter(r => r.response_status === 'quoted').length },
+          { value: 'accepted', label: SUPPLIER_LABELS.TAB_ACCEPTED, count: requests.filter(r => r.response_status === 'accepted').length },
+          { value: 'rejected', label: SUPPLIER_LABELS.TAB_REJECTED, count: requests.filter(r => r.response_status === 'rejected').length },
         ].map(tab => (
           <Button
             key={tab.value}
@@ -248,7 +248,7 @@ export function SupplierRequestsPage() {
                       ? 'text-morandi-gold hover:bg-morandi-gold/10'
                       : 'text-morandi-secondary hover:bg-morandi-container/50'
                   )}
-                  title={isPending ? '回覆' : '查看'}
+                  title={isPending ? SUPPLIER_LABELS.BTN_RESPOND : SUPPLIER_LABELS.BTN_VIEW}
                 >
                   {isPending ? <Send size={16} /> : <Eye size={16} />}
                 </Button>

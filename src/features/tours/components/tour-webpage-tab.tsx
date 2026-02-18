@@ -52,7 +52,7 @@ function getEmptyTourData(): LocalTourData {
     coverImage: '',
     country: '',
     city: '',
-    status: '提案',
+    status: TOUR_WEBPAGE_TAB_LABELS.STATUS_PROPOSAL,
     outboundFlight: {
       airline: '',
       flightNumber: '',
@@ -199,7 +199,7 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
       priceNote: itinerary.price_note || '',
       country: itinerary.country || '',
       city: itinerary.city || '',
-      status: itinerary.status || '提案',
+      status: itinerary.status || TOUR_WEBPAGE_TAB_LABELS.STATUS_PROPOSAL,
       outboundFlight: itinerary.outbound_flight || itinerary.flight_info?.outbound || getEmptyTourData().outboundFlight,
       returnFlight: itinerary.return_flight || itinerary.flight_info?.return || getEmptyTourData().returnFlight,
       features: itinerary.features || [],
@@ -250,7 +250,7 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
       price_note: data.priceNote || null,
       country: data.country,
       city: data.city,
-      status: (data.status || '提案') as '提案' | '進行中',
+      status: (data.status || TOUR_WEBPAGE_TAB_LABELS.STATUS_PROPOSAL) as '提案' | '進行中',
       outbound_flight: data.outboundFlight,
       return_flight: data.returnFlight,
       features: data.features,
@@ -405,7 +405,7 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
         cover_image: newTourData.coverImage,
         country: newTourData.country,
         city: newTourData.city,
-        status: '提案' as const,
+        status: TOUR_WEBPAGE_TAB_LABELS.STATUS_PROPOSAL as '提案',
         daily_itinerary: [],
         features: [],
         focus_cards: [],
@@ -453,7 +453,7 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
           ) : (
             <Plus className="w-4 h-4 mr-2" />
           )}
-          建立行程表
+          {TOUR_WEBPAGE_TAB_LABELS.CREATE_ITINERARY_BTN}
         </Button>
       </div>
     )

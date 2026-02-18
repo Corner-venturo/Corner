@@ -75,7 +75,7 @@ export function SupplierResponseDialog({
 
   // 判斷資源類型
   const isVehicle = request?.category === 'transport'
-  const resourceTypeLabel = isVehicle ? '車輛' : '領隊'
+  const resourceTypeLabel = isVehicle ? SUPPLIER_LABELS.RESOURCE_VEHICLE : SUPPLIER_LABELS.RESOURCE_LEADER
   const ResourceIcon = isVehicle ? Bus : Users
 
   // 初始化回覆項目
@@ -143,7 +143,7 @@ export function SupplierResponseDialog({
     // 驗證至少有一個項目有填資料
     const validItems = items.filter(item => item.resourceName.trim())
     if (validItems.length === 0) {
-      toast({ title: `請至少填寫一個${resourceTypeLabel}資訊`, variant: 'destructive' })
+      toast({ title: SUPPLIER_LABELS.FILL_AT_LEAST_ONE(resourceTypeLabel), variant: 'destructive' })
       return
     }
 
@@ -193,11 +193,11 @@ export function SupplierResponseDialog({
 
       if (updateError) throw updateError
 
-      toast({ title: '回覆已送出' })
+      toast({ title: SUPPLIER_LABELS.RESPONSE_SUBMITTED })
       onSuccess?.()
     } catch (error) {
       logger.error('送出回覆失敗:', error)
-      toast({ title: '送出失敗', variant: 'destructive' })
+      toast({ title: SUPPLIER_LABELS.SUBMIT_FAILED, variant: 'destructive' })
     } finally {
       setSaving(false)
     }
@@ -213,7 +213,7 @@ export function SupplierResponseDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ResourceIcon className="h-5 w-5 text-morandi-gold" />
-            {isReadOnly ? '查看回覆' : '回覆需求'} - {request.tour_name || request.tour_code}
+            {isReadOnly ? SUPPLIER_LABELS.VIEW_RESPONSE : SUPPLIER_LABELS.RESPOND_REQUEST} - {request.tour_name || request.tour_code}
           </DialogTitle>
         </DialogHeader>
 
@@ -249,7 +249,7 @@ export function SupplierResponseDialog({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-medium text-morandi-primary">
-                {resourceTypeLabel}資訊 ({items.length})
+                {SUPPLIER_LABELS.RESOURCE_INFO(resourceTypeLabel, items.length)}
               </h3>
               {!isReadOnly && (
                 <Button
@@ -259,7 +259,7 @@ export function SupplierResponseDialog({
                   className="gap-1"
                 >
                   <Plus className="h-4 w-4" />
-                  新增{resourceTypeLabel}
+                  {SUPPLIER_LABELS.ADD_RESOURCE(resourceTypeLabel)}
                 </Button>
               )}
             </div>
@@ -289,11 +289,11 @@ export function SupplierResponseDialog({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* 資源名稱 */}
                     <div className="space-y-2">
-                      <Label required>{isVehicle ? '車輛名稱/車型' : '領隊姓名'}</Label>
+                      <Label required>{isVehicle ? SUPPLIER_LABELS.VEHICLE_NAME_LABEL : SUPPLIER_LABELS.LEADER_NAME_LABEL}</Label>
                       <Input
                         value={item.resourceName}
                         onChange={(e) => updateItem(item.id, 'resourceName', e.target.value)}
-                        placeholder={isVehicle ? '例如：Toyota Coaster 中巴' : '例如：王小明'}
+                        placeholder={isVehicle ? SUPPLIER_LABELS.VEHICLE_NAME_PLACEHOLDER : SUPPLIER_LABELS.LEADER_NAME_PLACEHOLDER}
                         disabled={isReadOnly}
                       />
                     </div>
@@ -326,7 +326,7 @@ export function SupplierResponseDialog({
 
                     {/* 聯絡電話 */}
                     <div className="space-y-2">
-                      <Label>{isVehicle ? '司機電話' : '領隊電話'}</Label>
+                      <Label>{isVehicle ? SUPPLIER_LABELS.DRIVER_PHONE : SUPPLIER_LABELS.LEADER_PHONE}</Label>
                       <Input
                         value={item.driverPhone}
                         onChange={(e) => updateItem(item.id, 'driverPhone', e.target.value)}
@@ -401,7 +401,7 @@ export function SupplierResponseDialog({
         <div className="flex justify-end gap-2 pt-4 border-t border-border">
           <Button variant="outline" onClick={onClose} className="gap-2">
             <X size={16} />
-            {isReadOnly ? '關閉' : '取消'}
+            {isReadOnly ? SUPPLIER_LABELS.BTN_CLOSE : SUPPLIER_LABELS.BTN_CANCEL}
           </Button>
           {!isReadOnly && (
             <Button

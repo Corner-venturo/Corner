@@ -220,7 +220,7 @@ export function useDesigns() {
         name: `${design.name} (副本)`,
         status: 'draft',
         type: 'full',
-        thumbnail_url: design.thumbnail_url || null,
+        // Note: thumbnail_url does not exist on brochure_documents table
       })
       .select()
       .single()

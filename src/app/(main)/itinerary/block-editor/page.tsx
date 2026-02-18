@@ -173,7 +173,7 @@ function BlockEditorPageContent() {
         price_note: data.priceNote || null,
         country: data.country,
         city: data.city,
-        status: '提案' as const,
+        status: BLOCK_EDITOR_LABELS.STATUS_PROPOSAL as '提案',
         outbound_flight: data.outboundFlight,
         return_flight: data.returnFlight,
         features: data.features,
@@ -222,7 +222,7 @@ function BlockEditorPageContent() {
     } catch (error) {
       logger.error('自動存檔失敗:', error)
       setAutoSaveStatus('error')
-      toast.error('自動存檔失敗')
+      toast.error(BLOCK_EDITOR_LABELS.AUTO_SAVE_FAILED)
     }
   }, [isDirty, blocks, currentItineraryId, updateItinerary, createItinerary, user?.id])
 
@@ -246,9 +246,9 @@ function BlockEditorPageContent() {
     <ContentPageLayout
       title={BLOCK_EDITOR_LABELS.BLOCK_EDITOR}
       breadcrumb={[
-        { label: '首頁', href: '/' },
-        { label: '行程管理', href: '/itinerary' },
-        { label: '區塊編輯器', href: '#' },
+        { label: BLOCK_EDITOR_LABELS.HOME, href: '/' },
+        { label: BLOCK_EDITOR_LABELS.ITINERARY_MGMT, href: '/itinerary' },
+        { label: BLOCK_EDITOR_LABELS.BLOCK_EDITOR, href: '#' },
       ]}
       showBackButton
       onBack={() => router.push('/itinerary')}
@@ -260,7 +260,7 @@ function BlockEditorPageContent() {
             onClick={performAutoSave}
             disabled={!isDirty || autoSaveStatus === 'saving'}
           >
-            {autoSaveStatus === 'saving' ? '存檔中...' : '手動存檔'}
+            {autoSaveStatus === 'saving' ? BLOCK_EDITOR_LABELS.MANUAL_SAVING : BLOCK_EDITOR_LABELS.MANUAL_SAVE}
           </Button>
           <PublishButton
             data={{ ...tourData, id: currentItineraryId || undefined }}

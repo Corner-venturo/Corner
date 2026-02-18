@@ -204,7 +204,7 @@ export function SupplierFinancePage() {
               {formatCurrency(summary.totalRevenue)}
             </div>
             <p className="text-xs text-morandi-secondary mt-1">
-              共 {summary.taskCount} 筆任務
+              {SUPPLIER_LABELS.TASK_COUNT(summary.taskCount)}
             </p>
           </CardContent>
         </Card>
@@ -312,7 +312,7 @@ export function SupplierFinancePage() {
                         <Badge
                           variant={payment.status === 'paid' ? 'default' : 'outline'}
                         >
-                          {payment.status === 'paid' ? '已收款' : '待請款'}
+                          {payment.status === 'paid' ? SUPPLIER_LABELS.STATUS_PAID : SUPPLIER_LABELS.STATUS_PENDING_CLAIM}
                         </Badge>
                       </td>
                     </tr>

@@ -1083,6 +1083,8 @@ export const TOUR_WEBPAGE_TAB_LABELS = {
   AUTO_SAVE_FAILED: '自動存檔失敗，請手動儲存',
   ITINERARY_CREATED: '行程表已建立',
   CREATE_ITINERARY_FAILED: '建立行程表失敗',
+  CREATE_ITINERARY_BTN: '建立行程表',
+  STATUS_PROPOSAL: '提案',
 }
 
 // ============================================================
