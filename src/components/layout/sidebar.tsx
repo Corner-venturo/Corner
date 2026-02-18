@@ -71,7 +71,7 @@ const menuItems: MenuItem[] = [
       { href: '/finance/payments', label: COMP_LAYOUT_LABELS.收款管理, icon: CreditCard, requiredPermission: 'payments' },
       { href: '/finance/requests', label: COMP_LAYOUT_LABELS.請款管理, icon: TrendingDown, requiredPermission: 'requests' },
       { href: '/finance/treasury', label: COMP_LAYOUT_LABELS.出納管理, icon: Wallet, requiredPermission: 'disbursement' },
-      { href: '/erp-accounting/vouchers', label: COMP_LAYOUT_LABELS.會計傳票, icon: FileText, requiredPermission: 'vouchers' },
+      // { href: '/erp-accounting/vouchers', label: COMP_LAYOUT_LABELS.會計傳票, icon: FileText, requiredPermission: 'vouchers' }, // V2: 會計模組已移除
       { href: '/finance/travel-invoice', label: COMP_LAYOUT_LABELS.代轉發票, icon: FileText, requiredPermission: 'travel_invoice', restrictedFeature: 'travel_invoices' },
       { href: '/finance/reports', label: COMP_LAYOUT_LABELS.報表管理, icon: BarChart3, requiredPermission: 'reports' },
     ],
