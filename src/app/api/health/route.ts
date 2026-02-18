@@ -1,36 +1,55 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 
+const startedAt = new Date().toISOString()
+
 /**
  * Health Check API
  * 檢查系統各項服務狀態
  *
  * GET /api/health
  *
- * 公開端點 — 只回傳 healthy/unhealthy，不暴露內部細節
+ * 公開端點 — 回傳基本健康狀態 + 記憶體 / uptime / 版本
  */
 export async function GET() {
+  const mem = process.memoryUsage()
+  const memoryMB = {
+    rss: Math.round(mem.rss / 1024 / 1024),
+    heapUsed: Math.round(mem.heapUsed / 1024 / 1024),
+    heapTotal: Math.round(mem.heapTotal / 1024 / 1024),
+  }
+
   try {
     const supabase = getSupabaseAdminClient()
+    const dbStart = Date.now()
     const { error } = await supabase
       .from('employees')
       .select('count', { count: 'exact', head: true })
+    const dbLatencyMs = Date.now() - dbStart
 
-    if (error) {
-      return NextResponse.json(
-        { status: 'degraded' },
-        { status: 207 }
-      )
+    const payload = {
+      status: error ? 'degraded' : 'healthy',
+      version: process.env.npm_package_version ?? '1.0.0',
+      startedAt,
+      uptime: process.uptime(),
+      dbLatencyMs: error ? null : dbLatencyMs,
+      memory: memoryMB,
     }
 
-    return NextResponse.json(
-      { status: 'healthy' },
-      { status: 200 }
-    )
+    return NextResponse.json(payload, {
+      status: error ? 207 : 200,
+    })
   } catch {
     return NextResponse.json(
-      { status: 'unhealthy' },
-      { status: 503 }
+      {
+        status: 'unhealthy',
+        version: process.env.npm_package_version ?? '1.0.0',
+        startedAt,
+        uptime: process.uptime(),
+        dbLatencyMs: null,
+        memory: memoryMB,
+      },
+      { status: 503 },
     )
   }
 }
