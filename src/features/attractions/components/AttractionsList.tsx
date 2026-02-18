@@ -156,7 +156,7 @@ export function AttractionsList({
               : 'bg-morandi-container text-morandi-secondary'
           )}
         >
-          {attraction.is_active ? '啟用' : ATTRACTIONS_LIST_LABELS.停用}
+          {attraction.is_active ? ATTRACTIONS_LIST_LABELS.啟用 : ATTRACTIONS_LIST_LABELS.停用}
         </span>
       ),
     },
@@ -227,7 +227,7 @@ export function AttractionsList({
               onToggleStatus(attraction)
             }}
             className="h-8 px-2"
-            title={attraction.is_active ? '停用' : ATTRACTIONS_LIST_LABELS.啟用}
+            title={attraction.is_active ? ATTRACTIONS_LIST_LABELS.停用 : ATTRACTIONS_LIST_LABELS.啟用}
           >
             <Power
               size={14}

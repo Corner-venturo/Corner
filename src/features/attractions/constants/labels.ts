@@ -9,6 +9,9 @@ export const ATTRACTIONS_DIALOG_LABELS = {
   請拖曳圖片檔案: '請拖曳圖片檔案',
   新增景點: '新增景點',
   新增: '新增',
+  AI_補充: 'AI 補充',
+  已補充_PREFIX: '已補充 ',
+  已補充_SUFFIX: ' 個欄位的資料',
 };
 
 export const ATTRACTIONS_LIST_LABELS = {

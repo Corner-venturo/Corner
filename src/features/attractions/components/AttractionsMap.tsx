@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { MapPin, Navigation, Loader2 } from 'lucide-react'
 import type { Attraction } from '../types'
 import type L from 'leaflet'
-import { ATTRACTIONS_LABELS } from './constants/labels'
+import { ATTRACTIONS_LABELS, ATTRACTIONS_MAP_LABELS } from './constants/labels'
 import { logger } from '@/lib/utils/logger'
 
 interface AttractionsMapProps {
@@ -280,7 +280,7 @@ export function AttractionsMap({
       <div ref={containerRef} className="w-full h-full" style={{ minHeight: '400px' }} />
       {nearbyAttractions.length > 0 && (
         <div className="absolute bottom-3 left-3 text-xs bg-card/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm z-[1000] text-morandi-primary">
-          {radiusKm}km 內 {nearbyAttractions.length} 個景點
+          {radiusKm}{ATTRACTIONS_MAP_LABELS.NEARBY_PREFIX}{nearbyAttractions.length}{ATTRACTIONS_MAP_LABELS.NEARBY_SUFFIX}
         </div>
       )}
     </div>

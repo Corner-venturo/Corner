@@ -121,10 +121,10 @@ export function AttractionsDialog({
         tags: prev.tags || (suggestion.tags?.join(', ') || ''),
       }))
 
-      void alert(`已補充 ${result.data.missingFields?.length || 0} 個欄位的資料`, 'success')
+      void alert(`${ATTRACTIONS_DIALOG_LABELS.已補充_PREFIX}${result.data.missingFields?.length || 0}${ATTRACTIONS_DIALOG_LABELS.已補充_SUFFIX}`, 'success')
     } catch (error) {
       logger.error('AI 補充失敗:', error)
-      void alert(error instanceof Error ? error.message : 'AI 補充失敗', 'error')
+      void alert(error instanceof Error ? error.message : ATTRACTIONS_DIALOG_LABELS.AI_補充失敗, 'error')
     } finally {
       setIsAiLoading(false)
     }
@@ -303,7 +303,7 @@ export function AttractionsDialog({
           ) : (
             <Sparkles size={14} />
           )}
-          AI 補充
+          {ATTRACTIONS_DIALOG_LABELS.AI_補充}
         </Button>
       )}
     </div>
