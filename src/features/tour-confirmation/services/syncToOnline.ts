@@ -136,40 +136,40 @@ export async function syncTripToOnline(tourId: string): Promise<SyncResult> {
       logger.info(`行程已同步到 Online: ${onlineTripId}`)
     }
 
-    // 5. 建立行程群組聊天室（如果尚未建立）
-    const { data: existingConv } = await untypedSupabase
-      .from('conversations')
-      .select('id')
-      .eq('trip_id', onlineTripId)
-      .eq('type', 'trip')
-      .maybeSingle()
-
-    if (!existingConv) {
-      const chatName = `${tour.code} ${tour.name}`
-      const { data: newConv, error: convError } = await untypedSupabase
-        .from('conversations')
-        .insert({
-          type: 'trip',
-          trip_id: onlineTripId,
-          name: chatName,
-          status: 'active',
-        })
-        .select('id')
-        .single()
-
-      if (convError) {
-        logger.warn('建立行程群組失敗（不影響同步）:', convError)
-      } else if (newConv) {
-        // 發送系統訊息
-        await untypedSupabase.from('messages').insert({
-          conversation_id: newConv.id,
-          sender_id: null,
-          type: 'system',
-          content: '行程群組已建立，團員可以在這裡交流',
-        })
-        logger.info(`行程群組已建立: ${newConv.id}`)
-      }
-    }
+    // V2: 行程群組聊天室（conversations 表尚未建立）
+    // const { data: existingConv } = await untypedSupabase
+    //   .from('conversations')
+    //   .select('id')
+    //   .eq('trip_id', onlineTripId)
+    //   .eq('type', 'trip')
+    //   .maybeSingle()
+    //
+    // if (!existingConv) {
+    //   const chatName = `${tour.code} ${tour.name}`
+    //   const { data: newConv, error: convError } = await untypedSupabase
+    //     .from('conversations')
+    //     .insert({
+    //       type: 'trip',
+    //       trip_id: onlineTripId,
+    //       name: chatName,
+    //       status: 'active',
+    //     })
+    //     .select('id')
+    //     .single()
+    //
+    //   if (convError) {
+    //     logger.warn('建立行程群組失敗（不影響同步）:', convError)
+    //   } else if (newConv) {
+    //     // 發送系統訊息
+    //     await untypedSupabase.from('messages').insert({
+    //       conversation_id: newConv.id,
+    //       sender_id: null,
+    //       type: 'system',
+    //       content: '行程群組已建立，團員可以在這裡交流',
+    //     })
+    //     logger.info(`行程群組已建立: ${newConv.id}`)
+    //   }
+    // }
 
     // 6. 同步團員到 online_trip_members
     await syncTripMembers(tourId, onlineTripId, itinerary?.leader as LeaderInfo | null)

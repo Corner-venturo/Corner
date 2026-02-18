@@ -106,7 +106,7 @@ export default function TourClosingReportPage() {
             .select('order_id, amount')
             .in('order_id', allOrderIds)
             .eq('status', 'paid')
-            .neq('supplier_type', 'bonus'),
+            .neq('request_type', 'bonus'),
           // 團員
           supabase
             .from('order_members')
@@ -117,7 +117,7 @@ export default function TourClosingReportPage() {
             .from('payment_requests')
             .select('order_id, supplier_name, amount, notes')
             .in('order_id', allOrderIds)
-            .eq('supplier_type', 'bonus'),
+            .eq('request_type', 'bonus'),
         ])
 
         // 建立成本映射
