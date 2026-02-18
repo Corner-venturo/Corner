@@ -189,6 +189,27 @@ export const FEATURE_PERMISSIONS: PermissionConfig[] = [
     description: 'eSIM 申請和管理',
   },
   {
+    id: 'design',
+    label: '設計管理',
+    category: '全部',
+    routes: ['/design'],
+    description: '設計稿建立和管理',
+  },
+  {
+    id: 'office',
+    label: '文件管理',
+    category: '全部',
+    routes: ['/office'],
+    description: '文件編輯和管理',
+  },
+  {
+    id: 'travel_invoice',
+    label: '代轉發票',
+    category: '全部',
+    routes: ['/finance/travel-invoice'],
+    description: '代轉發票管理',
+  },
+  {
     id: 'company_assets',
     label: '公司資產管理',
     category: '全部',
