@@ -1,3 +1,4 @@
+import { captureException } from '@/lib/error-tracking'
 import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
@@ -88,6 +89,7 @@ export async function POST(request: NextRequest) {
     return successResponse({ message: '密碼更新成功' })
   } catch (error) {
     logger.error('Change password error:', error)
+    captureException(error, { module: 'auth.change-password' })
     return errorResponse('伺服器錯誤', 500, ErrorCode.INTERNAL_ERROR)
   }
 }

@@ -1,3 +1,4 @@
+import { captureException } from '@/lib/error-tracking'
 /**
  * 開立代轉發票 API
  * POST /api/travel-invoice/issue
@@ -121,6 +122,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       logger.error('儲存發票失敗:', error)
+    captureException(error, { module: 'travel-invoice.issue' })
       return successResponse({
         ...result.data,
         warning: '發票已開立，但儲存時發生錯誤，請手動記錄此發票資訊',
@@ -158,6 +160,7 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     logger.error('開立發票錯誤:', error)
+    captureException(error, { module: 'travel-invoice.issue' })
     return ApiError.internal(error instanceof Error ? error.message : '開立失敗')
   }
 }

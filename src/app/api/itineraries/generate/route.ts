@@ -1,3 +1,4 @@
+import { captureException } from '@/lib/error-tracking'
 /**
  * POST /api/itineraries/generate
  * 一鍵生成行程草稿 API
@@ -407,6 +408,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     logger.error('生成行程失敗:', error)
+    captureException(error, { module: 'itineraries.generate' })
     return errorResponse('生成行程失敗，請稍後再試', 500, ErrorCode.INTERNAL_ERROR)
   }
 }

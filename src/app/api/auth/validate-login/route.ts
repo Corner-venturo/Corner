@@ -1,3 +1,4 @@
+import { captureException } from '@/lib/error-tracking'
 import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import bcrypt from 'bcryptjs'
@@ -77,6 +78,7 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     logger.error('Validate login error:', error)
+    captureException(error, { module: 'auth.validate-login' })
     return ApiError.internal('系統錯誤')
   }
 }

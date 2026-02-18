@@ -1,3 +1,4 @@
+import { captureException } from '@/lib/error-tracking'
 import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
@@ -59,6 +60,7 @@ export async function GET(
 
     if (error) {
       logger.error('查詢行程失敗:', error)
+    captureException(error, { module: 'itineraries.[id]' })
       if (error.code === 'PGRST116') {
         return ApiError.notFound('行程')
       }
@@ -123,6 +125,7 @@ export async function GET(
     return successResponse(formattedItinerary)
   } catch (error) {
     logger.error('API 錯誤:', error)
+    captureException(error, { module: 'itineraries.[id]' })
     return ApiError.internal('伺服器錯誤')
   }
 }

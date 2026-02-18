@@ -1,3 +1,4 @@
+import { captureException } from '@/lib/error-tracking'
 import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
@@ -81,6 +82,7 @@ export async function POST(request: NextRequest) {
     return successResponse({ message: '密碼已重置成功' })
   } catch (error) {
     logger.error('Admin reset password error:', error)
+    captureException(error, { module: 'auth.admin-reset-password' })
     return errorResponse('伺服器錯誤', 500, ErrorCode.INTERNAL_ERROR)
   }
 }

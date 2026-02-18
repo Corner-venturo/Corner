@@ -1,3 +1,4 @@
+import { captureException } from '@/lib/error-tracking'
 /**
  * 查詢代轉發票 API
  * GET /api/travel-invoice/query
@@ -58,6 +59,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('查詢發票失敗:', error)
+    captureException(error, { module: 'travel-invoice.query' })
       return ApiError.database('查詢失敗')
     }
 
@@ -105,6 +107,7 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     logger.error('查詢發票錯誤:', error)
+    captureException(error, { module: 'travel-invoice.query' })
     return ApiError.internal(error instanceof Error ? error.message : '查詢失敗')
   }
 }

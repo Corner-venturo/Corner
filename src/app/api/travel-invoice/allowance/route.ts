@@ -1,3 +1,4 @@
+import { captureException } from '@/lib/error-tracking'
 /**
  * 開立折讓 API
  * POST /api/travel-invoice/allowance
@@ -85,6 +86,7 @@ export async function POST(request: NextRequest) {
     return successResponse(data)
   } catch (error) {
     logger.error('開立折讓錯誤:', error)
+    captureException(error, { module: 'travel-invoice.allowance' })
     return ApiError.internal(error instanceof Error ? error.message : '開立折讓失敗')
   }
 }

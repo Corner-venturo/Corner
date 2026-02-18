@@ -1,3 +1,4 @@
+import { captureException } from '@/lib/error-tracking'
 /**
  * 查詢可開發票訂單 API
  * GET /api/travel-invoice/orders?tour_id=xxx&has_invoiceable=true
@@ -37,6 +38,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('查詢訂單失敗:', error)
+    captureException(error, { module: 'travel-invoice.orders' })
       return ApiError.internal('查詢失敗')
     }
 
@@ -49,6 +51,7 @@ export async function GET(request: NextRequest) {
     return successResponse(result)
   } catch (error) {
     logger.error('查詢可開發票訂單錯誤:', error)
+    captureException(error, { module: 'travel-invoice.orders' })
     return ApiError.internal(error instanceof Error ? error.message : '查詢失敗')
   }
 }

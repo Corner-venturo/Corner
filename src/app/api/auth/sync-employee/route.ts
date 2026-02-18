@@ -1,3 +1,4 @@
+import { captureException } from '@/lib/error-tracking'
 /**
  * 同步員工的 supabase_user_id 和 workspace 到 metadata
  * 使用 Admin Client 繞過 RLS 限制

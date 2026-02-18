@@ -1,3 +1,4 @@
+import { captureException } from '@/lib/error-tracking'
 /**
  * LinkPay Webhook - 接收台新銀行付款成功通知
  *

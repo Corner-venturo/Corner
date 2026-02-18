@@ -1,3 +1,4 @@
+import { captureException } from '@/lib/error-tracking'
 /**
  * 建立員工 Supabase Auth 帳號的 API Route
  * 使用 Service Role Key 建立 Supabase Auth 用戶

@@ -1,3 +1,4 @@
+import { captureException } from '@/lib/error-tracking'
 /**
  * LinkPay API Route
  *
@@ -275,6 +276,7 @@ export async function POST(req: NextRequest) {
     }
   } catch (error) {
     logger.error('❌ LinkPay API 錯誤:', error)
+    captureException(error, { module: 'linkpay' })
     return ApiError.internal('處理 LinkPay 請求時發生錯誤')
   }
 }

@@ -1,3 +1,4 @@
+import { captureException } from '@/lib/error-tracking'
 /**
  * 作廢代轉發票 API
  * POST /api/travel-invoice/void
@@ -81,6 +82,7 @@ export async function POST(request: NextRequest) {
     return successResponse(data)
   } catch (error) {
     logger.error('作廢發票錯誤:', error)
+    captureException(error, { module: 'travel-invoice.void' })
     return ApiError.internal(error instanceof Error ? error.message : '作廢失敗')
   }
 }

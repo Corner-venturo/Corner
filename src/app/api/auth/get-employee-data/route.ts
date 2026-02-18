@@ -1,3 +1,4 @@
+import { captureException } from '@/lib/error-tracking'
 import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { successResponse, ApiError } from '@/lib/api/response'
@@ -66,6 +67,7 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     logger.error('Get employee data error:', error)
+    captureException(error, { module: 'auth.get-employee-data' })
     return ApiError.internal('系統錯誤')
   }
 }

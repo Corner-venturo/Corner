@@ -1,3 +1,4 @@
+import { captureException } from '@/lib/error-tracking'
 import { NextRequest } from 'next/server'
 import { logger } from '@/lib/utils/logger'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
@@ -262,6 +263,7 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     logger.error('轉開團 API 錯誤:', error)
+    captureException(error, { module: 'proposals.convert-to-tour' })
     return errorResponse(
       error instanceof Error ? error.message : '轉開團失敗',
       500,
