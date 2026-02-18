@@ -33,4 +33,7 @@ export const SCHEDULING_LABELS = {
   LABEL_6113: '今天',
   LABEL_8946: '週',
   LABEL_6426: '月',
+
+  BREADCRUMB_HOME: '首頁',
+  BREADCRUMB_SCHEDULING: '資源調度',
 }

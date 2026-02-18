@@ -129,7 +129,7 @@ export async function getTodosByEntity(entityType: string, entityId: string, wor
   const { data, error } = await supabase
     .from('todos')
     .select('*')
-    .contains('related_items', JSON.stringify([{ type: entityType, id: entityId }]))
+    .contains('related_items', [{ type: entityType, id: entityId }])
     .eq('workspace_id', workspaceId)  // 🔒 Workspace 過濾
     .order('created_at', { ascending: false })
 

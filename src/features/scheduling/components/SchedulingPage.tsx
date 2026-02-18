@@ -34,6 +34,7 @@ import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { useVehicleScheduleConflict, useLeaderScheduleConflict } from '../hooks/useScheduleConflict'
 import { supabase } from '@/lib/supabase/client'
+import { getCurrentWorkspaceId } from '@/lib/workspace-helpers'
 import {
   startOfWeek,
   endOfWeek,
@@ -152,11 +153,20 @@ export const SchedulingPage: React.FC = () => {
   const fetchRequests = useCallback(async () => {
     setLoadingRequests(true)
     try {
-      const { data, error } = await supabase
+      // 取得當前 workspace_id
+      const workspaceId = getCurrentWorkspaceId()
+
+      let query = supabase
         .from('tour_requests')
         .select('*')
         .in('category', ['transport', 'guide'])
         .order('service_date', { ascending: true })
+
+      if (workspaceId) {
+        query = query.eq('workspace_id', workspaceId)
+      }
+
+      const { data, error } = await query
 
       if (error) throw error
 
@@ -452,8 +462,8 @@ export const SchedulingPage: React.FC = () => {
       title={SCHEDULING_LABELS.LABEL_7493}
       icon={Calendar}
       breadcrumb={[
-        { label: '首頁', href: '/' },
-        { label: '資源調度', href: '/scheduling' },
+        { label: SCHEDULING_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: SCHEDULING_LABELS.BREADCRUMB_SCHEDULING, href: '/scheduling' },
       ]}
       headerActions={
           <div className="flex items-center gap-4">

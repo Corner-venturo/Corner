@@ -18,4 +18,34 @@ export const LABELS = {
   EDIT_8913: '其他同事可以查看此待辦，但只有你和共享者可以編輯',
   LABEL_1974: '建立任務',
   CANCEL: '取消',
+
+  // 狀態篩選
+  STATUS_ACTIVE: '未完成',
+  STATUS_PENDING: '待辦',
+  STATUS_IN_PROGRESS: '進行中',
+  STATUS_COMPLETED: '已完成',
+  STATUS_CANCELLED: '取消',
+  STATUS_DONE: '完成',
+
+  // 其他 UI
+  SEARCH_PLACEHOLDER: '搜尋任務...',
+  ADD_TASK: '新增任務',
+  DELETE_TODO_TITLE: '刪除待辦事項',
+  DELETE_CONFIRM_PREFIX: '確定要刪除待辦事項「',
+  DELETE_CONFIRM_SUFFIX: '」嗎？',
+  DELETE_IRREVERSIBLE: '此操作無法復原',
+  CONFIRM_DELETE: '確認刪除',
+  DELETE_FAILED: '刪除失敗，請稍後再試',
+  ADD_FAILED: '新增失敗，請稍後再試',
+  MARK_COMPLETE: '標記完成',
+  UNMARK_COMPLETE: '取消完成',
+  NOT_SET: '未設定',
+  LOADING_EMPLOYEES: '載入員工資料中...',
+  ENTER_TITLE: '請填寫任務標題',
+
+  // 表格欄位
+  COL_TITLE: '任務標題',
+  COL_PRIORITY: '優先級',
+  COL_STATUS: '狀態',
+  COL_DEADLINE: '期限',
 }

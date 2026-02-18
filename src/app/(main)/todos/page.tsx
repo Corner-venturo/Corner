@@ -161,7 +161,7 @@ export default function TodosPage() {
   const columns = [
     {
       key: 'title',
-      label: '任務標題',
+      label: LABELS.COL_TITLE,
       sortable: true,
       render: (value: unknown, todo: Todo) => {
         // 計算未讀留言數
@@ -217,7 +217,7 @@ export default function TodosPage() {
     },
     {
       key: 'priority',
-      label: '優先級',
+      label: LABELS.COL_PRIORITY,
       sortable: true,
       render: (value: unknown, todo: Todo) => (
         <div onClick={e => e.stopPropagation()}>
@@ -231,7 +231,7 @@ export default function TodosPage() {
     },
     {
       key: 'status',
-      label: '狀態',
+      label: LABELS.COL_STATUS,
       sortable: true,
       render: (value: unknown) => (
         <span className={cn('text-sm font-medium', getStatusColor(value as Todo['status']))}>
@@ -241,12 +241,12 @@ export default function TodosPage() {
     },
     {
       key: 'deadline',
-      label: '期限',
+      label: LABELS.COL_DEADLINE,
       sortable: true,
       width: '140px',
       render: (value: unknown) => (
         <div className={cn(getDeadlineColor(value ? String(value) : undefined))}>
-          <DateCell date={value ? String(value) : null} fallback="未設定" showIcon />
+          <DateCell date={value ? String(value) : null} fallback={LABELS.NOT_SET} showIcon />
         </div>
       ),
     },
@@ -426,7 +426,7 @@ export default function TodosPage() {
                 logger.log('✅ 待辦事項新增成功:', title)
               } catch (error) {
                 logger.error('快速新增失敗:', error)
-                await alertError('新增失敗，請稍後再試')
+                await alertError(LABELS.ADD_FAILED)
               } finally {
                 setIsSubmitting(false)
               }
@@ -481,7 +481,7 @@ export default function TodosPage() {
                       ? 'text-status-success hover:text-status-success hover:bg-status-success-bg'
                       : 'text-morandi-secondary hover:text-status-success hover:bg-status-success-bg'
                   )}
-                  title={todo.status === 'completed' ? '取消完成' : '標記完成'}
+                  title={todo.status === 'completed' ? LABELS.UNMARK_COMPLETE : LABELS.MARK_COMPLETE}
                 >
                   <CheckCircle size={14} />
                 </button>
@@ -577,7 +577,7 @@ function AddTodoForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.title.trim()) {
-      alert('請填寫任務標題')
+      alert(LABELS.ENTER_TITLE)
       return
     }
     onSubmit(formData)
@@ -622,7 +622,7 @@ function AddTodoForm({
           disabled={isLoadingUsers}
         >
           <SelectTrigger className="w-full">
-            <SelectValue placeholder={isLoadingUsers ? '載入員工資料中...' : '不指派（個人任務）'} />
+            <SelectValue placeholder={isLoadingUsers ? LABELS.LOADING_EMPLOYEES : LABELS.NO_ASSIGN} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__none__">{LABELS.NO_ASSIGN}</SelectItem>
