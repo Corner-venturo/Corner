@@ -74,4 +74,6 @@ export const LABELS = {
   edit: '編輯',
   delete: '刪除',
   untitledDesign: '未命名設計',
+
+  COPY: '複製',
 }

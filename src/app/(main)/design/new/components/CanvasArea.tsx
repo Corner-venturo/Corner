@@ -134,8 +134,8 @@ export const CanvasArea = forwardRef<HTMLDivElement, CanvasAreaProps>(
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
             <div className="text-center text-morandi-secondary/60">
               <MousePointerClick size={40} className="mx-auto mb-3 opacity-40" />
-              <p className="text-sm font-medium">從左側元件庫點選元件開始設計</p>
-              <p className="text-xs mt-1 opacity-60">或拖入圖片、使用快捷鍵新增元素</p>
+              <p className="text-sm font-medium">{DESIGNER_LABELS.LABEL_6693}</p>
+              <p className="text-xs mt-1 opacity-60">{DESIGNER_LABELS.ADD_1662}</p>
             </div>
           </div>
         )}

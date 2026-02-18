@@ -220,7 +220,7 @@ export function DesignerHeader({
             className="gap-1"
           >
             <FileDown size={14} />
-            匯出 PNG
+            {DESIGNER_LABELS.EXPORT_1966}
           </Button>
         )}
       </div>

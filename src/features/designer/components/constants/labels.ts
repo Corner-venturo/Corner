@@ -108,4 +108,8 @@ export const DESIGNER_LABELS = {
   LABEL_6119: '從舊版本恢復',
   LABEL_2872: '目前使用中',
   SAVING_4103: '版本會在每次儲存時自動建立',
+
+  LABEL_7516: '元件庫',
+  SEARCH_3877: '搜尋元件...',
+  NOT_FOUND_3128: '找不到相關元件',
 }

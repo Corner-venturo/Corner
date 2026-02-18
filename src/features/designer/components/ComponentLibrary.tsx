@@ -42,6 +42,7 @@ import {
 } from './design-components'
 import type { DesignComponent, ComponentCategory } from './design-components'
 import type { CanvasElement } from './types'
+import { DESIGNER_LABELS } from './constants/labels'
 
 // 圖示映射
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string; size?: number }>> = {
@@ -143,7 +144,7 @@ export function ComponentLibrary({ onInsertComponent, templateData }: ComponentL
     <div className="w-64 h-full bg-white border-r border-border flex flex-col">
       {/* 標題 */}
       <div className="p-3 border-b border-border h-[42px] flex items-center">
-        <h3 className="font-medium text-sm text-morandi-primary">元件庫</h3>
+        <h3 className="font-medium text-sm text-morandi-primary">{DESIGNER_LABELS.LABEL_7516}</h3>
       </div>
 
       {/* 風格切換 + 搜尋 */}
@@ -153,7 +154,7 @@ export function ComponentLibrary({ onInsertComponent, templateData }: ComponentL
           <Input
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            placeholder="搜尋元件..."
+            placeholder={DESIGNER_LABELS.SEARCH_3877}
             className="pl-8 h-8 text-xs"
           />
         </div>
@@ -166,7 +167,7 @@ export function ComponentLibrary({ onInsertComponent, templateData }: ComponentL
             // 搜尋結果
             <div className="px-2">
               {filteredComponents.length === 0 ? (
-                <p className="text-xs text-morandi-secondary text-center py-6">找不到相關元件</p>
+                <p className="text-xs text-morandi-secondary text-center py-6">{DESIGNER_LABELS.NOT_FOUND_3128}</p>
               ) : (
                 filteredComponents.map(renderComponentItem)
               )}

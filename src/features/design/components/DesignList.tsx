@@ -113,7 +113,7 @@ export function DesignList({ onEdit, onDelete, onDuplicate }: DesignListProps) {
             {onDuplicate && (
               <DropdownMenuItem onClick={() => onDuplicate(row)}>
                 <Copy size={14} className="mr-2" />
-                複製
+                {LABELS.COPY}
               </DropdownMenuItem>
             )}
             <DropdownMenuItem

@@ -31,4 +31,9 @@ export const DESIGNER_LABELS = {
   LOADING_DESIGN: '載入設計中...',
   LOADING_DESIGN_TOOL: '載入設計工具中...',
   RELOAD: '重新載入',
+
+  LABEL_6693: '從左側元件庫點選元件開始設計',
+  ADD_1662: '或拖入圖片、使用快捷鍵新增元素',
+
+  EXPORT_1966: '匯出 PNG',
 }
