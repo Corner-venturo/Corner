@@ -393,14 +393,14 @@ export default function TourClosingReportPage() {
       title={TOUR_CLOSING_LABELS.LABEL_5942}
       icon={FileText}
       breadcrumb={[
-        { label: '首頁', href: '/' },
-        { label: '報表', href: '/reports' },
-        { label: '結團報表', href: '/reports/tour-closing' },
+        { label: TOUR_CLOSING_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: TOUR_CLOSING_LABELS.BREADCRUMB_REPORTS, href: '/reports' },
+        { label: TOUR_CLOSING_LABELS.BREADCRUMB_TOUR_CLOSING, href: '/reports/tour-closing' },
       ]}
       data={filteredReports}
       columns={columns}
       searchFields={['code', 'name']}
-      searchPlaceholder="搜尋團號或團名..."
+      searchPlaceholder={TOUR_CLOSING_LABELS.SEARCH_PLACEHOLDER}
       renderActions={renderActions}
       bordered={true}
       headerActions={
