@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 
 export interface UseTableStateProps<T> {
   data: T[]
@@ -61,9 +61,9 @@ export function useTableState<T>({
   }, [data, searchTerm, searchableFields, filters, sortColumn, sortDirection])
 
   // 分頁邏輯
-  const totalPages = Math.ceil(processedData.length / pageSize) || 1
-  const startIndex = (currentPage - 1) * pageSize
-  const paginatedData = processedData.slice(startIndex, startIndex + pageSize)
+  const totalPages = useMemo(() => Math.ceil(processedData.length / pageSize) || 1, [processedData.length, pageSize])
+  const startIndex = useMemo(() => (currentPage - 1) * pageSize, [currentPage, pageSize])
+  const paginatedData = useMemo(() => processedData.slice(startIndex, startIndex + pageSize), [processedData, startIndex, pageSize])
 
   // 當目前頁面超過總頁數時，調整到最後一頁（而非強制回第一頁）
   useEffect(() => {
@@ -72,15 +72,17 @@ export function useTableState<T>({
     }
   }, [currentPage, totalPages])
 
-  const handleSort = (columnKey: string) => {
-    const newDirection = sortColumn === columnKey && sortDirection === 'asc' ? 'desc' : 'asc'
+  const handleSort = useCallback((columnKey: string) => {
+    setSortDirection(prev => {
+      // If same column, toggle; otherwise default to asc
+      return sortColumn === columnKey && prev === 'asc' ? 'desc' : 'asc'
+    })
     setSortColumn(columnKey)
-    setSortDirection(newDirection)
-  }
+  }, [sortColumn])
 
-  const updateFilter = (key: string, value: string) => {
+  const updateFilter = useCallback((key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value === '__all__' ? '' : value }))
-  }
+  }, [])
 
   return {
     sortColumn,

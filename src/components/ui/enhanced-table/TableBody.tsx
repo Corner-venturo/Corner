@@ -27,7 +27,7 @@ interface TableBodyProps<T extends RowData = RowData> {
   toggleSelection: (row: T, index: number) => void
 }
 
-export function TableBody({
+export const TableBody = React.memo(function TableBody({
   columns,
   paginatedData,
   startIndex,
@@ -217,4 +217,4 @@ export function TableBody({
       })}
     </tbody>
   )
-}
+})

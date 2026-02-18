@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EnhancedTableProps, RowData, TableColumn, SelectionConfig, ExpandableConfig } from './types'
@@ -71,25 +71,25 @@ export function EnhancedTable<T extends RowData = RowData>({
   })
 
   // Helper functions for selection and expandable
-  const getRowId = (row: RowData, index: number): string => {
+  const getRowId = useCallback((row: RowData, index: number): string => {
     if (typedSelection?.getRowId) return typedSelection.getRowId(row, index)
     if (typedExpandable?.getRowId) return typedExpandable.getRowId(row, index)
     return ((row as Record<string, unknown>).id as string) || ((row as Record<string, unknown>)._id as string) || index.toString()
-  }
+  }, [typedSelection, typedExpandable])
 
-  const isRowSelected = (row: RowData, index: number): boolean => {
+  const isRowSelected = useCallback((row: RowData, index: number): boolean => {
     if (!typedSelection) return false
     const rowId = getRowId(row, index)
     return typedSelection.selected.includes(rowId)
-  }
+  }, [typedSelection, getRowId])
 
-  const isRowExpanded = (row: RowData, index: number): boolean => {
+  const isRowExpanded = useCallback((row: RowData, index: number): boolean => {
     if (!typedExpandable) return false
     const rowId = getRowId(row, index)
     return typedExpandable.expanded.includes(rowId)
-  }
+  }, [typedExpandable, getRowId])
 
-  const toggleSelection = (row: RowData, index: number) => {
+  const toggleSelection = useCallback((row: RowData, index: number) => {
     if (!typedSelection) return
     const rowId = getRowId(row, index)
     const isSelected = typedSelection.selected.includes(rowId)
@@ -99,9 +99,9 @@ export function EnhancedTable<T extends RowData = RowData>({
     } else {
       typedSelection.onChange([...typedSelection.selected, rowId])
     }
-  }
+  }, [typedSelection, getRowId])
 
-  const toggleSelectAll = () => {
+  const toggleSelectAll = useCallback(() => {
     if (!typedSelection) return
     const allRowIds = paginatedData.map((row, index) => getRowId(row, startIndex + index))
     const allSelected = allRowIds.every(id => typedSelection.selected.includes(id))
@@ -119,27 +119,27 @@ export function EnhancedTable<T extends RowData = RowData>({
       })
       typedSelection.onChange(newSelected)
     }
-  }
+  }, [typedSelection, paginatedData, getRowId, startIndex])
 
   // Calculate if all visible rows are selected
-  const allVisibleSelected = typedSelection
+  const allVisibleSelected = useMemo(() => typedSelection
     ? paginatedData.length > 0 &&
       paginatedData.every((row, index) => isRowSelected(row, startIndex + index))
-    : false
-  const someVisibleSelected = typedSelection
+    : false, [typedSelection, paginatedData, isRowSelected, startIndex])
+  const someVisibleSelected = useMemo(() => typedSelection
     ? paginatedData.some((row, index) => isRowSelected(row, startIndex + index))
-    : false
+    : false, [typedSelection, paginatedData, isRowSelected, startIndex])
 
-  const handleSortWrapper = (columnKey: string) => {
+  const handleSortWrapper = useCallback((columnKey: string) => {
     handleSort(columnKey)
     onSort?.(columnKey, sortColumn === columnKey && sortDirection === 'asc' ? 'desc' : 'asc')
-  }
+  }, [handleSort, onSort, sortColumn, sortDirection])
 
-  const handleFilterChange = (key: string, value: string) => {
+  const handleFilterChange = useCallback((key: string, value: string) => {
     updateFilter(key, value)
     const newFilters = { ...filters, [key]: value === '__all__' ? '' : value }
     onFilter?.(newFilters)
-  }
+  }, [updateFilter, onFilter, filters])
 
   // Error state (loading state now handled in TableBody to keep table structure visible)
   if (error) {

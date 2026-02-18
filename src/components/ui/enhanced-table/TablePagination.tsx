@@ -22,7 +22,7 @@ interface TablePaginationProps {
   onPageSizeChange: (size: number) => void
 }
 
-export function TablePagination({
+export const TablePagination = React.memo(function TablePagination({
   currentPage,
   totalPages,
   pageSize,
@@ -125,4 +125,4 @@ export function TablePagination({
       </div>
     </div>
   )
-}
+})

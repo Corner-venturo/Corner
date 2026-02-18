@@ -33,7 +33,7 @@ interface TableHeaderProps<T extends RowData = RowData> {
   onToggleSelectAll: () => void
 }
 
-export function TableHeader({
+export const TableHeader = React.memo(function TableHeader({
   columns,
   sortColumn,
   sortDirection,
@@ -175,4 +175,4 @@ export function TableHeader({
       )}
     </thead>
   )
-}
+})
