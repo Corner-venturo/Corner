@@ -137,13 +137,7 @@ export const FEATURE_PERMISSIONS: PermissionConfig[] = [
     routes: ['/finance/reports'],
     description: '財務報表查看',
   },
-  {
-    id: 'vouchers',
-    label: '會計傳票',
-    category: '全部',
-    routes: ['/erp-accounting'],
-    description: '會計傳票管理',
-  },
+  // 會計傳票已移除 (V2)
   {
     id: 'hr',
     label: '人資管理',

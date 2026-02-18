@@ -60,11 +60,6 @@ export const BREADCRUMB_CONFIG: Record<string, BreadcrumbConfig> = {
   '/finance/travel-invoice/create': { label: '開立發票', parent: '/finance/travel-invoice' },
 
   // ========== 會計系統 ==========
-  '/erp-accounting': { label: '會計系統', parent: '/' },
-  '/erp-accounting/vouchers': { label: '傳票', parent: '/erp-accounting' },
-  '/erp-accounting/settings': { label: '會計設定', parent: '/erp-accounting', hidden: true },
-  '/erp-accounting/settings/accounts': { label: '會計科目', parent: '/erp-accounting' },
-  '/erp-accounting/settings/banks': { label: '銀行帳戶', parent: '/erp-accounting' },
   '/accounting': { label: '會計', parent: '/' },
 
   // ========== 資料庫管理 ==========
