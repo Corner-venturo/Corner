@@ -1,6 +1,7 @@
 /**
  * 設計模組類型定義
  */
+import { DESIGN_TYPE_LABELS, DESIGN_CATEGORY_LABELS, DESIGN_STATUS_LABELS } from './constants/labels'
 
 export type DesignType =
   // 手冊
@@ -71,24 +72,24 @@ export const DESIGN_TYPE_CONFIG: Record<DesignType, {
 }> = {
   // 手冊
   brochure_a5: {
-    label: '手冊 A5',
+    label: DESIGN_TYPE_LABELS.手冊A5,
     category: 'brochure',
-    size: '148 x 210 mm (直式)',
+    size: DESIGN_TYPE_LABELS.直式148x210,
     width: 148,
     height: 210,
     unit: 'mm',
   },
   brochure_a4: {
-    label: '手冊 A4',
+    label: DESIGN_TYPE_LABELS.手冊A4,
     category: 'brochure',
-    size: '210 x 297 mm (直式)',
+    size: DESIGN_TYPE_LABELS.直式210x297,
     width: 210,
     height: 297,
     unit: 'mm',
   },
   // 社群媒體
   ig_square: {
-    label: 'IG 正方形',
+    label: DESIGN_TYPE_LABELS.IG正方形,
     category: 'social',
     size: '1080 x 1080 px',
     width: 1080,
@@ -96,7 +97,7 @@ export const DESIGN_TYPE_CONFIG: Record<DesignType, {
     unit: 'px',
   },
   ig_portrait: {
-    label: 'IG 直式',
+    label: DESIGN_TYPE_LABELS.IG直式,
     category: 'social',
     size: '1080 x 1350 px',
     width: 1080,
@@ -104,7 +105,7 @@ export const DESIGN_TYPE_CONFIG: Record<DesignType, {
     unit: 'px',
   },
   ig_story: {
-    label: 'IG 限時動態',
+    label: DESIGN_TYPE_LABELS.IG限時動態,
     category: 'social',
     size: '1080 x 1920 px',
     width: 1080,
@@ -113,7 +114,7 @@ export const DESIGN_TYPE_CONFIG: Record<DesignType, {
   },
   // 廣告橫幅
   banner_horizontal: {
-    label: '橫幅布條',
+    label: DESIGN_TYPE_LABELS.橫幅布條,
     category: 'banner',
     size: '1200 x 400 px',
     width: 1200,
@@ -121,7 +122,7 @@ export const DESIGN_TYPE_CONFIG: Record<DesignType, {
     unit: 'px',
   },
   banner_square: {
-    label: '方形廣告',
+    label: DESIGN_TYPE_LABELS.方形廣告,
     category: 'banner',
     size: '800 x 800 px',
     width: 800,
@@ -136,16 +137,16 @@ export const DESIGN_CATEGORY_CONFIG: Record<DesignCategory, {
   description: string
 }> = {
   brochure: {
-    label: '手冊',
-    description: '手冊、傳單',
+    label: DESIGN_CATEGORY_LABELS.手冊,
+    description: DESIGN_CATEGORY_LABELS.手冊傳單,
   },
   social: {
-    label: '社群媒體',
+    label: DESIGN_CATEGORY_LABELS.社群媒體,
     description: 'Instagram、Facebook',
   },
   banner: {
-    label: '廣告橫幅',
-    description: '網站廣告、布條',
+    label: DESIGN_CATEGORY_LABELS.廣告橫幅,
+    description: DESIGN_CATEGORY_LABELS.網站廣告布條,
   },
 }
 
@@ -155,11 +156,11 @@ export const DESIGN_STATUS_CONFIG: Record<DesignStatus, {
   color: string
 }> = {
   draft: {
-    label: '草稿',
+    label: DESIGN_STATUS_LABELS.草稿,
     color: 'text-morandi-secondary',
   },
   completed: {
-    label: '已完成',
+    label: DESIGN_STATUS_LABELS.已完成,
     color: 'text-morandi-green',
   },
 }

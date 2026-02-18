@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { TourItinerarySelector } from './TourItinerarySelector'
 import { useDesigns } from '../hooks/useDesigns'
 import { DESIGN_TYPE_CONFIG, DESIGN_CATEGORY_CONFIG, type DesignType, type DesignCategory } from '../types'
-import { LABELS } from '../constants/labels'
+import { LABELS, DESIGN_COMPONENT_LABELS } from '../constants/labels'
 
 // 按分類分組設計類型
 const DESIGN_TYPES_BY_CATEGORY: Record<DesignCategory, DesignType[]> = {
@@ -67,7 +67,7 @@ export function CreateDesignDialog({
 
   const handleSubmit = async () => {
     if (!tourId) {
-      toast.error('請選擇旅遊團')
+      toast.error(DESIGN_COMPONENT_LABELS.請選擇旅遊團)
       return
     }
 
@@ -83,12 +83,12 @@ export function CreateDesignDialog({
         name: `${tourCode || tourName || LABELS.newDesign} - ${DESIGN_TYPE_CONFIG[designType].label}`,
       })
 
-      toast.success('設計已建立')
+      toast.success(DESIGN_COMPONENT_LABELS.設計已建立)
       handleClose()
       onSuccess?.(design.id, tourId, itineraryId || undefined)
     } catch (error) {
       logger.error('建立設計失敗:', error)
-      toast.error('建立設計失敗')
+      toast.error(DESIGN_COMPONENT_LABELS.建立設計失敗)
     } finally {
       setIsSubmitting(false)
     }

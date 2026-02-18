@@ -10,7 +10,7 @@ import { useDesigns } from '../hooks/useDesigns'
 import { type Design } from '../types'
 import { toast } from 'sonner'
 import { confirm } from '@/lib/ui/alert-dialog'
-import { LABELS } from '../constants/labels'
+import { LABELS, DESIGN_COMPONENT_LABELS } from '../constants/labels'
 import { logger } from '@/lib/utils/logger'
 
 /**
@@ -28,7 +28,7 @@ export function DesignPage() {
   // 編輯設計 - 跳轉到設計工具並帶入參數
   const handleEdit = useCallback((design: Design) => {
     if (!design.tour_id) {
-      toast.error('此設計缺少關聯的旅遊團')
+      toast.error(DESIGN_COMPONENT_LABELS.此設計缺少關聯的旅遊團)
       return
     }
     const params = new URLSearchParams()
@@ -43,10 +43,10 @@ export function DesignPage() {
   const handleDuplicate = useCallback(async (design: Design) => {
     try {
       await duplicateDesign(design)
-      toast.success('已複製設計')
+      toast.success(DESIGN_COMPONENT_LABELS.已複製設計)
     } catch (error) {
       logger.error('複製設計失敗:', error)
-      toast.error('複製失敗，請稍後再試')
+      toast.error(DESIGN_COMPONENT_LABELS.複製失敗請稍後再試)
     }
   }, [duplicateDesign])
 
@@ -60,10 +60,10 @@ export function DesignPage() {
 
     try {
       await deleteDesign(design.id)
-      toast.success('已刪除設計')
+      toast.success(DESIGN_COMPONENT_LABELS.已刪除設計)
     } catch (error) {
       logger.error('刪除設計失敗:', error)
-      toast.error('刪除失敗，請稍後再試')
+      toast.error(DESIGN_COMPONENT_LABELS.刪除失敗請稍後再試)
     }
   }, [deleteDesign])
 
