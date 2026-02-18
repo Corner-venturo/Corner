@@ -10,6 +10,7 @@
 import { createEntityHook } from '../core/createEntityHook'
 import { CACHE_PRESETS } from '../core/types'
 import type { Order } from '@/stores/types'
+import { createOrderSchema, updateOrderSchema } from '@/lib/validations/entities'
 
 // ============================================
 // Entity 定義
@@ -30,6 +31,8 @@ export const orderEntity = createEntityHook<Order>('orders', {
     select: '*',
   },
   cache: CACHE_PRESETS.high,
+  createSchema: createOrderSchema,
+  updateSchema: updateOrderSchema,
 })
 
 // ============================================

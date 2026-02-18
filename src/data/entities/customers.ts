@@ -7,6 +7,7 @@
 import { createEntityHook } from '../core/createEntityHook'
 import { CACHE_PRESETS } from '../core/types'
 import type { Customer } from '@/stores/types'
+import { createCustomerSchema, updateCustomerSchema } from '@/lib/validations/entities'
 
 export const customerEntity = createEntityHook<Customer>('customers', {
   list: {
@@ -20,6 +21,8 @@ export const customerEntity = createEntityHook<Customer>('customers', {
   },
   detail: { select: '*' }, // 詳情頁才載入完整資料（包含 passport_image_url）
   cache: CACHE_PRESETS.medium,
+  createSchema: createCustomerSchema,
+  updateSchema: updateCustomerSchema,
 })
 
 export const useCustomers = customerEntity.useList

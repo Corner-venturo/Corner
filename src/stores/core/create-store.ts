@@ -258,6 +258,11 @@ export function createStore<T extends BaseEntity>(
       try {
         set({ loading: true, error: null })
 
+        // 🛡️ Defense-in-depth: validate with Zod schema if configured
+        if (config.createSchema) {
+          config.createSchema.parse(data)
+        }
+
         // 生成 UUID（如果未提供）
         const id = (data as Record<string, unknown>).id || generateUUID()
 
@@ -398,6 +403,11 @@ export function createStore<T extends BaseEntity>(
     update: async (id: string, data: UpdateInput<T>) => {
       try {
         set({ loading: true, error: null })
+
+        // 🛡️ Defense-in-depth: validate with Zod schema if configured
+        if (config.updateSchema) {
+          config.updateSchema.parse(data)
+        }
 
         // 取得當前員工 ID（用於追蹤）
         const currentEmployeeId = getCurrentEmployeeId()

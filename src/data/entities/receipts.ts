@@ -8,6 +8,7 @@
 import { createEntityHook } from '../core/createEntityHook'
 import { CACHE_PRESETS } from '../core/types'
 import type { Receipt } from '@/types/receipt.types'
+import { createReceiptSchema, updateReceiptSchema } from '@/lib/validations/entities'
 
 export const receiptEntity = createEntityHook<Receipt>('receipts', {
   list: {
@@ -19,6 +20,8 @@ export const receiptEntity = createEntityHook<Receipt>('receipts', {
   },
   detail: { select: '*' },
   cache: CACHE_PRESETS.high,
+  createSchema: createReceiptSchema,
+  updateSchema: updateReceiptSchema,
 })
 
 export const useReceipts = receiptEntity.useList

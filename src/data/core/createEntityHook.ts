@@ -455,6 +455,11 @@ export function createEntityHook<T extends BaseEntity>(
   async function create(
     data: EntityCreateData<T>
   ): Promise<T> {
+    // 🛡️ Defense-in-depth: validate with Zod schema if configured
+    if (config.createSchema) {
+      config.createSchema.parse(data)
+    }
+
     const now = new Date().toISOString()
 
     // 自動注入 workspace_id
@@ -553,6 +558,11 @@ export function createEntityHook<T extends BaseEntity>(
   // update - 更新（樂觀更新）
   // ============================================
   async function update(id: string, data: Partial<T>): Promise<T> {
+    // 🛡️ Defense-in-depth: validate with Zod schema if configured
+    if (config.updateSchema) {
+      config.updateSchema.parse(data)
+    }
+
     const updateData = {
       ...data,
       updated_at: new Date().toISOString(),

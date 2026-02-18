@@ -5,6 +5,7 @@
 import { BaseEntity } from '@/types'
 import { TableName } from '@/lib/db/schemas'
 import type { Database } from '@/lib/supabase/types'
+import type { ZodSchema } from 'zod'
 
 /**
  * Supabase 表格名稱類型（用於 .from() 方法）
@@ -96,6 +97,10 @@ export interface StoreConfig {
    * Super Admin 可以跨 workspace 查詢
    */
   workspaceScoped?: boolean
+  /** Zod schema for validating create data (defense-in-depth) */
+  createSchema?: ZodSchema
+  /** Zod schema for validating update data (defense-in-depth) */
+  updateSchema?: ZodSchema
 }
 
 /**

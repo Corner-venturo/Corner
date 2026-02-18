@@ -19,6 +19,7 @@
  */
 
 import { createStore } from './core/create-store'
+import { createTourSchema, updateTourSchema, createOrderSchema, updateOrderSchema } from '@/lib/validations/entities'
 
 // 從 @/types 匯入（使用 types/ 目錄下的標準定義）
 import type { Tour, Order, Member, Customer, ReceiptOrder, Employee } from '@/types'
@@ -51,6 +52,8 @@ export const useTourStore = createStore<Tour>({
   tableName: 'tours',
   codePrefix: 'T',
   workspaceScoped: true,
+  createSchema: createTourSchema,
+  updateSchema: updateTourSchema,
 })
 
 /**
@@ -60,6 +63,8 @@ export const useTourStore = createStore<Tour>({
 export const useOrderStore = createStore<Order>({
   tableName: 'orders',
   workspaceScoped: true,
+  createSchema: createOrderSchema,
+  updateSchema: updateOrderSchema,
 })
 
 /**

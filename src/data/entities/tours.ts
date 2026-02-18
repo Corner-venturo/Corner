@@ -14,6 +14,7 @@ import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
 import { canCrossWorkspace, type UserRole } from '@/lib/rbac-config'
 import type { Tour } from '@/stores/types'
+import { createTourSchema, updateTourSchema } from '@/lib/validations/entities'
 
 // ============================================
 // Entity 定義
@@ -34,6 +35,8 @@ export const tourEntity = createEntityHook<Tour>('tours', {
     select: '*',
   },
   cache: CACHE_PRESETS.high,
+  createSchema: createTourSchema,
+  updateSchema: updateTourSchema,
 })
 
 // ============================================
