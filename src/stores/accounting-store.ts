@@ -2,6 +2,7 @@ import { logger } from '@/lib/utils/logger'
 import { create } from 'zustand'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from './auth-store'
+import { toast } from 'sonner'
 
 /**
  * 會計系統 Store (Supabase 版本)

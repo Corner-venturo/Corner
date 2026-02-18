@@ -42,11 +42,16 @@ export async function checkTourDependencies(tourId: string): Promise<TourDepende
  * 檢查旅遊團是否有已付款訂單
  */
 export async function checkTourPaidOrders(tourId: string): Promise<{ hasPaidOrders: boolean; count: number }> {
-  const { data: paidOrders } = await supabase
+  const { data: paidOrders, error } = await supabase
     .from('orders')
     .select('id, payment_status')
     .eq('tour_id', tourId)
     .neq('payment_status', 'unpaid')
+
+  if (error) {
+    logger.error('查詢已付款訂單失敗:', error)
+    throw error
+  }
 
   return {
     hasPaidOrders: (paidOrders?.length ?? 0) > 0,
@@ -69,10 +74,15 @@ export async function deleteTourEmptyOrders(tourId: string): Promise<void> {
  * 斷開旅遊團關聯的報價單（不刪除，只解除連結）
  */
 export async function unlinkTourQuotes(tourId: string): Promise<number> {
-  const { data: linkedQuotes } = await supabase
+  const { data: linkedQuotes, error: queryError } = await supabase
     .from('quotes')
     .select('id')
     .eq('tour_id', tourId)
+
+  if (queryError) {
+    logger.error('查詢關聯報價單失敗:', queryError)
+    throw queryError
+  }
 
   if (linkedQuotes && linkedQuotes.length > 0) {
     const { error } = await supabase
@@ -80,7 +90,8 @@ export async function unlinkTourQuotes(tourId: string): Promise<number> {
       .update({ tour_id: null, status: 'proposed', updated_at: new Date().toISOString() })
       .eq('tour_id', tourId)
     if (error) {
-      logger.warn('斷開報價單失敗:', error.message)
+      logger.error('斷開報價單失敗:', error.message)
+      throw error
     }
   }
 
@@ -91,10 +102,15 @@ export async function unlinkTourQuotes(tourId: string): Promise<number> {
  * 斷開旅遊團關聯的行程表（不刪除，只解除連結）
  */
 export async function unlinkTourItineraries(tourId: string): Promise<number> {
-  const { data: linkedItineraries } = await supabase
+  const { data: linkedItineraries, error: queryError } = await supabase
     .from('itineraries')
     .select('id')
     .eq('tour_id', tourId)
+
+  if (queryError) {
+    logger.error('查詢關聯行程表失敗:', queryError)
+    throw queryError
+  }
 
   if (linkedItineraries && linkedItineraries.length > 0) {
     const { error } = await supabase
@@ -102,7 +118,8 @@ export async function unlinkTourItineraries(tourId: string): Promise<number> {
       .update({ tour_id: null, tour_code: null, status: 'draft', updated_at: new Date().toISOString() })
       .eq('tour_id', tourId)
     if (error) {
-      logger.warn('斷開行程表失敗:', error.message)
+      logger.error('斷開行程表失敗:', error.message)
+      throw error
     }
   }
 
@@ -113,7 +130,11 @@ export async function unlinkTourItineraries(tourId: string): Promise<number> {
  * 取得旅遊團的 PNR 資料
  */
 export async function fetchTourPnrs(tourId: string): Promise<unknown[]> {
-  const { data } = await supabase.from('pnrs').select('*').eq('tour_id', tourId)
+  const { data, error } = await supabase.from('pnrs').select('*').eq('tour_id', tourId)
+  if (error) {
+    logger.error('查詢團 PNR 失敗:', error)
+    throw error
+  }
   return data ?? []
 }
 
@@ -122,7 +143,11 @@ export async function fetchTourPnrs(tourId: string): Promise<unknown[]> {
  */
 export async function fetchPnrsByLocators(locators: string[]): Promise<unknown[]> {
   if (locators.length === 0) return []
-  const { data } = await supabase.from('pnrs').select('*').in('record_locator', locators)
+  const { data, error } = await supabase.from('pnrs').select('*').in('record_locator', locators)
+  if (error) {
+    logger.error('查詢 PNR 失敗:', error)
+    throw error
+  }
   return data ?? []
 }
 

@@ -32,11 +32,16 @@ export async function recalculateOrderTotal(order_id: string): Promise<void> {
     )
 
     // 取得當前已收金額
-    const { data: order_data } = await supabase
+    const { data: order_data, error: order_error } = await supabase
       .from('orders')
       .select('paid_amount')
       .eq('id', order_id)
       .single()
+
+    if (order_error) {
+      logger.error('[recalculateOrderTotal] Failed to query order paid_amount:', order_error)
+      throw order_error
+    }
 
     const paid_amount = order_data?.paid_amount || 0
     const remaining_amount = Math.max(0, total_amount - paid_amount)
@@ -71,5 +76,6 @@ export async function recalculateOrderTotal(order_id: string): Promise<void> {
     logger.log('[recalculateOrderTotal] Recalculated:', { order_id, total_amount, remaining_amount, payment_status })
   } catch (error) {
     logger.error('[recalculateOrderTotal] Failed:', error)
+    throw error
   }
 }

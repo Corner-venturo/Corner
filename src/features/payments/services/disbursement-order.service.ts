@@ -7,6 +7,7 @@ import {
   invalidatePaymentRequests,
 } from '@/data'
 import { ValidationError } from '@/core/errors/app-errors'
+import { logger } from '@/lib/utils/logger'
 import { PAYMENTS_LABELS } from '../constants/labels'
 // workspace_id is now auto-set by DB trigger
 
@@ -168,7 +169,8 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
   }
 
   /**
-   * 確認出納單
+   * 確認出納單（含 rollback 保護）
+   * 如果請款單狀態更新失敗，會回滾出納單狀態
    */
   async confirmOrder(orderId: string, confirmedBy: string): Promise<void> {
     const order = await this.getById(orderId)
@@ -190,10 +192,36 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       updated_at: now,
     })
 
-    // 更新所有關聯請款單狀態為 confirmed
+    // 更新所有關聯請款單狀態為 confirmed（含 rollback）
     const requestIds = order.payment_request_ids || []
-    for (const requestId of requestIds) {
-      await this.updatePaymentRequestStatus(requestId, 'confirmed')
+    const updatedRequestIds: string[] = []
+
+    try {
+      for (const requestId of requestIds) {
+        await this.updatePaymentRequestStatus(requestId, 'confirmed')
+        updatedRequestIds.push(requestId)
+      }
+    } catch (error) {
+      // 回滾：將已更新的請款單改回 processing
+      for (const requestId of updatedRequestIds) {
+        try {
+          await this.updatePaymentRequestStatus(requestId, 'processing')
+        } catch (rollbackError) {
+          logger.error(`回滾請款單 ${requestId} 狀態失敗:`, rollbackError)
+        }
+      }
+      // 回滾出納單狀態
+      try {
+        await this.update(orderId, {
+          status: 'pending',
+          confirmed_by: undefined,
+          confirmed_at: undefined,
+          updated_at: now,
+        })
+      } catch (rollbackError) {
+        logger.error(`回滾出納單 ${orderId} 狀態失敗:`, rollbackError)
+      }
+      throw new Error(`確認出納單失敗，已回滾: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
 

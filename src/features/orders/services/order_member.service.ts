@@ -26,6 +26,9 @@ export async function insertRoomAssignments(
 
 /** 查詢所有客戶（用於護照驗證比對） */
 export async function fetchAllCustomers() {
-  const { data } = await supabase.from('customers').select('*')
+  const { data, error } = await supabase.from('customers').select('*')
+  if (error) {
+    throw new Error(`查詢客戶失敗: ${error.message}`)
+  }
   return data ?? []
 }

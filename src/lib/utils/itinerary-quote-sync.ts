@@ -351,11 +351,13 @@ export async function syncItineraryToQuote(
 
     if (error) {
       logger.error('更新報價單 categories 失敗:', error)
+      throw error
     } else {
       logger.log('已同步行程表資料到報價單:', quoteId)
     }
   } catch (error) {
     logger.error('同步行程表到報價單失敗:', error)
+    throw error
   }
 }
 
@@ -475,10 +477,12 @@ export async function syncTimelineToQuote(
 
     if (error) {
       logger.error('更新報價單 categories 失敗:', error)
+      throw error
     } else {
       logger.log('已同步時間軸行程到報價單:', quoteId)
     }
   } catch (error) {
     logger.error('同步時間軸行程到報價單失敗:', error)
+    throw error
   }
 }

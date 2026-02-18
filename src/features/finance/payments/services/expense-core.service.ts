@@ -1,12 +1,35 @@
+/**
+ * Expense Service - 請款核心邏輯
+ *
+ * @module expense-core.service
+ * @description
+ * 請款（支出）異動後的統計重算。與 receipt-core.service 對稱，
+ * 負責維護團的 total_cost 和 profit。
+ *
+ * 這是支出統計的 **Single Source of Truth**：
+ * - 團的 `total_cost` 由此重算（不允許手動修改）
+ * - `profit = total_revenue - total_cost`
+ */
+
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { mutate } from 'swr'
 
 /**
- * 請款變動後重算團成本統計
- * - 查 payment_requests (status in pending/approved/confirmed/paid)
- * - 加總 payment_request_items.subtotal = total_cost
- * - 更新 tours.total_cost 和 profit
+ * 重算團的成本統計
+ *
+ * @description 查詢該團所有有效請款單（status in pending/approved/confirmed/paid），
+ * 加總其 payment_request_items.subtotal 為 total_cost，
+ * 再從 tours.total_revenue 減去 total_cost 得到 profit。
+ * 這是成本統計的唯一真相源（Single Source of Truth）。
+ *
+ * @param tour_id - 團 ID
+ * @returns void
+ * @throws 如果 DB 更新失敗（catch 內部 log 但不會向上拋出）
+ *
+ * @example
+ * // 請款單建立/審核/刪除後重算
+ * await recalculateExpenseStats(paymentRequest.tour_id)
  */
 export async function recalculateExpenseStats(tour_id: string): Promise<void> {
   try {
