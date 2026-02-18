@@ -140,7 +140,7 @@ function FlightNode({
             <Plane className="w-5 h-5 -rotate-90" />
           </motion.span>
           <span className="text-xs" style={{ fontFamily: 'monospace', color: `${DREAM.text}99` }}>
-            {flightInfo || '航班資訊'}
+            {flightInfo || FLIGHT_LABELS.LABEL_1343}
             {duration && ` · ${duration}`}
           </span>
         </motion.div>

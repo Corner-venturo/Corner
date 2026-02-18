@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { Plane, Calendar } from 'lucide-react'
 import { getTheme, type TourStyle, type TourTheme } from '@/features/tours/themes'
 import type { FlightInfo } from '@/types/flight.types'
+import { FLIGHT_LABELS } from './constants/labels'
 
 // ============================================
 // 工具函數
@@ -170,7 +171,7 @@ function OriginalFlightCard({
           color: '#FFFFFF',
         }}
       >
-        {type === 'outbound' ? '去程' : '回程'}
+        {type === 'outbound' ? FLIGHT_LABELS.去程 : FLIGHT_LABELS.回程}
       </div>
 
       {/* 航線資訊 */}
@@ -712,7 +713,7 @@ function NatureFlightCard({
           fontFamily: theme.fonts.heading,
         }}
       >
-        {type === 'outbound' ? '去程' : '回程'}
+        {type === 'outbound' ? FLIGHT_LABELS.去程 : FLIGHT_LABELS.回程}
       </div>
 
       {/* 書法風格航線 */}

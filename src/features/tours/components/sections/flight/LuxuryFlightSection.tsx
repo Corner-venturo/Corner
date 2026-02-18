@@ -222,7 +222,7 @@ function MobileFlightCard({
           className="text-xs font-bold px-2 py-1 rounded"
           style={{ backgroundColor: `${labelColor}15`, color: labelColor }}
         >
-          {isOutbound ? '去程' : '回程'}
+          {isOutbound ? FLIGHT_LABELS.去程 : FLIGHT_LABELS.回程}
         </span>
         <span className="text-sm" style={{ color: theme.colors.muted }}>
           {date} {day}
