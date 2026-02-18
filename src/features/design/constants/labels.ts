@@ -35,4 +35,5 @@ export const LABELS = {
   cancel: '取消',
   edit: '編輯',
   delete: '刪除',
+  untitledDesign: '未命名設計',
 }

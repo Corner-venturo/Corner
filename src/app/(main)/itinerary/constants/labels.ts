@@ -143,10 +143,6 @@ export const BLOCK_EDITOR_LABELS = {
   AUTO_SAVE_FAILED: '自動存檔失敗',
   HOME: '首頁',
   ITINERARY_MGMT: '行程管理',
-  DESKTOP: '💻 電腦',
-  MOBILE: '📱 手機',
-  PDF_EXPORT_FAILED: 'PDF 匯出失敗，請稍後再試',
-  CREATE_ITINERARY_BTN: '建立行程表',
 }
 
 // Itinerary Actions

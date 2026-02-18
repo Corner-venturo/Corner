@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase/client'
 import { useWorkspaceId } from '@/lib/workspace-context'
 import { logger } from '@/lib/utils/logger'
 import type { Design, DesignType } from '../types'
+import { LABELS } from '../constants/labels'
 
 const DESIGNS_KEY = 'designs'
 
@@ -77,7 +78,7 @@ export function useDesigns() {
         tour_name: params.tour_name || null,
         itinerary_id: params.itinerary_id || null,
         itinerary_name: params.itinerary_name || null,
-        name: params.name || '未命名設計',
+        name: params.name || LABELS.untitledDesign,
         status: 'draft',
         type: 'full',
       })
