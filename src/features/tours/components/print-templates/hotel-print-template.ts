@@ -55,7 +55,6 @@ export function generateHotelPrintContent({ tour, members }: HotelPrintOptions):
         </div>
         <div class="guest-info">
           <strong>旅客姓名:</strong> ${guestName}
-          ${member.hotel_confirmation ? `<br/><strong>訂房代號:</strong> ${member.hotel_confirmation}` : ''}
         </div>
         <table class="hotel-table">
           <thead>

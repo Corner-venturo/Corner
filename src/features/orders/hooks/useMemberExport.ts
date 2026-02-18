@@ -17,7 +17,6 @@ export const EXPORT_COLUMN_LABELS: Record<string, string> = {
   passport_number: EXPORT_DIALOG_LABELS.COL_PASSPORT_NUMBER,
   passport_expiry: EXPORT_DIALOG_LABELS.COL_PASSPORT_EXPIRY,
   special_meal: '飲食禁忌',
-  hotel_confirmation: '訂房代號',
   remarks: EXPORT_DIALOG_LABELS.COL_REMARKS,
   // 金額相關欄位放最後
   total_payable: '應付金額',
@@ -35,7 +34,6 @@ const DEFAULT_EXPORT_COLUMNS: ExportColumns = {
   passport_number: true,
   passport_expiry: true,
   special_meal: true,
-  hotel_confirmation: false,
   remarks: false,
   // 金額相關欄位預設關閉（2026-01-05）
   total_payable: false,

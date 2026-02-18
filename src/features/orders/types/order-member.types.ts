@@ -32,7 +32,6 @@ export interface OrderMember {
   hotel_2_name?: string | null
   hotel_2_checkin?: string | null
   hotel_2_checkout?: string | null
-  hotel_confirmation?: string | null
   checked_in?: boolean | null
   checked_in_at?: string | null
   transport_cost?: number | null
@@ -91,7 +90,6 @@ export interface ExportColumnsConfig {
   passport_number: boolean
   passport_expiry: boolean
   special_meal: boolean
-  hotel_confirmation: boolean
   remarks: boolean
   // 金額相關欄位放最後
   total_payable: boolean
@@ -109,7 +107,6 @@ export const DEFAULT_EXPORT_COLUMNS: ExportColumnsConfig = {
   passport_number: true,
   passport_expiry: true,
   special_meal: true,
-  hotel_confirmation: false,
   remarks: false,
   // 金額相關欄位預設關閉（2026-01-05）
   total_payable: false,

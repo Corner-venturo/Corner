@@ -16,7 +16,6 @@ export const COLUMN_LABELS: Record<keyof ExportColumnsConfig, string> = {
   passport_number: COMP_TOURS_LABELS.護照號碼,
   passport_expiry: COMP_TOURS_LABELS.護照效期,
   special_meal: COMP_TOURS_LABELS.特殊餐食,
-  hotel_confirmation: COMP_TOURS_LABELS.訂房代號,
   remarks: COMP_TOURS_LABELS.備註,
   // 金額相關欄位放最後
   total_payable: COMP_TOURS_LABELS.應付金額,
@@ -35,7 +34,6 @@ export const DEFAULT_COLUMNS: ExportColumnsConfig = {
   passport_number: true,
   passport_expiry: true,
   special_meal: true,
-  hotel_confirmation: false,
   remarks: false,
   // 金額相關欄位預設顯示
   total_payable: true,

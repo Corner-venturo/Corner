@@ -22,7 +22,7 @@ export async function recalculateOrderTotal(order_id: string): Promise<void> {
       .eq('order_id', order_id)
 
     if (members_error) {
-      logger.error('查詢訂單成員金額失敗:', members_error)
+      logger.error('[recalculateOrderTotal] Failed to query member amounts:', members_error)
       throw members_error
     }
 
@@ -61,15 +61,15 @@ export async function recalculateOrderTotal(order_id: string): Promise<void> {
       .eq('id', order_id)
 
     if (update_error) {
-      logger.error('更新訂單金額失敗:', update_error)
+      logger.error('[recalculateOrderTotal] Failed to update order amounts:', update_error)
       throw update_error
     }
 
     // 刷新 SWR 快取
     await mutate('orders')
 
-    logger.log('訂單金額已重算:', { order_id, total_amount, remaining_amount, payment_status })
+    logger.log('[recalculateOrderTotal] Recalculated:', { order_id, total_amount, remaining_amount, payment_status })
   } catch (error) {
-    logger.error('recalculateOrderTotal 失敗:', error)
+    logger.error('[recalculateOrderTotal] Failed:', error)
   }
 }

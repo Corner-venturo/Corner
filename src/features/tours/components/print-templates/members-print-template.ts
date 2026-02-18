@@ -28,7 +28,6 @@ export function generateMembersPrintContent({ tour, members, columns }: MembersP
             case 'passport_number': value = member.passport_number || ''; break
             case 'passport_expiry': value = member.passport_expiry || ''; break
             case 'special_meal': value = member.special_meal || ''; break
-            case 'hotel_confirmation': value = member.hotel_confirmation || ''; break
             case 'total_payable': value = member.total_payable?.toLocaleString() || ''; break
             case 'deposit_amount': value = member.deposit_amount?.toLocaleString() || ''; break
             case 'balance': value = member.balance_amount?.toLocaleString() || ''; break

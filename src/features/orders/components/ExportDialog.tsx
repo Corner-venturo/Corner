@@ -34,7 +34,6 @@ const COLUMN_LABELS: Record<keyof ExportColumnsConfig, string> = {
   passport_number: EXPORT_DIALOG_LABELS.COL_PASSPORT_NUMBER,
   passport_expiry: EXPORT_DIALOG_LABELS.COL_PASSPORT_EXPIRY,
   special_meal: '特殊餐食',
-  hotel_confirmation: '訂房代號',
   remarks: EXPORT_DIALOG_LABELS.COL_REMARKS,
   // 金額相關欄位放最後
   total_payable: '應付金額',
@@ -107,9 +106,6 @@ export function ExportDialog({
             break
           case 'special_meal':
             value = member.special_meal || ''
-            break
-          case 'hotel_confirmation':
-            value = member.hotel_confirmation || ''
             break
           case 'total_payable':
             value = member.total_payable?.toLocaleString() || ''
