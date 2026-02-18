@@ -203,12 +203,6 @@ export interface TourFormData {
   dailyItinerary: DailyItinerary[]
 }
 
-export interface IconOption {
-  value: string
-  label: string
-  component: React.ComponentType<{ className?: string }>
-}
-
 export interface CityOption {
   id: string
   code: string

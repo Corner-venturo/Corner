@@ -71,20 +71,3 @@ export function MuscleGroupIcon({
 
   return <Icon className={className} />
 }
-
-/**
- * 獲取圖標名稱（用於資料庫儲存）
- */
-export function getIconName(category: string, equipment?: string): string {
-  // 根據器材類型決定圖標
-  if (equipment === '徒手') return 'zap'
-  if (category === 'cardio') {
-    if (equipment === '飛輪') return 'bike'
-    if (equipment === '划船機') return 'waves'
-    if (equipment === '跳繩') return 'move'
-    if (equipment === '沙包') return 'boxing'
-    return 'activity'
-  }
-  // 預設使用啞鈴圖標
-  return 'dumbbell'
-}
