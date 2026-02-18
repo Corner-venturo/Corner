@@ -163,7 +163,7 @@ export class AnalyticsService {
         .neq('status', 'paid')
 
       const { data: receipts } = await receiptQuery
-      const accountsReceivable = (receipts || []).reduce((sum, r) => sum + ((r as Record<string, unknown>).total_amount as number || 0), 0)
+      const accountsReceivable = (receipts || []).reduce((sum, r) => sum + (r.total_amount || 0), 0)
 
       // 取得應付帳款（未付款的請款單）
       let paymentQuery = supabase

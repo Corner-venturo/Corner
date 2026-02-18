@@ -15,9 +15,7 @@ import { zhTW } from 'date-fns/locale'
 import { parseLocalDate } from '@/lib/utils/format-date'
 import { validateBody } from '@/lib/api/validation'
 import { ticketStatusPostSchema, ticketStatusPatchSchema } from '@/lib/validations/api-schemas'
-
-// 系統機器人 ID
-const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
+import { SYSTEM_BOT_ID } from '@/lib/constants/workspace'
 
 // 成員開票狀態
 interface MemberTicketStatus {

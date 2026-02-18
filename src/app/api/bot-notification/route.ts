@@ -11,7 +11,7 @@ import { validateBody } from '@/lib/api/validation'
 import { botNotificationRequestSchema } from '@/lib/validations/api-schemas'
 
 // 系統機器人 ID
-const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
+import { SYSTEM_BOT_ID } from '@/lib/constants/workspace'
 
 export async function POST(request: NextRequest) {
   // Bot API 驗證

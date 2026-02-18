@@ -2,9 +2,7 @@ import { useCallback } from 'react'
 import { useWorkspaceChat } from '@/stores/workspace-store'
 import { logger } from '@/lib/utils/logger'
 import { COMP_WORKSPACE_LABELS } from '../../constants/labels'
-
-// VENTURO 機器人 ID（同時也是 Logan AI）
-const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
+import { SYSTEM_BOT_ID } from '@/lib/constants/workspace'
 
 interface LoganResponse {
   success: boolean

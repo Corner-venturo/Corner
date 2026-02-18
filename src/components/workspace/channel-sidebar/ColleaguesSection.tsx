@@ -12,9 +12,7 @@ import { useWorkspaceStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
 import { useEmployeesSlim } from '@/data'
 import { COMP_WORKSPACE_LABELS } from '../constants/labels'
-
-// 系統機器人的固定 ID
-export const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
+import { SYSTEM_BOT_ID } from '@/lib/constants/workspace'
 
 interface ColleaguesSectionProps {
   isExpanded: boolean

@@ -62,6 +62,9 @@ export const ALLOWED_FILE_TYPES = {
   ],
 } as const
 
+// 系統機器人
+export const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
+
 // 預設值
 export const WORKSPACE_DEFAULTS = {
   CHANNEL_NAME: '新頻道',
