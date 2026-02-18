@@ -35,8 +35,8 @@ export default function EsimsPage() {
   })
 
   const handleDelete = async (id: string) => {
-    const confirmed = await confirm('確定要刪除此網卡嗎？', {
-      title: '刪除網卡',
+    const confirmed = await confirm(ESIMS_LABELS.CONFIRM_DELETE, {
+      title: ESIMS_LABELS.DELETE_TITLE,
       type: 'warning',
     })
     if (confirmed) {
@@ -44,7 +44,7 @@ export default function EsimsPage() {
         await deleteEsim(id)
       } catch (error) {
         const { alert } = await import('@/lib/ui/alert-dialog')
-        await alert('刪除失敗，請稍後再試', 'error')
+        await alert(ESIMS_LABELS.DELETE_FAILED, 'error')
       }
     }
   }

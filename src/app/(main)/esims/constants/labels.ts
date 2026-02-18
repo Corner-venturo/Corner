@@ -16,4 +16,7 @@ export const ESIMS_LABELS = {
   ACTION_EDIT: '編輯',
   ACTION_DELETE: '刪除',
   QUANTITY_UNIT: '張',
+  CONFIRM_DELETE: '確定要刪除此網卡嗎？',
+  DELETE_TITLE: '刪除網卡',
+  DELETE_FAILED: '刪除失敗，請稍後再試',
 }

@@ -29,13 +29,11 @@ import { generateCompanyPaymentRequestCode } from '@/stores/utils/code-generator
 import { useAuthStore } from '@/stores/auth-store'
 import { toast } from 'sonner'
 
-// 員工分類 Tab 類型
 type EmployeeTab = 'active' | 'terminated' | 'bot'
 
 export default function HRPage() {
   const { items: users, fetchAll, update: updateUser, delete: deleteUser } = useUserStore()
   const { workspaces, loadWorkspaces: fetchWorkspaces } = useWorkspaceChannels()
-  // 使用 @/data hooks（SWR 自動載入）
   const { items: paymentRequests } = usePaymentRequests()
   const currentUser = useAuthStore(state => state.user)
   const [expandedEmployee, setExpandedEmployee] = useState<string | null>(null)
@@ -44,18 +42,15 @@ export default function HRPage() {
   const [activeTab, setActiveTab] = useState<EmployeeTab>('active')
   const { confirm, confirmDialogProps } = useConfirmDialog()
 
-  // 檢查是否為超級管理員
   const isSuperAdmin = useMemo(() => {
     return currentUser?.roles?.includes('super_admin') || currentUser?.roles?.includes('admin')
   }, [currentUser?.roles])
 
-  // 初始化時載入員工、工作空間資料（請款單由 SWR 自動載入）
   useEffect(() => {
     fetchAll()
     fetchWorkspaces()
   }, [])
 
-  // 根據 Tab 過濾員工
   const filteredEmployees = useMemo(() => {
     return users.filter(emp => {
       const isBot = emp.employee_type === 'bot'
@@ -63,13 +58,10 @@ export default function HRPage() {
 
       switch (activeTab) {
         case 'active':
-          // 在職：非機器人 且 非離職
           return !isBot && !isTerminated
         case 'terminated':
-          // 離職：非機器人 且 已離職
           return !isBot && isTerminated
         case 'bot':
-          // 機器人：只有超級管理員能看
           return isBot && isSuperAdmin
         default:
           return !isBot && !isTerminated
@@ -77,16 +69,15 @@ export default function HRPage() {
     })
   }, [users, activeTab, isSuperAdmin])
 
-  // Tab 選項（機器人 Tab 只有超級管理員能看）
   const tabOptions = useMemo(() => {
     const baseTabs: { value: EmployeeTab; label: string; count: number }[] = [
-      { value: 'active', label: '在職', count: users.filter(e => e.employee_type !== 'bot' && e.status !== 'terminated').length },
-      { value: 'terminated', label: '離職', count: users.filter(e => e.employee_type !== 'bot' && e.status === 'terminated').length },
+      { value: 'active', label: LABELS.TAB_ACTIVE, count: users.filter(e => e.employee_type !== 'bot' && e.status !== 'terminated').length },
+      { value: 'terminated', label: LABELS.TAB_TERMINATED, count: users.filter(e => e.employee_type !== 'bot' && e.status === 'terminated').length },
     ]
     if (isSuperAdmin) {
       baseTabs.push({
         value: 'bot',
-        label: '機器人',
+        label: LABELS.TAB_BOT,
         count: users.filter(e => e.employee_type === 'bot').length,
       })
     }
@@ -95,10 +86,10 @@ export default function HRPage() {
 
   const getStatusLabel = (status: Employee['status']) => {
     const statusMap = {
-      active: '在職',
-      probation: '試用期',
-      leave: '請假',
-      terminated: '離職',
+      active: LABELS.STATUS_ACTIVE,
+      probation: LABELS.STATUS_PROBATION,
+      leave: LABELS.STATUS_LEAVE,
+      terminated: LABELS.STATUS_TERMINATED,
     }
     return statusMap[status]
   }
@@ -122,13 +113,14 @@ export default function HRPage() {
       e.stopPropagation()
     }
 
+    const employeeName = employee.display_name || employee.chinese_name || LABELS.UNNAMED_EMPLOYEE
     const confirmed = await confirm({
       type: 'warning',
-      title: '辦理離職',
-      message: `確定要將員工「${employee.display_name || employee.chinese_name || '未命名員工'}」辦理離職嗎？`,
-      details: ['離職後將無法登入系統', '歷史記錄會被保留', '可以隨時修改狀態回復在職'],
-      confirmLabel: '確認離職',
-      cancelLabel: '取消',
+      title: LABELS.TERMINATE_TITLE,
+      message: `${LABELS.TERMINATE_CONFIRM_PREFIX}${employeeName}${LABELS.TERMINATE_CONFIRM_SUFFIX}`,
+      details: [LABELS.TERMINATE_DETAIL_1, LABELS.TERMINATE_DETAIL_2, LABELS.TERMINATE_DETAIL_3],
+      confirmLabel: LABELS.TERMINATE_CONFIRM_LABEL,
+      cancelLabel: LABELS.CANCEL,
     })
 
     if (!confirmed) {
@@ -141,7 +133,7 @@ export default function HRPage() {
         setExpandedEmployee(null)
       }
     } catch (err) {
-      toast.error('離職處理失敗，請稍後再試')
+      toast.error(LABELS.TERMINATE_FAILED)
     }
   }
 
@@ -150,19 +142,20 @@ export default function HRPage() {
       e.stopPropagation()
     }
 
+    const employeeName = employee.display_name || employee.chinese_name || LABELS.UNNAMED_EMPLOYEE
     const confirmed = await confirm({
       type: 'danger',
-      title: '刪除員工',
-      message: `確定要刪除員工「${employee.display_name || employee.chinese_name || '未命名員工'}」嗎？`,
+      title: LABELS.DELETE_TITLE,
+      message: `${LABELS.DELETE_CONFIRM_PREFIX}${employeeName}${LABELS.DELETE_CONFIRM_SUFFIX}`,
       details: [
-        '⚠️ 永久刪除員工所有資料',
-        '⚠️ 移除所有歷史記錄',
-        '⚠️ 此操作無法復原',
+        LABELS.DELETE_DETAIL_1,
+        LABELS.DELETE_DETAIL_2,
+        LABELS.DELETE_DETAIL_3,
         '',
-        '💡 建議使用「辦理離職」來保留歷史記錄',
+        LABELS.DELETE_DETAIL_4,
       ],
-      confirmLabel: '確認刪除',
-      cancelLabel: '取消',
+      confirmLabel: LABELS.DELETE_CONFIRM_LABEL,
+      cancelLabel: LABELS.CANCEL,
     })
 
     if (!confirmed) {
@@ -175,40 +168,38 @@ export default function HRPage() {
         setExpandedEmployee(null)
       }
     } catch (err) {
-      toast.error('刪除員工失敗，請稍後再試')
+      toast.error(LABELS.DELETE_FAILED)
     }
   }
 
-  // 取得 workspace 名稱
   const getWorkspaceName = useCallback(
     (workspaceId: string | undefined) => {
-      if (!workspaceId) return '未設定'
+      if (!workspaceId) return LABELS.NOT_SET
       const workspace = workspaces.find(w => w.id === workspaceId)
-      return workspace ? workspace.name : '未知辦公室'
+      return workspace ? workspace.name : LABELS.UNKNOWN_OFFICE
     },
     [workspaces]
   )
 
-  // 定義表格欄位
   const columns: TableColumn<Employee>[] = useMemo(
     () => [
       {
         key: 'employee_number',
-        label: '員工編號',
+        label: LABELS.COL_EMPLOYEE_NUMBER,
         sortable: true,
         render: (value) => <span className="font-mono text-sm">{String(value || '')}</span>,
       },
       {
         key: 'display_name',
-        label: '姓名',
+        label: LABELS.COL_NAME,
         sortable: true,
         render: (value, employee: Employee) => (
-          <span className="font-medium">{String(value || employee.chinese_name || '未命名員工')}</span>
+          <span className="font-medium">{String(value || employee.chinese_name || LABELS.UNNAMED_EMPLOYEE)}</span>
         ),
       },
       {
         key: 'workspace_id',
-        label: '所屬辦公室',
+        label: LABELS.COL_WORKSPACE,
         sortable: true,
         render: (_value, employee: Employee) => (
           <span className="text-sm font-medium text-morandi-primary">
@@ -218,15 +209,15 @@ export default function HRPage() {
       },
       {
         key: 'job_info',
-        label: '職位',
+        label: LABELS.COL_POSITION,
         sortable: false,
         render: (_value, employee: Employee) => (
-          <span className="text-sm">{employee.job_info?.position || '未設定'}</span>
+          <span className="text-sm">{employee.job_info?.position || LABELS.NOT_SET}</span>
         ),
       },
       {
         key: 'roles',
-        label: '身份角色',
+        label: LABELS.COL_ROLES,
         sortable: false,
         render: (_value, employee: Employee) => {
           const roles = employee.roles as UserRole[] | undefined
@@ -252,15 +243,15 @@ export default function HRPage() {
       },
       {
         key: 'personal_info',
-        label: '聯絡方式',
+        label: LABELS.COL_CONTACT,
         sortable: false,
         render: (_value, employee: Employee) => {
           const info = employee.personal_info as { phone?: string | string[]; email?: string } | null
           return (
             <div className="text-sm">
-              <div>{Array.isArray(info?.phone) ? info.phone[0] : info?.phone || '未提供'}</div>
+              <div>{Array.isArray(info?.phone) ? info.phone[0] : info?.phone || LABELS.NOT_PROVIDED}</div>
               <div className="text-morandi-muted text-xs truncate max-w-[200px]">
-                {info?.email || '未提供'}
+                {info?.email || LABELS.NOT_PROVIDED}
               </div>
             </div>
           )
@@ -268,7 +259,7 @@ export default function HRPage() {
       },
       {
         key: 'status',
-        label: '狀態',
+        label: LABELS.COL_STATUS,
         sortable: true,
         render: (_value, employee: Employee) => (
           <span
@@ -280,7 +271,7 @@ export default function HRPage() {
       },
       {
         key: 'hire_date',
-        label: '入職日期',
+        label: LABELS.COL_HIRE_DATE,
         sortable: true,
         render: (_value, employee: Employee) => {
           if (!employee.job_info?.hire_date)
@@ -298,14 +289,14 @@ export default function HRPage() {
         actions={[
           {
             icon: Edit2,
-            label: '編輯',
+            label: LABELS.ACTION_EDIT,
             onClick: () => setExpandedEmployee(employee.id),
           },
           ...(employee.status !== 'terminated'
             ? [
                 {
                   icon: UserX,
-                  label: '辦理離職',
+                  label: LABELS.ACTION_TERMINATE,
                   onClick: () => handleTerminateEmployee(employee),
                   variant: 'warning' as const,
                 },
@@ -313,7 +304,7 @@ export default function HRPage() {
             : []),
           {
             icon: Trash2,
-            label: '刪除',
+            label: LABELS.ACTION_DELETE,
             onClick: () => handleDeleteEmployee(employee),
             variant: 'danger' as const,
           },
@@ -323,36 +314,30 @@ export default function HRPage() {
     []
   )
 
-  // Handle salary payment submission
   const handleSalaryPaymentSubmit = async (data: SalaryPaymentData) => {
     try {
-      // 計算總金額
       const totalAmount = data.employee_salaries.reduce((sum, s) => sum + s.amount, 0)
-
-      // 生成公司請款編號
       const code = generateCompanyPaymentRequestCode('SAL', data.request_date, paymentRequests)
 
-      // 建立一張薪資請款單
       const newRequest = await createPaymentRequestApi({
         code,
         request_number: code,
         request_date: data.request_date,
-        request_type: '薪資',
-        request_category: 'company', // 公司請款
-        expense_type: 'SAL', // 薪資
+        request_type: LABELS.SALARY_REQUEST_TYPE,
+        request_category: 'company',
+        expense_type: 'SAL',
         amount: totalAmount,
         is_special_billing: data.is_special_billing,
-        notes: data.notes || `${data.employee_salaries.length} 位員工薪資`,
+        notes: data.notes || `${data.employee_salaries.length}${LABELS.SALARY_NOTES_SUFFIX}`,
         status: 'pending',
         created_by: currentUser?.id,
         created_by_name: currentUser?.display_name || currentUser?.chinese_name,
       })
 
-      // 為每位員工建立請款項目
       if (newRequest?.id) {
         for (let i = 0; i < data.employee_salaries.length; i++) {
           const salary = data.employee_salaries[i]
-          const itemNumber = `${code}-${String.fromCharCode(65 + i)}` // A, B, C...
+          const itemNumber = `${code}-${String.fromCharCode(65 + i)}`
 
           await createPaymentRequestItem({
             request_id: newRequest.id,
@@ -360,7 +345,7 @@ export default function HRPage() {
             category: '其他' as const,
             supplier_id: salary.employee_id,
             supplier_name: salary.employee_name,
-            description: `${salary.employee_name} 薪資`,
+            description: `${salary.employee_name}${LABELS.SALARY_DESC_SUFFIX}`,
             unit_price: salary.amount,
             quantity: 1,
             subtotal: salary.amount,
@@ -369,13 +354,12 @@ export default function HRPage() {
         }
       }
 
-      // SWR 快取失效，自動重新載入
       await invalidatePaymentRequests()
-      toast.success(`已建立薪資請款單（${data.employee_salaries.length} 位員工，共 NT$ ${totalAmount.toLocaleString()}）`)
+      toast.success(`${LABELS.SALARY_SUCCESS_PREFIX}${data.employee_salaries.length}${LABELS.SALARY_SUCCESS_MID}${totalAmount.toLocaleString()}${LABELS.SALARY_SUCCESS_SUFFIX}`)
       logger.log('建立薪資請款成功：', data)
     } catch (error) {
       logger.error('建立薪資請款失敗：', error)
-      toast.error('建立薪資請款失敗，請稍後再試')
+      toast.error(LABELS.SALARY_FAILED)
     }
   }
 
@@ -385,13 +369,13 @@ export default function HRPage() {
         title={LABELS.MANAGE_3470}
         icon={Users}
         breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '人資管理', href: '/hr' },
+          { label: LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: LABELS.BREADCRUMB_HR, href: '/hr' },
         ]}
         data={filteredEmployees}
         columns={columns}
         searchFields={['display_name', 'employee_number', 'personal_info'] as (keyof Employee)[]}
-        searchPlaceholder="搜尋員工..."
+        searchPlaceholder={LABELS.SEARCH_PLACEHOLDER}
         onRowClick={handleEmployeeClick}
         renderActions={renderActions}
         bordered={true}
@@ -444,7 +428,6 @@ export default function HRPage() {
         }
       />
 
-      {/* 員工詳細資料展開視圖 */}
       {expandedEmployee && (
         <EmployeeExpandedView
           employee_id={expandedEmployee}
@@ -452,7 +435,6 @@ export default function HRPage() {
         />
       )}
 
-      {/* 新增員工對話框 */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent level={1} className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -465,7 +447,6 @@ export default function HRPage() {
         </DialogContent>
       </Dialog>
 
-      {/* 薪資請款對話框 */}
       <SalaryPaymentDialog
         open={isSalaryPaymentDialogOpen}
         onOpenChange={setIsSalaryPaymentDialogOpen}
@@ -473,7 +454,6 @@ export default function HRPage() {
         onSubmit={handleSalaryPaymentSubmit}
       />
 
-      {/* Confirm Dialog */}
       <ConfirmDialog {...confirmDialogProps} />
     </>
   )
