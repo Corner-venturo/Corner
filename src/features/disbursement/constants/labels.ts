@@ -1,5 +1,10 @@
 // disbursement 模組 UI 標籤常量
 
+export const DISBURSEMENT_HOOK_LABELS = {
+  出納單建立成功: (orderNumber: string) => `出納單 ${orderNumber} 建立成功`,
+  建立出納單失敗: (errorMessage: string) => `建立出納單失敗: ${errorMessage}`,
+}
+
 export const DISBURSEMENT_LABELS = {
   Supabase_錯誤: 'Supabase 錯誤:',
   找不到請款項目資料: '⚠️ 找不到請款項目資料',

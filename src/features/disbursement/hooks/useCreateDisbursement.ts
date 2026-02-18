@@ -18,7 +18,7 @@ import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { createDisbursementSchema } from '@/lib/validations/schemas'
-import { DISBURSEMENT_LABELS } from '../constants/labels'
+import { DISBURSEMENT_LABELS, DISBURSEMENT_HOOK_LABELS } from '../constants/labels'
 import { recalculateExpenseStats } from '@/features/finance/payments/services/expense-core.service'
 
 // 計算下一個週四
@@ -195,7 +195,7 @@ export function useCreateDisbursement({ pendingRequests, onSuccess }: UseCreateD
       // 重新載入出納單列表（SWR 快取失效）
       await invalidateDisbursementOrders()
 
-      await alert(`出納單 ${orderNumber} 建立成功`, 'success')
+      await alert(DISBURSEMENT_HOOK_LABELS.出納單建立成功(orderNumber), 'success')
 
       // 重置狀態
       resetForm()
@@ -203,7 +203,7 @@ export function useCreateDisbursement({ pendingRequests, onSuccess }: UseCreateD
     } catch (error) {
       logger.error(DISBURSEMENT_LABELS.建立出納單失敗, error)
       const errorMessage = error instanceof Error ? error.message : DISBURSEMENT_LABELS.未知錯誤
-      await alert(`建立出納單失敗: ${errorMessage}`, 'error')
+      await alert(DISBURSEMENT_HOOK_LABELS.建立出納單失敗(errorMessage), 'error')
     } finally {
       setIsSubmitting(false)
     }
