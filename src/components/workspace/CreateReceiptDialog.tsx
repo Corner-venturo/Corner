@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { createReceiptOrder } from '@/data'
+import { useAuthStore } from '@/stores'
 import type { ReceiptOrder } from '@/types'
 import { alert } from '@/lib/ui/alert-dialog'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -36,7 +37,7 @@ interface CreateReceiptDialogProps {
 }
 
 export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateReceiptDialogProps) {
-
+  const { user } = useAuthStore()
   const [receiptDate, setReceiptDate] = useState(getTodayString())
   const [paymentMethod, setPaymentMethod] = useState<'現金' | '匯款' | '刷卡' | '支票'>('匯款')
   const [amount, setAmount] = useState(order.gap.toString())
@@ -59,6 +60,7 @@ export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateR
         amount: parseFloat(amount),
         notes: note,
         handled_by: null,
+        workspace_id: user?.workspace_id || '',
       }
 
       const receipt = await createReceiptOrder(receiptData as Omit<ReceiptOrder, 'id' | 'created_at' | 'updated_at'>)

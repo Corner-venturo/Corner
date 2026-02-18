@@ -378,7 +378,7 @@ export function AddReceiptDialog({
       <DialogContent level={2} className="max-w-[95vw] w-[95vw] h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            {isEditMode ? '編輯收款單' : ADD_RECEIPT_DIALOG_LABELS.新增收款單}
+            {isEditMode ? ADD_RECEIPT_DIALOG_LABELS.編輯收款單 : ADD_RECEIPT_DIALOG_LABELS.新增收款單}
             {isConfirmed && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-morandi-green/20 text-morandi-green text-xs font-medium">
                 <Lock size={12} />
@@ -536,7 +536,7 @@ export function AddReceiptDialog({
           <div className="space-y-3 pt-4 border-t border-morandi-gold/30 bg-morandi-gold/5 -mx-6 px-6 py-4">
             <h3 className="text-sm font-medium text-morandi-gold flex items-center gap-2">
               <ExternalLink size={16} />
-              LinkPay 付款連結已產生
+              {ADD_RECEIPT_DIALOG_LABELS.LINKPAY_LINKS_GENERATED}
             </h3>
             <div className="space-y-2">
               {linkPayResults.map(result => (
@@ -608,7 +608,7 @@ export function AddReceiptDialog({
                 className="gap-2 text-morandi-red border-morandi-red hover:bg-morandi-red hover:text-white"
               >
                 <Trash2 size={16} />
-                {isDeleting ? '刪除中...' : ADD_RECEIPT_DIALOG_LABELS.刪除}
+                {isDeleting ? ADD_RECEIPT_DIALOG_LABELS.刪除中 : ADD_RECEIPT_DIALOG_LABELS.刪除}
               </Button>
             )}
           </div>
@@ -617,7 +617,7 @@ export function AddReceiptDialog({
           <div className="flex space-x-2">
             <Button variant="outline" onClick={handleCancel} className="gap-2">
               <X size={16} />
-              {linkPayResults.length > 0 ? '關閉' : isConfirmed ? '關閉' : ADD_RECEIPT_DIALOG_LABELS.取消}
+              {linkPayResults.length > 0 ? ADD_RECEIPT_DIALOG_LABELS.關閉 : isConfirmed ? ADD_RECEIPT_DIALOG_LABELS.關閉 : ADD_RECEIPT_DIALOG_LABELS.取消}
             </Button>
             {linkPayResults.length === 0 && !isConfirmed && (
               <Button

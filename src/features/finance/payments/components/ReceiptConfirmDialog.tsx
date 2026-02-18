@@ -177,7 +177,7 @@ export function ReceiptConfirmDialog({
               'font-medium',
               isConfirmed ? 'text-morandi-green' : 'text-morandi-gold'
             )}>
-              {isConfirmed ? '已確認' : RECEIPT_CONFIRM_DIALOG_LABELS.待確認}
+              {isConfirmed ? RECEIPT_CONFIRM_DIALOG_LABELS.已確認 : RECEIPT_CONFIRM_DIALOG_LABELS.待確認}
             </span>
           </div>
         </div>
@@ -301,7 +301,7 @@ export function ReceiptConfirmDialog({
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              確認後將通知收款單建立者：{receipt.receipt_number} 金額異常
+              {RECEIPT_CONFIRM_DIALOG_LABELS.確認後將通知建立者(receipt.receipt_number)}
             </p>
           </div>
         )}
@@ -317,7 +317,7 @@ export function ReceiptConfirmDialog({
                 className="gap-2 text-morandi-red border-morandi-red hover:bg-morandi-red hover:text-white"
               >
                 <Trash2 size={16} />
-                {isDeleting ? '刪除中...' : ADD_RECEIPT_DIALOG_LABELS.刪除}
+                {isDeleting ? RECEIPT_CONFIRM_DIALOG_LABELS.刪除中 : ADD_RECEIPT_DIALOG_LABELS.刪除}
               </Button>
             )}
           </div>

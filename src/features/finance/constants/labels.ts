@@ -1,6 +1,10 @@
 // finance 模組 UI 標籤常量
 
 export const ADD_RECEIPT_DIALOG_LABELS = {
+  編輯收款單: '編輯收款單',
+  刪除中: '刪除中...',
+  關閉: '關閉',
+  LINKPAY_LINKS_GENERATED: 'LinkPay 付款連結已產生',
   表單驗證失敗: '表單驗證失敗',
   無法取得_workspace_ID: '無法取得 workspace ID',
   收款單更新成功: '收款單更新成功',
@@ -79,6 +83,8 @@ export const PAYMENT_ITEM_ROW_LABELS = {
 };
 
 export const RECEIPT_CONFIRM_DIALOG_LABELS = {
+  已確認: '已確認',
+  刪除中: '刪除中...',
   未知: '未知',
   確認成功: '確認成功',
   收款金額已確認: '收款金額已確認',
@@ -88,6 +94,7 @@ export const RECEIPT_CONFIRM_DIALOG_LABELS = {
   待確認: '待確認',
   金額正確: '金額正確',
   金額異常: '金額異常',
+  確認後將通知建立者: (receiptNumber: string) => `確認後將通知收款單建立者：${receiptNumber} 金額異常`,
   輸入實際金額: '輸入實際金額',
 };
 
