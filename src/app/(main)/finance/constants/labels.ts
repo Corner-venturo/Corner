@@ -366,12 +366,12 @@ export const TRAVEL_INVOICE_DETAIL_LABELS = {
   CANCEL: '取消',
   CONFIRM_8486: '確認作廢',
 
-  // Payment method labels
-  PAYMENT_METHOD_MAP: {
-    transfer: '匯款',
-    cash: '現金',
-    card: '刷卡',
-    check: '支票',
-    linkpay: 'LinkPay',
-  } as Record<string, string>,
+}
+
+export const PAYMENT_METHOD_MAP: Record<string, string> = {
+  transfer: '匯款',
+  cash: '現金',
+  card: '刷卡',
+  check: '支票',
+  linkpay: 'LinkPay',
 }

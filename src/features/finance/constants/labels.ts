@@ -354,6 +354,13 @@ export const RECEIPT_CONFIRM_LABELS = {
   ORDER: '訂單：',
   STATUS: '狀態：',
   PAYMENT_METHOD: '收款方式',
+  PAYMENT_METHOD_MAP: {
+    cash: '現金',
+    transfer: '匯款',
+    credit_card: '刷卡',
+    check: '支票',
+    linkpay: 'LinkPay',
+  } as Record<string, string>,
   TRANSACTION_DATE: '交易日期',
   PAYER: '付款人',
   REMARKS: '備註',

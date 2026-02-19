@@ -15,7 +15,7 @@ import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
-import { FinanceLabels } from '../constants/labels'
+import { FinanceLabels, PAYMENT_METHOD_MAP } from '../constants/labels'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { Button } from '@/components/ui/button'
 import { TableColumn } from '@/components/ui/enhanced-table'
@@ -134,7 +134,7 @@ export default function PaymentsPage() {
     { key: 'tour_name', label: FinanceLabels.tourName, sortable: true },
     { key: 'receipt_amount', label: FinanceLabels.receiptAmount, sortable: true, render: (value) => <CurrencyCell amount={Number(value)} /> },
     { key: 'actual_amount', label: FinanceLabels.actualAmount, sortable: true, render: (value) => <CurrencyCell amount={Number(value) || 0} /> },
-    { key: 'payment_method', label: FinanceLabels.paymentMethod, render: (value) => <span className="text-sm">{FinanceLabels.PAYMENT_METHOD_MAP[String(value)] || String(value || '-')}</span> },
+    { key: 'payment_method', label: FinanceLabels.paymentMethod, render: (value) => <span className="text-sm">{PAYMENT_METHOD_MAP[String(value)] || String(value || '-')}</span> },
     { key: 'status', label: FinanceLabels.status, render: (value) => <StatusCell type="receipt" status={String(value)} /> },
     { key: 'actions', label: FinanceLabels.actions, render: (_, row) => <ActionCell actions={[{ icon: Edit2, label: FinanceLabels.edit, onClick: () => loadReceiptForEdit(row) }]} /> },
   ]
