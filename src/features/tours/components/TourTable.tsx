@@ -15,6 +15,7 @@ interface TourTableProps {
   onRowClick: (row: unknown) => void
   renderActions: (row: unknown) => React.ReactNode
   getStatusColor: (status: string) => string
+  ordersByTourId?: Map<string, { sales_person: string | null; assistant: string | null }>
 }
 
 export const TourTable: React.FC<TourTableProps> = ({
@@ -24,8 +25,9 @@ export const TourTable: React.FC<TourTableProps> = ({
   onRowClick,
   renderActions,
   getStatusColor,
+  ordersByTourId,
 }) => {
-  const columns = useTourTableColumns({ getStatusColor })
+  const columns = useTourTableColumns({ getStatusColor, ordersByTourId })
 
   return (
     <>

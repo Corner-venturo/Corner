@@ -14,9 +14,10 @@ import { TOUR_TABLE } from '../constants'
 
 interface UseTourTableColumnsParams {
   getStatusColor: (status: string) => string
+  ordersByTourId?: Map<string, { sales_person: string | null; assistant: string | null }>
 }
 
-export function useTourTableColumns({ getStatusColor }: UseTourTableColumnsParams) {
+export function useTourTableColumns({ getStatusColor, ordersByTourId }: UseTourTableColumnsParams) {
 
   return useMemo<TableColumn[]>(
     () => [
@@ -61,6 +62,36 @@ export function useTourTableColumns({ getStatusColor }: UseTourTableColumnsParam
         },
       },
       {
+        key: 'return_date',
+        label: TOUR_TABLE.col_return,
+        sortable: true,
+        width: '100px',
+        render: (value, row) => {
+          const tour = row as Tour
+          return <DateCell date={tour.return_date} showIcon={false} />
+        },
+      },
+      {
+        key: 'salesperson',
+        label: TOUR_TABLE.col_salesperson,
+        width: '80px',
+        render: (_value, row) => {
+          const tour = row as Tour
+          const orderInfo = ordersByTourId?.get(tour.id)
+          return <span className="text-sm text-morandi-primary">{orderInfo?.sales_person || '-'}</span>
+        },
+      },
+      {
+        key: 'assistant',
+        label: TOUR_TABLE.col_assistant,
+        width: '80px',
+        render: (_value, row) => {
+          const tour = row as Tour
+          const orderInfo = ordersByTourId?.get(tour.id)
+          return <span className="text-sm text-morandi-primary">{orderInfo?.assistant || '-'}</span>
+        },
+      },
+      {
         key: 'status',
         label: TOUR_TABLE.col_status,
         sortable: true,
@@ -76,6 +107,6 @@ export function useTourTableColumns({ getStatusColor }: UseTourTableColumnsParam
         },
       },
     ],
-    [getStatusColor]
+    [getStatusColor, ordersByTourId]
   )
 }

@@ -8,7 +8,7 @@
 import React, { useCallback, useEffect, useState, useMemo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores/auth-store'
-import { useQuotesListSlim } from '@/hooks/useListSlim'
+import { useQuotesListSlim, useOrdersListSlim } from '@/hooks/useListSlim'
 import { useTourOperations } from '../hooks/useTourOperations'
 import { useTourChannelOperations, TourStoreActions } from './TourChannelOperations'
 import { useTourActionButtons } from './TourActionButtons'
@@ -66,6 +66,21 @@ export const ToursPage: React.FC = () => {
 
   // 🔧 優化：只保留 quotes（TourActionButtons 需要），其他由 useTourOperations 內部處理
   const { items: quotes } = useQuotesListSlim()
+  const { items: allOrders } = useOrdersListSlim()
+
+  // Build a map of tour_id → first order's sales_person/assistant for display in tour table
+  const ordersByTourId = useMemo(() => {
+    const map = new Map<string, { sales_person: string | null; assistant: string | null }>()
+    for (const order of allOrders) {
+      if (order.tour_id && !map.has(order.tour_id)) {
+        map.set(order.tour_id, {
+          sales_person: order.sales_person ?? null,
+          assistant: order.assistant ?? null,
+        })
+      }
+    }
+    return map
+  }, [allOrders])
 
   // 🔧 對話框狀態（替代 deprecated useDialog）
   const [dialogState, setDialogState] = useState<{
@@ -339,6 +354,7 @@ export const ToursPage: React.FC = () => {
               onRowClick={handleRowClick}
               renderActions={renderActions}
               getStatusColor={getStatusColor}
+              ordersByTourId={ordersByTourId}
             />
           </div>
         )}
