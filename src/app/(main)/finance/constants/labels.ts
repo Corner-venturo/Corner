@@ -57,6 +57,7 @@ export const FinanceLabels = {
   receiptAmount: '應收金額',
   actualAmount: '實收金額',
   status: '狀態',
+  paymentMethod: '收款方式',
   actions: '操作',
   edit: '編輯',
   createReceiptFailedPrefix: '建立收款單失敗',
@@ -364,4 +365,13 @@ export const TRAVEL_INVOICE_DETAIL_LABELS = {
   PLEASE_ENTER_7085: '請輸入作廢原因',
   CANCEL: '取消',
   CONFIRM_8486: '確認作廢',
+
+  // Payment method labels
+  PAYMENT_METHOD_MAP: {
+    transfer: '匯款',
+    cash: '現金',
+    card: '刷卡',
+    check: '支票',
+    linkpay: 'LinkPay',
+  } as Record<string, string>,
 }
