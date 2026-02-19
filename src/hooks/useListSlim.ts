@@ -18,6 +18,7 @@ const ORDERS_LIST_FIELDS = [
   'sales_person',
   'assistant',
   'payment_status',
+  'total_amount',
   'paid_amount',      // TourOverviewTab 用於計算收款率
   'remaining_amount',
   'member_count',

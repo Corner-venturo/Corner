@@ -267,6 +267,9 @@ export const COMP_ORDERS_LABELS = {
 
   LABEL_7017: '訂單編號',
   LABEL_8875: '旅遊團',
+  LABEL_TOTAL_AMOUNT: '訂單金額',
+  LABEL_PAID_AMOUNT: '已收金額',
+  LABEL_REMAINING_AMOUNT: '未收金額',
   ACTIONS: '操作',
 };
 
