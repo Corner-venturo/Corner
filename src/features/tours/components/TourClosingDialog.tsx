@@ -18,6 +18,8 @@ import { Tour } from '@/stores/types'
 import {
   usePaymentRequests,
   useOrdersSlim,
+  useReceipts,
+  useTourBonusSettings,
   updateTour,
   createPaymentRequest as createPaymentRequestApi,
 } from '@/data'
@@ -25,6 +27,7 @@ import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import { formatCurrency } from '@/lib/utils/format-currency'
 import { generateTourClosingPDF } from '@/lib/pdf/tour-closing-pdf'
+import { calculateFullProfit } from '@/features/tours/services/profit-calculation.service'
 import { supabase } from '@/lib/supabase/client'
 import { TOURS_LABELS } from './constants/labels'
 import { TOUR_CLOSING_LABELS, TOUR_SERVICE_LABELS } from '../constants/labels'
@@ -53,6 +56,8 @@ export function TourClosingDialog({
   // 使用 @/data hooks（SWR 自動載入）
   const { items: paymentRequests } = usePaymentRequests()
   const { items: orders } = useOrdersSlim()
+  const { items: allReceipts } = useReceipts()
+  const { items: bonusSettings } = useTourBonusSettings()
 
   // 計算團的總收入（從訂單）
   const tourOrders = useMemo(() => {
@@ -71,6 +76,16 @@ export function TourClosingDialog({
         pr.request_type !== TOUR_CLOSING_LABELS.OP_BONUS
     )
   }, [paymentRequests, tour.id])
+
+  // 取得團的收款單
+  const tourReceipts = useMemo(() => {
+    return allReceipts.filter(r => r.tour_id === tour.id)
+  }, [allReceipts, tour.id])
+
+  // 取得此團的獎金設定
+  const tourBonusSettingsFiltered = useMemo(() => {
+    return bonusSettings.filter(s => s.tour_id === tour.id)
+  }, [bonusSettings, tour.id])
 
   // 取得團的獎金請款單
   const tourBonuses = useMemo(() => {
@@ -180,11 +195,23 @@ export function TourClosingDialog({
   const handlePrintReport = async () => {
     setIsPrinting(true)
     try {
+      // 計算團員總人數
+      const memberCount = tourOrders.reduce((sum, o) => sum + (o.member_count || 0), 0)
+
+      // 使用利潤計算引擎
+      const profitResult = calculateFullProfit({
+        receipts: tourReceipts,
+        expenses: tourCosts,
+        settings: tourBonusSettingsFiltered,
+        memberCount,
+      })
+
       await generateTourClosingPDF({
         tour,
         orders: tourOrders,
+        receipts: tourReceipts,
         costs: tourCosts,
-        bonuses: tourBonuses,
+        profitResult,
       })
       toast.success(TOUR_CLOSING_LABELS.REPORT_GENERATED)
     } catch (error) {

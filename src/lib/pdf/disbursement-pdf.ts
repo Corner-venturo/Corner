@@ -2,11 +2,13 @@
  * 出納單 PDF 生成
  *
  * 功能：
- * 1. 橫向 A4 格式（配合 cornerERP）
+ * 1. 直式 A4 格式（portrait）
  * 2. 按付款對象（供應商）分組
  * 3. 跨請款單合併同一供應商
- * 4. 自動分頁處理
- * 5. 支援中文字體
+ * 4. 每組最多 5 筆，超過換頁
+ * 5. 每頁小計、最後一頁總計
+ * 6. 頁碼（第 X 頁 / 共 Y 頁）
+ * 7. 支援中文字體
  */
 
 import jsPDF from 'jspdf'
@@ -14,11 +16,13 @@ import autoTable from 'jspdf-autotable'
 import type { DisbursementOrder, PaymentRequest, PaymentRequestItem } from '@/stores/types'
 import { formatDate } from '@/lib/utils'
 import { loadChineseFonts } from './pdf-fonts'
+import { DISBURSEMENT_PDF_LABELS } from './constants/pdf-labels'
 
 interface DisbursementPDFData {
   order: DisbursementOrder
   paymentRequests: PaymentRequest[]
   paymentRequestItems: PaymentRequestItem[]
+  preparedBy?: string
 }
 
 interface ProcessedItem {
@@ -53,7 +57,7 @@ function processItems(
       createdBy: request?.created_by_name || '-',
       tourName: request?.tour_name || '-',
       description: item.description || item.category || '-',
-      payFor: item.supplier_name || '未指定供應商',
+      payFor: item.supplier_name || DISBURSEMENT_PDF_LABELS.UNSPECIFIED_SUPPLIER,
       amount: item.subtotal || 0,
     }
   })
@@ -84,7 +88,7 @@ function groupByPayFor(items: ProcessedItem[]): PayForGroup[] {
 }
 
 /**
- * 分割大型群組
+ * 分割大型群組（每組最多 maxSize 筆）
  */
 function splitLargeGroups(groups: PayForGroup[], maxSize = 5): PayForGroup[] {
   const result: PayForGroup[] = []
@@ -95,11 +99,12 @@ function splitLargeGroups(groups: PayForGroup[], maxSize = 5): PayForGroup[] {
     } else {
       for (let i = 0; i < group.items.length; i += maxSize) {
         const chunk = group.items.slice(i, i + maxSize)
+        const isLastChunk = i + maxSize >= group.items.length
         result.push({
           payFor: group.payFor,
           items: chunk,
-          total: i === 0 ? group.total : 0,
-          hiddenTotal: i !== 0,
+          total: isLastChunk ? group.total : 0,
+          hiddenTotal: !isLastChunk,
         })
       }
     }
@@ -112,30 +117,53 @@ function splitLargeGroups(groups: PayForGroup[], maxSize = 5): PayForGroup[] {
  * 生成出納單 PDF
  */
 export async function generateDisbursementPDF(data: DisbursementPDFData): Promise<void> {
-  const { order, paymentRequests, paymentRequestItems } = data
+  const { order, paymentRequests, paymentRequestItems, preparedBy } = data
 
   // 處理資料
   const processedItems = processItems(paymentRequests, paymentRequestItems)
   const payForGroups = splitLargeGroups(groupByPayFor(processedItems))
 
-  // 初始化 PDF - 橫向 A4 (208mm x 295mm)
+  // 初始化 PDF - 直式 A4
   const doc = new jsPDF({
-    orientation: 'landscape',
+    orientation: 'portrait',
     unit: 'mm',
-    format: [208, 295],
+    format: 'a4',
   })
 
   // 載入中文字體
   await loadChineseFonts(doc)
 
+  const pageWidth = doc.internal.pageSize.getWidth()
+
   // ========== 標題區 ==========
-  doc.setFontSize(14)
+  doc.setFontSize(16)
   doc.setFont('ChironHeiHK', 'bold')
-  doc.text(`出納單號 ${order.order_number || '-'}`, 15, 15)
+  doc.text(
+    `${DISBURSEMENT_PDF_LABELS.TITLE} ${order.order_number || '-'}`,
+    pageWidth / 2,
+    18,
+    { align: 'center' }
+  )
 
   doc.setFontSize(10)
   doc.setFont('ChironHeiHK', 'normal')
-  doc.text(`出帳日期: ${order.disbursement_date ? formatDate(order.disbursement_date) : '-'}`, 15, 22)
+
+  // 出帳日期（左）
+  doc.text(
+    `${DISBURSEMENT_PDF_LABELS.DISBURSEMENT_DATE}${order.disbursement_date ? formatDate(order.disbursement_date) : '-'}`,
+    15,
+    27
+  )
+
+  // 製表人（右）
+  if (preparedBy) {
+    doc.text(
+      `${DISBURSEMENT_PDF_LABELS.PREPARED_BY}${preparedBy}`,
+      pageWidth - 15,
+      27,
+      { align: 'right' }
+    )
+  }
 
   // ========== 準備表格資料 ==========
   const tableBody: (string | { content: string; rowSpan?: number })[][] = []
@@ -150,8 +178,6 @@ export async function generateDisbursementPDF(data: DisbursementPDFData): Promis
       }
 
       row.push(item.requestCode)
-      row.push(item.createdBy)
-      row.push(item.tourName)
       row.push(item.description)
       row.push(item.amount.toLocaleString())
 
@@ -169,10 +195,22 @@ export async function generateDisbursementPDF(data: DisbursementPDFData): Promis
 
   // ========== 繪製表格 ==========
   autoTable(doc, {
-    startY: 28,
-    head: [['付款對象', '請款編號', '請款人員', '團名', '項目', '應付金額', '小計']],
+    startY: 33,
+    head: [[
+      DISBURSEMENT_PDF_LABELS.COL_PAYEE,
+      DISBURSEMENT_PDF_LABELS.COL_REQUEST_NO,
+      DISBURSEMENT_PDF_LABELS.COL_DESCRIPTION,
+      DISBURSEMENT_PDF_LABELS.COL_AMOUNT,
+      DISBURSEMENT_PDF_LABELS.COL_SUBTOTAL,
+    ]],
     body: tableBody,
-    foot: [['TOTAL', '', '', '', '', '', (order.amount || 0).toLocaleString()]],
+    foot: [[
+      DISBURSEMENT_PDF_LABELS.TOTAL,
+      '',
+      '',
+      '',
+      (order.amount || 0).toLocaleString(),
+    ]],
     theme: 'grid',
     styles: {
       font: 'ChironHeiHK',
@@ -199,13 +237,11 @@ export async function generateDisbursementPDF(data: DisbursementPDFData): Promis
       lineColor: [100, 100, 100],
     },
     columnStyles: {
-      0: { cellWidth: 35, halign: 'left', fontStyle: 'bold' },
-      1: { cellWidth: 30, halign: 'left' },
-      2: { cellWidth: 25, halign: 'left' },
-      3: { cellWidth: 45, halign: 'left' },
-      4: { cellWidth: 'auto', halign: 'left' },
-      5: { cellWidth: 28, halign: 'right' },
-      6: { cellWidth: 28, halign: 'right', fontStyle: 'bold' },
+      0: { cellWidth: 40, halign: 'left', fontStyle: 'bold' },
+      1: { cellWidth: 35, halign: 'left' },
+      2: { cellWidth: 'auto', halign: 'left' },
+      3: { cellWidth: 28, halign: 'right' },
+      4: { cellWidth: 28, halign: 'right', fontStyle: 'bold' },
     },
     margin: { left: 15, right: 15 },
     showFoot: 'lastPage',
@@ -220,16 +256,15 @@ export async function generateDisbursementPDF(data: DisbursementPDFData): Promis
     doc.setTextColor(150)
 
     const pageHeight = doc.internal.pageSize.getHeight()
-    const pageWidth = doc.internal.pageSize.getWidth()
 
     doc.text(
-      '─ 如果可以，讓我們一起探索世界的每個角落 ─',
+      DISBURSEMENT_PDF_LABELS.COMPANY_SLOGAN,
       pageWidth / 2,
       pageHeight - 12,
       { align: 'center' }
     )
     doc.text(
-      `${i} / ${pageCount}`,
+      DISBURSEMENT_PDF_LABELS.PAGE_NUMBER(i, pageCount),
       pageWidth - 18,
       pageHeight - 12,
       { align: 'center' }
@@ -239,17 +274,4 @@ export async function generateDisbursementPDF(data: DisbursementPDFData): Promis
   // ========== 儲存 PDF ==========
   const filename = `${order.order_number || 'Disbursement'}.pdf`
   doc.save(filename)
-}
-
-/**
- * 取得狀態文字
- */
-function getStatusText(status: string): string {
-  const statusMap: Record<string, string> = {
-    pending: '待出帳',
-    confirmed: '已確認',
-    paid: '已出帳',
-    cancelled: '已取消',
-  }
-  return statusMap[status] || status
 }

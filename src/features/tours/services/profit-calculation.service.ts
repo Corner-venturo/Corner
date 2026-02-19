@@ -33,7 +33,7 @@ export function calculateReceiptTotal(receipts: ReceiptData[]): number {
     if (r.payment_items && r.payment_items.length > 0) {
       return sum + r.payment_items.reduce((s, item) => s + (item.amount || 0), 0)
     }
-    return sum + (r.total_amount ?? Number(r.amount) || 0)
+    return sum + (r.total_amount ?? (Number(r.amount) || 0))
   }, 0)
 }
 
