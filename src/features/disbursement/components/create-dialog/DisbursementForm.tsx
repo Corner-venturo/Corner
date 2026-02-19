@@ -19,9 +19,9 @@ import { DISBURSEMENT_LABELS } from '../../constants/labels'
 // 狀態選項
 const STATUS_OPTIONS = [
   { value: 'all', label: DISBURSEMENT_LABELS.全部狀態 },
-  { value: 'pending', label: DISBURSEMENT_LABELS.請款中 },
-  { value: 'approved', label: DISBURSEMENT_LABELS.已核准 },
+  { value: 'pending', label: DISBURSEMENT_LABELS.待處理 },
   { value: 'confirmed', label: DISBURSEMENT_LABELS.已確認 },
+  { value: 'billed', label: DISBURSEMENT_LABELS.已出帳 },
 ]
 
 interface DisbursementFormProps {

@@ -123,8 +123,8 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
             break
           case 'status':
             // Provide default 'pending' if status is null for indexing
-            aValue = statusLabels[(a.status || 'pending') as 'pending' | 'approved' | 'paid']
-            bValue = statusLabels[(b.status || 'pending') as 'pending' | 'approved' | 'paid']
+            aValue = statusLabels[(a.status || 'pending') as 'pending' | 'confirmed' | 'billed']
+            bValue = statusLabels[(b.status || 'pending') as 'pending' | 'confirmed' | 'billed']
             break
           default:
             return 0
@@ -176,7 +176,7 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
 
 // Helper function for status badge, explicitly typed
 function getStatusBadge(status: PaymentRequest['status']) {
-  const currentStatus = (status || 'pending') as 'pending' | 'approved' | 'paid'; // Default to 'pending' if null
+  const currentStatus = (status || 'pending') as 'pending' | 'confirmed' | 'billed'; // Default to 'pending' if null
   return {
     label: statusLabels[currentStatus],
     color: statusColors[currentStatus],

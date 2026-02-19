@@ -160,9 +160,9 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
 
     const order = await this.create(orderData)
 
-    // 更新請款單狀態為 processing
+    // 更新請款單狀態為 billed（已加入出納單）
     for (const requestId of paymentRequestIds) {
-      await this.updatePaymentRequestStatus(requestId, 'processing')
+      await this.updatePaymentRequestStatus(requestId, 'billed')
     }
 
     return order
@@ -198,14 +198,14 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
 
     try {
       for (const requestId of requestIds) {
-        await this.updatePaymentRequestStatus(requestId, 'confirmed')
+        await this.updatePaymentRequestStatus(requestId, 'billed')
         updatedRequestIds.push(requestId)
       }
     } catch (error) {
-      // 回滾：將已更新的請款單改回 processing
+      // 回滾：將已更新的請款單改回 confirmed
       for (const requestId of updatedRequestIds) {
         try {
-          await this.updatePaymentRequestStatus(requestId, 'processing')
+          await this.updatePaymentRequestStatus(requestId, 'confirmed')
         } catch (rollbackError) {
           logger.error(`回滾請款單 ${requestId} 狀態失敗:`, rollbackError)
         }
@@ -257,9 +257,9 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       updated_at: this.now(),
     })
 
-    // 更新請款單狀態
+    // 更新請款單狀態為 billed（已加入出納單）
     for (const requestId of requestIds) {
-      await this.updatePaymentRequestStatus(requestId, 'processing')
+      await this.updatePaymentRequestStatus(requestId, 'billed')
     }
   }
 
@@ -298,8 +298,8 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       updated_at: this.now(),
     })
 
-    // 將請款單狀態改回 pending
-    await this.updatePaymentRequestStatus(requestId, 'pending')
+    // 將請款單狀態改回 confirmed
+    await this.updatePaymentRequestStatus(requestId, 'confirmed')
   }
 
   /**

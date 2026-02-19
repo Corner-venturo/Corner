@@ -43,16 +43,16 @@ export interface NewItemFormData {
 
 import { REQUEST_TYPE_LABELS } from '../constants/labels'
 
-export const statusLabels: Record<'pending' | 'approved' | 'paid', string> = {
+export const statusLabels: Record<'pending' | 'confirmed' | 'billed', string> = {
   pending: REQUEST_TYPE_LABELS.STATUS_PENDING,
-  approved: REQUEST_TYPE_LABELS.STATUS_APPROVED,
-  paid: REQUEST_TYPE_LABELS.STATUS_PAID,
+  confirmed: REQUEST_TYPE_LABELS.STATUS_CONFIRMED,
+  billed: REQUEST_TYPE_LABELS.STATUS_BILLED,
 }
 
-export const statusColors: Record<'pending' | 'approved' | 'paid', string> = {
+export const statusColors: Record<'pending' | 'confirmed' | 'billed', string> = {
   pending: 'bg-morandi-gold',
-  approved: 'bg-morandi-green',
-  paid: 'bg-morandi-primary',
+  confirmed: 'bg-status-info',
+  billed: 'bg-morandi-green',
 }
 
 export const categoryOptions = [

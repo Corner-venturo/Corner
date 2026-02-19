@@ -5,7 +5,7 @@
 import { z } from 'zod'
 
 const paymentRequestCategorySchema = z.enum(['tour', 'company'])
-const paymentRequestStatusSchema = z.enum(['pending', 'approved', 'paid'])
+const paymentRequestStatusSchema = z.enum(['pending', 'confirmed', 'billed'])
 
 export const createPaymentRequestSchema = z.object({
   code: z.string().optional(),

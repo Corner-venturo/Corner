@@ -29,13 +29,13 @@ export const DISBURSEMENT_STATUS = {
 // 請款單狀態標籤（Payment Request）
 export const PAYMENT_REQUEST_STATUS_LABELS = {
   pending: DISBURSEMENT_LABELS.待處理,
-  approved: DISBURSEMENT_LABELS.已核准,
-  paid: DISBURSEMENT_LABELS.已付款,
+  confirmed: DISBURSEMENT_LABELS.已確認,
+  billed: DISBURSEMENT_LABELS.已出帳,
 } as const
 
 // 請款單狀態顏色
 export const PAYMENT_REQUEST_STATUS_COLORS = {
   pending: 'bg-morandi-gold',
-  approved: 'bg-morandi-green',
-  paid: 'bg-morandi-primary',
+  confirmed: 'bg-status-info',
+  billed: 'bg-morandi-green',
 } as const

@@ -454,9 +454,9 @@ export const TOUR_REQUEST_ITEMS_LABELS = {
 
 // Request types
 export const REQUEST_TYPE_LABELS = {
-  STATUS_PENDING: '請款中',
-  STATUS_APPROVED: '已確認',
-  STATUS_PAID: '已付款',
+  STATUS_PENDING: '待處理',
+  STATUS_CONFIRMED: '已確認',
+  STATUS_BILLED: '已出帳',
   CAT_ACCOMMODATION: '住宿',
   CAT_TRANSPORTATION: '交通',
   CAT_MEAL: '餐食',

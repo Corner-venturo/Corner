@@ -98,10 +98,10 @@ export function DisbursementDetailDialog({
         amount: newAmount,
       })
 
-      // 更新追加的請款單狀態為 approved
+      // 更新追加的請款單狀態為 billed（已加入出納單）
       const tour_ids_to_recalculate = new Set<string>()
       for (const id of selectedToAdd) {
-        await updatePaymentRequestApi(id, { status: 'approved' })
+        await updatePaymentRequestApi(id, { status: 'billed' })
         const req = payment_requests.find(r => r.id === id)
         if (req?.tour_id) {
           tour_ids_to_recalculate.add(req.tour_id)
@@ -155,8 +155,8 @@ export function DisbursementDetailDialog({
         amount: newAmount,
       })
 
-      // 將請款單狀態改回 pending
-      await updatePaymentRequestApi(requestId, { status: 'pending' })
+      // 將請款單狀態改回 confirmed
+      await updatePaymentRequestApi(requestId, { status: 'confirmed' })
 
       // 重算團成本
       if (request.tour_id) {
@@ -189,13 +189,12 @@ export function DisbursementDetailDialog({
         confirmed_at: new Date().toISOString(),
       })
 
-      // 更新所有請款單狀態為 paid
+      // 更新所有請款單狀態為 billed
       const requestIds = order.payment_request_ids || []
       const tour_ids_to_recalculate = new Set<string>()
       for (const requestId of requestIds) {
         await updatePaymentRequestApi(requestId, {
-          status: 'paid',
-          paid_at: new Date().toISOString(),
+          status: 'billed',
         })
         const req = payment_requests.find(r => r.id === requestId)
         if (req?.tour_id) {

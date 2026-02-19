@@ -38,7 +38,7 @@ export async function recalculateExpenseStats(tour_id: string): Promise<void> {
       .from('payment_requests')
       .select('id')
       .eq('tour_id', tour_id)
-      .in('status', ['pending', 'approved', 'confirmed', 'paid'])
+      .in('status', ['pending', 'confirmed', 'billed'])
 
     if (requestsError) {
       logger.error('查詢有效請款單失敗:', requestsError)

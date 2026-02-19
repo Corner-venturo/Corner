@@ -438,11 +438,11 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                           text-xs px-1.5 py-0.5 rounded
                           ${request.status === 'confirmed' ? 'bg-morandi-green/20 text-morandi-green' : ''}
                           ${request.status === 'draft' ? 'bg-morandi-container text-morandi-secondary' : ''}
-                          ${request.status === 'processing' ? 'bg-morandi-gold/20 text-morandi-gold' : ''}
+                          ${request.status === 'billed' ? 'bg-morandi-green/20 text-morandi-green' : ''}
                         `}>
                           {request.status === 'confirmed' ? COMP_TOURS_LABELS.已確認 :
                            request.status === 'draft' ? COMP_TOURS_LABELS.草稿 :
-                           request.status === 'processing' ? COMP_TOURS_LABELS.處理中 : request.status}
+                           request.status === 'billed' ? COMP_TOURS_LABELS.已出帳 : request.status}
                         </span>
                       )}
                     </div>

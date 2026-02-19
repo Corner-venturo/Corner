@@ -80,15 +80,15 @@ export function useDisbursementData() {
     return map
   }, [requestItems])
 
-  // 待出帳的請款單 (status = pending 或 approved)
+  // 待出帳的請款單 (status = pending 或 confirmed)
   const pendingRequests = useMemo(
-    () => payment_requests.filter(r => r.status === 'pending' || r.status === 'approved'),
+    () => payment_requests.filter(r => r.status === 'pending' || r.status === 'confirmed'),
     [payment_requests]
   )
 
-  // 處理中的請款單 (status = processing)
+  // 已出帳的請款單 (status = billed)
   const processingRequests = useMemo(
-    () => payment_requests.filter(r => r.status === 'processing'),
+    () => payment_requests.filter(r => r.status === 'billed'),
     [payment_requests]
   )
 
@@ -175,9 +175,9 @@ export function useDisbursementData() {
       })
     }
 
-    // 更新請款單狀態為 approved（已加入出納單）
+    // 更新請款單狀態為 billed（已加入出納單）
     for (const id of requestIds) {
-      await updatePaymentRequestApi(id, { status: 'approved' })
+      await updatePaymentRequestApi(id, { status: 'billed' })
     }
   }, [currentOrder, payment_requests, disbursement_orders, nextThursday])
 
@@ -202,8 +202,8 @@ export function useDisbursementData() {
       })
     }
 
-    // 將請款單狀態改回 pending
-    await updatePaymentRequestApi(requestId, { status: 'pending' })
+    // 將請款單狀態改回 confirmed
+    await updatePaymentRequestApi(requestId, { status: 'confirmed' })
 
     // 重算團成本
     const request = payment_requests.find(r => r.id === requestId)
@@ -223,14 +223,13 @@ export function useDisbursementData() {
       confirmed_at: new Date().toISOString(),
     })
 
-    // 更新所有請款單狀態為 paid
+    // 更新所有請款單狀態為 billed
     const requestIds = order.payment_request_ids || []
     const tour_ids_to_recalculate = new Set<string>()
 
     for (const requestId of requestIds) {
       await updatePaymentRequestApi(requestId, {
-        status: 'paid',
-        paid_at: new Date().toISOString(),
+        status: 'billed',
       })
       const request = payment_requests.find(r => r.id === requestId)
       if (request?.tour_id) {
@@ -260,10 +259,10 @@ export function useDisbursementData() {
       status: 'pending',
     })
 
-    // 更新請款單狀態為 approved（已加入出納單）
+    // 更新請款單狀態為 billed（已加入出納單）
     const tour_ids_to_recalculate = new Set<string>()
     for (const id of requestIds) {
-      await updatePaymentRequestApi(id, { status: 'approved' })
+      await updatePaymentRequestApi(id, { status: 'billed' })
       const request = payment_requests.find(r => r.id === id)
       if (request?.tour_id) {
         tour_ids_to_recalculate.add(request.tour_id)

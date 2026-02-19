@@ -9,7 +9,7 @@ interface PaymentCardProps {
     code: string
     description: string
     amount: number
-    status: 'pending' | 'approved' | 'paid' | 'rejected'
+    status: 'pending' | 'confirmed' | 'billed' | 'rejected'
     supplier_name?: string | null
     tour_code?: string | null
     created_at?: string | null
@@ -19,11 +19,13 @@ interface PaymentCardProps {
   className?: string
 }
 
+import { PAYMENT_CARD_LABELS } from './labels'
+
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: typeof Clock }> = {
-  pending: { label: '待審核', color: 'text-amber-700', bg: 'bg-amber-100', icon: Clock },
-  approved: { label: '已核准', color: 'text-blue-700', bg: 'bg-blue-100', icon: CheckCircle },
-  paid: { label: '已付款', color: 'text-green-700', bg: 'bg-green-100', icon: CheckCircle },
-  rejected: { label: '已退回', color: 'text-red-700', bg: 'bg-red-100', icon: AlertCircle },
+  pending: { label: PAYMENT_CARD_LABELS.STATUS_PENDING, color: 'text-amber-700', bg: 'bg-amber-100', icon: Clock },
+  confirmed: { label: PAYMENT_CARD_LABELS.STATUS_CONFIRMED, color: 'text-blue-700', bg: 'bg-blue-100', icon: CheckCircle },
+  billed: { label: PAYMENT_CARD_LABELS.STATUS_BILLED, color: 'text-green-700', bg: 'bg-green-100', icon: CheckCircle },
+  rejected: { label: PAYMENT_CARD_LABELS.STATUS_REJECTED, color: 'text-red-700', bg: 'bg-red-100', icon: AlertCircle },
 }
 
 export function PaymentCard({ payment, onClick, className }: PaymentCardProps) {

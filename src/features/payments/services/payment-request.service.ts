@@ -449,13 +449,13 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
   }
 
   /**
-   * 取得處理中請款單
+   * 取得已出帳請款單
    */
-  async getProcessingRequests(): Promise<PaymentRequest[]> {
+  async getBilledRequests(): Promise<PaymentRequest[]> {
     const { data, error } = await supabase
       .from('payment_requests')
       .select('*')
-      .eq('status', 'processing')
+      .eq('status', 'billed')
       .order('created_at', { ascending: false })
 
     if (error) throw error
@@ -491,23 +491,22 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
   }
 
   /**
-   * ✅ 付款確認（標記為已付款）
+   * ✅ 標記為已出帳
    */
-  async markAsPaid(requestId: string): Promise<void> {
+  async markAsBilled(requestId: string): Promise<void> {
     const request = await this.getById(requestId)
     if (!request) {
       throw new Error(`找不到請款單: ${requestId}`)
     }
 
-    if (request.status === 'paid') {
-      throw new Error(PAYMENTS_LABELS.此請款單已付款)
+    if (request.status === 'billed') {
+      throw new Error(PAYMENTS_LABELS.此請款單已出帳)
     }
 
     const now = this.now()
 
     await this.update(requestId, {
-      status: 'paid',
-      paid_at: now,
+      status: 'billed',
       updated_at: now,
     })
 
@@ -518,21 +517,20 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
   }
 
   /**
-   * 取消付款（將狀態改回待處理）
+   * 取消出帳（將狀態改回已確認）
    */
-  async cancelPayment(requestId: string): Promise<void> {
+  async cancelBilling(requestId: string): Promise<void> {
     const request = await this.getById(requestId)
     if (!request) {
       throw new Error(`找不到請款單: ${requestId}`)
     }
 
-    if (request.status !== 'paid') {
-      throw new Error(PAYMENTS_LABELS.只能取消已付款的請款單)
+    if (request.status !== 'billed') {
+      throw new Error(PAYMENTS_LABELS.只能取消已出帳的請款單)
     }
 
     await this.update(requestId, {
-      status: 'pending',
-      paid_at: undefined,
+      status: 'confirmed',
       updated_at: this.now(),
     })
 
@@ -541,7 +539,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       await recalculateExpenseStats(request.tour_id)
     }
 
-    logger.warn(PAYMENTS_LABELS.付款已取消, { requestId })
+    logger.warn(PAYMENTS_LABELS.出帳已取消, { requestId })
   }
 }
 

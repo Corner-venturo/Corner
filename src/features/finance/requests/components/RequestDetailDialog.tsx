@@ -321,8 +321,8 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                 {currentRequest.order_number && REQUEST_LABELS.訂單(currentRequest.order_number)}
               </p>
             </div>
-            <Badge className={statusColors[(currentRequest.status || 'pending') as 'pending' | 'approved' | 'paid']}>
-              {statusLabels[(currentRequest.status || 'pending') as 'pending' | 'approved' | 'paid']}
+            <Badge className={statusColors[(currentRequest.status || 'pending') as 'pending' | 'confirmed' | 'billed']}>
+              {statusLabels[(currentRequest.status || 'pending') as 'pending' | 'confirmed' | 'billed']}
             </Badge>
           </div>
         </DialogHeader>

@@ -101,7 +101,7 @@ export const usePayments = () => {
     },
 
     getProcessingRequests: async () => {
-      return await paymentRequestService.getProcessingRequests()
+      return await paymentRequestService.getBilledRequests()
     },
 
     // ========== DisbursementOrder CRUD 操作 ==========
