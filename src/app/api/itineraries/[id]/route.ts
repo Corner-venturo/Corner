@@ -77,10 +77,8 @@ export async function GET(
       return ApiError.notFound('行程')
     }
 
-    // 🔒 未登入用戶只能存取已發布的行程
-    if (!isAuthenticated && itinerary.status !== 'published') {
-      return ApiError.notFound('行程')
-    }
+    // 🔒 此 API 供 /view/[id] 公開分享頁使用，有連結即可檢視
+    // 敏感操作（編輯、刪除）由其他 API 處理並檢查權限
 
     // 轉換資料格式（snake_case → camelCase）
     const formattedItinerary = {
