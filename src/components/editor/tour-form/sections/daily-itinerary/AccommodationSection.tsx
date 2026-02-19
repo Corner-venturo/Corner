@@ -41,24 +41,27 @@ export function AccommodationSection({
       
       {/* 續住勾選（第二天以後才顯示） */}
       {dayIndex > 0 && !isLockedByQuote && (
-        <label className="flex items-center gap-2 cursor-pointer">
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => {
+            const newChecked = !day.isSameAccommodation
+            if (newChecked) {
+              // 勾選續住：一次性複製前一天的住宿資料（避免多次 setState 覆蓋）
+              const prevDay = data.dailyItinerary[dayIndex - 1]
+              updateDailyItinerary(dayIndex, {
+                isSameAccommodation: true,
+                accommodation: prevDay?.accommodation || '',
+                accommodationUrl: prevDay?.accommodationUrl || '',
+                accommodationRating: prevDay?.accommodationRating ?? 5,
+              })
+            } else {
+              // 取消續住
+              updateDailyItinerary(dayIndex, 'isSameAccommodation', false)
+            }
+          }}
+        >
           <Checkbox
             checked={day.isSameAccommodation || false}
-            onCheckedChange={checked => {
-              if (checked) {
-                // 勾選續住：一次性複製前一天的住宿資料（避免多次 setState 覆蓋）
-                const prevDay = data.dailyItinerary[dayIndex - 1]
-                updateDailyItinerary(dayIndex, {
-                  isSameAccommodation: true,
-                  accommodation: prevDay?.accommodation || '',
-                  accommodationUrl: prevDay?.accommodationUrl || '',
-                  accommodationRating: prevDay?.accommodationRating ?? 5,
-                })
-              } else {
-                // 取消續住
-                updateDailyItinerary(dayIndex, 'isSameAccommodation', false)
-              }
-            }}
           />
           <span className="text-sm text-morandi-primary">
             {COMP_EDITOR_LABELS.LABEL_3005}
@@ -68,7 +71,7 @@ export function AccommodationSection({
               </span>
             )}
           </span>
-        </label>
+        </div>
       )}
 
       {/* 住宿標題與飯店庫按鈕 */}
