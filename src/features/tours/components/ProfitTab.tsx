@@ -19,6 +19,7 @@ import {
 } from '../constants/bonus-labels'
 import { BonusSettingType } from '@/types/bonus.types'
 import type { ProfitTableRow } from '@/types/bonus.types'
+import { TOURS_LABELS } from './constants/labels'
 
 interface ProfitTabProps {
   tour: Tour
@@ -161,9 +162,9 @@ export function ProfitTab({ tour }: ProfitTabProps) {
             <table className="w-full text-sm">
               <thead className="bg-muted/50">
                 <tr>
-                  <th className="text-left px-3 py-2 font-medium">收款單號</th>
-                  <th className="text-left px-3 py-2 font-medium">日期</th>
-                  <th className="text-right px-3 py-2 font-medium">金額</th>
+                  <th className="text-left px-3 py-2 font-medium">{TOURS_LABELS.LABEL_116}</th>
+                  <th className="text-left px-3 py-2 font-medium">{TOURS_LABELS.DATE}</th>
+                  <th className="text-right px-3 py-2 font-medium">{TOURS_LABELS.AMOUNT}</th>
                 </tr>
               </thead>
               <tbody>
@@ -175,14 +176,14 @@ export function ProfitTab({ tour }: ProfitTabProps) {
                   </tr>
                 ))}
                 <tr className="border-t bg-muted/30 font-medium">
-                  <td className="px-3 py-2" colSpan={2}>合計</td>
+                  <td className="px-3 py-2" colSpan={2}>{TOURS_LABELS.LABEL_1423}</td>
                   <td className="px-3 py-2 text-right font-mono">${formatAmount(profitResult.receipt_total)}</td>
                 </tr>
               </tbody>
             </table>
           </div>
         ) : (
-          <div className="text-muted-foreground text-sm py-4 text-center">無收款紀錄</div>
+          <div className="text-muted-foreground text-sm py-4 text-center">{TOURS_LABELS.LABEL_7189}</div>
         )}
       </section>
 
@@ -194,8 +195,8 @@ export function ProfitTab({ tour }: ProfitTabProps) {
             <table className="w-full text-sm">
               <thead className="bg-muted/50">
                 <tr>
-                  <th className="text-left px-3 py-2 font-medium">請款單號</th>
-                  <th className="text-left px-3 py-2 font-medium">供應商</th>
+                  <th className="text-left px-3 py-2 font-medium">{TOURS_LABELS.LABEL_9671}</th>
+                  <th className="text-left px-3 py-2 font-medium">{TOURS_LABELS.LABEL_1552}</th>
                   <th className="text-right px-3 py-2 font-medium">金額</th>
                 </tr>
               </thead>
@@ -215,7 +216,7 @@ export function ProfitTab({ tour }: ProfitTabProps) {
             </table>
           </div>
         ) : (
-          <div className="text-muted-foreground text-sm py-4 text-center">無支出紀錄</div>
+          <div className="text-muted-foreground text-sm py-4 text-center">{TOURS_LABELS.LABEL_4310}</div>
         )}
       </section>
 
@@ -238,14 +239,14 @@ export function ProfitTab({ tour }: ProfitTabProps) {
         ) : (
           <div className="space-y-2">
             {[...profitResult.team_bonuses, ...profitResult.employee_bonuses].length === 0 ? (
-              <div className="text-muted-foreground text-sm py-4 text-center">無獎金設定</div>
+              <div className="text-muted-foreground text-sm py-4 text-center">{TOURS_LABELS.SETTINGS_6822}</div>
             ) : (
               <div className="border rounded-lg overflow-hidden">
                 <table className="w-full text-sm">
                   <thead className="bg-muted/50">
                     <tr>
-                      <th className="text-left px-3 py-2 font-medium">類型</th>
-                      <th className="text-left px-3 py-2 font-medium">員工</th>
+                      <th className="text-left px-3 py-2 font-medium">{TOURS_LABELS.TYPE}</th>
+                      <th className="text-left px-3 py-2 font-medium">{TOURS_LABELS.LABEL_2076}</th>
                       <th className="text-right px-3 py-2 font-medium">金額</th>
                     </tr>
                   </thead>
@@ -269,7 +270,7 @@ export function ProfitTab({ tour }: ProfitTabProps) {
             {/* 獎金請款 */}
             {bonusExpenses.length > 0 && (
               <div className="mt-4">
-                <h4 className="text-sm font-medium mb-2 text-muted-foreground">獎金請款明細</h4>
+                <h4 className="text-sm font-medium mb-2 text-muted-foreground">{TOURS_LABELS.LABEL_8378}</h4>
                 <div className="border rounded-lg overflow-hidden">
                   <table className="w-full text-sm">
                     <tbody>

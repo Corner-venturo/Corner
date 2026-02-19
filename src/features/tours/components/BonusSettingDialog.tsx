@@ -129,10 +129,10 @@ export function BonusSettingDialog({ open, onOpenChange, onSave, initial }: Bonu
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            取消
+            {BONUS_TAB_LABELS.CANCEL}
           </Button>
           <Button onClick={handleSave}>
-            儲存
+            {BONUS_TAB_LABELS.SAVE}
           </Button>
         </DialogFooter>
       </DialogContent>

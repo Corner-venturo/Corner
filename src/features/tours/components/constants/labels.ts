@@ -37,4 +37,19 @@ export const TOURS_LABELS = {
   CONFIRM_7150: '待確認',
   TOTAL_2951: '總收款',
   LABEL_1728: '待收款',
+
+  LOADING_9771: '載入中...',
+
+  LABEL_116: '收款單號',
+  DATE: '日期',
+  AMOUNT: '金額',
+  LABEL_1423: '合計',
+  LABEL_7189: '無收款紀錄',
+  LABEL_9671: '請款單號',
+  LABEL_1552: '供應商',
+  LABEL_4310: '無支出紀錄',
+  SETTINGS_6822: '無獎金設定',
+  TYPE: '類型',
+  LABEL_2076: '員工',
+  LABEL_8378: '獎金請款明細',
 }

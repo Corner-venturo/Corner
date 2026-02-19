@@ -24,6 +24,7 @@ import {
   BONUS_TAB_LABELS,
 } from '../constants/bonus-labels'
 import { BonusSettingDialog } from './BonusSettingDialog'
+import { TOURS_LABELS } from './constants/labels'
 
 interface BonusSettingTabProps {
   tour: Tour
@@ -137,7 +138,7 @@ export function BonusSettingTab({ tour }: BonusSettingTabProps) {
       </div>
 
       {loading ? (
-        <div className="text-muted-foreground py-8 text-center text-sm">載入中...</div>
+        <div className="text-muted-foreground py-8 text-center text-sm">{TOURS_LABELS.LOADING_9771}</div>
       ) : !settings || settings.length === 0 ? (
         <div className="text-muted-foreground py-8 text-center text-sm">{BONUS_TAB_LABELS.no_settings}</div>
       ) : (

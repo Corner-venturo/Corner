@@ -61,6 +61,9 @@ export const BONUS_TAB_LABELS = {
   no_settings: '尚無獎金設定',
   copy_defaults: '從預設值複製',
   confirm_delete: '確定要刪除此獎金設定嗎？',
+
+  CANCEL: '取消',
+  SAVE: '儲存',
 } as const
 
 /** 利潤 Tab 標籤 */
