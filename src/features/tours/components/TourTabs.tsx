@@ -89,6 +89,16 @@ const TourWebpageTab = dynamic(
   { loading: () => <TabLoading /> }
 )
 
+const BonusSettingTab = dynamic(
+  () => import('@/features/tours/components/BonusSettingTab').then(m => m.BonusSettingTab),
+  { loading: () => <TabLoading /> }
+)
+
+const ProfitTab = dynamic(
+  () => import('@/features/tours/components/ProfitTab').then(m => m.ProfitTab),
+  { loading: () => <TabLoading /> }
+)
+
 // ============================================================================
 // 頁籤定義（共用）
 // ============================================================================
@@ -105,6 +115,8 @@ export const TOUR_TABS = [
   { value: 'designs', label: COMP_TOURS_LABELS.設計 },
   { value: 'files', label: COMP_TOURS_LABELS.檔案 },
   { value: 'overview', label: COMP_TOURS_LABELS.總覽 },
+  { value: 'bonus', label: COMP_TOURS_LABELS.獎金設定 },
+  { value: 'profit', label: COMP_TOURS_LABELS.利潤 },
 ] as const
 
 export type TourTabValue = typeof TOUR_TABS[number]['value']
@@ -190,6 +202,10 @@ export function TourTabContent({
           <TourCosts tour={tour} showSummary={false} />
         </div>
       )
+    case 'bonus':
+      return <BonusSettingTab tour={tour} />
+    case 'profit':
+      return <ProfitTab tour={tour} />
     default:
       return <TourOverview tour={tour} />
   }

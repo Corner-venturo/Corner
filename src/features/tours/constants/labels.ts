@@ -314,6 +314,8 @@ export const COMP_TOURS_LABELS = {
   總支出: '總支出',
   總收入: '總收入',
   總覽: '總覽',
+  獎金設定: '獎金設定',
+  利潤: '利潤',
   總訂單數: '總訂單數',
   續住: '續住',
   美國航空: '美國航空',
@@ -1157,3 +1159,6 @@ export const TOUR_DETAIL_PAGE_LABELS = {
   BREADCRUMB_HOME: '首頁',
   BREADCRUMB_TOURS: '旅遊團管理',
 }
+
+// Add missing tab labels used by TourTabs
+// (If not already in COMP_TOURS_LABELS above, they're in the large generated object)

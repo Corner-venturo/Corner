@@ -726,3 +726,9 @@ export * from './tour-requests'
 
 // Image Library
 export * from './image-library'
+
+// Tour Bonus Settings
+export * from "./tour-bonus-settings"
+
+// Workspace Bonus Defaults
+export * from "./workspace-bonus-defaults"
