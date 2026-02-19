@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Plus, Search, Edit2, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
-import { StatusCell, ActionCell } from '@/components/table-cells'
+import { StatusCell, ActionCell, CurrencyCell } from '@/components/table-cells'
 import { useEsims, deleteEsim } from '@/data'
 import { STATUS_CONFIG } from '@/lib/status-config'
 import { Button } from '@/components/ui/button'
@@ -98,18 +98,14 @@ export default function EsimsPage() {
       key: 'price',
       label: ESIMS_LABELS.COL_UNIT_PRICE,
       render: (_: unknown, row: Esim) => (
-        <span className="text-morandi-text-primary font-medium">
-          {row.price ? `$${row.price}` : '-'}
-        </span>
+        row.price ? <CurrencyCell amount={row.price} /> : <span className="text-morandi-text-secondary">-</span>
       ),
     },
     {
       key: 'total_amount',
       label: ESIMS_LABELS.COL_TOTAL,
       render: (_: unknown, row: Esim) => (
-        <span className="text-morandi-gold font-semibold">
-          {row.price ? `$${row.price * row.quantity}` : '-'}
-        </span>
+        row.price ? <CurrencyCell amount={row.price * row.quantity} /> : <span className="text-morandi-text-secondary">-</span>
       ),
     },
     {
