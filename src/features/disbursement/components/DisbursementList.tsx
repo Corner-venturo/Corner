@@ -15,6 +15,7 @@ import { PaymentRequestItem } from '@/stores/types'
 import { usePendingColumns, useCurrentOrderColumns, useHistoryColumns } from './DisbursementColumns'
 import { cn } from '@/lib/utils'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
+import { useEmployeeDictionary } from '@/data'
 import { DISBURSEMENT_LABELS } from './constants/labels'
 
 interface PendingListProps {
@@ -176,7 +177,13 @@ interface HistoryListProps {
 }
 
 export function HistoryList({ data, searchTerm, onPrintPDF }: HistoryListProps) {
-  const columns = useHistoryColumns({ onPrintPDF })
+  const { get: getEmployee } = useEmployeeDictionary()
+  const getEmployeeName = (id: string) => {
+    if (!id) return '-'
+    const emp = getEmployee(id)
+    return emp?.chinese_name || emp?.display_name || '-'
+  }
+  const columns = useHistoryColumns({ onPrintPDF, getEmployeeName })
 
   return (
     <EnhancedTable

@@ -167,9 +167,10 @@ export function useCurrentOrderColumns({ currentOrder, onRemove }: UseCurrentOrd
 
 interface UseHistoryColumnsProps {
   onPrintPDF: (order: DisbursementOrder) => void
+  getEmployeeName?: (id: string) => string
 }
 
-export function useHistoryColumns({ onPrintPDF }: UseHistoryColumnsProps) {
+export function useHistoryColumns({ onPrintPDF, getEmployeeName }: UseHistoryColumnsProps) {
   return useMemo<TableColumn[]>(
     () => [
       {
@@ -216,6 +217,14 @@ export function useHistoryColumns({ onPrintPDF }: UseHistoryColumnsProps) {
         render: (value: unknown) => <DateCell date={value as string} format="long" />,
       },
       {
+        key: 'created_by',
+        label: DISBURSEMENT_LABELS.建立人員,
+        width: '100px',
+        render: (value: unknown) => (
+          <TextCell text={getEmployeeName ? getEmployeeName(value as string) : String(value || '-')} />
+        ),
+      },
+      {
         key: 'actions',
         label: DISBURSEMENT_LABELS.操作,
         width: '100px',
@@ -235,6 +244,6 @@ export function useHistoryColumns({ onPrintPDF }: UseHistoryColumnsProps) {
         },
       },
     ],
-    [onPrintPDF]
+    [onPrintPDF, getEmployeeName]
   )
 }

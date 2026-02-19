@@ -130,6 +130,7 @@ export const DISBURSEMENT_LABELS = {
   SELECTED_PAREN_SUFFIX: '）',
   CONFIRM_DELETE_PREFIX: '確定要刪除出納單 ',
   CONFIRM_DELETE_SUFFIX: ' 嗎？',
+  建立人員: '建立人員',
 };
 
 
