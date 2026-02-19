@@ -24,6 +24,7 @@ export const TOURS_LABELS = {
   PRINT_REPORT: '列印報表',
   PROCESSING: '處理中...',
   CONFIRM_CLOSE: '確認結案',
+  CONFIRM_CLOSE_WARNING: '確定要結案嗎？結案後將無法修改訂單和請款。',
   CONFIRM_DELETE_PREFIX: '確定要刪除「',
   CONFIRM_DELETE_SUFFIX: '」嗎？此操作無法復原。',
   ITINERARY_VERSION: '行程版本',

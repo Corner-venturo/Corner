@@ -11,7 +11,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog'
+// confirmation uses nested Dialog
 import { Tour } from '@/stores/types'
 import {
   usePaymentRequests,
@@ -42,6 +44,7 @@ export function TourClosingDialog({
 }: TourClosingDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isPrinting, setIsPrinting] = useState(false)
+  const [showConfirmation, setShowConfirmation] = useState(false)
 
   // 獎金比例設定
   const [salesBonusPercent, setSalesBonusPercent] = useState(5) // 業務獎金 %
@@ -303,7 +306,7 @@ export function TourClosingDialog({
             {TOURS_LABELS.CANCEL}
           </Button>
           <Button
-            onClick={handleClose}
+            onClick={() => setShowConfirmation(true)}
             disabled={isSubmitting}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
@@ -312,6 +315,29 @@ export function TourClosingDialog({
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      {/* 二次確認 Dialog */}
+      <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
+        <DialogContent level={3} className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{TOURS_LABELS.CONFIRM_CLOSE}</DialogTitle>
+            <DialogDescription>
+              {TOURS_LABELS.CONFIRM_CLOSE_WARNING}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setShowConfirmation(false)}>
+              {TOURS_LABELS.CANCEL}
+            </Button>
+            <Button
+              onClick={() => { setShowConfirmation(false); handleClose() }}
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            >
+              {TOURS_LABELS.CONFIRM_CLOSE}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   )
 }

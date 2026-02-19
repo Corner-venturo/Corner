@@ -2,6 +2,7 @@ import { captureException } from '@/lib/error-tracking'
 /**
  * 作廢代轉發票 API
  * POST /api/travel-invoice/void
+ * 🔒 安全修復 2026-02-19：需要 admin 或 accountant 角色
  */
 
 import { NextRequest } from 'next/server'
@@ -13,11 +14,36 @@ import { getServerAuth } from '@/lib/auth/server-auth'
 import { validateBody } from '@/lib/api/validation'
 import { voidInvoiceSchema } from '@/lib/validations/api-schemas'
 
+const VOID_INVOICE_ALLOWED_ROLES = ['admin', 'super_admin', 'accountant']
+
+/**
+ * 檢查員工是否有作廢發票的權限
+ */
+async function checkVoidPermission(employeeId: string): Promise<boolean> {
+  const adminClient = getSupabaseAdminClient()
+  const { data, error } = await adminClient
+    .from('employees')
+    .select('roles')
+    .eq('id', employeeId)
+    .single()
+
+  if (error || !data) return false
+
+  const roles = data.roles as string[] | null
+  return roles?.some((r) => VOID_INVOICE_ALLOWED_ROLES.includes(r)) ?? false
+}
+
 export async function POST(request: NextRequest) {
   // 認證檢查
   const auth = await getServerAuth()
   if (!auth.success) {
     return ApiError.unauthorized('請先登入')
+  }
+
+  // 🔒 角色權限檢查
+  const hasPermission = await checkVoidPermission(auth.data.employeeId)
+  if (!hasPermission) {
+    return errorResponse('需要管理員或會計權限', 403, ErrorCode.FORBIDDEN)
   }
 
   try {

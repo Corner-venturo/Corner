@@ -25,6 +25,8 @@ import {
   UserCheck,
   X,
   CheckCircle,
+  Palette,
+  FileSpreadsheet,
 } from 'lucide-react'
 import { MOBILE_LABELS } from './constants/labels'
 import { MOBILE_NAV_LABELS } from './constants/labels'
@@ -62,9 +64,9 @@ const WORKBENCH_CATEGORIES = [
     items: [
       { icon: Calendar, label: MOBILE_NAV_LABELS.CALENDAR, href: '/calendar', color: 'text-red-600' },
       { icon: Stamp, label: MOBILE_NAV_LABELS.VISA, href: '/m/visas', color: 'text-amber-600' },
-      { icon: FileCheck, label: MOBILE_NAV_LABELS.CONFIRMATION, href: '/m/confirmations', color: 'text-indigo-600' },
-      // 旅伴通訊已整合到工作頻道中
-      // { icon: MessageCircle, label: '通訊', href: '/traveler-chat', color: 'text-pink-600' },
+      { icon: Palette, label: MOBILE_NAV_LABELS.DESIGN, href: '/design', color: 'text-indigo-600' },
+      { icon: FileSpreadsheet, label: MOBILE_NAV_LABELS.DOCUMENTS, href: '/office', color: 'text-pink-600' },
+      { icon: Calendar, label: MOBILE_NAV_LABELS.SCHEDULING, href: '/scheduling', color: 'text-sky-600' },
     ],
   },
   {

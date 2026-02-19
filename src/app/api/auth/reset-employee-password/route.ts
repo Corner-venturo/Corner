@@ -8,8 +8,26 @@ import { validateBody } from '@/lib/api/validation'
 import { resetEmployeePasswordSchema } from '@/lib/validations/api-schemas'
 
 /**
+ * 檢查員工是否為管理員或超級管理員
+ */
+async function checkIsAdmin(employeeId: string): Promise<boolean> {
+  const adminClient = getSupabaseAdminClient()
+  const { data, error } = await adminClient
+    .from('employees')
+    .select('roles')
+    .eq('id', employeeId)
+    .single()
+
+  if (error || !data) return false
+
+  const roles = data.roles as string[] | null
+  return roles?.some((r) => r === 'admin' || r === 'super_admin') ?? false
+}
+
+/**
  * 重設員工密碼 API
  * 只更新 Supabase Auth 密碼（不更新 password_hash）
+ * 🔒 安全修復 2026-02-19：需要管理員權限
  */
 export async function POST(request: NextRequest) {
   try {
@@ -17,6 +35,12 @@ export async function POST(request: NextRequest) {
     const auth = await getServerAuth()
     if (!auth.success) {
       return errorResponse('請先登入', 401, ErrorCode.UNAUTHORIZED)
+    }
+
+    // 🔒 管理員權限檢查
+    const isAdmin = await checkIsAdmin(auth.data.employeeId)
+    if (!isAdmin) {
+      return errorResponse('需要管理員權限', 403, ErrorCode.FORBIDDEN)
     }
 
     const validation = await validateBody(request, resetEmployeePasswordSchema)

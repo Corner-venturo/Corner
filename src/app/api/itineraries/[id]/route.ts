@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, ApiError } from '@/lib/api/response'
+import { getServerAuth } from '@/lib/auth/server-auth'
 
 export async function GET(
   request: NextRequest,
@@ -15,6 +16,11 @@ export async function GET(
     if (!id) {
       return ApiError.missingField('id')
     }
+
+    // 🔒 安全修復 2026-02-19：檢查認證狀態
+    // 未登入用戶只能存取已發布的行程（供客戶公開瀏覽）
+    const auth = await getServerAuth()
+    const isAuthenticated = auth.success
 
     // 判斷查詢類型：
     // 1. 完整 UUID（36 字元，含連字號）
@@ -68,6 +74,11 @@ export async function GET(
     }
 
     if (!itinerary) {
+      return ApiError.notFound('行程')
+    }
+
+    // 🔒 未登入用戶只能存取已發布的行程
+    if (!isAuthenticated && itinerary.status !== 'published') {
       return ApiError.notFound('行程')
     }
 

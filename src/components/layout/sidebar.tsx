@@ -132,7 +132,6 @@ const supplierMenuItems: MenuItem[] = [
 ]
 
 const personalToolItems: MenuItem[] = [
-  { href: '/accounting', label: COMP_LAYOUT_LABELS.記帳管理, icon: Wallet, requiredPermission: 'super_admin_only' },
   { href: '/timebox', label: COMP_LAYOUT_LABELS.箱型時間, icon: Clock, requiredPermission: 'super_admin_only' },
 ]
 
