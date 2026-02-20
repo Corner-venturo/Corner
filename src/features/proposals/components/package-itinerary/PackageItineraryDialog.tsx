@@ -275,11 +275,13 @@ export function PackageItineraryDialog({
                     dailySchedule={hook.dailySchedule}
                     selectedDayIndex={hook.selectedDayIndex}
                     startDate={pkg.start_date ?? null}
+                    tourCountryName={pkg.destination || pkg.country_id || ''}
                     onSelectDay={hook.setSelectedDayIndex}
                     onUpdateDay={hook.updateDaySchedule}
                     onAddActivity={hook.addActivity}
                     onRemoveActivity={hook.removeActivity}
                     onUpdateActivity={hook.updateActivity}
+                    onAddActivitiesFromAttractions={hook.addActivitiesFromAttractions}
                     getPreviousAccommodation={hook.getPreviousAccommodation}
                   />
                 )}

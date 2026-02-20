@@ -4,8 +4,10 @@
  */
 
 
-import { Plus, X } from 'lucide-react'
+import { useState } from 'react'
+import { Plus, X, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { AttractionSelector } from '@/components/editor/attraction-selector'
 import type { DailyScheduleItem, SimpleActivity } from './types'
 import { DAILY_SCHEDULE_EDITOR_LABELS, ITINERARY_DIALOG_LABELS } from '../../constants/labels';
 
@@ -13,11 +15,13 @@ interface TimelineEditorProps {
   dailySchedule: DailyScheduleItem[]
   selectedDayIndex: number
   startDate: string | null
+  tourCountryName?: string  // 行程國家名稱，用於景點庫篩選
   onSelectDay: (index: number) => void
   onUpdateDay: (index: number, field: string, value: string | boolean) => void
   onAddActivity: (dayIndex: number) => void
   onRemoveActivity: (dayIndex: number, activityIndex: number) => void
   onUpdateActivity: (dayIndex: number, activityIndex: number, field: keyof SimpleActivity, value: string) => void
+  onAddActivitiesFromAttractions?: (dayIndex: number, attractions: { name: string; id?: string }[]) => void
   getPreviousAccommodation: (index: number) => string
 }
 
@@ -25,17 +29,26 @@ export function TimelineEditor({
   dailySchedule,
   selectedDayIndex,
   startDate,
+  tourCountryName = '',
   onSelectDay,
   onUpdateDay,
   onAddActivity,
   onRemoveActivity,
   onUpdateActivity,
+  onAddActivitiesFromAttractions,
   getPreviousAccommodation,
 }: TimelineEditorProps) {
+  const [isAttractionSelectorOpen, setIsAttractionSelectorOpen] = useState(false)
+
   const day = dailySchedule[selectedDayIndex]
   if (!day) return null
 
   const idx = selectedDayIndex
+
+  // 已選景點 ID（用於標記已選過的）
+  const existingAttractionIds = (day.activities || [])
+    .map(a => a.attractionId)
+    .filter((id): id is string => !!id)
   let dateLabel = ''
   if (startDate) {
     const date = new Date(startDate)
@@ -79,15 +92,27 @@ export function TimelineEditor({
             <span className="text-lg font-bold text-morandi-gold">Day {day.day}</span>
             {dateLabel && <span className="text-sm text-morandi-secondary">{dateLabel}</span>}
           </div>
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => onAddActivity(idx)}
-            className="h-7 px-2 text-xs gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-          >
-            <Plus size={12} />
-            {ITINERARY_DIALOG_LABELS.ADD_2951}
-          </Button>
+          <div className="flex gap-1.5">
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => setIsAttractionSelectorOpen(true)}
+              className="h-7 px-2 text-xs gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            >
+              <MapPin size={12} />
+              {ITINERARY_DIALOG_LABELS.從景點庫選擇}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => onAddActivity(idx)}
+              className="h-7 px-2 text-xs gap-1"
+              variant="secondary"
+            >
+              <Plus size={12} />
+              {ITINERARY_DIALOG_LABELS.ADD_2951}
+            </Button>
+          </div>
         </div>
 
         {/* 今日標題 + 餐食 + 住宿 */}
@@ -259,6 +284,28 @@ export function TimelineEditor({
           )}
         </div>
       </div>
+
+      {/* 景點庫選擇器 */}
+      <AttractionSelector
+        isOpen={isAttractionSelectorOpen}
+        onClose={() => setIsAttractionSelectorOpen(false)}
+        tourCountryName={tourCountryName}
+        dayTitle={day.route || ''}
+        existingIds={existingAttractionIds}
+        onSelect={(attractions) => {
+          if (onAddActivitiesFromAttractions) {
+            onAddActivitiesFromAttractions(idx, attractions.map(a => ({
+              name: a.name,
+              id: a.id?.startsWith('manual_') ? undefined : a.id,
+            })))
+          } else {
+            // fallback: 一個一個加
+            for (const attraction of attractions) {
+              onAddActivity(idx)
+            }
+          }
+        }}
+      />
     </div>
   )
 }

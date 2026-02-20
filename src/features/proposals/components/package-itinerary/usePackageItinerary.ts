@@ -386,6 +386,26 @@ export function usePackageItinerary({
     })
   }, [])
 
+  // 從景點庫批次新增活動
+  const addActivitiesFromAttractions = useCallback((dayIndex: number, attractions: { name: string; id?: string }[]) => {
+    setDailySchedule(prev => {
+      const newSchedule = [...prev]
+      const existing = newSchedule[dayIndex].activities || []
+      const newActivities: SimpleActivity[] = attractions.map((attr, i) => ({
+        id: `activity-${dayIndex}-${Date.now()}-${i}`,
+        title: attr.name,
+        startTime: '',
+        endTime: '',
+        attractionId: attr.id,
+      }))
+      newSchedule[dayIndex] = {
+        ...newSchedule[dayIndex],
+        activities: [...existing, ...newActivities],
+      }
+      return newSchedule
+    })
+  }, [])
+
   const updateActivity = useCallback((dayIndex: number, activityIndex: number, field: keyof SimpleActivity, value: string) => {
     setDailySchedule(prev => {
       const newSchedule = [...prev]
@@ -825,6 +845,7 @@ export function usePackageItinerary({
     selectedDayIndex,
     setSelectedDayIndex,
     addActivity,
+    addActivitiesFromAttractions,
     removeActivity,
     updateActivity,
 

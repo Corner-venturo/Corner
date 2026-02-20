@@ -19,6 +19,7 @@ export interface SimpleActivity {
   title: string
   startTime?: string  // 格式 "0900"
   endTime?: string    // 格式 "1030"
+  attractionId?: string  // 景點庫 ID（可追溯圖片/描述等）
 }
 
 /** 每日行程項目 */
