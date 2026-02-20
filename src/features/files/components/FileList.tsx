@@ -202,6 +202,17 @@ function FileItem({ file, isSelected, viewMode, onSelect, onToggleStar }: FileIt
             <Download className="w-4 h-4 mr-2" />
             {LABELS.download}
           </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              const newName = prompt(LABELS.rename, file.filename)
+              if (newName && newName.trim() && newName !== file.filename) {
+                void useFileSystemStore.getState().renameFile(file.id, newName.trim())
+              }
+            }}
+          >
+            <FileText className="w-4 h-4 mr-2" />
+            {LABELS.rename}
+          </DropdownMenuItem>
           <DropdownMenuItem>
             <FolderInput className="w-4 h-4 mr-2" />
             {LABELS.moveTo}
