@@ -54,6 +54,7 @@ export function formatDailyItinerary({
       description: '',
       startTime: act.startTime,
       endTime: act.endTime,
+      ...(act.attractionId ? { attraction_id: act.attractionId } : {}),
     }))
 
     const base = {
