@@ -15,7 +15,7 @@ interface AccommodationSectionProps {
   data: TourFormData
   updateDailyItinerary: (index: number, field: string | Record<string, unknown>, value?: unknown) => void
   onOpenHotelSelector: (dayIndex: number) => void
-  isLockedByQuote?: boolean  // 有關聯報價單時鎖定編輯
+  isLockedByQuote?: boolean  // 有關聯報價單時鎖定飯店名稱
 }
 
 export function AccommodationSection({
@@ -26,27 +26,21 @@ export function AccommodationSection({
   onOpenHotelSelector,
   isLockedByQuote = false,
 }: AccommodationSectionProps) {
-  // 如果有關聯報價單，飯店欄位鎖定
-  const isLocked = isLockedByQuote || day.isSameAccommodation
+  // 飯店名稱鎖定：有報價單 或 續住時
+  const isNameLocked = isLockedByQuote || day.isSameAccommodation
+  // 續住時星級和連結也不需要編輯（跟前一天一樣）
+  const isDetailLocked = day.isSameAccommodation
   
   return (
     <div className="space-y-2">
-      {/* 報價單鎖定提示 */}
-      {isLockedByQuote && (
-        <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-md text-sm text-amber-700">
-          <span>🔒</span>
-          <span>{COMP_EDITOR_LABELS.LABEL_4457}</span>
-        </div>
-      )}
-      
-      {/* 續住勾選（第二天以後才顯示） */}
-      {dayIndex > 0 && !isLockedByQuote && (
+      {/* 續住勾選（第二天以後才顯示） — 永遠可操作 */}
+      {dayIndex > 0 && (
         <div
           className="flex items-center gap-2 cursor-pointer"
           onClick={() => {
             const newChecked = !day.isSameAccommodation
             if (newChecked) {
-              // 勾選續住：一次性複製前一天的住宿資料（避免多次 setState 覆蓋）
+              // 勾選續住：一次性複製前一天的住宿資料
               const prevDay = data.dailyItinerary[dayIndex - 1]
               updateDailyItinerary(dayIndex, {
                 isSameAccommodation: true,
@@ -55,8 +49,16 @@ export function AccommodationSection({
                 accommodationRating: prevDay?.accommodationRating ?? 5,
               })
             } else {
-              // 取消續住
-              updateDailyItinerary(dayIndex, 'isSameAccommodation', false)
+              // 取消續住：保留飯店名稱（報價單鎖定時），清空星級和連結讓用戶重填
+              if (isLockedByQuote) {
+                updateDailyItinerary(dayIndex, {
+                  isSameAccommodation: false,
+                  accommodationUrl: '',
+                  accommodationRating: 5,
+                })
+              } else {
+                updateDailyItinerary(dayIndex, 'isSameAccommodation', false)
+              }
             }
           }}
         >
@@ -74,95 +76,100 @@ export function AccommodationSection({
         </div>
       )}
 
-      {/* 住宿標題與飯店庫按鈕 */}
-      <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-morandi-primary flex items-center gap-2">
-          <Building2 size={14} />
-          {COMP_EDITOR_LABELS.住宿}
-        </label>
-        {!isLockedByQuote && (
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              onClick={() => onOpenHotelSelector(dayIndex)}
-              disabled={isLocked}
-              size="xs"
-              variant="default"
-              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white disabled:opacity-50"
-            >
-              {COMP_EDITOR_LABELS.SELECT_7853}
-            </Button>
-            <Button
-              type="button"
-              onClick={() => {
-                // 清空欄位讓用戶手動輸入
-                updateDailyItinerary(dayIndex, 'accommodation', '')
-                updateDailyItinerary(dayIndex, 'accommodationUrl', '')
-                updateDailyItinerary(dayIndex, 'accommodationRating', 5)
-                // Focus 到輸入框
-                setTimeout(() => {
-                  const input = document.querySelector(`#accommodation-input-${dayIndex}`) as HTMLInputElement
-                  input?.focus()
-                }, 0)
-              }}
-              disabled={isLocked}
-              size="xs"
-              variant="secondary"
-            >
-              + 手動新增
-            </Button>
+      {/* 續住時不顯示住宿欄位 */}
+      {!day.isSameAccommodation && (
+        <>
+          {/* 住宿標題與飯店庫按鈕 */}
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-morandi-primary flex items-center gap-2">
+              <Building2 size={14} />
+              {COMP_EDITOR_LABELS.住宿}
+            </label>
+            {/* 有報價單時隱藏飯店選擇按鈕（飯店由報價單決定） */}
+            {!isLockedByQuote && (
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  onClick={() => onOpenHotelSelector(dayIndex)}
+                  size="xs"
+                  variant="default"
+                  className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                >
+                  {COMP_EDITOR_LABELS.SELECT_7853}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    updateDailyItinerary(dayIndex, 'accommodation', '')
+                    updateDailyItinerary(dayIndex, 'accommodationUrl', '')
+                    updateDailyItinerary(dayIndex, 'accommodationRating', 5)
+                    setTimeout(() => {
+                      const input = document.querySelector(`#accommodation-input-${dayIndex}`) as HTMLInputElement
+                      input?.focus()
+                    }, 0)
+                  }}
+                  size="xs"
+                  variant="secondary"
+                >
+                  + 手動新增
+                </Button>
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
-      {/* 住宿輸入欄位 */}
-      <div className={`flex flex-wrap gap-3 ${isLocked ? 'opacity-50' : ''}`}>
-        <div className="flex-1 min-w-[200px]">
-          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5732}</label>
-          <Input
-            id={`accommodation-input-${dayIndex}`}
-            type="text"
-            value={day.accommodation || ''}
-            onChange={e => updateDailyItinerary(dayIndex, 'accommodation', e.target.value)}
-            disabled={isLocked}
-            className="h-8 text-sm"
-            placeholder={COMP_EDITOR_LABELS.飯店名稱}
-          />
-        </div>
-        <div className="w-24">
-          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5000}</label>
-          <Select
-            value={String(day.accommodationRating ?? 5)}
-            onValueChange={val => {
-              updateDailyItinerary(dayIndex, 'accommodationRating', val === '0' ? 0 : Number(val))
-            }}
-            disabled={isLocked}
-          >
-            <SelectTrigger className="h-8 text-sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="5">5{COMP_EDITOR_LABELS.STAR_SUFFIX}</SelectItem>
-              <SelectItem value="4">4{COMP_EDITOR_LABELS.STAR_SUFFIX}</SelectItem>
-              <SelectItem value="3">3{COMP_EDITOR_LABELS.STAR_SUFFIX}</SelectItem>
-              <SelectItem value="2">2{COMP_EDITOR_LABELS.STAR_SUFFIX}</SelectItem>
-              <SelectItem value="1">1星</SelectItem>
-              <SelectItem value="0">{COMP_EDITOR_LABELS.LABEL_6456}</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex-1 min-w-[180px]">
-          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5538}</label>
-          <Input
-            type="url"
-            value={day.accommodationUrl || ''}
-            onChange={e => updateDailyItinerary(dayIndex, 'accommodationUrl', e.target.value)}
-            disabled={isLocked}
-            className="h-8 text-sm"
-            placeholder="https://..."
-          />
-        </div>
-      </div>
+          {/* 住宿輸入欄位 */}
+          <div className="flex flex-wrap gap-3">
+            {/* 飯店名稱：有報價單時鎖定 */}
+            <div className={`flex-1 min-w-[200px] ${isNameLocked ? 'opacity-60' : ''}`}>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5732}</label>
+              <Input
+                id={`accommodation-input-${dayIndex}`}
+                type="text"
+                value={day.accommodation || ''}
+                onChange={e => updateDailyItinerary(dayIndex, 'accommodation', e.target.value)}
+                disabled={isNameLocked}
+                className="h-8 text-sm"
+                placeholder={COMP_EDITOR_LABELS.飯店名稱}
+              />
+            </div>
+            {/* 星級：永遠可編輯（行程表階段填入） */}
+            <div className="w-24">
+              <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5000}</label>
+              <Select
+                value={String(day.accommodationRating ?? 5)}
+                onValueChange={val => {
+                  updateDailyItinerary(dayIndex, 'accommodationRating', val === '0' ? 0 : Number(val))
+                }}
+                disabled={isDetailLocked}
+              >
+                <SelectTrigger className="h-8 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5{COMP_EDITOR_LABELS.STAR_SUFFIX}</SelectItem>
+                  <SelectItem value="4">4{COMP_EDITOR_LABELS.STAR_SUFFIX}</SelectItem>
+                  <SelectItem value="3">3{COMP_EDITOR_LABELS.STAR_SUFFIX}</SelectItem>
+                  <SelectItem value="2">2{COMP_EDITOR_LABELS.STAR_SUFFIX}</SelectItem>
+                  <SelectItem value="1">1星</SelectItem>
+                  <SelectItem value="0">{COMP_EDITOR_LABELS.LABEL_6456}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {/* 飯店連結：永遠可編輯（行程表階段填入） */}
+            <div className="flex-1 min-w-[180px]">
+              <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5538}</label>
+              <Input
+                type="url"
+                value={day.accommodationUrl || ''}
+                onChange={e => updateDailyItinerary(dayIndex, 'accommodationUrl', e.target.value)}
+                disabled={isDetailLocked}
+                className="h-8 text-sm"
+                placeholder="https://..."
+              />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }
