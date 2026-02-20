@@ -365,7 +365,7 @@ export function TourForm({ data, onChange, quoteTierPricings, hasLinkedQuote }: 
             addRecommendation={handlers.addRecommendation}
             updateRecommendation={handlers.updateRecommendation}
             removeRecommendation={handlers.removeRecommendation}
-            isAccommodationLockedByQuote={false}
+            isAccommodationLockedByQuote={hasLinkedQuote}
           />
         </div>
 

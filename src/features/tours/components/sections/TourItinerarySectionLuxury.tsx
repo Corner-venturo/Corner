@@ -570,7 +570,7 @@ export function TourItinerarySectionLuxury({
                                 {day.accommodation}
                               </div>
                               {/* 星級 */}
-                              {day.accommodationRating && day.accommodationRating > 0 && (
+                              {day.accommodationRating != null && day.accommodationRating > 0 && (
                                 <div className="flex gap-0.5">
                                   {[1, 2, 3, 4, 5].slice(0, day.accommodationRating).map(i => (
                                     <Star
