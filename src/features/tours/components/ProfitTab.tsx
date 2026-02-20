@@ -197,7 +197,7 @@ export function ProfitTab({ tour }: ProfitTabProps) {
                 <tr>
                   <th className="text-left px-3 py-2 font-medium">{TOURS_LABELS.LABEL_9671}</th>
                   <th className="text-left px-3 py-2 font-medium">{TOURS_LABELS.LABEL_1552}</th>
-                  <th className="text-right px-3 py-2 font-medium">金額</th>
+                  <th className="text-right px-3 py-2 font-medium">{TOURS_LABELS.AMOUNT}</th>
                 </tr>
               </thead>
               <tbody>
@@ -209,7 +209,7 @@ export function ProfitTab({ tour }: ProfitTabProps) {
                   </tr>
                 ))}
                 <tr className="border-t bg-muted/30 font-medium">
-                  <td className="px-3 py-2" colSpan={2}>合計</td>
+                  <td className="px-3 py-2" colSpan={2}>{TOURS_LABELS.LABEL_1423}</td>
                   <td className="px-3 py-2 text-right font-mono">${formatAmount(profitResult.expense_total)}</td>
                 </tr>
               </tbody>
