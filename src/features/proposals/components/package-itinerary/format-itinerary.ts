@@ -48,7 +48,15 @@ export function formatDailyItinerary({
       accommodation = getPreviousAccommodation(idx) || '續住'
     }
 
-    const formattedActivities = (day.activities || []).map(act => ({
+    // 按時間排序活動（有時間的排前面，無時間的保持原順序在後面）
+    const sortedActivities = [...(day.activities || [])].sort((a, b) => {
+      if (a.startTime && b.startTime) return a.startTime.localeCompare(b.startTime)
+      if (a.startTime && !b.startTime) return -1
+      if (!a.startTime && b.startTime) return 1
+      return 0 // 都沒時間就保持原順序
+    })
+
+    const formattedActivities = sortedActivities.map(act => ({
       icon: '',
       title: act.title,
       description: '',
