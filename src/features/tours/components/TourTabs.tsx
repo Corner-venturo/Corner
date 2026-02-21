@@ -39,11 +39,6 @@ const OrderMembersExpandable = dynamic(
   { loading: () => <TabLoading /> }
 )
 
-const TourConfirmationSheetPage = dynamic(
-  () => import('@/features/tour-confirmation/components/TourConfirmationSheetPage').then(m => m.TourConfirmationSheetPage),
-  { loading: () => <TabLoading /> }
-)
-
 const TourCheckin = dynamic(
   () => import('@/features/tours/components/tour-checkin').then(m => m.TourCheckin),
   { loading: () => <TabLoading /> }
@@ -56,11 +51,6 @@ const TourRequirementsTab = dynamic(
 
 const TourFilesTree = dynamic(
   () => import('@/features/tours/components/TourFilesTree').then(m => m.TourFilesTree),
-  { loading: () => <TabLoading /> }
-)
-
-const TourDesignsTab = dynamic(
-  () => import('@/features/tours/components/tour-designs-tab').then(m => m.TourDesignsTab),
   { loading: () => <TabLoading /> }
 )
 
@@ -84,18 +74,8 @@ const TourItineraryTab = dynamic(
   { loading: () => <TabLoading /> }
 )
 
-const TourWebpageTab = dynamic(
-  () => import('@/features/tours/components/tour-webpage-tab').then(m => m.TourWebpageTab),
-  { loading: () => <TabLoading /> }
-)
-
-const BonusSettingTab = dynamic(
-  () => import('@/features/tours/components/BonusSettingTab').then(m => m.BonusSettingTab),
-  { loading: () => <TabLoading /> }
-)
-
-const ProfitTab = dynamic(
-  () => import('@/features/tours/components/ProfitTab').then(m => m.ProfitTab),
+const TourClosingTab = dynamic(
+  () => import('@/features/tours/components/tour-closing-tab').then(m => m.TourClosingTab),
   { loading: () => <TabLoading /> }
 )
 
@@ -104,19 +84,15 @@ const ProfitTab = dynamic(
 // ============================================================================
 
 export const TOUR_TABS = [
+  { value: 'overview', label: COMP_TOURS_LABELS.總覽 },
   { value: 'orders', label: COMP_TOURS_LABELS.訂單 },
   { value: 'members', label: COMP_TOURS_LABELS.團員 },
   { value: 'itinerary', label: COMP_TOURS_LABELS.行程 },
   { value: 'quote', label: COMP_TOURS_LABELS.報價 },
   { value: 'requirements', label: COMP_TOURS_LABELS.需求 },
-  { value: 'confirmation', label: COMP_TOURS_LABELS.確認 },
   { value: 'checkin', label: COMP_TOURS_LABELS.報到 },
-  { value: 'webpage', label: COMP_TOURS_LABELS.網頁 },
-  { value: 'designs', label: COMP_TOURS_LABELS.設計 },
   { value: 'files', label: COMP_TOURS_LABELS.檔案 },
-  { value: 'overview', label: COMP_TOURS_LABELS.總覽 },
-  { value: 'bonus', label: COMP_TOURS_LABELS.獎金設定 },
-  { value: 'profit', label: COMP_TOURS_LABELS.利潤 },
+  { value: 'closing', label: COMP_TOURS_LABELS.結案 },
 ] as const
 
 export type TourTabValue = typeof TOUR_TABS[number]['value']
@@ -172,8 +148,6 @@ export function TourTabContent({
       )
     case 'orders':
       return <TourOrders tour={tour} />
-    case 'confirmation':
-      return <TourConfirmationSheetPage tour={tour} />
     case 'checkin':
       return <TourCheckin tour={tour} />
     case 'requirements':
@@ -181,6 +155,7 @@ export function TourTabContent({
         <TourRequirementsTab
           tourId={tour.id}
           quoteId={tour.quote_id}
+          tour={tour}
           onOpenRequestDialog={onOpenRequestDialog}
         />
       )
@@ -188,12 +163,8 @@ export function TourTabContent({
       return <TourQuoteTab tour={tour} />
     case 'itinerary':
       return <TourItineraryTab tour={tour} />
-    case 'webpage':
-      return <TourWebpageTab tour={tour} />
     case 'files':
       return <TourFilesTree tourId={tour.id} tourCode={tour.code || ''} quoteId={tour.quote_id} itineraryId={tour.itinerary_id} />
-    case 'designs':
-      return <TourDesignsTab tourId={tour.id} proposalId={undefined} />
     case 'overview':
       return (
         <div className="space-y-6">
@@ -202,10 +173,8 @@ export function TourTabContent({
           <TourCosts tour={tour} showSummary={false} />
         </div>
       )
-    case 'bonus':
-      return <BonusSettingTab tour={tour} />
-    case 'profit':
-      return <ProfitTab tour={tour} />
+    case 'closing':
+      return <TourClosingTab tour={tour} />
     default:
       return <TourOverview tour={tour} />
   }
