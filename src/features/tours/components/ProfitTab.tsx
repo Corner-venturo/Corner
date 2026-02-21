@@ -247,7 +247,7 @@ export function ProfitTab({ tour }: ProfitTabProps) {
                     <tr>
                       <th className="text-left px-3 py-2 font-medium">{TOURS_LABELS.TYPE}</th>
                       <th className="text-left px-3 py-2 font-medium">{TOURS_LABELS.LABEL_2076}</th>
-                      <th className="text-right px-3 py-2 font-medium">金額</th>
+                      <th className="text-right px-3 py-2 font-medium">{TOURS_LABELS.AMOUNT}</th>
                     </tr>
                   </thead>
                   <tbody>
