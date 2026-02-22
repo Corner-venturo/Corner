@@ -545,7 +545,7 @@ export function DialogsContainer({
               {/* 團體進度 */}
               <div className="border border-morandi-container rounded-lg p-4">
                 <h4 className="font-medium text-morandi-primary mb-2">{DIALOGS_CONTAINER_LABELS.團體進度}</h4>
-                <p className="text-sm text-morandi-secondary">{DIALOGS_CONTAINER_LABELS.顯示目前進行中的團}</p>
+                <p className="text-sm text-morandi-secondary">{DIALOGS_CONTAINER_LABELS.顯示目前待出發的團}</p>
               </div>
               {/* 確認單/需求單 */}
               <div className="border border-morandi-container rounded-lg p-4">
