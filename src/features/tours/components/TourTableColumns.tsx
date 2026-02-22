@@ -10,7 +10,8 @@ import { TableColumn } from '@/components/ui/enhanced-table'
 import { Tour } from '@/stores/types'
 import { cn } from '@/lib/utils'
 import { DateCell } from '@/components/table-cells'
-import { TOUR_TABLE, STATUS_BADGE_CLASSES } from '../constants'
+import { TOUR_TABLE } from '../constants'
+import { getStatusConfig } from '@/lib/status-config'
 
 interface UseTourTableColumnsParams {
   ordersByTourId?: Map<string, { sales_person: string | null; assistant: string | null }>
@@ -98,9 +99,9 @@ export function useTourTableColumns({ ordersByTourId }: UseTourTableColumnsParam
         render: (value, row) => {
           const tour = row as Tour
           const status = tour.status || ''
-          const badgeClass = STATUS_BADGE_CLASSES[status] || STATUS_BADGE_CLASSES.default
+          const config = getStatusConfig('tour', status)
           return (
-            <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium', badgeClass)}>
+            <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border', config.bgColor, config.color, config.borderColor)}>
               {status}
             </span>
           )
