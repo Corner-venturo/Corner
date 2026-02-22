@@ -137,7 +137,7 @@ export function useCalendarEvents() {
     return (tours || [])
       .filter(tour => tour.status !== '特殊團' && !tour.archived) // 過濾掉簽證專用團等特殊團，以及已封存的
       .map(tour => {
-        const color = getEventColor('tour', tour.status || '提案')
+        const color = getEventColor('tour', tour.status || '開團')
         // 🔧 優化：直接使用 tour.current_participants，不再遍歷 orders/members
         const actualMembers = tour.current_participants || 0
 

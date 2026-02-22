@@ -24,14 +24,14 @@ interface TourCardProps {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  '提案': { label: '提案', color: 'text-amber-700', bg: 'bg-amber-100' },
-  '進行中': { label: '進行中', color: 'text-green-700', bg: 'bg-green-100' },
-  '結案': { label: '結案', color: 'text-morandi-secondary', bg: 'bg-morandi-container' },
+  '開團': { label: '開團', color: 'text-amber-700', bg: 'bg-amber-100' },
+  '待出發': { label: '待出發', color: 'text-green-700', bg: 'bg-green-100' },
+  '已結團': { label: '已結團', color: 'text-morandi-secondary', bg: 'bg-morandi-container' },
   '取消': { label: '取消', color: 'text-red-700', bg: 'bg-red-100' },
 }
 
 export function TourCard({ tour, showActions = true, children, className }: TourCardProps) {
-  const status = STATUS_CONFIG[tour.status || '提案'] || STATUS_CONFIG['提案']
+  const status = STATUS_CONFIG[tour.status || '開團'] || STATUS_CONFIG['開團']
 
   const getDaysUntil = (dateStr: string | null) => {
     if (!dateStr) return null

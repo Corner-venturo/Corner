@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
       main_city_id: null,
       departure_date: pkgData.start_date || departure_date,
       return_date: returnDateValue,
-      status: '進行中',
+      status: '待出發',
       max_participants: pkgData.group_size || proposalData.group_size,
       current_participants: 0,
       contract_status: 'pending',

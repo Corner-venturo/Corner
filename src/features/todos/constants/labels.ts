@@ -3,7 +3,7 @@
 // 狀態相關
 export const TODO_STATUS_LABELS = {
   pending: '待辦',
-  in_progress: '進行中',
+  in_progress: '待出發',
   completed: '完成',
   cancelled: '取消',
 }

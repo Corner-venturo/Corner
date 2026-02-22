@@ -9,8 +9,8 @@ import { Calculator, FileText } from 'lucide-react'
  */
 export const STATUS_FILTERS = [
   { value: 'all', label: '全部', icon: Calculator },
-  { value: 'proposed', label: '提案', icon: FileText },
-  { value: '進行中', label: '進行中', icon: FileText },
+  { value: 'proposed', label: '開團', icon: FileText },
+  { value: '待出發', label: '待出發', icon: FileText },
   { value: 'approved', label: '已核准', icon: FileText },
 ] as const
 
@@ -21,7 +21,7 @@ export const STATUS_COLORS: Record<string, string> = {
   draft: 'text-morandi-secondary',
   proposed: 'text-morandi-gold',
   revised: 'text-status-info',
-  '進行中': 'text-status-info',
+  '待出發': 'text-status-info',
   approved: 'text-morandi-green',
   converted: 'text-morandi-primary',
   rejected: 'text-morandi-red',

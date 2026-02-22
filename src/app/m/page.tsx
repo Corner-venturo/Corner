@@ -100,7 +100,7 @@ export default function MobileHomePage() {
     departure_date: tour.departure_date,
     return_date: tour.return_date,
     total_people: tour.current_participants || 0,
-    status: tour.status || '提案',
+    status: tour.status || '開團',
     duration_nights: calculateNights(tour.departure_date, tour.return_date),
   })
 

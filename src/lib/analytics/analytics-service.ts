@@ -49,8 +49,8 @@ export class AnalyticsService {
 
       return {
         totalTours: toursData.length,
-        activeTours: toursData.filter(t => t.status === '進行中').length,
-        completedTours: toursData.filter(t => t.status === '結案').length,
+        activeTours: toursData.filter(t => t.status === '待出發').length,
+        completedTours: toursData.filter(t => t.status === '已結團').length,
         cancelledTours: toursData.filter(t => t.status === '取消').length,
         totalParticipants,
         averageGroupSize: toursData.length > 0 ? totalParticipants / toursData.length : 0,
@@ -234,7 +234,7 @@ export class AnalyticsService {
     const metrics = await this.getTourMetrics()
 
     return {
-      labels: ['提案', '進行中', '結案', '取消'],
+      labels: ['開團', '待出發', '已結團', '取消'],
       datasets: [
         {
           name: '旅遊團數量',

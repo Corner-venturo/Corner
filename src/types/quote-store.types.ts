@@ -28,7 +28,7 @@ export interface Quote {
   name?: string // 團體名稱（標準報價單必填，快速報價單選填）
   destination?: string // 目的地（向後相容）
   days?: number // 天數（向後相容）
-  status: 'draft' | 'proposed' | 'revised' | '進行中' | 'approved' | 'converted' | 'rejected'
+  status: 'draft' | 'proposed' | 'revised' | '待出發' | 'approved' | 'converted' | 'rejected'
   tour_id?: string // 關聯的旅遊團ID
   itinerary_id?: string // 關聯的行程表ID
   proposal_package_id?: string // 關聯的提案套件ID

@@ -28,7 +28,7 @@ export const QUOTE_SYNC_LABELS = {
 export const QUOTE_PAGE_LABELS = {
   UPDATE_STATUS_FAILED: '更新狀態失敗，請稍後再試',
   NO_SYNC_CHANGES: '沒有需要同步的變更',
-  STATUS_ACTIVE: '進行中',
+  STATUS_ACTIVE: '待出發',
   TOUR_LINKED: (code: string) => `已關聯旅遊團：${code}`,
   IMPORTED_MEALS: (count: number) => `已匯入 ${count} 筆餐飲`,
   IMPORTED_ATTRACTIONS: (count: number) => `已匯入 ${count} 筆景點`,

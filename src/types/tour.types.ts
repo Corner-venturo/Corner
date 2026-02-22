@@ -279,7 +279,7 @@ export interface Itinerary {
   cover_image: string
   country: string
   city: string
-  status: '提案' | '進行中' | '結案' | '取消'
+  status: TourStatus
   cover_style?: 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage' // 封面風格
   flight_style?: 'original' | 'chinese' | 'japanese' | 'luxury' | 'art' | 'none' | 'dreamscape' | 'collage' // 航班卡片風格
   itinerary_style?: 'original' | 'luxury' | 'art' | 'dreamscape' // 每日行程風格
@@ -469,19 +469,23 @@ export interface Tour extends BaseEntity {
  * TourStatus - 旅遊團狀態（中文）
  *
  * 生命週期流程:
- * 提案 → 進行中 → 結案
- *          ↓
- *   (解鎖回提案修改)
+ * 開團 → 待出發 → 已出發 → 待結團 → 已結團
+ *                                      ↓
+ *                                    取消
  *
- * - 提案：可編輯行程
- * - 進行中：已確認出團，行程鎖定
- * - 結案：團結束，結算獎金
- * - 取消：取消
+ * - 開團：可編輯行程
+ * - 待出發：已確認出團，行程鎖定
+ * - 已出發：團已出發
+ * - 待結團：等待結算
+ * - 已結團：團結束，結算獎金
+ * - 取消：已取消
  */
 export type TourStatus =
-  | '提案'      // 可編輯行程
-  | '進行中'    // 已確認出團，行程鎖定
-  | '結案'      // 團結束，結算獎金
+  | '開團'      // 可編輯行程
+  | '待出發'    // 已確認出團，行程鎖定
+  | '已出發'    // 團已出發
+  | '待結團'    // 等待結算
+  | '已結團'    // 團結束，結算獎金
   | '取消'      // 已取消
 
 /**

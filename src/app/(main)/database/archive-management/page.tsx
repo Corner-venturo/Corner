@@ -48,7 +48,7 @@ interface OrphanedQuote {
   created_at: string | null
 }
 
-// 結案旅遊團
+// 已結團旅遊團
 interface ClosedTour {
   id: string
   code: string
@@ -398,7 +398,7 @@ export default function ArchiveManagementPage() {
     },
   ]
 
-  // 結案旅遊團表格欄位
+  // 已結團旅遊團表格欄位
   const closedToursColumns = [
     {
       key: 'code',
@@ -553,7 +553,7 @@ export default function ArchiveManagementPage() {
               )
             )}
 
-            {/* 結案旅遊團 */}
+            {/* 已結團旅遊團 */}
             {activeTab === 'closed' && (
               closedTours.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">

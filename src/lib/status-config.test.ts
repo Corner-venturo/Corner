@@ -44,8 +44,8 @@ describe('getStatusConfig', () => {
   })
 
   it('should handle tour Chinese status keys', () => {
-    const config = getStatusConfig('tour', '進行中')
-    expect(config.label).toBe('進行中')
+    const config = getStatusConfig('tour', '待出發')
+    expect(config.label).toBe('待出發')
   })
 
   it('should handle receipt numeric string keys', () => {

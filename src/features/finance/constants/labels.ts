@@ -428,7 +428,7 @@ export const RECEIPT_MUTATION_LABELS = {
 
 // useUnclosedTours
 export const UNCLOSED_TOURS_HOOK_LABELS = {
-  CLOSED: '結案',
+  CLOSED: '已結團',
   CANCELLED: '取消',
 }
 

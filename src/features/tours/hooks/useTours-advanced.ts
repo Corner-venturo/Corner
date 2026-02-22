@@ -230,7 +230,7 @@ export function useTourDetails(tour_id: string) {
     const VALID_TOUR_TRANSITIONS: Record<string, string[]> = {
       'draft': ['published', 'cancelled'],
       'proposed': ['draft', 'cancelled'],
-      '提案': ['draft', 'cancelled'],
+      '開團': ['draft', 'cancelled'],
       'published': ['departed', 'cancelled', 'draft'],
       'departed': ['completed'],
       'completed': ['archived'],

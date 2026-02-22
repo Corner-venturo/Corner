@@ -69,7 +69,7 @@ export function useUnclosedTours(): UseUnclosedToursResult {
         .lte('return_date', cutoffDateStr)
         // Not closed
         .neq('closing_status', 'closed')
-        .neq('status', '結案')
+        .neq('status', '已結團')
         // Not cancelled
         .neq('status', '取消')
         // Order by return_date (oldest first)

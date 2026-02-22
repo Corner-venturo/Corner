@@ -605,13 +605,13 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
         onClose={() => setShowLinkTourDialog(false)}
         onCreateNew={() => {
           if (quote) {
-            updateQuote(quote.id, { status: '進行中' })
+            updateQuote(quote.id, { status: '待出發' })
             handleCreateTour()
           }
         }}
         onLinkExisting={async (tour) => {
           if (quote) {
-            await updateQuote(quote.id, { status: '進行中', tour_id: tour.id })
+            await updateQuote(quote.id, { status: '待出發', tour_id: tour.id })
             const { updateTour } = await import('@/data')
             await updateTour(tour.id, { quote_id: quote.id })
             toast.success(`已關聯旅遊團：${tour.code}`)

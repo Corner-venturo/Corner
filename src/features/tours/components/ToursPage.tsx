@@ -341,7 +341,7 @@ export const ToursPage: React.FC = () => {
       />
 
       <div className="flex-1 overflow-hidden flex flex-col">
-        {activeStatusTab === '提案' ? (
+        {activeStatusTab === '開團' ? (
           <div className="flex-1 overflow-auto">
             <ProposalsTableContent searchQuery={searchQuery} />
           </div>

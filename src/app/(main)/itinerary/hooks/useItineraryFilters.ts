@@ -27,22 +27,22 @@ export function useItineraryFilters({
     let filtered = itineraries
 
     switch (statusFilter) {
-      case '提案':
+      case '開團':
         // 提案狀態不受出發日期影響，只檢查 closed_at
         filtered = filtered.filter(
-          item => item.status === '提案' && !item.closed_at && !item.archived_at && !item.is_template
+          item => item.status === '開團' && !item.closed_at && !item.archived_at && !item.is_template
         )
         break
-      case '進行中':
+      case '待出發':
         // 進行中狀態不受出發日期影響，只檢查 closed_at
         filtered = filtered.filter(
-          item => item.status === '進行中' && !item.closed_at && !item.archived_at && !item.is_template
+          item => item.status === '待出發' && !item.closed_at && !item.archived_at && !item.is_template
         )
         break
       case '公司範例':
         filtered = filtered.filter(item => item.is_template && !item.archived_at)
         break
-      case '結案':
+      case '已結團':
         filtered = filtered.filter(item => isItineraryClosed(item) && !item.archived_at)
         break
       default:

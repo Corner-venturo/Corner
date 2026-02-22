@@ -46,7 +46,7 @@ describe('TourChannelService', () => {
     id: 'tour-1',
     code: 'TYO250116A',
     name: '東京5日遊',
-    status: '進行中',
+    status: '待出發',
     departure_date: '2025-01-16',
     return_date: '2025-01-20',
     contract_status: 'pending',

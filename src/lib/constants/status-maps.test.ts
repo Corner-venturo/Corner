@@ -28,22 +28,22 @@ describe('TOUR_STATUS constants', () => {
     expect(TOUR_STATUS_LIST).toHaveLength(4)
   })
   it('contains expected values', () => {
-    expect(TOUR_STATUS.PROPOSAL).toBe('提案')
-    expect(TOUR_STATUS.IN_PROGRESS).toBe('進行中')
-    expect(TOUR_STATUS.CLOSED).toBe('結案')
+    expect(TOUR_STATUS.PROPOSAL).toBe('開團')
+    expect(TOUR_STATUS.IN_PROGRESS).toBe('待出發')
+    expect(TOUR_STATUS.CLOSED).toBe('已結團')
     expect(TOUR_STATUS.CANCELLED).toBe('取消')
   })
 })
 
 describe('isTourLocked', () => {
   it('returns true for 進行中', () => {
-    expect(isTourLocked('進行中')).toBe(true)
+    expect(isTourLocked('待出發')).toBe(true)
   })
   it('returns true for 結案', () => {
-    expect(isTourLocked('結案')).toBe(true)
+    expect(isTourLocked('已結團')).toBe(true)
   })
   it('returns false for 提案', () => {
-    expect(isTourLocked('提案')).toBe(false)
+    expect(isTourLocked('開團')).toBe(false)
   })
   it('returns false for 取消', () => {
     expect(isTourLocked('取消')).toBe(false)
@@ -55,10 +55,10 @@ describe('isTourLocked', () => {
 
 describe('canConfirmTour', () => {
   it('returns true for 提案', () => {
-    expect(canConfirmTour('提案')).toBe(true)
+    expect(canConfirmTour('開團')).toBe(true)
   })
   it('returns false for 進行中', () => {
-    expect(canConfirmTour('進行中')).toBe(false)
+    expect(canConfirmTour('待出發')).toBe(false)
   })
   it('returns false for null', () => {
     expect(canConfirmTour(null)).toBe(false)
@@ -67,8 +67,8 @@ describe('canConfirmTour', () => {
 
 describe('getTourStatusLabel', () => {
   it('returns the status directly', () => {
-    expect(getTourStatusLabel('提案')).toBe('提案')
-    expect(getTourStatusLabel('進行中')).toBe('進行中')
+    expect(getTourStatusLabel('開團')).toBe('開團')
+    expect(getTourStatusLabel('待出發')).toBe('待出發')
   })
 })
 
@@ -99,7 +99,7 @@ describe('getPaymentStatusLabel', () => {
 describe('getQuoteStatusLabel', () => {
   it('maps known statuses', () => {
     expect(getQuoteStatusLabel('draft')).toBe('草稿')
-    expect(getQuoteStatusLabel('proposed')).toBe('提案')
+    expect(getQuoteStatusLabel('proposed')).toBe('開團')
     expect(getQuoteStatusLabel('approved')).toBe('已核准')
   })
   it('returns raw for unknown', () => {

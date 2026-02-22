@@ -198,7 +198,7 @@ export type ScheduleStatus = 'pending' | 'confirmed' | 'in_progress' | 'complete
 export const SCHEDULE_STATUS_OPTIONS = [
   { value: 'pending', label: '待確認', color: 'bg-morandi-gold' },
   { value: 'confirmed', label: '已確認', color: 'bg-morandi-green' },
-  { value: 'in_progress', label: '進行中', color: 'bg-status-info' },
+  { value: 'in_progress', label: '待出發', color: 'bg-status-info' },
   { value: 'completed', label: '已完成', color: 'bg-morandi-secondary' },
   { value: 'cancelled', label: '已取消', color: 'bg-morandi-red' },
 ] as const

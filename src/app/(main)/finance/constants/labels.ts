@@ -180,7 +180,7 @@ export const TOUR_PNL_LABELS = {
   CONFIRMED: '已確認',
   OPERATING: '出團中',
   COMPLETED: '已完成',
-  CLOSED: '已結案',
+  CLOSED: '已結團',
 
   TOTAL_2832: '團收支總覽',
 
@@ -189,7 +189,7 @@ export const TOUR_PNL_LABELS = {
   STATUS_CONFIRMED: '已確認',
   STATUS_OPERATING: '出團中',
   STATUS_COMPLETED: '已完成',
-  STATUS_CLOSED: '已結案',
+  STATUS_CLOSED: '已結團',
   STATUS_CANCELLED: '已取消',
 
   // Column labels
@@ -216,28 +216,28 @@ export const TOUR_PNL_LABELS = {
 }
 
 export const UNCLOSED_TOURS_LABELS = {
-  DESCRIPTION: '此報表顯示<strong>回程日 + 7 天已過</strong>但尚未執行結案的團體。',
-  DESCRIPTION_SUFFIX: '建議儘快完成結案作業以確保財務數據準確。',
+  DESCRIPTION: '此報表顯示<strong>回程日 + 7 天已過</strong>但尚未執行結團的團體。',
+  DESCRIPTION_SUFFIX: '建議儘快完成結團作業以確保財務數據準確。',
 
-  LABEL_996: '未結案團體報表',
-  LABEL_9947: '未結案團體數',
+  LABEL_996: '未結團團體報表',
+  LABEL_9947: '未結團團體數',
   TOTAL_7262: '總收入',
   TOTAL_582: '總支出',
   TOTAL_8800: '總利潤',
-  LABEL_332: '未結案團體列表',
+  LABEL_332: '未結團團體列表',
 
   // Column labels
   COL_TOUR_CODE: '團號',
   COL_TOUR_NAME: '團名',
   COL_RETURN_DATE: '回程日',
-  COL_EXPECTED_CLOSING_DATE: '應結案日',
+  COL_EXPECTED_CLOSING_DATE: '應結團日',
   COL_DAYS_OVERDUE: '逾期天數',
   COL_TOTAL_REVENUE: '總收入',
   COL_TOTAL_COST: '總支出',
   COL_PROFIT: '利潤',
   COL_STATUS: '狀態',
   DAYS_SUFFIX: ' 天',
-  STATUS_DEFAULT: '進行中',
+  STATUS_DEFAULT: '待出發',
 
   // Breadcrumb
   BREADCRUMB_HOME: '首頁',
@@ -245,7 +245,7 @@ export const UNCLOSED_TOURS_LABELS = {
   BREADCRUMB_REPORTS: '報表管理',
 
   // Table
-  EMPTY_MESSAGE: '目前沒有需要結案的團體',
+  EMPTY_MESSAGE: '目前沒有需要結團的團體',
   SEARCH_PLACEHOLDER: '搜尋團號或團名...',
 }
 

@@ -16,7 +16,7 @@ test.describe('團員 CRUD 測試', () => {
     await page.waitForTimeout(2000)
 
     // 找到狀態是「進行中」的旅遊團
-    const tourRow = page.locator('table tbody tr').filter({ hasText: '進行中' }).first()
+    const tourRow = page.locator('table tbody tr').filter({ hasText: '待出發' }).first()
 
     if (!(await tourRow.isVisible({ timeout: 5000 }).catch(() => false))) {
       return null

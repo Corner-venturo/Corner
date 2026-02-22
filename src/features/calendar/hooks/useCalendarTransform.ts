@@ -81,7 +81,7 @@ export function useCalendarTransform(calendarEvents: CalendarEvent[]) {
     return (tours || [])
       .filter(tour => tour.status !== '特殊團') // 過濾掉簽證專用團等特殊團
       .map(tour => {
-        const color = getEventColor('tour', tour.status || '提案')
+        const color = getEventColor('tour', tour.status || '開團')
         // 使用 denormalized 欄位，避免 N+1 查詢
         const actualMembers = tour.current_participants || 0
 

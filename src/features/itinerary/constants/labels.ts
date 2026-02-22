@@ -157,7 +157,7 @@ export const ITINERARY_HOOKS_LABELS = {
   // useItineraryFilters
   FILTER_ALL: '全部',
   FILTER_DRAFT: '草稿',
-  FILTER_ACTIVE: '進行中',
+  FILTER_ACTIVE: '待出發',
   FILTER_ARCHIVED: '已封存',
 
   // useQuoteImport

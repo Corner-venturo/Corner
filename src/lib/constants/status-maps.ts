@@ -15,9 +15,9 @@
  *        (解鎖回提案)
  */
 export const TOUR_STATUS_LIST = [
-  '提案',      // 可編輯行程
-  '進行中',    // 已確認出團，行程鎖定
-  '結案',      // 團結束，結算獎金
+  '開團',      // 可編輯行程
+  '待出發',    // 已確認出團，行程鎖定
+  '已結團',      // 團結束，結算獎金
   '取消',      // 已取消
 ] as const
 
@@ -25,15 +25,15 @@ export type TourStatusValue = (typeof TOUR_STATUS_LIST)[number]
 
 /**
  * 旅遊團狀態常數 - 避免魔法字串
- * 使用方式: TOUR_STATUS.PROPOSAL 代替 '提案'
+ * 使用方式: TOUR_STATUS.PROPOSAL 代替 '開團'
  */
 export const TOUR_STATUS = {
   /** 提案階段 - 可編輯行程 */
-  PROPOSAL: '提案',
+  PROPOSAL: '開團',
   /** 進行中 - 已確認出團，行程鎖定 */
-  IN_PROGRESS: '進行中',
+  IN_PROGRESS: '待出發',
   /** 結案 - 團結束，結算獎金 */
-  CLOSED: '結案',
+  CLOSED: '已結團',
   /** 已取消 */
   CANCELLED: '取消',
 } as const satisfies Record<string, TourStatusValue>
@@ -100,9 +100,9 @@ export type PaymentStatusValue = (typeof PAYMENT_STATUS_MAP)[PaymentStatusKey]
 
 export const QUOTE_STATUS_MAP = {
   draft: '草稿',
-  proposed: '提案',
+  proposed: '開團',
   revised: '修改中',
-  '進行中': '進行中',
+  '待出發': '待出發',
   approved: '已核准',
   converted: '已轉單',
   rejected: '已拒絕',
@@ -112,7 +112,7 @@ export const QUOTE_STATUS_REVERSE_MAP = {
   草稿: 'draft',
   提案: 'proposed',
   修改中: 'revised',
-  進行中: '進行中',
+  進行中: '待出發',
   已核准: 'approved',
   已轉單: 'converted',
   已拒絕: 'rejected',

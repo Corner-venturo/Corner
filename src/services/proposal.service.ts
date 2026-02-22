@@ -539,7 +539,7 @@ export async function createItineraryForPackage(
       id: crypto.randomUUID(),
       title: pkg.proposal?.title || pkg.version_name,
       tour_code: '',  // 提案階段沒有團號
-      status: '提案',
+      status: '開團',
       departure_date: pkg.start_date || pkg.proposal?.expected_start_date || '',
       country: pkg.destination || pkg.proposal?.destination || '',
       city: pkg.destination || pkg.proposal?.destination || '',

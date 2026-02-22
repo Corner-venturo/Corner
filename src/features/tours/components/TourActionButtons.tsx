@@ -288,7 +288,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
           </button>
 
           {/* 結案（僅進行中狀態可見） */}
-          {tour.status === '進行中' && onCloseTour && (
+          {tour.status === '待出發' && onCloseTour && (
             <button
               onClick={e => {
                 e.stopPropagation()

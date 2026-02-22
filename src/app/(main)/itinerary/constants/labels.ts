@@ -1,10 +1,10 @@
 export const LABELS = {
   // Status filters
   ALL: '全部',
-  STATUS_PROPOSAL: '提案',
-  STATUS_ACTIVE: '進行中',
+  STATUS_PROPOSAL: '開團',
+  STATUS_ACTIVE: '待出發',
   STATUS_TEMPLATE: '公司範例',
-  STATUS_CLOSED: '結案',
+  STATUS_CLOSED: '已結團',
   SEARCH_ITINERARY: '搜尋行程...',
 
   // 页面标题和导航
@@ -94,7 +94,7 @@ export const LABELS = {
   SELECT_DAYS_FIRST: '請先選擇行程天數',
   
   // 密码和安全
-  EDIT_ONGOING_ITINERARY: '編輯進行中行程',
+  EDIT_ONGOING_ITINERARY: '編輯待出發行程',
   EDIT_PASSWORD_WARNING: '此行程已綁定旅遊團，為避免誤觸修改，請輸入公司密碼以解鎖編輯。',
   ENTER_COMPANY_PASSWORD: '請輸入公司密碼',
   
@@ -153,7 +153,7 @@ export const BLOCK_EDITOR_LABELS = {
   LABEL_2827: '存檔中...',
   SAVING_4294: '已儲存',
   LABEL_6397: '存檔失敗',
-  STATUS_PROPOSAL: '提案',
+  STATUS_PROPOSAL: '開團',
   MANUAL_SAVE: '手動存檔',
   MANUAL_SAVING: '存檔中...',
   AUTO_SAVE_FAILED: '自動存檔失敗',
@@ -164,7 +164,7 @@ export const BLOCK_EDITOR_LABELS = {
 // Itinerary Actions
 export const ITINERARY_ACTIONS_LABELS = {
   FILL_CODE_AND_NAME: '請填寫行程編號和行程名稱',
-  STATUS_PROPOSAL: '提案',
+  STATUS_PROPOSAL: '開團',
   TO_BE_FILLED: '（待填寫）',
   COPY_WITH_QUOTES: (count: number) => `行程已複製成功！同時複製了 ${count} 個報價單（客戶資料已清空）`,
   COPY_SUCCESS: '行程已複製成功！',
@@ -194,7 +194,7 @@ export const ITINERARY_ACTIONS_LABELS = {
 
 // Itinerary Data Loader
 export const ITINERARY_DATA_LOADER_LABELS = {
-  STATUS_PROPOSAL: '提案',
+  STATUS_PROPOSAL: '開團',
   TRANSPORT_COST: '行程表所列之交通費用',
   ACCOMMODATION_COST: '行程表所列之住宿費用',
   MEAL_COST: '行程表所列之餐食費用',
@@ -212,8 +212,8 @@ export const ITINERARY_DATA_LOADER_LABELS = {
 
 // Itinerary Editor
 export const ITINERARY_EDITOR_LABELS = {
-  STATUS_PROPOSAL: '提案',
-  STATUS_ACTIVE: '進行中',
+  STATUS_PROPOSAL: '開團',
+  STATUS_ACTIVE: '待出發',
   SAVE_LEADER_CONFIRM: (name: string) => `要將「${name}」新增到領隊資料庫嗎？\n下次可以直接搜尋選用。`,
   SAVE_LEADER_TITLE: '儲存領隊資料',
   AUTO_SAVE_FAILED: '自動存檔失敗，請手動儲存',

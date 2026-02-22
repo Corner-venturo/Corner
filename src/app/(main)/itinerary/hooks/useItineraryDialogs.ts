@@ -44,7 +44,7 @@ export function useItineraryDialogs() {
   const handleRowClick = useCallback(
     (itinerary: Itinerary) => {
       // 如果是進行中狀態（已綁定旅遊團），需要密碼解鎖
-      if (itinerary.status === '進行中') {
+      if (itinerary.status === '待出發') {
         setPendingEditId(itinerary.id)
         setPasswordInput('')
         setIsPasswordDialogOpen(true)

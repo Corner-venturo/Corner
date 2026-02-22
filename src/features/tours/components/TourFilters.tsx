@@ -54,9 +54,9 @@ export const TourFilters: React.FC<TourFiltersProps> = ({
       searchPlaceholder={TOUR_FILTERS.search_placeholder}
       tabs={[
         { value: 'all', label: TOUR_FILTERS.tab_all, icon: BarChart3 },
-        { value: '提案', label: TOUR_FILTERS.tab_proposal, icon: FileText },
-        { value: '進行中', label: TOUR_FILTERS.tab_active, icon: Calendar },
-        { value: '結案', label: TOUR_FILTERS.tab_closed, icon: FileCheck },
+        { value: '開團', label: TOUR_FILTERS.tab_proposal, icon: FileText },
+        { value: '待出發', label: TOUR_FILTERS.tab_active, icon: Calendar },
+        { value: '已結團', label: TOUR_FILTERS.tab_closed, icon: FileCheck },
         { value: '特殊團', label: TOUR_FILTERS.tab_special, icon: Star },
         { value: 'archived', label: TOUR_FILTERS.tab_archived, icon: Archive },
       ]}

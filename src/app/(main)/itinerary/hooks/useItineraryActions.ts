@@ -95,7 +95,7 @@ export function useItineraryActions({
         ...restData,
         tour_code: duplicateTourCode.trim(),
         title: duplicateTitle.trim(),
-        status: '提案' as const,
+        status: '開團' as const,
         created_by: userId,
       }
 
@@ -266,16 +266,16 @@ export function useItineraryActions({
   // 手動結案
   const handleClose = useCallback(
     async (id: string) => {
-      const confirmed = await confirm('確定要結案這個行程嗎？結案後仍可在「結案」分頁中查看。', {
+      const confirmed = await confirm('確定要結團這個行程嗎？結團後仍可在「結案」分頁中查看。', {
         type: 'warning',
-        title: '結案行程',
+        title: '結團行程',
       })
       if (confirmed) {
         try {
           await updateItinerary(id, { closed_at: new Date().toISOString() })
-          await alertSuccess('已結案！')
+          await alertSuccess('已結團！')
         } catch {
-          await alertError('結案失敗，請稍後再試')
+          await alertError('結團失敗，請稍後再試')
         }
       }
     },
@@ -298,7 +298,7 @@ export function useItineraryActions({
   // 處理行程點擊 - 只依賴穩定的 setters
   const handleRowClick = useCallback(
     (itinerary: Itinerary) => {
-      if (itinerary.status === '進行中') {
+      if (itinerary.status === '待出發') {
         setPendingEditId(itinerary.id)
         setPasswordInput('')
         setIsPasswordDialogOpen(true)
@@ -324,7 +324,7 @@ export function useItineraryActions({
     }
   }, [getPasswordInput, getPendingEditId, setIsPasswordDialogOpen, router])
 
-  // 判斷行程是否已結案 - 純函數，無依賴
+  // 判斷行程是否已結團 - 純函數，無依賴
   const isItineraryClosed = useCallback((itinerary: Itinerary) => {
     if (itinerary.closed_at) return true
     if (itinerary.is_template) return false

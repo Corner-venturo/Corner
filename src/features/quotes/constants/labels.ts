@@ -236,7 +236,7 @@ export const QUOTE_DETAIL_EMBED_LABELS = {
   此報價單沒有關聯的行程表: '此報價單沒有關聯的行程表',
   Local_報價: 'Local 報價',
   此報價單: '此報價單',
-  進行中: '進行中',
+  進行中: '待出發',
 
   LOADING_6912: '載入中...',
   LABEL_2257: '分類',
@@ -260,7 +260,7 @@ export const QUOTE_DIALOG_LABELS = {
   LABEL_7457: '團體名稱',
   LABEL_6764: '人數',
   STATUS: '狀態',
-  LABEL_5485: '提案',
+  LABEL_5485: '開團',
   LABEL_2328: '已核准',
   COPYING_2742: '設為置頂範本（方便複製使用）',
   LABEL_9029: '商品編號（選填）',

@@ -16,7 +16,7 @@ test.describe.serial('旅遊團詳情分頁測試', () => {
   // 輔助函數：找到實際的旅遊團（狀態是「進行中」而不是「提案」）
   async function findAndClickTour(page: import('@playwright/test').Page) {
     // 找到狀態是「進行中」的旅遊團行
-    const tourRow = page.locator('table tbody tr').filter({ hasText: '進行中' }).first()
+    const tourRow = page.locator('table tbody tr').filter({ hasText: '待出發' }).first()
     await tourRow.click()
 
     // 等待旅遊團詳情對話框開啟（檢查是否有團員名單分頁）

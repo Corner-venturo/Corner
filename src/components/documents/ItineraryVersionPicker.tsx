@@ -31,7 +31,7 @@ import { DOCUMENTS_LABELS } from './constants/labels'
 
 // 判斷是否為已確認版本（狀態為結案）
 function isConfirmedItinerary(itinerary: Itinerary): boolean {
-  return itinerary.status === '結案'
+  return itinerary.status === '已結團'
 }
 
 interface ItineraryVersionPickerProps {

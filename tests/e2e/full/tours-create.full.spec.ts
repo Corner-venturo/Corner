@@ -37,7 +37,7 @@ test.describe('旅遊團管理 - 創建流程測試', () => {
         // 常見的開團欄位
         const possibleFields = [
           '團名', '目的地', '出發日期', '回程日期',
-          '提案', '團號', '人數', '價格'
+          '開團', '團號', '人數', '價格'
         ]
 
         for (const field of possibleFields) {

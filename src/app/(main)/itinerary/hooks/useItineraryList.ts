@@ -88,20 +88,20 @@ export function useItineraryList() {
 
     // 狀態篩選
     switch (statusFilter) {
-      case '提案':
+      case '開團':
         filtered = filtered.filter(
-          item => item.status === '提案' && !isItineraryClosed(item) && !item.archived_at && !item.is_template
+          item => item.status === '開團' && !isItineraryClosed(item) && !item.archived_at && !item.is_template
         )
         break
-      case '進行中':
+      case '待出發':
         filtered = filtered.filter(
-          item => item.status === '進行中' && !isItineraryClosed(item) && !item.archived_at && !item.is_template
+          item => item.status === '待出發' && !isItineraryClosed(item) && !item.archived_at && !item.is_template
         )
         break
       case '公司範例':
         filtered = filtered.filter(item => item.is_template && !item.archived_at)
         break
-      case '結案':
+      case '已結團':
         filtered = filtered.filter(item => isItineraryClosed(item) && !item.archived_at)
         break
       default:

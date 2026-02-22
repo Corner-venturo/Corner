@@ -35,9 +35,9 @@ const TABS: { id: TabType; label: string; icon: typeof FileText }[] = [
 ]
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  '提案': { label: ID_LABELS.STATUS_PROPOSAL, color: 'text-amber-700', bg: 'bg-amber-100' },
-  '進行中': { label: ID_LABELS.STATUS_IN_PROGRESS, color: 'text-green-700', bg: 'bg-green-100' },
-  '結案': { label: ID_LABELS.STATUS_CLOSED, color: 'text-morandi-secondary', bg: 'bg-morandi-container' },
+  '開團': { label: ID_LABELS.STATUS_PROPOSAL, color: 'text-amber-700', bg: 'bg-amber-100' },
+  '待出發': { label: ID_LABELS.STATUS_IN_PROGRESS, color: 'text-green-700', bg: 'bg-green-100' },
+  '已結團': { label: ID_LABELS.STATUS_CLOSED, color: 'text-morandi-secondary', bg: 'bg-morandi-container' },
   '取消': { label: ID_LABELS.STATUS_CANCELLED, color: 'text-red-700', bg: 'bg-red-100' },
 }
 
@@ -394,7 +394,7 @@ export default function TourDetailPage() {
     )
   }
 
-  const status = STATUS_CONFIG[tour.status || '提案'] || STATUS_CONFIG['提案']
+  const status = STATUS_CONFIG[tour.status || '開團'] || STATUS_CONFIG['開團']
   const durationNights = calculateNights(tour.departure_date, tour.return_date)
 
   return (

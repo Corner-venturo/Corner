@@ -1,8 +1,8 @@
 export const ITINERARY_LABELS = {
-  LABEL_248: '結案',
+  LABEL_248: '已結團',
   LABEL_4206: '公司範例',
-  LABEL_555: '進行中',
-  LABEL_5485: '提案',
+  LABEL_555: '待出發',
+  LABEL_5485: '開團',
   LABEL_9823: '產生分享連結',
   COPYING_6704: '複製行程',
   LABEL_6743: '取消公司範例',

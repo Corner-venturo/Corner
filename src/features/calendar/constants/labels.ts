@@ -66,10 +66,10 @@ export const CALENDAR_LABELS = {
 
   // CalendarLegend
   LEGEND: '圖例：',
-  PROPOSAL: '提案',
-  IN_PROGRESS: '進行中',
+  PROPOSAL: '開團',
+  IN_PROGRESS: '待出發',
   PENDING_CLOSE: '待結案',
-  CLOSED: '結案',
+  CLOSED: '已結團',
   SPECIAL_TOUR: '特殊團',
   PERSONAL_EVENT: '個人事項',
   BIRTHDAY: '生日',

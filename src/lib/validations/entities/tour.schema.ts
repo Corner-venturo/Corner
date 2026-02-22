@@ -6,7 +6,7 @@
 import { z } from 'zod'
 
 // Tour statuses
-const tourStatusSchema = z.enum(['提案', '進行中', '結案', '取消'])
+const tourStatusSchema = z.enum(['開團', '待出發', '已結團', '取消'])
 const contractStatusSchema = z.enum(['pending', 'partial', 'signed'])
 
 /**

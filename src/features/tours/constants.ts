@@ -12,9 +12,9 @@ export const TOUR_FILTERS = {
   breadcrumb_tours: '旅遊團管理',
   search_placeholder: '搜尋旅遊團...',
   tab_all: '全部',
-  tab_proposal: '提案',
-  tab_active: '進行中',
-  tab_closed: '結案',
+  tab_proposal: '開團',
+  tab_active: '待出發',
+  tab_closed: '已結團',
   tab_special: '特殊團',
   tab_archived: '封存',
   add_button: '新增',
@@ -297,7 +297,7 @@ export const TOUR_ACTIONS = {
   contract_title: '合約管理',
   requirements: '需求',
   requirements_title: '需求總覽',
-  close_tour: '結案',
+  close_tour: '已結團',
 } as const
 
 // ============================================================

@@ -677,7 +677,7 @@ export function usePackageItinerary({
           title: formData.title,
           tour_id: null,
           tour_code: '',
-          status: '提案',
+          status: '開團',
           author_name: authorName,
           departure_date: pkg.start_date || '',
           country: pkg.country_id || '',

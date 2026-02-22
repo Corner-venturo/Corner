@@ -128,7 +128,7 @@ export interface ListPageLayoutProps<T extends Record<string, any>> {
  *   statusField="status"
  *   statusTabs={[
  *     { value: 'all', label: '全部' },
- *     { value: 'active', label: '進行中' },
+ *     { value: 'active', label: '待出發' },
  *   ]}
  *   onAdd={() => openDialog('create')}
  *   addLabel="新增旅遊團"

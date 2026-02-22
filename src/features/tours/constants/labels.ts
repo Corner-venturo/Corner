@@ -183,7 +183,7 @@ export const COMP_TOURS_LABELS = {
   找不到符合的團員: '找不到符合的團員',
   找不到符合的城市: '找不到符合的城市',
   抵達目的地: '抵達目的地',
-  提案: '提案',
+  提案: '開團',
   插入星號: '插入星號',
   插入直線: '插入直線',
   插入箭頭: '插入箭頭',
@@ -307,7 +307,7 @@ export const COMP_TOURS_LABELS = {
   結團失敗_2: '結團失敗:',
   結團成功: '結團成功！',
   結團確認: '結團確認',
-  結案: '結案',
+  結案: '已結團',
   經濟艙: '經濟艙',
   網頁: '網頁',
   網頁行程: '網頁行程',
@@ -400,7 +400,7 @@ export const COMP_TOURS_LABELS = {
   轎車: '轎車',
   返回台灣: '返回台灣',
   連結已複製: '連結已複製',
-  進行中: '進行中',
+  進行中: '待出發',
   達美航空: '達美航空',
   選填: '選填',
   選擇_OP: '選擇 OP',
@@ -796,6 +796,18 @@ export const TOUR_ITINERARY_TAB_LABELS = {
   行程表: '行程表',
   出發日期: '出發日期',
 
+  // Accommodation Dialog labels
+  住宿設定: '住宿設定',
+  住宿: '住宿',
+  第N晚: (n: number) => `第 ${n} 晚`,
+  續住_同上一晚: '續住（同上一晚）',
+  搜尋飯店: '搜尋飯店...',
+  手動輸入飯店名稱: '手動輸入飯店名稱',
+  關閉: '關閉',
+  // Day tabs
+  DAY_LABEL: (n: number) => `Day ${n}`,
+  調整天數: '調整天數',
+
   // Extra labels
   TAIWAN: '台灣',
   WEEKDAYS: ['日', '一', '二', '三', '四', '五', '六'] as readonly string[],
@@ -959,11 +971,11 @@ export const TOUR_SERVICE_LABELS = {
   RETURN_BEFORE_DEPARTURE: '返回日期不能早於出發日期',
   CANNOT_GET_WORKSPACE: '無法取得 workspace code，請重新登入',
   TOUR_NOT_FOUND: '找不到該旅遊團',
-  STATUS_CLOSED: '結案',
+  STATUS_CLOSED: '已結團',
   TOUR_ALREADY_CLOSED: '該旅遊團已經結案，無法取消',
   CANNOT_CANCEL_WITHIN_3_DAYS: '出發前3天內無法取消',
-  STATUS_PROPOSAL: '提案',
-  STATUS_ACTIVE: '進行中',
+  STATUS_PROPOSAL: '開團',
+  STATUS_ACTIVE: '待出發',
   STATUS_CANCELLED: '取消',
   STATUS_SPECIAL: '特殊團',
   INVALID_STATUS_TRANSITION: (from: string, to: string) => `不允許的狀態轉換：無法從 "${from}" 更新為 "${to}"`,
@@ -1088,7 +1100,7 @@ export const TOUR_WEBPAGE_TAB_LABELS = {
   ITINERARY_CREATED: '行程表已建立',
   CREATE_ITINERARY_FAILED: '建立行程表失敗',
   CREATE_ITINERARY_BTN: '建立行程表',
-  STATUS_PROPOSAL: '提案',
+  STATUS_PROPOSAL: '開團',
 }
 
 // ============================================================

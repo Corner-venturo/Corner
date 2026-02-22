@@ -110,7 +110,7 @@ export function useItineraryEditor() {
       price_note: data.priceNote || null,
       country: data.country,
       city: data.city,
-      status: (data.status || '提案') as '提案' | '進行中',
+      status: (data.status || '開團') as '開團' | '待出發',
       outbound_flight: data.outboundFlight,
       return_flight: data.returnFlight,
       features: data.features,

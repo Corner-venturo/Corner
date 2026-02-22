@@ -26,7 +26,7 @@ export const MANIFESTATION_LABELS = {
   LABEL_221: '完成此章',
   LABEL_3875: '下一步',
 
-  LABEL_555: '進行中',
+  LABEL_555: '待出發',
 
   LOADING_6912: '載入中...',
   LABEL_966: '願望之牆還很空',

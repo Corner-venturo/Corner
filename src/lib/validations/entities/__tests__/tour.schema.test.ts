@@ -7,7 +7,7 @@ describe('createTourSchema', () => {
     location: '日本東京',
     departure_date: '2026-03-01',
     return_date: '2026-03-05',
-    status: '提案' as const,
+    status: '開團' as const,
     price: 35000,
     max_participants: 30,
     contract_status: 'pending' as const,
