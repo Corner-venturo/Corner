@@ -732,3 +732,21 @@ export * from "./tour-bonus-settings"
 
 // Workspace Bonus Defaults
 export * from "./workspace-bonus-defaults"
+
+// ============================================
+// 核心表（行程項目生命週期）
+// ============================================
+
+// Tour Itinerary Items
+export {
+  tourItineraryItemEntity,
+  useTourItineraryItems,
+  useTourItineraryItemsSlim,
+  useTourItineraryItem,
+  useTourItineraryItemsPaginated,
+  useTourItineraryItemDictionary,
+  createTourItineraryItem,
+  updateTourItineraryItem,
+  deleteTourItineraryItem,
+  invalidateTourItineraryItems,
+} from './tour-itinerary-items'

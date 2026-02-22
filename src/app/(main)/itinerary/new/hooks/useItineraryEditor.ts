@@ -7,6 +7,7 @@ import { createItinerary, updateItinerary, createTourLeader } from '@/data'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import { syncHotelsFromItineraryToQuote } from '@/features/quotes/services/quoteItinerarySync'
+import { useSyncItineraryToCore } from '@/features/tours/hooks/useTourItineraryItems'
 import { supabase } from '@/lib/supabase/client'
 import { confirm } from '@/lib/ui/alert-dialog'
 import type {
@@ -82,6 +83,7 @@ export function useItineraryEditor() {
   const [hasLinkedQuote, setHasLinkedQuote] = useState(false) // 是否有關聯報價單（住宿鎖定）
 
   const { user } = useAuthStore()
+  const { syncToCore } = useSyncItineraryToCore()
   const tourDataRef = useRef(tourData)
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -161,6 +163,28 @@ export function useItineraryEditor() {
               }
             })
             .catch(err => logger.error('飯店同步錯誤:', err))
+        }
+
+        // 同步行程項目到核心表 (tour_itinerary_items)
+        if (convertedData.daily_itinerary && convertedData.daily_itinerary.length > 0) {
+          // 取得 tour_id（從 itinerary 記錄）
+          const { data: itinerary_record } = await supabase
+            .from('itineraries')
+            .select('tour_id')
+            .eq('id', currentItineraryId)
+            .maybeSingle()
+
+          syncToCore({
+            itinerary_id: currentItineraryId,
+            tour_id: itinerary_record?.tour_id ?? null,
+            daily_itinerary: convertedData.daily_itinerary as DailyItinerary[],
+          })
+            .then(result => {
+              if (!result.success) {
+                logger.warn('Core table sync:', result.message)
+              }
+            })
+            .catch(err => logger.error('Core table sync error:', err))
         }
 
         // 同步領隊到 tour_leaders 表

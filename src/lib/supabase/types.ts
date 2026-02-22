@@ -3342,6 +3342,7 @@ export type Database = {
           nationality: string | null
           nickname: string | null
           notes: string | null
+          online_user_id: string | null
           passport_expiry: string | null
           passport_image_url: string | null
           passport_name: string | null
@@ -3389,6 +3390,7 @@ export type Database = {
           nationality?: string | null
           nickname?: string | null
           notes?: string | null
+          online_user_id?: string | null
           passport_expiry?: string | null
           passport_image_url?: string | null
           passport_name?: string | null
@@ -3436,6 +3438,7 @@ export type Database = {
           nationality?: string | null
           nickname?: string | null
           notes?: string | null
+          online_user_id?: string | null
           passport_expiry?: string | null
           passport_image_url?: string | null
           passport_name?: string | null
@@ -7948,6 +7951,7 @@ export type Database = {
           special_meal: string | null
           trip_id: string
           updated_at: string | null
+          user_id: string | null
           vehicle_number: string | null
           vehicle_seat: string | null
         }
@@ -7970,6 +7974,7 @@ export type Database = {
           special_meal?: string | null
           trip_id: string
           updated_at?: string | null
+          user_id?: string | null
           vehicle_number?: string | null
           vehicle_seat?: string | null
         }
@@ -7992,6 +7997,7 @@ export type Database = {
           special_meal?: string | null
           trip_id?: string
           updated_at?: string | null
+          user_id?: string | null
           vehicle_number?: string | null
           vehicle_seat?: string | null
         }
@@ -13739,6 +13745,71 @@ export type Database = {
           },
         ]
       }
+      tour_bonus_settings: {
+        Row: {
+          bonus: number
+          bonus_type: number
+          created_at: string | null
+          employee_id: string | null
+          id: string
+          tour_id: string
+          type: number
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          bonus?: number
+          bonus_type?: number
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          tour_id: string
+          type: number
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          bonus?: number
+          bonus_type?: number
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          tour_id?: string
+          type?: number
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_bonus_settings_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_bonus_settings_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_bonus_settings_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_bonus_settings_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tour_confirmation_items: {
         Row: {
           actual_cost: number | null
@@ -14356,6 +14427,213 @@ export type Database = {
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_itinerary_items: {
+        Row: {
+          actual_expense: number | null
+          adult_price: number | null
+          booking_reference: string | null
+          booking_status: string | null
+          category: string | null
+          child_price: number | null
+          confirmation_date: string | null
+          confirmation_item_id: string | null
+          confirmation_note: string | null
+          confirmation_status: string | null
+          confirmed_cost: number | null
+          created_at: string | null
+          created_by: string | null
+          currency: string | null
+          day_number: number | null
+          description: string | null
+          estimated_cost: number | null
+          expense_at: string | null
+          expense_note: string | null
+          google_maps_url: string | null
+          id: string
+          infant_price: number | null
+          itinerary_id: string | null
+          latitude: number | null
+          leader_status: string | null
+          longitude: number | null
+          pricing_type: string | null
+          quantity: number | null
+          quote_item_id: string | null
+          quote_note: string | null
+          quote_status: string | null
+          quoted_cost: number | null
+          receipt_images: string[] | null
+          reply_content: Json | null
+          reply_cost: number | null
+          request_id: string | null
+          request_reply_at: string | null
+          request_sent_at: string | null
+          request_status: string | null
+          resource_id: string | null
+          resource_name: string | null
+          resource_type: string | null
+          service_date: string | null
+          service_date_end: string | null
+          sort_order: number | null
+          sub_category: string | null
+          supplier_id: string | null
+          supplier_name: string | null
+          title: string | null
+          total_cost: number | null
+          tour_id: string | null
+          unit_price: number | null
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          actual_expense?: number | null
+          adult_price?: number | null
+          booking_reference?: string | null
+          booking_status?: string | null
+          category?: string | null
+          child_price?: number | null
+          confirmation_date?: string | null
+          confirmation_item_id?: string | null
+          confirmation_note?: string | null
+          confirmation_status?: string | null
+          confirmed_cost?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          day_number?: number | null
+          description?: string | null
+          estimated_cost?: number | null
+          expense_at?: string | null
+          expense_note?: string | null
+          google_maps_url?: string | null
+          id?: string
+          infant_price?: number | null
+          itinerary_id?: string | null
+          latitude?: number | null
+          leader_status?: string | null
+          longitude?: number | null
+          pricing_type?: string | null
+          quantity?: number | null
+          quote_item_id?: string | null
+          quote_note?: string | null
+          quote_status?: string | null
+          quoted_cost?: number | null
+          receipt_images?: string[] | null
+          reply_content?: Json | null
+          reply_cost?: number | null
+          request_id?: string | null
+          request_reply_at?: string | null
+          request_sent_at?: string | null
+          request_status?: string | null
+          resource_id?: string | null
+          resource_name?: string | null
+          resource_type?: string | null
+          service_date?: string | null
+          service_date_end?: string | null
+          sort_order?: number | null
+          sub_category?: string | null
+          supplier_id?: string | null
+          supplier_name?: string | null
+          title?: string | null
+          total_cost?: number | null
+          tour_id?: string | null
+          unit_price?: number | null
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          actual_expense?: number | null
+          adult_price?: number | null
+          booking_reference?: string | null
+          booking_status?: string | null
+          category?: string | null
+          child_price?: number | null
+          confirmation_date?: string | null
+          confirmation_item_id?: string | null
+          confirmation_note?: string | null
+          confirmation_status?: string | null
+          confirmed_cost?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          day_number?: number | null
+          description?: string | null
+          estimated_cost?: number | null
+          expense_at?: string | null
+          expense_note?: string | null
+          google_maps_url?: string | null
+          id?: string
+          infant_price?: number | null
+          itinerary_id?: string | null
+          latitude?: number | null
+          leader_status?: string | null
+          longitude?: number | null
+          pricing_type?: string | null
+          quantity?: number | null
+          quote_item_id?: string | null
+          quote_note?: string | null
+          quote_status?: string | null
+          quoted_cost?: number | null
+          receipt_images?: string[] | null
+          reply_content?: Json | null
+          reply_cost?: number | null
+          request_id?: string | null
+          request_reply_at?: string | null
+          request_sent_at?: string | null
+          request_status?: string | null
+          resource_id?: string | null
+          resource_name?: string | null
+          resource_type?: string | null
+          service_date?: string | null
+          service_date_end?: string | null
+          sort_order?: number | null
+          sub_category?: string | null
+          supplier_id?: string | null
+          supplier_name?: string | null
+          title?: string | null
+          total_cost?: number | null
+          tour_id?: string | null
+          unit_price?: number | null
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_itinerary_items_itinerary_id_fkey"
+            columns: ["itinerary_id"]
+            isOneToOne: false
+            referencedRelation: "itineraries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_itinerary_items_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "tour_request_payment_summary"
+            referencedColumns: ["tour_request_id"]
+          },
+          {
+            foreignKeyName: "tour_itinerary_items_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "tour_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_itinerary_items_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_itinerary_items_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
             referencedColumns: ["id"]
           },
         ]
@@ -18312,6 +18590,54 @@ export type Database = {
             columns: ["session_id"]
             isOneToOne: false
             referencedRelation: "workout_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_bonus_defaults: {
+        Row: {
+          bonus: number
+          bonus_type: number
+          created_at: string | null
+          employee_id: string | null
+          id: string
+          type: number
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          bonus?: number
+          bonus_type?: number
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          type: number
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          bonus?: number
+          bonus_type?: number
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          type?: number
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_bonus_defaults_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_bonus_defaults_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]

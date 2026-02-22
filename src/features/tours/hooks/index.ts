@@ -10,3 +10,9 @@ export { useTourItineraryNav } from './useTourItineraryNav'
 export { useTourDepartureData } from './useTourDepartureData'
 export { useQuoteLoader } from './useQuoteLoader'
 export { useTourDepartureTotals } from './useTourDepartureTotals'
+
+export {
+  useTourItineraryItemsByTour,
+  useTourItineraryItemsByItinerary,
+  useSyncItineraryToCore,
+} from './useTourItineraryItems'

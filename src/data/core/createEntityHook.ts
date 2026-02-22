@@ -68,6 +68,8 @@ const WORKSPACE_SCOPED_TABLES = [
   'attractions',
   // === 獎金系統 ===
   'tour_bonus_settings', 'workspace_bonus_defaults',
+  // === 核心表 ===
+  'tour_itinerary_items',
 ]
 
 // 表格對應的 code prefix（用於自動生成編號）
