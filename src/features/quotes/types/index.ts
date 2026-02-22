@@ -35,6 +35,9 @@ export interface CostItem {
   child_price_formula?: string // 兒童價公式
   infant_price_formula?: string // 嬰兒價公式
 
+  // === 核心表關聯 ===
+  itinerary_item_id?: string // 對應 tour_itinerary_items.id
+
   // === 資源關聯（餐廳/飯店/景點）===
   resource_type?: CostItemResourceType // 資源類型
   resource_id?: string // 關聯的資源 ID（指向對應表格）

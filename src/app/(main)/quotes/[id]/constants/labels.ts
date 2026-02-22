@@ -24,6 +24,16 @@ export const QUOTE_SYNC_LABELS = {
   SYNC_ACCOMMODATION: (days: number) => `已從行程表同步 ${days} 天住宿`,
 }
 
+// Import from itinerary
+export const QUOTE_IMPORT_LABELS = {
+  IMPORT_BUTTON: '從行程帶入項目',
+  IMPORT_SUCCESS: (count: number) => `已從行程帶入 ${count} 筆項目`,
+  IMPORT_EMPTY: '行程中沒有可帶入的新項目',
+  IMPORT_FAILED: '從行程帶入失敗',
+  IMPORT_NO_TOUR: '此報價單未關聯旅遊團',
+  IMPORTING: '帶入中...',
+}
+
 // Quote page
 export const QUOTE_PAGE_LABELS = {
   UPDATE_STATUS_FAILED: '更新狀態失敗，請稍後再試',

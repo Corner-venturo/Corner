@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { ArrowLeft, Save, Map, Plane, Contact, X } from 'lucide-react'
+import { ArrowLeft, Save, Map, Plane, Contact, X, Download } from 'lucide-react'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { Button } from '@/components/ui/button'
 import {
@@ -53,6 +53,8 @@ interface QuoteHeaderProps {
   handleCreateItinerary?: () => void
   handleSyncToItinerary?: () => void
   handleSyncAccommodationFromItinerary?: () => void
+  onImportFromItinerary?: () => void
+  importingFromItinerary?: boolean
   onStatusChange?: (status: 'proposed' | 'approved', showLinkDialog?: boolean) => void
   router: AppRouterInstance
   accommodationDays?: number
@@ -81,6 +83,8 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
   handleCreateItinerary,
   handleSyncToItinerary,
   handleSyncAccommodationFromItinerary,
+  onImportFromItinerary,
+  importingFromItinerary,
   onStatusChange,
   router,
   accommodationDays,
@@ -196,6 +200,19 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
               onConfirmationStatusChange={onConfirmationStatusChange}
               isReadOnly={isReadOnly}
             />
+          )}
+
+          {/* 從行程帶入 */}
+          {onImportFromItinerary && !isReadOnly && (
+            <Button
+              onClick={onImportFromItinerary}
+              variant="outline"
+              disabled={importingFromItinerary}
+              className="h-8 px-2.5 text-sm gap-1"
+            >
+              <Download size={14} />
+              {importingFromItinerary ? QUOTE_HEADER_LABELS.IMPORTING : QUOTE_HEADER_LABELS.IMPORT_FROM_ITINERARY}
+            </Button>
           )}
 
           {/* 行程表 - SVG + 文字 */}

@@ -287,6 +287,8 @@ export const QUOTE_HEADER_LABELS = {
   PRINT_8717: '提示：此資訊會用於合約和信封列印，切換快速報價時也會自動帶入',
   CANCEL: '取消',
   SAVE: '儲存',
+  IMPORT_FROM_ITINERARY: '從行程帶入',
+  IMPORTING: '帶入中...',
 };
 
 export const QUOTES_LIST_LABELS = {

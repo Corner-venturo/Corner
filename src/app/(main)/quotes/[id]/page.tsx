@@ -38,7 +38,7 @@ import {
   generateUniqueId,
 } from '@/features/quotes/utils/priceCalculations'
 import { ID_LABELS } from './constants/labels'
-import { QUOTE_PAGE_LABELS, QUOTE_SYNC_LABELS } from './constants/labels'
+import { QUOTE_PAGE_LABELS, QUOTE_SYNC_LABELS, QUOTE_IMPORT_LABELS } from './constants/labels'
 
 export default function QuoteDetailPage() {
 
@@ -184,6 +184,33 @@ export default function QuoteDetailPage() {
   const handleConfirmSync = useCallback(() => {
     syncOps.handleConfirmSync(syncDiffs)
   }, [syncOps, syncDiffs])
+
+  // 從行程帶入
+  const [importingFromItinerary, setImportingFromItinerary] = React.useState(false)
+  const handleImportFromItinerary = React.useCallback(async () => {
+    const tour_id = quote?.tour_id
+    if (!tour_id) {
+      toast.error(QUOTE_IMPORT_LABELS.IMPORT_NO_TOUR)
+      return
+    }
+    setImportingFromItinerary(true)
+    try {
+      const { importItineraryItemsToQuote } = await import('@/features/quotes/services/quoteCoreTableSync')
+      const result = await importItineraryItemsToQuote(tour_id, categories)
+      if (result.success && result.imported_count > 0) {
+        setCategories(result.categories)
+        toast.success(QUOTE_IMPORT_LABELS.IMPORT_SUCCESS(result.imported_count))
+      } else if (result.imported_count === 0) {
+        toast.info(QUOTE_IMPORT_LABELS.IMPORT_EMPTY)
+      } else {
+        toast.error(QUOTE_IMPORT_LABELS.IMPORT_FAILED)
+      }
+    } catch {
+      toast.error(QUOTE_IMPORT_LABELS.IMPORT_FAILED)
+    } finally {
+      setImportingFromItinerary(false)
+    }
+  }, [quote?.tour_id, categories, setCategories])
 
   // 報價單預覽
   const [showQuotationPreview, setShowQuotationPreview] = React.useState(false)
@@ -480,6 +507,8 @@ export default function QuoteDetailPage() {
         handleGenerateQuotation={handleGenerateQuotation}
         handleSyncToItinerary={handleSyncToItinerary}
         handleSyncAccommodationFromItinerary={syncOps.handleSyncAccommodationFromItinerary}
+        onImportFromItinerary={quote?.tour_id ? handleImportFromItinerary : undefined}
+        importingFromItinerary={importingFromItinerary}
         onStatusChange={handleStatusChange}
         router={router}
         accommodationDays={accommodationDays}

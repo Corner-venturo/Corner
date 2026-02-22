@@ -7,6 +7,7 @@ import { CostCategory, ParticipantCounts, SellingPrices, TierPricing } from '../
 import type { Quote } from '@/stores/types'
 import type { QuickQuoteItem } from '@/types/quote.types'
 import { syncHotelsFromQuoteToItinerary } from '../services/quoteItinerarySync'
+import { syncQuotePricingToCore } from '../services/quoteCoreTableSync'
 
 interface QuickQuoteCustomerInfo {
   customer_name: string
@@ -89,6 +90,15 @@ export const useQuoteSave = ({
 
         setSaveSuccess(true)
         setTimeout(() => setSaveSuccess(false), UI_DELAYS.SUCCESS_MESSAGE)
+
+        // 同步報價欄位到核心表
+        syncQuotePricingToCore(updatedCategories, quote.tour_id ?? null)
+          .then(result => {
+            if (result.success && result.synced_count > 0) {
+              logger.log('核心表同步:', result.synced_count, 'items')
+            }
+          })
+          .catch(err => logger.error('核心表同步錯誤:', err))
 
         // 同步飯店到行程表
         const accommodationItems = updatedCategories
