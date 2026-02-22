@@ -26,13 +26,13 @@ export const TOUR_FILTERS = {
 // Status badge color mapping
 // ============================================================
 export const STATUS_BADGE_CLASSES: Record<string, string> = {
-  '開團': 'bg-yellow-100 text-yellow-800',
-  '待出發': 'bg-blue-100 text-blue-800',
-  '已出發': 'bg-green-100 text-green-800',
-  '待結團': 'bg-orange-100 text-orange-800',
-  '已結團': 'bg-gray-100 text-gray-600',
-  '取消': 'bg-red-100 text-red-800',
-  default: 'bg-gray-100 text-gray-600',
+  '開團': 'bg-morandi-gold/15 text-morandi-gold border border-morandi-gold/30',
+  '待出發': 'bg-morandi-green/15 text-morandi-green border border-morandi-green/30',
+  '已出發': 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+  '待結團': 'bg-morandi-red/15 text-morandi-red border border-morandi-red/30',
+  '已結團': 'bg-morandi-container text-morandi-secondary border border-morandi-muted/30',
+  '取消': 'bg-morandi-red/10 text-morandi-muted border border-morandi-muted/30 line-through',
+  default: 'bg-morandi-container text-morandi-secondary border border-morandi-muted/30',
 } as const
 
 // ============================================================
