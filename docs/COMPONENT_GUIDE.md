@@ -621,3 +621,39 @@ export async function POST(req: Request) {
 
 - `docs/VENTURO_UI_DESIGN_STYLE.md` - 詳細 UI 設計規範
 - `docs/DESIGN_SYSTEM.md` - 設計系統（圓角、邊框、間距）
+
+## 🏷️ 狀態顏色規範
+
+**唯一真相源：`src/lib/status-config.ts`**
+
+所有狀態 badge、StatusCell、狀態相關的顏色都必須從 `status-config.ts` 取得，禁止在其他地方自定義顏色。
+
+### 莫蘭迪色系語意
+
+| 語意 | 顏色 | CSS | 用於 |
+|------|------|-----|------|
+| **等待/注意** | 莫蘭迪金 | `morandi-gold` | 待確認、開團、草稿 |
+| **就緒/安全** | 莫蘭迪綠 | `morandi-green` | 待出發、已確認、已核准 |
+| **進行中** | 翠綠 | `emerald-700` | 已出發、處理中 |
+| **需處理** | 莫蘭迪紅 | `morandi-red` | 待結團、異常、退件 |
+| **完成/歸檔** | 莫蘭迪灰 | `morandi-secondary` | 已結團、已歸還 |
+| **取消/無效** | 莫蘭迪淡灰 | `morandi-muted` | 取消、作廢 |
+| **深色強調** | 莫蘭迪主色 | `morandi-primary` | 已完成、已轉單、已鎖定 |
+
+### 使用方式
+
+```tsx
+import { getStatusConfig } from '@/lib/status-config'
+
+const config = getStatusConfig('tour', status)
+// config.color → text-morandi-gold
+// config.bgColor → bg-morandi-gold/10
+// config.borderColor → border-morandi-gold/30
+// config.label → 開團
+// config.icon → FileText
+```
+
+### 禁止事項
+- ❌ 在元件裡自定義狀態顏色
+- ❌ 用 Tailwind 預設色系做狀態（yellow-100, blue-100 等）
+- ❌ 在 constants.ts 裡建立 STATUS_XXX_CLASSES 之類的重複對照表
