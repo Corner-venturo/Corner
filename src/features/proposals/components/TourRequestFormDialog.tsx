@@ -46,6 +46,7 @@ import type { Tour } from '@/stores/types'
 import type { Database } from '@/lib/supabase/types'
 import { ADD_MANUAL_REQUEST_DIALOG_LABELS, PACKAGE_LIST_PANEL_LABELS, TOUR_REQUEST_FORM_DIALOG_LABELS } from '../constants/labels';
 import { formatDateTW } from '@/lib/utils/format-date'
+import { syncRequestStatusToCore } from '@/features/confirmations/services/requestCoreTableSync'
 
 type Workspace = Database['public']['Tables']['workspaces']['Row']
 
@@ -516,6 +517,23 @@ export function TourRequestFormDialog({
         logger.warn('更新需求單狀態失敗:', error)
       } else {
         logger.info(`已更新 ${requestIds.length} 筆需求單狀態為「已發送」`)
+
+        // 同步核心表
+        const { data: requests_with_core } = await supabase
+          .from('tour_requests')
+          .select('itinerary_item_id')
+          .in('id', requestIds)
+
+        if (requests_with_core) {
+          for (const req of requests_with_core) {
+            if (req.itinerary_item_id) {
+              await syncRequestStatusToCore({
+                itinerary_item_id: req.itinerary_item_id,
+                status: 'sent',
+              })
+            }
+          }
+        }
       }
     } catch (err) {
       logger.error('更新需求單狀態錯誤:', err)

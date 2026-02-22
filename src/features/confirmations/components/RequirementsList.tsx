@@ -28,6 +28,7 @@ import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores'
 import { AddManualRequestDialog } from '@/features/proposals/components/AddManualRequestDialog'
+import { useGenerateRequestsFromCore } from '../hooks/useGenerateRequestsFromCore'
 import type { Tour } from '@/stores/types'
 import type { CostCategory } from '@/features/quotes/types'
 import type { ProposalPackage } from '@/types/proposal.types'
@@ -82,6 +83,18 @@ export function RequirementsList({
   const [expandedHiddenCategories, setExpandedHiddenCategories] = useState<Set<string>>(new Set())
 
   const mode = tourId ? 'tour' : 'proposal'
+
+  // 一鍵產需求單
+  const {
+    loading: generating_requests,
+    generate: generateFromCore,
+    fetchUnrequested,
+  } = useGenerateRequestsFromCore({
+    tour_id: tourId || '',
+    tour_code: tour?.code || '',
+    tour_name: tour?.name || '',
+    on_success: () => loadData(false),
+  })
 
   // ============================================
   // 載入資料
@@ -262,6 +275,23 @@ export function RequirementsList({
               <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
               {COMP_REQUIREMENTS_LABELS.刷新}
             </Button>
+            {mode === 'tour' && tourId && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  const groups = await fetchUnrequested()
+                  if (groups.length > 0) {
+                    await generateFromCore(groups)
+                  }
+                }}
+                disabled={generating_requests}
+                className="gap-1"
+              >
+                {generating_requests ? <Loader2 size={14} className="animate-spin" /> : <FileText size={14} />}
+                {COMP_REQUIREMENTS_LABELS.一鍵產需求單}
+              </Button>
+            )}
             {mode === 'tour' && quoteItems.length > 0 && (
               <Button size="sm" onClick={handleGenerateConfirmationSheet} disabled={generatingSheet}
                 className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white">

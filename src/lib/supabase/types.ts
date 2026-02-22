@@ -15168,6 +15168,7 @@ export type Database = {
           handler_type: string
           hidden: boolean | null
           id: string
+          itinerary_item_id: string | null
           latitude: number | null
           longitude: number | null
           member_data: Json | null
@@ -15236,6 +15237,7 @@ export type Database = {
           handler_type?: string
           hidden?: boolean | null
           id?: string
+          itinerary_item_id?: string | null
           latitude?: number | null
           longitude?: number | null
           member_data?: Json | null
@@ -15304,6 +15306,7 @@ export type Database = {
           handler_type?: string
           hidden?: boolean | null
           id?: string
+          itinerary_item_id?: string | null
           latitude?: number | null
           longitude?: number | null
           member_data?: Json | null
@@ -15357,6 +15360,13 @@ export type Database = {
             columns: ["assigned_vehicle_id"]
             isOneToOne: false
             referencedRelation: "fleet_vehicles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_requests_itinerary_item_id_fkey"
+            columns: ["itinerary_item_id"]
+            isOneToOne: false
+            referencedRelation: "tour_itinerary_items"
             referencedColumns: ["id"]
           },
           {

@@ -37,6 +37,7 @@ export interface TourRequest {
   assigned_by: string | null
   assigned_by_name: string | null
   assignment_note: string | null
+  itinerary_item_id: string | null
   quantity: number | null
   currency: string | null
   estimated_cost: number | null
