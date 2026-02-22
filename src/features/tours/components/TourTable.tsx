@@ -14,7 +14,7 @@ interface TourTableProps {
   onSort: (field: string, order: 'asc' | 'desc') => void
   onRowClick: (row: unknown) => void
   renderActions: (row: unknown) => React.ReactNode
-  getStatusColor: (status: string) => string
+  getStatusColor?: (status: string) => string
   ordersByTourId?: Map<string, { sales_person: string | null; assistant: string | null }>
 }
 
@@ -27,7 +27,7 @@ export const TourTable: React.FC<TourTableProps> = ({
   getStatusColor,
   ordersByTourId,
 }) => {
-  const columns = useTourTableColumns({ getStatusColor, ordersByTourId })
+  const columns = useTourTableColumns({ ordersByTourId })
 
   return (
     <>
@@ -39,7 +39,7 @@ export const TourTable: React.FC<TourTableProps> = ({
           loading={loading}
           onSort={onSort}
           actions={renderActions}
-          actionsWidth="50%"
+          actionsWidth="50px"
           onRowClick={onRowClick}
           bordered={true}
         />
@@ -63,7 +63,8 @@ export const TourTable: React.FC<TourTableProps> = ({
               key={tour.id}
               tour={tour}
               onClick={() => onRowClick(tour)}
-              getStatusColor={getStatusColor}
+              getStatusColor={getStatusColor || (() => '')}
+
             />
           ))
         )}

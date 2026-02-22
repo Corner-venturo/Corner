@@ -1,9 +1,11 @@
 'use client'
 
 import React from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Tour } from '@/stores/types'
 import { useOrdersSlim } from '@/data'
+import { useWorkspaceChannels } from '@/stores/workspace-store'
 import {
   Calendar,
   MapPin,
@@ -18,6 +20,9 @@ import {
 import { cn } from '@/lib/utils'
 import { CurrencyCell } from '@/components/table-cells'
 import { COMP_TOURS_LABELS } from '../constants/labels'
+import { TOUR_OVERVIEW } from '../constants'
+import { useTourChannelOperations, TourStoreActions } from './TourChannelOperations'
+import { logger } from '@/lib/utils/logger'
 
 interface TourOverviewProps {
   tour: Tour
@@ -25,6 +30,8 @@ interface TourOverviewProps {
   onEdit?: () => void // 選填：編輯基本資料的回調
   onManageQuote?: () => void // 選填：管理報價單的回調
   onManageItinerary?: () => void // 選填：管理行程表的回調
+  onOpenContractDialog?: () => void // 選填：產出合約的回調
+  onArchive?: () => void // 選填：封存的回調
 }
 
 export const TourOverview = React.memo(function TourOverview({
@@ -33,8 +40,28 @@ export const TourOverview = React.memo(function TourOverview({
   onEdit,
   onManageQuote,
   onManageItinerary,
+  onOpenContractDialog,
+  onArchive,
 }: TourOverviewProps) {
+  const router = useRouter()
   const { items: orders } = useOrdersSlim()
+  const { channels } = useWorkspaceChannels()
+
+  // 檢查該團是否已有頻道
+  const existingChannel = channels.find((ch: { tour_id?: string | null }) => ch.tour_id === tour.id)
+
+  // Stub actions for channel operations
+  const noopActions: TourStoreActions = { fetchAll: async () => { /* noop */ } }
+  const { handleCreateChannel } = useTourChannelOperations({ actions: noopActions })
+
+  const handleChannelClick = async () => {
+    if (existingChannel) {
+      router.push(`/workspace?channel=${existingChannel.id}`)
+    } else {
+      logger.log('🔵 [總覽快捷] 建立頻道:', tour.code)
+      await handleCreateChannel(tour)
+    }
+  }
 
   // 如果有 orderFilter，取得該訂單的資料
   const order = orderFilter ? orders.find(o => o.id === orderFilter) : null
@@ -142,6 +169,31 @@ export const TourOverview = React.memo(function TourOverview({
 
   return (
     <div className="space-y-6">
+      {/* 快捷動作列 */}
+      <div className="flex items-center gap-3 pb-2 border-b border-border">
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={onOpenContractDialog}
+        >
+          {TOUR_OVERVIEW.action_contract}
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={handleChannelClick}
+        >
+          {existingChannel ? TOUR_OVERVIEW.action_enter_channel : TOUR_OVERVIEW.action_create_channel}
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={onArchive}
+        >
+          {TOUR_OVERVIEW.action_archive}
+        </Button>
+      </div>
+
       {/* 基本資訊 + 快速操作 */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-8 text-sm">

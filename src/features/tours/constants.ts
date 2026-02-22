@@ -23,6 +23,19 @@ export const TOUR_FILTERS = {
 } as const
 
 // ============================================================
+// Status badge color mapping
+// ============================================================
+export const STATUS_BADGE_CLASSES: Record<string, string> = {
+  '開團': 'bg-yellow-100 text-yellow-800',
+  '待出發': 'bg-blue-100 text-blue-800',
+  '已出發': 'bg-green-100 text-green-800',
+  '待結團': 'bg-orange-100 text-orange-800',
+  '已結團': 'bg-gray-100 text-gray-600',
+  '取消': 'bg-red-100 text-red-800',
+  default: 'bg-gray-100 text-gray-600',
+} as const
+
+// ============================================================
 // TourTableColumns
 // ============================================================
 export const TOUR_TABLE = {
@@ -182,6 +195,11 @@ export const TOUR_OVERVIEW = {
   note_green: '綠色數字表示節省預算',
   note_red: '紅色數字表示超出預算',
   note_threshold: '差額率超過20%會特別標示',
+  // Quick actions
+  action_contract: '📄 產出合約',
+  action_create_channel: '📢 建立頻道',
+  action_enter_channel: '📢 進入頻道',
+  action_archive: '🗄️ 封存',
 } as const
 
 // ============================================================
