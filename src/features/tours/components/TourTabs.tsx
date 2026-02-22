@@ -79,6 +79,11 @@ const TourClosingTab = dynamic(
   { loading: () => <TabLoading /> }
 )
 
+const TourTrackingPanel = dynamic(
+  () => import('@/features/tours/components/tour-tracking').then(m => m.TourTrackingPanel),
+  { loading: () => <TabLoading /> }
+)
+
 // ============================================================================
 // 頁籤定義（共用）
 // ============================================================================
@@ -90,6 +95,7 @@ export const TOUR_TABS = [
   { value: 'itinerary', label: COMP_TOURS_LABELS.行程 },
   { value: 'quote', label: COMP_TOURS_LABELS.報價 },
   { value: 'requirements', label: COMP_TOURS_LABELS.需求 },
+  { value: 'tracking', label: COMP_TOURS_LABELS.追蹤 },
   { value: 'checkin', label: COMP_TOURS_LABELS.報到 },
   { value: 'files', label: COMP_TOURS_LABELS.檔案 },
   { value: 'closing', label: COMP_TOURS_LABELS.結案 },
@@ -148,6 +154,8 @@ export function TourTabContent({
       )
     case 'orders':
       return <TourOrders tour={tour} />
+    case 'tracking':
+      return <TourTrackingPanel tour={tour} />
     case 'checkin':
       return <TourCheckin tour={tour} />
     case 'requirements':

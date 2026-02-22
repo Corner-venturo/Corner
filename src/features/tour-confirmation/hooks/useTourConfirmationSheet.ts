@@ -203,6 +203,8 @@ export function useTourConfirmationSheet({ tourId }: UseTourConfirmationSheetPro
         latitude: item.latitude,
         longitude: item.longitude,
         google_maps_url: item.google_maps_url,
+        // 核心表關聯
+        itinerary_item_id: item.itinerary_item_id,
         // 領隊記帳欄位
         leader_expense: item.leader_expense,
         leader_expense_note: item.leader_expense_note,
