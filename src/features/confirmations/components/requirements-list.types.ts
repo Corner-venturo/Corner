@@ -62,6 +62,7 @@ export interface QuoteItem {
   longitude?: number | null
   googleMapsUrl?: string | null
   quotedPrice?: number | null
+  itinerary_item_id?: string | null
 }
 
 // ============================================

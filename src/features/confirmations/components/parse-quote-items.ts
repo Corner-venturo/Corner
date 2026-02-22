@@ -69,6 +69,7 @@ export function parseQuoteItems(
         longitude: item.resource_longitude,
         googleMapsUrl: item.resource_google_maps_url,
         quotedPrice: item.unit_price,
+        itinerary_item_id: item.itinerary_item_id || null,
       })
     }
   }
@@ -95,6 +96,7 @@ function parseTransportItems(quoteCategories: CostCategory[], items: QuoteItem[]
         resourceType: item.resource_type,
         resourceId: item.resource_id,
         quotedPrice: item.unit_price,
+        itinerary_item_id: item.itinerary_item_id || null,
       })
     }
   }
@@ -117,6 +119,7 @@ function parseTransportItems(quoteCategories: CostCategory[], items: QuoteItem[]
         resourceType: item.resource_type,
         resourceId: item.resource_id,
         quotedPrice: item.unit_price,
+        itinerary_item_id: item.itinerary_item_id || null,
       })
     }
   }

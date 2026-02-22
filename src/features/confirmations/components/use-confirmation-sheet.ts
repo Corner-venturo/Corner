@@ -9,6 +9,9 @@ import { logger } from '@/lib/utils/logger'
 import type { Tour } from '@/stores/types'
 import type { FlightInfo } from '@/types/flight.types'
 import type { QuoteItem, TourRequest } from './requirements-list.types'
+import {
+  syncConfirmationCreateToCore,
+} from '@/features/tour-confirmation/services/confirmationCoreTableSync'
 
 interface UseConfirmationSheetOptions {
   user: { id: string; workspace_id?: string; display_name?: string; chinese_name?: string } | null
@@ -70,6 +73,7 @@ export function useConfirmationSheet({
       longitude?: number | null
       google_maps_url?: string | null
       notes?: string | null
+      itinerary_item_id?: string | null
     }> = []
 
     // 1. 航班資訊
@@ -156,15 +160,31 @@ export function useConfirmationSheet({
         longitude: item.longitude || null,
         google_maps_url: item.googleMapsUrl || null,
         notes: item.notes || null,
+        itinerary_item_id: item.itinerary_item_id || null,
       })
     })
 
     if (allItems.length > 0) {
-      const { error } = await supabase
+      const { data: inserted_items, error } = await supabase
         .from('tour_confirmation_items')
         .insert(allItems)
+        .select('id, itinerary_item_id, booking_status')
 
       if (error) throw error
+
+      // 同步核心表
+      if (inserted_items) {
+        for (const item of inserted_items) {
+          const typed_item = item as { id: string; itinerary_item_id: string | null; booking_status: string | null }
+          if (typed_item.itinerary_item_id) {
+            syncConfirmationCreateToCore({
+              confirmation_item_id: typed_item.id,
+              itinerary_item_id: typed_item.itinerary_item_id,
+              booking_status: typed_item.booking_status,
+            }).catch(err => logger.error('Core table sync failed:', err))
+          }
+        }
+      }
     }
   }, [user, tour, quoteItems, quoteGroupSize, existingRequests, outboundFlight, returnFlight])
 

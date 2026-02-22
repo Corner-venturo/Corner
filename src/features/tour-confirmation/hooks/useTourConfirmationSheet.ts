@@ -13,6 +13,11 @@ import type {
   UpdateConfirmationItem,
   ConfirmationItemCategory,
 } from '@/types/tour-confirmation-sheet.types'
+import {
+  syncConfirmationCreateToCore,
+  syncConfirmationUpdateToCore,
+  syncLeaderExpenseToCore,
+} from '@/features/tour-confirmation/services/confirmationCoreTableSync'
 
 // 資料庫表類型 (用於 Supabase 操作)
 type DbConfirmationItem = Database['public']['Tables']['tour_confirmation_items']['Insert']
@@ -213,8 +218,19 @@ export function useTourConfirmationSheet({ tourId }: UseTourConfirmationSheetPro
 
       if (error) throw error
 
-      setItems(prev => [...prev, data as TourConfirmationItem])
-      return data as TourConfirmationItem
+      const new_item = data as TourConfirmationItem
+
+      // 同步核心表
+      if (item.itinerary_item_id) {
+        syncConfirmationCreateToCore({
+          confirmation_item_id: new_item.id,
+          itinerary_item_id: item.itinerary_item_id,
+          booking_status: item.booking_status,
+        }).catch(err => logger.error('Core table sync failed on add:', err))
+      }
+
+      setItems(prev => [...prev, new_item])
+      return new_item
     } catch (err) {
       const message = err instanceof Error ? err.message : '新增失敗'
       logger.error('新增明細失敗:', err)
@@ -256,10 +272,39 @@ export function useTourConfirmationSheet({ tourId }: UseTourConfirmationSheetPro
 
       if (error) throw error
 
+      const updated_item = data as TourConfirmationItem
+
+      // 同步核心表
+      const existing_item = items.find(i => i.id === itemId)
+      const core_item_id = (existing_item as TourConfirmationItem & { itinerary_item_id?: string | null })?.itinerary_item_id
+      if (core_item_id) {
+        // 確認相關欄位
+        if (updates.booking_status !== undefined || updates.actual_cost !== undefined || updates.booking_reference !== undefined) {
+          syncConfirmationUpdateToCore({
+            itinerary_item_id: core_item_id,
+            booking_status: updates.booking_status,
+            confirmed_cost: updates.actual_cost,
+            booking_reference: updates.booking_reference,
+            confirmation_note: updates.notes,
+          }).catch(err => logger.error('Core table sync failed on update:', err))
+        }
+
+        // 領隊回填欄位
+        if (updates.leader_expense !== undefined) {
+          syncLeaderExpenseToCore({
+            itinerary_item_id: core_item_id,
+            actual_expense: updates.leader_expense ?? null,
+            expense_note: updates.leader_expense_note,
+            expense_at: updates.leader_expense_at,
+            receipt_images: updates.receipt_images,
+          }).catch(err => logger.error('Core table leader sync failed:', err))
+        }
+      }
+
       setItems(prev => prev.map(item =>
-        item.id === itemId ? (data as TourConfirmationItem) : item
+        item.id === itemId ? updated_item : item
       ))
-      return data as TourConfirmationItem
+      return updated_item
     } catch (err) {
       const message = err instanceof Error ? err.message : '更新失敗'
       logger.error('更新明細失敗:', err)
@@ -268,7 +313,7 @@ export function useTourConfirmationSheet({ tourId }: UseTourConfirmationSheetPro
     } finally {
       setSaving(false)
     }
-  }, [isLocked])
+  }, [isLocked, items])
 
   // 刪除明細項目
   const deleteItem = useCallback(async (itemId: string) => {

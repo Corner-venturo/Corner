@@ -13824,6 +13824,7 @@ export type Database = {
           expected_cost: number | null
           google_maps_url: string | null
           id: string
+          itinerary_item_id: string | null
           latitude: number | null
           leader_expense: number | null
           leader_expense_at: string | null
@@ -13861,6 +13862,7 @@ export type Database = {
           expected_cost?: number | null
           google_maps_url?: string | null
           id?: string
+          itinerary_item_id?: string | null
           latitude?: number | null
           leader_expense?: number | null
           leader_expense_at?: string | null
@@ -13898,6 +13900,7 @@ export type Database = {
           expected_cost?: number | null
           google_maps_url?: string | null
           id?: string
+          itinerary_item_id?: string | null
           latitude?: number | null
           leader_expense?: number | null
           leader_expense_at?: string | null
@@ -13923,6 +13926,13 @@ export type Database = {
           workspace_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "tour_confirmation_items_itinerary_item_id_fkey"
+            columns: ["itinerary_item_id"]
+            isOneToOne: false
+            referencedRelation: "tour_itinerary_items"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tour_confirmation_items_request_id_fkey"
             columns: ["request_id"]

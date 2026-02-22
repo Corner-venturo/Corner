@@ -63,6 +63,9 @@ export interface TourConfirmationItem extends BaseEntity {
   // 關聯需求單
   request_id: string | null // FK to tour_requests
 
+  // 關聯核心表
+  itinerary_item_id: string | null // FK to tour_itinerary_items
+
   // 分類
   category: ConfirmationItemCategory
 
@@ -227,6 +230,7 @@ export type CreateConfirmationItem = Omit<
   | 'updated_at'
   // 以下新欄位設為可選
   | 'request_id'
+  | 'itinerary_item_id'
   | 'resource_type'
   | 'resource_id'
   | 'latitude'
@@ -238,6 +242,7 @@ export type CreateConfirmationItem = Omit<
   | 'receipt_images'
 > & {
   // 這些新欄位設為可選，以便現有代碼可以正常運作
+  itinerary_item_id?: string | null
   request_id?: string | null
   resource_type?: ResourceType | null
   resource_id?: string | null
