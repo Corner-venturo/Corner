@@ -3,9 +3,10 @@
 import React, { useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, ImageIcon, Loader2, X, Crop, Upload, Database, Clock, ChevronDown, ChevronUp, Search } from 'lucide-react'
+import { GripVertical, ImageIcon, Loader2, X, Crop, Upload, Database, Clock, ChevronDown, ChevronUp, ChevronRight, Search } from 'lucide-react'
 import { RelatedImagesPreviewer } from '../../../RelatedImagesPreviewer'
 import { getImagePositionStyle } from '@/components/ui/image-position-editor'
+import { cn } from '@/lib/utils'
 import { SortableActivityItemProps } from './types'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { UnsplashSearch } from '@/components/ui/image-uploader/UnsplashSearch'
@@ -16,6 +17,8 @@ export function SortableActivityItem({
   activity,
   actIndex,
   dayIndex,
+  is_collapsed = false,
+  on_toggle_collapse,
   updateActivity,
   removeActivity,
   handleActivityImageUpload,
@@ -69,16 +72,74 @@ export function SortableActivityItem({
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-card/90 p-3 rounded-lg border border-morandi-container"
+      className={cn(
+        'bg-card/90 rounded-lg border border-morandi-container',
+        is_collapsed ? 'px-3 py-2' : 'p-3'
+      )}
     >
+      {/* 摺疊時：只顯示標題行 */}
+      {is_collapsed ? (
+        <div className="flex items-center gap-2">
+          <div
+            {...attributes}
+            {...listeners}
+            className="flex items-center justify-center w-5 cursor-grab active:cursor-grabbing text-morandi-secondary/50 hover:text-morandi-secondary flex-shrink-0"
+          >
+            <GripVertical size={16} />
+          </div>
+          {on_toggle_collapse && (
+            <button
+              type="button"
+              onClick={on_toggle_collapse}
+              className="p-0.5 rounded text-morandi-secondary hover:text-morandi-primary transition-colors flex-shrink-0"
+            >
+              <ChevronRight size={14} />
+            </button>
+          )}
+          {activity.image && (
+            <img
+              src={activity.image}
+              alt=""
+              className="w-6 h-6 rounded object-cover flex-shrink-0"
+              style={getImagePositionStyle(activity.imagePosition)}
+            />
+          )}
+          <span className="text-sm text-morandi-primary truncate flex-1">
+            {activity.title || COMP_EDITOR_LABELS.景點名稱}
+          </span>
+          {(activity.startTime || activity.endTime) && (
+            <span className="text-[10px] text-morandi-secondary flex-shrink-0">
+              {activity.startTime || '--:--'}~{activity.endTime || '--:--'}
+            </span>
+          )}
+          <button
+            onClick={() => removeActivity(dayIndex, actIndex)}
+            className="px-1 py-0.5 text-morandi-red hover:text-morandi-red/80 text-xs transition-colors flex-shrink-0"
+          >
+            ✕
+          </button>
+        </div>
+      ) : (
+      <>
       <div className="flex gap-3">
-        {/* 拖曳把手 */}
-        <div
-          {...attributes}
-          {...listeners}
-          className="flex items-center justify-center w-6 cursor-grab active:cursor-grabbing text-morandi-secondary/50 hover:text-morandi-secondary flex-shrink-0"
-        >
-          <GripVertical size={18} />
+        {/* 拖曳把手 + 摺疊按鈕 */}
+        <div className="flex flex-col items-center gap-1 flex-shrink-0">
+          <div
+            {...attributes}
+            {...listeners}
+            className="flex items-center justify-center w-6 cursor-grab active:cursor-grabbing text-morandi-secondary/50 hover:text-morandi-secondary"
+          >
+            <GripVertical size={18} />
+          </div>
+          {on_toggle_collapse && (
+            <button
+              type="button"
+              onClick={on_toggle_collapse}
+              className="p-0.5 rounded text-morandi-secondary hover:text-morandi-primary transition-colors"
+            >
+              <ChevronRight size={14} className="rotate-90" />
+            </button>
+          )}
         </div>
 
         {/* 圖片區域 */}
@@ -369,6 +430,8 @@ export function SortableActivityItem({
           </div>
         </DialogContent>
       </Dialog>
+      </>
+      )}
     </div>
   )
 }

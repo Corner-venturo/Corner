@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useRef, useState } from 'react'
-import { List, LayoutGrid } from 'lucide-react'
+import React, { useRef, useState, useEffect } from 'react'
+import { List, LayoutGrid, ChevronsDownUp, ChevronsUpDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
@@ -26,6 +26,7 @@ import { SortableActivityItem } from './SortableActivityItem'
 import { SortableActivityGridItem } from './SortableActivityGridItem'
 import { logger } from '@/lib/utils/logger'
 import { COMP_EDITOR_LABELS } from '../../../constants/labels'
+import { DAILY_ITINERARY_LABELS } from './constants/labels'
 
 interface ActivitiesSectionProps {
   day: DailyItinerary
@@ -63,6 +64,54 @@ export function ActivitiesSection({
   // 視圖模式
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
   const activityFileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
+
+  // 活動摺疊狀態（預設全部收合）
+  const activity_count = day.activities?.length || 0
+  const [collapsed_activities, set_collapsed_activities] = useState<Set<number>>(
+    () => new Set(Array.from({ length: activity_count }, (_, i) => i))
+  )
+
+  // 當活動數量變化時，新增的活動預設收合
+  useEffect(() => {
+    set_collapsed_activities(prev => {
+      if (activity_count > prev.size || activity_count === 0) {
+        // 新增了活動，把新的也加入收合集合（但展開最新一個方便編輯）
+        const new_set = new Set(prev)
+        // 如果是新增活動（數量增加），展開最後一個
+        if (activity_count > 0 && activity_count > prev.size) {
+          for (let i = 0; i < activity_count - 1; i++) {
+            new_set.add(i)
+          }
+          new_set.delete(activity_count - 1)
+        }
+        return new_set
+      }
+      return prev
+    })
+  }, [activity_count])
+
+  const all_activities_collapsed = collapsed_activities.size === activity_count && activity_count > 0
+  const all_activities_expanded = collapsed_activities.size === 0
+
+  const toggle_activity_collapse = (act_index: number) => {
+    set_collapsed_activities(prev => {
+      const new_set = new Set(prev)
+      if (new_set.has(act_index)) {
+        new_set.delete(act_index)
+      } else {
+        new_set.add(act_index)
+      }
+      return new_set
+    })
+  }
+
+  const collapse_all_activities = () => {
+    set_collapsed_activities(new Set(Array.from({ length: activity_count }, (_, i) => i)))
+  }
+
+  const expand_all_activities = () => {
+    set_collapsed_activities(new Set())
+  }
 
   // DnD Kit sensors
   const sensors = useSensors(
@@ -165,7 +214,37 @@ export function ActivitiesSection({
             {viewMode === 'grid' ? COMP_EDITOR_LABELS.拖曳調整順序 : COMP_EDITOR_LABELS.拖曳_可調整順序}
           </span>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
+          {activity_count > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={collapse_all_activities}
+                disabled={all_activities_collapsed}
+                className={`flex items-center gap-0.5 px-1.5 py-1 text-[10px] rounded transition-colors ${
+                  all_activities_collapsed
+                    ? 'text-morandi-muted cursor-not-allowed'
+                    : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50'
+                }`}
+              >
+                <ChevronsDownUp size={12} />
+                {DAILY_ITINERARY_LABELS.COLLAPSE_ACTIVITIES}
+              </button>
+              <button
+                type="button"
+                onClick={expand_all_activities}
+                disabled={all_activities_expanded}
+                className={`flex items-center gap-0.5 px-1.5 py-1 text-[10px] rounded transition-colors ${
+                  all_activities_expanded
+                    ? 'text-morandi-muted cursor-not-allowed'
+                    : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50'
+                }`}
+              >
+                <ChevronsUpDown size={12} />
+                {DAILY_ITINERARY_LABELS.EXPAND_ACTIVITIES}
+              </button>
+            </>
+          )}
           <Button
             onClick={() => onOpenAttractionSelector(dayIndex)}
             size="xs"
@@ -217,6 +296,8 @@ export function ActivitiesSection({
                     activity={activity}
                     actIndex={actIndex}
                     dayIndex={dayIndex}
+                    is_collapsed={collapsed_activities.has(actIndex)}
+                    on_toggle_collapse={() => toggle_activity_collapse(actIndex)}
                     updateActivity={updateActivity}
                     removeActivity={removeActivity}
                     handleActivityImageUpload={handleActivityImageUpload}

@@ -51,8 +51,10 @@ export function DayList({
   handleExternalImageUpload,
   onOpenPositionEditor,
 }: DayListProps) {
-  // 管理每天的摺疊狀態
-  const [collapsedDays, setCollapsedDays] = useState<Set<number>>(new Set())
+  // 管理每天的摺疊狀態（預設全部收合）
+  const [collapsedDays, setCollapsedDays] = useState<Set<number>>(
+    () => new Set(Array.from({ length: data.dailyItinerary?.length || 0 }, (_, i) => i))
+  )
 
   // 計算是否全部摺疊或全部展開
   const totalDays = data.dailyItinerary?.length || 0

@@ -60,6 +60,8 @@ export interface SortableActivityItemProps {
   activity: Activity
   actIndex: number
   dayIndex: number
+  is_collapsed?: boolean
+  on_toggle_collapse?: () => void
   updateActivity: (dayIndex: number, actIndex: number, field: string, value: string) => void
   removeActivity: (dayIndex: number, actIndex: number) => void
   handleActivityImageUpload: (dayIndex: number, actIndex: number, file: File) => void
