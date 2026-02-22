@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils'
 import { ParticipantCounts, SellingPrices, VersionRecord, CostCategory, CostItem } from '@/features/quotes/types'
 import type { Tour } from '@/types/tour.types'
 import { useQuotes } from '@/features/quotes/hooks/useQuotes'
+import { useQuote as useQuoteDetail } from '@/data'
 import { useCategoryOperations } from '@/features/quotes/hooks/useCategoryOperations'
 import { useQuoteCalculations } from '@/features/quotes/hooks/useQuoteCalculations'
 import { useQuoteActions } from '@/features/quotes/hooks/useQuoteActions'
@@ -58,7 +59,8 @@ interface QuoteDetailEmbedProps {
 
 export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbedProps) {
   const router = useRouter()
-  const { quotes, updateQuote, loadQuotes } = useQuotes()
+  const { updateQuote } = useQuotes()
+  const { item: quote, loading: quoteLoading } = useQuoteDetail(quoteId)
   const { items: tours } = useToursSlim()
   const { items: itineraries } = useItineraries()
   const { user } = useAuthStore()
@@ -66,15 +68,6 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
   // Scroll handling refs
   const scrollRef = useRef<HTMLDivElement>(null)
   const scrollTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
-
-  // 載入報價單
-  useEffect(() => {
-    if (quotes.length === 0) {
-      loadQuotes()
-    }
-  }, [quotes.length, loadQuotes])
-
-  const quote = quotes.find(q => q.id === quoteId)
 
   // 檢查是否為特殊團報價單
   const relatedTour = quote?.tour_id ? tours.find(t => t.id === quote.tour_id) : null
@@ -425,7 +418,7 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
   }, [])
 
   // Loading state
-  if (!hasLoaded || !quote) {
+  if (quoteLoading || !hasLoaded || !quote) {
     return (
       <div className="flex items-center justify-center h-[50vh]">
         <div className="text-center">
