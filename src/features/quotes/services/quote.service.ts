@@ -3,18 +3,16 @@
  *
  * @module quote.service
  * @description
- * 報價單的 CRUD 操作、複製、版本管理和成本計算。
+ * 報價單的 CRUD 操作、複製和成本計算。
  * 繼承 BaseService 提供基礎 CRUD，額外提供：
  * - 報價單複製（duplicateQuote）
- * - 版本控制（createNewVersion）
  * - 成本計算（calculateTotalCost）
  */
 
 import { BaseService, StoreOperations } from '@/core/services/base.service'
-import { Quote, QuoteVersion } from '@/stores/types/quote.types'
+import { Quote } from '@/stores/types/quote.types'
 import { useQuoteStore } from '@/stores'
 import { ValidationError } from '@/core/errors/app-errors'
-import { generateId } from '@/lib/data/create-data-store'
 import { QUOTE_SERVICE_LABELS } from '../constants/labels'
 
 class QuoteService extends BaseService<Quote> {
@@ -88,53 +86,6 @@ class QuoteService extends BaseService<Quote> {
     }
 
     return duplicated
-  }
-
-  /**
-   * 建立報價單新版本
-   *
-   * @description 將當前版本的 categories、pricing 等快照存入 versions 陣列，
-   * 然後套用 updates 更新。version 號自動遞增。
-   *
-   * @param id - 報價單 ID
-   * @param updates - 新版本的更新內容
-   * @returns 更新後的報價單，若不存在則返回 undefined
-   */
-  async createNewVersion(id: string, updates: Partial<Quote>): Promise<Quote | undefined> {
-    const store = useQuoteStore.getState()
-    const current = store.items.find(q => q.id === id)
-    if (!current) return undefined
-
-    const newVersion: QuoteVersion = {
-      id: generateId(),
-      version: (current.version || 1) + 1,
-      mode: 'detailed', // Default to detailed mode
-      categories: current.categories,
-      total_cost: current.total_cost,
-      group_size: current.group_size,
-      accommodation_days: current.accommodation_days,
-      participant_counts: current.participant_counts || {
-        adult: 0,
-        child_with_bed: 0,
-        child_no_bed: 0,
-        single_room: 0,
-        infant: 0,
-      },
-      selling_prices: current.selling_prices || {
-        adult: 0,
-        child_with_bed: 0,
-        child_no_bed: 0,
-        single_room: 0,
-        infant: 0,
-      },
-      created_at: new Date().toISOString(),
-    }
-
-    return await store.update(id, {
-      version: (current.version || 1) + 1,
-      versions: [...(current.versions || []), newVersion],
-      ...updates,
-    })
   }
 
   getQuotesByTour(tour_id: string): Quote[] {

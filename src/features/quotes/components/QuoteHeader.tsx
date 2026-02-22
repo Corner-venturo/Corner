@@ -47,7 +47,6 @@ interface QuoteHeaderProps {
   participantCounts: ParticipantCounts
   setParticipantCounts: React.Dispatch<React.SetStateAction<ParticipantCounts>>
   saveSuccess: boolean
-  setIsSaveDialogOpen: (open: boolean) => void
   handleSave: () => void
   handleCreateTour: () => void
   handleGenerateQuotation: () => void
@@ -76,7 +75,6 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
   participantCounts,
   setParticipantCounts,
   saveSuccess,
-  setIsSaveDialogOpen,
   handleSave,
   handleCreateTour,
   handleGenerateQuotation,

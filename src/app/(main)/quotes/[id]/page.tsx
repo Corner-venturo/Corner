@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useCallback } from 'react'
 import { cn } from '@/lib/utils'
-import { ParticipantCounts, SellingPrices, VersionRecord } from '@/features/quotes/types'
+import { ParticipantCounts, SellingPrices } from '@/features/quotes/types'
 import type { Tour as TourType } from '@/types/tour.types'
 import { useQuoteState } from '@/features/quotes/hooks/useQuoteState'
 import { useCategoryOperations } from '@/features/quotes/hooks/useCategoryOperations'
@@ -17,7 +17,6 @@ import {
   QuoteHeader,
   CategorySection,
   SellingPriceSection,
-  SaveVersionDialog,
   SyncToItineraryDialog,
   PrintableQuotation,
   LinkTourDialog,
@@ -66,12 +65,6 @@ export default function QuoteDetailPage() {
     setQuoteName,
     saveSuccess,
     setSaveSuccess,
-    isSaveDialogOpen,
-    setIsSaveDialogOpen,
-    versionName,
-    setVersionName,
-    currentEditingVersion,
-    setCurrentEditingVersion,
     sellingPrices,
     setSellingPrices,
     // 砍次表相關
@@ -153,13 +146,11 @@ export default function QuoteDetailPage() {
     accommodationDays,
     participantCounts,
     sellingPrices,
-    versionName,
-    currentEditingVersion,
     setSaveSuccess,
     setCategories,
     tierPricings,
   })
-  const { handleSave, handleSaveAsNewVersion, formatDateTime, handleFinalize, handleCreateTour, handleDeleteVersion } = actions
+  const { handleSave, handleCreateTour } = actions
 
   // 同步到行程表 - 狀態
   const [isSyncDialogOpen, setIsSyncDialogOpen] = React.useState(false)
@@ -193,26 +184,6 @@ export default function QuoteDetailPage() {
   const handleConfirmSync = useCallback(() => {
     syncOps.handleConfirmSync(syncDiffs)
   }, [syncOps, syncDiffs])
-
-  // 載入特定版本
-  const handleLoadVersion = useCallback(
-    (versionIndex: number, versionData: VersionRecord) => {
-      // 載入版本資料
-      setCategories(versionData.categories || [])
-      setAccommodationDays(versionData.accommodation_days || 0)
-      if (versionData.participant_counts) {
-        setParticipantCounts(versionData.participant_counts)
-      }
-      if (versionData.selling_prices) {
-        setSellingPrices(versionData.selling_prices)
-      }
-
-      // 記錄當前編輯的版本索引（-1 表示主版本，null 表示初始狀態）
-      setCurrentEditingVersion(versionIndex === -1 ? null : versionIndex)
-    },
-    [setCategories, setAccommodationDays, setParticipantCounts, setSellingPrices, setCurrentEditingVersion]
-  )
-
 
   // 報價單預覽
   const [showQuotationPreview, setShowQuotationPreview] = React.useState(false)
@@ -504,7 +475,6 @@ export default function QuoteDetailPage() {
         participantCounts={participantCounts}
         setParticipantCounts={setParticipantCounts}
         saveSuccess={saveSuccess}
-        setIsSaveDialogOpen={setIsSaveDialogOpen}
         handleSave={handleSave}
         handleCreateTour={handleCreateTour}
         handleGenerateQuotation={handleGenerateQuotation}
@@ -615,15 +585,6 @@ export default function QuoteDetailPage() {
         </div>
 
       </div>
-
-      {/* 另存新版本對話框 */}
-      <SaveVersionDialog
-        isOpen={isSaveDialogOpen}
-        onClose={() => setIsSaveDialogOpen(false)}
-        versionName={versionName}
-        setVersionName={setVersionName}
-        onSave={(note) => handleSaveAsNewVersion(note, setCurrentEditingVersion)}
-      />
 
       {/* 同步到行程表對話框 */}
       <SyncToItineraryDialog

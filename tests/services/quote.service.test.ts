@@ -20,10 +20,6 @@ vi.mock('@/stores', () => ({
   },
 }))
 
-vi.mock('@/lib/data/create-data-store', () => ({
-  generateId: () => 'generated-id-123',
-}))
-
 describe('QuoteService', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -100,33 +96,6 @@ describe('QuoteService', () => {
 
       expect(result).toBeUndefined()
       expect(mockCreate).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('createNewVersion', () => {
-    it('should create a new version of a quote', async () => {
-      const originalQuote = createMockQuote({ id: 'quote-1', version: 1, versions: [] })
-      mockItems.push(originalQuote)
-
-      const updatedQuote = { ...originalQuote, version: 2 }
-      mockUpdate.mockResolvedValue(updatedQuote)
-
-      const result = await quoteService.createNewVersion('quote-1', { name: '更新版本' })
-
-      expect(mockUpdate).toHaveBeenCalledWith(
-        'quote-1',
-        expect.objectContaining({
-          version: 2,
-          name: '更新版本',
-        })
-      )
-    })
-
-    it('should return undefined when quote not found', async () => {
-      const result = await quoteService.createNewVersion('non-existent', {})
-
-      expect(result).toBeUndefined()
-      expect(mockUpdate).not.toHaveBeenCalled()
     })
   })
 

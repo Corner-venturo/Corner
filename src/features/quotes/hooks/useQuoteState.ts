@@ -338,9 +338,6 @@ export const useQuoteState = () => {
 
   const [quoteName, setQuoteName] = useState<string>(quote?.name || '')
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false)
-  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState<boolean>(false)
-  const [versionName, setVersionName] = useState<string>('')
-  const [currentEditingVersion, setCurrentEditingVersion] = useState<number | null>(null) // 追蹤當前編輯的版本索引
 
   // 多身份售價
   const [sellingPrices, setSellingPrices] = useState<SellingPrices>(
@@ -427,12 +424,6 @@ export const useQuoteState = () => {
     setQuoteName,
     saveSuccess,
     setSaveSuccess,
-    isSaveDialogOpen,
-    setIsSaveDialogOpen,
-    versionName,
-    setVersionName,
-    currentEditingVersion,
-    setCurrentEditingVersion,
     sellingPrices,
     setSellingPrices,
     // 快速報價單相關

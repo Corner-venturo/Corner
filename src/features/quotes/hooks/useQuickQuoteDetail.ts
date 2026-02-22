@@ -4,9 +4,8 @@ import { getTodayString } from '@/lib/utils/format-date'
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
-import { Quote, QuickQuoteItem, QuoteVersion } from '@/stores/types'
+import { Quote, QuickQuoteItem } from '@/stores/types'
 import { alert } from '@/lib/ui/alert-dialog'
-import { QUOTE_HOOKS_LABELS } from '../constants/labels'
 
 interface UseQuickQuoteDetailProps {
   quote: Quote
@@ -29,10 +28,6 @@ export function useQuickQuoteDetail({ quote, onUpdate }: UseQuickQuoteDetailProp
   const [isEditing, setIsEditing] = useState(quote.status === 'draft')
   const [isSaving, setIsSaving] = useState(false)
   const [showPrintPreview, setShowPrintPreview] = useState(false)
-  const [currentEditingVersion, setCurrentEditingVersion] = useState<number | null>(null)
-  const [isSaveVersionDialogOpen, setIsSaveVersionDialogOpen] = useState(false)
-  const [versionName, setVersionName] = useState('')
-  const [hoveredVersionIndex, setHoveredVersionIndex] = useState<number | null>(null)
 
   // 表單狀態
   const [formData, setFormData] = useState<FormData>({
@@ -69,7 +64,7 @@ export function useQuickQuoteDetail({ quote, onUpdate }: UseQuickQuoteDetailProp
   const totalProfit = totalAmount - totalCost
   const balanceAmount = totalAmount - formData.received_amount
 
-  // 項目操作 - 使用 functional update 避免 stale closure
+  // 項目操作
   const addItem = () => {
     const newItem: QuickQuoteItem = {
       id: `item-${Date.now()}`,
@@ -112,28 +107,11 @@ export function useQuickQuoteDetail({ quote, onUpdate }: UseQuickQuoteDetailProp
     })
   }
 
-  // 準備版本資料
-  const prepareVersionData = (versionNumber: number, versionName: string): QuoteVersion => ({
-    id: Date.now().toString(),
-    version: versionNumber,
-    mode: 'simple',
-    name: versionName,
-    created_at: new Date().toISOString(),
-    quick_quote_items: items,
-    customer_name: formData.customer_name,
-    contact_phone: formData.contact_phone,
-    contact_address: formData.contact_address,
-    handler_name: formData.handler_name,
-    issue_date: formData.issue_date,
-    received_amount: formData.received_amount,
-    expense_description: formData.expense_description,
-  })
-
-  // 儲存變更
+  // 儲存變更 - 直接存到主欄位
   const handleSave = async (showAlert = false) => {
     setIsSaving(true)
     try {
-      const baseUpdate = {
+      await onUpdate({
         customer_name: formData.customer_name,
         contact_phone: formData.contact_phone,
         contact_address: formData.contact_address,
@@ -146,37 +124,7 @@ export function useQuickQuoteDetail({ quote, onUpdate }: UseQuickQuoteDetailProp
         received_amount: formData.received_amount,
         balance_amount: totalAmount - formData.received_amount,
         quick_quote_items: items,
-      }
-
-      const existingVersions = quote.versions || []
-
-      if (currentEditingVersion !== null && existingVersions.length > 0) {
-        const updatedVersions = [...existingVersions]
-        updatedVersions[currentEditingVersion] = {
-          ...updatedVersions[currentEditingVersion],
-          ...prepareVersionData(
-            updatedVersions[currentEditingVersion].version,
-            updatedVersions[currentEditingVersion].name || `版本 ${updatedVersions[currentEditingVersion].version}`
-          ),
-        }
-
-        await onUpdate({
-          ...baseUpdate,
-          versions: updatedVersions,
-        })
-      } else if (existingVersions.length === 0) {
-        const versionName = formData.tour_code || formData.customer_name || '版本 1'
-        const firstVersion = prepareVersionData(1, versionName)
-
-        await onUpdate({
-          ...baseUpdate,
-          version: 1,
-          versions: [firstVersion],
-        })
-        setCurrentEditingVersion(0)
-      } else {
-        await onUpdate(baseUpdate)
-      }
+      })
 
       logger.log('✅ [QuickQuote] 儲存成功')
       if (showAlert) {
@@ -192,89 +140,6 @@ export function useQuickQuoteDetail({ quote, onUpdate }: UseQuickQuoteDetailProp
     }
   }
 
-  // 另存新版本
-  const handleSaveAsNewVersion = async () => {
-    if (!versionName.trim()) {
-      await alert('請輸入版本名稱', 'warning')
-      return
-    }
-
-    setIsSaving(true)
-    try {
-      const existingVersions = quote.versions || []
-      const maxVersion = existingVersions.reduce((max, v) =>
-        Math.max(max, v.version || 0), 0
-      )
-      const newVersionNumber = maxVersion + 1
-
-      const newVersionData = prepareVersionData(newVersionNumber, versionName.trim())
-      const newVersions = [...existingVersions, newVersionData]
-
-      await onUpdate({
-        customer_name: formData.customer_name,
-        contact_phone: formData.contact_phone,
-        contact_address: formData.contact_address,
-        tour_code: formData.tour_code,
-        handler_name: formData.handler_name,
-        issue_date: formData.issue_date,
-        expense_description: formData.expense_description,
-        total_amount: totalAmount,
-        total_cost: totalCost,
-        received_amount: formData.received_amount,
-        balance_amount: totalAmount - formData.received_amount,
-        quick_quote_items: items,
-        version: newVersionNumber,
-        versions: newVersions,
-      })
-
-      setCurrentEditingVersion(newVersions.length - 1)
-      setIsSaveVersionDialogOpen(false)
-      setVersionName('')
-      logger.log('✅ [QuickQuote] 新版本儲存成功')
-    } catch (error) {
-      logger.error('❌ [QuickQuote] 儲存版本失敗:', error)
-      await alert('版本儲存失敗：' + (error as Error).message, 'error')
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  // 載入版本
-  const handleLoadVersion = (versionIndex: number) => {
-    const versions = quote.versions || []
-
-    if (versionIndex < 0 || versionIndex >= versions.length) return
-
-    const versionData = versions[versionIndex] as QuoteVersion & {
-      customer_name?: string
-      contact_phone?: string
-      contact_address?: string
-      tour_code?: string
-      handler_name?: string
-      issue_date?: string
-      received_amount?: number
-      expense_description?: string
-      quick_quote_items?: QuickQuoteItem[]
-    }
-
-    setFormData({
-      customer_name: versionData.customer_name || '',
-      contact_phone: versionData.contact_phone || '',
-      contact_address: versionData.contact_address || '',
-      tour_code: versionData.tour_code || '',
-      handler_name: versionData.handler_name || 'William',
-      issue_date: versionData.issue_date || getTodayString(),
-      received_amount: versionData.received_amount || 0,
-      expense_description: versionData.expense_description || '',
-    })
-
-    if (versionData.quick_quote_items) {
-      setItems(versionData.quick_quote_items)
-    }
-
-    setCurrentEditingVersion(versionIndex)
-  }
-
   return {
     // 狀態
     isEditing,
@@ -282,13 +147,6 @@ export function useQuickQuoteDetail({ quote, onUpdate }: UseQuickQuoteDetailProp
     isSaving,
     showPrintPreview,
     setShowPrintPreview,
-    currentEditingVersion,
-    isSaveVersionDialogOpen,
-    setIsSaveVersionDialogOpen,
-    versionName,
-    setVersionName,
-    hoveredVersionIndex,
-    setHoveredVersionIndex,
 
     // 表單資料
     formData,
@@ -310,7 +168,5 @@ export function useQuickQuoteDetail({ quote, onUpdate }: UseQuickQuoteDetailProp
     updateItem,
     reorderItems,
     handleSave,
-    handleSaveAsNewVersion,
-    handleLoadVersion,
   }
 }

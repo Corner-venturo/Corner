@@ -51,10 +51,6 @@ export const useQuotesFeature = () => {
       return await quoteService.duplicateQuote(id)
     },
 
-    createNewVersion: async (id: string, updates: Partial<Quote>) => {
-      return await quoteService.createNewVersion(id, updates)
-    },
-
     getQuotesByTour: (tour_id: string) => {
       return quoteService.getQuotesByTour(tour_id)
     },

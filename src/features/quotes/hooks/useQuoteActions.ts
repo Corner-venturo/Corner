@@ -6,7 +6,6 @@ import type { Quote, Tour } from '@/stores/types'
 import type { CreateInput } from '@/stores/core/types'
 import type { QuickQuoteItem } from '@/types/quote.types'
 import { useQuoteSave } from './useQuoteSave'
-import { useQuoteVersion } from './useQuoteVersion'
 import { useQuoteTour } from './useQuoteTour'
 import { useQuoteGroupCostUpdate } from './useQuoteGroupCostUpdate'
 
@@ -34,8 +33,6 @@ interface UseQuoteActionsProps {
   accommodationDays: number
   participantCounts: ParticipantCounts
   sellingPrices: SellingPrices
-  versionName: string
-  currentEditingVersion: number | null
   setSaveSuccess: (value: boolean) => void
   setCategories: React.Dispatch<React.SetStateAction<CostCategory[]>>
   // 快速報價單相關
@@ -58,8 +55,6 @@ export const useQuoteActions = ({
   accommodationDays,
   participantCounts,
   sellingPrices,
-  versionName,
-  currentEditingVersion,
   setSaveSuccess,
   setCategories,
   quickQuoteItems,
@@ -67,28 +62,9 @@ export const useQuoteActions = ({
   tierPricings,
 }: UseQuoteActionsProps) => {
   // 使用分離的 hooks
-  const { handleSave, handleSaveAsNewVersion } = useQuoteSave({
+  const { handleSave } = useQuoteSave({
     quote,
     updateQuote,
-    updatedCategories,
-    total_cost,
-    groupSize,
-    quoteName,
-    accommodationDays,
-    participantCounts,
-    sellingPrices,
-    versionName,
-    currentEditingVersion,
-    setSaveSuccess,
-    quickQuoteItems,
-    quickQuoteCustomerInfo,
-    tierPricings,
-  })
-
-  const { formatDateTime, handleFinalize, handleDeleteVersion } = useQuoteVersion({
-    quote,
-    updateQuote,
-    router,
     updatedCategories,
     total_cost,
     groupSize,
@@ -97,6 +73,9 @@ export const useQuoteActions = ({
     participantCounts,
     sellingPrices,
     setSaveSuccess,
+    quickQuoteItems,
+    quickQuoteCustomerInfo,
+    tierPricings,
   })
 
   const { handleCreateTour } = useQuoteTour({
@@ -122,10 +101,6 @@ export const useQuoteActions = ({
 
   return {
     handleSave,
-    handleSaveAsNewVersion,
-    formatDateTime,
-    handleFinalize,
     handleCreateTour,
-    handleDeleteVersion,
   }
 }

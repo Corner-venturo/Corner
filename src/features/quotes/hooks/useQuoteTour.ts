@@ -7,8 +7,8 @@ import { useRouter } from 'next/navigation'
 import { generateTourCode } from '@/stores/utils/code-generator'
 import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
 import { useToursSlim } from '@/data'
-import { CostCategory, ParticipantCounts, SellingPrices } from '../types'
-import type { Quote, Tour, QuoteVersion } from '@/stores/types'
+import type { ParticipantCounts, SellingPrices, CostCategory } from '../types'
+import type { Quote, Tour } from '@/stores/types'
 import type { CreateInput } from '@/stores/core/types'
 import { QUOTE_HOOKS_LABELS } from '../constants/labels'
 
@@ -46,32 +46,9 @@ export const useQuoteTour = ({
   const handleCreateTour = useCallback(async () => {
     if (!quote) return
 
-    // 先保存目前的報價單狀態為新版本
-    const existingVersions = quote.versions || []
-    const maxVersion = existingVersions.reduce((max: number, v: QuoteVersion) =>
-      Math.max(max, v.version || 0), 0
-    )
-    const newVersion = maxVersion + 1
-
-    const createTourVersionRecord: QuoteVersion = {
-      id: Date.now().toString(),
-      version: newVersion,
-      mode: 'detailed', // 預設為詳細模式
-      name: `開團版本 ${newVersion}`,
-      categories: updatedCategories,
-      total_cost,
-      group_size: groupSize,
-      accommodation_days: accommodationDays,
-      participant_counts: participantCounts,
-      selling_prices: sellingPrices,
-      notes: '轉為旅遊團前的版本',
-      created_at: new Date().toISOString(),
-    }
-
-    // 更新報價單狀態為最終版本
+    // 更新報價單狀態為已核准
     updateQuote(quote.id, {
       status: 'approved',
-      versions: [...existingVersions, createTourVersionRecord],
     })
 
     // 創建旅遊團

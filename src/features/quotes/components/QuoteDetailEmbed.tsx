@@ -13,7 +13,7 @@
 import React, { useRef, useEffect, useCallback, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { ParticipantCounts, SellingPrices, VersionRecord, CostCategory, CostItem } from '@/features/quotes/types'
+import { ParticipantCounts, SellingPrices, CostCategory, CostItem } from '@/features/quotes/types'
 import type { Tour } from '@/types/tour.types'
 import { useQuotes } from '@/features/quotes/hooks/useQuotes'
 import { useQuote as useQuoteDetail } from '@/data'
@@ -28,7 +28,6 @@ import {
   QuoteHeader,
   CategorySection,
   SellingPriceSection,
-  SaveVersionDialog,
   SyncToItineraryDialog,
   PrintableQuotation,
   LinkTourDialog,
@@ -86,9 +85,6 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
   })
   const [quoteName, setQuoteName] = useState('')
   const [saveSuccess, setSaveSuccess] = useState(false)
-  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false)
-  const [versionName, setVersionName] = useState('')
-  const [currentEditingVersion, setCurrentEditingVersion] = useState<number | null>(null)
   const [sellingPrices, setSellingPrices] = useState<SellingPrices>({
     adult: 0,
     child_with_bed: 0,
@@ -186,13 +182,11 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
     accommodationDays,
     participantCounts,
     sellingPrices,
-    versionName,
-    currentEditingVersion,
     setSaveSuccess,
     setCategories,
     tierPricings,
   })
-  const { handleSave, handleSaveAsNewVersion, formatDateTime, handleFinalize, handleCreateTour, handleDeleteVersion } = actions
+  const { handleSave, handleCreateTour } = actions
 
   // 同步到行程表 - 狀態
   const [isSyncDialogOpen, setIsSyncDialogOpen] = useState(false)
@@ -233,22 +227,6 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
       updateQuote(quote.id, { status })
     }
   }, [quote, updateQuote])
-
-  // 載入版本
-  const handleLoadVersion = useCallback(
-    (versionIndex: number, versionData: VersionRecord) => {
-      setCategories(versionData.categories || [])
-      setAccommodationDays(versionData.accommodation_days || 0)
-      if (versionData.participant_counts) {
-        setParticipantCounts(versionData.participant_counts)
-      }
-      if (versionData.selling_prices) {
-        setSellingPrices(versionData.selling_prices)
-      }
-      setCurrentEditingVersion(versionIndex === -1 ? null : versionIndex)
-    },
-    []
-  )
 
   const handleGenerateQuotation = useCallback(
     (
@@ -449,7 +427,6 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
           participantCounts={participantCounts}
           setParticipantCounts={setParticipantCounts}
           saveSuccess={saveSuccess}
-          setIsSaveDialogOpen={setIsSaveDialogOpen}
           handleSave={handleSave}
           handleCreateTour={handleCreateTour}
           handleGenerateQuotation={handleGenerateQuotation}
@@ -562,14 +539,6 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
       </div>
 
       {/* Dialogs */}
-      <SaveVersionDialog
-        isOpen={isSaveDialogOpen}
-        onClose={() => setIsSaveDialogOpen(false)}
-        versionName={versionName}
-        setVersionName={setVersionName}
-        onSave={(note) => handleSaveAsNewVersion(note, setCurrentEditingVersion)}
-      />
-
       <SyncToItineraryDialog
         isOpen={isSyncDialogOpen}
         onClose={() => setIsSyncDialogOpen(false)}

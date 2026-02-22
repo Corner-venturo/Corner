@@ -7,7 +7,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Save, Printer, FilePlus, Edit2, X } from 'lucide-react'
+import { Save, Printer, Edit2, X } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Quote } from '@/stores/types'
 import type { Quote as PrintableQuote } from '@/types/quote.types'
@@ -16,12 +16,9 @@ import { useQuickQuoteDetail } from '../hooks/useQuickQuoteDetail'
 import {
   QuickQuoteHeader,
   QuickQuoteItemsTable,
-  QuickQuoteVersionPanel,
   QuickQuoteSummary,
 } from './quick-quote'
-import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { QUICK_QUOTE_DETAIL_LABELS } from '../constants/labels';
-import { QUOTE_COMPONENT_LABELS } from '../constants/labels'
 
 interface QuickQuoteDetailProps {
   quote: Quote
@@ -39,13 +36,6 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
     isSaving,
     showPrintPreview,
     setShowPrintPreview,
-    currentEditingVersion,
-    isSaveVersionDialogOpen,
-    setIsSaveVersionDialogOpen,
-    versionName,
-    setVersionName,
-    hoveredVersionIndex,
-    setHoveredVersionIndex,
     formData,
     setFormField,
     items,
@@ -58,25 +48,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
     updateItem,
     reorderItems,
     handleSave,
-    handleSaveAsNewVersion,
-    handleLoadVersion,
   } = useQuickQuoteDetail({ quote, onUpdate })
-
-  // 刪除版本
-  const handleDeleteVersion = async (versionIndex: number) => {
-    const versions = quote.versions || []
-    if (versions.length <= 1) {
-      await alert(QUICK_QUOTE_DETAIL_LABELS.至少需要保留一個版本, 'warning')
-      return
-    }
-
-    try {
-      const newVersions = versions.filter((_, idx) => idx !== versionIndex)
-      await onUpdate({ versions: newVersions })
-    } catch (error) {
-      await alert(QUICK_QUOTE_DETAIL_LABELS.刪除版本失敗, 'error')
-    }
-  }
 
   // 列印
   const handlePrint = async () => {
@@ -90,7 +62,6 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
         title={`快速報價單 ${quote.code || ''}`}
         showBackButton={true}
         onBack={() => {
-          // 如果有關聯旅遊團，返回該旅遊團頁面
           if (quote.tour_id) {
             router.push(`/tours?highlight=${quote.tour_id}`)
           } else {
@@ -100,23 +71,6 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
         actions={
           <div className="flex items-center gap-2">
             {viewModeToggle}
-
-            {/* 版本歷史面板 */}
-            <QuickQuoteVersionPanel
-              versions={quote.versions || []}
-              currentEditingVersion={currentEditingVersion}
-              isEditing={isEditing}
-              hoveredVersionIndex={hoveredVersionIndex}
-              onSetHoveredVersionIndex={setHoveredVersionIndex}
-              onLoadVersion={handleLoadVersion}
-              onDeleteVersion={handleDeleteVersion}
-              isSaveVersionDialogOpen={isSaveVersionDialogOpen}
-              onSetSaveVersionDialogOpen={setIsSaveVersionDialogOpen}
-              versionName={versionName}
-              onSetVersionName={setVersionName}
-              isSaving={isSaving}
-              onSaveAsNewVersion={handleSaveAsNewVersion}
-            />
 
             {/* 非編輯模式 */}
             {!isEditing && (
@@ -138,15 +92,6 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                 <Button onClick={() => setIsEditing(false)} variant="outline" className="gap-2">
                   <X size={16} />
                   {QUICK_QUOTE_DETAIL_LABELS.CANCEL}
-                </Button>
-                <Button
-                  onClick={() => setIsSaveVersionDialogOpen(true)}
-                  disabled={isSaving}
-                  variant="outline"
-                  className="gap-2"
-                >
-                  <FilePlus className="h-4 w-4" />
-                  {QUICK_QUOTE_DETAIL_LABELS.LABEL_6621}
                 </Button>
                 <Button
                   onClick={() => handleSave(true)}
