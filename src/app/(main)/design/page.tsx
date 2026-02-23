@@ -1,7 +1,5 @@
-'use client'
+import { redirect } from 'next/navigation'
 
-import { DesignPage } from '@/features/design'
-
-export default function Page() {
-  return <DesignPage />
+export default function DesignRedirectPage() {
+  redirect('/brochures')
 }

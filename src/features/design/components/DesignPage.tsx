@@ -2,23 +2,44 @@
 
 import { useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Palette, Plus } from 'lucide-react'
+import { Palette, Plus, type LucideIcon } from 'lucide-react'
 import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { DesignList } from './DesignList'
 import { useDesigns } from '../hooks/useDesigns'
-import { type Design } from '../types'
+import { type Design, type DesignCategory } from '../types'
 import { toast } from 'sonner'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { LABELS, DESIGN_COMPONENT_LABELS } from '../constants/labels'
 import { logger } from '@/lib/utils/logger'
 
+interface DesignPageProps {
+  /** 頁面標題（預設：設計） */
+  title?: string
+  /** 頁面圖示（預設：Palette） */
+  icon?: LucideIcon
+  /** 麵包屑 */
+  breadcrumb?: Array<{ label: string; href: string }>
+  /** 依設計分類篩選 */
+  categoryFilter?: DesignCategory[]
+}
+
 /**
  * 設計管理頁面
  */
-export function DesignPage() {
+export function DesignPage({
+  title = LABELS.design,
+  icon = Palette,
+  breadcrumb,
+  categoryFilter,
+}: DesignPageProps) {
   const router = useRouter()
   const { deleteDesign, duplicateDesign } = useDesigns()
+
+  const defaultBreadcrumb = [
+    { label: LABELS.home, href: '/' },
+    { label: title, href: '#' },
+  ]
 
   // 新增設計 - 直接跳轉到設計工具
   const handleCreate = useCallback(() => {
@@ -69,12 +90,9 @@ export function DesignPage() {
 
   return (
     <ContentPageLayout
-      title={LABELS.design}
-      icon={Palette}
-      breadcrumb={[
-        { label: LABELS.home, href: '/' },
-        { label: LABELS.design, href: '/design' },
-      ]}
+      title={title}
+      icon={icon}
+      breadcrumb={breadcrumb ?? defaultBreadcrumb}
       headerActions={
         <Button
           onClick={handleCreate}
@@ -89,6 +107,7 @@ export function DesignPage() {
         onEdit={handleEdit}
         onDelete={handleDelete}
         onDuplicate={handleDuplicate}
+        categoryFilter={categoryFilter}
       />
     </ContentPageLayout>
   )

@@ -33,6 +33,8 @@ import {
   ClipboardList,
   Building,
   Palette,
+  BookOpen,
+  Megaphone,
   Mail,
   Truck,
   LineChart,
@@ -77,16 +79,8 @@ const menuItems: MenuItem[] = [
     ],
   },
   { href: '/visas', label: COMP_LAYOUT_LABELS.簽證管理, icon: FileCheck, requiredPermission: 'visas' },
-  {
-    href: '/design',
-    label: COMP_LAYOUT_LABELS.設計,
-    icon: Palette,
-    requiredPermission: 'design',
-    children: [
-      { href: '/design', label: COMP_LAYOUT_LABELS.設計列表, icon: Palette, requiredPermission: 'design' },
-      { href: '/design/new', label: COMP_LAYOUT_LABELS.新增設計, icon: Palette, requiredPermission: 'design' },
-    ],
-  },
+  { href: '/brochures', label: COMP_LAYOUT_LABELS.手冊, icon: BookOpen, requiredPermission: 'design' },
+  { href: '/marketing', label: COMP_LAYOUT_LABELS.行銷素材, icon: Megaphone, requiredPermission: 'design' },
   {
     href: '/office',
     label: COMP_LAYOUT_LABELS.文件,

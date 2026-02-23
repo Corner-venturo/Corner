@@ -11,8 +11,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useMemo } from 'react'
 import { useDesigns } from '../hooks/useDesigns'
-import { DESIGN_TYPE_CONFIG, type Design, type DesignType } from '../types'
+import { DESIGN_TYPE_CONFIG, type Design, type DesignCategory, type DesignType } from '../types'
 import { cn } from '@/lib/utils'
 import { LABELS } from '../constants/labels'
 
@@ -20,13 +21,23 @@ interface DesignListProps {
   onEdit?: (design: Design) => void
   onDelete?: (design: Design) => void
   onDuplicate?: (design: Design) => void
+  /** 依設計分類篩選（例如 ['brochure'] 或 ['social', 'banner']） */
+  categoryFilter?: DesignCategory[]
 }
 
 /**
  * 設計列表組件
  */
-export function DesignList({ onEdit, onDelete, onDuplicate }: DesignListProps) {
+export function DesignList({ onEdit, onDelete, onDuplicate, categoryFilter }: DesignListProps) {
   const { designs, isLoading, error } = useDesigns()
+
+  const filteredDesigns = useMemo(() => {
+    if (!categoryFilter || categoryFilter.length === 0) return designs
+    return designs.filter(d => {
+      const cfg = DESIGN_TYPE_CONFIG[d.design_type as DesignType]
+      return cfg && categoryFilter.includes(cfg.category)
+    })
+  }, [designs, categoryFilter])
 
   const columns: TableColumn<Design>[] = [
     {
@@ -146,7 +157,7 @@ export function DesignList({ onEdit, onDelete, onDuplicate }: DesignListProps) {
     )
   }
 
-  if (designs.length === 0) {
+  if (filteredDesigns.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
         <FileText size={48} className="mb-4 opacity-30" />
@@ -159,7 +170,7 @@ export function DesignList({ onEdit, onDelete, onDuplicate }: DesignListProps) {
   return (
     <EnhancedTable
       columns={columns}
-      data={designs}
+      data={filteredDesigns}
       className="min-h-full"
     />
   )
