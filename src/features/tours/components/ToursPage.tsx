@@ -25,6 +25,8 @@ import { LinkDocumentsToTourDialog } from './LinkDocumentsToTourDialog'
 import { TourItineraryDialog } from './TourItineraryDialog'
 import { ContractDialog } from '@/features/contracts/components/ContractDialog'
 import { TourClosingDialog } from './TourClosingDialog'
+// TourControlDialogWrapper 已移除，功能整合到團確單
+// TourRequirementsDialog removed — use tour detail page instead
 import { TourEditDialog } from '@/features/tours/components/tour-edit-dialog'
 import { alert } from '@/lib/ui/alert-dialog'
 
@@ -34,13 +36,16 @@ export const ToursPage: React.FC = () => {
   const router = useRouter()
   const { user } = useAuthStore()
 
-  // Edit dialog state
+  // requirementsDialogTour removed — use tour detail page instead
+
+  // Edit dialog state (using TourEditDialog instead of TourForm for edit mode)
   const [editDialogTour, setEditDialogTour] = useState<Tour | null>(null)
 
+  // 🔧 優化：只保留 quotes（TourActionButtons 需要），其他由 useTourOperations 內部處理
   const { items: quotes } = useQuotesListSlim()
   const { items: allOrders } = useOrdersListSlim()
 
-  // Build a map of tour_id → first order's sales_person/assistant for display
+  // Build a map of tour_id → first order's sales_person/assistant for display in tour table
   const ordersByTourId = useMemo(() => {
     const map = new Map<string, { sales_person: string | null; assistant: string | null }>()
     for (const order of allOrders) {
@@ -54,6 +59,7 @@ export const ToursPage: React.FC = () => {
     return map
   }, [allOrders])
 
+  // 🔧 對話框狀態（替代 deprecated useDialog）
   const [dialogState, setDialogState] = useState<{
     isOpen: boolean
     type: string | null
@@ -67,6 +73,10 @@ export const ToursPage: React.FC = () => {
   const closeDialog = useCallback(() => {
     setDialogState({ isOpen: false, type: null, data: null })
   }, [])
+
+  // 🔧 優化：移除無條件載入 regions
+  // 提案已有 destination 欄位，不需要 country_id/city_id 轉換
+  // 如果未來需要 regions，可以在 TourForm 開啟時才載入
 
   const {
     filteredTours,
@@ -86,21 +96,22 @@ export const ToursPage: React.FC = () => {
     itineraryDialogTour,
     openItineraryDialog,
     closeItineraryDialog,
+    tourItineraryDialogTour,
+    openTourItineraryDialog,
+    closeTourItineraryDialog,
     quoteDialogTour,
     openQuoteDialog,
     closeQuoteDialog,
-    tourItineraryDialogTour,
-    closeTourItineraryDialog,
     contractDialogState,
     openContractDialog,
     closeContractDialog,
-    closingDialogTour,
-    openClosingDialog,
-    closeClosingDialog,
     archiveDialogTour,
     openArchiveDialog,
     closeArchiveDialog,
     confirmArchive,
+    closingDialogTour,
+    openClosingDialog,
+    closeClosingDialog,
     deleteConfirm,
     openDeleteDialog,
     closeDeleteDialog,
@@ -125,14 +136,18 @@ export const ToursPage: React.FC = () => {
     handleNavigationEffect,
   } = useToursForm({ state, openDialog })
 
+  // Handler for opening edit dialog (now uses TourEditDialog instead of TourForm)
   const handleOpenEditDialog = useCallback((tour: Tour) => {
     setEditDialogTour(tour)
   }, [])
 
+  // Handler for closing edit dialog
   const handleCloseEditDialog = useCallback(() => {
     setEditDialogTour(null)
   }, [])
 
+  // 🔧 優化：useTourOperations 不再需要外部傳入 quotes/itineraries/addOrder 等
+  // 🔧 編輯模式已移至 TourEditDialog + useTourEdit hook
   const operations = useTourOperations({
     actions,
     resetForm,
@@ -174,12 +189,9 @@ export const ToursPage: React.FC = () => {
     onCloseTour: openClosingDialog,
     onOpenArchiveDialog: openArchiveDialog,
     onOpenRequirementsDialog: undefined,
-    onProposalClick: undefined,
-    onProposalEdit: undefined,
-    onProposalArchive: undefined,
-    onProposalDelete: undefined,
   })
 
+  // 點擊整列導航到詳情頁面
   const handleRowClick = useCallback((row: unknown) => {
     const item = row as Tour
     router.push(`/tours/${item.code}`)
@@ -188,6 +200,9 @@ export const ToursPage: React.FC = () => {
   useEffect(() => {
     handleNavigationEffect()
   }, [handleNavigationEffect])
+
+  // 移除完整頁面載入阻擋，改為讓表格結構先顯示
+  // loading 狀態由 TourTable 內部處理
 
   return (
     <div className="h-full flex flex-col">
@@ -240,7 +255,9 @@ export const ToursPage: React.FC = () => {
           isOpen={!!editDialogTour}
           onClose={handleCloseEditDialog}
           tour={editDialogTour}
-          onSuccess={() => {}}
+          onSuccess={() => {
+            // Refresh is handled by SWR mutate in the hook
+          }}
         />
       )}
 
@@ -274,6 +291,7 @@ export const ToursPage: React.FC = () => {
         />
       )}
 
+      {/* 行程表選擇對話框 */}
       {tourItineraryDialogTour && (
         <TourItineraryDialog
           isOpen={!!tourItineraryDialogTour}
@@ -291,6 +309,8 @@ export const ToursPage: React.FC = () => {
         />
       )}
 
+
+
       {closingDialogTour && (
         <TourClosingDialog
           tour={closingDialogTour}
@@ -299,6 +319,9 @@ export const ToursPage: React.FC = () => {
           onSuccess={closeClosingDialog}
         />
       )}
+
+      {/* 需求總表對話框已移除 — 統一使用詳情頁 */}
+
     </div>
   )
 }
