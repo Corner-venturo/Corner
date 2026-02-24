@@ -1,25 +1,17 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import {
   Calendar,
-  FileText,
+  FileCheck,
   MapPin,
   BarChart3,
-  FileCheck,
   Archive,
   Star,
   Plus,
   Plane,
-  ChevronDown,
 } from 'lucide-react'
 import { TOUR_FILTERS } from '../constants'
 
@@ -28,7 +20,6 @@ interface TourFiltersProps {
   onSearchChange: (query: string) => void
   activeTab: string
   onTabChange: (tab: string) => void
-  onAddProposal: () => void
   onAddTour: () => void
 }
 
@@ -37,7 +28,6 @@ export const TourFilters: React.FC<TourFiltersProps> = ({
   onSearchChange,
   activeTab,
   onTabChange,
-  onAddProposal,
   onAddTour,
 }) => {
   return (
@@ -54,7 +44,6 @@ export const TourFilters: React.FC<TourFiltersProps> = ({
       searchPlaceholder={TOUR_FILTERS.search_placeholder}
       tabs={[
         { value: 'all', label: TOUR_FILTERS.tab_all, icon: BarChart3 },
-        { value: '開團', label: TOUR_FILTERS.tab_proposal, icon: FileText },
         { value: '待出發', label: TOUR_FILTERS.tab_active, icon: Calendar },
         { value: '已結團', label: TOUR_FILTERS.tab_closed, icon: FileCheck },
         { value: '特殊團', label: TOUR_FILTERS.tab_special, icon: Star },
@@ -63,25 +52,13 @@ export const TourFilters: React.FC<TourFiltersProps> = ({
       activeTab={activeTab}
       onTabChange={onTabChange}
       customActions={
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1.5">
-              <Plus size={16} />
-              {TOUR_FILTERS.add_button}
-              <ChevronDown size={14} />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onClick={onAddProposal} className="gap-2 cursor-pointer">
-              <FileText size={16} className="text-morandi-gold" />
-              <span>{TOUR_FILTERS.add_proposal}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={onAddTour} className="gap-2 cursor-pointer">
-              <Plane size={16} className="text-status-info" />
-              <span>{TOUR_FILTERS.add_tour_direct}</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Button
+          onClick={onAddTour}
+          className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1.5"
+        >
+          <Plus size={16} />
+          {TOUR_FILTERS.add_tour_direct}
+        </Button>
       }
     />
   )
