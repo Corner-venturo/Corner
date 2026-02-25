@@ -53,3 +53,71 @@ export const SUPPLIERS_PAGE_LABELS = {
   CREATE_SUCCESS: '供應商建立成功',
   SAVE_FAILED: '儲存失敗，請稍後再試',
 }
+
+// Supplier Import
+export const SUPPLIER_IMPORT_LABELS = {
+  // Dialog
+  title: '批次匯入供應商',
+  description: '上傳 Excel 或 CSV 檔案，批次匯入供應商資料',
+  // Buttons
+  btn_download_template: '下載模板',
+  btn_select_file: '選擇檔案',
+  btn_import: '確認匯入',
+  btn_cancel: '取消',
+  btn_back: '重新選擇',
+  btn_importing: '匯入中...',
+  // File
+  file_hint: '支援 .xlsx 和 .csv 檔案',
+  file_drop: '拖曳檔案到這裡，或點擊選擇',
+  file_selected: (name: string) => `已選擇：${name}`,
+  // Preview
+  preview_title: '資料預覽',
+  preview_summary: (total: number, error_count: number) =>
+    `共 ${total} 筆資料${error_count > 0 ? `，${error_count} 筆有錯誤` : ''}`,
+  // Table headers
+  col_row: '列號',
+  col_status: '狀態',
+  col_name: '公司名稱',
+  col_english_name: '英文名稱',
+  col_contact_person: '聯繫人',
+  col_phone: '電話',
+  col_email: 'Email',
+  col_address: '地址',
+  col_type: '類別',
+  col_notes: '備註',
+  // Template headers
+  tpl_name: '公司名稱',
+  tpl_english_name: '英文名稱',
+  tpl_contact_person: '聯繫人',
+  tpl_phone: '電話',
+  tpl_email: 'Email',
+  tpl_address: '地址',
+  tpl_type: '類別',
+  tpl_notes: '備註',
+  // Status
+  status_ok: '正常',
+  status_error: '有錯誤',
+  status_warning: '警告',
+  status_duplicate: '可能重複',
+  // Errors
+  error_no_file: '請選擇檔案',
+  error_parse_failed: '檔案解析失敗',
+  // Messages
+  msg_import_success: (count: number) => `成功匯入 ${count} 家供應商`,
+  msg_import_partial: (success: number, total: number) =>
+    `匯入完成：${success}/${total} 筆成功`,
+  msg_import_failed: '匯入失敗，請稍後再試',
+  msg_duplicate_name: (name: string) => `供應商名稱「${name}」已存在`,
+  // Supplier type mapping
+  type_hotel: '飯店',
+  type_restaurant: '餐廳',
+  type_transport: '交通',
+  type_attraction: '景點',
+  type_guide: '導遊',
+  type_agency: '旅行社',
+  type_ticketing: '票務',
+  type_other: '其他',
+  // Template filename
+  template_filename: '供應商匯入模板.xlsx',
+  template_sheet: '供應商資料',
+}

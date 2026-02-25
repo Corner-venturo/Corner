@@ -7,9 +7,11 @@
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useCallback } from 'react'
 import { ContentPageLayout } from '@/components/layout/content-page-layout'
-import { Building2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Building2, FileSpreadsheet } from 'lucide-react'
 import { SuppliersList } from './SuppliersList'
 import { SuppliersDialog } from './SuppliersDialog'
+import { ImportSuppliersDialog } from './ImportSuppliersDialog'
 import {
   useSuppliersSlim,
   createSupplier,
@@ -18,14 +20,14 @@ import {
 } from '@/data'
 import type { Supplier } from '@/types/supplier.types'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
-import { LABELS } from '../constants/labels'
-import { SUPPLIERS_PAGE_LABELS } from '../constants/labels'
+import { LABELS, SUPPLIERS_PAGE_LABELS, SUPPLIER_IMPORT_LABELS } from '../constants/labels'
 
 export const SuppliersPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false)
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null)
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
 
   const { items: suppliers } = useSuppliersSlim()
 
@@ -143,6 +145,17 @@ export const SuppliersPage: React.FC = () => {
       searchPlaceholder={LABELS.searchPlaceholder}
       onAdd={handleOpenAddDialog}
       addLabel={LABELS.addSupplier}
+      headerActions={
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsImportDialogOpen(true)}
+          className="gap-2"
+        >
+          <FileSpreadsheet size={16} />
+          <span className="hidden sm:inline">{SUPPLIER_IMPORT_LABELS.btn_select_file}</span>
+        </Button>
+      }
     >
       <SuppliersList
         suppliers={filteredSuppliers}
@@ -158,6 +171,12 @@ export const SuppliersPage: React.FC = () => {
         onFormFieldChange={handleFormFieldChange}
         onSubmit={handleSubmit}
         isEditMode={isEditMode}
+      />
+
+      {/* 批次匯入對話框 */}
+      <ImportSuppliersDialog
+        open={isImportDialogOpen}
+        onOpenChange={setIsImportDialogOpen}
       />
     </ContentPageLayout>
   )
