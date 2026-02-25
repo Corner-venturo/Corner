@@ -3,7 +3,6 @@ import {
   DollarSign,
   Clock,
   Clipboard,
-  Sparkles,
   Cloud,
   Plane,
   CloudSun,
@@ -14,7 +13,6 @@ import { CalculatorWidget } from './calculator-widget'
 import { CurrencyWidget } from './currency-widget'
 import { TimerWidget } from './timer-widget'
 import { NotesWidget } from './notes-widget'
-import { ManifestationWidget } from './manifestation-widget'
 import { WeatherWidget } from './weather-widget'
 import { WeatherWidgetWeekly } from './weather-widget-weekly'
 import { FlightWidget } from './flight-widget'
@@ -22,14 +20,6 @@ import { PNRWidget } from './pnr-widget'
 
 // 小工具配置
 export const AVAILABLE_WIDGETS: Array<Omit<WidgetConfig, 'id'> & { id: string }> = [
-  {
-    id: 'manifestation',
-    name: '顯化魔法',
-    icon: Sparkles,
-    component: ManifestationWidget,
-    span: 1,
-    requiredPermission: 'super_admin_only',
-  },
   {
     id: 'flight',
     name: '航班查詢',

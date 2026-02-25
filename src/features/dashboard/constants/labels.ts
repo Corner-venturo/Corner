@@ -49,10 +49,6 @@ export const DASHBOARD_LABELS = {
   landing: '降落',
   estimated: '預計',
   
-  // Manifestation Widget
-  manifestation: '顯化',
-  weeklyManifestation: '這週顯化曲線',
-  
   // Notes Widget
   notes: '便利貼',
   

@@ -166,13 +166,7 @@ export const FEATURE_PERMISSIONS: PermissionConfig[] = [
     routes: ['/reports'],
     description: '各類報表查看',
   },
-  {
-    id: 'manifestation',
-    label: '顯化魔法',
-    category: '全部',
-    routes: ['/manifestation'],
-    description: '顯化魔法功能',
-  },
+  // 顯化功能已移除
   // 確認單管理已整合到團的操作中，不再需要獨立權限
   // {
   //   id: 'confirmations',

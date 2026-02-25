@@ -77,7 +77,7 @@ export const BREADCRUMB_CONFIG: Record<string, BreadcrumbConfig> = {
   '/esims': { label: 'eSIM 管理', parent: '/' },
   '/todos': { label: '待辦事項', parent: '/' },
   '/timebox': { label: 'Timebox', parent: '/' },
-  '/manifestation': { label: '宣示管理', parent: '/' },
+  // manifestation removed
   '/hr': { label: '人資管理', parent: '/' },
   '/workspace': { label: '工作區', parent: '/' },
   '/traveler-chat': { label: '旅客聊天', parent: '/' },
@@ -100,10 +100,7 @@ export const BREADCRUMB_CONFIG: Record<string, BreadcrumbConfig> = {
   '/reports/tour-closing': { label: '結團報表', parent: '/' },
 
   // ========== 健身模組 ==========
-  '/fitness': { label: '健身', parent: '/' },
-  '/fitness/history': { label: '歷史記錄', parent: '/fitness' },
-  '/fitness/stats': { label: '統計分析', parent: '/fitness' },
-  '/fitness/settings': { label: '健身設定', parent: '/fitness' },
+  // fitness removed
 
   // ========== 行動版 ==========
   '/m': { label: '行動版', parent: '/' },

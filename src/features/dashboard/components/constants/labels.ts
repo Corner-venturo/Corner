@@ -1,9 +1,6 @@
 export const DASHBOARD_LABELS = {
   LABEL_9544: '輸入匯率',
 
-  LABEL_4129: '這週顯化曲線',
-  LABEL_2181: '前往顯化練習',
-
   LABEL_2502: '便條紙',
   LABEL_9180: '隨手記錄，靈感不遺漏',
   ADD_5952: '新增分頁',

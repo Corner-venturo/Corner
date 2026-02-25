@@ -6,12 +6,12 @@ import { useState, useMemo } from 'react'
 import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Clock, ChevronLeft, ChevronRight, Settings, BookOpen, Sparkles } from 'lucide-react'
+import { Clock, ChevronLeft, ChevronRight, Settings, BookOpen } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
 import BoxManager from '@/features/timebox/components/BoxManager'
 import WeekView from '@/features/timebox/components/WeekView'
-import ManifestationNotebook from '@/features/timebox/components/ManifestationNotebook'
+// ManifestationNotebook removed
 import WeekReviewDialog from '@/features/timebox/components/WeekReviewDialog'
 import {
   getWeekStart,
@@ -26,7 +26,7 @@ export default function TimeboxPage() {
   const [timeInterval, setTimeInterval] = useState<30 | 60>(60)
   const [showBoxManager, setShowBoxManager] = useState(false)
   const [showWeekReview, setShowWeekReview] = useState(false)
-  const [showManifestation, setShowManifestation] = useState(false)
+  // showManifestation removed
 
   const user = useAuthStore(state => state.user)
   const userId = user?.id
@@ -156,15 +156,6 @@ export default function TimeboxPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setShowManifestation(true)}
-                className="h-8 w-8 p-0 rounded-none text-morandi-secondary hover:text-morandi-gold"
-                title={LABELS.LABEL_4938}
-              >
-                <Sparkles className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
                 onClick={() => setShowWeekReview(true)}
                 className="h-8 w-8 p-0 rounded-none border-l border-border text-morandi-secondary hover:text-morandi-gold"
                 title={LABELS.LABEL_4141}
@@ -208,18 +199,7 @@ export default function TimeboxPage() {
         selectedWeek={selectedWeek}
       />
 
-      {/* 顯化筆記本對話框 */}
-      <Dialog open={showManifestation} onOpenChange={setShowManifestation}>
-        <DialogContent level={1} className="max-w-md max-h-[85vh]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-morandi-gold" />
-              {LABELS.LABEL_7491}
-            </DialogTitle>
-          </DialogHeader>
-          <ManifestationNotebook />
-        </DialogContent>
-      </Dialog>
+      {/* 顯化功能已移除 */}
     </ContentPageLayout>
   )
 }

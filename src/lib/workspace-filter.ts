@@ -48,7 +48,7 @@ const WORKSPACE_ENABLED_TABLES = [
   'disbursement_orders',
   'employees',
   'esims',
-  'fitness_goals',
+  // fitness_goals removed
   'itineraries',
   'linkpay_logs',
   'messages',
