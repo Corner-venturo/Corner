@@ -7,9 +7,12 @@
 import React from 'react'
 import { COMPANY } from '@/lib/constants/company'
 import { MORANDI_COLORS } from './print-styles'
-import { PRINT_FOOTER_LABELS } from '@/constants/labels'
+import { useAuthStore } from '@/stores/auth-store'
 
 export const PrintFooter: React.FC = () => {
+  const workspaceName = useAuthStore(state => state.user?.workspace_name) || ''
+  const companyFullName = workspaceName ? `${workspaceName}股份有限公司` : ''
+
   return (
     <div
       className="border-t"
@@ -25,7 +28,7 @@ export const PrintFooter: React.FC = () => {
         </p>
       </div>
       <div className="text-center text-xs" style={{ color: MORANDI_COLORS.lightGray }}>
-        <span>{PRINT_FOOTER_LABELS.角落旅行社版權.replace('{year}', new Date().getFullYear().toString())}</span>
+        <span>{companyFullName} © {new Date().getFullYear()}</span>
       </div>
     </div>
   )

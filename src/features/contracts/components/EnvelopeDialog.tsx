@@ -48,7 +48,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
   const [senderName, setSenderName] = useState('')
   const [senderPhone, setSenderPhone] = useState('')
   const senderAddress = COMP_CONTRACTS_LABELS.台北市大同區重慶北路一段67號8樓之2
-  const senderCompany = COMP_CONTRACTS_LABELS.角落旅行社
+  const senderCompany = user?.workspace_name || ''
 
   useEffect(() => {
     if (isOpen && user) {

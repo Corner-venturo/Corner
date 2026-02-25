@@ -80,10 +80,9 @@ export const PRICE_SUMMARY_CARD_LABELS = {
 };
 
 export const PRINTABLE_QUICK_QUOTE_LABELS = {
-  角落旅行社_Logo: '角落旅行社 Logo',
+  公司_Logo_Alt: 'Company Logo',
   報價請款單: '報價請款單',
   列印: '列印',
-  角落旅行社: '角落旅行社',
   團體名稱標籤: '團體名稱：',
   團體編號標籤: '團體編號：',
   聯絡電話標籤: '聯絡電話：',
@@ -99,15 +98,15 @@ export const PRINTABLE_QUICK_QUOTE_LABELS = {
   已收金額: '已收金額',
   應收餘額: '應收餘額',
   匯款資訊: '匯款資訊',
-  戶名_角落旅行社: '戶名：角落旅行社股份有限公司',
+  戶名前綴: '戶名：',
   支票資訊: '支票資訊',
-  抬頭_角落旅行社: '抬頭：角落旅行社股份有限公司',
+  抬頭前綴: '抬頭：',
   禁止背書轉讓: '禁止背書轉讓',
   請於出發日前付清餘額: '（請於出發日前付清餘額）',
   收據資訊: '收據資訊',
   開立代收轉付抬頭: '開立代收轉付抬頭：',
   開立代收轉付統編: '開立代收轉付統編：',
-  角落旅行社版權: '角落旅行社股份有限公司 ©',
+  版權前綴: '©',
 };
 
 export const PRINTABLE_QUOTATION_LABELS = {
@@ -297,7 +296,7 @@ export const QUOTATION_INCLUSIONS_LABELS = {
 };
 
 export const PRINT_FOOTER_LABELS = {
-  角落旅行社版權: '角落旅行社股份有限公司 © {year}',
+  版權格式: '{companyName} © {year}',
 };
 
 export const PAYMENT_INFO_LABELS = {

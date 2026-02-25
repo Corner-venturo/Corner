@@ -59,7 +59,7 @@ export function TourHeroGemini({ data, viewMode }: TourHeroGeminiProps) {
         {/* Brand Tag */}
         <div className="mb-4">
           <span className="inline-flex items-center gap-2 bg-[#c9aa7c] text-[#3a3633] text-xs font-bold px-5 py-2 rounded-full tracking-wider">
-            CORNER TRAVEL
+            VENTURO
           </span>
         </div>
 

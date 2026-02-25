@@ -97,8 +97,8 @@ function NewItineraryPageContent() {
   // Print itinerary data (只在 type === 'print' 時使用)
   const [printData, setPrintData] = useState({
     coverImage: '',
-    tagline: '角落嚴選行程',
-    taglineEn: 'EXPLORE EVERY CORNER OF THE WORLD',
+    tagline: '精選行程',
+    taglineEn: 'EXPLORE THE WORLD',
     title: '越南峴港經典五日',
     subtitle: '峴港的晨曦喚醒沉睡的古城，海風捎來遠方的故事\n在黃牆老屋與法式城堡之間，找到屬於自己的越式慢時光',
     price: '35,500',

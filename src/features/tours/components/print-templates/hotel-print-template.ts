@@ -1,6 +1,7 @@
 import type { Tour } from '@/stores/types'
 import type { OrderMember } from '@/features/orders/types/order-member.types'
 import { TOUR_PRINT_DIALOG_LABELS } from '../../constants/labels'
+import { getCompanyInfo } from '@/lib/workspace-company-info'
 
 interface HotelPrintOptions {
   tour: Tour
@@ -45,7 +46,7 @@ export function generateHotelPrintContent({ tour, members }: HotelPrintOptions):
       return `
       <div class="page" style="${index > 0 ? 'page-break-before: always;' : ''}">
         <div class="header">
-          <div class="company">${TOUR_PRINT_DIALOG_LABELS.角落旅行社股份有限公司}</div>
+          <div class="company">${getCompanyInfo().fullName}</div>
           <div class="address">台北市大同區重慶北路一段67號八樓之二</div>
         </div>
         <h2>住宿確認單</h2>

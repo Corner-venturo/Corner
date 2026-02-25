@@ -15,6 +15,7 @@ import { supabase } from '@/lib/supabase/client'
 import { COMPANY } from '@/lib/constants/company'
 import { PRINTABLE_QUICK_QUOTE_LABELS, PAYMENT_INFO_LABELS, DIALOGS_CONTAINER_LABELS, ACCOMMODATION_ITEM_ROW_LABELS, QUOTES_PAGE_LABELS, QUOTES_LIST_LABELS, QUICK_QUOTE_SECTION_LABELS } from '@/constants/labels';
 import { QUOTE_COMPONENT_LABELS } from '../constants/labels'
+import { useAuthStore } from '@/stores/auth-store'
 
 interface PrintableQuickQuoteProps {
   quote: Quote
@@ -34,6 +35,8 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
   const [isMounted, setIsMounted] = useState(false)
   const [logoUrl, setLogoUrl] = useState<string>('')
   const printContentRef = useRef<HTMLDivElement>(null)
+  const workspaceName = useAuthStore(state => state.user?.workspace_name) || ''
+  const companyFullName = workspaceName ? `${workspaceName}股份有限公司` : ''
 
   useEffect(() => {
     setIsMounted(true)
@@ -432,13 +435,13 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
             {logoUrl ? (
               <div className="logo" style={{ position: 'absolute', left: 0, top: 0, width: '120px', height: '40px' }}>
                 <img src={logoUrl}
-                  alt={PRINTABLE_QUICK_QUOTE_LABELS.角落旅行社_Logo}
+                  alt={PRINTABLE_QUICK_QUOTE_LABELS.公司_Logo_Alt}
                   style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left top' }}
                 />
               </div>
             ) : (
               <div style={{ position: 'absolute', left: 0, top: 0, fontSize: '12px', color: '#9CA3AF' }}>
-                {PRINTABLE_QUICK_QUOTE_LABELS.角落旅行社}
+                {workspaceName}
               </div>
             )}
             <div className="title-area" style={{ textAlign: 'center', padding: '8px 0' }}>
@@ -565,7 +568,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
             <div>
               <div className="payment-title" style={{ fontWeight: 600, color: '#333333', marginBottom: '8px' }}>{PRINTABLE_QUICK_QUOTE_LABELS.匯款資訊}</div>
               <div className="payment-info" style={{ color: '#4B5563', lineHeight: 1.8 }}>
-                <div>{PRINTABLE_QUICK_QUOTE_LABELS.戶名_角落旅行社}</div>
+                <div>{PRINTABLE_QUICK_QUOTE_LABELS.戶名前綴}{companyFullName}</div>
                 <div>{PAYMENT_INFO_LABELS.銀行}</div>
                 <div>{PAYMENT_INFO_LABELS.分行}</div>
                 <div>{PAYMENT_INFO_LABELS.帳號}</div>
@@ -574,7 +577,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
             <div>
               <div className="payment-title" style={{ fontWeight: 600, color: '#333333', marginBottom: '8px' }}>{PRINTABLE_QUICK_QUOTE_LABELS.支票資訊}</div>
               <div className="payment-info" style={{ color: '#4B5563', lineHeight: 1.8 }}>
-                <div>{PRINTABLE_QUICK_QUOTE_LABELS.抬頭_角落旅行社}</div>
+                <div>{PRINTABLE_QUICK_QUOTE_LABELS.抬頭前綴}{companyFullName}</div>
                 <div className="warning" style={{ color: '#DC2626', fontWeight: 600 }}>{PRINTABLE_QUICK_QUOTE_LABELS.禁止背書轉讓}</div>
                 <div className="note" style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '8px' }}>{PRINTABLE_QUICK_QUOTE_LABELS.請於出發日前付清餘額}</div>
               </div>
@@ -602,7 +605,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
               {COMPANY.subtitle}
             </div>
             <div className="footer-copyright" style={{ fontSize: '11px', color: '#D1D5DB' }}>
-              {PRINTABLE_QUICK_QUOTE_LABELS.角落旅行社版權} {new Date().getFullYear()}
+              {companyFullName} {PRINTABLE_QUICK_QUOTE_LABELS.版權前綴} {new Date().getFullYear()}
             </div>
           </div>
         </div>

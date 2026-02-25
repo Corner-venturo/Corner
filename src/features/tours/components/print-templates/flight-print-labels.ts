@@ -7,13 +7,13 @@
 const PLANE_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>'
 
 export const FLIGHT_PRINT_LABELS = {
-  // Company
-  COMPANY_NAME: '角落旅行社',
-  COMPANY_ADDRESS: '台北市大同區重慶北路一段67號八樓之二',
-  COMPANY_TEL: '02-7751-6051',
-  COMPANY_FAX: '02-2555-3098',
-  COMPANY_EMAIL: 'sales@cornertravel.com.tw',
-  FOOTER_COMPANY_LINE: '此文件由角落旅行社股份有限公司發出 | 交觀甲 XXXX | 品保北 XXXX',
+  // Company — 由呼叫端從 workspace 帶入，這裡只放預設值
+  COMPANY_NAME: '',
+  COMPANY_ADDRESS: '',
+  COMPANY_TEL: '',
+  COMPANY_FAX: '',
+  COMPANY_EMAIL: '',
+  FOOTER_COMPANY_LINE: '',
 
   // Passenger row
   PASSENGER_NAME_LABEL: '旅客姓名 Passenger',

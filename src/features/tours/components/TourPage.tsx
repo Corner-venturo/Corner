@@ -285,7 +285,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
               )}
             </div>
             <p className="text-morandi-secondary mb-6 text-sm">{COMPANY.subtitle}</p>
-            <p className="text-morandi-secondary text-xs">© {new Date().getFullYear()} Corner Travel. All rights reserved.</p>
+            <p className="text-morandi-secondary text-xs">© {new Date().getFullYear()} {COMPANY.name}. All rights reserved.</p>
           </div>
         </div>
       </footer>

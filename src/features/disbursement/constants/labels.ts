@@ -57,7 +57,7 @@ export const DISBURSEMENT_LABELS = {
   移除請款單失敗_2: '移除請款單失敗:',
   總金額: '總金額',
   自動產生: '自動產生',
-  角落旅行社: '角落旅行社',
+  公司Logo_Alt: 'Company Logo',
   請款中: '請款中',
   請款單數: '請款單數',
   請款單號: '請款單號',
@@ -120,7 +120,7 @@ export const DISBURSEMENT_LABELS = {
   LABEL_6208: '請款編號',
   NOT_FOUND_1858: '沒有符合條件的請款單',
   COMPANY_SLOGAN: '─ 如果可以，讓我們一起探索世界的每個角落 ─',
-  COMPANY_FULL_NAME: '角落旅行社股份有限公司',
+  COMPANY_FULL_NAME: '', // 動態從 workspace 讀取
   PRINT_PREVIEW: '列印預覽',
   DISBURSEMENT_TITLE: '出納單',
   ITEMS_COUNT_SUFFIX: ' 筆',

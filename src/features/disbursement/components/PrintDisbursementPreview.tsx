@@ -18,6 +18,7 @@ import React, { forwardRef, useMemo } from 'react'
 import type { DisbursementOrder, PaymentRequest, PaymentRequestItem } from '@/stores/types'
 import { formatDate } from '@/lib/utils'
 import { DISBURSEMENT_LABELS } from '../constants/labels'
+import { useAuthStore } from '@/stores/auth-store'
 
 // Morandi 色系
 const COLORS = {
@@ -133,6 +134,9 @@ function splitLargeGroups(groups: PayForGroup[], maxSize = 5): PayForGroup[] {
 
 export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisbursementPreviewProps>(
   function PrintDisbursementPreview({ order, paymentRequests, paymentRequestItems }, ref) {
+    const workspaceName = useAuthStore(state => state.user?.workspace_name) || ''
+    const companyFullName = workspaceName ? `${workspaceName}股份有限公司` : ''
+
     const processedItems = useMemo(
       () => processItems(paymentRequests, paymentRequestItems),
       [paymentRequests, paymentRequestItems]
@@ -193,7 +197,7 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
             top: 0,
           }}>
             <img src="/corner-logo.png"
-              alt={DISBURSEMENT_LABELS.角落旅行社}
+              alt={DISBURSEMENT_LABELS.公司Logo_Alt}
               style={{
                 height: '36px',
                 width: 'auto',
@@ -429,7 +433,7 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
             color: COLORS.lightGray,
             margin: 0,
           }}>
-            {DISBURSEMENT_LABELS.COMPANY_FULL_NAME} © {new Date().getFullYear()}
+            {companyFullName} © {new Date().getFullYear()}
           </p>
         </div>
       </div>

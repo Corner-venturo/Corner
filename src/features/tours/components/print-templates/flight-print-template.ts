@@ -5,6 +5,7 @@ import { SSRCategory } from '@/lib/pnr-parser/types'
 import type { EnhancedSSR, EnhancedOSI } from '@/lib/pnr-parser'
 import { CLASS_NAMES } from '../tour-print-constants'
 import { FLIGHT_PRINT_LABELS } from './flight-print-labels'
+import { getCompanyInfo, getCompanyFooterLine } from '@/lib/workspace-company-info'
 
 // ─── Types ───
 
@@ -260,6 +261,9 @@ export function generateFlightPrintContent({
 }: FlightPrintOptions): string {
   const pages = members.map((member, pageIndex) => {
     const formatPassportName = (name: string) => name.toUpperCase().replace('/', ' / ')
+    const companyInfo = getCompanyInfo()
+    const companyFooter = getCompanyFooterLine()
+
     const passengerName = member.passport_name
       ? formatPassportName(member.passport_name)
       : member.chinese_name || ''
@@ -328,15 +332,15 @@ export function generateFlightPrintContent({
 
         <div class="header">
           <div class="header-left">
-            <div class="logo-box">
-              <span class="logo-letter">C</span>
-            </div>
+            ${companyInfo.name ? `<div class="logo-box">
+              <span class="logo-letter">${companyInfo.name.charAt(0)}</span>
+            </div>` : ''}
             <div class="company-info">
-              <h1>${FLIGHT_PRINT_LABELS.COMPANY_NAME}</h1>
-              <p>
-                ${FLIGHT_PRINT_LABELS.COMPANY_ADDRESS}<br/>
-                TEL ${FLIGHT_PRINT_LABELS.COMPANY_TEL} | ${FLIGHT_PRINT_LABELS.COMPANY_EMAIL}
-              </p>
+              <h1>${escapeHtml(companyInfo.name)}</h1>
+              ${companyInfo.address || companyInfo.tel || companyInfo.email ? `<p>
+                ${companyInfo.address ? `${escapeHtml(companyInfo.address)}<br/>` : ''}
+                ${companyInfo.tel ? `TEL ${escapeHtml(companyInfo.tel)}` : ''}${companyInfo.tel && companyInfo.email ? ' | ' : ''}${companyInfo.email ? escapeHtml(companyInfo.email) : ''}
+              </p>` : ''}
             </div>
           </div>
         </div>
@@ -378,13 +382,13 @@ export function generateFlightPrintContent({
         </div>
 
         <div class="footer">
-          <div class="footer-notice">${FLIGHT_PRINT_LABELS.FOOTER_COMPANY_LINE}</div>
-          <div class="footer-contact">
-            <span>${FLIGHT_PRINT_LABELS.COMPANY_ADDRESS}</span>
-            <span>TEL ${FLIGHT_PRINT_LABELS.COMPANY_TEL}</span>
-            <span>FAX ${FLIGHT_PRINT_LABELS.COMPANY_FAX}</span>
-            <span>${FLIGHT_PRINT_LABELS.COMPANY_EMAIL}</span>
-          </div>
+          ${companyFooter ? `<div class="footer-notice">${escapeHtml(companyFooter)}</div>` : ''}
+          ${companyInfo.address || companyInfo.tel || companyInfo.fax || companyInfo.email ? `<div class="footer-contact">
+            ${companyInfo.address ? `<span>${escapeHtml(companyInfo.address)}</span>` : ''}
+            ${companyInfo.tel ? `<span>TEL ${escapeHtml(companyInfo.tel)}</span>` : ''}
+            ${companyInfo.fax ? `<span>FAX ${escapeHtml(companyInfo.fax)}</span>` : ''}
+            ${companyInfo.email ? `<span>${escapeHtml(companyInfo.email)}</span>` : ''}
+          </div>` : ''}
         </div>
       </div>
     `

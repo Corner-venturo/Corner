@@ -6,7 +6,8 @@
 
 import React from 'react'
 import { MORANDI_COLORS } from './print-styles'
-import { PRINTABLE_QUICK_QUOTE_LABELS } from '../../../constants/labels';
+import { PRINTABLE_QUICK_QUOTE_LABELS } from '../../../constants/labels'
+import { useAuthStore } from '@/stores/auth-store'
 
 interface PrintHeaderProps {
   logoUrl?: string
@@ -19,6 +20,8 @@ export const PrintHeader: React.FC<PrintHeaderProps> = ({
   title,
   subtitle = 'QUOTATION',
 }) => {
+  const workspaceName = useAuthStore(state => state.user?.workspace_name) || ''
+
   return (
     <div
       className="relative pb-4 mb-6"
@@ -31,7 +34,7 @@ export const PrintHeader: React.FC<PrintHeaderProps> = ({
           style={{ width: '120px', height: '40px' }}
         >
           <img src={logoUrl}
-            alt={PRINTABLE_QUICK_QUOTE_LABELS.角落旅行社_Logo}
+            alt={PRINTABLE_QUICK_QUOTE_LABELS.公司_Logo_Alt}
             style={{
               width: '100%',
               height: '100%',
@@ -42,7 +45,7 @@ export const PrintHeader: React.FC<PrintHeaderProps> = ({
         </div>
       ) : (
         <div className="absolute left-0 top-0 text-xs" style={{ color: MORANDI_COLORS.lightGray }}>
-          {PRINTABLE_QUICK_QUOTE_LABELS.LABEL_3621}
+          {workspaceName}
         </div>
       )}
 

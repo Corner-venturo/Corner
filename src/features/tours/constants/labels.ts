@@ -640,7 +640,7 @@ export const TOUR_PRINT_DIALOG_LABELS = {
   成員名單_團號: (code: string) => `成員名單 - ${code}`,
   出發日期: (date: string) => `出發日期：${date}`,
   總人數: (count: number) => `總人數：${count} 人`,
-  角落旅行社股份有限公司: '角落旅行社股份有限公司',
+  角落旅行社股份有限公司: '', // 動態從 workspace 讀取
   電子機票號碼_E_TICKET_NUMBER: '電子機票號碼 E-TICKET NUMBER',
   電腦代號_PNR: '電腦代號 PNR',
   旅客姓名_PASSENGER_NAME: '旅客姓名 PASSENGER NAME',

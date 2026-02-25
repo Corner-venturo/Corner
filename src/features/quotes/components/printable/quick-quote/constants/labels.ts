@@ -14,9 +14,9 @@ export const QUICK_QUOTE_LABELS = {
   EMPTY_842: '尚無收費項目',
 
   LABEL_5832: '匯款資訊',
-  LABEL_8910: '戶名：角落旅行社股份有限公司',
+  LABEL_8910_PREFIX: '戶名：',
   LABEL_9304: '支票資訊',
-  LABEL_5024: '抬頭：角落旅行社股份有限公司',
+  LABEL_5024_PREFIX: '抬頭：',
   LABEL_2697: '禁止背書轉讓',
 
   LABEL_4917: '收據資訊',
