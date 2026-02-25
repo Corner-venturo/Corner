@@ -67,6 +67,7 @@ export async function middleware(request: NextRequest) {
 
   // 公開路由：不需要登入即可訪問（prefix 匹配）
   const publicPaths = [
+    '/landing',
     '/login',
     '/confirm', // 報價確認頁面（客戶公開連結）
     '/api/auth',
