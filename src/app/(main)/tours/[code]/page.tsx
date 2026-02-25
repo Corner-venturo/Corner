@@ -80,7 +80,7 @@ export default function TourDetailPage() {
         title={CODE_LABELS.LOADING_6912}
         icon={MapPin}
         breadcrumb={[
-          { label: TOUR_DETAIL_PAGE_LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: TOUR_DETAIL_PAGE_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
           { label: TOUR_DETAIL_PAGE_LABELS.BREADCRUMB_TOURS, href: '/tours' },
           { label: code, href: `/tours/${code}` },
         ]}
@@ -101,7 +101,7 @@ export default function TourDetailPage() {
         title={CODE_LABELS.NOT_FOUND_9865}
         icon={MapPin}
         breadcrumb={[
-          { label: TOUR_DETAIL_PAGE_LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: TOUR_DETAIL_PAGE_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
           { label: TOUR_DETAIL_PAGE_LABELS.BREADCRUMB_TOURS, href: '/tours' },
           { label: code, href: `/tours/${code}` },
         ]}
@@ -123,7 +123,7 @@ export default function TourDetailPage() {
       title={tour.name}
       icon={MapPin}
       breadcrumb={[
-        { label: TOUR_DETAIL_PAGE_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: TOUR_DETAIL_PAGE_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
         { label: TOUR_DETAIL_PAGE_LABELS.BREADCRUMB_TOURS, href: '/tours' },
         { label: `${tour.code} ${tour.name}`, href: `/tours/${code}` },
       ]}

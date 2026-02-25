@@ -28,7 +28,7 @@ export default function UnauthorizedPage() {
             {LABELS.LABEL_3074}
           </Button>
 
-          <Button onClick={() => router.push('/')} className="w-full gap-2">
+          <Button onClick={() => router.push('/dashboard')} className="w-full gap-2">
             <Home size={16} />
             {LABELS.LABEL_1027}
           </Button>

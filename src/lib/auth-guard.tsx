@@ -105,7 +105,7 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
 
       // 3. 檢查路由權限
       const hasRoutePermission = hasPermissionForRoute(permissions, pathname)
-      if (!hasRoutePermission && pathname !== '/') {
+      if (!hasRoutePermission && pathname !== '/dashboard') {
         logger.warn(`用戶無權限訪問路由 ${pathname}`)
         redirectingRef.current = true
         router.push('/unauthorized')

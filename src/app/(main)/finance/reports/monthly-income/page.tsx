@@ -197,7 +197,7 @@ export default function MonthlyIncomeReportPage() {
     <ContentPageLayout
       title={MONTHLY_INCOME_LABELS.LABEL_120}
       breadcrumb={[
-        { label: MONTHLY_INCOME_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: MONTHLY_INCOME_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
         { label: MONTHLY_INCOME_LABELS.BREADCRUMB_FINANCE, href: '/finance' },
         { label: MONTHLY_INCOME_LABELS.BREADCRUMB_REPORTS, href: '/finance/reports' },
         { label: MONTHLY_INCOME_LABELS.LABEL_120, href: '/finance/reports/monthly-income' },

@@ -292,7 +292,7 @@ export function AttendanceManagementPage() {
       title={L.page_title}
       icon={Clock}
       breadcrumb={[
-        { label: L.breadcrumb_home, href: '/' },
+        { label: L.breadcrumb_home, href: '/dashboard' },
         { label: L.breadcrumb_hr, href: '/hr' },
         { label: L.breadcrumb_attendance, href: '/hr/attendance' },
       ]}

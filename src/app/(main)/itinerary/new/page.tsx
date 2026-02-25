@@ -193,7 +193,7 @@ function NewItineraryPageContent() {
       <ContentPageLayout
         title={EDITOR_LABELS.ADD_9998}
         breadcrumb={[
-          { label: EDITOR_LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: EDITOR_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
           { label: EDITOR_LABELS.BREADCRUMB_ITINERARY_MGMT, href: '/itinerary' },
           { label: EDITOR_LABELS.ADD_9998, href: '#' },
         ]}

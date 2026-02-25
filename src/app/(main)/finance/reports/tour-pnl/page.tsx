@@ -158,7 +158,7 @@ export default function TourPnLPage() {
     <ListPageLayout
       title={TOUR_PNL_LABELS.TOTAL_2832}
       breadcrumb={[
-        { label: TOUR_PNL_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: TOUR_PNL_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
         { label: TOUR_PNL_LABELS.BREADCRUMB_FINANCE, href: '/finance' },
         { label: TOUR_PNL_LABELS.BREADCRUMB_REPORTS, href: '/finance/reports' },
         { label: TOUR_PNL_LABELS.TOTAL_2832, href: '/finance/reports/tour-pnl' },

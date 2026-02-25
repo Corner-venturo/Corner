@@ -190,7 +190,7 @@ export function WorkspacesManagePage() {
         title={WORKSPACES_LABELS.公司管理}
         icon={Building2}
         breadcrumb={[
-          { label: WORKSPACES_LABELS.首頁, href: '/' },
+          { label: WORKSPACES_LABELS.首頁, href: '/dashboard' },
           { label: WORKSPACES_LABELS.資料庫管理, href: '/database' },
           { label: WORKSPACES_LABELS.公司管理, href: '/database/workspaces' },
         ]}

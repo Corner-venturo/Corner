@@ -94,11 +94,12 @@ export function CustomerVerifyDialog({
 
       if (uploadError) throw uploadError
 
-      const { data: urlData } = supabase.storage
+      const { data: urlData, error: urlError } = await supabase.storage
         .from('passport-images')
-        .getPublicUrl(fileName)
+        .createSignedUrl(fileName, 3600)
 
-      const newUrl = urlData.publicUrl
+      if (urlError || !urlData?.signedUrl) throw urlError || new Error('Failed to create signed URL')
+      const newUrl = urlData.signedUrl
 
       // 更新本地顯示
       setLocalImageUrl(newUrl)
@@ -211,12 +212,13 @@ export function CustomerVerifyDialog({
 
       if (uploadError) throw uploadError
 
-      const { data: urlData } = supabase.storage
+      const { data: urlData, error: urlError } = await supabase.storage
         .from('passport-images')
-        .getPublicUrl(fileName)
+        .createSignedUrl(fileName, 3600)
 
+      if (urlError || !urlData?.signedUrl) throw urlError || new Error('Failed to create signed URL')
       // 更新本地顯示
-      setLocalImageUrl(urlData.publicUrl)
+      setLocalImageUrl(urlData.signedUrl)
 
       // 刪除舊照片
       await deleteOldPassportImage(oldUrl)

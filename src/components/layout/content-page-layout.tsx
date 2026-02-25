@@ -106,7 +106,7 @@ export interface ContentPageLayoutProps {
  * <ContentPageLayout
  *   title="財務報表"
  *   breadcrumb={[
- *     { label: '首頁', href: '/' },
+ *     { label: '首頁', href: '/dashboard' },
  *     { label: '財務報表', href: '/finance/reports' },
  *   ]}
  * >

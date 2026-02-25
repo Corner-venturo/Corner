@@ -152,7 +152,7 @@ export default function UnpaidOrdersPage() {
     <ListPageLayout
       title={UNPAID_ORDERS_LABELS.LABEL_1474}
       breadcrumb={[
-        { label: UNPAID_ORDERS_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: UNPAID_ORDERS_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
         { label: UNPAID_ORDERS_LABELS.BREADCRUMB_FINANCE, href: '/finance' },
         { label: UNPAID_ORDERS_LABELS.BREADCRUMB_REPORTS, href: '/finance/reports' },
         { label: UNPAID_ORDERS_LABELS.LABEL_1474, href: '/finance/reports/unpaid-orders' },

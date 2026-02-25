@@ -336,7 +336,7 @@ export function LeaveManagementPage() {
       title={L.page_title}
       icon={Calendar}
       breadcrumb={[
-        { label: L.breadcrumb_home, href: '/' },
+        { label: L.breadcrumb_home, href: '/dashboard' },
         { label: L.breadcrumb_hr, href: '/hr' },
         { label: L.breadcrumb_leave, href: '/hr/leave' },
       ]}

@@ -300,7 +300,7 @@ export function PayrollManagementPage() {
       title={L.page_title}
       icon={DollarSign}
       breadcrumb={[
-        { label: L.breadcrumb_home, href: '/' },
+        { label: L.breadcrumb_home, href: '/dashboard' },
         { label: L.breadcrumb_hr, href: '/hr' },
         { label: L.breadcrumb_payroll, href: '/hr/payroll' },
       ]}

@@ -182,7 +182,7 @@ export const CompanyAssetsPage: React.FC = () => {
       title={COMPANY_ASSETS_LABELS.公司資源管理}
       icon={FolderArchive}
       breadcrumb={[
-        { label: COMPANY_ASSETS_LABELS.首頁, href: '/' },
+        { label: COMPANY_ASSETS_LABELS.首頁, href: '/dashboard' },
         { label: COMPANY_ASSETS_LABELS.資料庫管理, href: '/database' },
         { label: COMPANY_ASSETS_LABELS.公司資源管理, href: '/database/company-assets' },
       ]}

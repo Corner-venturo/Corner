@@ -75,7 +75,7 @@ export function useSwipeNavigation(config: SwipeConfig = {}) {
 
       // 找到當前頁面在導航項目中的索引
       const currentIndex = selectedItems.findIndex(item => {
-        if (item.href === '/') return pathname === '/'
+        if (item.href === '/dashboard') return pathname === '/dashboard'
         return pathname.startsWith(item.href)
       })
 

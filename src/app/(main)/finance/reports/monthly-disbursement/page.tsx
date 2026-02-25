@@ -247,7 +247,7 @@ export default function MonthlyDisbursementReportPage() {
     <ContentPageLayout
       title={MONTHLY_DISBURSEMENT_LABELS.LABEL_3446}
       breadcrumb={[
-        { label: MONTHLY_DISBURSEMENT_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: MONTHLY_DISBURSEMENT_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
         { label: MONTHLY_DISBURSEMENT_LABELS.BREADCRUMB_FINANCE, href: '/finance' },
         { label: MONTHLY_DISBURSEMENT_LABELS.BREADCRUMB_REPORTS, href: '/finance/reports' },
         { label: MONTHLY_DISBURSEMENT_LABELS.LABEL_3446, href: '/finance/reports/monthly-disbursement' },

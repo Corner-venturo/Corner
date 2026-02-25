@@ -19,7 +19,7 @@ export default function NotFound() {
         </h2>
         <p style={{ color: '#666', marginBottom: '2rem' }}>{ERROR_PAGE_LABELS.LABEL_9421}</p>
         <Link
-          href="/"
+          href="/dashboard"
           style={{
             display: 'inline-block',
             padding: '0.5rem 1.5rem',

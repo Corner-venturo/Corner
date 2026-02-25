@@ -98,7 +98,7 @@ export const ConfirmationsPage: React.FC = () => {
       title={CONFIRMATIONS_LABELS.MANAGE_4795}
       icon={FileCheck}
       breadcrumb={[
-        { label: '首頁', href: '/' },
+        { label: '首頁', href: '/dashboard' },
         { label: '確認單管理', href: '/confirmations' },
       ]}
       tabs={STATUS_FILTERS.map(f => ({

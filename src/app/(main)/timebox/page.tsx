@@ -79,7 +79,7 @@ export default function TimeboxPage() {
       title={LABELS.LABEL_9636}
       icon={Clock}
       breadcrumb={[
-        { label: '首頁', href: '/' },
+        { label: '首頁', href: '/dashboard' },
         { label: '箱型時間', href: '/timebox' }
       ]}
       contentClassName="flex-1 overflow-hidden"

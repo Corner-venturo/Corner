@@ -393,7 +393,7 @@ export default function TourClosingReportPage() {
       title={TOUR_CLOSING_LABELS.LABEL_5942}
       icon={FileText}
       breadcrumb={[
-        { label: TOUR_CLOSING_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: TOUR_CLOSING_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
         { label: TOUR_CLOSING_LABELS.BREADCRUMB_REPORTS, href: '/reports' },
         { label: TOUR_CLOSING_LABELS.BREADCRUMB_TOUR_CLOSING, href: '/reports/tour-closing' },
       ]}

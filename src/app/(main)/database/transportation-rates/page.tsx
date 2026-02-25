@@ -74,7 +74,7 @@ export default function TransportationRatesPage() {
       title={TRANSPORTATION_RATES_LABELS.PAGE_TITLE}
       icon={Bus}
       breadcrumb={[
-        { label: TRANSPORTATION_RATES_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: TRANSPORTATION_RATES_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
         { label: TRANSPORTATION_RATES_LABELS.BREADCRUMB_DATABASE, href: '/database' },
         { label: TRANSPORTATION_RATES_LABELS.BREADCRUMB_RATES, href: '/database/transportation-rates' },
       ]}

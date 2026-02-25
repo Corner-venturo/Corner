@@ -37,7 +37,7 @@ export function DesignPage({
   const { deleteDesign, duplicateDesign } = useDesigns()
 
   const defaultBreadcrumb = [
-    { label: LABELS.home, href: '/' },
+    { label: LABELS.home, href: '/dashboard' },
     { label: title, href: '#' },
   ]
 

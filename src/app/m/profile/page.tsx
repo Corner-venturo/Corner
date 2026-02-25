@@ -40,7 +40,7 @@ export default function MobileProfilePage() {
       title: '顯示設定',
       items: [
         { icon: Moon, label: '深色模式', href: '#', badge: '即將推出' },
-        { icon: Monitor, label: '切換桌面版', href: '/' },
+        { icon: Monitor, label: '切換桌面版', href: '/dashboard' },
       ],
     },
     {

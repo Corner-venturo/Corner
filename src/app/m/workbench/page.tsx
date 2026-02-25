@@ -121,7 +121,7 @@ export default function MobileWorkbenchPage() {
       {/* 切換到桌面版 */}
       <div className="p-4 mt-4">
         <Link
-          href="/"
+          href="/dashboard"
           className="block w-full py-3 text-center text-sm text-morandi-secondary
                      bg-morandi-container/50 rounded-xl hover:bg-morandi-container transition-colors"
         >

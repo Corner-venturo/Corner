@@ -220,7 +220,7 @@ export default function ContractsPage() {
         title={CONTRACTS_LABELS.PAGE_TITLE}
         icon={FileSignature}
         breadcrumb={[
-          { label: CONTRACTS_LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: CONTRACTS_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
           { label: CONTRACTS_LABELS.BREADCRUMB_CONTRACTS, href: '/contracts' },
         ]}
         data={contractTours}

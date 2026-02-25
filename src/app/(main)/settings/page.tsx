@@ -76,7 +76,7 @@ export default function SettingsPage() {
     <ContentPageLayout
       title={LABELS.SYSTEM_SETTINGS}
       breadcrumb={[
-        { label: LABELS.HOME, href: '/' },
+        { label: LABELS.HOME, href: '/dashboard' },
         { label: LABELS.SETTINGS, href: '/settings' },
       ]}
       headerActions={

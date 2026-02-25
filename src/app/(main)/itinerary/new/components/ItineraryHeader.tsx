@@ -27,7 +27,7 @@ export function ItineraryHeader({
     <ResponsiveHeader
       title={tourData.tourCode ? NEW_LABELS.EDIT_ITINERARY_TITLE(tourData.tourCode) : NEW_LABELS.NEW_WEB_ITINERARY}
       breadcrumb={[
-        { label: NEW_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: NEW_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
         { label: NEW_LABELS.BREADCRUMB_ITINERARY_MGMT, href: '/itinerary' },
         { label: tourData.tourCode ? NEW_LABELS.EDIT_BREADCRUMB(tourData.tourCode) : NEW_LABELS.NEW_WEB_ITINERARY, href: '#' },
       ]}

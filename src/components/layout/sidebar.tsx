@@ -55,7 +55,7 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-  { href: '/', label: COMP_LAYOUT_LABELS.首頁, icon: Home },
+  { href: '/dashboard', label: COMP_LAYOUT_LABELS.首頁, icon: Home },
   { href: '/calendar', label: COMP_LAYOUT_LABELS.行事曆, icon: Calendar, requiredPermission: 'calendar' },
   { href: '/workspace', label: COMP_LAYOUT_LABELS.工作空間, icon: Building2, requiredPermission: 'workspace' },
   // 郵件系統暫時隱藏（目前使用 Google Workspace）
@@ -128,7 +128,7 @@ const menuItems: MenuItem[] = [
 
 // 供應商專用選單（車行、領隊公司）
 const supplierMenuItems: MenuItem[] = [
-  { href: '/', label: COMP_LAYOUT_LABELS.首頁, icon: Home },
+  { href: '/dashboard', label: COMP_LAYOUT_LABELS.首頁, icon: Home },
   { href: '/supplier/requests', label: COMP_LAYOUT_LABELS.需求收件匣, icon: ClipboardList },
   { href: '/supplier/dispatch', label: COMP_LAYOUT_LABELS.派單管理, icon: Truck }, // 車行專用
   { href: '/database/fleet', label: COMP_LAYOUT_LABELS.車隊管理, icon: Bus }, // 車行專用
@@ -199,7 +199,7 @@ export function Sidebar() {
 
   const is_active = (href: string) => {
     if (!mounted) return false
-    if (href === '/') return pathname === '/'
+    if (href === '/dashboard') return pathname === '/dashboard'
     return pathname.startsWith(href)
   }
 

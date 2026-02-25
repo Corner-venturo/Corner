@@ -246,7 +246,7 @@ function BlockEditorPageContent() {
     <ContentPageLayout
       title={BLOCK_EDITOR_LABELS.BLOCK_EDITOR}
       breadcrumb={[
-        { label: BLOCK_EDITOR_LABELS.HOME, href: '/' },
+        { label: BLOCK_EDITOR_LABELS.HOME, href: '/dashboard' },
         { label: BLOCK_EDITOR_LABELS.ITINERARY_MGMT, href: '/itinerary' },
         { label: BLOCK_EDITOR_LABELS.BLOCK_EDITOR, href: '#' },
       ]}

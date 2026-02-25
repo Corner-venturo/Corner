@@ -35,7 +35,7 @@ export const TourFilters: React.FC<TourFiltersProps> = ({
       title={TOUR_FILTERS.page_title}
       icon={MapPin}
       breadcrumb={[
-        { label: TOUR_FILTERS.breadcrumb_home, href: '/' },
+        { label: TOUR_FILTERS.breadcrumb_home, href: '/dashboard' },
         { label: TOUR_FILTERS.breadcrumb_tours, href: '/tours' },
       ]}
       showSearch={true}

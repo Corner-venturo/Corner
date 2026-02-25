@@ -45,7 +45,7 @@ export default function LoginPage() {
     if (lastPath && lastPath !== '/login') {
       return lastPath
     }
-    return '/'
+    return '/dashboard'
   }
 
   const demoCompanyCode = process.env.NEXT_PUBLIC_DEMO_COMPANY_CODE
@@ -62,7 +62,7 @@ export default function LoginPage() {
       const result = await validateLogin(demoEmployeeId, demoPassword, demoCompanyCode, true)
 
       if (result.success) {
-        router.push('/')
+        router.push('/dashboard')
       } else {
         setError(result.message || '體驗帳號登入失敗')
       }

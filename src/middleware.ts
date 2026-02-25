@@ -60,7 +60,12 @@ export async function middleware(request: NextRequest) {
   const authCookie = request.cookies.get('auth-token')
   const { pathname } = request.nextUrl
 
-  // 公開路由：不需要登入即可訪問
+  // 根路由（Landing Page）為精確匹配
+  if (pathname === '/') {
+    return NextResponse.next()
+  }
+
+  // 公開路由：不需要登入即可訪問（prefix 匹配）
   const publicPaths = [
     '/login',
     '/confirm', // 報價確認頁面（客戶公開連結）
@@ -93,7 +98,7 @@ export async function middleware(request: NextRequest) {
 
   // 建立重定向到登入頁的 URL
   const loginUrl = new URL('/login', request.url)
-  if (pathname !== '/') {
+  if (pathname !== '/dashboard') {
     loginUrl.searchParams.set('redirect', pathname)
   }
 

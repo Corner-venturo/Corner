@@ -240,7 +240,7 @@ export const QuotesPage: React.FC = () => {
       title={QUOTES_PAGE_LABELS.報價單管理}
       icon={Calculator}
       breadcrumb={[
-        { label: QUOTES_PAGE_LABELS.首頁, href: '/' },
+        { label: QUOTES_PAGE_LABELS.首頁, href: '/dashboard' },
         { label: QUOTES_PAGE_LABELS.報價單管理, href: '/quotes' },
       ]}
       tabs={STATUS_TABS}

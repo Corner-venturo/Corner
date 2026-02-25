@@ -165,7 +165,7 @@ export default function UnclosedToursReportPage() {
     <ContentPageLayout
       title={UNCLOSED_TOURS_LABELS.LABEL_996}
       breadcrumb={[
-        { label: UNCLOSED_TOURS_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: UNCLOSED_TOURS_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
         { label: UNCLOSED_TOURS_LABELS.BREADCRUMB_FINANCE, href: '/finance' },
         { label: UNCLOSED_TOURS_LABELS.BREADCRUMB_REPORTS, href: '/finance/reports' },
         { label: UNCLOSED_TOURS_LABELS.LABEL_996, href: '/finance/reports/unclosed-tours' },

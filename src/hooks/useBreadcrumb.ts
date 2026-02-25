@@ -71,7 +71,7 @@ export interface UseBreadcrumbOptions {
  * // 完全自訂
  * const breadcrumb = useBreadcrumb({
  *   customItems: [
- *     { label: '首頁', href: '/' },
+ *     { label: '首頁', href: '/dashboard' },
  *     { label: '報價單', href: '/quotes' },
  *   ],
  * })

@@ -176,7 +176,7 @@ export default function EditConfirmationPage() {
       <ContentPageLayout
         title={LABELS.EDIT_CONFIRMATION}
         breadcrumb={[
-          { label: LABELS.HOME, href: '/' },
+          { label: LABELS.HOME, href: '/dashboard' },
           { label: LABELS.CONFIRMATIONS_MANAGEMENT, href: '/confirmations' },
           { label: LABELS.EDIT_CONFIRMATION, href: '#' },
         ]}
@@ -197,7 +197,7 @@ export default function EditConfirmationPage() {
     <ContentPageLayout
       title={LABELS.EDIT_CONFIRMATION}
       breadcrumb={[
-        { label: LABELS.HOME, href: '/' },
+        { label: LABELS.HOME, href: '/dashboard' },
         { label: LABELS.CONFIRMATIONS_MANAGEMENT, href: '/confirmations' },
         { label: LABELS.EDIT_CONFIRMATION, href: '#' },
       ]}

@@ -182,7 +182,7 @@ export default function ModulesManagementPage() {
       <ContentPageLayout
         title={MODULES_PAGE_LABELS.MANAGE_8474}
         breadcrumb={[
-          { label: MODULES_PAGE_LABELS.BREADCRUMB_HOME, href: '/' },
+          { label: MODULES_PAGE_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
           { label: MODULES_PAGE_LABELS.BREADCRUMB_SETTINGS, href: '/settings' },
           { label: MODULES_PAGE_LABELS.BREADCRUMB_MODULES, href: '/settings/modules' },
         ]}

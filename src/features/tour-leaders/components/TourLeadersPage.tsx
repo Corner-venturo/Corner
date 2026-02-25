@@ -177,7 +177,7 @@ export const TourLeadersPage: React.FC = () => {
       title={TOUR_LEADERS_LABELS.PAGE_TITLE}
       icon={Users}
       breadcrumb={[
-        { label: TOUR_LEADERS_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: TOUR_LEADERS_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
         { label: TOUR_LEADERS_LABELS.BREADCRUMB_DATABASE, href: '/database' },
         { label: TOUR_LEADERS_LABELS.BREADCRUMB_TOUR_LEADERS, href: '/database/tour-leaders' },
       ]}

@@ -49,7 +49,7 @@ interface MenuItem {
 
 // 主選單項目
 const menuItems: MenuItem[] = [
-  { href: '/', label: COMP_LAYOUT_LABELS.首頁, icon: Home },
+  { href: '/dashboard', label: COMP_LAYOUT_LABELS.首頁, icon: Home },
   { href: '/calendar', label: COMP_LAYOUT_LABELS.行事曆, icon: Calendar, requiredPermission: 'calendar' },
   { href: '/workspace', label: COMP_LAYOUT_LABELS.工作空間, icon: Building2, requiredPermission: 'workspace' },
   // 旅伴通訊已整合到工作頻道中，此路由暫時隱藏

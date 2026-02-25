@@ -523,7 +523,7 @@ export default function ArchiveManagementPage() {
       title={ARCHIVE_LABELS.PAGE_TITLE}
       icon={Archive}
       breadcrumb={[
-        { label: ARCHIVE_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: ARCHIVE_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
         { label: ARCHIVE_LABELS.BREADCRUMB_DATABASE, href: '/database' },
         { label: ARCHIVE_LABELS.BREADCRUMB_ARCHIVE, href: '/database/archive-management' },
       ]}

@@ -89,7 +89,7 @@ export default function DatabaseManagementPage() {
         title={DATABASE_MANAGEMENT_PAGE_LABELS.旅遊資料庫}
         icon={MapPin}
         breadcrumb={[
-          { label: DATABASE_MANAGEMENT_PAGE_LABELS.首頁, href: '/' },
+          { label: DATABASE_MANAGEMENT_PAGE_LABELS.首頁, href: '/dashboard' },
           { label: DATABASE_MANAGEMENT_PAGE_LABELS.資料庫管理, href: '/database' },
           { label: DATABASE_MANAGEMENT_PAGE_LABELS.旅遊資料庫, href: '/database/attractions' },
         ]}

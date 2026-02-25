@@ -143,7 +143,7 @@ export default function FitnessSettingsPage() {
 
         {/* 返回主系統 */}
         <button
-          onClick={() => router.push('/')}
+          onClick={() => router.push('/dashboard')}
           className="w-full py-3 text-sm text-muted-foreground border border-border rounded-xl hover:bg-muted/50 transition-colors"
         >
           {FITNESS_SETTINGS_LABELS.BACK_TO_MAIN}

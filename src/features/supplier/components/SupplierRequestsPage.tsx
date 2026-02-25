@@ -186,7 +186,7 @@ export function SupplierRequestsPage() {
       title={SUPPLIER_LABELS.LABEL_174}
       icon={ClipboardList}
       breadcrumb={[
-        { label: SUPPLIER_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: SUPPLIER_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
         { label: SUPPLIER_LABELS.BREADCRUMB_SUPPLIER, href: '/supplier' },
         { label: SUPPLIER_LABELS.BREADCRUMB_REQUESTS, href: '/supplier/requests' },
       ]}

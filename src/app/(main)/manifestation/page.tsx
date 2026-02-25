@@ -78,7 +78,7 @@ export default function ManifestationPage() {
       title={MANIFESTATION_LABELS.LABEL_9240}
       icon={Sparkles}
       breadcrumb={[
-        { label: '首頁', href: '/' },
+        { label: '首頁', href: '/dashboard' },
         { label: '顯化魔法', href: '/manifestation' },
       ]}
       tabs={[

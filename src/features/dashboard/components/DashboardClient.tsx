@@ -132,7 +132,7 @@ export function DashboardClient() {
   return (
     <ContentPageLayout
       title={DASHBOARD_LABELS.home}
-      breadcrumb={[{ label: DASHBOARD_LABELS.home, href: '/' }]}
+      breadcrumb={[{ label: DASHBOARD_LABELS.home, href: '/dashboard' }]}
       headerActions={
         <WidgetSettingsDialog activeWidgets={activeWidgets} onToggleWidget={toggleWidget} />
       }

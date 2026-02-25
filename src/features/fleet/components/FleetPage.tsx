@@ -330,7 +330,7 @@ export const FleetPage: React.FC = () => {
       title={FLEET_LABELS.MANAGE_8153}
       icon={Bus}
       breadcrumb={[
-        { label: '首頁', href: '/' },
+        { label: '首頁', href: '/dashboard' },
         { label: '資料庫管理', href: '/database' },
         { label: '車隊管理', href: '/database/fleet' },
       ]}

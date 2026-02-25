@@ -353,7 +353,8 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
 
             if (uploadError) throw uploadError
 
-            const { data: urlData } = supabase.storage.from('passport-images').getPublicUrl(storageFileName)
+            const { data: urlData, error: urlError } = await supabase.storage.from('passport-images').createSignedUrl(storageFileName, 3600)
+            if (urlError || !urlData?.signedUrl) throw urlError || new Error('Failed to create signed URL')
 
             // 檢查與現有資料的差異
             const differences: string[] = []
@@ -397,7 +398,7 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
               fileName: file.name,
               ocrData,
               compressedFile,
-              imageUrl: urlData.publicUrl,
+              imageUrl: urlData.signedUrl,
               storageFileName,
               existingCustomer,
               matchReason,

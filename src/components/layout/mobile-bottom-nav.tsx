@@ -52,7 +52,7 @@ const ICON_MAP = {
 
 // 預設導航項目（所有可選的功能）
 export const DEFAULT_NAV_ITEMS: NavItem[] = [
-  { id: 'home', icon: 'Home', label: COMP_LAYOUT_LABELS.首頁, href: '/' },
+  { id: 'home', icon: 'Home', label: COMP_LAYOUT_LABELS.首頁, href: '/dashboard' },
   {
     id: 'calendar',
     icon: 'Calendar',
@@ -175,7 +175,7 @@ export function MobileBottomNav() {
 
   // 檢查路徑是否匹配
   const isActive = (href: string) => {
-    if (href === '/') return pathname === '/'
+    if (href === '/dashboard') return pathname === '/dashboard'
     return pathname.startsWith(href)
   }
 
@@ -201,7 +201,7 @@ export function MobileBottomNav() {
 
   // 找到當前頁面在導航項目中的索引（用於指示器）
   const currentIndex = selectedItems.findIndex(item => {
-    if (item.href === '/') return pathname === '/'
+    if (item.href === '/dashboard') return pathname === '/dashboard'
     return pathname.startsWith(item.href)
   })
 

@@ -462,7 +462,7 @@ export const SchedulingPage: React.FC = () => {
       title={SCHEDULING_LABELS.LABEL_7493}
       icon={Calendar}
       breadcrumb={[
-        { label: SCHEDULING_LABELS.BREADCRUMB_HOME, href: '/' },
+        { label: SCHEDULING_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
         { label: SCHEDULING_LABELS.BREADCRUMB_SCHEDULING, href: '/scheduling' },
       ]}
       headerActions={

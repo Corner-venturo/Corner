@@ -286,7 +286,7 @@ export default function VisasPage() {
       title={VISAS_LABELS.MANAGE_1750}
       icon={FileText}
       breadcrumb={[
-        { label: '首頁', href: '/' },
+        { label: '首頁', href: '/dashboard' },
         { label: '簽證管理', href: '/visas' },
       ]}
       headerActions={

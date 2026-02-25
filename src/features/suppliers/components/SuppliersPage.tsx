@@ -135,7 +135,7 @@ export const SuppliersPage: React.FC = () => {
       title={LABELS.supplierManagement}
       icon={Building2}
       breadcrumb={[
-        { label: LABELS.home, href: '/' },
+        { label: LABELS.home, href: '/dashboard' },
         { label: LABELS.databaseManagement, href: '/database' },
         { label: LABELS.supplierManagement, href: '/database/suppliers' },
       ]}
