@@ -274,3 +274,67 @@ export const CUSTOMER_VERIFY_LABELS = {
   VERIFY_SUCCESS: '已驗證',
   VERIFY_FAILED: '驗證失敗',
 }
+
+// ============================================================
+// Customer Import
+// ============================================================
+export const CUSTOMER_IMPORT_LABELS = {
+  // Dialog
+  title: '批次匯入顧客',
+  description: '上傳 Excel 或 CSV 檔案，批次匯入顧客資料',
+  // Buttons
+  btn_download_template: '下載模板',
+  btn_select_file: '選擇檔案',
+  btn_import: '確認匯入',
+  btn_cancel: '取消',
+  btn_back: '重新選擇',
+  btn_importing: '匯入中...',
+  // File
+  file_hint: '支援 .xlsx 和 .csv 檔案',
+  file_drop: '拖曳檔案到這裡，或點擊選擇',
+  file_selected: (name: string) => `已選擇：${name}`,
+  // Preview
+  preview_title: '資料預覽',
+  preview_summary: (total: number, error_count: number) =>
+    `共 ${total} 筆資料${error_count > 0 ? `，${error_count} 筆有錯誤` : ''}`,
+  // Table headers
+  col_row: '列號',
+  col_status: '狀態',
+  col_name: '姓名',
+  col_english_name: '英文姓名',
+  col_phone: '電話',
+  col_email: 'Email',
+  col_passport_number: '護照號碼',
+  col_passport_expiry: '護照效期',
+  col_birth_date: '出生日期',
+  col_gender: '性別',
+  col_notes: '備註',
+  // Template headers (Excel 中文標題)
+  tpl_name: '姓名',
+  tpl_english_name: '英文姓名',
+  tpl_phone: '電話',
+  tpl_email: 'Email',
+  tpl_passport_number: '護照號碼',
+  tpl_passport_expiry: '護照效期',
+  tpl_birth_date: '出生日期',
+  tpl_gender: '性別',
+  tpl_notes: '備註',
+  // Status
+  status_ok: '正常',
+  status_error: '有錯誤',
+  status_warning: '警告',
+  status_duplicate: '可能重複',
+  // Errors
+  error_no_file: '請選擇檔案',
+  error_parse_failed: '檔案解析失敗',
+  // Messages
+  msg_import_success: (count: number) => `成功匯入 ${count} 位顧客`,
+  msg_import_partial: (success: number, total: number) =>
+    `匯入完成：${success}/${total} 筆成功`,
+  msg_import_failed: '匯入失敗，請稍後再試',
+  msg_duplicate_passport: (passport: string) => `護照號碼 ${passport} 已存在`,
+  msg_duplicate_phone: (phone: string) => `電話 ${phone} 已存在`,
+  // Template filename
+  template_filename: '顧客匯入模板.xlsx',
+  template_sheet: '顧客資料',
+}

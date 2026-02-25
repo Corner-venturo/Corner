@@ -12,7 +12,7 @@
 
 
 import { useState, useMemo, useCallback } from 'react'
-import { Search, X, Plus, AlertTriangle, Edit, Trash2, Users } from 'lucide-react'
+import { Search, X, Plus, AlertTriangle, Edit, Trash2, Users, FileSpreadsheet } from 'lucide-react'
 import { formatPassportExpiryWithStatus } from '@/lib/utils/passport-expiry'
 import { DateCell } from '@/components/table-cells'
 
@@ -37,8 +37,9 @@ import {
   CustomerVerifyDialog,
   CustomerDetailDialog,
   ResetPasswordDialog,
+  ImportCustomersDialog,
 } from './components'
-import { CUSTOMER_PAGE_LABELS as L } from './constants/labels'
+import { CUSTOMER_PAGE_LABELS as L, CUSTOMER_IMPORT_LABELS } from './constants/labels'
 
 export default function CustomersPage() {
   const router = useRouter()
@@ -66,6 +67,7 @@ export default function CustomersPage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
   const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] = useState(false)
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
 
   // 處理點擊行
@@ -332,6 +334,16 @@ export default function CustomersPage() {
           )}
 
           <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsImportDialogOpen(true)}
+            className="gap-2"
+          >
+            <FileSpreadsheet size={16} />
+            <span className="hidden sm:inline">{CUSTOMER_IMPORT_LABELS.btn_select_file}</span>
+          </Button>
+
+          <Button
             onClick={() => setIsAddDialogOpen(true)}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
             size="sm"
@@ -440,6 +452,12 @@ export default function CustomersPage() {
         open={isResetPasswordDialogOpen}
         onOpenChange={setIsResetPasswordDialogOpen}
         customer={selectedCustomer}
+      />
+
+      {/* 批次匯入對話框 */}
+      <ImportCustomersDialog
+        open={isImportDialogOpen}
+        onOpenChange={setIsImportDialogOpen}
       />
     </ContentPageLayout>
   )
