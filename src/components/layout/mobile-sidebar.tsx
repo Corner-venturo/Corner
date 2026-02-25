@@ -100,7 +100,7 @@ const menuItems: MenuItem[] = [
 // 個人工具
 const personalToolItems: MenuItem[] = [
   { href: '/accounting', label: COMP_LAYOUT_LABELS.記帳管理, icon: Wallet, requiredPermission: 'accounting' },
-  { href: '/timebox', label: COMP_LAYOUT_LABELS.箱型時間, icon: Clock, requiredPermission: 'timebox' },
+  // timebox removed
 ]
 
 interface MobileSidebarProps {

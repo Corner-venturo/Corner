@@ -76,7 +76,7 @@ export const BREADCRUMB_CONFIG: Record<string, BreadcrumbConfig> = {
   '/visas': { label: '簽證管理', parent: '/' },
   '/esims': { label: 'eSIM 管理', parent: '/' },
   '/todos': { label: '待辦事項', parent: '/' },
-  '/timebox': { label: 'Timebox', parent: '/' },
+  // timebox removed
   // manifestation removed
   '/hr': { label: '人資管理', parent: '/' },
   '/workspace': { label: '工作區', parent: '/' },

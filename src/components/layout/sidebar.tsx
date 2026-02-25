@@ -135,9 +135,7 @@ const supplierMenuItems: MenuItem[] = [
   { href: '/supplier/finance', label: COMP_LAYOUT_LABELS.財務報表, icon: LineChart },
 ]
 
-const personalToolItems: MenuItem[] = [
-  { href: '/timebox', label: COMP_LAYOUT_LABELS.箱型時間, icon: Clock, requiredPermission: 'super_admin_only' },
-]
+const personalToolItems: MenuItem[] = []
 
 export function Sidebar() {
   const pathname = usePathname()

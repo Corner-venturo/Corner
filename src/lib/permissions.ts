@@ -53,13 +53,7 @@ export const FEATURE_PERMISSIONS: PermissionConfig[] = [
     routes: ['/todos'],
     description: '管理個人待辦事項',
   },
-  {
-    id: 'timebox',
-    label: '時間管理',
-    category: '全部',
-    routes: ['/timebox'],
-    description: '時間箱管理功能',
-  },
+  // timebox removed
   {
     id: 'quotes',
     label: '報價管理',
