@@ -10,7 +10,7 @@ import { confirm } from '@/lib/ui/alert-dialog'
 import type { OrderMember, CustomCostField } from '../types/order-member.types'
 import { COMP_ORDERS_LABELS } from '../constants/labels'
 import { recalculateParticipants } from '@/features/tours/services/tour-stats.service'
-import { recalculateOrderTotal } from '@/features/orders/services/order-stats.service'
+import { recalculateOrderAmount } from '@/features/orders/services/order-stats.service'
 
 interface UseOrderMembersParams {
   orderId?: string
@@ -316,7 +316,7 @@ export function useOrderMembers({
       if (field === 'total_payable' || field === 'selling_price') {
         const member = members.find(m => m.id === memberId)
         if (member?.order_id) {
-          recalculateOrderTotal(member.order_id).catch(err => {
+          recalculateOrderAmount(member.order_id).catch(err => {
             logger.error('重算訂單金額失敗:', err)
           })
         }
@@ -347,7 +347,7 @@ export function useOrderMembers({
       if ('total_payable' in data || 'selling_price' in data) {
         const member = members.find(m => m.id === memberId)
         if (member?.order_id) {
-          recalculateOrderTotal(member.order_id).catch(err => {
+          recalculateOrderAmount(member.order_id).catch(err => {
             logger.error('重算訂單金額失敗:', err)
           })
         }

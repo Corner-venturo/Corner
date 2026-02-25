@@ -5,7 +5,7 @@
  *
  * 設計風格：
  * - 使用 Morandi 色系配合公司品牌
- * - 橫向 (landscape) A4 格式
+ * - 直向 (portrait) A4 格式
  * - 極簡線條設計
  * - 付款對象和小計用 rowSpan 合併並垂直置中
  * - 每組最多 5 筆，超過自動拆分（避免跨頁問題）
@@ -168,9 +168,9 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
         ref={ref}
         style={{
           width: '100%',
-          maxWidth: '950px',
+          maxWidth: '680px',
           minHeight: '400px',
-          padding: '40px',
+          padding: '32px 28px',
           margin: '0 auto',
           background: 'white',
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif',
@@ -258,21 +258,21 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
               marginBottom: '16px',
             }}>
               <colgroup>
-                <col style={{ width: '16%' }} />
+                <col style={{ width: '18%' }} />
                 <col style={{ width: '14%' }} />
-                <col style={{ width: '20%' }} />
-                <col style={{ width: '26%' }} />
-                <col style={{ width: '12%' }} />
-                <col style={{ width: '12%' }} />
+                <col style={{ width: '18%' }} />
+                <col style={{ width: '24%' }} />
+                <col style={{ width: '13%' }} />
+                <col style={{ width: '13%' }} />
               </colgroup>
               <thead>
                 <tr style={{ borderBottom: `2px solid ${COLORS.brown}` }}>
-                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.PAYEE}</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.REQUEST_NO}</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.TOUR_NAME}</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.ITEM_DESC}</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.AMOUNT}</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.SUBTOTAL}</th>
+                  <th style={{ padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '10px' }}>{PRINT_LABELS.PAYEE}</th>
+                  <th style={{ padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '10px' }}>{PRINT_LABELS.REQUEST_NO}</th>
+                  <th style={{ padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '10px' }}>{PRINT_LABELS.TOUR_NAME}</th>
+                  <th style={{ padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '10px' }}>{PRINT_LABELS.ITEM_DESC}</th>
+                  <th style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, fontSize: '10px' }}>{PRINT_LABELS.AMOUNT}</th>
+                  <th style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, fontSize: '10px' }}>{PRINT_LABELS.SUBTOTAL}</th>
                 </tr>
               </thead>
               <tbody>
@@ -282,16 +282,16 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
                     return (
                       <tr key={`tour-${groupIdx}-${itemIdx}`}>
                         {isFirstInGroup && (
-                          <td rowSpan={group.items.length} style={{ padding: '8px', verticalAlign: 'middle', fontSize: '11px', fontWeight: 600, color: COLORS.brown, borderTop: groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>
+                          <td rowSpan={group.items.length} style={{ padding: '6px', verticalAlign: 'middle', fontSize: '10px', fontWeight: 600, color: COLORS.brown, borderTop: groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>
                             {group.payFor}
                           </td>
                         )}
-                        <td style={{ padding: '8px', verticalAlign: 'middle', fontSize: '11px', color: COLORS.gray, borderTop: isFirstInGroup && groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>{item.requestCode}</td>
-                        <td style={{ padding: '8px', verticalAlign: 'middle', fontSize: '11px', color: COLORS.gray, borderTop: isFirstInGroup && groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.tourName}</td>
-                        <td style={{ padding: '8px', verticalAlign: 'middle', fontSize: '11px', color: COLORS.gray, borderTop: isFirstInGroup && groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>{item.description}</td>
-                        <td style={{ padding: '8px', verticalAlign: 'middle', fontSize: '11px', textAlign: 'right', color: COLORS.gray, borderTop: isFirstInGroup && groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>{item.amount.toLocaleString()}</td>
+                        <td style={{ padding: '6px', verticalAlign: 'middle', fontSize: '10px', color: COLORS.gray, borderTop: isFirstInGroup && groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>{item.requestCode}</td>
+                        <td style={{ padding: '6px', verticalAlign: 'middle', fontSize: '10px', color: COLORS.gray, borderTop: isFirstInGroup && groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.tourName}</td>
+                        <td style={{ padding: '6px', verticalAlign: 'middle', fontSize: '10px', color: COLORS.gray, borderTop: isFirstInGroup && groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>{item.description}</td>
+                        <td style={{ padding: '6px', verticalAlign: 'middle', fontSize: '10px', textAlign: 'right', color: COLORS.gray, borderTop: isFirstInGroup && groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>{item.amount.toLocaleString()}</td>
                         {isFirstInGroup && (
-                          <td rowSpan={group.items.length} style={{ padding: '8px', verticalAlign: 'middle', fontSize: '11px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, borderTop: groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>
+                          <td rowSpan={group.items.length} style={{ padding: '6px', verticalAlign: 'middle', fontSize: '10px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, borderTop: groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>
                             {group.showTotal ? group.total.toLocaleString() : ''}
                           </td>
                         )}
@@ -302,7 +302,7 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
               </tbody>
             </table>
             {/* 團體小計 */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: '8px', marginBottom: '24px', borderTop: `1px solid ${COLORS.gold}` }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: '6px', marginBottom: '24px', borderTop: `1px solid ${COLORS.gold}` }}>
               <span style={{ fontSize: '12px', color: COLORS.gray, marginRight: '16px' }}>{PRINT_LABELS.TOUR_SUBTOTAL}</span>
               <span style={{ fontSize: '13px', fontWeight: 600, color: COLORS.brown }}>NT$ {tourTotal.toLocaleString()}</span>
             </div>
@@ -328,21 +328,21 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
               marginBottom: '16px',
             }}>
               <colgroup>
-                <col style={{ width: '16%' }} />
+                <col style={{ width: '18%' }} />
                 <col style={{ width: '14%' }} />
-                <col style={{ width: '20%' }} />
-                <col style={{ width: '26%' }} />
-                <col style={{ width: '12%' }} />
-                <col style={{ width: '12%' }} />
+                <col style={{ width: '18%' }} />
+                <col style={{ width: '24%' }} />
+                <col style={{ width: '13%' }} />
+                <col style={{ width: '13%' }} />
               </colgroup>
               <thead>
                 <tr style={{ borderBottom: `2px solid ${COLORS.brown}` }}>
-                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.PAYEE}</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.REQUEST_NO}</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.TYPE}</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.ITEM_DESC}</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.AMOUNT}</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, fontSize: '11px' }}>{PRINT_LABELS.SUBTOTAL}</th>
+                  <th style={{ padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '10px' }}>{PRINT_LABELS.PAYEE}</th>
+                  <th style={{ padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '10px' }}>{PRINT_LABELS.REQUEST_NO}</th>
+                  <th style={{ padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '10px' }}>{PRINT_LABELS.TYPE}</th>
+                  <th style={{ padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: COLORS.brown, fontSize: '10px' }}>{PRINT_LABELS.ITEM_DESC}</th>
+                  <th style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, fontSize: '10px' }}>{PRINT_LABELS.AMOUNT}</th>
+                  <th style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, fontSize: '10px' }}>{PRINT_LABELS.SUBTOTAL}</th>
                 </tr>
               </thead>
               <tbody>
@@ -352,16 +352,16 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
                     return (
                       <tr key={`company-${groupIdx}-${itemIdx}`}>
                         {isFirstInGroup && (
-                          <td rowSpan={group.items.length} style={{ padding: '8px', verticalAlign: 'middle', fontSize: '11px', fontWeight: 600, color: COLORS.brown, borderTop: groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>
+                          <td rowSpan={group.items.length} style={{ padding: '6px', verticalAlign: 'middle', fontSize: '10px', fontWeight: 600, color: COLORS.brown, borderTop: groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>
                             {group.payFor}
                           </td>
                         )}
-                        <td style={{ padding: '8px', verticalAlign: 'middle', fontSize: '11px', color: COLORS.gray, borderTop: isFirstInGroup && groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>{item.requestCode}</td>
-                        <td style={{ padding: '8px', verticalAlign: 'middle', fontSize: '11px', color: COLORS.gray, borderTop: isFirstInGroup && groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>{item.tourName}</td>
-                        <td style={{ padding: '8px', verticalAlign: 'middle', fontSize: '11px', color: COLORS.gray, borderTop: isFirstInGroup && groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>{item.description}</td>
-                        <td style={{ padding: '8px', verticalAlign: 'middle', fontSize: '11px', textAlign: 'right', color: COLORS.gray, borderTop: isFirstInGroup && groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>{item.amount.toLocaleString()}</td>
+                        <td style={{ padding: '6px', verticalAlign: 'middle', fontSize: '10px', color: COLORS.gray, borderTop: isFirstInGroup && groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>{item.requestCode}</td>
+                        <td style={{ padding: '6px', verticalAlign: 'middle', fontSize: '10px', color: COLORS.gray, borderTop: isFirstInGroup && groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>{item.tourName}</td>
+                        <td style={{ padding: '6px', verticalAlign: 'middle', fontSize: '10px', color: COLORS.gray, borderTop: isFirstInGroup && groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>{item.description}</td>
+                        <td style={{ padding: '6px', verticalAlign: 'middle', fontSize: '10px', textAlign: 'right', color: COLORS.gray, borderTop: isFirstInGroup && groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>{item.amount.toLocaleString()}</td>
                         {isFirstInGroup && (
-                          <td rowSpan={group.items.length} style={{ padding: '8px', verticalAlign: 'middle', fontSize: '11px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, borderTop: groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>
+                          <td rowSpan={group.items.length} style={{ padding: '6px', verticalAlign: 'middle', fontSize: '10px', textAlign: 'right', fontWeight: 600, color: COLORS.brown, borderTop: groupIdx > 0 ? `1px solid ${COLORS.gold}` : 'none' }}>
                             {group.showTotal ? group.total.toLocaleString() : ''}
                           </td>
                         )}
@@ -372,7 +372,7 @@ export const PrintDisbursementPreview = forwardRef<HTMLDivElement, PrintDisburse
               </tbody>
             </table>
             {/* 公司小計 */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: '8px', marginBottom: '24px', borderTop: `1px solid ${COLORS.gold}` }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: '6px', marginBottom: '24px', borderTop: `1px solid ${COLORS.gold}` }}>
               <span style={{ fontSize: '12px', color: COLORS.gray, marginRight: '16px' }}>{PRINT_LABELS.LABEL_5145}</span>
               <span style={{ fontSize: '13px', fontWeight: 600, color: COLORS.brown }}>NT$ {companyTotal.toLocaleString()}</span>
             </div>

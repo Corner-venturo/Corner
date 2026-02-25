@@ -228,14 +228,13 @@ export function useTourDetails(tour_id: string) {
 
     // 狀態轉換驗證
     const VALID_TOUR_TRANSITIONS: Record<string, string[]> = {
-      'draft': ['published', 'cancelled'],
-      'proposed': ['draft', 'cancelled'],
-      '開團': ['draft', 'cancelled'],
-      'published': ['departed', 'cancelled', 'draft'],
-      'departed': ['completed'],
-      'completed': ['archived'],
-      'cancelled': ['draft'],
-      'archived': [],
+      '開團': ['待出發', '取消'],
+      '待出發': ['已出發', '取消', '開團'],
+      '已出發': ['待結團'],
+      '待結團': ['已結團'],
+      '已結團': [],
+      '取消': ['開團'],
+      '特殊團': [],
     }
 
     const { data: current, error: fetchError } = await supabase

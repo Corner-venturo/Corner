@@ -413,6 +413,7 @@ export interface Tour extends BaseEntity {
   return_date: string // 返回日期 (ISO 8601)（相容舊欄位：end_date）
   status?: string | null // 狀態（英文）
   price?: number | null // 基本價格
+  selling_price_per_person?: number | null // 每人售價（從報價單帶入）
   max_participants?: number | null // 最大參與人數（相容舊欄位：max_people）
   current_participants?: number | null // 當前參與人數
   contract_status: string // 合約狀態
@@ -530,6 +531,7 @@ export interface CreateTourData {
   return_date: string
   status: TourStatus
   price: number
+  selling_price_per_person?: number
   max_participants: number
   contract_status: ContractStatus
   total_revenue: number
@@ -550,6 +552,7 @@ export interface UpdateTourData {
   return_date?: string
   status?: TourStatus
   price?: number
+  selling_price_per_person?: number
   max_participants?: number
   contract_status?: ContractStatus
   total_revenue?: number

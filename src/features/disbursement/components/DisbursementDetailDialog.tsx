@@ -16,6 +16,8 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Check, FileText, Plus, X, Trash2 } from 'lucide-react'
+import { generateDisbursementPDF } from '@/lib/pdf/disbursement-pdf'
+import { supabase } from '@/lib/supabase/client'
 import { DisbursementOrder, PaymentRequest } from '@/stores/types'
 import {
   usePaymentRequests,
@@ -205,6 +207,31 @@ export function DisbursementDetailDialog({
       // 重算相關團的成本
       for (const tour_id of tour_ids_to_recalculate) {
         await recalculateExpenseStats(tour_id)
+      }
+
+      // 自動存檔 PDF
+      try {
+        const allItems = await supabase
+          .from('payment_request_items')
+          .select('*')
+          .in('request_id', requestIds)
+        const blob = await generateDisbursementPDF({
+          order: { ...order, status: 'paid', confirmed_by: user?.id || null, confirmed_at: new Date().toISOString() },
+          paymentRequests: includedRequests,
+          paymentRequestItems: (allItems.data || []) as unknown as import('@/stores/types').PaymentRequestItem[],
+        })
+        const filename = `disbursement/${order.order_number || order.id}.pdf`
+        const { error: uploadErr } = await supabase.storage
+          .from('documents')
+          .upload(filename, blob, { contentType: 'application/pdf', upsert: true })
+        if (!uploadErr) {
+          const { data: urlData } = supabase.storage.from('documents').getPublicUrl(filename)
+          if (urlData?.publicUrl) {
+            await updateDisbursementOrderApi(order.id, { pdf_url: urlData.publicUrl } as Partial<DisbursementOrder>)
+          }
+        }
+      } catch (pdfErr) {
+        logger.error('Auto-save PDF failed (non-blocking):', pdfErr)
       }
 
       await alert(DISBURSEMENT_LABELS.出納單已標記為已出帳, 'success')
@@ -424,14 +451,23 @@ export function DisbursementDetailDialog({
 
           {/* 操作按鈕 */}
           <div className="flex items-center justify-between pt-4 border-t border-morandi-container/20">
-            <Button
-              variant="outline"
-              onClick={handlePrintPDF}
-              className="text-morandi-gold border-morandi-gold hover:bg-morandi-gold/10"
-            >
-              <FileText size={16} className="mr-2" />
-              {DISBURSEMENT_LABELS.列印PDF}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={handlePrintPDF}
+                className="text-morandi-gold border-morandi-gold hover:bg-morandi-gold/10"
+              >
+                <FileText size={16} className="mr-2" />
+                {DISBURSEMENT_LABELS.列印PDF}
+              </Button>
+              {order.pdf_url && (
+                <a href={order.pdf_url} target="_blank" rel="noopener noreferrer">
+                  <Button variant="ghost" size="sm" className="text-morandi-secondary">
+                    {DISBURSEMENT_LABELS.查看存檔}
+                  </Button>
+                </a>
+              )}
+            </div>
 
             <div className="flex gap-2">
               {order.status === 'pending' && !isAddingMode && (

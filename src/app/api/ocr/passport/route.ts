@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { getServerAuth } from '@/lib/auth/server-auth'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
+import { checkRateLimit } from '@/lib/rate-limit'
 import { callOcrSpace, callGoogleVision } from './ocr-clients'
 import { getGoogleVisionKeys, checkGoogleVisionUsage, updateGoogleVisionUsage } from './google-vision-usage'
 import { parsePassportText } from './passport-parser'
@@ -14,6 +15,10 @@ import { parsePassportText } from './passport-parser'
  */
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 Rate limiting: 10 requests per minute (OCR processing is resource intensive)
+    const rateLimited = checkRateLimit(request, 'ocr-passport', 10, 60_000)
+    if (rateLimited) return rateLimited
+
     // 🔒 安全檢查：驗證用戶身份（護照資料敏感）
     const auth = await getServerAuth()
     if (!auth.success) {

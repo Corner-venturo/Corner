@@ -27,12 +27,7 @@ export function useTourTableColumns({ ordersByTourId }: UseTourTableColumnsParam
         sortable: true,
         width: '110px',
         render: (value, row) => {
-          const tour = row as Tour & { __isProposal?: boolean }
           const code = String(value || "")
-          // 提案不顯示連結
-          if (tour.__isProposal) {
-            return <span className="text-sm text-morandi-primary">{code}</span>
-          }
           return (
             <Link
               href={`/tours/${code}`}

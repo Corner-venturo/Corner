@@ -78,7 +78,8 @@ const menuItems: MenuItem[] = [
       { href: '/finance/reports', label: COMP_LAYOUT_LABELS.報表管理, icon: BarChart3, requiredPermission: 'reports' },
     ],
   },
-  { href: '/visas', label: COMP_LAYOUT_LABELS.簽證管理, icon: FileCheck, requiredPermission: 'visas' },
+  // V1: 簽證管理暫時隱藏
+  // { href: '/visas', label: COMP_LAYOUT_LABELS.簽證管理, icon: FileCheck, requiredPermission: 'visas' },
   {
     href: '/design',
     label: COMP_LAYOUT_LABELS.設計,
@@ -121,7 +122,8 @@ const menuItems: MenuItem[] = [
   { href: '/hr', label: COMP_LAYOUT_LABELS.人資管理, icon: UserCog, requiredPermission: 'hr' },
   { href: '/scheduling', label: COMP_LAYOUT_LABELS.資源調度, icon: Calendar, requiredPermission: 'hr' },
   { href: '/database/fleet', label: COMP_LAYOUT_LABELS.車隊管理, icon: Bus, requiredPermission: 'hr' },
-  { href: '/esims', label: COMP_LAYOUT_LABELS.網卡管理, icon: Wifi, requiredPermission: 'hr', restrictedFeature: 'esim' },
+  // V1: 網卡管理暫時隱藏
+  // { href: '/esims', label: COMP_LAYOUT_LABELS.網卡管理, icon: Wifi, requiredPermission: 'hr', restrictedFeature: 'esim' },
 ]
 
 // 供應商專用選單（車行、領隊公司）

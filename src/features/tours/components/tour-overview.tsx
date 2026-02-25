@@ -19,7 +19,8 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CurrencyCell } from '@/components/table-cells'
-import { COMP_TOURS_LABELS } from '../constants/labels'
+import { COMP_TOURS_LABELS, TOUR_HEALTH_LABELS } from '../constants/labels'
+import { useTourHealth } from '../hooks/useTourHealth'
 import { TOUR_OVERVIEW } from '../constants'
 import { useTourChannelOperations, TourStoreActions } from './TourChannelOperations'
 import { logger } from '@/lib/utils/logger'
@@ -46,6 +47,9 @@ export const TourOverview = React.memo(function TourOverview({
   const router = useRouter()
   const { items: orders } = useOrdersSlim()
   const { channels } = useWorkspaceChannels()
+  
+  // 健康度資料
+  const healthData = useTourHealth(tour.id)
 
   // 檢查該團是否已有頻道
   const existingChannel = channels.find((ch: { tour_id?: string | null }) => ch.tour_id === tour.id)
@@ -167,92 +171,77 @@ export const TourOverview = React.memo(function TourOverview({
     return badges[status || ''] || 'bg-morandi-container text-morandi-secondary'
   }
 
+  // 健康度項目
+  const healthItems = !healthData.isLoading && !healthData.error ? [
+    { emoji: '📋', label: TOUR_HEALTH_LABELS.需求單狀態, data: healthData.requirements },
+    { emoji: '🛂', label: TOUR_HEALTH_LABELS.護照資料, data: healthData.passports },
+    { emoji: '✈️', label: TOUR_HEALTH_LABELS.機票狀態, data: healthData.tickets },
+    { emoji: '🏨', label: TOUR_HEALTH_LABELS.飯店確認, data: healthData.hotels },
+    { emoji: '👥', label: TOUR_HEALTH_LABELS.團員人數, data: healthData.participants },
+  ] : []
+
   return (
-    <div className="space-y-6">
-      {/* 快捷動作列 */}
-      <div className="flex items-center gap-3 pb-2 border-b border-border">
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={onOpenContractDialog}
-        >
+    <div className="border border-border rounded-lg overflow-hidden bg-card">
+      {/* 標題列：基本資訊 + 狀態 */}
+      <div className="px-5 py-3 border-b border-border/60">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-6 text-sm">
+            <span className="text-lg font-semibold text-morandi-primary">{tour.code}</span>
+            <div className="flex items-center gap-1.5 text-morandi-secondary">
+              <MapPin size={14} />
+              <span>{tour.location}</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-morandi-secondary">
+              <Calendar size={14} />
+              <span>{tour.departure_date} ~ {tour.return_date}</span>
+            </div>
+            <span className={cn('px-2 py-0.5 rounded text-xs font-medium', getStatusBadge(tour.status ?? ''))}>
+              {tour.status}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* 動作列 */}
+      <div className="px-5 py-2.5 border-b border-border/40 bg-morandi-container/30 flex items-center gap-2 flex-wrap">
+        <Button onClick={onManageQuote} size="sm" className="h-7 text-xs bg-morandi-gold hover:bg-morandi-gold-hover text-white">
+          <Calculator size={12} className="mr-1" />{COMP_TOURS_LABELS.LABEL_4601}
+        </Button>
+        {onManageItinerary && (
+          <Button onClick={onManageItinerary} size="sm" variant="outline" className="h-7 text-xs">
+            <FileText size={12} className="mr-1" />{COMP_TOURS_LABELS.行程表}
+          </Button>
+        )}
+        <Button size="sm" variant="outline" className="h-7 text-xs" onClick={onOpenContractDialog}>
           {TOUR_OVERVIEW.action_contract}
         </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={handleChannelClick}
-        >
+        <Button size="sm" variant="outline" className="h-7 text-xs" onClick={handleChannelClick}>
           {existingChannel ? TOUR_OVERVIEW.action_enter_channel : TOUR_OVERVIEW.action_create_channel}
         </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={onArchive}
-        >
+        <Button onClick={onEdit} size="sm" variant="outline" className="h-7 text-xs">
+          {COMP_TOURS_LABELS.EDIT}
+        </Button>
+        <Button size="sm" variant="outline" className="h-7 text-xs" onClick={onArchive}>
           {TOUR_OVERVIEW.action_archive}
         </Button>
       </div>
 
-      {/* 基本資訊 + 快速操作 */}
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-8 text-sm">
-          <div className="flex items-center gap-2">
-            <FileText size={16} className="text-morandi-secondary" />
-            <span className="text-morandi-secondary">{COMP_TOURS_LABELS.LABEL_9750}</span>
-            <span className="font-medium text-morandi-primary">{tour.code}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <MapPin size={16} className="text-morandi-secondary" />
-            <span className="text-morandi-secondary">{COMP_TOURS_LABELS.LABEL_5475}</span>
-            <span className="font-medium text-morandi-primary">{tour.location}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Calendar size={16} className="text-morandi-secondary" />
-            <span className="font-medium text-morandi-primary">{tour.departure_date} ~ {tour.return_date}</span>
-          </div>
-          <span className={cn('px-2 py-0.5 rounded text-xs font-medium', getStatusBadge(tour.status ?? ''))}>
-            {tour.status}
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button onClick={onManageQuote} size="sm" className="bg-morandi-gold hover:bg-morandi-gold-hover text-white">
-            <Calculator size={14} className="mr-1" />{COMP_TOURS_LABELS.LABEL_4601}
-          </Button>
-          {onManageItinerary && (
-            <Button onClick={onManageItinerary} size="sm" variant="outline">
-              <FileText size={14} className="mr-1" />{COMP_TOURS_LABELS.行程表}
-            </Button>
-          )}
-          <Button onClick={onEdit} size="sm" variant="outline">
-            <FileText size={14} className="mr-1" />{COMP_TOURS_LABELS.EDIT}
-          </Button>
-        </div>
-      </div>
-
-      {/* 財務概況 */}
-      <div className="border border-border rounded-lg overflow-hidden bg-card">
-        {/* 區塊標題行 */}
-        <div className="bg-morandi-container/50 border-b border-border/60 px-4 py-2">
-          <span className="text-sm font-medium text-morandi-primary">{COMP_TOURS_LABELS.LABEL_3513}</span>
-        </div>
-        {/* 內容 */}
+      {/* 財務概況 — 橫排緊湊 */}
+      <div className="px-5 py-3 border-b border-border/40">
         <div className="flex items-stretch">
           {overviewCards.map((card, index) => (
             <React.Fragment key={index}>
-              {index > 0 && (
-                <div className="w-px bg-border my-3" />
-              )}
-              <div className="flex-1 flex items-center gap-3 px-4 py-3">
-                <div className={card.color}>
-                  <card.icon size={18} />
+              {index > 0 && <div className="w-px bg-border/60 my-1" />}
+              <div className="flex-1 flex items-center gap-2.5 px-3">
+                <div className={cn('shrink-0', card.color)}>
+                  <card.icon size={16} />
                 </div>
-                <div>
-                  <p className="text-xs text-morandi-secondary">{card.title}</p>
+                <div className="min-w-0">
+                  <p className="text-[11px] text-morandi-secondary leading-tight">{card.title}</p>
                   {card.amount !== undefined ? (
                     <CurrencyCell amount={card.amount} className="text-sm font-semibold text-morandi-primary" />
                   ) : (
-                    <p className="text-sm font-semibold text-morandi-primary">{card.value}</p>
+                    <p className="text-sm font-semibold text-morandi-primary truncate">{card.value}</p>
                   )}
                 </div>
               </div>
@@ -260,6 +249,55 @@ export const TourOverview = React.memo(function TourOverview({
           ))}
         </div>
       </div>
+
+      {/* 團況健康度 — 兩欄緊湊 */}
+      <div className="px-5 py-3">
+        {healthData.isLoading ? (
+          <div className="text-center py-2 text-sm text-morandi-secondary">{TOUR_HEALTH_LABELS.載入中}</div>
+        ) : healthData.error ? (
+          <div className="text-center py-2 text-sm text-morandi-red">{healthData.error}</div>
+        ) : (
+          <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+            {healthItems.map((item, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <span className="text-sm">{getHealthStatusEmoji(item.data.status)}</span>
+                <span className="text-xs text-morandi-secondary">{item.emoji} {item.label}</span>
+                <span className={cn('text-xs font-medium ml-auto', getHealthStatusColor(item.data.status))}>
+                  {item.data.message}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 })
+
+// 健康度狀態顏色
+function getHealthStatusColor(status: 'good' | 'warning' | 'error'): string {
+  switch (status) {
+    case 'good':
+      return 'text-morandi-green'
+    case 'warning':
+      return 'text-morandi-gold'
+    case 'error':
+      return 'text-morandi-red'
+    default:
+      return 'text-morandi-secondary'
+  }
+}
+
+// 健康度狀態 emoji
+function getHealthStatusEmoji(status: 'good' | 'warning' | 'error'): string {
+  switch (status) {
+    case 'good':
+      return '✅'
+    case 'warning':
+      return '⚠️'
+    case 'error':
+      return '🔴'
+    default:
+      return '⚠️'
+  }
+}

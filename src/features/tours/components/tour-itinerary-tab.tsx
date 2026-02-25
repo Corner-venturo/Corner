@@ -35,7 +35,6 @@ import type { FlightInfo } from '@/types/flight.types'
 import { COMP_TOURS_LABELS, TOUR_ITINERARY_TAB_LABELS } from '../constants/labels'
 import {
   getPreviewDailyData as computePreviewData,
-  generatePrintHtml,
 } from '@/features/proposals/components/package-itinerary/format-itinerary'
 
 // 每日行程項目
@@ -115,7 +114,7 @@ function AccommodationDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+      <DialogContent level={2} className="max-w-lg max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Hotel className="w-5 h-5 text-morandi-gold" />
@@ -628,16 +627,16 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
     if (!printWindow) return
 
     const dailyData = getPreviewDailyData()
-    const printContent = generatePrintHtml({
-      title: title || TOUR_ITINERARY_TAB_LABELS.行程表,
-      companyName: currentUser?.workspace_code || TOUR_ITINERARY_TAB_LABELS.TRAVEL_AGENCY,
-      destination: tour.location || '',
-      startDate: tour.departure_date || null,
-      isDomestic,
-      outboundFlight,
-      returnFlight,
-      dailyData,
-    })
+    // TODO: 需要重新實作 generatePrintHtml 函數（從 proposals feature 移除後）
+    const printContent = `
+      <html>
+        <head><title>${title || TOUR_ITINERARY_TAB_LABELS.行程表}</title></head>
+        <body>
+          <h1>列印功能暫時停用</h1>
+          <p>正在重新實作列印功能...</p>
+        </body>
+      </html>
+    `
 
     printWindow.document.write(printContent)
     printWindow.document.close()

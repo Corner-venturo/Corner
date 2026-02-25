@@ -122,6 +122,12 @@ export default function OrdersPage() {
       const nextOrderNumber = tourOrders.length + 1
       const orderNumber = `${selectedTour.code}-O${nextOrderNumber.toString().padStart(2, '0')}`
 
+      // 🆕 價格鏈：從 tour 的 selling_price_per_person 計算初始 total_amount
+      // 假設 2 人作為初始值，之後加團員時會重新計算
+      const estimatedPeople = 2
+      const sellingPricePerPerson = (selectedTour as any).selling_price_per_person || 0
+      const initialTotalAmount = sellingPricePerPerson * estimatedPeople
+
       await addOrder({
         order_number: orderNumber,
         tour_id: orderData.tour_id,
@@ -132,10 +138,10 @@ export default function OrdersPage() {
         sales_person: orderData.sales_person,
         assistant: orderData.assistant,
         member_count: 0,
-        total_amount: 0,
+        total_amount: initialTotalAmount,
         paid_amount: 0,
         payment_status: 'unpaid',
-        remaining_amount: 0,
+        remaining_amount: initialTotalAmount,
         status: null,
         notes: null,
         customer_id: null,

@@ -53,6 +53,10 @@ export interface ComboboxProps<T = unknown> {
   maxHeight?: string
   /** 禁用 Portal，讓下拉選單在原位置渲染（用於 Dialog 內） */
   disablePortal?: boolean
+  /** 快速新增回調 — 傳入搜尋文字，回傳新建的 value（或 null 取消） */
+  onCreate?: (name: string) => Promise<string | null>
+  /** 快速新增按鈕文字，預設「+ 新增 "xxx"」 */
+  createLabel?: string
 }
 
 /**
@@ -97,10 +101,13 @@ export function Combobox<T = unknown>({
   renderOption,
   maxHeight = '16rem',
   disablePortal = false,
+  onCreate,
+  createLabel,
 }: ComboboxProps<T>) {
   const [isOpen, setIsOpen] = React.useState(false)
   const [searchValue, setSearchValue] = React.useState('')
   const [highlightedIndex, setHighlightedIndex] = React.useState(-1)
+  const [isCreating, setIsCreating] = React.useState(false)
   const [dropdownPosition, setDropdownPosition] = React.useState({ top: 0, left: 0, width: 0, maxHeight: 256 })
   const inputRef = React.useRef<HTMLInputElement>(null)
   const containerRef = React.useRef<HTMLDivElement>(null)
@@ -212,6 +219,14 @@ export function Combobox<T = unknown>({
         e.preventDefault()
         if (highlightedIndex >= 0 && highlightedIndex < filteredOptions.length) {
           handleOptionSelect(filteredOptions[highlightedIndex])
+        } else if (onCreate && searchValue.trim() && !isCreating && !options.some(o => o.label === searchValue.trim())) {
+          setIsCreating(true)
+          onCreate(searchValue.trim()).then(newId => {
+            if (newId) {
+              onChange(newId)
+              setIsOpen(false)
+            }
+          }).finally(() => setIsCreating(false))
         }
         break
       case 'Escape':
@@ -386,6 +401,31 @@ export function Combobox<T = unknown>({
                 <div className="px-3 py-6 text-center text-sm text-morandi-secondary">
                   {emptyMessage}
                 </div>
+              )}
+              {onCreate && searchValue.trim() && !options.some(o => o.label === searchValue.trim()) && (
+                <button
+                  type="button"
+                  disabled={isCreating}
+                  onClick={async () => {
+                    if (isCreating) return
+                    setIsCreating(true)
+                    try {
+                      const newId = await onCreate(searchValue.trim())
+                      if (newId) {
+                        onChange(newId)
+                        setIsOpen(false)
+                      }
+                    } finally {
+                      setIsCreating(false)
+                    }
+                  }}
+                  className={cn(
+                    'w-full px-3 py-2 text-left text-sm text-morandi-gold hover:bg-morandi-gold/10 border-t border-border transition-colors',
+                    isCreating && 'opacity-50 cursor-wait'
+                  )}
+                >
+                  {isCreating ? '建立中...' : (createLabel || `+ 新增「${searchValue.trim()}」`)}
+                </button>
               )}
             </div>
           </div>

@@ -17,6 +17,7 @@ interface MemberTableHeaderProps {
   showPnrColumn: boolean
   showRoomColumn: boolean
   showVehicleColumn: boolean
+  showSurchargeColumn?: boolean
   hotelColumns?: HotelColumn[]
   customCostFields: Array<{ id: string; name: string; values: Record<string, string> }>
   columnVisibility?: ColumnVisibility
@@ -126,6 +127,7 @@ export function MemberTableHeader({
   showPnrColumn,
   showRoomColumn,
   showVehicleColumn,
+  showSurchargeColumn = false,
   hotelColumns = [],
   customCostFields,
   columnVisibility,
@@ -319,6 +321,18 @@ export function MemberTableHeader({
           </ResizableTh>
         )}
 
+        {/* 團體模式：附加費用 */}
+        {mode === 'tour' && showSurchargeColumn && (
+          <ResizableTh
+            columnId="surcharges"
+            width={getWidth('surcharges') || 120}
+            onResize={onColumnResize}
+            className={thBaseClass}
+          >
+            附加費用
+          </ResizableTh>
+        )}
+
         {/* 團體模式：自訂費用欄位 */}
         {mode === 'tour' && customCostFields.map(field => (
           <ResizableTh
@@ -333,9 +347,9 @@ export function MemberTableHeader({
         ))}
 
         {/* 操作 */}
-        <ResizableTh columnId="actions" width={getWidth('actions')} onResize={onColumnResize} className={`${thBaseClass} text-center`}>
+        <th className={`${thBaseClass} text-center`} style={{ minWidth: '80px' }}>
           {L.actions}
-        </ResizableTh>
+        </th>
       </tr>
     </thead>
   )

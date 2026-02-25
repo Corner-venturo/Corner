@@ -9,9 +9,17 @@ import dynamic from 'next/dynamic'
 
 const AddRequestDialog = dynamic(() => import('@/features/finance/requests/components/AddRequestDialog').then(m => m.AddRequestDialog), { ssr: false })
 import { InvoiceDialog } from '@/features/finance/components/invoice-dialog'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { AddOrderForm, type OrderFormData } from '@/features/orders/components/add-order-form'
+import { createOrder } from '@/data'
+import { recalculateParticipants } from '@/features/tours/services/tour-stats.service'
+import { Plus } from 'lucide-react'
 import type { Order as OrderType } from '@/types/order.types'
 import { logger } from '@/lib/utils/logger'
 import { COMP_TOURS_LABELS, TOUR_ORDERS_LABELS } from '../constants/labels'
+import { useAuthStore } from '@/stores'
+import { useToast } from '@/components/ui/use-toast'
 
 interface TourOrdersProps {
   tour: Tour
@@ -21,6 +29,9 @@ interface TourOrdersProps {
 export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
+  const [addDialogOpen, setAddDialogOpen] = useState(false)
+  const currentWorkspace = useAuthStore(state => state.user?.workspace_id)
+  const { toast } = useToast()
 
   // 收款對話框狀態
   const [receiptDialogOpen, setReceiptDialogOpen] = useState(false)
@@ -90,10 +101,57 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
     }
   }, [tour.id])
 
-  // 請款成功後的處理（目前不需要重新載入訂單，但保留以便未來擴展）
+  // 請款成功後的處理
   const handleRequestSuccess = useCallback(() => {
-    // 請款不影響訂單狀態，無需重新載入
+    toast({ title: TOUR_ORDERS_LABELS.請款成功 })
   }, [])
+
+  // 新增訂單
+  const handleAddOrder = useCallback(async (orderData: OrderFormData) => {
+    if (!currentWorkspace) return
+
+    try {
+      const nextOrderNumber = orders.length + 1
+      const orderNumber = `${tour.code}-O${nextOrderNumber.toString().padStart(2, '0')}`
+
+      await createOrder({
+        order_number: orderNumber,
+        tour_id: tour.id,
+        tour_name: tour.name,
+        contact_person: orderData.contact_person,
+        contact_phone: null,
+        sales_person: orderData.sales_person,
+        assistant: orderData.assistant,
+        member_count: 0,
+        total_amount: 0,
+        paid_amount: 0,
+        payment_status: 'unpaid',
+        remaining_amount: 0,
+        status: null,
+        notes: null,
+        customer_id: null,
+      } as Omit<Order, 'id' | 'created_at' | 'updated_at'>)
+
+      setAddDialogOpen(false)
+      toast({ title: TOUR_ORDERS_LABELS.新增訂單成功 })
+
+      // 重新載入訂單
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('tour_id', tour.id)
+        .order('created_at', { ascending: false })
+      if (!error && data) setOrders(data as Order[])
+
+      // 重算團人數
+      recalculateParticipants(tour.id).catch(err => {
+        logger.error('重算團人數失敗:', err)
+      })
+    } catch (err) {
+      logger.error('新增訂單失敗:', err)
+      toast({ title: TOUR_ORDERS_LABELS.新增訂單失敗, variant: 'destructive' })
+    }
+  }, [currentWorkspace, orders.length, tour.code, tour.id, tour.name])
 
   if (loading) {
     return (
@@ -111,6 +169,7 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
         onQuickReceipt={handleQuickReceipt}
         onQuickPaymentRequest={handleQuickPaymentRequest}
         onQuickInvoice={handleQuickInvoice}
+        onAdd={() => setAddDialogOpen(true)}
       />
 
       {/* 收款對話框 */}
@@ -130,6 +189,16 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
         defaultOrderId={selectedOrderForRequest?.id}
         onSuccess={handleRequestSuccess}
       />
+
+      {/* 新增訂單對話框 */}
+      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+        <DialogContent level={2} className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{TOUR_ORDERS_LABELS.新增訂單}</DialogTitle>
+          </DialogHeader>
+          <AddOrderForm tourId={tour.id} onSubmit={handleAddOrder} onCancel={() => setAddDialogOpen(false)} />
+        </DialogContent>
+      </Dialog>
 
       {/* 發票對話框 */}
       <InvoiceDialog

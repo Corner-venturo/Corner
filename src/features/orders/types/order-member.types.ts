@@ -53,6 +53,8 @@ export interface OrderMember {
   order_code?: string | null
   // 排序順序
   sort_order?: number | null
+  // 自訂費用（jsonb 欄位）
+  custom_costs?: Record<string, unknown> | null
 }
 
 // ============================================

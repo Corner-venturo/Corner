@@ -166,16 +166,31 @@ export function DisbursementPrintDialog({
     }, 100)
   }, [order?.order_number])
 
-  // 下載 PDF
+  // 下載 PDF 並上傳到 Storage
   const handleDownloadPDF = useCallback(async () => {
     if (!order) return
 
     try {
-      await generateDisbursementPDF({
+      const blob = await generateDisbursementPDF({
         order,
         paymentRequests,
         paymentRequestItems,
       })
+
+      // 上傳到 Supabase Storage
+      const filename = `disbursement/${order.order_number || order.id}.pdf`
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('documents')
+        .upload(filename, blob, { contentType: 'application/pdf', upsert: true })
+
+      if (!uploadError && uploadData) {
+        const { data: urlData } = supabase.storage.from('documents').getPublicUrl(filename)
+        if (urlData?.publicUrl) {
+          await supabase.from('disbursement_orders').update({ pdf_url: urlData.publicUrl } as Record<string, unknown>).eq('id', order.id)
+        }
+      } else if (uploadError) {
+        logger.error('Upload disbursement PDF failed:', uploadError)
+      }
     } catch (error) {
       logger.error(DISBURSEMENT_LABELS.下載_PDF_失敗_2, error)
       void alert(DISBURSEMENT_LABELS.下載_PDF_失敗, 'error')

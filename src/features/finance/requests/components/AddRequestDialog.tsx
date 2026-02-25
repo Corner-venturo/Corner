@@ -30,6 +30,7 @@ import { cn } from '@/lib/utils'
 import { alert } from '@/lib/ui/alert-dialog'
 import { formatDate } from '@/lib/utils/format-date'
 import { useWorkspaceId } from '@/lib/workspace-context'
+import { createSupplier, invalidateSuppliers } from '@/data'
 import type { UserRole } from '@/lib/rbac-config'
 import { ADD_RECEIPT_DIALOG_LABELS, ADD_REQUEST_DIALOG_LABELS, BATCH_RECEIPT_DIALOG_LABELS, PAYMENT_ITEM_ROW_LABELS, ADD_REQUEST_FORM_LABELS, REQUEST_TYPE_LABELS, REQUEST_LABELS, ADD_REQUEST_EXTRA_LABELS } from '../../constants/labels';
 
@@ -206,6 +207,27 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
     const supplier = suppliers.find(s => s.id === batchSupplierId)
     return supplier?.name || ''
   }, [suppliers, batchSupplierId])
+
+  // 快速新增供應商
+  const handleCreateSupplier = async (name: string): Promise<string | null> => {
+    try {
+      const result = await createSupplier({
+        name,
+        code: name.substring(0, 10).toUpperCase(),
+        type: 'other',
+        is_active: true,
+        workspace_id: workspaceId,
+      })
+      if (result?.id) {
+        await invalidateSuppliers()
+        return result.id
+      }
+      return null
+    } catch (error) {
+      logger.error('Quick-create supplier failed:', error)
+      return null
+    }
+  }
 
   // 批量請款：操作
   const addTourAllocation = () => {
@@ -410,7 +432,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
             })
             successCount++
           } catch (itemError) {
-            logger.error(`建立請款單品項失敗 (${allocation.tour_code}):`, itemError)
+            logger.error(`Failed to create payment item (${allocation.tour_code}):`, itemError)
             errorCount++
           }
         }
@@ -469,7 +491,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
         onSuccess?.()
       }
     } catch (error) {
-      logger.error('新增請款單失敗:', error)
+      logger.error('Failed to create payment request:', error)
       const message = error instanceof Error ? error.message : ADD_REQUEST_EXTRA_LABELS.CREATE_FAILED
       void alert(message, 'error')
     } finally {
@@ -631,7 +653,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                 )}
               </div>
             ) : (
-              <EditableRequestItemList items={requestItems} suppliers={suppliers} updateItem={updateItem} removeItem={removeItem} addNewEmptyItem={addNewEmptyItem} />
+              <EditableRequestItemList items={requestItems} suppliers={suppliers} updateItem={updateItem} removeItem={removeItem} addNewEmptyItem={addNewEmptyItem} onCreateSupplier={handleCreateSupplier} tourId={formData.tour_id || null} />
             )}
           </TabsContent>
 
@@ -664,14 +686,15 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                 </div>
                 <div>
                   <Label>{ADD_REQUEST_FORM_LABELS.供應商_label}</Label>
-                  <Select value={batchSupplierId} onValueChange={setBatchSupplierId}>
-                    <SelectTrigger><SelectValue placeholder={ADD_REQUEST_DIALOG_LABELS.選擇供應商_選填} /></SelectTrigger>
-                    <SelectContent className="max-h-[300px] overflow-y-auto">
-                      {suppliers.filter(s => s.type === 'supplier').map(supplier => (
-                        <SelectItem key={supplier.id} value={supplier.id}>{supplier.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Combobox
+                    value={batchSupplierId}
+                    onChange={setBatchSupplierId}
+                    options={suppliers.map(s => ({ value: s.id, label: s.name || '' }))}
+                    placeholder={ADD_REQUEST_DIALOG_LABELS.選擇供應商_選填}
+                    showSearchIcon={false}
+                    onCreate={handleCreateSupplier}
+                    disablePortal
+                  />
                 </div>
               </div>
               <div>
@@ -746,7 +769,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                     {/* 總計行 */}
                     <tr className="bg-morandi-container/20 font-medium">
                       <td className="py-2.5 px-3 border-r border-border text-sm text-morandi-primary">
-                        共 {tourAllocations.length} 行
+                        {ADD_REQUEST_FORM_LABELS.共N行(tourAllocations.length)}
                       </td>
                       <td className="py-2.5 px-3 border-r border-border text-right">
                         <CurrencyCell amount={totalAllocatedAmount} className="text-sm" />
@@ -804,7 +827,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                 </div>
               </div>
 
-              <EditableRequestItemList items={requestItems} suppliers={suppliers} updateItem={updateItem} removeItem={removeItem} addNewEmptyItem={addNewEmptyItem} />
+              <EditableRequestItemList items={requestItems} suppliers={suppliers} updateItem={updateItem} removeItem={removeItem} addNewEmptyItem={addNewEmptyItem} onCreateSupplier={handleCreateSupplier} tourId={formData.tour_id || null} />
             </TabsContent>
           )}
         </Tabs>

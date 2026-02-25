@@ -129,15 +129,22 @@ export function MemberBasicInfo({
               )}
             />
           ) : (
-            <span
-              className={cn(
-                "flex-1 text-xs",
-                member.customer_verification_status === 'unverified' ? 'text-status-danger font-medium' : 'text-morandi-primary'
+            <div className="flex-1 flex items-center gap-1">
+              <span
+                className={cn(
+                  "text-xs",
+                  member.customer_verification_status === 'unverified' ? 'text-status-danger font-medium' : 'text-morandi-primary'
+                )}
+                title={member.customer_verification_status === 'unverified' ? COMP_ORDERS_LABELS.待驗證_請點擊編輯按鈕 : ''}
+              >
+                {member.chinese_name || '-'}
+              </span>
+              {member.identity === COMP_ORDERS_LABELS.領隊_2 && (
+                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-morandi-gold/20 text-morandi-gold text-xs rounded-full font-medium border border-morandi-gold/30">
+                  👑 領隊
+                </span>
               )}
-              title={member.customer_verification_status === 'unverified' ? COMP_ORDERS_LABELS.待驗證_請點擊編輯按鈕 : ''}
-            >
-              {member.chinese_name || '-'}
-            </span>
+            </div>
           )}
           {member.passport_image_url && (
             <button

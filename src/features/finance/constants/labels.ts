@@ -290,6 +290,7 @@ export const ADD_REQUEST_FORM_LABELS = {
   將建立N筆請款單: (count: number) => `將建立 ${count} 筆請款單`,
   未分配: '未分配',
   共N筆總金額: (count: number) => `共 ${count} 筆，總金額`,
+  共N行: (count: number) => `共 ${count} 行`,
 
   LABEL_7551: '團體請款',
   LABEL_163: '批量請款',
@@ -489,4 +490,16 @@ export const BATCH_INVOICE_TOAST_LABELS = {
 export const ISSUE_INVOICE_EXTRA_LABELS = {
   EXCEED_AVAILABLE: (amount: number) => `發票金額不能超過可開金額 ${amount}`,
   TRAVEL_SERVICE_FEE: '旅遊服務費',
+}
+
+// LinkConfirmationDialog
+export const LINK_CONFIRMATION_LABELS = {
+  TITLE: '關聯確認單項目',
+  LOADING: '載入中...',
+  EMPTY: '此團尚無確認單項目',
+  CLEAR: '取消關聯',
+  CANCEL: '取消',
+  CONFIRM: '確認',
+  LINK_BUTTON: '關聯',
+  LINKED: '已關聯',
 }

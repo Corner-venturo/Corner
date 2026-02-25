@@ -10,14 +10,15 @@
  */
 
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { Check, GripVertical } from 'lucide-react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
 import type { OrderMember, CustomCostField } from '../types/order-member.types'
 import type { ColumnVisibility } from './OrderMembersExpandable'
-import { MemberBasicInfo, MemberPassportInfo, MemberActions } from './member-row'
+import type { MemberSurcharges } from '../types/member-surcharge.types'
+import { MemberBasicInfo, MemberPassportInfo, MemberActions, MemberSurchargeCell } from './member-row'
 
 import type { HotelColumn, RoomOption, RoomMemberInfo } from '../hooks/useRoomVehicleAssignments'
 import { RoomAssignmentCell } from './member-row/RoomAssignmentCell'
@@ -53,11 +54,13 @@ interface MemberRowProps {
   onPreview: (member: OrderMember) => void
   onPnrChange: (memberId: string, value: string) => void
   onCustomCostChange: (fieldId: string, memberId: string, value: string) => void
+  onSurchargeChange?: (memberId: string, surcharges: MemberSurcharges) => void  // 附加費用變更
   onKeyDown: (e: React.KeyboardEvent, memberIndex: number, field: string) => void
   onNameSearch?: (memberId: string, value: string) => void
   onIdNumberSearch?: (memberId: string, value: string, memberIndex: number) => void
   onRoomAssign?: (memberId: string, hotelName: string, roomId: string | null, memberBirthDate?: string | null) => void
   onRemoveMemberFromRoom?: (memberId: string, hotelName: string) => void  // 移除單一成員（不影響室友）
+  onSetAsLeader?: (memberId: string) => void
 }
 
 export function MemberRow({
@@ -88,6 +91,7 @@ export function MemberRow({
   onPreview,
   onPnrChange,
   onCustomCostChange,
+  onSurchargeChange,
   onKeyDown,
   onNameSearch,
   onIdNumberSearch,
@@ -95,6 +99,7 @@ export function MemberRow({
   roomOptionsByHotel = {},
   onRoomAssign,
   onRemoveMemberFromRoom,
+  onSetAsLeader,
 }: MemberRowProps) {
   const [isComposing, setIsComposing] = useState(false)
 
@@ -137,6 +142,7 @@ export function MemberRow({
     flight_cost: false,   // 機票金額預設關閉
     room: true,   // 分房欄位
     vehicle: true,  // 分車欄位
+    surcharges: false,  // 附加費用預設關閉
   }
 
   // 處理數字輸入
@@ -144,6 +150,13 @@ export function MemberRow({
     const num = parseInt(value.replace(/\D/g, ''), 10)
     onUpdateField(member.id, field, isNaN(num) ? null : num)
   }, [member.id, onUpdateField])
+
+  // 解析附加費用數據
+  const memberSurcharges = useMemo(() => {
+    if (!member.custom_costs || typeof member.custom_costs !== 'object') return null
+    const customCosts = member.custom_costs as Record<string, unknown>
+    return (customCosts.surcharges as MemberSurcharges) || null
+  }, [member.custom_costs])
 
   return (
     <tr
@@ -372,6 +385,17 @@ export function MemberRow({
         </td>
       )}
 
+      {/* 團體模式：附加費用 */}
+      {mode === 'tour' && cv.surcharges && onSurchargeChange && (
+        <MemberSurchargeCell
+          memberId={member.id}
+          memberName={member.chinese_name || member.passport_name || '成員'}
+          surcharges={memberSurcharges}
+          baseCost={member.selling_price ?? null}
+          onChange={onSurchargeChange}
+        />
+      )}
+
       {/* 團體模式：自訂費用欄位 */}
       {mode === 'tour' && customCostFields.map(field => (
         <td
@@ -392,6 +416,7 @@ export function MemberRow({
         member={member}
         onEdit={onEdit}
         onDelete={onDelete}
+        onSetAsLeader={onSetAsLeader}
       />
     </tr>
   )

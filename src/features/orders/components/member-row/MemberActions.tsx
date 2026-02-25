@@ -1,12 +1,12 @@
 'use client'
 /**
  * MemberActions - 成員操作按鈕
- * 包含：警告、編輯、刪除按鈕
+ * 包含：警告、編輯、刪除、設為領隊按鈕
  */
 
 
 import React from 'react'
-import { AlertTriangle, Pencil, Trash2 } from 'lucide-react'
+import { AlertTriangle, Pencil, Trash2, Crown } from 'lucide-react'
 import type { OrderMember } from '../../types/order-member.types'
 import { COMP_ORDERS_LABELS } from '../../constants/labels'
 
@@ -14,13 +14,17 @@ interface MemberActionsProps {
   member: OrderMember
   onEdit: (member: OrderMember, mode: 'verify' | 'edit') => void
   onDelete: (memberId: string) => void
+  onSetAsLeader?: (memberId: string) => void
 }
 
 export function MemberActions({
   member,
   onEdit,
   onDelete,
+  onSetAsLeader,
 }: MemberActionsProps) {
+  const isLeader = member.identity === COMP_ORDERS_LABELS.領隊_2
+  
   return (
     <td className="border border-morandi-gold/20 px-2 py-1 bg-card text-center">
       <div className="flex items-center justify-center gap-1">
@@ -32,6 +36,16 @@ export function MemberActions({
             title={COMP_ORDERS_LABELS.待驗證_點擊驗證}
           >
             <AlertTriangle size={14} />
+          </button>
+        )}
+        {/* 設為領隊按鈕 */}
+        {onSetAsLeader && !isLeader && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onSetAsLeader(member.id) }}
+            className="text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10 transition-colors p-1 rounded"
+            title={COMP_ORDERS_LABELS.勾選設為領隊}
+          >
+            <Crown size={14} />
           </button>
         )}
         {/* 編輯按鈕 */}

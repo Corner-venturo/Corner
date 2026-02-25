@@ -14,7 +14,7 @@ import { useCallback, useState, useMemo } from 'react'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { FileText, Eye, Trash2 } from 'lucide-react'
+import { FileText, Eye, Trash2, Calendar, Clock, List } from 'lucide-react'
 import {
   usePaymentRequests,
   useDisbursementOrders,
@@ -158,24 +158,44 @@ export function DisbursementPage() {
     ])
   }, [])
 
-  // 計算統計數據
-  const thisMonthOrders = useMemo(() => {
-    return disbursement_orders.filter(o => {
-      const date = new Date(o.created_at || '')
-      const now = new Date()
-      return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()
-    })
-  }, [disbursement_orders])
+  // 週次計算
+  const getWeekRange = useCallback((offset: number) => {
+    const now = new Date()
+    const dayOfWeek = now.getDay() // 0=日, 1=一, ..., 4=四
+    // 本週一
+    const monday = new Date(now)
+    monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1) + offset * 7)
+    monday.setHours(0, 0, 0, 0)
+    // 本週日
+    const sunday = new Date(monday)
+    sunday.setDate(monday.getDate() + 6)
+    sunday.setHours(23, 59, 59, 999)
+    return { start: monday, end: sunday }
+  }, [])
 
-  const thisMonthAmount = useMemo(() => {
-    return thisMonthOrders.reduce((sum, o) => sum + (o.amount || 0), 0)
-  }, [thisMonthOrders])
+  // 為出納單加上 _weekTag 供 tab 篩選
+  const taggedOrders = useMemo(() => {
+    const thisWeek = getWeekRange(0)
+    const lastWeek = getWeekRange(-1)
+
+    return disbursement_orders.map(o => {
+      const date = new Date(o.disbursement_date || o.created_at || '')
+      let _weekTag = 'older'
+      if (date >= thisWeek.start && date <= thisWeek.end) _weekTag = 'this_week'
+      else if (date >= lastWeek.start && date <= lastWeek.end) _weekTag = 'last_week'
+      return { ...o, _weekTag }
+    })
+  }, [disbursement_orders, getWeekRange])
+
+  // 統計
+  const thisWeekOrders = useMemo(() => taggedOrders.filter(o => o._weekTag === 'this_week'), [taggedOrders])
+  const thisWeekAmount = useMemo(() => thisWeekOrders.reduce((sum, o) => sum + (o.amount || 0), 0), [thisWeekOrders])
 
   return (
     <>
-      <ListPageLayout<DisbursementOrder>
+      <ListPageLayout<DisbursementOrder & { _weekTag: string }>
         title={DISBURSEMENT_LABELS.出納單管理}
-        data={disbursement_orders}
+        data={taggedOrders}
         columns={columns}
         searchFields={['order_number']}
         searchPlaceholder={DISBURSEMENT_LABELS.搜尋出納單號}
@@ -183,6 +203,13 @@ export function DisbursementPage() {
         addLabel={DISBURSEMENT_LABELS.新增出納單}
         onRowClick={handleViewDetail}
         initialPageSize={20}
+        statusTabs={[
+          { value: 'this_week', label: DISBURSEMENT_LABELS.本週, icon: Calendar },
+          { value: 'last_week', label: DISBURSEMENT_LABELS.上週, icon: Clock },
+          { value: 'all', label: DISBURSEMENT_LABELS.全部, icon: List },
+        ]}
+        statusField="_weekTag"
+        defaultStatusTab="this_week"
         headerChildren={
           <div className="flex items-center gap-6 text-sm">
             <div className="text-right">
@@ -190,12 +217,12 @@ export function DisbursementPage() {
               <span className="ml-2 font-semibold text-morandi-gold">{pendingRequests.length}{DISBURSEMENT_LABELS.筆}</span>
             </div>
             <div className="text-right">
-              <span className="text-morandi-muted">{DISBURSEMENT_LABELS.LABEL_4658}</span>
-              <span className="ml-2 font-semibold text-morandi-primary">{thisMonthOrders.length}{DISBURSEMENT_LABELS.筆}</span>
+              <span className="text-morandi-muted">{DISBURSEMENT_LABELS.本週出帳}</span>
+              <span className="ml-2 font-semibold text-morandi-primary">{thisWeekOrders.length}{DISBURSEMENT_LABELS.筆}</span>
             </div>
             <div className="text-right flex items-center gap-2">
-              <span className="text-morandi-muted">{DISBURSEMENT_LABELS.LABEL_1688}</span>
-              <CurrencyCell amount={thisMonthAmount} className="font-semibold text-morandi-green" />
+              <span className="text-morandi-muted">{DISBURSEMENT_LABELS.本週金額}</span>
+              <CurrencyCell amount={thisWeekAmount} className="font-semibold text-morandi-green" />
             </div>
           </div>
         }

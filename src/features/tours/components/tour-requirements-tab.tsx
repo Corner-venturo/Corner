@@ -60,7 +60,7 @@ export function TourRequirementsTab({ tourId, quoteId, tour, onOpenRequestDialog
       />
       {tour && (
         <Dialog open={showConfirmationSheet} onOpenChange={setShowConfirmationSheet}>
-          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogContent level={2} className="max-w-6xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{COMP_TOURS_LABELS.確認單}</DialogTitle>
             </DialogHeader>

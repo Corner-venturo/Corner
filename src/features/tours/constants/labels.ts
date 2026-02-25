@@ -615,6 +615,10 @@ export const BASIC_INFO_SECTION_LABELS = {
 // TourOrders 模組的 UI 標籤
 export const TOUR_ORDERS_LABELS = {
   載入中: '載入中...',
+  新增訂單: '新增訂單',
+  新增訂單成功: '訂單已建立',
+  新增訂單失敗: '新增訂單失敗，請稍後再試',
+  請款成功: '請款單已建立',
 };
 
 // TourPrintDialog 模組的 UI 標籤
@@ -1174,6 +1178,27 @@ export const TOUR_DETAIL_PAGE_LABELS = {
   BREADCRUMB_HOME: '首頁',
   BREADCRUMB_TOURS: '旅遊團管理',
 }
+
+// ============================================================
+// Tour Health
+// ============================================================
+export const TOUR_HEALTH_LABELS = {
+  團況健康度: '團況健康度',
+  需求單狀態: '需求單狀態',
+  護照資料: '護照資料', 
+  機票狀態: '機票狀態',
+  飯店確認: '飯店確認',
+  團員人數: '團員人數',
+  全部完成: '全部完成',
+  項需回覆: '項需回覆',
+  人缺護照: '人缺護照',
+  人沒有機票: '人沒有機票',
+  間飯店未確認: '間飯店未確認',
+  人滿團: '人（滿團）',
+  尚未開團: '尚未開團',
+  載入中: '載入中...',
+  載入失敗: '載入失敗，請稍後再試'
+} as const
 
 // Add missing tab labels used by TourTabs
 // (If not already in COMP_TOURS_LABELS above, they're in the large generated object)

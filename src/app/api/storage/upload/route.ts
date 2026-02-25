@@ -3,6 +3,7 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 import { getServerAuth } from '@/lib/auth/server-auth'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 /**
  * 檔案上傳 API
@@ -10,6 +11,10 @@ import { getServerAuth } from '@/lib/auth/server-auth'
  */
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 Rate limiting: 20 requests per minute (file upload)
+    const rateLimited = checkRateLimit(request, 'storage-upload', 20, 60_000)
+    if (rateLimited) return rateLimited
+
     // 🔒 安全檢查：需要已登入用戶
     const auth = await getServerAuth()
     if (!auth.success) {
@@ -74,6 +79,10 @@ export async function POST(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   try {
+    // 🔒 Rate limiting: 20 requests per minute (file delete)
+    const rateLimited = checkRateLimit(request, 'storage-delete', 20, 60_000)
+    if (rateLimited) return rateLimited
+
     // 🔒 安全檢查：需要已登入用戶
     const auth = await getServerAuth()
     if (!auth.success) {

@@ -45,6 +45,7 @@ const TOURS_LIST_FIELDS = [
   'code',
   'name',
   'departure_date',
+  'selling_price_per_person', // 🆕 價格鏈：建立訂單時需要
 ].join(',')
 
 /**

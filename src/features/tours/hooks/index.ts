@@ -6,6 +6,7 @@ export { useTourOperations } from './useTourOperations'
 export { useTourScrollEffects } from './useTourScrollEffects'
 export { useTourGallery } from './useTourGallery'
 export { useTourItineraryNav } from './useTourItineraryNav'
+export { useTourHealth } from './useTourHealth'
 
 export { useTourDepartureData } from './useTourDepartureData'
 export { useQuoteLoader } from './useQuoteLoader'

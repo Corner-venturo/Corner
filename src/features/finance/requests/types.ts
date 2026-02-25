@@ -31,6 +31,7 @@ export interface RequestItem {
   unit_price: number
   quantity: number
   tour_request_id?: string | null // 關聯的需求單 ID
+  confirmation_item_id?: string | null // 關聯的確認單項目 ID
 }
 
 export interface NewItemFormData {

@@ -116,7 +116,7 @@ function splitLargeGroups(groups: PayForGroup[], maxSize = 5): PayForGroup[] {
 /**
  * 生成出納單 PDF
  */
-export async function generateDisbursementPDF(data: DisbursementPDFData): Promise<void> {
+export async function generateDisbursementPDF(data: DisbursementPDFData): Promise<Blob> {
   const { order, paymentRequests, paymentRequestItems, preparedBy } = data
 
   // 處理資料
@@ -274,4 +274,7 @@ export async function generateDisbursementPDF(data: DisbursementPDFData): Promis
   // ========== 儲存 PDF ==========
   const filename = `${order.order_number || 'Disbursement'}.pdf`
   doc.save(filename)
+
+  // 回傳 Blob 供上傳用
+  return doc.output('blob')
 }

@@ -271,6 +271,8 @@ export const COMP_ORDERS_LABELS = {
   LABEL_PAID_AMOUNT: '已收金額',
   LABEL_REMAINING_AMOUNT: '未收金額',
   ACTIONS: '操作',
+  筆: '筆',
+  尚無訂單: '尚無訂單',
 };
 
 // MemberTableHeader 相關標籤

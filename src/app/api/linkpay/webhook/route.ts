@@ -18,6 +18,7 @@ import {
   verifyWebhookSignature,
   type TaishinWebhookParams,
 } from '@/lib/linkpay/signature'
+import { checkRateLimit } from '@/lib/rate-limit'
 import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
 
 // ============================================
@@ -34,6 +35,10 @@ interface TaishinWebhookRequest {
 
 export async function POST(req: NextRequest) {
   try {
+    // 🔒 Rate limiting: 1000 requests per minute (webhook - relaxed limit)
+    const rateLimited = checkRateLimit(req, 'linkpay-webhook', 1000, 60_000)
+    if (rateLimited) return rateLimited
+
     const body: TaishinWebhookRequest = await req.json()
     logger.log('[LinkPay Webhook] 收到通知:', body)
 

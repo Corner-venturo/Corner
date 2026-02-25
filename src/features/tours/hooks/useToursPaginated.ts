@@ -88,10 +88,16 @@ export function useToursPaginated(params: UseToursPaginatedParams): UseToursPagi
             .eq('status', status)
             .neq('archived', true)
             .neq('status', TOUR_SERVICE_LABELS.STATUS_SPECIAL)
+            .not('code', 'like', 'VISA%')
+            .not('code', 'like', 'ESIM%')
         }
       } else {
-        // 'all' tab: exclude archived and special tours
-        query = query.neq('archived', true).neq('status', TOUR_SERVICE_LABELS.STATUS_SPECIAL)
+        // 'all' tab: exclude archived, special tours, and utility tours (visa/esim)
+        query = query
+          .neq('archived', true)
+          .neq('status', TOUR_SERVICE_LABELS.STATUS_SPECIAL)
+          .not('code', 'like', 'VISA%')
+          .not('code', 'like', 'ESIM%')
       }
 
       // ✅ Server-side search
@@ -274,14 +280,13 @@ export function useTourDetailsPaginated(tourId: string | null) {
 
     // 狀態轉換驗證
     const VALID_TOUR_TRANSITIONS: Record<string, string[]> = {
-      'draft': ['published', 'cancelled'],
-      'proposed': ['draft', 'cancelled'],
-      [TOUR_SERVICE_LABELS.STATUS_PROPOSAL]: ['draft', 'cancelled'],
-      'published': ['departed', 'cancelled', 'draft'],
-      'departed': ['completed'],
-      'completed': ['archived'],
-      'cancelled': ['draft'],
-      'archived': [],
+      '開團': ['待出發', '取消'],
+      '待出發': ['已出發', '取消', '開團'],
+      '已出發': ['待結團'],
+      '待結團': ['已結團'],
+      '已結團': [],
+      '取消': ['開團'],
+      '特殊團': [],
     }
 
     const { data: current, error: fetchError } = await supabase

@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase/client'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { COMP_TOURS_LABELS } from '../constants/labels'
 import { recalculateParticipants } from '@/features/tours/services/tour-stats.service'
+import { recalculateOrderAmount } from '@/features/orders/services/order-stats.service'
 
 export interface EditingMember {
   id?: string
@@ -288,15 +289,24 @@ export function useTourMemberEditor(
         assigned_room: assignedRoom,
       }
 
-      const newMember = await createMember(convertedData as unknown as Parameters<typeof createMember>[0])
+      // 🆕 價格鏈：從 tour 的 selling_price_per_person 帶入團員的 selling_price
+      const memberWithPrice = {
+        ...convertedData,
+        selling_price: (tour as any).selling_price_per_person || null,
+      }
+      
+      const newMember = await createMember(memberWithPrice as unknown as Parameters<typeof createMember>[0])
 
       const updatedMembers = [...tableMembers]
       updatedMembers[index] = { ...member, id: newMember.id, isNew: false }
       setTableMembers(updatedMembers)
 
-      // 重算團人數
+      // 重算團人數和訂單金額
       recalculateParticipants(tour.id).catch(err => {
         logger.error('重算團人數失敗:', err)
+      })
+      recalculateOrderAmount(member.order_id).catch(err => {
+        logger.error('重算訂單金額失敗:', err)
       })
     } else if (member.id && !member.isNew) {
       const {
@@ -335,9 +345,12 @@ export function useTourMemberEditor(
 
     if (member.id && !member.isNew) {
       deleteMember(member.id)
-      // 重算團人數
+      // 重算團人數和訂單金額
       recalculateParticipants(tour.id).catch(err => {
         logger.error('重算團人數失敗:', err)
+      })
+      recalculateOrderAmount(member.order_id).catch(err => {
+        logger.error('重算訂單金額失敗:', err)
       })
     }
     const updatedMembers = tableMembers.filter((_, i) => i !== index)

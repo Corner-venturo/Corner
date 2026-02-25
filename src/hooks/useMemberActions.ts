@@ -12,7 +12,7 @@ import type { Member } from '@/stores/types'
 import type { Database } from '@/lib/supabase/types'
 import { deleteMember, updateMember } from '@/data/entities/members'
 import { recalculateParticipants } from '@/features/tours/services/tour-stats.service'
-import { recalculateOrderTotal } from '@/features/orders/services/order-stats.service'
+import { recalculateOrderAmount } from '@/features/orders/services/order-stats.service'
 
 // Supabase Insert 類型（使用 order_members 表）
 type OrderMemberInsert = Database['public']['Tables']['order_members']['Insert']

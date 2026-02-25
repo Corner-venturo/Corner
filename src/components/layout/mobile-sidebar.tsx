@@ -74,7 +74,8 @@ const menuItems: MenuItem[] = [
       { href: '/finance/reports', label: COMP_LAYOUT_LABELS.報表管理, icon: BarChart3, requiredPermission: 'reports' },
     ],
   },
-  { href: '/visas', label: COMP_LAYOUT_LABELS.簽證管理, icon: FileCheck, requiredPermission: 'visas' },
+  // V1: 簽證管理暫時隱藏
+  // { href: '/visas', label: COMP_LAYOUT_LABELS.簽證管理, icon: FileCheck, requiredPermission: 'visas' },
   { href: '/contracts', label: COMP_LAYOUT_LABELS.合約管理, icon: FileSignature, requiredPermission: 'contracts' },
   { href: '/confirmations', label: COMP_LAYOUT_LABELS.確認單管理, icon: CircleDot, requiredPermission: 'confirmations' },
   {
@@ -92,7 +93,8 @@ const menuItems: MenuItem[] = [
     ],
   },
   { href: '/hr', label: COMP_LAYOUT_LABELS.人資管理, icon: UserCog, requiredPermission: 'hr' },
-  { href: '/esims', label: COMP_LAYOUT_LABELS.網卡管理, icon: Wifi, requiredPermission: 'hr', restrictedFeature: 'esim' },
+  // V1: 網卡管理暫時隱藏
+  // { href: '/esims', label: COMP_LAYOUT_LABELS.網卡管理, icon: Wifi, requiredPermission: 'hr', restrictedFeature: 'esim' },
 ]
 
 // 個人工具

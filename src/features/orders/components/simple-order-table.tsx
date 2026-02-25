@@ -8,7 +8,7 @@ import { deleteOrder } from '@/data'
 import { recalculateParticipants } from '@/features/tours/services/tour-stats.service'
 import { recalculateReceiptStats } from '@/features/finance/payments/services/receipt-core.service'
 import { logger } from '@/lib/utils/logger'
-import { User, Trash2, FileText, Pencil, Stamp } from 'lucide-react'
+import { User, Trash2, FileText, Pencil, Stamp, Plus } from 'lucide-react'
 import { CurrencyCell } from '@/components/table-cells'
 import { cn } from '@/lib/utils'
 import { Order, Tour } from '@/stores/types'
@@ -32,6 +32,8 @@ interface SimpleOrderTableProps {
   onEdit?: (order: Order) => void
   /** 快速開簽證單 callback */
   onQuickVisa?: (order: Order) => void
+  /** 新增訂單 callback */
+  onAdd?: () => void
 }
 
 export const SimpleOrderTable = React.memo(function SimpleOrderTable({
@@ -44,6 +46,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
   onQuickInvoice,
   onEdit,
   onQuickVisa,
+  onAdd,
 }: SimpleOrderTableProps) {
   const router = useRouter()
   const workspaceId = useAuthStore(state => state.user?.workspace_id) || ''
@@ -89,8 +92,25 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
         className
       )}
     >
+      {/* 工具列 */}
+      {onAdd && (
+        <div className="flex items-center justify-between px-4 py-2 border-b border-border/60">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-morandi-secondary">({orders.length} {COMP_ORDERS_LABELS.筆})</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Button variant="default" size="sm" className="h-8 px-3" onClick={onAdd}>
+              <Plus size={14} className="mr-1" />{COMP_ORDERS_LABELS.新增}
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* 表頭 */}
-      <div className="bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40 border-b border-border/60 rounded-t-xl">
+      <div className={cn(
+        "bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40 border-b border-border/60",
+        !onAdd && "rounded-t-xl"
+      )}>
         <div className="grid" style={{ gridTemplateColumns: gridCols }}>
           <div className="text-left py-2.5 px-4 text-xs relative">
             <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
@@ -131,15 +151,14 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
       {/* 表格內容 */}
       <div className="flex-1 overflow-y-auto">
         {orders.length === 0 ? (
-          <div className="grid" style={{ gridTemplateColumns: gridCols }}>
-            <div className="py-2 px-4 text-center text-morandi-secondary/50">-</div>
-            {showTourInfo && <div className="py-2 px-4 text-center text-morandi-secondary/50">-</div>}
-            <div className="py-2 px-4 text-center text-morandi-secondary/50">-</div>
-            <div className="py-2 px-4 text-center text-morandi-secondary/50">-</div>
-            <div className="py-2 px-4 text-center text-morandi-secondary/50">-</div>
-            <div className="py-2 px-4 text-center text-morandi-secondary/50">-</div>
-            <div className="py-2 px-4 text-center text-morandi-secondary/50">-</div>
-            <div className="py-2 px-4 text-center text-morandi-secondary/50">-</div>
+          <div className="flex flex-col items-center justify-center py-12 text-morandi-secondary">
+            <FileText size={32} className="mb-2 opacity-30" />
+            <p className="text-sm">{COMP_ORDERS_LABELS.尚無訂單}</p>
+            {onAdd && (
+              <Button variant="outline" size="sm" className="mt-3" onClick={onAdd}>
+                <Plus size={14} className="mr-1" />{COMP_ORDERS_LABELS.新增}
+              </Button>
+            )}
           </div>
         ) : (
           orders.map(order => (

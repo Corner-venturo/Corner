@@ -72,7 +72,9 @@ import { PassportConflictDialog } from './PassportConflictDialog'
 const TourPrintDialog = dynamic(() => import('@/features/tours/components/TourPrintDialog').then(m => m.TourPrintDialog), { ssr: false })
 import type { OrderMember, OrderMembersExpandableProps, CustomCostField } from '../types/order-member.types'
 import type { EditFormData } from './MemberEditDialog'
+import type { MemberSurcharges } from '../types/member-surcharge.types'
 import { COMP_ORDERS_LABELS } from '../constants/labels'
+import { DEFAULT_SURCHARGES } from '../types/member-surcharge.types'
 import { computeRowSpans } from '../utils'
 
 // 可切換顯示的欄位定義
@@ -94,6 +96,7 @@ export interface ColumnVisibility {
   flight_cost: boolean  // 機票金額（成本）
   room: boolean  // 分房欄位
   vehicle: boolean  // 分車欄位
+  surcharges: boolean  // 附加費用
 }
 
 // 預設欄位顯示設定（訂金/尾款/應付金額 預設關閉）
@@ -115,6 +118,7 @@ const defaultColumnVisibility: ColumnVisibility = {
   flight_cost: false,   // 機票金額預設關閉
   room: true,   // 分房欄位預設顯示（有資料時）
   vehicle: true,  // 分車欄位預設顯示（有資料時）
+  surcharges: true,  // 附加費用預設顯示
 }
 
 // 欄位標籤對照
@@ -136,6 +140,7 @@ const columnLabels: Record<keyof ColumnVisibility, string> = {
   flight_cost: COMP_ORDERS_LABELS.機票金額,
   room: COMP_ORDERS_LABELS.分房,
   vehicle: COMP_ORDERS_LABELS.分車,
+  surcharges: '附加費用',
 }
 
 export function OrderMembersExpandable({
@@ -274,6 +279,49 @@ export function OrderMembersExpandable({
   const [isComposing, setIsComposing] = useState(false)
   const [previewMember, setPreviewMember] = useState<OrderMember | null>(null)
   const [customCostFields, setCustomCostFields] = useState<CustomCostField[]>([])
+
+  // 從 DB 載入自訂費用欄位定義和值
+  useEffect(() => {
+    if (!tourId || mode !== 'tour') return
+    const loadCustomCosts = async () => {
+      try {
+        // 讀取團的欄位定義
+        const { data: tourData } = await supabase
+          .from('tours')
+          .select('custom_cost_fields')
+          .eq('id', tourId)
+          .single()
+        const rawData = tourData as Record<string, unknown> | null
+        const fieldDefs: Array<{ id: string; name: string }> = (rawData?.custom_cost_fields as Array<{ id: string; name: string }>) || []
+        if (fieldDefs.length === 0) return
+
+        // 讀取所有團員的自訂費用值
+        const memberIds = membersData.members.map(m => m.id)
+        if (memberIds.length === 0) {
+          setCustomCostFields(fieldDefs.map(f => ({ ...f, values: {} })))
+          return
+        }
+        const { data: membersWithCosts } = await supabase
+          .from('order_members')
+          .select('id, custom_costs')
+          .in('id', memberIds)
+
+        // 組合成 CustomCostField 格式
+        const fields: CustomCostField[] = fieldDefs.map(f => {
+          const values: Record<string, string> = {}
+          for (const m of (membersWithCosts || []) as unknown as Array<{ id: string; custom_costs: Record<string, string> | null }>) {
+            const costs = (m.custom_costs || {}) as Record<string, string>
+            if (costs[f.id]) values[m.id] = costs[f.id]
+          }
+          return { ...f, values }
+        })
+        setCustomCostFields(fields)
+      } catch (err) {
+        logger.error('載入自訂費用欄位失敗', err)
+      }
+    }
+    loadCustomCosts()
+  }, [tourId, mode, membersData.members.length])
   const [pnrValues, setPnrValues] = useState<Record<string, string>>({})
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>(getInitialColumnVisibility)
   // PNR 配對 Dialog：支援父組件控制（避免多重遮罩問題）
@@ -438,6 +486,41 @@ export function OrderMembersExpandable({
   }, [membersData])
 
   // Handlers
+  const handleSetAsLeader = useCallback(async (memberId: string) => {
+    const currentMember = membersData.members.find(m => m.id === memberId)
+    if (!currentMember) return
+
+    try {
+      // 1. 先將所有團員的身份設為成人（取消之前的領隊）
+      const resetPromises = membersData.members
+        .filter(m => m.identity === COMP_ORDERS_LABELS.領隊_2)
+        .map(m => updateMember(m.id, { identity: COMP_ORDERS_LABELS.大人, sort_order: m.sort_order || 999 } as Parameters<typeof updateMember>[1]))
+      
+      await Promise.all(resetPromises)
+      
+      // 2. 設定新領隊並排到第一位
+      await updateMember(memberId, { identity: COMP_ORDERS_LABELS.領隊_2, sort_order: 0 } as Parameters<typeof updateMember>[1])
+      
+      // 3. 更新本地狀態
+      membersData.setMembers(membersData.members.map(m => 
+        m.id === memberId 
+          ? { ...m, identity: COMP_ORDERS_LABELS.領隊_2, sort_order: 0 }
+          : m.identity === COMP_ORDERS_LABELS.領隊_2 
+            ? { ...m, identity: COMP_ORDERS_LABELS.大人, sort_order: m.sort_order || 999 }
+            : m
+      ))
+      
+      toast.success(`已將 ${currentMember.chinese_name || currentMember.passport_name || '成員'} 設為領隊`)
+      logger.info(`已將 ${currentMember.chinese_name} 設為領隊並排到第一位`)
+      
+      // 重新載入資料以確保順序正確
+      setTimeout(() => membersData.loadMembers(), 100)
+    } catch (error) {
+      logger.error(COMP_ORDERS_LABELS.設定領隊失敗, error)
+      toast.error(COMP_ORDERS_LABELS.設定領隊失敗)
+    }
+  }, [membersData])
+
   const handleUpdateField = useCallback(async (memberId: string, field: keyof OrderMember, value: string | number | null) => {
     // 對於開票期限，同步更新同 PNR 的所有成員
     if (field === 'ticketing_deadline') {
@@ -487,6 +570,60 @@ export function OrderMembersExpandable({
       await updateMember(memberId, { [field]: value })
     } catch (error) {
       logger.error(COMP_ORDERS_LABELS.更新欄位失敗, error)
+    }
+  }, [membersData])
+
+  // 處理附加費用變更
+  const handleSurchargeChange = useCallback(async (memberId: string, surcharges: MemberSurcharges) => {
+    try {
+      // 計算附加費用總額
+      let surchargeTotal = 0
+      if (surcharges.single_room_surcharge) surchargeTotal += surcharges.single_room_surcharge
+      if (surcharges.visa_fee) surchargeTotal += surcharges.visa_fee
+      surcharges.add_on_items.forEach(item => { if (item.amount) surchargeTotal += item.amount })
+      surcharges.other_charges.forEach(item => { if (item.amount) surchargeTotal += item.amount })
+      
+      // 獲取該團員的基本團費
+      const member = membersData.members.find(m => m.id === memberId)
+      const newTotalPayable = (member?.selling_price || 0) + surchargeTotal
+
+      // 更新本地狀態
+      membersData.setMembers(prev => prev.map(m => {
+        if (m.id === memberId) {
+          return {
+            ...m,
+            total_payable: newTotalPayable
+          }
+        }
+        return m
+      }))
+
+      // 存到 DB: 讀取該團員現有的 custom_costs，合併後寫回
+      const { data: existing } = await supabase
+        .from('order_members')
+        .select('custom_costs')
+        .eq('id', memberId)
+        .single()
+
+      const existingRaw = existing as Record<string, unknown> | null
+      const currentCosts = ((existingRaw?.custom_costs as Record<string, unknown>) || {})
+      const updatedCosts = { 
+        ...currentCosts, 
+        surcharges: surcharges 
+      }
+
+      // 同時更新 custom_costs 和 total_payable
+      await supabase
+        .from('order_members')
+        .update({ 
+          custom_costs: updatedCosts,
+          total_payable: newTotalPayable
+        } as Record<string, unknown>)
+        .eq('id', memberId)
+
+    } catch (err) {
+      logger.error('儲存附加費用失敗', err)
+      toast.error('儲存附加費用失敗')
     }
   }, [membersData])
 
@@ -567,20 +704,6 @@ export function OrderMembersExpandable({
             <Pencil size={14} />
             {isAllEditMode ? COMP_ORDERS_LABELS.關閉編輯 : COMP_ORDERS_LABELS.全部編輯}
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 px-2 gap-1"
-            onClick={handleBulkSyncFromCustomers}
-            disabled={isSyncingFromCustomers}
-            title={COMP_ORDERS_LABELS.從顧客主檔同步所有成員的護照資料}
-          >
-            <RefreshCw size={14} className={isSyncingFromCustomers ? 'animate-spin' : ''} />
-            {isSyncingFromCustomers ? COMP_ORDERS_LABELS.同步中 : COMP_ORDERS_LABELS.從顧客同步}
-          </Button>
-          <Button variant="ghost" size="sm" className={`h-8 px-2 ${showIdentityColumn ? 'text-morandi-gold' : ''}`} onClick={() => setShowIdentityColumn(!showIdentityColumn)}>
-            {COMP_ORDERS_LABELS.身份}
-          </Button>
           {mode === 'tour' && (
             <Button
               variant="ghost"
@@ -592,7 +715,14 @@ export function OrderMembersExpandable({
                   placeholder: COMP_ORDERS_LABELS.例如_簽證費_小費,
                 })
                 if (name?.trim()) {
-                  setCustomCostFields([...customCostFields, { id: `cost_${Date.now()}`, name: name.trim(), values: {} }])
+                  const newField = { id: `cost_${Date.now()}`, name: name.trim(), values: {} }
+                  const updated = [...customCostFields, newField]
+                  setCustomCostFields(updated)
+                  // 存到 DB
+                  if (tourId) {
+                    const fieldDefs = updated.map(f => ({ id: f.id, name: f.name }))
+                    await supabase.from('tours').update({ custom_cost_fields: fieldDefs } as Record<string, unknown>).eq('id', tourId)
+                  }
                 }
               }}
             >
@@ -721,6 +851,13 @@ export function OrderMembersExpandable({
                   >
                     {columnLabels.vehicle} {!roomVehicle.showVehicleColumn && COMP_ORDERS_LABELS.無資料}
                   </DropdownMenuCheckboxItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuCheckboxItem
+                    checked={columnVisibility.surcharges}
+                    onCheckedChange={() => toggleColumnVisibility('surcharges')}
+                  >
+                    {columnLabels.surcharges}
+                  </DropdownMenuCheckboxItem>
                 </>
               )}
             </DropdownMenuContent>
@@ -738,7 +875,7 @@ export function OrderMembersExpandable({
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
-          <table className="border-collapse text-sm member-table-inline table-fixed">
+          <table className="border-collapse text-sm member-table-inline table-fixed w-full">
             <MemberTableHeader
               mode={mode}
               orderCount={membersData.orderCount}
@@ -746,6 +883,7 @@ export function OrderMembersExpandable({
               showPnrColumn={columnVisibility.pnr}
               showRoomColumn={roomVehicle.showRoomColumn && columnVisibility.room}
               showVehicleColumn={roomVehicle.showVehicleColumn && columnVisibility.vehicle}
+              showSurchargeColumn={columnVisibility.surcharges}
               hotelColumns={roomVehicle.hotelColumns}
               customCostFields={customCostFields}
               columnVisibility={columnVisibility}
@@ -791,7 +929,25 @@ export function OrderMembersExpandable({
                 onEdit={memberEdit.openEditDialog}
                 onPreview={(member) => setPreviewMember(member)}
                 onPnrChange={(id, val) => setPnrValues({ ...pnrValues, [id]: val })}
-                onCustomCostChange={(fId, mId, val) => setCustomCostFields(customCostFields.map(f => f.id === fId ? { ...f, values: { ...f.values, [mId]: val } } : f))}
+                onCustomCostChange={async (fId, mId, val) => {
+                  // 更新前端 state
+                  setCustomCostFields(customCostFields.map(f => f.id === fId ? { ...f, values: { ...f.values, [mId]: val } } : f))
+                  // 存到 DB: 讀取該團員現有的 custom_costs，合併後寫回
+                  try {
+                    const { data: existing } = await supabase
+                      .from('order_members')
+                      .select('custom_costs')
+                      .eq('id', mId)
+                      .single()
+                    const existingRaw = existing as Record<string, unknown> | null
+                    const currentCosts = ((existingRaw?.custom_costs as Record<string, string>) || {})
+                    const updatedCosts = { ...currentCosts, [fId]: val }
+                    await supabase.from('order_members').update({ custom_costs: updatedCosts } as Record<string, unknown>).eq('id', mId)
+                  } catch (err) {
+                    logger.error('儲存自訂費用失敗', err)
+                  }
+                }}
+                onSurchargeChange={handleSurchargeChange}
                 onKeyDown={handleKeyDown}
                 onNameSearch={(memberId, value) => {
                   const memberIndex = membersData.members.findIndex(m => m.id === memberId)
@@ -802,6 +958,7 @@ export function OrderMembersExpandable({
                 onIdNumberSearch={(memberId, value, memberIndex) => {
                   customerMatch.checkCustomerMatchByIdNumber(value, memberIndex, membersData.members[memberIndex])
                 }}
+                onSetAsLeader={handleSetAsLeader}
                   />
                 ))}
               </tbody>

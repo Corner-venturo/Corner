@@ -129,6 +129,7 @@ export interface DisbursementOrder {
   handled_at?: string | null // 經手時間
   payment_method?: string | null // 付款方式
   paid_at?: string | null // 付款時間
+  pdf_url?: string | null // 存檔的 PDF 連結
   workspace_id?: string | null
   created_at: string | null
   updated_at: string | null
