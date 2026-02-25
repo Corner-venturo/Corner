@@ -9,4 +9,8 @@ export const LABELS = {
   LABEL_772: '輸入密碼',
   LABEL_3877: '記住我（30 天內免重新登入）',
   TITLE: 'Venturo 系統登入',
+
+  DEMO_BUTTON: '免費體驗 Demo',
+  DEMO_LOADING: '正在進入體驗模式...',
+  DEMO_DIVIDER: '或',
 }
