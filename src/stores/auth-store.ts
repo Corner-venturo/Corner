@@ -134,8 +134,8 @@ interface AuthState {
   setHasHydrated: (hasHydrated: boolean) => void
 }
 
-function setSecureCookie(token: string, rememberMe: boolean = false): void {
-  const maxAge = rememberMe ? 30 * 24 * 60 * 60 : 8 * 60 * 60 // 30 days or 8 hours
+function setSecureCookie(token: string, _rememberMe: boolean = false): void {
+  const maxAge = 30 * 24 * 60 * 60 // 30 days — 登入後不應該頻繁要求重新登入
   const secure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'Secure; ' : ''
 
   if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
