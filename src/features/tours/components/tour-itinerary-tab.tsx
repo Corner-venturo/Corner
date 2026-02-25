@@ -632,8 +632,8 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
       <html>
         <head><title>${title || TOUR_ITINERARY_TAB_LABELS.行程表}</title></head>
         <body>
-          <h1>列印功能暫時停用</h1>
-          <p>正在重新實作列印功能...</p>
+          <h1>{TOUR_ITINERARY_TAB_LABELS.PRINT_5670}</h1>
+          <p>{TOUR_ITINERARY_TAB_LABELS.PRINT_5535}</p>
         </body>
       </html>
     `

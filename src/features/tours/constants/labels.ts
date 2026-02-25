@@ -817,6 +817,9 @@ export const TOUR_ITINERARY_TAB_LABELS = {
   TAIWAN: '台灣',
   WEEKDAYS: ['日', '一', '二', '三', '四', '五', '六'] as readonly string[],
   TRAVEL_AGENCY: '旅行社',
+
+  PRINT_5670: '列印功能暫時停用',
+  PRINT_5535: '正在重新實作列印功能...',
 };
 
 // TourCosts 模組的 UI 標籤

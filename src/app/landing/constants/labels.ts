@@ -52,4 +52,6 @@ export const LANDING_LABELS = {
   FOOTER_CONTACT_TITLE: '聯繫我們',
   FOOTER_EMAIL: 'hello@venturo.app',
   FOOTER_COPYRIGHT: '© 2025 Venturo. All rights reserved.',
+
+  LABEL_3045: '截圖預留區',
 } as const

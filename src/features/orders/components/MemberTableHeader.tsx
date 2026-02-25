@@ -329,7 +329,7 @@ export function MemberTableHeader({
             onResize={onColumnResize}
             className={thBaseClass}
           >
-            附加費用
+            {L.LABEL_7281}
           </ResizableTh>
         )}
 

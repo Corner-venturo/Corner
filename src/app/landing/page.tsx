@@ -133,7 +133,7 @@ function FeaturesSection() {
               <p className="mt-2 text-sm leading-relaxed text-slate-600">{feature.description}</p>
               {/* Screenshot placeholder */}
               <div className="mt-4 flex h-36 items-center justify-center rounded-lg border-2 border-dashed border-slate-200 bg-slate-50 text-sm text-slate-400">
-                截圖預留區
+                {LANDING_LABELS.LABEL_3045}
               </div>
             </div>
           ))}

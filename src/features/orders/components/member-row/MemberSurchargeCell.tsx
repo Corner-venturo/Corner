@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { cn } from '@/lib/utils'
 import type { MemberSurcharges, SurchargeItem } from '../../types/member-surcharge.types'
 import { DEFAULT_SURCHARGES, SURCHARGE_LABELS } from '../../types/member-surcharge.types'
+import { MEMBER_ROW_LABELS } from './constants/labels'
 
 interface MemberSurchargeCellProps {
   memberId: string
@@ -217,7 +218,7 @@ export function MemberSurchargeCell({
               {editData.add_on_items.map((item, index) => (
                 <div key={index} className="flex gap-2">
                   <Input
-                    placeholder="項目名稱"
+                    placeholder={MEMBER_ROW_LABELS.LABEL_7515}
                     value={item.name}
                     onChange={(e) => handleUpdateItem('add_on_items', index, 'name', e.target.value)}
                     className="flex-1"
@@ -225,7 +226,7 @@ export function MemberSurchargeCell({
                   <Input
                     type="text"
                     inputMode="numeric"
-                    placeholder="金額"
+                    placeholder={MEMBER_ROW_LABELS.AMOUNT}
                     value={item.amount || ''}
                     onChange={(e) => handleUpdateItem('add_on_items', index, 'amount', e.target.value)}
                     className="w-24 text-right"
@@ -262,7 +263,7 @@ export function MemberSurchargeCell({
               {editData.other_charges.map((item, index) => (
                 <div key={index} className="flex gap-2">
                   <Input
-                    placeholder="費用名稱"
+                    placeholder={MEMBER_ROW_LABELS.LABEL_9044}
                     value={item.name}
                     onChange={(e) => handleUpdateItem('other_charges', index, 'name', e.target.value)}
                     className="flex-1"
@@ -326,10 +327,10 @@ export function MemberSurchargeCell({
 
           <div className="flex justify-end gap-2 pt-4">
             <Button variant="outline" onClick={handleCloseDialog}>
-              取消
+              {MEMBER_ROW_LABELS.CANCEL}
             </Button>
             <Button onClick={handleSave}>
-              儲存
+              {MEMBER_ROW_LABELS.SAVE}
             </Button>
           </div>
         </DialogContent>

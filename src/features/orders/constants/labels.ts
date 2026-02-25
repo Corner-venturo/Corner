@@ -299,6 +299,8 @@ export const MEMBER_TABLE_HEADER_LABELS = {
   ticketing_deadline: '開票期限',
   flight_cost: '機票金額',
   actions: '操作',
+
+  LABEL_7281: '附加費用',
 };
 
 // ExportDialog 相關標籤
