@@ -75,13 +75,12 @@ export function verifyWebhookSignature(params: TaishinWebhookParams): {
   valid: boolean
   reason?: string
 } {
-  // 檢查是否有設定 MAC_KEY
+  // 檢查是否有設定 MAC_KEY — 未設定時拒絕所有請求，防止簽名驗證被繞過
   if (!TAISHIN_MAC_KEY) {
-    logger.warn('[LinkPay Webhook] TAISHIN_MAC_KEY 未設定，跳過簽名驗證')
-    // 在開發環境或未設定密鑰時，允許通過（但記錄警告）
+    logger.warn('[LinkPay Webhook] TAISHIN_MAC_KEY 未設定，拒絕請求')
     return {
-      valid: true,
-      reason: 'MAC_KEY 未設定，跳過驗證',
+      valid: false,
+      reason: 'MAC_KEY 未設定，無法驗證簽名',
     }
   }
 
