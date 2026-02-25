@@ -10,6 +10,7 @@ import {
 import type { CanvasPage } from '@/features/designer/components/types'
 import type { StyleSeries, TemplateData } from '@/features/designer/templates/engine'
 import type { DesignType } from '@/features/designer/components/DesignTypeSelector'
+import { getWorkspaceCompanyName } from '@/lib/workspace-helpers'
 
 interface UseDesignerSetupOptions {
   entityId: string | null
@@ -79,7 +80,7 @@ export function useDesignerSetup({
       try {
         let data: TemplateData = {
           mainTitle: '旅遊手冊',
-          companyName: 'Corner Travel',
+          companyName: getWorkspaceCompanyName(),
         }
 
         if (selectedItineraryId) {

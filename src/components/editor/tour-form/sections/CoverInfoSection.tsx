@@ -19,6 +19,7 @@ import { useCoverInfo } from './cover/hooks/useCoverInfo'
 import { AirportImageLibrary } from './cover/AirportImageLibrary'
 import { CoverInfoForm } from './cover/CoverInfoForm'
 import { COMP_EDITOR_LABELS } from '../../constants/labels'
+import { getWorkspaceCompanyName } from '@/lib/workspace-helpers'
 
 interface CoverInfoSectionProps {
   data: TourFormData
@@ -93,7 +94,7 @@ export function CoverInfoSection({
   // 生成預覽用資料
   const getHeroData = () => ({
     coverImage: data.coverImage,
-    tagline: data.tagline || 'Corner Travel',
+    tagline: data.tagline || getWorkspaceCompanyName(),
     title: data.title || COMP_EDITOR_LABELS.行程標題,
     subtitle: data.subtitle || COMP_EDITOR_LABELS.副標題,
     description: data.description || COMP_EDITOR_LABELS.此處顯示行程描述,

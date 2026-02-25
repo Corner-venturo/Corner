@@ -222,6 +222,27 @@ export function canManageWorkspace(targetWorkspaceId: string): boolean {
 }
 
 /**
+ * 取得當前 workspace 的公司名稱
+ *
+ * @returns 公司名稱或空字串
+ */
+export function getWorkspaceCompanyName(): string {
+  const { user } = useAuthStore.getState()
+  return user?.workspace_name || ''
+}
+
+/**
+ * 取得當前 workspace 的年度標語 (e.g., "Corner Travel 2026")
+ *
+ * @returns 標語字串
+ */
+export function getWorkspaceTagline(): string {
+  const name = getWorkspaceCompanyName()
+  const year = new Date().getFullYear()
+  return name ? `${name} ${year}` : String(year)
+}
+
+/**
  * 取得所有可用的 workspaces（根據權限）
  *
  * @returns workspace 陣列

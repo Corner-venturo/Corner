@@ -13,6 +13,7 @@ import { X, Printer } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { COMPANY } from '@/lib/constants/company'
 import { LABELS } from '../constants/labels'
+import { getWorkspaceCompanyName } from '@/lib/workspace-helpers'
 import type { Confirmation, FlightData, AccommodationData } from '@/types/confirmation.types'
 
 interface PrintableConfirmationProps {
@@ -28,6 +29,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
   onClose,
   onPrint,
 }) => {
+  const workspaceName = getWorkspaceCompanyName()
   const [isMounted, setIsMounted] = useState(false)
   const [logoUrl, setLogoUrl] = useState<string>('')
 
@@ -206,7 +208,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
                       </div>
                     ) : (
                       <div className="absolute left-0 top-0 text-xs" style={{ color: '#9CA3AF' }}>
-                        {LABELS.CORNER_TRAVEL}
+                        {workspaceName}
                       </div>
                     )}
 
@@ -249,7 +251,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
                       </p>
                     </div>
                     <div className="text-center text-xs" style={{ color: '#9CA3AF' }}>
-                      <span>{LABELS.CORNER_TRAVEL_COMPANY} © {new Date().getFullYear()}</span>
+                      <span>{workspaceName} © {new Date().getFullYear()}</span>
                     </div>
                   </div>
                 </td>
@@ -301,7 +303,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
                 </div>
               ) : (
                 <div className="absolute left-0 top-0 text-xs" style={{ color: '#9CA3AF' }}>
-                  {LABELS.CORNER_TRAVEL}
+                  {workspaceName}
                 </div>
               )}
 
@@ -353,7 +355,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
                 </p>
               </div>
               <div className="text-center text-xs" style={{ color: '#9CA3AF' }}>
-                <span>{LABELS.CORNER_TRAVEL_COMPANY} © {new Date().getFullYear()}</span>
+                <span>{workspaceName} © {new Date().getFullYear()}</span>
               </div>
             </div>
           </div>

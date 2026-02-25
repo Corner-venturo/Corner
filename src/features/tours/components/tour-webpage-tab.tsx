@@ -40,10 +40,11 @@ const ItineraryPreview = dynamic(
 import type { LocalTourData, AutoSaveStatus } from '@/app/(main)/itinerary/new/hooks/useItineraryEditor'
 import { COMP_TOURS_LABELS } from '../constants/labels'
 import { TOUR_WEBPAGE_TAB_LABELS, TOUR_SERVICE_LABELS } from '../constants/labels'
+import { getWorkspaceTagline } from '@/lib/workspace-helpers'
 
 function getEmptyTourData(): LocalTourData {
   return {
-    tagline: `Corner Travel ${new Date().getFullYear()}`,
+    tagline: getWorkspaceTagline(),
     title: '',
     subtitle: '',
     description: '',
@@ -185,7 +186,7 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
     const relatedQuote = quotes.find(q => q.tour_id === tour.id)
 
     setTourData({
-      tagline: itinerary.tagline || `Corner Travel ${new Date().getFullYear()}`,
+      tagline: itinerary.tagline || getWorkspaceTagline(),
       title: itinerary.title || relatedTour?.name || '',
       subtitle: itinerary.subtitle || '',
       description: itinerary.description || '',

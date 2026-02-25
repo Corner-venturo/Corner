@@ -8,6 +8,7 @@ import { formatDateCompact, formatWeekday, formatDateTW, formatDateCompactPadded
 import type { Itinerary } from '@/stores/types'
 import type { FlightInfo } from '@/types/flight.types'
 import { ITINERARY_ACTIONS_LABELS } from '../constants/labels'
+import { getWorkspaceTagline } from '@/lib/workspace-helpers'
 
 interface DailyData {
   title: string
@@ -175,7 +176,7 @@ export function useItineraryForm({ createItinerary, userId }: UseItineraryFormPr
       }
 
       const newItinerary = {
-        tagline: `Corner Travel ${new Date().getFullYear()}`,
+        tagline: getWorkspaceTagline(),
         title: newItineraryTitle.trim(),
         subtitle: '',
         description: '',

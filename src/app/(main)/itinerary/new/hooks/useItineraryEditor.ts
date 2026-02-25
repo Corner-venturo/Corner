@@ -22,6 +22,7 @@ import type {
 import type { ItineraryVersionRecord, PricingDetails, PriceTier, FAQ } from '@/stores/types'
 import type { TierPricing } from '@/stores/types/quote.types'
 import { ITINERARY_EDITOR_LABELS } from '../../constants/labels'
+import { getWorkspaceTagline } from '@/lib/workspace-helpers'
 
 // Local tour data interface
 export interface LocalTourData {
@@ -323,7 +324,7 @@ export function useItineraryEditor() {
 
 function getEmptyTourData(): LocalTourData {
   return {
-    tagline: `Corner Travel ${new Date().getFullYear()}`,
+    tagline: getWorkspaceTagline(),
     title: '',
     subtitle: '',
     description: '',

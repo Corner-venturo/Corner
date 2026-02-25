@@ -68,8 +68,8 @@ export const LABELS = {
   BOOKING_CODE: '訂位代號',
   CONFIRMATION_CODE: '確認號碼',
   REMARKS: '備註',
-  CORNER_TRAVEL: '角落旅行社',
-  CORNER_TRAVEL_COMPANY: '角落旅行社股份有限公司',
+  CORNER_TRAVEL: '', // deprecated: 改從 workspace 讀取
+  CORNER_TRAVEL_COMPANY: '', // deprecated: 改從 workspace 讀取
   
   // Flight related
   DISCLAIMER: '**** 此文件資訊僅提供參考, 實際資訊以航空公司及相關旅遊供應商為準 ****',

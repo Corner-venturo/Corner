@@ -11,6 +11,7 @@ import type { DailyItinerary, HotelInfo, FlightInfo } from '@/components/editor/
 import type { TierPricing } from '@/stores/types/quote.types'
 import type { Itinerary } from '@/stores/types'
 import { ITINERARY_DATA_LOADER_LABELS } from '../../constants/labels'
+import { getWorkspaceTagline } from '@/lib/workspace-helpers'
 
 interface UseItineraryDataLoaderProps {
   setTourData: (data: LocalTourData) => void
@@ -60,7 +61,7 @@ export function useItineraryDataLoader({
     logger.log('[ItineraryDataLoader] 行程資料 - features:', itinerary.features, 'daily_itinerary:', (itinerary.daily_itinerary as unknown[])?.length || 0)
 
     setTourData({
-      tagline: itinerary.tagline || `Corner Travel ${new Date().getFullYear()}`,
+      tagline: itinerary.tagline || getWorkspaceTagline(),
       title: itinerary.title || '',
       subtitle: itinerary.subtitle || '',
       description: itinerary.description || '',
@@ -261,7 +262,7 @@ export function useItineraryDataLoader({
           )
 
           setTourData({
-            tagline: `Corner Travel ${new Date().getFullYear()}`,
+            tagline: getWorkspaceTagline(),
             title: quoteName || '',
             subtitle: '',
             description: '',
@@ -340,7 +341,7 @@ export function useItineraryDataLoader({
       const isTaiwan = country?.name === '台灣'
 
       setTourData({
-        tagline: `Corner Travel ${new Date().getFullYear()}`,
+        tagline: getWorkspaceTagline(),
         title: tour.name,
         subtitle: '精緻旅遊',
         description: tour.description || '',

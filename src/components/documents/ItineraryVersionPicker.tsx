@@ -28,6 +28,7 @@ import type { Tour, Itinerary } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 import { stripHtml } from '@/lib/utils/string-utils'
 import { DOCUMENTS_LABELS } from './constants/labels'
+import { getWorkspaceTagline } from '@/lib/workspace-helpers'
 
 // 判斷是否為已確認版本（狀態為結案）
 function isConfirmedItinerary(itinerary: Itinerary): boolean {
@@ -141,7 +142,7 @@ export function ItineraryVersionPicker({
         departure_date: tour.departure_date || '',
         city: cityName,
         daily_itinerary: formattedDailyItinerary,
-        tagline: `Corner Travel ${new Date().getFullYear()}`,
+        tagline: getWorkspaceTagline(),
         subtitle: '',
         description: '',
         cover_image: '',
