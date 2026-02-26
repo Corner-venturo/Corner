@@ -6,6 +6,7 @@ import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { validateBody } from '@/lib/api/validation'
 import { changePasswordSchema } from '@/lib/validations/api-schemas'
+import { getServerAuth } from '@/lib/auth/server-auth'
 
 /**
  * 用戶自行更改密碼
@@ -17,6 +18,12 @@ export async function POST(request: NextRequest) {
     // 🔒 Rate limiting: 5 requests per minute
     const rateLimited = checkRateLimit(request, 'change-password', 5, 60_000)
     if (rateLimited) return rateLimited
+
+    // 🔒 Session 檢查：必須已登入
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      return errorResponse('請先登入', 401, ErrorCode.UNAUTHORIZED)
+    }
 
     const validation = await validateBody(request, changePasswordSchema)
     if (!validation.success) return validation.error
