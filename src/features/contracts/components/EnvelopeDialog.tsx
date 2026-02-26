@@ -30,6 +30,7 @@ import { useTours, updateTour, useQuotes } from '@/data'
 import { generateUUID } from '@/lib/utils/uuid'
 import { alert } from '@/lib/ui/alert-dialog'
 import { COMP_CONTRACTS_LABELS } from './constants/labels'
+import { useWorkspaceSettings } from '@/hooks/useWorkspaceSettings'
 
 interface EnvelopeDialogProps {
   isOpen: boolean
@@ -40,6 +41,7 @@ interface EnvelopeDialogProps {
 export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
   const { user } = useAuthStore()
   const { items: quotes } = useQuotes()
+  const ws = useWorkspaceSettings()
   const [recipient, setRecipient] = useState('')
   const [recipientAddress, setRecipientAddress] = useState('')
   const [recipientPhone, setRecipientPhone] = useState('')
@@ -47,18 +49,18 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
   // 寄件人資訊
   const [senderName, setSenderName] = useState('')
   const [senderPhone, setSenderPhone] = useState('')
-  const senderAddress = COMP_CONTRACTS_LABELS.台北市大同區重慶北路一段67號8樓之2
+  const senderAddress = ws.address
   const senderCompany = user?.workspace_name || ''
 
   useEffect(() => {
     if (isOpen && user) {
       // 從 HR 帶入員工資料
       setSenderName(user.display_name || user.chinese_name || user.english_name || '')
-      // 從 user 物件取得電話，如果沒有就使用公司總機（可手動修改）
+      // 從 user 物件取得電話，如果沒有就使用 workspace 公司總機（可手動修改）
       const userPhone = Array.isArray(user.personal_info?.phone)
         ? user.personal_info.phone[0]
         : user.personal_info?.phone || ''
-      setSenderPhone(userPhone || '02-7751-6051')
+      setSenderPhone(userPhone || ws.phone)
 
       // 從關聯的報價單帶入收件人資訊
       const linkedQuote = quotes.find(q => q.tour_id === tour.id)
@@ -78,7 +80,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
       setSenderName('')
       setSenderPhone('')
     }
-  }, [isOpen, user, tour.id, quotes])
+  }, [isOpen, user, tour.id, quotes, ws.phone])
 
   const handlePrint = async () => {
     if (!recipient || !recipientAddress || !recipientPhone) {

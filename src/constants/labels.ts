@@ -300,9 +300,10 @@ export const PRINT_FOOTER_LABELS = {
 };
 
 export const PAYMENT_INFO_LABELS = {
-  銀行: '銀行：國泰世華銀行 (013)',
-  分行: '分行：大同分行 (0626)',
-  帳號: '帳號：062-03-500821-2',
+  銀行: '銀行：',
+  分行: '分行：',
+  帳號: '帳號：',
+  未設定銀行資訊: '請至公司設定填寫銀行資訊',
 };
 
 export const QUOTE_DIALOG_LABELS_EXTRA = {

@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Printer, FileText } from 'lucide-react'
 import { FLIGHT_ITINERARY_LABELS } from './constants/labels'
+import { useWorkspaceSettings } from '@/hooks/useWorkspaceSettings'
 
 // 預設資料（從 PDF 提取）
 const SAMPLE_DATA_1 = {
@@ -105,6 +106,7 @@ export default function FlightItineraryPage() {
   const [currentItinerary, setCurrentItinerary] = useState(1)
   const [isOpen, setIsOpen] = useState(true)
   const [language, setLanguage] = useState<'zh' | 'en'>('zh')
+  const ws = useWorkspaceSettings()
 
   const getCurrentData = () => {
     switch (currentItinerary) {
@@ -173,7 +175,7 @@ export default function FlightItineraryPage() {
 
           {/* 行程單內容 */}
           <div className="print:p-0">
-            <CornerFlightItinerary data={getCurrentData()} language={language} />
+            <CornerFlightItinerary data={getCurrentData()} language={language} companyName={ws.name} />
           </div>
         </DialogContent>
       </Dialog>

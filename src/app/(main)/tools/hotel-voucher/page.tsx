@@ -9,8 +9,9 @@ import React, { useState } from 'react'
 import { CornerHotelVoucher } from '@/features/accommodation/components/CornerHotelVoucher'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
-import { X, Printer, FileText } from 'lucide-react'
+import { Printer, FileText } from 'lucide-react'
 import { HOTEL_VOUCHER_LABELS } from './constants/labels'
+import { useWorkspaceSettings } from '@/hooks/useWorkspaceSettings'
 
 // 預設資料（第一個 PDF - 赤阪城市酒店）
 const SAMPLE_DATA_1 = {
@@ -204,6 +205,7 @@ export default function HotelVoucherPage() {
   const [currentVoucher, setCurrentVoucher] = useState(1)
   const [isOpen, setIsOpen] = useState(true)
   const [language, setLanguage] = useState<'zh' | 'ja'>('zh')
+  const ws = useWorkspaceSettings()
 
   const getCurrentData = () => {
     switch (currentVoucher) {
@@ -305,7 +307,7 @@ export default function HotelVoucherPage() {
 
           {/* 憑證內容 */}
           <div className="print:p-0">
-            <CornerHotelVoucher data={getCurrentData()} language={language} />
+            <CornerHotelVoucher data={getCurrentData()} language={language} companyName={ws.name} />
           </div>
         </DialogContent>
       </Dialog>

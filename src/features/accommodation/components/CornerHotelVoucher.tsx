@@ -52,11 +52,14 @@ interface HotelVoucherData {
 interface CornerHotelVoucherProps {
   data: HotelVoucherData
   language?: 'zh' | 'ja'
+  companyName?: string
 }
 
 
 
-export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, language = 'zh' }) => {
+export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, language = 'zh', companyName }) => {
+  const displayCompany = companyName || ''
+
   const labels = {
     zh: {
       title: '入住憑證',
@@ -75,7 +78,6 @@ export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, la
       meal: '餐點',
       facilities: '房間設施',
       slogan: '如果可以，讓我們一起探索世界的每個角落',
-      company: '角落旅行社股份有限公司',
     },
     ja: {
       title: '予約確認書',
@@ -94,7 +96,6 @@ export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, la
       meal: '食事',
       facilities: '客室備品',
       slogan: '如果可以，讓我們一起探索世界的每個角落',
-      company: '角落旅行社股份有限公司',
     },
   }
 
@@ -228,7 +229,7 @@ export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, la
       <div className="mt-10 pt-4 border-t border-[#E5E7EB] text-center">
         <div className="text-[9pt] text-[#4B5563] italic mb-3">{t.slogan}</div>
         <div className="text-[8pt] text-[#9CA3AF]">
-          {t.company} © {new Date().getFullYear()}
+          {displayCompany} © {new Date().getFullYear()}
         </div>
       </div>
     </div>

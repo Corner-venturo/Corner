@@ -16,6 +16,7 @@ import { COMPANY } from '@/lib/constants/company'
 import { PRINTABLE_QUICK_QUOTE_LABELS, PAYMENT_INFO_LABELS, DIALOGS_CONTAINER_LABELS, ACCOMMODATION_ITEM_ROW_LABELS, QUOTES_PAGE_LABELS, QUOTES_LIST_LABELS, QUICK_QUOTE_SECTION_LABELS } from '@/constants/labels';
 import { QUOTE_COMPONENT_LABELS } from '../constants/labels'
 import { useAuthStore } from '@/stores/auth-store'
+import { useWorkspaceSettings } from '@/hooks/useWorkspaceSettings'
 
 interface PrintableQuickQuoteProps {
   quote: Quote
@@ -37,6 +38,8 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
   const printContentRef = useRef<HTMLDivElement>(null)
   const workspaceName = useAuthStore(state => state.user?.workspace_name) || ''
   const companyFullName = workspaceName ? `${workspaceName}股份有限公司` : ''
+  const ws = useWorkspaceSettings()
+  const hasBankInfo = !!(ws.bank_name || ws.bank_branch || ws.bank_account)
 
   useEffect(() => {
     setIsMounted(true)
@@ -568,10 +571,16 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
             <div>
               <div className="payment-title" style={{ fontWeight: 600, color: '#333333', marginBottom: '8px' }}>{PRINTABLE_QUICK_QUOTE_LABELS.匯款資訊}</div>
               <div className="payment-info" style={{ color: '#4B5563', lineHeight: 1.8 }}>
-                <div>{PRINTABLE_QUICK_QUOTE_LABELS.戶名前綴}{companyFullName}</div>
-                <div>{PAYMENT_INFO_LABELS.銀行}</div>
-                <div>{PAYMENT_INFO_LABELS.分行}</div>
-                <div>{PAYMENT_INFO_LABELS.帳號}</div>
+                {hasBankInfo ? (
+                  <>
+                    <div>{PRINTABLE_QUICK_QUOTE_LABELS.戶名前綴}{ws.bank_account_name || companyFullName}</div>
+                    {ws.bank_name && <div>{PAYMENT_INFO_LABELS.銀行}{ws.bank_name}</div>}
+                    {ws.bank_branch && <div>{PAYMENT_INFO_LABELS.分行}{ws.bank_branch}</div>}
+                    {ws.bank_account && <div>{PAYMENT_INFO_LABELS.帳號}{ws.bank_account}</div>}
+                  </>
+                ) : (
+                  <div style={{ color: '#9CA3AF', fontStyle: 'italic' }}>{PAYMENT_INFO_LABELS.未設定銀行資訊}</div>
+                )}
               </div>
             </div>
             <div>

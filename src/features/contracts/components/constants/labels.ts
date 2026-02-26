@@ -111,6 +111,8 @@ export const CONTRACT_FORM_LABELS = {
   TOTAL_6648: '總金額（新台幣）',
   LABEL_3770: '定金（新台幣）',
   LABEL_2868: '乙方聯絡資訊',
+  PHONE_EXTENSION: '電話分機',
+  PHONE_EXTENSION_SUFFIX: ' #）',
 }
 
 export const ENVELOPE_LABELS = {

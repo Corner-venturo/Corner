@@ -50,12 +50,16 @@ interface FlightItineraryData {
 interface CornerFlightItineraryProps {
   data: FlightItineraryData
   language?: 'zh' | 'en'
+  companyName?: string
 }
 
 export const CornerFlightItinerary: React.FC<CornerFlightItineraryProps> = ({
   data,
-  language = 'zh'
+  language = 'zh',
+  companyName,
 }) => {
+  const displayCompany = companyName || ''
+
   const labels = {
     zh: {
       title: '機票行程單',
@@ -78,7 +82,6 @@ export const CornerFlightItinerary: React.FC<CornerFlightItineraryProps> = ({
       carryOn: '手提行李',
       checked: '托運行李',
       slogan: '如果可以，讓我們一起探索世界的每個角落',
-      company: '角落旅行社股份有限公司',
     },
     en: {
       title: 'Flight Itinerary',
@@ -101,7 +104,6 @@ export const CornerFlightItinerary: React.FC<CornerFlightItineraryProps> = ({
       carryOn: 'Carry-on baggage',
       checked: 'Checked baggage',
       slogan: '如果可以，讓我們一起探索世界的每個角落',
-      company: '角落旅行社股份有限公司',
     },
   }
 
@@ -420,7 +422,7 @@ export const CornerFlightItinerary: React.FC<CornerFlightItineraryProps> = ({
           fontSize: '8pt',
           color: CORNER_COLORS.lightGray,
         }}>
-          {t.company} © {new Date().getFullYear()}
+          {displayCompany} © {new Date().getFullYear()}
         </div>
       </div>
     </div>

@@ -9,10 +9,13 @@ import { MORANDI_COLORS } from '../shared/print-styles'
 import { PAYMENT_INFO_LABELS } from '@/constants/labels'
 import { QUICK_QUOTE_LABELS } from './constants/labels'
 import { useAuthStore } from '@/stores/auth-store'
+import { useWorkspaceSettings } from '@/hooks/useWorkspaceSettings'
 
 export const QuickQuotePaymentInfo: React.FC = () => {
   const workspaceName = useAuthStore(state => state.user?.workspace_name) || ''
   const fullName = workspaceName ? `${workspaceName}股份有限公司` : ''
+  const ws = useWorkspaceSettings()
+  const hasBankInfo = !!(ws.bank_name || ws.bank_branch || ws.bank_account)
 
   return (
     <div
@@ -24,10 +27,18 @@ export const QuickQuotePaymentInfo: React.FC = () => {
           {QUICK_QUOTE_LABELS.LABEL_5832}
         </h4>
         <div className="space-y-1" style={{ color: MORANDI_COLORS.gray }}>
-          <div>{QUICK_QUOTE_LABELS.LABEL_8910_PREFIX}{fullName}</div>
-          <div>{PAYMENT_INFO_LABELS.銀行}</div>
-          <div>{PAYMENT_INFO_LABELS.分行}</div>
-          <div>{PAYMENT_INFO_LABELS.帳號}</div>
+          {hasBankInfo ? (
+            <>
+              <div>{QUICK_QUOTE_LABELS.LABEL_8910_PREFIX}{ws.bank_account_name || fullName}</div>
+              {ws.bank_name && <div>{PAYMENT_INFO_LABELS.銀行}{ws.bank_name}</div>}
+              {ws.bank_branch && <div>{PAYMENT_INFO_LABELS.分行}{ws.bank_branch}</div>}
+              {ws.bank_account && <div>{PAYMENT_INFO_LABELS.帳號}{ws.bank_account}</div>}
+            </>
+          ) : (
+            <div style={{ color: MORANDI_COLORS.lightGray, fontStyle: 'italic' }}>
+              {PAYMENT_INFO_LABELS.未設定銀行資訊}
+            </div>
+          )}
         </div>
       </div>
       <div>

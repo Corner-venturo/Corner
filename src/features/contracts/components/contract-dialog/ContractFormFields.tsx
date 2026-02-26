@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { ContractData } from './types'
 import { Users, ChevronDown, Check } from 'lucide-react'
 import { COMP_CONTRACTS_LABELS } from '../constants/labels'
+import { useWorkspaceSettings } from '@/hooks/useWorkspaceSettings'
 
 interface MemberOption {
   id: string
@@ -31,6 +32,7 @@ export function ContractFormFields({
   selectedMemberIds = [],
 }: ContractFormFieldsProps) {
   const [showMemberDropdown, setShowMemberDropdown] = useState(false)
+  const ws = useWorkspaceSettings()
 
   // 切換成員選擇
   const toggleMember = (memberId: string) => {
@@ -307,7 +309,7 @@ export function ContractFormFields({
         <h3 className="text-sm font-semibold text-morandi-primary mb-3">{CONTRACT_FORM_LABELS.LABEL_2868}</h3>
         <div>
           <label className="text-xs text-morandi-primary block mb-1">
-            電話分機（02-7751-6051 #）
+            {CONTRACT_FORM_LABELS.PHONE_EXTENSION}{ws.phone ? `（${ws.phone}${CONTRACT_FORM_LABELS.PHONE_EXTENSION_SUFFIX}` : ''}
           </label>
           <Input
             type="text"
