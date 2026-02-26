@@ -232,7 +232,7 @@ export const MENU_HREF_TO_ID_MAP: Record<string, string> = {
   '/accounting': 'accounting',
   '/hr': 'hr',
   '/attendance': 'attendance',
-  '/suppliers': 'suppliers',
+  '/database/suppliers': 'suppliers',
   '/visas': 'visas',
   '/esims': 'esims',
   '/attractions': 'attractions',

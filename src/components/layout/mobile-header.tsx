@@ -24,7 +24,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/settings': COMP_LAYOUT_LABELS.設定,
   '/destinations': COMP_LAYOUT_LABELS.地區管理,
   '/attractions': COMP_LAYOUT_LABELS.景點管理,
-  '/suppliers': COMP_LAYOUT_LABELS.供應商,
+  '/database/suppliers': COMP_LAYOUT_LABELS.供應商,
   '/visas': COMP_LAYOUT_LABELS.簽證管理,
   '/confirmations': COMP_LAYOUT_LABELS.確認單,
   '/image-library': COMP_LAYOUT_LABELS.圖庫,
