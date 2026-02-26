@@ -111,7 +111,7 @@ export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCod
     [validateCode]
   )
 
-  const isStep1Valid = step1.name.trim() !== '' && step1.code.trim() !== '' && !codeError && validateCode(step1.code)
+  const isStep1Valid = step1.name.trim() !== '' && step1.code.trim() !== '' && !codeError && /^[A-Z]+$/.test(step1.code)
   const isStep2Valid = step2.name.trim() !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(step2.email)
 
   const handleCreate = async () => {

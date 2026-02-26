@@ -292,7 +292,7 @@ export function useTourMemberEditor(
       // 🆕 價格鏈：從 tour 的 selling_price_per_person 帶入團員的 selling_price
       const memberWithPrice = {
         ...convertedData,
-        selling_price: (tour as any).selling_price_per_person || null,
+        selling_price: tour.selling_price_per_person || null,
       }
       
       const newMember = await createMember(memberWithPrice as unknown as Parameters<typeof createMember>[0])

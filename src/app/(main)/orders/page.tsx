@@ -125,7 +125,7 @@ export default function OrdersPage() {
       // 🆕 價格鏈：從 tour 的 selling_price_per_person 計算初始 total_amount
       // 假設 2 人作為初始值，之後加團員時會重新計算
       const estimatedPeople = 2
-      const sellingPricePerPerson = (selectedTour as any).selling_price_per_person || 0
+      const sellingPricePerPerson = selectedTour.selling_price_per_person || 0
       const initialTotalAmount = sellingPricePerPerson * estimatedPeople
 
       await addOrder({
