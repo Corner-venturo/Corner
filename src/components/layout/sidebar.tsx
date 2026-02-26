@@ -116,10 +116,10 @@ const menuItems: MenuItem[] = [
       { href: '/database/tour-leaders', label: COMP_LAYOUT_LABELS.領隊資料, icon: Users, requiredPermission: 'database' },
       { href: '/database/company-assets', label: COMP_LAYOUT_LABELS.公司資源管理, icon: ImageIcon, requiredPermission: 'database' },
       { href: '/database/archive-management', label: COMP_LAYOUT_LABELS.封存管理, icon: Archive, requiredPermission: 'database' },
-      { href: '/database/workspaces', label: COMP_LAYOUT_LABELS.公司管理, icon: Building, requiredPermission: 'super_admin_only' },
     ],
   },
   { href: '/hr', label: COMP_LAYOUT_LABELS.人資管理, icon: UserCog, requiredPermission: 'hr' },
+  { href: '/tenants', label: COMP_LAYOUT_LABELS.租戶管理, icon: Building, requiredPermission: 'super_admin_only' },
   { href: '/scheduling', label: COMP_LAYOUT_LABELS.資源調度, icon: Calendar, requiredPermission: 'hr' },
   { href: '/database/fleet', label: COMP_LAYOUT_LABELS.車隊管理, icon: Bus, requiredPermission: 'hr' },
   // V1: 網卡管理暫時隱藏

@@ -1,0 +1,463 @@
+'use client'
+
+import React, { useState, useCallback } from 'react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Card } from '@/components/ui/card'
+import { Copy, Check } from 'lucide-react'
+import { toast } from 'sonner'
+import { logger } from '@/lib/utils/logger'
+import { useWorkspaceChannels } from '@/stores/workspace'
+import { useAuthStore } from '@/stores/auth-store'
+import { supabase } from '@/lib/supabase/client'
+import { LABELS } from './constants/labels'
+
+const WORKSPACE_TYPES = [
+  { value: 'travel_agency', label: LABELS.TYPE_TRAVEL_AGENCY },
+  { value: 'transportation', label: LABELS.TYPE_TRANSPORTATION },
+  { value: 'dmc', label: LABELS.TYPE_DMC },
+  { value: 'other', label: LABELS.TYPE_OTHER },
+] as const
+
+interface CreateTenantDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onComplete: () => void
+  existingCodes: string[]
+}
+
+interface Step1Data {
+  name: string
+  code: string
+  type: string
+}
+
+interface Step2Data {
+  employeeNumber: string
+  name: string
+  password: string
+}
+
+interface LoginInfo {
+  workspaceCode: string
+  employeeNumber: string
+  password: string
+}
+
+export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCodes }: CreateTenantDialogProps) {
+  const { createWorkspace, createChannel } = useWorkspaceChannels()
+  const user = useAuthStore(state => state.user)
+
+  const [step, setStep] = useState<1 | 2 | 3>(1)
+  const [creating, setCreating] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const [codeError, setCodeError] = useState('')
+
+  const [step1, setStep1] = useState<Step1Data>({ name: '', code: '', type: '' })
+  const [step2, setStep2] = useState<Step2Data>({ employeeNumber: 'E001', name: '', password: '12345678' })
+  const [loginInfo, setLoginInfo] = useState<LoginInfo | null>(null)
+
+  const resetForm = useCallback(() => {
+    setStep(1)
+    setCreating(false)
+    setCopied(false)
+    setCodeError('')
+    setStep1({ name: '', code: '', type: '' })
+    setStep2({ employeeNumber: 'E001', name: '', password: '12345678' })
+    setLoginInfo(null)
+  }, [])
+
+  const handleOpenChange = useCallback(
+    (isOpen: boolean) => {
+      if (!isOpen) {
+        resetForm()
+      }
+      onOpenChange(isOpen)
+    },
+    [onOpenChange, resetForm]
+  )
+
+  const validateCode = useCallback(
+    (code: string) => {
+      if (!code) {
+        setCodeError('')
+        return false
+      }
+      if (!/^[A-Z]+$/.test(code)) {
+        setCodeError(LABELS.FIELD_CODE_INVALID)
+        return false
+      }
+      const isDuplicate = existingCodes.some(c => c.toUpperCase() === code.toUpperCase())
+      if (isDuplicate) {
+        setCodeError(LABELS.FIELD_CODE_DUPLICATE)
+        return false
+      }
+      setCodeError('')
+      return true
+    },
+    [existingCodes]
+  )
+
+  const handleCodeChange = useCallback(
+    (value: string) => {
+      const upper = value.toUpperCase()
+      setStep1(prev => ({ ...prev, code: upper }))
+      validateCode(upper)
+    },
+    [validateCode]
+  )
+
+  const isStep1Valid = step1.name.trim() !== '' && step1.code.trim() !== '' && !codeError && validateCode(step1.code)
+  const isStep2Valid = step2.name.trim() !== ''
+
+  const handleCreate = async () => {
+    if (!user) return
+    setCreating(true)
+
+    try {
+      // 1. Create workspace
+      const createdWs = await createWorkspace({
+        name: step1.name,
+        code: step1.code,
+        type: step1.type || null,
+        is_active: true,
+      })
+
+      if (!createdWs) {
+        toast.error(LABELS.TOAST_CREATE_FAILED)
+        setCreating(false)
+        return
+      }
+
+      logger.log(`Workspace created: ${createdWs.id}`)
+
+      // Create announcement channel
+      try {
+        await createChannel({
+          workspace_id: createdWs.id,
+          name: '公告',
+          description: '公司公告頻道',
+          type: 'PUBLIC',
+          is_announcement: true,
+          created_by: user.id,
+        })
+      } catch (channelError) {
+        logger.warn('Failed to create announcement channel:', channelError)
+      }
+
+      // Setup workspace bots
+      try {
+        const botResponse = await fetch('/api/debug/setup-workspace-bots', {
+          method: 'POST',
+        })
+        if (botResponse.ok) {
+          logger.log(`Bot created for workspace: ${createdWs.id}`)
+        }
+      } catch (botError) {
+        logger.warn('Failed to create bot:', botError)
+      }
+
+      toast.success(LABELS.TOAST_WORKSPACE_CREATED)
+
+      // 2. Insert employee
+      const { data: employee, error: empError } = await supabase
+        .from('employees')
+        .insert({
+          workspace_id: createdWs.id,
+          employee_number: step2.employeeNumber,
+          chinese_name: step2.name,
+          display_name: step2.name,
+          roles: ['admin'],
+          is_active: true,
+        })
+        .select('id')
+        .single()
+
+      if (empError || !employee) {
+        logger.error('Failed to create employee:', empError)
+        toast.error(LABELS.TOAST_ADMIN_FAILED)
+        setCreating(false)
+        return
+      }
+
+      // 3. Create auth user
+      const authResponse = await fetch('/api/auth/create-employee-auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          employee_number: step2.employeeNumber,
+          password: step2.password,
+          workspace_code: step1.code,
+        }),
+      })
+
+      const authResult = (await authResponse.json()) as {
+        success: boolean
+        data?: { user: { id: string } }
+        message?: string
+      }
+
+      if (!authResult.success || !authResult.data?.user) {
+        logger.error('Failed to create auth user:', authResult.message)
+        toast.error(LABELS.TOAST_ADMIN_FAILED)
+        setCreating(false)
+        return
+      }
+
+      const authUserId = authResult.data.user.id
+
+      // 4. Update employee with supabase_user_id
+      await supabase
+        .from('employees')
+        .update({ supabase_user_id: authUserId })
+        .eq('id', employee.id)
+
+      // 5. Insert profile
+      await supabase
+        .from('profiles')
+        .insert({
+          id: authUserId,
+          workspace_id: createdWs.id,
+          employee_id: employee.id,
+          display_name: step2.name,
+          is_employee: true,
+        })
+
+      toast.success(LABELS.TOAST_ADMIN_CREATED)
+
+      // Move to step 3 - show login info
+      setLoginInfo({
+        workspaceCode: step1.code,
+        employeeNumber: step2.employeeNumber,
+        password: step2.password,
+      })
+      setStep(3)
+    } catch (error) {
+      logger.error('Failed to create tenant:', error)
+      toast.error(LABELS.TOAST_CREATE_FAILED)
+    } finally {
+      setCreating(false)
+    }
+  }
+
+  const handleCopyLoginInfo = async () => {
+    if (!loginInfo) return
+    const text = [
+      `${LABELS.LOGIN_INFO_CODE}：${loginInfo.workspaceCode}`,
+      `${LABELS.LOGIN_INFO_EMPLOYEE_NUMBER}：${loginInfo.employeeNumber}`,
+      `${LABELS.LOGIN_INFO_PASSWORD}：${loginInfo.password}`,
+    ].join('\n')
+
+    await navigator.clipboard.writeText(text)
+    setCopied(true)
+    toast.success(LABELS.COPIED)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  const handleClose = () => {
+    onComplete()
+    resetForm()
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent level={1} className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-bold text-morandi-primary">
+            {step === 1 && LABELS.STEP1_TITLE}
+            {step === 2 && LABELS.STEP2_TITLE}
+            {step === 3 && LABELS.STEP3_TITLE}
+          </DialogTitle>
+        </DialogHeader>
+
+        {/* Step indicator */}
+        <div className="flex items-center gap-2 mb-2">
+          {[1, 2, 3].map(s => (
+            <div
+              key={s}
+              className={`h-1.5 flex-1 rounded-full transition-colors ${
+                s <= step ? 'bg-morandi-gold' : 'bg-morandi-container'
+              }`}
+            />
+          ))}
+        </div>
+
+        {/* Step 1: Company info */}
+        {step === 1 && (
+          <>
+            <p className="text-sm text-morandi-secondary mb-4">{LABELS.STEP1_DESC}</p>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-morandi-primary mb-2 block">
+                  {LABELS.FIELD_NAME} <span className="text-morandi-red">{LABELS.FIELD_NAME_REQUIRED}</span>
+                </label>
+                <Input
+                  value={step1.name}
+                  onChange={e => setStep1(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder={LABELS.FIELD_NAME_PLACEHOLDER}
+                  className="border-morandi-container/30"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-morandi-primary mb-2 block">
+                  {LABELS.FIELD_CODE} <span className="text-morandi-red">{LABELS.FIELD_CODE_REQUIRED}</span>
+                </label>
+                <Input
+                  value={step1.code}
+                  onChange={e => handleCodeChange(e.target.value)}
+                  placeholder={LABELS.FIELD_CODE_PLACEHOLDER}
+                  className={`border-morandi-container/30 font-mono ${codeError ? 'border-morandi-red' : ''}`}
+                />
+                {codeError ? (
+                  <p className="text-xs text-morandi-red mt-1">{codeError}</p>
+                ) : (
+                  <p className="text-xs text-morandi-muted mt-1">{LABELS.FIELD_CODE_HINT}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-morandi-primary mb-2 block">
+                  {LABELS.FIELD_TYPE}
+                </label>
+                <Select
+                  value={step1.type}
+                  onValueChange={value => setStep1(prev => ({ ...prev, type: value }))}
+                >
+                  <SelectTrigger className="border-morandi-container/30">
+                    <SelectValue placeholder={LABELS.FIELD_TYPE_PLACEHOLDER} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {WORKSPACE_TYPES.map(t => (
+                      <SelectItem key={t.value} value={t.value}>
+                        {t.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="flex gap-2 mt-6">
+              <Button
+                variant="outline"
+                onClick={() => handleOpenChange(false)}
+                className="flex-1"
+              >
+                {LABELS.BTN_CANCEL}
+              </Button>
+              <Button
+                onClick={() => setStep(2)}
+                disabled={!isStep1Valid}
+                className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+              >
+                {LABELS.BTN_NEXT}
+              </Button>
+            </div>
+          </>
+        )}
+
+        {/* Step 2: Admin account */}
+        {step === 2 && (
+          <>
+            <p className="text-sm text-morandi-secondary mb-4">{LABELS.STEP2_DESC}</p>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-morandi-primary mb-2 block">
+                  {LABELS.FIELD_EMPLOYEE_NUMBER}
+                </label>
+                <Input
+                  value={step2.employeeNumber}
+                  onChange={e => setStep2(prev => ({ ...prev, employeeNumber: e.target.value }))}
+                  className="border-morandi-container/30 font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-morandi-primary mb-2 block">
+                  {LABELS.FIELD_ADMIN_NAME} <span className="text-morandi-red">{LABELS.FIELD_ADMIN_NAME_REQUIRED}</span>
+                </label>
+                <Input
+                  value={step2.name}
+                  onChange={e => setStep2(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder={LABELS.FIELD_ADMIN_NAME_PLACEHOLDER}
+                  className="border-morandi-container/30"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-morandi-primary mb-2 block">
+                  {LABELS.FIELD_PASSWORD}
+                </label>
+                <Input
+                  value={step2.password}
+                  onChange={e => setStep2(prev => ({ ...prev, password: e.target.value }))}
+                  placeholder={LABELS.FIELD_PASSWORD_PLACEHOLDER}
+                  className="border-morandi-container/30 font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-2 mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setStep(1)}
+                className="flex-1"
+              >
+                {LABELS.BTN_PREV}
+              </Button>
+              <Button
+                onClick={handleCreate}
+                disabled={!isStep2Valid || creating}
+                className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+              >
+                {creating ? LABELS.BTN_CREATING : LABELS.BTN_CREATE}
+              </Button>
+            </div>
+          </>
+        )}
+
+        {/* Step 3: Login info */}
+        {step === 3 && loginInfo && (
+          <>
+            <p className="text-sm text-morandi-secondary mb-4">{LABELS.STEP3_DESC}</p>
+
+            <Card className="bg-morandi-container/10 border-morandi-container/30 p-4 space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-morandi-secondary">{LABELS.LOGIN_INFO_CODE}</span>
+                <span className="font-mono font-semibold text-morandi-primary">{loginInfo.workspaceCode}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-morandi-secondary">{LABELS.LOGIN_INFO_EMPLOYEE_NUMBER}</span>
+                <span className="font-mono font-semibold text-morandi-primary">{loginInfo.employeeNumber}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-morandi-secondary">{LABELS.LOGIN_INFO_PASSWORD}</span>
+                <span className="font-mono font-semibold text-morandi-primary">{loginInfo.password}</span>
+              </div>
+            </Card>
+
+            <div className="flex gap-2 mt-4">
+              <Button
+                variant="outline"
+                onClick={handleClose}
+                className="flex-1"
+              >
+                {LABELS.BTN_CLOSE}
+              </Button>
+              <Button
+                onClick={handleCopyLoginInfo}
+                className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
+              >
+                {copied ? <Check size={16} /> : <Copy size={16} />}
+                {LABELS.COPY_ALL}
+              </Button>
+            </div>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}
