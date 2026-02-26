@@ -40,16 +40,16 @@ describe('LinkPay signature', () => {
     expect(typeof result).toBe('string')
   })
 
-  it('verifyWebhookSignature 缺少 mac 欄位時失敗', async () => {
-    // No TAISHIN_MAC_KEY set, so it returns valid with skip message
+  it('verifyWebhookSignature MAC_KEY 未設定時拒絕', async () => {
+    // No TAISHIN_MAC_KEY set — should reject for security
     const { verifyWebhookSignature } = await import('@/lib/linkpay/signature')
     const result = verifyWebhookSignature({
       order_no: 'TEST001',
       ret_code: '00',
       tx_amt: '1000',
     })
-    // Without MAC_KEY, it skips validation
-    expect(result.valid).toBe(true)
+    // Without MAC_KEY, reject all requests
+    expect(result.valid).toBe(false)
     expect(result.reason).toContain('未設定')
   })
 

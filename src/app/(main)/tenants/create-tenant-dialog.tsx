@@ -161,6 +161,22 @@ export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCod
         logger.warn('Failed to create bot:', botError)
       }
 
+      // Seed base data (countries, cities)
+      try {
+        const seedResponse = await fetch('/api/tenants/seed-base-data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ targetWorkspaceId: createdWs.id }),
+        })
+        if (seedResponse.ok) {
+          logger.log(`Base data seeded for workspace: ${createdWs.id}`)
+        } else {
+          logger.warn('Failed to seed base data')
+        }
+      } catch (seedError) {
+        logger.warn('Failed to seed base data:', seedError)
+      }
+
       toast.success(LABELS.TOAST_WORKSPACE_CREATED)
 
       // 2. Insert employee

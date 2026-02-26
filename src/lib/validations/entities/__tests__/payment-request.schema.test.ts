@@ -44,7 +44,7 @@ describe('createPaymentRequestSchema', () => {
 
 describe('updatePaymentRequestSchema', () => {
   it('should accept partial update', () => {
-    expect(updatePaymentRequestSchema.safeParse({ status: 'approved' }).success).toBe(true)
+    expect(updatePaymentRequestSchema.safeParse({ status: 'confirmed' }).success).toBe(true)
   })
 
   it('should accept empty object', () => {

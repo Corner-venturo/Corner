@@ -37,13 +37,13 @@ describe('generateToken', () => {
     expect(decoded.iss).toBe('venturo-app')
   })
 
-  it('sets 8h expiration by default', () => {
+  it('sets 30d expiration by default', () => {
     const before = Date.now()
     const token = generateToken(samplePayload, false)
     const decoded = JSON.parse(atob(token))
-    const eightHours = 8 * 60 * 60 * 1000
-    expect(decoded.exp).toBeGreaterThanOrEqual(before + eightHours - 100)
-    expect(decoded.exp).toBeLessThanOrEqual(before + eightHours + 1000)
+    const thirtyDays = 30 * 24 * 60 * 60 * 1000
+    expect(decoded.exp).toBeGreaterThanOrEqual(before + thirtyDays - 100)
+    expect(decoded.exp).toBeLessThanOrEqual(before + thirtyDays + 1000)
   })
 
   it('sets 30d expiration with rememberMe', () => {

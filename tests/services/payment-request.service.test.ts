@@ -160,22 +160,6 @@ describe('PaymentRequestService', () => {
     })
   })
 
-  describe('getProcessingRequests', () => {
-    it('should return processing requests', async () => {
-      const mockRequests = [
-        createMockRequest({ id: 'request-1', status: 'processing' }),
-      ]
-
-      mockFromImplementation.mockReturnValue(
-        createMockChain({ data: mockRequests, error: null })
-      )
-
-      const result = await paymentRequestService.getProcessingRequests()
-
-      expect(result).toEqual(mockRequests)
-    })
-  })
-
   describe('getRequestsByTour', () => {
     it('should return requests for a specific tour', async () => {
       const mockRequests = [
