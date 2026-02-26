@@ -42,8 +42,46 @@ export const LABELS = {
   CANCEL: '取消',
   CREATE: '建立',
   
+  // Workspace Creation - Code & Type
+  WORKSPACE_CODE_LABEL: '公司代碼',
+  WORKSPACE_CODE_REQUIRED: '*',
+  WORKSPACE_CODE_PLACEHOLDER: '例如：CORNER、DEMO（英文大寫）',
+  WORKSPACE_CODE_INVALID: '公司代碼只能使用英文大寫字母',
+  WORKSPACE_CODE_DUPLICATE: '此公司代碼已被使用',
+  WORKSPACE_TYPE_LABEL: '類型',
+  WORKSPACE_TYPE_PLACEHOLDER: '選擇工作空間類型',
+  WORKSPACE_TYPE_TRAVEL_AGENCY: '旅行社',
+  WORKSPACE_TYPE_TRANSPORTATION: '車公司',
+  WORKSPACE_TYPE_DMC: '地接社',
+  WORKSPACE_TYPE_OTHER: '其他',
+
+  // Create Admin Dialog
+  CREATE_ADMIN_TITLE: '建立第一位管理員',
+  CREATE_ADMIN_DESC: '為新工作空間建立管理員帳號',
+  ADMIN_EMPLOYEE_NUMBER_LABEL: '員工編號',
+  ADMIN_NAME_LABEL: '姓名',
+  ADMIN_NAME_REQUIRED: '*',
+  ADMIN_NAME_PLACEHOLDER: '管理員姓名',
+  ADMIN_PASSWORD_LABEL: '密碼',
+  ADMIN_PASSWORD_PLACEHOLDER: '登入密碼',
+  CREATING_ADMIN: '建立中...',
+  CREATE_ADMIN_BTN: '建立管理員',
+  ADMIN_CREATED_SUCCESS: '管理員帳號已建立',
+  ADMIN_CREATION_FAILED: '建立管理員失敗',
+
+  // Login Info Card
+  LOGIN_INFO_TITLE: '帳號建立完成',
+  LOGIN_INFO_DESC: '請將以下登入資訊提供給客戶：',
+  LOGIN_INFO_CODE: '公司代碼',
+  LOGIN_INFO_EMPLOYEE_NUMBER: '員工編號',
+  LOGIN_INFO_PASSWORD: '密碼',
+  COPY_LOGIN_INFO: '複製登入資訊',
+  COPIED_SUCCESS: '已複製到剪貼簿',
+  CLOSE: '關閉',
+
   // Messages and Notifications
   WORKSPACE_NAME_REQUIRED_MSG: '請填寫工作空間名稱',
+  WORKSPACE_CODE_REQUIRED_MSG: '請填寫公司代碼',
   ANNOUNCEMENT: '公告',
   ANNOUNCEMENT_CHANNEL_DESC: '此頻道用於發布全工作空間的重要公告。',
   BOT_CREATION_FAILED: '建立機器人失敗（不影響 workspace 建立）',

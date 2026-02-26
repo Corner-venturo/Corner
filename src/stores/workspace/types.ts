@@ -3,6 +3,8 @@
 export interface Workspace {
   id: string
   name: string
+  code?: string | null
+  type?: string | null
   description?: string | null
   icon?: string | null
   is_active: boolean | null

@@ -82,7 +82,7 @@ const nextConfig: NextConfig = {
   },
 
   // 允許 ngrok 等開發工具的跨域請求
-  allowedDevOrigins: ['frisky-masonic-mellissa.ngrok-free.dev'],
+  allowedDevOrigins: ['frisky-masonic-mellissa.ngrok-free.dev', '192.168.1.173'],
 
   // ✅ 啟用 standalone 輸出模式（適合 Docker/Vercel 部署）
   output: 'standalone',
