@@ -259,6 +259,7 @@ export const COMP_HR_LABELS = {
   LABEL_4950: '員工資料已成功建立，請記錄以下登入資訊',
   LABEL_7801: '已成功創建！',
   LABEL_4929: '員工編號',
+  LABEL_LOGIN_EMAIL: '登入 Email',
   LABEL_9036: '預設密碼',
   LABEL_4950_1: '請提醒員工首次登入後更改密碼',
   LABEL_6771: '完成',

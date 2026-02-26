@@ -57,6 +57,9 @@ export const LABELS = {
   FIELD_ADMIN_NAME: '姓名',
   FIELD_ADMIN_NAME_REQUIRED: '*',
   FIELD_ADMIN_NAME_PLACEHOLDER: '管理員姓名',
+  FIELD_EMAIL: '登入 Email',
+  FIELD_EMAIL_PLACEHOLDER: '管理員的真實 Email',
+  FIELD_EMAIL_HINT: '用於建立系統登入帳號',
   FIELD_PASSWORD: '密碼',
   FIELD_PASSWORD_PLACEHOLDER: '登入密碼',
 
@@ -65,6 +68,7 @@ export const LABELS = {
   STEP3_DESC: '請將以下登入資訊提供給客戶：',
   LOGIN_INFO_CODE: '公司代碼',
   LOGIN_INFO_EMPLOYEE_NUMBER: '員工編號',
+  LOGIN_INFO_EMAIL: '登入 Email',
   LOGIN_INFO_PASSWORD: '密碼',
   COPY_ALL: '複製全部',
   COPIED: '已複製到剪貼簿',

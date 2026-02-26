@@ -4,6 +4,8 @@ export interface EmployeeFormData {
   english_name: string
   display_name: string
   chinese_name: string
+  pinyin: string
+  auth_email: string // 用於建立 Supabase Auth 帳號的 email
   defaultPassword: string
   workspace_id?: string // super_admin 可以選擇 workspace
   roles: UserRole[]
@@ -33,6 +35,7 @@ export interface CreatedEmployeeInfo {
   display_name: string
   employee_number: string
   password: string
+  email: string
 }
 
 export interface AddEmployeeFormProps {

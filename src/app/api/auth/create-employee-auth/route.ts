@@ -48,14 +48,15 @@ export async function POST(request: NextRequest) {
 
     const validation = await validateBody(request, createEmployeeAuthSchema)
     if (!validation.success) return validation.error
-    const { employee_number, password, workspace_code } = validation.data
+    const { employee_number, password, workspace_code, email: providedEmail } = validation.data
 
     const supabaseAdmin = getSupabaseAdminClient()
-    // Email 格式：{workspace_code}_{employee_number}@venturo.com（區分不同公司的同編號員工）
-    // 統一使用小寫格式
-    const email = workspace_code
-      ? `${workspace_code.toLowerCase()}_${employee_number.toLowerCase()}@venturo.com`
-      : `${employee_number.toLowerCase()}@venturo.com`
+    // 優先使用前端傳入的真實 email；若無則使用自動生成的格式（向後兼容）
+    const email = providedEmail
+      ? providedEmail.toLowerCase()
+      : workspace_code
+        ? `${workspace_code.toLowerCase()}_${employee_number.toLowerCase()}@venturo.com`
+        : `${employee_number.toLowerCase()}@venturo.com`
 
     // 使用 Admin API 建立用戶
     const { data, error } = await supabaseAdmin.auth.admin.createUser({

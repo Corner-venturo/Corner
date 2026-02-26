@@ -20,6 +20,8 @@ export function useEmployeeForm(onSubmit: () => void) {
     english_name: '',
     display_name: '',
     chinese_name: '',
+    pinyin: '',
+    auth_email: '',
     defaultPassword: '00000000',
     roles: [],
     personal_info: {
@@ -49,6 +51,11 @@ export function useEmployeeForm(onSubmit: () => void) {
 
     if (!formData.english_name.trim() || !formData.display_name.trim()) {
       alert(COMP_HR_LABELS.請填寫姓名)
+      return
+    }
+
+    if (!formData.auth_email.trim()) {
+      alert('請填寫登入 Email')
       return
     }
 
@@ -86,6 +93,7 @@ export function useEmployeeForm(onSubmit: () => void) {
             employee_number,
             password: formData.defaultPassword,
             workspace_code: workspace?.code || null,
+            email: formData.auth_email || undefined,
           }),
         })
 
@@ -110,6 +118,7 @@ export function useEmployeeForm(onSubmit: () => void) {
         english_name: formData.english_name,
         display_name: formData.display_name,
         chinese_name: formData.chinese_name,
+        pinyin: formData.pinyin || null,
         workspace_id: targetWorkspaceId,
         supabase_user_id: authUserId, // 設定 supabase_user_id（向後相容）
         roles: formData.roles as ('admin' | 'employee' | 'user' | 'tour_leader' | 'sales' | 'accountant' | 'assistant' | 'super_admin')[],
@@ -184,6 +193,7 @@ export function useEmployeeForm(onSubmit: () => void) {
         display_name: formData.display_name,
         employee_number: employee_number,
         password: formData.defaultPassword,
+        email: formData.auth_email,
       })
       setShowSuccessDialog(true)
     } catch (error) {

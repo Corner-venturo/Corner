@@ -75,7 +75,22 @@ export function ContactFields({ formData, setFormData }: ContactFieldsProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">Email</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">
+          {ADD_EMPLOYEE_LABELS.LABEL_AUTH_EMAIL}
+        </label>
+        <Input
+          type="email"
+          value={formData.auth_email}
+          onChange={e => setFormData({ ...formData, auth_email: e.target.value })}
+          required
+        />
+        <p className="text-xs text-morandi-muted mt-1">
+          {ADD_EMPLOYEE_LABELS.LABEL_AUTH_EMAIL_HINT}
+        </p>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">Email（個人）</label>
         <Input
           type="email"
           value={formData.personal_info.email}

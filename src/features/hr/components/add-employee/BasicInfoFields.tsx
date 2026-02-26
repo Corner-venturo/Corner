@@ -6,6 +6,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { userStoreHelpers } from '@/stores/user-store'
 import { EmployeeFormData } from './types'
 import { COMP_HR_LABELS } from '@/features/hr/constants/labels'
+import { ADD_EMPLOYEE_LABELS } from './constants/labels'
 
 interface BasicInfoFieldsProps {
   formData: EmployeeFormData
@@ -50,17 +51,28 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
         </div>
         <div>
           <label className="block text-sm font-medium text-morandi-primary mb-1">
-            {COMP_HR_LABELS.GENERATING_9845}
+            {ADD_EMPLOYEE_LABELS.LABEL_PINYIN}
           </label>
           <Input
-            value={userStoreHelpers.generateUserNumber()}
-            disabled
-            className="bg-morandi-container/20"
+            value={formData.pinyin}
+            onChange={e => setFormData({ ...formData, pinyin: e.target.value })}
+            placeholder={ADD_EMPLOYEE_LABELS.LABEL_PINYIN_PLACEHOLDER}
           />
-          <p className="text-xs text-morandi-muted mt-1">
-            格式：E001, E002...
-          </p>
         </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">
+          {COMP_HR_LABELS.GENERATING_9845}
+        </label>
+        <Input
+          value={userStoreHelpers.generateUserNumber()}
+          disabled
+          className="bg-morandi-container/20"
+        />
+        <p className="text-xs text-morandi-muted mt-1">
+          格式：E001, E002...
+        </p>
       </div>
 
       <div>

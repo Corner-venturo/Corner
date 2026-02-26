@@ -70,6 +70,31 @@ export function SuccessDialog({
                 </div>
               </div>
 
+              {/* 登入 Email */}
+              {createdEmployee?.email && (
+                <div className="bg-card rounded-lg p-4 border border-border">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <p className="text-xs text-morandi-muted mb-1.5">{COMP_HR_LABELS.LABEL_LOGIN_EMAIL}</p>
+                      <p className="font-mono text-base font-semibold text-morandi-primary">
+                        {createdEmployee.email}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => onCopy(createdEmployee.email, 'email')}
+                      className="ml-3 p-2 hover:bg-muted rounded-md transition-colors"
+                      title="複製 Email"
+                    >
+                      {copiedField === 'email' ? (
+                        <Check size={20} className="text-morandi-gold" />
+                      ) : (
+                        <Copy size={20} className="text-morandi-secondary" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* 預設密碼 */}
               <div className="bg-card rounded-lg p-4 border border-border">
                 <div className="flex items-center justify-between">

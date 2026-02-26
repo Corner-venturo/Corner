@@ -80,6 +80,7 @@ export interface User {
   workspace_name?: string // 所屬工作空間名稱
   workspace_type?: 'travel_agency' | 'vehicle_supplier' | 'guide_supplier' // 工作空間類型
   selected_workspace_id?: string // Super Admin 選擇的工作空間 ID
+  pinyin?: string | null // 拼音姓名
   hidden_menu_items?: string[] // 隱藏的選單項目 ID
   preferred_features?: string[] // 個人常用功能列表（用於個人化 Sidebar），例如: ["tours", "orders", "calendar"]
 

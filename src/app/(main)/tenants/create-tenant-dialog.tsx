@@ -37,12 +37,14 @@ interface Step1Data {
 interface Step2Data {
   employeeNumber: string
   name: string
+  email: string
   password: string
 }
 
 interface LoginInfo {
   workspaceCode: string
   employeeNumber: string
+  email: string
   password: string
 }
 
@@ -56,7 +58,7 @@ export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCod
   const [codeError, setCodeError] = useState('')
 
   const [step1, setStep1] = useState<Step1Data>({ name: '', code: '', type: '' })
-  const [step2, setStep2] = useState<Step2Data>({ employeeNumber: 'E001', name: '', password: '12345678' })
+  const [step2, setStep2] = useState<Step2Data>({ employeeNumber: 'E001', name: '', email: '', password: '12345678' })
   const [loginInfo, setLoginInfo] = useState<LoginInfo | null>(null)
 
   const resetForm = useCallback(() => {
@@ -65,7 +67,7 @@ export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCod
     setCopied(false)
     setCodeError('')
     setStep1({ name: '', code: '', type: '' })
-    setStep2({ employeeNumber: 'E001', name: '', password: '12345678' })
+    setStep2({ employeeNumber: 'E001', name: '', email: '', password: '12345678' })
     setLoginInfo(null)
   }, [])
 
@@ -110,7 +112,7 @@ export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCod
   )
 
   const isStep1Valid = step1.name.trim() !== '' && step1.code.trim() !== '' && !codeError && validateCode(step1.code)
-  const isStep2Valid = step2.name.trim() !== ''
+  const isStep2Valid = step2.name.trim() !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(step2.email)
 
   const handleCreate = async () => {
     if (!user) return
@@ -190,6 +192,7 @@ export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCod
           employee_number: step2.employeeNumber,
           password: step2.password,
           workspace_code: step1.code,
+          email: step2.email,
         }),
       })
 
@@ -231,6 +234,7 @@ export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCod
       setLoginInfo({
         workspaceCode: step1.code,
         employeeNumber: step2.employeeNumber,
+        email: step2.email,
         password: step2.password,
       })
       setStep(3)
@@ -247,6 +251,7 @@ export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCod
     const text = [
       `${LABELS.LOGIN_INFO_CODE}：${loginInfo.workspaceCode}`,
       `${LABELS.LOGIN_INFO_EMPLOYEE_NUMBER}：${loginInfo.employeeNumber}`,
+      `${LABELS.LOGIN_INFO_EMAIL}：${loginInfo.email}`,
       `${LABELS.LOGIN_INFO_PASSWORD}：${loginInfo.password}`,
     ].join('\n')
 
@@ -389,6 +394,20 @@ export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCod
 
               <div>
                 <label className="text-sm font-medium text-morandi-primary mb-2 block">
+                  {LABELS.FIELD_EMAIL} <span className="text-morandi-red">*</span>
+                </label>
+                <Input
+                  type="email"
+                  value={step2.email}
+                  onChange={e => setStep2(prev => ({ ...prev, email: e.target.value }))}
+                  placeholder={LABELS.FIELD_EMAIL_PLACEHOLDER}
+                  className="border-morandi-container/30"
+                />
+                <p className="text-xs text-morandi-muted mt-1">{LABELS.FIELD_EMAIL_HINT}</p>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-morandi-primary mb-2 block">
                   {LABELS.FIELD_PASSWORD}
                 </label>
                 <Input
@@ -432,6 +451,10 @@ export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCod
               <div className="flex justify-between items-center">
                 <span className="text-sm text-morandi-secondary">{LABELS.LOGIN_INFO_EMPLOYEE_NUMBER}</span>
                 <span className="font-mono font-semibold text-morandi-primary">{loginInfo.employeeNumber}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-morandi-secondary">{LABELS.LOGIN_INFO_EMAIL}</span>
+                <span className="font-mono font-semibold text-morandi-primary text-sm">{loginInfo.email}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-morandi-secondary">{LABELS.LOGIN_INFO_PASSWORD}</span>
