@@ -28,7 +28,6 @@ export function captureException(error: unknown, context?: ErrorContext): void {
   const err = error instanceof Error ? error : new Error(String(error))
   const level = context?.level ?? 'error'
 
-  // eslint-disable-next-line no-console
   console.error(`[error-tracking][${level}]`, err.message, {
     stack: err.stack,
     userId: _currentUserId,

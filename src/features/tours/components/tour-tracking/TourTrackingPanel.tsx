@@ -94,7 +94,7 @@ function StatusBadge({ display }: { display: StatusDisplay }) {
 // === Amount display ===
 function AmountCell({ amount, currency }: { amount: number | null; currency?: string }) {
   if (amount === null || amount === undefined) {
-    return <span className="text-gray-300">-</span>
+    return <span className="text-morandi-secondary">-</span>
   }
   return (
     <span className="font-mono text-sm">

@@ -242,19 +242,23 @@ export const useAuthStore = create<AuthState>()(
 
           const user = buildUserFromEmployee(employeeData, workspaceInfo)
 
-          // 5. 合併後的權限（用於 authPayload）
-          const userRoles = (employeeData.roles || []) as UserRole[]
-          const mergedPermissions = mergePermissionsWithRoles(employeeData.permissions || [], userRoles)
-
-          const authPayload: AuthPayload = {
-            id: employeeData.id,
-            employee_number: employeeData.employee_number,
-            permissions: mergedPermissions,
-            role: mergedPermissions.includes('admin') || mergedPermissions.includes('*') ? 'admin' : 'employee',
+          // 5. 使用 API 回傳的 JWT（server-side 簽名）
+          const jwt = (validateResult.data?.jwt ?? validateResult.jwt) as string
+          if (jwt) {
+            setSecureCookie(jwt, rememberMe)
+          } else {
+            // fallback: 舊格式（向下相容，待移除）
+            const userRoles = (employeeData.roles || []) as UserRole[]
+            const mergedPermissions = mergePermissionsWithRoles(employeeData.permissions || [], userRoles)
+            const authPayload: AuthPayload = {
+              id: employeeData.id,
+              employee_number: employeeData.employee_number,
+              permissions: mergedPermissions,
+              role: mergedPermissions.includes('admin') || mergedPermissions.includes('*') ? 'admin' : 'employee',
+            }
+            const token = generateToken(authPayload, rememberMe)
+            setSecureCookie(token, rememberMe)
           }
-
-          const token = generateToken(authPayload, rememberMe)
-          setSecureCookie(token, rememberMe)
 
           get().setUser(user);
 

@@ -30,25 +30,24 @@ async function verifyAuthToken(token: string): Promise<boolean> {
     return await verifyQuickLoginToken(token)
   }
 
-  // 優先嘗試 base64 解碼（這是主要的 token 格式）
+  // 優先嘗試 JWT 驗證（新格式，有簽名）
   try {
-    const decoded = JSON.parse(atob(token))
-    // 檢查 issuer
-    if (decoded.iss !== 'venturo-app') {
-      return false
-    }
-    // 檢查是否過期
-    if (decoded.exp && Date.now() > decoded.exp) {
-      return false
-    }
+    const secret = new TextEncoder().encode(JWT_SECRET_KEY)
+    await jwtVerify(token, secret, {
+      issuer: 'venturo-app',
+    })
     return true
   } catch {
-    // base64 失敗，嘗試 JWT 驗證
+    // JWT 失敗，fallback 嘗試 base64 解碼（舊格式，向下相容已登入的 session）
+    // TODO: 2026-04 移除 base64 fallback，屆時舊 session 會被強制重新登入
     try {
-      const secret = new TextEncoder().encode(JWT_SECRET_KEY)
-      await jwtVerify(token, secret, {
-        issuer: 'venturo-app',
-      })
+      const decoded = JSON.parse(atob(token))
+      if (decoded.iss !== 'venturo-app') {
+        return false
+      }
+      if (decoded.exp && Date.now() > decoded.exp) {
+        return false
+      }
       return true
     } catch {
       return false

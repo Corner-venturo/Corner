@@ -37,7 +37,6 @@ export function NewebPaySettings() {
 
   useEffect(() => {
     fetchConfig()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workspaceId])
 
   const fetchConfig = async () => {

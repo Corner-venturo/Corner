@@ -6,6 +6,10 @@ import { ApiError, successResponse } from '@/lib/api/response'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { validateBody } from '@/lib/api/validation'
 import { validateLoginSchema } from '@/lib/validations/api-schemas'
+import { SignJWT } from 'jose'
+
+const JWT_SECRET = process.env.JWT_SECRET || 'venturo_dev_jwt_secret_local_only'
+const JWT_SECRET_KEY = new TextEncoder().encode(JWT_SECRET)
 
 export async function POST(request: NextRequest) {
   try {
@@ -89,11 +93,30 @@ export async function POST(request: NextRequest) {
     // 6. 回傳員工資料（不含密碼）+ auth email
     const { password_hash: _, ...employeeData } = employee
 
+    // 7. 產生 JWT（server-side 簽名）
+    const mergedPermissions = [
+      ...(employeeData.permissions || []),
+      ...(employeeData.roles || []),
+    ]
+    const jwt = await new SignJWT({
+      sub: employeeData.id,
+      employee_number: employeeData.employee_number,
+      permissions: mergedPermissions,
+      role: mergedPermissions.includes('admin') || mergedPermissions.includes('*') ? 'admin' : 'employee',
+      workspace_id: workspace.id,
+    })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setIssuer('venturo-app')
+      .setExpirationTime('30d')
+      .sign(JWT_SECRET_KEY)
+
     return successResponse({
       employee: employeeData,
       workspaceId: workspace.id,
       workspaceCode: workspace.code,
       authEmail,
+      jwt,
     })
   } catch (error) {
     logger.error('Validate login error:', error)
