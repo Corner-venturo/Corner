@@ -10,7 +10,6 @@
 import { useCallback, useMemo } from 'react'
 import useSWR, { mutate } from 'swr'
 import { supabase } from '@/lib/supabase/client'
-import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
 
 export interface Airport {
@@ -61,20 +60,14 @@ async function fetchAirports(): Promise<Airport[]> {
 }
 
 // 從 countries 表讀取國家（含 code 用於對照）
-async function fetchCountries(workspaceId: string | null): Promise<CountryInfo[]> {
-  let query = supabase
+// RLS 會自動根據 auth session 的 workspace_id 過濾
+async function fetchCountries(): Promise<CountryInfo[]> {
+  const { data, error } = await supabase
     .from('countries')
     .select('name, code')
     .eq('is_active', true)
     .order('usage_count', { ascending: false, nullsFirst: false })
     .order('display_order', { ascending: true })
-
-  // 手動 filter workspace_id（前端 supabase client 沒有 auth session，RLS 不起作用）
-  if (workspaceId) {
-    query = query.or(`workspace_id.eq.${workspaceId},workspace_id.is.null`)
-  }
-
-  const { data, error } = await query
 
   if (error) {
     logger.error('載入國家列表失敗:', error)
@@ -90,7 +83,6 @@ interface UseAirportsOptions {
 
 export function useAirports(options: UseAirportsOptions = {}) {
   const { enabled = true } = options
-  const workspaceId = useAuthStore(s => s.user?.workspace_id) ?? null
 
   // 載入所有機場
   const { 
@@ -103,14 +95,13 @@ export function useAirports(options: UseAirportsOptions = {}) {
     SWR_CONFIG
   )
 
-  // 載入國家列表（含 code 用於對照，加 workspace_id filter）
-  const countriesCacheKey = enabled && workspaceId ? `${COUNTRIES_CACHE_KEY}:${workspaceId}` : null
+  // 載入國家列表（RLS 自動根據 auth session 過濾 workspace）
   const {
     data: countriesData = [],
     isLoading: countriesLoading,
   } = useSWR<CountryInfo[]>(
-    countriesCacheKey,
-    () => fetchCountries(workspaceId),
+    enabled ? COUNTRIES_CACHE_KEY : null,
+    fetchCountries,
     SWR_CONFIG
   )
 
