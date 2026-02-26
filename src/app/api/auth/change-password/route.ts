@@ -58,9 +58,22 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. 用 Supabase Auth 驗證當前密碼
-    const authEmail = workspace_code
-      ? `${workspace_code.toLowerCase()}_${employee_number.toLowerCase()}@venturo.com`
-      : `${employee_number.toLowerCase()}@venturo.com`
+    // 優先從 auth.users 取得真實 email，fallback 用舊邏輯拼假 email
+    let authEmail: string | undefined
+
+    if (employee.supabase_user_id) {
+      const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(
+        employee.supabase_user_id
+      )
+      authEmail = authUser?.user?.email ?? undefined
+    }
+
+    if (!authEmail) {
+      // fallback：向後兼容舊帳號
+      authEmail = workspace_code
+        ? `${workspace_code.toLowerCase()}_${employee_number.toLowerCase()}@venturo.com`
+        : `${employee_number.toLowerCase()}@venturo.com`
+    }
 
     const { error: signInError } = await supabaseAdmin.auth.signInWithPassword({
       email: authEmail,

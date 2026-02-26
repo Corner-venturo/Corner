@@ -4,6 +4,7 @@ export interface BasicInfoFormData {
   display_name: string
   chinese_name: string
   english_name: string
+  pinyin: string
   personal_info: {
     national_id: string
     birth_date: string

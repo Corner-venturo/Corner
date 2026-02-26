@@ -11,6 +11,7 @@ export function useBasicInfoForm(employee: Employee, setIsEditing: (editing: boo
     display_name: employee.display_name || '',
     chinese_name: employee.chinese_name || '',
     english_name: employee.english_name || '',
+    pinyin: employee.pinyin || '',
     personal_info: {
       national_id: employee.personal_info?.national_id || '',
       birth_date: employee.personal_info?.birth_date || '',
@@ -49,6 +50,7 @@ export function useBasicInfoForm(employee: Employee, setIsEditing: (editing: boo
       display_name: formData.display_name,
       chinese_name: formData.chinese_name,
       english_name: formData.english_name,
+      pinyin: formData.pinyin,
       personal_info: formData.personal_info,
       job_info: formData.job_info,
     }
@@ -66,6 +68,7 @@ export function useBasicInfoForm(employee: Employee, setIsEditing: (editing: boo
       display_name: employee.display_name || '',
       chinese_name: employee.chinese_name || '',
       english_name: employee.english_name || '',
+      pinyin: employee.pinyin || '',
       personal_info: {
         national_id: employee.personal_info?.national_id || '',
         birth_date: employee.personal_info?.birth_date || '',

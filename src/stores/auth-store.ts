@@ -197,38 +197,39 @@ export const useAuthStore = create<AuthState>()(
 
           const { supabase } = await import('@/lib/supabase/client')
 
-          // 1. 直接用 Supabase Auth 登入（唯一的密碼驗證）
-          const authEmail = `${code.toLowerCase()}_${username.toLowerCase()}@venturo.com`
+          // 1. 呼叫 validate-login 驗證密碼並取得真實 auth email
+          const validateResponse = await fetch('/api/auth/validate-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, code }),
+          })
+
+          const validateResult = await validateResponse.json()
+
+          if (!validateResult.success) {
+            logger.warn(`⚠️ 登入驗證失敗: ${validateResult.message}`)
+            return {
+              success: false,
+              message: validateResult.message || '帳號或密碼錯誤',
+            }
+          }
+
+          // 2. 用真實 auth email 建立客戶端 Supabase session
+          const authEmail = (validateResult.data?.authEmail ?? validateResult.authEmail) as string
           const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
             email: authEmail,
             password,
           })
 
           if (authError || !authData) {
-            logger.warn(`⚠️ 登入失敗: ${authError?.message}`)
+            logger.warn(`⚠️ Supabase Auth 登入失敗: ${authError?.message}`)
             return {
               success: false,
-              message: '帳號或密碼錯誤'
+              message: '帳號或密碼錯誤',
             }
           }
 
-          // 2. 登入成功後，取得員工資料（用 API 繞過 RLS）
-          const response = await fetch('/api/auth/get-employee-data', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, code }),
-          })
-
-          const result = await response.json()
-
-          if (!result.success) {
-            logger.warn(`⚠️ 取得員工資料失敗: ${result.message}`)
-            // 登出 Supabase Auth
-            await supabase.auth.signOut()
-            return { success: false, message: result.message || '找不到員工資料' }
-          }
-
-          const employeeData = (result.data?.employee ?? result.employee) as EmployeeRow
+          const employeeData = (validateResult.data?.employee ?? validateResult.employee) as EmployeeRow
 
           // 3. 確保 Auth 同步（處理 RLS 所需的 supabase_user_id）
           await ensureAuthSync({

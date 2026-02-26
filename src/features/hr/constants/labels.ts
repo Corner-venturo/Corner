@@ -299,4 +299,7 @@ export const COMP_HR_LABELS = {
   DEFAULT_TAG: '(預設)',
   PASSWORD_MATCH: '✓ 密碼確認一致',
   PASSWORD_MISMATCH: '✗ 密碼確認不一致',
+
+  LABEL_PINYIN: '護照拼音',
+  LABEL_AUTH_EMAIL: '登入 Email',
 };
