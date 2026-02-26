@@ -271,7 +271,7 @@ export function MemberSurchargeCell({
                   <Input
                     type="text"
                     inputMode="numeric"
-                    placeholder="金額"
+                    placeholder={MEMBER_ROW_LABELS.AMOUNT}
                     value={item.amount || ''}
                     onChange={(e) => handleUpdateItem('other_charges', index, 'amount', e.target.value)}
                     className="w-24 text-right"

@@ -12,6 +12,7 @@ import {
 import { Copy, Check } from 'lucide-react'
 import { CreatedEmployeeInfo } from './types'
 import { COMP_HR_LABELS } from '@/features/hr/constants/labels'
+import { ADD_EMPLOYEE_LABELS } from './constants/labels'
 
 interface SuccessDialogProps {
   open: boolean
@@ -83,7 +84,7 @@ export function SuccessDialog({
                     <button
                       onClick={() => onCopy(createdEmployee.email, 'email')}
                       className="ml-3 p-2 hover:bg-muted rounded-md transition-colors"
-                      title="複製 Email"
+                      title={ADD_EMPLOYEE_LABELS.COPYING_9979}
                     >
                       {copiedField === 'email' ? (
                         <Check size={20} className="text-morandi-gold" />

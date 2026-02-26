@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import type { Json } from '@/lib/supabase/types'
+import { useAuthStore } from '@/stores/auth-store'
 import { NEWEBPAY_LABELS } from '../constants/labels'
 
 interface NewebPayConfig {
@@ -19,6 +20,7 @@ interface NewebPayConfig {
 }
 
 export function NewebPaySettings() {
+  const workspaceId = useAuthStore(s => s.user?.workspace_id)
   const [config, setConfig] = useState<NewebPayConfig>({
     merchantId: '',
     hashKey: '',
@@ -35,14 +37,17 @@ export function NewebPaySettings() {
 
   useEffect(() => {
     fetchConfig()
-  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workspaceId])
 
   const fetchConfig = async () => {
     try {
+      if (!workspaceId) return
       const { data, error } = await supabase
         .from('system_settings')
         .select('settings')
         .eq('category', 'newebpay')
+        .eq('workspace_id', workspaceId)
         .single()
 
       if (error) {
@@ -69,15 +74,17 @@ export function NewebPaySettings() {
     setMessage(null)
 
     try {
+      if (!workspaceId) return
       const { error } = await supabase
         .from('system_settings')
         .upsert({
           category: 'newebpay',
+          workspace_id: workspaceId,
           settings: config as unknown as Json,
           description: NEWEBPAY_LABELS.TITLE,
           updated_at: new Date().toISOString(),
         }, {
-          onConflict: 'category',
+          onConflict: 'category,workspace_id',
         })
 
       if (error) throw error
