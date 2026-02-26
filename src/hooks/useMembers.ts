@@ -161,13 +161,17 @@ export function useMembers({ orderId, tourId }: UseMembersOptions = {}): UseMemb
           return { data: null, error: uploadError }
         }
 
-        // 取得公開 URL
-        const { data: urlData } = supabase.storage
+        // 取得簽名 URL（passport-images bucket 已改為 private）
+        const { data: urlData, error: urlError } = await supabase.storage
           .from('passport-images')
-          .getPublicUrl(fileName)
+          .createSignedUrl(fileName, 3600 * 24 * 365) // 1 year signed URL
+
+        if (urlError) {
+          return { data: { publicUrl: '' }, error: urlError }
+        }
 
         return {
-          data: { publicUrl: urlData?.publicUrl || '' },
+          data: { publicUrl: urlData?.signedUrl || '' },
           error: null,
         }
       } catch (err) {

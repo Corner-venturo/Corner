@@ -178,13 +178,15 @@ export function MemberEditDialog({
 
       if (uploadError) throw uploadError
 
-      const { data: urlData } = supabase.storage
+      const { data: urlData, error: urlError } = await supabase.storage
         .from('passport-images')
-        .getPublicUrl(fileName)
+        .createSignedUrl(fileName, 3600 * 24 * 365) // 1 year signed URL
+
+      if (urlError) throw urlError
 
       onMemberChange({
         ...editingMember,
-        passport_image_url: urlData.publicUrl,
+        passport_image_url: urlData.signedUrl,
       })
 
       toast.success(COMP_ORDERS_LABELS.護照照片已上傳)
@@ -192,7 +194,7 @@ export function MemberEditDialog({
       // 自動進行 OCR
       if (onRecognize) {
         try {
-          await onRecognize(urlData.publicUrl)
+          await onRecognize(urlData.signedUrl)
         } catch {
           // OCR 失敗不影響上傳
         }

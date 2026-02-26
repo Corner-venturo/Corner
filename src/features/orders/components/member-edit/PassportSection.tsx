@@ -74,11 +74,12 @@ export function PassportSection({
 
       if (uploadError) throw uploadError
 
-      const { data: urlData } = supabase.storage
+      const { data: urlData, error: urlError } = await supabase.storage
         .from('passport-images')
-        .getPublicUrl(fileName)
+        .createSignedUrl(fileName, 3600 * 24 * 365) // 1 year signed URL
 
-      const newUrl = urlData.publicUrl
+      if (urlError) throw urlError
+      const newUrl = urlData.signedUrl
 
       // 更新成員資料
       await supabase
