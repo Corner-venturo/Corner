@@ -66,13 +66,18 @@ export async function POST(request: NextRequest) {
       itemAmt: totalAmount,
     }]
 
-    // 呼叫藍新 API
+    // 呼叫藍新 API（依 workspace_id 取得該租戶的藍新金鑰）
+    const finalWorkspaceId = workspace_id || ordersData[0]?.workspace_id
+    if (!finalWorkspaceId) {
+      return ApiError.validation('無法確認 workspace_id，請重新操作')
+    }
     const result = await issueInvoice({
       invoiceDate: invoice_date,
       totalAmount: totalAmount,
       taxType: 'dutiable',
       buyerInfo,
       items,
+      workspaceId: finalWorkspaceId,
     })
 
     if (!result.success) {

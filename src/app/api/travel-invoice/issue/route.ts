@@ -74,13 +74,17 @@ export async function POST(request: NextRequest) {
       return ApiError.validation('總金額與訂單分攤金額不符')
     }
 
-    // 呼叫藍新 API
+    // 呼叫藍新 API（依 workspace_id 取得該租戶的藍新金鑰）
+    if (!finalWorkspaceId) {
+      return ApiError.validation('無法確認 workspace_id，請重新操作')
+    }
     const result = await issueInvoice({
       invoiceDate: invoice_date,
       totalAmount: total_amount,
       taxType: tax_type || 'dutiable',
       buyerInfo,
       items,
+      workspaceId: finalWorkspaceId,
     })
 
     if (!result.success) {

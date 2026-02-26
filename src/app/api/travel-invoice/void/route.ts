@@ -73,11 +73,15 @@ export async function POST(request: NextRequest) {
       return ApiError.validation('發票資料不完整')
     }
 
-    // 呼叫藍新 API
+    // 呼叫藍新 API（依 workspace_id 取得該租戶的藍新金鑰）
+    if (!invoice.workspace_id) {
+      return ApiError.validation('發票缺少 workspace_id，無法作廢')
+    }
     const result = await voidInvoice({
       invoiceNumber: invoice.invoice_number,
       invoiceDate: invoice.invoice_date,
       voidReason,
+      workspaceId: invoice.workspace_id,
     })
 
     if (!result.success) {

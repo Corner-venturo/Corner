@@ -96,14 +96,15 @@ interface QueryParams {
 /**
  * 從 Supabase 獲取藍新金流設定
  */
-async function getNewebPayConfig(): Promise<NewebPayConfig> {
+async function getNewebPayConfig(workspaceId: string): Promise<NewebPayConfig> {
   const supabase = getSupabaseAdminClient()
 
-  // 從 system_settings 表獲取設定
+  // 從 system_settings 表獲取設定（依 workspace_id 隔離）
   const { data, error } = await supabase
     .from('system_settings')
     .select('*')
     .eq('category', 'newebpay')
+    .eq('workspace_id', workspaceId)
     .single()
 
   if (error || !data) {
@@ -159,8 +160,8 @@ function parseUrlEncodedResponse(responseText: string): Record<string, string> {
 /**
  * 發送請求到藍新 API
  */
-async function sendRequest(path: string, postData: Record<string, unknown>): Promise<Record<string, string>> {
-  const config = await getNewebPayConfig()
+async function sendRequest(path: string, postData: Record<string, unknown>, workspaceId: string): Promise<Record<string, string>> {
+  const config = await getNewebPayConfig(workspaceId)
   const baseUrl = config.isProduction ? API_ENDPOINTS.production : API_ENDPOINTS.test
 
   // 將資料轉為 URL encoded 字串，然後加密
@@ -247,7 +248,7 @@ async function sendRequest(path: string, postData: Record<string, unknown>): Pro
  * - TotalAmt: 收據金額
  * - ItemName/ItemCount/ItemUnit/ItemPrice/ItemAmt: 商品資訊（多項用 | 分隔）
  */
-export async function issueInvoice(params: IssueInvoiceParams): Promise<{
+export async function issueInvoice(params: IssueInvoiceParams & { workspaceId: string }): Promise<{
   success: boolean
   message: string
   data?: {
@@ -330,7 +331,7 @@ export async function issueInvoice(params: IssueInvoiceParams): Promise<{
   logger.log('[NewebPay] buyerInfo 原始值:', JSON.stringify(params.buyerInfo, null, 2))
 
   try {
-    const result = await sendRequest(API_PATHS.issue, postData)
+    const result = await sendRequest(API_PATHS.issue, postData, params.workspaceId)
 
     logger.log('[NewebPay] 開立收據回應:', result)
 
@@ -367,7 +368,7 @@ export async function issueInvoice(params: IssueInvoiceParams): Promise<{
 /**
  * 作廢收據
  */
-export async function voidInvoice(params: VoidInvoiceParams): Promise<{
+export async function voidInvoice(params: VoidInvoiceParams & { workspaceId: string }): Promise<{
   success: boolean
   message: string
 }> {
@@ -380,7 +381,7 @@ export async function voidInvoice(params: VoidInvoiceParams): Promise<{
   }
 
   try {
-    const result = await sendRequest(API_PATHS.void, postData)
+    const result = await sendRequest(API_PATHS.void, postData, params.workspaceId)
 
     if (result.Status === 'SUCCESS' || result.Status === '1') {
       return {
@@ -404,7 +405,7 @@ export async function voidInvoice(params: VoidInvoiceParams): Promise<{
 /**
  * 開立折讓
  */
-export async function issueAllowance(params: AllowanceParams): Promise<{
+export async function issueAllowance(params: AllowanceParams & { workspaceId: string }): Promise<{
   success: boolean
   message: string
   data?: {
@@ -432,7 +433,7 @@ export async function issueAllowance(params: AllowanceParams): Promise<{
   }
 
   try {
-    const result = await sendRequest(API_PATHS.allowance, postData)
+    const result = await sendRequest(API_PATHS.allowance, postData, params.workspaceId)
 
     if (result.Status === 'SUCCESS' || result.Status === '1') {
       return {
@@ -459,7 +460,7 @@ export async function issueAllowance(params: AllowanceParams): Promise<{
 /**
  * 查詢收據
  */
-export async function queryInvoice(params: QueryParams): Promise<{
+export async function queryInvoice(params: QueryParams & { workspaceId: string }): Promise<{
   success: boolean
   message: string
   data?: Record<string, string>
@@ -483,7 +484,7 @@ export async function queryInvoice(params: QueryParams): Promise<{
   }
 
   try {
-    const result = await sendRequest(API_PATHS.query, postData)
+    const result = await sendRequest(API_PATHS.query, postData, params.workspaceId)
 
     if (result.Status === 'SUCCESS' || result.Status === '1') {
       return {
