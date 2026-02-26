@@ -3,6 +3,8 @@
  * 從 OrderMembersExpandable.tsx 拆分出來
  */
 
+import type { Json } from '@/lib/supabase/types'
+
 // ============================================
 // 核心類型
 // ============================================
@@ -54,7 +56,7 @@ export interface OrderMember {
   // 排序順序
   sort_order?: number | null
   // 自訂費用（jsonb 欄位）
-  custom_costs?: Record<string, unknown> | null
+  custom_costs?: Json | null
 }
 
 // ============================================

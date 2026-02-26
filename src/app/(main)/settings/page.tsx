@@ -1,6 +1,5 @@
 'use client'
 
-import { useThemeStore } from '@/stores/theme-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
@@ -9,7 +8,6 @@ import { useSettingsState } from './hooks/useSettingsState'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import {
-  AppearanceSettings,
   AccountSettings,
   SystemSettings,
   OtherSettings,
@@ -26,7 +24,6 @@ export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
 
 export default function SettingsPage() {
-  const { currentTheme, setTheme } = useThemeStore()
   const { user, logout } = useAuthStore()
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -158,9 +155,6 @@ export default function SettingsPage() {
           )}
 
           {/* ===== 一般使用者可見 ===== */}
-
-          {/* 主題設定 */}
-          <AppearanceSettings currentTheme={currentTheme} onThemeChange={setTheme} />
 
           {/* 帳號安全設定 */}
           <AccountSettings

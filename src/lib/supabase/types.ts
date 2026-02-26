@@ -3759,6 +3759,7 @@ export type Database = {
           order_number: string | null
           payment_method: string | null
           payment_request_ids: string[] | null
+          pdf_url: string | null
           status: string | null
           updated_at: string | null
           updated_by: string | null
@@ -3779,6 +3780,7 @@ export type Database = {
           order_number?: string | null
           payment_method?: string | null
           payment_request_ids?: string[] | null
+          pdf_url?: string | null
           status?: string | null
           updated_at?: string | null
           updated_by?: string | null
@@ -3799,6 +3801,7 @@ export type Database = {
           order_number?: string | null
           payment_method?: string | null
           payment_request_ids?: string[] | null
+          pdf_url?: string | null
           status?: string | null
           updated_at?: string | null
           updated_by?: string | null
@@ -8087,6 +8090,7 @@ export type Database = {
           cost_price: number | null
           created_at: string | null
           created_by: string | null
+          custom_costs: Json | null
           customer_id: string | null
           deposit_amount: number | null
           deposit_receipt_no: string | null
@@ -8135,6 +8139,7 @@ export type Database = {
           cost_price?: number | null
           created_at?: string | null
           created_by?: string | null
+          custom_costs?: Json | null
           customer_id?: string | null
           deposit_amount?: number | null
           deposit_receipt_no?: string | null
@@ -8183,6 +8188,7 @@ export type Database = {
           cost_price?: number | null
           created_at?: string | null
           created_by?: string | null
+          custom_costs?: Json | null
           customer_id?: string | null
           deposit_amount?: number | null
           deposit_receipt_no?: string | null
@@ -8371,6 +8377,7 @@ export type Database = {
       payment_request_items: {
         Row: {
           category: string | null
+          confirmation_item_id: string | null
           created_at: string | null
           created_by: string | null
           custom_request_date: string | null
@@ -8394,6 +8401,7 @@ export type Database = {
         }
         Insert: {
           category?: string | null
+          confirmation_item_id?: string | null
           created_at?: string | null
           created_by?: string | null
           custom_request_date?: string | null
@@ -8417,6 +8425,7 @@ export type Database = {
         }
         Update: {
           category?: string | null
+          confirmation_item_id?: string | null
           created_at?: string | null
           created_by?: string | null
           custom_request_date?: string | null
@@ -8439,6 +8448,13 @@ export type Database = {
           workspace_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "payment_request_items_confirmation_item_id_fkey"
+            columns: ["confirmation_item_id"]
+            isOneToOne: false
+            referencedRelation: "tour_confirmation_items"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "payment_request_items_tour_id_fkey"
             columns: ["tour_id"]
@@ -14487,6 +14503,8 @@ export type Database = {
           resource_type: string | null
           service_date: string | null
           service_date_end: string | null
+          show_on_brochure: boolean
+          show_on_web: boolean
           sort_order: number | null
           sub_category: string | null
           supplier_id: string | null
@@ -14543,6 +14561,8 @@ export type Database = {
           resource_type?: string | null
           service_date?: string | null
           service_date_end?: string | null
+          show_on_brochure?: boolean
+          show_on_web?: boolean
           sort_order?: number | null
           sub_category?: string | null
           supplier_id?: string | null
@@ -14599,6 +14619,8 @@ export type Database = {
           resource_type?: string | null
           service_date?: string | null
           service_date_end?: string | null
+          show_on_brochure?: boolean
+          show_on_web?: boolean
           sort_order?: number | null
           sub_category?: string | null
           supplier_id?: string | null
@@ -15771,6 +15793,7 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           current_participants: number | null
+          custom_cost_fields: Json | null
           departure_date: string
           description: string | null
           enable_checkin: boolean | null
@@ -15801,9 +15824,11 @@ export type Database = {
           quote_id: string | null
           return_date: string
           return_flight: Json | null
+          selling_price_per_person: number | null
           status: string | null
           total_cost: number
           total_revenue: number
+          tour_leader_id: string | null
           updated_at: string | null
           updated_by: string | null
           workspace_id: string | null
@@ -15833,6 +15858,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           current_participants?: number | null
+          custom_cost_fields?: Json | null
           departure_date: string
           description?: string | null
           enable_checkin?: boolean | null
@@ -15863,9 +15889,11 @@ export type Database = {
           quote_id?: string | null
           return_date: string
           return_flight?: Json | null
+          selling_price_per_person?: number | null
           status?: string | null
           total_cost?: number
           total_revenue?: number
+          tour_leader_id?: string | null
           updated_at?: string | null
           updated_by?: string | null
           workspace_id?: string | null
@@ -15895,6 +15923,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           current_participants?: number | null
+          custom_cost_fields?: Json | null
           departure_date?: string
           description?: string | null
           enable_checkin?: boolean | null
@@ -15925,9 +15954,11 @@ export type Database = {
           quote_id?: string | null
           return_date?: string
           return_flight?: Json | null
+          selling_price_per_person?: number | null
           status?: string | null
           total_cost?: number
           total_revenue?: number
+          tour_leader_id?: string | null
           updated_at?: string | null
           updated_by?: string | null
           workspace_id?: string | null
@@ -15980,6 +16011,20 @@ export type Database = {
             columns: ["proposal_package_id"]
             isOneToOne: false
             referencedRelation: "proposal_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tours_tour_leader_id_fkey"
+            columns: ["tour_leader_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["order_member_id"]
+          },
+          {
+            foreignKeyName: "tours_tour_leader_id_fkey"
+            columns: ["tour_leader_id"]
+            isOneToOne: false
+            referencedRelation: "order_members"
             referencedColumns: ["id"]
           },
           {
@@ -18753,55 +18798,94 @@ export type Database = {
           _deleted: boolean | null
           _needs_sync: boolean | null
           _synced_at: string | null
+          address: string | null
+          bank_account: string | null
+          bank_account_name: string | null
+          bank_branch: string | null
+          bank_name: string | null
           code: string
           created_at: string | null
           created_by: string | null
           default_password: string | null
           description: string | null
+          email: string | null
           employee_number_prefix: string | null
+          fax: string | null
           icon: string | null
           id: string
+          invoice_seal_image_url: string | null
           is_active: boolean | null
+          logo_url: string | null
           name: string
           payment_config: Json | null
+          phone: string | null
+          seal_image_url: string | null
+          tax_id: string | null
           type: string | null
           updated_at: string | null
+          website: string | null
         }
         Insert: {
           _deleted?: boolean | null
           _needs_sync?: boolean | null
           _synced_at?: string | null
+          address?: string | null
+          bank_account?: string | null
+          bank_account_name?: string | null
+          bank_branch?: string | null
+          bank_name?: string | null
           code?: string
           created_at?: string | null
           created_by?: string | null
           default_password?: string | null
           description?: string | null
+          email?: string | null
           employee_number_prefix?: string | null
+          fax?: string | null
           icon?: string | null
           id?: string
+          invoice_seal_image_url?: string | null
           is_active?: boolean | null
+          logo_url?: string | null
           name: string
           payment_config?: Json | null
+          phone?: string | null
+          seal_image_url?: string | null
+          tax_id?: string | null
           type?: string | null
           updated_at?: string | null
+          website?: string | null
         }
         Update: {
           _deleted?: boolean | null
           _needs_sync?: boolean | null
           _synced_at?: string | null
+          address?: string | null
+          bank_account?: string | null
+          bank_account_name?: string | null
+          bank_branch?: string | null
+          bank_name?: string | null
           code?: string
           created_at?: string | null
           created_by?: string | null
           default_password?: string | null
           description?: string | null
+          email?: string | null
           employee_number_prefix?: string | null
+          fax?: string | null
           icon?: string | null
           id?: string
+          invoice_seal_image_url?: string | null
           is_active?: boolean | null
+          logo_url?: string | null
           name?: string
           payment_config?: Json | null
+          phone?: string | null
+          seal_image_url?: string | null
+          tax_id?: string | null
           type?: string | null
           updated_at?: string | null
+          website?: string | null
         }
         Relationships: [
           {

@@ -26,6 +26,7 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
   const pathname = usePathname()
   const { user, _hasHydrated, isAuthenticated, logout } = useAuthStore()
   const redirectingRef = useRef(false) // 防止重複跳轉
+  const sessionCheckedRef = useRef(false) // 一次性 Supabase session 健康檢查
 
   // Token 過期同步：檢查 cookie 是否被 middleware 清除
   const syncTokenState = useCallback(() => {
@@ -54,8 +55,24 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
       }
 
       // 如果已認證（剛登入），不需要等待 hydration
+      // 但需要一次性驗證 Supabase session 是否仍有效
       if (isAuthenticated && user?.id) {
-        logger.debug('AuthGuard: 已認證，跳過 hydration 等待')
+        if (!sessionCheckedRef.current) {
+          sessionCheckedRef.current = true
+          try {
+            const { supabase } = await import('@/lib/supabase/client')
+            const { data: { session } } = await supabase.auth.getSession()
+            if (!session) {
+              logger.warn(LIB_LABELS.SESSION_CHECK_EXPIRED)
+              redirectingRef.current = true
+              logout()
+              router.push('/login?reason=session_expired')
+              return
+            }
+          } catch (err) {
+            logger.warn(LIB_LABELS.SESSION_CHECK_FAILED, err)
+          }
+        }
         redirectingRef.current = false
         return
       }

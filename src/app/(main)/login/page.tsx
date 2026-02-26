@@ -35,6 +35,13 @@ export default function LoginPage() {
     if (lastUsername) setUsername(lastUsername)
   }, [])
 
+  // 顯示 session 過期提示
+  useEffect(() => {
+    if (searchParams.get('reason') === 'session_expired') {
+      setError(LABELS.SESSION_EXPIRED)
+    }
+  }, [searchParams])
+
   // 取得登入後要跳轉的頁面
   const getRedirectPath = (): string => {
     const redirectParam = searchParams.get('redirect')

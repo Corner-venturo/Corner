@@ -13,4 +13,5 @@ export const LABELS = {
   DEMO_BUTTON: '免費體驗 Demo',
   DEMO_LOADING: '正在進入體驗模式...',
   DEMO_DIVIDER: '或',
+  SESSION_EXPIRED: '登入已過期，請重新登入',
 }

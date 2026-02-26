@@ -381,23 +381,15 @@ export function Sidebar() {
           {visiblePersonalToolItems.map(item => renderMenuItem(item))}
 
           {/* 設定 */}
-          <li>
-            <Link
-              href="/settings"
-              prefetch={false}
-              onClick={closeSidebar}
-              className={cn(
-                'w-full relative block h-9 text-xs text-morandi-secondary transition-all duration-200',
-                'hover:bg-morandi-gold/5 hover:text-morandi-gold',
-                mounted && pathname === '/settings' && 'bg-morandi-gold/10 text-morandi-gold border-l-3 border-morandi-gold'
-              )}
-            >
-              <Settings size={18} className="absolute left-5 top-1/2 -translate-y-1/2" />
-              {showExpanded && (
-                <span className="ml-12 block text-left leading-9">{COMP_LAYOUT_LABELS.設定}</span>
-              )}
-            </Link>
-          </li>
+          {renderMenuItem({
+            href: '/settings',
+            label: COMP_LAYOUT_LABELS.設定,
+            icon: Settings,
+            children: [
+              { href: '/settings', label: COMP_LAYOUT_LABELS.個人設定, icon: Settings },
+              ...(isSuperAdmin ? [{ href: '/settings/company', label: COMP_LAYOUT_LABELS.公司資訊, icon: Building2 }] : []),
+            ],
+          })}
         </ul>
       </nav>
     </div>

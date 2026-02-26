@@ -1,4 +1,3 @@
-export { AppearanceSettings } from './AppearanceSettings'
 export { AccountSettings } from './AccountSettings'
 export { SystemSettings } from './SystemSettings'
 export { OtherSettings } from './OtherSettings'
