@@ -2,12 +2,12 @@
 /**
  * CompanyAssetsPage - 公司資源管理頁面
  * 
- * 改用樹狀資料夾結構（參考 TourFilesTree）
+ * 列表模式 — 簡潔的檔案清單
  */
 
 
 import { logger } from '@/lib/utils/logger'
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { FolderArchive } from 'lucide-react'
 import {
@@ -16,10 +16,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { CompanyAssetsTree } from './CompanyAssetsTree'
+import { CompanyAssetsList } from './CompanyAssetsList'
 import { CompanyAssetsDialog } from './CompanyAssetsDialog'
 import { supabase } from '@/lib/supabase/client'
-import { createCompanyAsset, updateCompanyAsset } from '@/data/entities/company-assets'
 import { useAuthStore } from '@/stores'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import type { CompanyAsset, CompanyAssetType } from '@/types/company-asset.types'
@@ -27,13 +26,13 @@ import { COMPANY_ASSETS_LABELS } from '../constants/labels'
 
 export const CompanyAssetsPage: React.FC = () => {
   const user = useAuthStore(state => state.user)
+  const [searchQuery, setSearchQuery] = useState('')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false)
   const [editingAsset, setEditingAsset] = useState<CompanyAsset | null>(null)
-  const [previewAsset, setPreviewAsset] = useState<CompanyAsset | null>(null)
+  const [assets, setAssets] = useState<CompanyAsset[]>([])
   const [isLoading, setIsLoading] = useState(false)
-  const [targetFolderId, setTargetFolderId] = useState<string | null>(null)
-  const [refreshKey, setRefreshKey] = useState(0)
+  const [previewAsset, setPreviewAsset] = useState<CompanyAsset | null>(null)
 
   // 表單狀態
   const [formData, setFormData] = useState({
@@ -43,25 +42,111 @@ export const CompanyAssetsPage: React.FC = () => {
     restricted: false,
   })
 
-  // 處理選取檔案（預覽）
-  const handleSelectFile = useCallback((asset: { id: string; name: string; file_path: string; mime_type: string | null }) => {
-    setPreviewAsset(asset as CompanyAsset)
-  }, [])
+  // 判斷是否為管理者或會計
+  const isAdminOrAccountant =
+    user?.permissions?.includes('admin') ||
+    user?.permissions?.includes('*') ||
+    user?.roles?.includes('admin') ||
+    user?.roles?.includes('accountant')
 
-  // 處理新增檔案
-  const handleAddFile = useCallback((folderId: string | null) => {
+  // 載入資料
+  const fetchAssets = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('company_assets')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+
+      // 過濾受限資源（非管理者/會計看不到）
+      const filteredData = (data || []).filter(asset => {
+        const assetWithRestricted = asset as typeof asset & { restricted?: boolean }
+        if (!assetWithRestricted.restricted) return true
+        return isAdminOrAccountant
+      })
+
+      setAssets(filteredData as unknown as CompanyAsset[])
+    } catch (error) {
+      logger.error(COMPANY_ASSETS_LABELS.載入公司資源失敗, error)
+    }
+  }, [isAdminOrAccountant])
+
+  useEffect(() => {
+    fetchAssets()
+  }, [fetchAssets])
+
+  // 過濾資源
+  const filteredAssets = assets.filter(asset =>
+    searchQuery
+      ? asset.name?.toLowerCase().includes(searchQuery.toLowerCase())
+      : true
+  )
+
+  const handleOpenAddDialog = useCallback(() => {
     setIsEditMode(false)
     setEditingAsset(null)
-    setTargetFolderId(folderId)
     setFormData({ name: '', asset_type: 'image', file: null, restricted: false })
     setIsDialogOpen(true)
+  }, [])
+
+  const handleEdit = useCallback((asset: CompanyAsset) => {
+    setIsEditMode(true)
+    setEditingAsset(asset)
+    setFormData({
+      name: asset.name || '',
+      asset_type: asset.asset_type || 'image',
+      file: null,
+      restricted: asset.restricted || false,
+    })
+    setIsDialogOpen(true)
+  }, [])
+
+  const handleDelete = useCallback(async (asset: CompanyAsset) => {
+    const confirmed = await confirm(`確定要刪除「${asset.name}」嗎？`, {
+      title: COMPANY_ASSETS_LABELS.刪除資源,
+      type: 'warning',
+    })
+    if (!confirmed) return
+
+    try {
+      const response = await fetch(
+        `/api/storage/upload?bucket=company-assets&path=${encodeURIComponent(asset.file_path)}`,
+        { method: 'DELETE' }
+      )
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || COMPANY_ASSETS_LABELS.刪除失敗)
+      }
+
+      const { error } = await supabase.from('company_assets').delete().eq('id', asset.id)
+      if (error) throw error
+
+      await alert(COMPANY_ASSETS_LABELS.刪除成功, 'success')
+      fetchAssets()
+    } catch (error) {
+      logger.error(COMPANY_ASSETS_LABELS.刪除失敗, error)
+      await alert(COMPANY_ASSETS_LABELS.刪除失敗, 'error')
+    }
+  }, [fetchAssets])
+
+  const handlePreview = useCallback((asset: CompanyAsset) => {
+    setPreviewAsset(asset)
+  }, [])
+
+  const handleDownload = useCallback((asset: CompanyAsset) => {
+    const { data } = supabase.storage.from('company-assets').getPublicUrl(asset.file_path)
+    const link = document.createElement('a')
+    link.href = data.publicUrl
+    link.download = asset.name
+    link.target = '_blank'
+    link.click()
   }, [])
 
   const handleCloseDialog = useCallback(() => {
     setIsDialogOpen(false)
     setIsEditMode(false)
     setEditingAsset(null)
-    setTargetFolderId(null)
     setIsLoading(false)
     setFormData({ name: '', asset_type: 'image', file: null, restricted: false })
   }, [])
@@ -116,7 +201,6 @@ export const CompanyAssetsPage: React.FC = () => {
     setIsLoading(true)
     try {
       if (isEditMode && editingAsset) {
-        // 更新模式
         const updateData: Record<string, unknown> = {
           name: formData.name,
           asset_type: formData.asset_type,
@@ -137,10 +221,14 @@ export const CompanyAssetsPage: React.FC = () => {
           updateData.mime_type = formData.file.type
         }
 
-        await updateCompanyAsset(editingAsset.id, updateData)
+        const { error } = await supabase
+          .from('company_assets')
+          .update(updateData)
+          .eq('id', editingAsset.id)
+
+        if (error) throw error
         await alert(COMPANY_ASSETS_LABELS.更新成功, 'success')
       } else {
-        // 新增模式
         const file = formData.file!
         const fileExt = file.name.split('.').pop()
         const safeFileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`
@@ -151,7 +239,7 @@ export const CompanyAssetsPage: React.FC = () => {
         const userName =
           user?.display_name || user?.chinese_name || user?.personal_info?.email || 'Unknown'
 
-        await createCompanyAsset({
+        const { error: dbError } = await supabase.from('company_assets').insert({
           name: formData.name,
           asset_type: formData.asset_type,
           file_path: filePath,
@@ -162,20 +250,21 @@ export const CompanyAssetsPage: React.FC = () => {
           description: formData.restricted ? COMPANY_ASSETS_LABELS.受限資源 : null,
           restricted: formData.restricted,
           workspace_id: user?.workspace_id ?? null,
-          folder_id: targetFolderId,
         })
+
+        if (dbError) throw dbError
         await alert(COMPANY_ASSETS_LABELS.新增成功, 'success')
       }
 
       handleCloseDialog()
-      setRefreshKey(k => k + 1) // 觸發重新載入
+      fetchAssets()
     } catch (error) {
       logger.error(COMPANY_ASSETS_LABELS.儲存失敗, error)
       await alert(`儲存失敗: ${error instanceof Error ? error.message : COMPANY_ASSETS_LABELS.未知錯誤}`, 'error')
     } finally {
       setIsLoading(false)
     }
-  }, [formData, isEditMode, editingAsset, user, handleCloseDialog, targetFolderId])
+  }, [formData, isEditMode, editingAsset, user, handleCloseDialog, fetchAssets])
 
   return (
     <ContentPageLayout
@@ -186,17 +275,23 @@ export const CompanyAssetsPage: React.FC = () => {
         { label: COMPANY_ASSETS_LABELS.資料庫管理, href: '/database' },
         { label: COMPANY_ASSETS_LABELS.公司資源管理, href: '/database/company-assets' },
       ]}
-      onAdd={() => handleAddFile(null)}
+      showSearch
+      searchTerm={searchQuery}
+      onSearchChange={setSearchQuery}
+      searchPlaceholder={COMPANY_ASSETS_LABELS.搜尋檔案名稱}
+      onAdd={handleOpenAddDialog}
       addLabel={COMPANY_ASSETS_LABELS.上傳檔案}
-      contentClassName="flex-1 overflow-hidden"
     >
-        <div className="h-full border border-border rounded-xl overflow-hidden bg-card shadow-sm flex flex-col">
-          <CompanyAssetsTree
-            key={refreshKey}
-            onSelectFile={handleSelectFile}
-            onAddFile={handleAddFile}
-          />
-        </div>
+      <div className="flex-1 overflow-auto">
+        <CompanyAssetsList
+          assets={filteredAssets}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onPreview={handlePreview}
+          onDownload={handleDownload}
+          onThumbnailClick={handlePreview}
+        />
+      </div>
 
       <CompanyAssetsDialog
         isOpen={isDialogOpen}
@@ -217,10 +312,10 @@ export const CompanyAssetsPage: React.FC = () => {
             </DialogTitle>
           </DialogHeader>
 
-          {/* 預覽內容 */}
           <div className="flex items-center justify-center bg-morandi-container/20 min-h-[300px] max-h-[60vh] rounded-lg">
             {previewAsset?.asset_type === 'image' ? (
-              <img src={supabase.storage.from('company-assets').getPublicUrl(previewAsset.file_path).data.publicUrl}
+              <img
+                src={supabase.storage.from('company-assets').getPublicUrl(previewAsset.file_path).data.publicUrl}
                 alt={previewAsset.name}
                 className="max-w-full max-h-[55vh] object-contain"
               />
