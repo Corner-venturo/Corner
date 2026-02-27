@@ -30,6 +30,7 @@ export async function getAllTodos(workspaceId: string): Promise<Todo[]> {
     .select('*')
     .eq('workspace_id', workspaceId)  // 🔒 Workspace 過濾
     .order('created_at', { ascending: false })
+    .limit(500)
 
   if (error) {
     logger.error('Error fetching todos:', error)

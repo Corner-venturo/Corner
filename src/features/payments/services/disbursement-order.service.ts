@@ -57,6 +57,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       .from('disbursement_orders')
       .select('*')
       .order('created_at', { ascending: false })
+      .limit(500)
     if (error) throw new Error(error.message)
     this.cachedItems = (data || []) as unknown as DisbursementOrder[]
     return this.cachedItems

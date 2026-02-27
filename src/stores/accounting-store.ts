@@ -236,6 +236,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
       .select('*')
       .order('type', { ascending: true })
       .order('name', { ascending: true })
+      .limit(200)
 
     if (!error && data) {
       set({ categories: data as TransactionCategory[] })

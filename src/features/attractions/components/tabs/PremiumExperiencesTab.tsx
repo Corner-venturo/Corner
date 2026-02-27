@@ -69,6 +69,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
         .select('*')
         .order('exclusivity_level', { ascending: false })
         .order('name')
+        .limit(1000)
 
       if (error) throw error
       setExperiences((data as unknown as PremiumExperience[]) || [])

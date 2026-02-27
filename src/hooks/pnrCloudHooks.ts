@@ -67,7 +67,7 @@ export function usePnrFareHistory(pnrId?: string) {
       query = query.eq('pnr_id', pnrId)
     }
 
-    const { data, error } = await query
+    const { data, error } = await query.limit(500)
 
     if (error) {
       logger.error('[pnr_fare_history] Supabase error:', error)
@@ -110,7 +110,7 @@ export function usePnrFareAlerts(pnrId?: string) {
       query = query.eq('pnr_id', pnrId)
     }
 
-    const { data, error } = await query
+    const { data, error } = await query.limit(500)
 
     if (error) {
       logger.error('[pnr_fare_alerts] Supabase error:', error)
@@ -165,7 +165,7 @@ export function usePnrFlightStatusHistory(pnrId?: string) {
       query = query.eq('pnr_id', pnrId)
     }
 
-    const { data, error } = await query
+    const { data, error } = await query.limit(500)
 
     if (error) {
       logger.error('[pnr_flight_status_history] Supabase error:', error)
@@ -217,7 +217,7 @@ export function usePnrQueue(options?: { pnrId?: string; status?: QueueStatus; qu
       query = query.eq('queue_type', options.queueType)
     }
 
-    const { data, error } = await query
+    const { data, error } = await query.limit(500)
 
     if (error) {
       logger.error('[pnr_queue_items] Supabase error:', error)
@@ -315,7 +315,7 @@ export function usePnrScheduleChanges(options?: { pnrId?: string; status?: strin
       query = query.eq('status', options.status)
     }
 
-    const { data, error } = await query
+    const { data, error } = await query.limit(500)
 
     if (error) {
       logger.error('[pnr_schedule_changes] Supabase error:', error)
@@ -369,7 +369,7 @@ export function usePnrAiQueries(pnrId?: string) {
       query = query.eq('pnr_id', pnrId)
     }
 
-    const { data, error } = await query
+    const { data, error } = await query.limit(500)
 
     if (error) {
       logger.error('[pnr_ai_queries] Supabase error:', error)

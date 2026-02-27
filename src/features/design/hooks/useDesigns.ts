@@ -24,6 +24,7 @@ export function useDesigns() {
         .select('*')
         .eq('workspace_id', workspaceId!)
         .order('created_at', { ascending: false })
+        .limit(200)
 
       if (docsError) throw docsError
 

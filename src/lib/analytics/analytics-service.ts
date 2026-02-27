@@ -29,7 +29,7 @@ export class AnalyticsService {
     try {
       let query = supabase
         .from('tours')
-        .select('*')
+        .select('id, status, total_revenue, total_cost, current_participants, departure_date')
         .eq('workspace_id', this.workspaceId)
 
       if (dateRange) {
@@ -71,7 +71,7 @@ export class AnalyticsService {
     try {
       let query = supabase
         .from('orders')
-        .select('*')
+        .select('id, total_amount, payment_status, created_at')
         .eq('workspace_id', this.workspaceId)
 
       if (dateRange) {
@@ -113,7 +113,7 @@ export class AnalyticsService {
     try {
       let query = supabase
         .from('customers')
-        .select('*')
+        .select('id, created_at')
         .eq('workspace_id', this.workspaceId)
 
       const { data: customers, error } = await query

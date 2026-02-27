@@ -505,6 +505,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
         .select('*')
         .eq('document_id', document.id)
         .order('version_number', { ascending: false })
+        .limit(100)
 
       if (error) throw new Error(`載入版本歷史失敗: ${error.message}`)
 
@@ -608,7 +609,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
         query = query.eq('workspace_id', workspaceId)
       }
 
-      const { data: templates, error } = await query
+      const { data: templates, error } = await query.limit(200)
 
       if (error) throw new Error(`載入模板失敗: ${error.message}`)
 

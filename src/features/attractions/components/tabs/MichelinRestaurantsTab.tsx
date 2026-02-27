@@ -62,6 +62,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
         .select('*')
         .order('michelin_stars', { ascending: false })
         .order('name')
+        .limit(1000)
 
       if (error) throw error
       setRestaurants((data as MichelinRestaurant[]) || [])

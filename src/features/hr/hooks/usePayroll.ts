@@ -140,7 +140,7 @@ export function usePayroll() {
         query = query.eq('year', year)
       }
 
-      const { data, error: queryError } = await query
+      const { data, error: queryError } = await query.limit(100)
 
       if (queryError) throw queryError
 

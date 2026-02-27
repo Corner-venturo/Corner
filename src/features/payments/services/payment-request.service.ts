@@ -66,6 +66,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       .from('payment_requests')
       .select('*')
       .order('created_at', { ascending: false })
+      .limit(1000)
     if (error) throw error
     this._items = (data || []) as unknown as PaymentRequest[]
     this._itemsLoaded = true
@@ -77,6 +78,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       .from('payment_request_items')
       .select('*')
       .order('sort_order', { ascending: true })
+      .limit(5000)
     if (error) throw error
     return (data || []) as unknown as PaymentRequestItem[]
   }
