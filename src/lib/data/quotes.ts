@@ -133,7 +133,7 @@ export async function getQuotesPageData({
     // 旅遊團查詢（限制 100 筆未結案的）
     supabase
       .from('tours')
-      .select('*')
+      .select('id, code, name, departure_date, return_date, status, closing_status, workspace_id')
       .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
       .neq('closing_status', 'closed')
       .order('departure_date', { ascending: false })

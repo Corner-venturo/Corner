@@ -34,7 +34,7 @@ export function useVisasData() {
     if (tours.length > 0) return // 已載入過就不重複載入
     const { data } = await supabase
       .from('tours')
-      .select('*')
+      .select('id, code, name, departure_date, return_date, status, archived, workspace_id')
       .or('archived.is.null,archived.eq.false') // 排除封存的
       .order('created_at', { ascending: false })
       .limit(500)
@@ -46,7 +46,7 @@ export function useVisasData() {
     if (orders.length > 0) return
     const { data } = await supabase
       .from('orders')
-      .select('*')
+      .select('id, code, order_number, tour_id, tour_name, contact_person, status, workspace_id, created_at')
       .order('created_at', { ascending: false })
       .limit(500)
     if (data) setOrders(data as Order[])

@@ -63,7 +63,7 @@ export function useUnclosedTours(): UseUnclosedToursResult {
       // ✅ Server-side filtering
       const { data: tours, error: queryError } = await supabase
         .from('tours')
-        .select('*')
+        .select('id, code, name, status, departure_date, return_date, closing_status, total_revenue, total_cost, profit, current_participants, controller_id, workspace_id')
         // return_date must exist and be before cutoff
         .not('return_date', 'is', null)
         .lte('return_date', cutoffDateStr)
