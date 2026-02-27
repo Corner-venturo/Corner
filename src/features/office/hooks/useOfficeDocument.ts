@@ -60,6 +60,7 @@ export function useOfficeDocument(): UseOfficeDocumentReturn {
         .select('*')
         .is('tour_id', null)
         .order('updated_at', { ascending: false })
+        .limit(500)
 
       if (fetchError) throw fetchError
 
@@ -81,6 +82,7 @@ export function useOfficeDocument(): UseOfficeDocumentReturn {
         .select('*')
         .eq('tour_id', tourId)
         .order('updated_at', { ascending: false })
+        .limit(500)
 
       if (fetchError) throw fetchError
 

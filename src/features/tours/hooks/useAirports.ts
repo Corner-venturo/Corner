@@ -50,6 +50,7 @@ async function fetchAirports(): Promise<Airport[]> {
     .select('*')
     .order('usage_count', { ascending: false, nullsFirst: true })
     .order('city_name_zh', { ascending: true })
+    .limit(500)
 
   if (error) {
     logger.error('載入機場資料失敗:', error)

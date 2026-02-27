@@ -74,6 +74,7 @@ export function TourRoomTab({ tourId, tour, members, tourNights }: TourRoomTabPr
         .eq('tour_id', tourId)
         .order('night_number')
         .order('display_order')
+        .limit(500)
 
       if (error) throw error
       setRooms((data || []) as TourRoomStatus[])

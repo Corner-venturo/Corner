@@ -81,6 +81,7 @@ export async function getTodosByStatus(status: string, workspaceId: string): Pro
     .eq('status', status)
     .eq('workspace_id', workspaceId)  // 🔒 Workspace 過濾
     .order('created_at', { ascending: false })
+    .limit(500)
 
   if (error) {
     logger.error('Error fetching todos by status:', error)
@@ -106,6 +107,7 @@ export async function getTodosByAssignee(assigneeId: string, workspaceId: string
     .eq('assignee', assigneeId)
     .eq('workspace_id', workspaceId)  // 🔒 Workspace 過濾
     .order('created_at', { ascending: false })
+    .limit(500)
 
   if (error) {
     logger.error('Error fetching todos by assignee:', error)
@@ -133,6 +135,7 @@ export async function getTodosByEntity(entityType: string, entityId: string, wor
     .contains('related_items', [{ type: entityType, id: entityId }])
     .eq('workspace_id', workspaceId)  // 🔒 Workspace 過濾
     .order('created_at', { ascending: false })
+    .limit(500)
 
   if (error) {
     logger.error('Error fetching todos by entity:', error)

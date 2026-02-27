@@ -66,12 +66,14 @@ export function DisbursementPrintDialog({
           .from('payment_requests')
           .select('*')
           .in('id', requestIds)
+          .limit(500)
 
         // 取得請款項目
         const { data: items } = await supabase
           .from('payment_request_items')
           .select('*')
           .in('request_id', requestIds)
+          .limit(500)
 
         setPaymentRequests((requests || []) as unknown as PaymentRequest[])
         setPaymentRequestItems((items || []) as unknown as PaymentRequestItem[])

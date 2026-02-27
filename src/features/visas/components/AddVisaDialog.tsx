@@ -115,6 +115,7 @@ export function AddVisaDialog({
             .select('*')
             .eq('tour_id', contact_info.tour_id)
             .order('created_at', { ascending: false })
+            .limit(500)
 
           if (!error && data) {
             setTourOrders(data as OrderData[])

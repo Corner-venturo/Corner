@@ -127,6 +127,7 @@ export function useOrderMembersData({
             .in('order_id', orderIds)
             .order('sort_order', { ascending: true })
             .order('created_at', { ascending: true })
+            .limit(500)
 
           if (membersError) throw membersError
           membersData = allMembersData || []
@@ -139,6 +140,7 @@ export function useOrderMembersData({
           .eq('order_id', orderId)
           .order('sort_order', { ascending: true })
           .order('created_at', { ascending: true })
+          .limit(500)
 
         if (membersError) throw membersError
         membersData = data || []

@@ -149,6 +149,7 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
           .eq('tour_id', tourId)
           .is('parent_id', null)
           .order('sort_order')
+          .limit(500)
 
         if (customFolders) {
           for (const folder of customFolders) {
@@ -179,6 +180,7 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
             .eq('tour_id', tourId)
             .eq('category', category as FileCategory)
             .order('created_at', { ascending: false })
+            .limit(500)
 
           if (files) {
             for (const file of files) {
@@ -203,6 +205,7 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
           .select('*')
           .eq('parent_id', folderId)
           .order('sort_order')
+          .limit(500)
 
         if (subFolders) {
           for (const folder of subFolders) {
@@ -224,6 +227,7 @@ export function TourFilesManager({ tourId, tourCode, quoteId, itineraryId }: Tou
           .select('*')
           .eq('folder_id', folderId)
           .order('created_at', { ascending: false })
+          .limit(500)
 
         if (files) {
           for (const file of files) {

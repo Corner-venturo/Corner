@@ -32,6 +32,7 @@ export async function POST(request: NextRequest) {
       .from('orders_invoice_summary')
       .select('*')
       .in('order_id', order_ids)
+      .limit(500)
 
     if (ordersError) {
       logger.error('查詢訂單失敗:', ordersError)

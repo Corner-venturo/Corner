@@ -229,6 +229,7 @@ export async function checkFareAlerts(
       .select('*')
       .eq('pnr_id', pnrId)
       .eq('is_active', true)
+      .limit(500)
 
     if (error) {
       logger.error('[FareMonitoring] Failed to get fare alerts:', error)

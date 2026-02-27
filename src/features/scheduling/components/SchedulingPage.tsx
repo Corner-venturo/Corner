@@ -161,6 +161,7 @@ export const SchedulingPage: React.FC = () => {
         .select('*')
         .in('category', ['transport', 'guide'])
         .order('service_date', { ascending: true })
+        .limit(500)
 
       if (workspaceId) {
         query = query.eq('workspace_id', workspaceId)

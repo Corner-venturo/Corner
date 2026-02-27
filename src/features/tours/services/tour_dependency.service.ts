@@ -131,6 +131,7 @@ export async function unlinkTourItineraries(tourId: string): Promise<number> {
  */
 export async function fetchTourPnrs(tourId: string): Promise<unknown[]> {
   const { data, error } = await supabase.from('pnrs').select('*').eq('tour_id', tourId)
+  .limit(500)
   if (error) {
     logger.error('查詢團 PNR 失敗:', error)
     throw error
@@ -144,6 +145,7 @@ export async function fetchTourPnrs(tourId: string): Promise<unknown[]> {
 export async function fetchPnrsByLocators(locators: string[]): Promise<unknown[]> {
   if (locators.length === 0) return []
   const { data, error } = await supabase.from('pnrs').select('*').in('record_locator', locators)
+  .limit(500)
   if (error) {
     logger.error('查詢 PNR 失敗:', error)
     throw error

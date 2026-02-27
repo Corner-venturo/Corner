@@ -37,6 +37,7 @@ export function useVisasData() {
       .select('*')
       .or('archived.is.null,archived.eq.false') // 排除封存的
       .order('created_at', { ascending: false })
+      .limit(500)
     if (data) setTours(data as Tour[])
   }, [tours.length])
 
@@ -47,6 +48,7 @@ export function useVisasData() {
       .from('orders')
       .select('*')
       .order('created_at', { ascending: false })
+      .limit(500)
     if (data) setOrders(data as Order[])
   }, [orders.length])
 

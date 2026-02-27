@@ -112,6 +112,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       .select('*')
       .eq('request_id', requestId)
       .order('sort_order', { ascending: true })
+      .limit(500)
     if (error) throw error
     return (data || []) as unknown as PaymentRequestItem[]
   }
@@ -405,6 +406,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       .eq('request_id', requestId)
       .eq('category', category)
       .order('sort_order', { ascending: true })
+      .limit(500)
 
     if (error) throw error
     return (data || []) as unknown as PaymentRequestItem[]
@@ -445,6 +447,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       .select('*')
       .eq('status', 'pending')
       .order('created_at', { ascending: false })
+      .limit(500)
 
     if (error) throw error
     return (data || []) as unknown as PaymentRequest[]
@@ -459,6 +462,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       .select('*')
       .eq('status', 'billed')
       .order('created_at', { ascending: false })
+      .limit(500)
 
     if (error) throw error
     return (data || []) as unknown as PaymentRequest[]
@@ -473,6 +477,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       .select('*')
       .eq('tour_id', tourId)
       .order('created_at', { ascending: false })
+      .limit(500)
 
     if (error) throw error
     return (data || []) as unknown as PaymentRequest[]
@@ -487,6 +492,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       .select('*')
       .eq('order_id', orderId)
       .order('created_at', { ascending: false })
+      .limit(500)
 
     if (error) throw error
     return (data || []) as unknown as PaymentRequest[]

@@ -145,6 +145,7 @@ export async function getOrdersByTourId(tourId: string, workspaceId?: string): P
     .eq('tour_id', tourId)
     .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
     .order('created_at', { ascending: false })
+    .limit(500)
 
   if (error) {
     logger.error('Error fetching orders by tour:', error)

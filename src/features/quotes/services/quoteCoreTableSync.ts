@@ -139,6 +139,7 @@ export async function importItineraryItemsToQuote(
       .eq('tour_id', tour_id)
       .order('day_number', { ascending: true })
       .order('sort_order', { ascending: true })
+      .limit(500)
 
     if (error) throw error
     if (!core_items || core_items.length === 0) {

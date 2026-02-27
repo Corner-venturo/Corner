@@ -119,6 +119,7 @@ export function AddReceiptDialog({
           .eq('receipt_id', editingReceipt.id)
           .is('deleted_at', null)
           .order('created_at', { ascending: true })
+          .limit(500)
 
         if (receiptItems && receiptItems.length > 0) {
           // 有 receipt_items，用新的結構

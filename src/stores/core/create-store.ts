@@ -183,6 +183,7 @@ export function createStore<T extends BaseEntity>(
           let query = dynamicFrom(tableName)
             .select('*')
             .order('created_at', { ascending: false })
+            .limit(500)
 
           // 🔒 Workspace 隔離：若啟用 workspaceScoped，自動過濾 workspace_id
           if (config.workspaceScoped) {

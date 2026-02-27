@@ -76,6 +76,7 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
         .select('*')
         .order('sort_order', { ascending: true })
         .order('name', { ascending: true })
+        .limit(500)
       
       if (workspaceId) {
         folderQuery = folderQuery.eq('workspace_id', workspaceId)

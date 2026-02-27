@@ -412,6 +412,7 @@ export function OrderMembersExpandable({
         .from('customers')
         .select('*')
         .in('id', customerIds)
+        .limit(500)
 
       if (error) {
         logger.error(COMP_ORDERS_LABELS.同步_取得顧客資料失敗, error)

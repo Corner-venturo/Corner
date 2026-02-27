@@ -382,6 +382,7 @@ export async function getScheduleChanges(
       .select('*')
       .eq('pnr_id', pnrId)
       .order('detected_at', { ascending: false })
+      .limit(500)
 
     if (options?.status) {
       if (Array.isArray(options.status)) {

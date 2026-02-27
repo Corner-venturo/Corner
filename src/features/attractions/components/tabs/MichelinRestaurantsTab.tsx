@@ -77,6 +77,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
             .from('countries')
             .select('*')
             .in('id', countryIds)
+            .limit(500)
             .then(({ data }) => {
               if (data) setCountries(data.map(c => ({ id: c.id, name: c.name, emoji: c.emoji ?? undefined })))
             })
@@ -87,6 +88,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
             .from('cities')
             .select('*')
             .in('id', cityIds)
+            .limit(500)
             .then(({ data }) => {
               if (data) setCities(data.map(c => ({ id: c.id, name: c.name })))
             })

@@ -134,6 +134,7 @@ export function useQuoteLoader(
         .select('*')
         .eq('quote_id', quoteId)
         .order('display_order', { ascending: true })
+        .limit(500)
 
       if (itemsError) {
         logger.error(COMP_TOURS_LABELS.載入報價項目失敗, itemsError)

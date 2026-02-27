@@ -34,6 +34,7 @@ export function useNotes() {
           .select('*')
           .eq('user_id', user.id)
           .order('tab_order', { ascending: true })
+          .limit(500)
 
         if (error) {
           // Failed to load from Supabase - fallback to localStorage

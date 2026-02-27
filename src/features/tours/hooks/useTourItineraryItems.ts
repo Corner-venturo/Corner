@@ -50,6 +50,7 @@ export function useTourItineraryItemsByTour(tour_id: string | null) {
         .eq('tour_id', tour_id)
         .order('day_number', { ascending: true })
         .order('sort_order', { ascending: true })
+        .limit(500)
       if (error) throw error
       return data as TourItineraryItem[]
     }
@@ -75,6 +76,7 @@ export function useTourItineraryItemsByItinerary(itinerary_id: string | null) {
         .eq('itinerary_id', itinerary_id)
         .order('day_number', { ascending: true })
         .order('sort_order', { ascending: true })
+        .limit(500)
       if (error) throw error
       return data as TourItineraryItem[]
     }

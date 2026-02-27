@@ -26,6 +26,7 @@ export function useSupplierRequests() {
       .select('*')
       .eq('recipient_workspace_id', workspaceId)
       .order('created_at', { ascending: false })
+      .limit(500)
 
     if (error) {
       throw error

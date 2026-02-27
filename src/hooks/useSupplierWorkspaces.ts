@@ -46,6 +46,7 @@ export function useSupplierWorkspaces(options?: UseSupplierWorkspacesOptions) {
       .select('*')
       .in('type', targetTypes)
       .order('name')
+      .limit(500)
 
     // 如果需要排除當前 workspace
     if (excludeCurrentWorkspace) {

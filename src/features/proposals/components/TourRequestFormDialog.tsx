@@ -213,6 +213,7 @@ export function TourRequestFormDialog({
         .neq('id', currentWorkspaceId)
         .eq('is_active', true)
         .order('name')
+        .limit(500)
       if (error) {
         logger.warn('載入 workspace 清單失敗:', error)
         return

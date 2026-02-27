@@ -58,6 +58,7 @@ export function usePnrFareHistory(pnrId?: string) {
       .from('pnr_fare_history')
       .select('*')
       .order('recorded_at', { ascending: false })
+      .limit(500)
 
     if (workspaceId) {
       query = query.eq('workspace_id', workspaceId)
@@ -101,6 +102,7 @@ export function usePnrFareAlerts(pnrId?: string) {
       .from('pnr_fare_alerts')
       .select('*')
       .order('created_at', { ascending: false })
+      .limit(500)
 
     if (workspaceId) {
       query = query.eq('workspace_id', workspaceId)
@@ -156,6 +158,7 @@ export function usePnrFlightStatusHistory(pnrId?: string) {
       .from('pnr_flight_status_history')
       .select('*')
       .order('recorded_at', { ascending: false })
+      .limit(500)
 
     if (workspaceId) {
       query = query.eq('workspace_id', workspaceId)
@@ -200,6 +203,7 @@ export function usePnrQueue(options?: { pnrId?: string; status?: QueueStatus; qu
       .select('*')
       .order('priority', { ascending: false })
       .order('due_date', { ascending: true })
+      .limit(500)
 
     if (workspaceId) {
       query = query.eq('workspace_id', workspaceId)
@@ -302,6 +306,7 @@ export function usePnrScheduleChanges(options?: { pnrId?: string; status?: strin
       .from('pnr_schedule_changes')
       .select('*')
       .order('detected_at', { ascending: false })
+      .limit(500)
 
     if (workspaceId) {
       query = query.eq('workspace_id', workspaceId)

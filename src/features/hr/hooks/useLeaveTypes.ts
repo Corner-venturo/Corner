@@ -73,6 +73,7 @@ export function useLeaveTypes() {
       const { data, error: queryError } = await supabase
         .from('leave_types')
         .select('*')
+        .limit(500)
         
         .order('code', { ascending: true })
 

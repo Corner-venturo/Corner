@@ -101,11 +101,11 @@ async function fetchAllReferenceData(): Promise<ReferenceData> {
       ssrCodesResult,
       statusCodesResult,
     ] = await Promise.all([
-      supabase.from('ref_airlines').select('*').eq('is_active', true),
-      supabase.from('ref_airports').select('*'),
-      supabase.from('ref_booking_classes').select('*').order('priority'),
-      supabase.from('ref_ssr_codes').select('*'),
-      supabase.from('ref_status_codes').select('*'),
+      supabase.from('ref_airlines').select('*').eq('is_active', true).limit(500),
+      supabase.from('ref_airports').select('*').limit(2000),
+      supabase.from('ref_booking_classes').select('*').order('priority').limit(500),
+      supabase.from('ref_ssr_codes').select('*').limit(500),
+      supabase.from('ref_status_codes').select('*').limit(200),
     ])
 
     // 轉換為 Map

@@ -65,6 +65,7 @@ export default function TourClosingReportPage() {
         .eq('workspace_id', workspace.id)
         .eq('archived', true)
         .order('return_date', { ascending: false })
+        .limit(500)
 
       if (error) throw error
       if (!tours?.length) {

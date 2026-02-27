@@ -207,6 +207,7 @@ export function useLeaveRequests() {
         .from('leave_requests')
         .select('*')
         .eq('id', id)
+        .limit(500)
         
         .single()
 

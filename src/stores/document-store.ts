@@ -604,6 +604,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
         .select('*')
         .eq('type', type)
         .order('use_count', { ascending: false })
+        .limit(500)
 
       if (workspaceId) {
         query = query.eq('workspace_id', workspaceId)

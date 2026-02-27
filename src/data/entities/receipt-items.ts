@@ -33,4 +33,4 @@ export const invalidateReceiptItems = receiptItemEntity.invalidate
 
 // 依收款單 ID 取得項目（直接用 supabase 查詢）
 // 如需此功能，請在使用處直接查詢：
-// const { data } = await supabase.from('receipt_items').select('*').eq('receipt_id', receiptId)
+// const { data } = await supabase.from('receipt_items').select('*').eq('receipt_id', receiptId).limit(500)

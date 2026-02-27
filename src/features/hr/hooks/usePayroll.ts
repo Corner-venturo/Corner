@@ -132,6 +132,7 @@ export function usePayroll() {
       let query = supabase
         .from('payroll_periods')
         .select('*')
+        .limit(500)
         
         .order('year', { ascending: false })
         .order('month', { ascending: false })
@@ -334,6 +335,7 @@ export function usePayroll() {
       const { data: attendanceRecords, error: attError } = await supabase
         .from('attendance_records')
         .select('*')
+        .limit(500)
         
         .gte('date', period.start_date)
         .lte('date', period.end_date)

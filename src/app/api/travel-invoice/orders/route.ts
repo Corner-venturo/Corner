@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
       .from('orders_invoice_summary')
       .select('*')
       .order('order_number', { ascending: false })
+      .limit(500)
 
     if (tourId) {
       query = query.eq('tour_id', tourId)

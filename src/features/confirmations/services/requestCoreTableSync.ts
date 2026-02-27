@@ -139,6 +139,7 @@ export async function fetchRequestableItems(
       .eq('tour_id', tour_id)
       .order('day_number', { ascending: true })
       .order('sort_order', { ascending: true })
+      .limit(500)
 
     if (error) {
       logger.error(LABELS.FETCH_ERROR, error)

@@ -171,6 +171,7 @@ export function useOrderMembers({
             .select('*')
             .in('order_id', orderIds)
             .order('created_at', { ascending: true })
+            .limit(500)
 
           if (membersError) throw membersError
           membersData = (allMembersData || []).map(m => ({
@@ -189,6 +190,7 @@ export function useOrderMembers({
           .select('*')
           .eq('order_id', orderId)
           .order('created_at', { ascending: true })
+          .limit(500)
 
         if (membersError) throw membersError
         membersData = data || []

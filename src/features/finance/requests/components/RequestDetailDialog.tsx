@@ -70,6 +70,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
           .select('*')
           .eq('batch_id', request.batch_id)
           .order('code', { ascending: true })
+          .limit(500)
 
         if (error) {
           logger.error('載入批次請款單失敗:', error)

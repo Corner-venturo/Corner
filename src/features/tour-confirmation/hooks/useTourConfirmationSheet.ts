@@ -61,6 +61,7 @@ export function useTourConfirmationSheet({ tourId }: UseTourConfirmationSheetPro
           .order('category')
           .order('service_date')
           .order('sort_order')
+          .limit(500)
 
         if (itemsError) throw itemsError
         setItems((itemsData || []) as TourConfirmationItem[])

@@ -45,6 +45,7 @@ export function useTourDepartureData(tourId: string, open: boolean) {
           .eq('departure_data_id', mainData.id)
           .order('date', { ascending: true })
           .order('display_order', { ascending: true })
+          .limit(500)
         setMeals(castRows<TourDepartureMeal>(mealsData))
 
         // 載入住宿
@@ -53,6 +54,7 @@ export function useTourDepartureData(tourId: string, open: boolean) {
           .eq('departure_data_id', mainData.id)
           .order('date', { ascending: true })
           .order('display_order', { ascending: true })
+          .limit(500)
         setAccommodations(castRows<TourDepartureAccommodation>(accomData))
 
         // 載入活動
@@ -61,6 +63,7 @@ export function useTourDepartureData(tourId: string, open: boolean) {
           .eq('departure_data_id', mainData.id)
           .order('date', { ascending: true })
           .order('display_order', { ascending: true })
+          .limit(500)
         setActivities(castRows<TourDepartureActivity>(activData))
 
         // 載入其他

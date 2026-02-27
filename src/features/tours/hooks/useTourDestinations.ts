@@ -59,6 +59,7 @@ async function fetchDestinations(): Promise<TourDestination[]> {
     .select('*')
     .order('country', { ascending: true })
     .order('city', { ascending: true })
+    .limit(500)
 
   if (error) throw error
   return data || []

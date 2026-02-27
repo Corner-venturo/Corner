@@ -10,6 +10,7 @@ function createMockChain(resolveValue: { data: unknown; error: unknown }) {
     update: vi.fn().mockReturnThis(),
     delete: vi.fn().mockReturnThis(),
     order: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockReturnThis(),
     single: vi.fn().mockResolvedValue(resolveValue),
     eq: vi.fn().mockReturnThis(),
     // Make the chain thenable - so await works without .single()

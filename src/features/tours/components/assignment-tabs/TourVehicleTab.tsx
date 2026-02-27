@@ -57,6 +57,7 @@ export function TourVehicleTab({ tourId, members }: TourVehicleTabProps) {
         .select('*')
         .eq('tour_id', tourId)
         .order('display_order')
+        .limit(500)
 
       if (error) throw error
       setVehicles((data || []) as TourVehicleStatus[])

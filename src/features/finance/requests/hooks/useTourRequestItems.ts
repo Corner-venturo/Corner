@@ -85,6 +85,7 @@ export function useTourRequestItems(tourId: string | null): UseTourRequestItemsR
         .eq('tour_id', tourId)
         .not('supplier_id', 'is', null) // 有供應商才顯示
         .order('category')
+        .limit(500)
 
       if (fetchError) {
         throw fetchError
@@ -141,6 +142,7 @@ export function useTourRequestItemsByPackage(packageId: string | null): UseTourR
         .eq('proposal_package_id', packageId)
         .not('supplier_id', 'is', null) // 有供應商才顯示
         .order('category')
+        .limit(500)
 
       if (fetchError) {
         throw fetchError

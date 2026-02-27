@@ -350,6 +350,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       .select('*')
       .eq('status', 'pending')
       .order('created_at', { ascending: false })
+      .limit(500)
     if (error) throw new Error(error.message)
     return (data || []) as unknown as DisbursementOrder[]
   }
@@ -364,6 +365,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       .select('*')
       .eq('status', 'confirmed')
       .order('created_at', { ascending: false })
+      .limit(500)
     if (error) throw new Error(error.message)
     return (data || []) as unknown as DisbursementOrder[]
   }
@@ -377,6 +379,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       .select('*')
       .eq('disbursement_date', date)
       .order('created_at', { ascending: false })
+      .limit(500)
     if (error) throw new Error(error.message)
     return (data || []) as unknown as DisbursementOrder[]
   }

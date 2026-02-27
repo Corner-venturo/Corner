@@ -144,6 +144,7 @@ export const useChatStore = () => {
           .select('*')
           .eq('channel_id', channelId)
           .order('created_at', { ascending: true })
+          .limit(500)
 
         if (error) throw error
 

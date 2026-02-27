@@ -170,6 +170,7 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
         .eq('tour_id', tourId)
         .order('day_number')
         .order('meal_type')
+        .limit(500)
 
       if (settingsError) throw settingsError
 
@@ -179,6 +180,7 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
         .select('*')
         .eq('tour_id', tourId)
         .order('table_number')
+        .limit(500)
 
       if (tableError) throw tableError
 

@@ -136,6 +136,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
             .select('*')
             .eq('tour_id', selectedTourId)
             .order('created_at', { ascending: false })
+            .limit(500)
 
           if (!error && data) {
             setTourOrders(data)

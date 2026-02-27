@@ -295,6 +295,7 @@ export async function getStatusHistory(
       .select('*')
       .eq('pnr_id', pnrId)
       .order('recorded_at', { ascending: false })
+      .limit(500)
 
     if (options?.airlineCode) {
       query = query.eq('airline_code', options.airlineCode)
@@ -438,6 +439,7 @@ export async function getPnrSubscriptions(
       .select('*')
       .eq('pnr_id', pnrId)
       .eq('is_active', true)
+      .limit(500)
 
     if (error) {
       logger.error('[FlightStatus] Failed to get subscriptions:', error)

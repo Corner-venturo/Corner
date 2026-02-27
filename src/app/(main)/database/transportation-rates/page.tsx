@@ -22,6 +22,7 @@ const fetchRates = async (): Promise<TransportationRate[]> => {
     .order('category')
     .order('supplier')
     .order('route')
+    .limit(500)
 
   if (error) {
     toast.error(TRANSPORTATION_RATES_LABELS.LOAD_ERROR)

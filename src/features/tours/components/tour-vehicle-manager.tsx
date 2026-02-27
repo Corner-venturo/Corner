@@ -62,6 +62,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
         .select('*')
         .eq('tour_id', tourId)
         .order('display_order')
+        .limit(500)
 
       if (error) throw error
       setVehicles((data || []) as TourVehicleStatus[])

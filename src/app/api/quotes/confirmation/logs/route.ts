@@ -31,6 +31,7 @@ export async function GET(request: NextRequest) {
       .select('*')
       .eq('quote_id', quoteId)
       .order('created_at', { ascending: false })
+      .limit(500)
 
     if (error) {
       logger.error('取得確認記錄失敗:', error)

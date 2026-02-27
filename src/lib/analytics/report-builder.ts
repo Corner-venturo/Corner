@@ -116,6 +116,7 @@ export class ReportBuilder {
       .from('tours')
       .select('*')
       .eq('workspace_id', this.workspaceId)
+      .limit(500)
 
     if (this.dateRange) {
       query = query
@@ -170,6 +171,7 @@ export class ReportBuilder {
       .from('orders')
       .select('*')
       .eq('workspace_id', this.workspaceId)
+      .limit(500)
 
     if (this.dateRange) {
       query = query

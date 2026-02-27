@@ -86,6 +86,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
         .eq('tour_id', tourId)
         .order('night_number')
         .order('display_order')
+        .limit(500)
 
       if (error) throw error
       setRooms((data || []) as TourRoomStatus[])

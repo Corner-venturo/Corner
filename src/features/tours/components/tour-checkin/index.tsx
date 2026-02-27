@@ -47,6 +47,7 @@ export function TourCheckin({ tour }: TourCheckinProps) {
         .select('*')
         .in('order_id', orderIds)
         .order('chinese_name')
+        .limit(500)
 
       if (membersError) throw membersError
 

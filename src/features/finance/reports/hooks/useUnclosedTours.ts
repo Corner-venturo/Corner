@@ -72,6 +72,7 @@ export function useUnclosedTours(): UseUnclosedToursResult {
         .neq('status', '已結團')
         // Not cancelled
         .neq('status', '取消')
+        .limit(500)
         // Order by return_date (oldest first)
         .order('return_date', { ascending: true })
 

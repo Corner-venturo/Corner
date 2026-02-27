@@ -332,6 +332,7 @@ export async function getPnrQueueItems(
       .eq('pnr_id', pnrId)
       .order('priority', { ascending: false })
       .order('created_at', { ascending: false })
+      .limit(500)
 
     if (options?.status) {
       if (Array.isArray(options.status)) {
@@ -379,6 +380,7 @@ export async function getDueItems(
       .or(`due_date.is.null,due_date.lte.${now}`)
       .order('priority', { ascending: false })
       .order('due_date', { ascending: true, nullsFirst: false })
+      .limit(500)
 
     if (options?.assignedTo) {
       query = query.eq('assigned_to', options.assignedTo)

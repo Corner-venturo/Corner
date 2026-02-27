@@ -149,6 +149,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
       .eq('country_name', countryName)
       .eq('is_active', true)
       .order('display_order')
+      .limit(500)
 
     if (data) {
       setTransportRates(data as CategoryTransportationRate[])
@@ -167,6 +168,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
       .eq('country_name', selectedCountry)
       .eq('is_active', true)
       .order('display_order')
+      .limit(500)
 
     if (data) setTransportRates(data as CategoryTransportationRate[])
   }
