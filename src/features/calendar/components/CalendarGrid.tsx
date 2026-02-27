@@ -8,6 +8,7 @@ import interactionPlugin, { EventDragStopArg } from '@fullcalendar/interaction'
 import { EventClickArg, MoreLinkAction, EventDropArg, DatesSetArg } from '@fullcalendar/core'
 import { DateClickArg } from '@fullcalendar/interaction'
 import { FullCalendarEvent } from '../types'
+import { CALENDAR_LABELS } from '../constants/labels'
 
 interface CalendarGridProps {
   calendarRef: RefObject<FullCalendar | null>
@@ -51,7 +52,7 @@ export function CalendarGrid({
         dayMaxEvents={7}
         eventMinHeight={20}
         moreLinkClick={onMoreLinkClick}
-        moreLinkText="更多"
+        moreLinkText={CALENDAR_LABELS.MORE}
         weekends={true}
         firstDay={1}
         eventDisplay="auto"
@@ -63,10 +64,10 @@ export function CalendarGrid({
         displayEventTime={currentView !== 'dayGridMonth'}
         eventOrder="start,-duration,title"
         buttonText={{
-          today: '今天',
-          month: '月',
-          week: '週',
-          day: '日',
+          today: CALENDAR_LABELS.BUTTON_TODAY,
+          month: CALENDAR_LABELS.BUTTON_MONTH,
+          week: CALENDAR_LABELS.BUTTON_WEEK,
+          day: CALENDAR_LABELS.BUTTON_DAY,
         }}
         // 拖曳功能
         editable={true}
@@ -92,7 +93,7 @@ export function CalendarGrid({
           hour12: false,
         }}
         allDaySlot={true}
-        allDayText="全天"
+        allDayText={CALENDAR_LABELS.ALL_DAY}
         nowIndicator={true}
         // 自動滾動到現在時間（往前 1 小時，讓現在時間線在畫面中間偏上）
         scrollTime={(() => {

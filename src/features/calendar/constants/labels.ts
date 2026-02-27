@@ -65,7 +65,13 @@ export const CALENDAR_LABELS = {
   MONTHLY_BIRTHDAY_COUNT_SUFFIX: ' 位客戶生日',
 
   // CalendarLegend
+  MORE: '更多',
   LEGEND: '圖例：',
+  ALL_DAY: '全天',
+  BUTTON_TODAY: '今天',
+  BUTTON_MONTH: '月',
+  BUTTON_WEEK: '週',
+  BUTTON_DAY: '日',
   PROPOSAL: '開團',
   IN_PROGRESS: '待出發',
   PENDING_CLOSE: '待結案',
