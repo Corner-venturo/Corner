@@ -171,13 +171,13 @@ export default function OrdersPage() {
         { value: 'unpaid', label: ORDERS_PAGE_LABELS.TAB_UNPAID, icon: AlertCircle },
         { value: 'partial', label: ORDERS_PAGE_LABELS.TAB_PARTIAL, icon: Clock },
         { value: 'paid', label: ORDERS_PAGE_LABELS.TAB_PAID, icon: CheckCircle },
-        { value: 'visa-only', label: '簽證專用', icon: Shield },
-        { value: 'sim-only', label: '網卡專用', icon: Wifi },
+        { value: 'visa-only', label: LABELS.TAB_VISA, icon: Shield },
+        { value: 'sim-only', label: LABELS.TAB_SIM, icon: Wifi },
       ]}
       activeTab={statusFilter}
       onTabChange={setStatusFilter}
       onAdd={() => setIsAddDialogOpen(true)}
-      addLabel="新增訂單"
+      addLabel={LABELS.ADD_ORDER}
       contentClassName="flex-1 overflow-auto flex flex-col"
     >
         {/* 訂單列表 */}

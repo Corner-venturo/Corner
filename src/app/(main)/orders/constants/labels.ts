@@ -7,4 +7,6 @@ export const LABELS = {
   WORKSPACE_ERROR: '無法取得工作空間，請重新登入',
   SELECT_SALES: '請選擇業務人員',
   ADD_ORDER_FAILED: '新增訂單失敗，請稍後再試',
+  TAB_VISA: '簽證專用',
+  TAB_SIM: '網卡專用',
 }
