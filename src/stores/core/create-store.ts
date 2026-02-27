@@ -198,6 +198,10 @@ export function createStore<T extends BaseEntity>(
             }
           }
 
+          // 加上 limit 防止全表掃描
+          const fetchLimit = config.fetchLimit ?? 1000
+          query = query.limit(fetchLimit)
+
           const { data, error } = await query
 
           if (error) throw error

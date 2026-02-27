@@ -19,11 +19,16 @@ const TOURS_KEY = 'tours'
 // Supabase fetcher
 // 注意：此函數只在 SWR key 有效時才會被調用（已通過 auth 檢查）
 // 不要在這裡調用 getSession()，它會導致掛起
+// 列表頁只需要的欄位（63 欄 → ~20 欄）
+// 列表頁只需要的欄位（63 欄 → 22 欄）
+const TOUR_LIST_SELECT = 'id, code, name, location, status, departure_date, return_date, price, selling_price_per_person, max_participants, current_participants, total_revenue, total_cost, profit, archived, is_active, quote_id, itinerary_id, controller_id, closing_status, workspace_id, created_at'
+
 async function fetchTours(): Promise<Tour[]> {
   const { data, error } = await supabase
     .from('tours')
-    .select('*')
+    .select(TOUR_LIST_SELECT)
     .order('departure_date', { ascending: false })
+    .limit(500)
 
   if (error) {
     logger.error('❌ Error fetching tours:', error.message)

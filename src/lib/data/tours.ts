@@ -147,7 +147,7 @@ export async function getActiveToursForSelect(limit = 100, workspaceId?: string)
 
   const { data, error } = await supabase
     .from('tours')
-    .select('*')
+    .select('id, code, name, departure_date, return_date, location, status, closing_status, current_participants, max_participants, workspace_id')
     .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
     .neq('closing_status', 'closed')
     .order('departure_date', { ascending: false })

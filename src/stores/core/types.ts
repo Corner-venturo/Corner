@@ -97,6 +97,8 @@ export interface StoreConfig {
    * Super Admin 可以跨 workspace 查詢
    */
   workspaceScoped?: boolean
+  /** 列表查詢的最大筆數（預設 1000，防止全表掃描） */
+  fetchLimit?: number
   /** Zod schema for validating create data (defense-in-depth) */
   createSchema?: ZodSchema
   /** Zod schema for validating update data (defense-in-depth) */

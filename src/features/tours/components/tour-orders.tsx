@@ -8,6 +8,9 @@ import { AddReceiptDialog } from '@/features/finance/payments'
 import dynamic from 'next/dynamic'
 
 const AddRequestDialog = dynamic(() => import('@/features/finance/requests/components/AddRequestDialog').then(m => m.AddRequestDialog), { ssr: false })
+
+// 訂單列表只需要的欄位（29 欄 → 15 欄）
+const ORDER_LIST_SELECT = 'id, order_number, code, contact_person, sales_person, assistant, tour_id, tour_name, paid_amount, remaining_amount, total_amount, status, member_count, created_at, workspace_id'
 import { InvoiceDialog } from '@/features/finance/components/invoice-dialog'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -53,7 +56,7 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
       try {
         const { data, error } = await supabase
           .from('orders')
-          .select('*')
+          .select(ORDER_LIST_SELECT)
           .eq('tour_id', tour.id)
           .order('created_at', { ascending: false })
 
@@ -92,7 +95,7 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
   const handleReceiptSuccess = useCallback(async () => {
     const { data, error } = await supabase
       .from('orders')
-      .select('*')
+      .select(ORDER_LIST_SELECT)
       .eq('tour_id', tour.id)
       .order('created_at', { ascending: false })
 
@@ -138,7 +141,7 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
       // 重新載入訂單
       const { data, error } = await supabase
         .from('orders')
-        .select('*')
+        .select(ORDER_LIST_SELECT)
         .eq('tour_id', tour.id)
         .order('created_at', { ascending: false })
       if (!error && data) setOrders(data as Order[])
