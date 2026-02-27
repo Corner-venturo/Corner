@@ -3,7 +3,7 @@ export { CurrencyWidget } from './currency-widget'
 export { TimerWidget } from './timer-widget'
 export { NotesWidget } from './notes-widget'
 export { FlightWidget } from './flight-widget'
-export { PNRWidget } from './pnr-widget'
+// PNR widget 已移至團內操作
 export { WeatherWidgetWeekly } from './weather-widget-weekly'
 export { VisaWidget } from './visa-widget'
 export { RemittanceWidget } from './remittance-widget'

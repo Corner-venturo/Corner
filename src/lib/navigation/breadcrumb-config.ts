@@ -35,7 +35,6 @@ export const BREADCRUMB_CONFIG: Record<string, BreadcrumbConfig> = {
   '/confirmations': { label: '確認單', parent: '/' },
   '/confirmations/[id]': { label: '確認單詳情', parent: '/confirmations' },
   '/tour-requests': { label: '需求確認單', parent: '/' },
-  '/pnrs': { label: 'PNR 管理', parent: '/' },
 
   // ========== 行程管理 ==========
   '/itinerary': { label: '行程表', parent: '/' },

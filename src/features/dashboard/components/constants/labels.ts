@@ -74,7 +74,6 @@ export const DASHBOARD_LABELS = {
   DESTINATION: '目的地',
   VISA_DISCLAIMER: '⚠️ 此資訊僅供參考，實際簽證要求請以目的地國家官方公告為準',
 
-  // pnr-widget
   URGENT: '(緊急！)',
   INFANT_COUNT_PREFIX: '+',
   INFANT_COUNT_SUFFIX: ' 嬰兒',
@@ -102,20 +101,7 @@ export const DASHBOARD_LABELS = {
   start: '開始',
   stop: '暫停',
 
-  // PNR Widget - section headers
-  pnrFlightsPrefix: '航班',
-  pnrSpecialRequestsPrefix: '特殊需求',
-  pnrInfantPrefix: '嬰兒',
-  pnrPlaceholder: '貼上 Amadeus PNR 電報...\n\n範例:\nRP/TPEW123ML/...   FUM2GY\n1.CHEN/WILLIAM MR\n2  BR 116 Y 15JAN 4 TPECTS HK2  0930 1405\nTK TL20JAN/1200',
-
-  // Error messages
-  errorPastePnr: '請貼上 PNR 電報內容',
-  errorParseFailed: '解析失敗：',
-  errorClipboard: '無法存取剪貼簿',
-  errorSaveFailed: '儲存失敗：',
-  errorUnknown: '未知錯誤',
-  errorFlightNumberRequired: '請輸入航班號碼',
-  errorAirportRequired: '請選擇機場',
+  // Error messages (shared by widgets)
   errorInvalidAmount: '請輸入有效金額',
   errorSameCountry: '匯款國家和收款國家不能相同',
   errorQueryFailed: '查詢失敗，請稍後再試',
@@ -124,4 +110,4 @@ export const DASHBOARD_LABELS = {
 
   // Remittance disclaimer
   remittanceDisclaimer: '⚠️ 此資訊僅供參考，實際費率請以各管道最新公告為準',
-}
+} as const

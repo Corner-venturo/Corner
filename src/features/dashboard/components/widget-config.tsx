@@ -6,7 +6,6 @@ import {
   Cloud,
   Plane,
   CloudSun,
-  FileText,
 } from 'lucide-react'
 import type { WidgetConfig } from '../types'
 import { CalculatorWidget } from './calculator-widget'
@@ -16,7 +15,7 @@ import { NotesWidget } from './notes-widget'
 import { WeatherWidget } from './weather-widget'
 import { WeatherWidgetWeekly } from './weather-widget-weekly'
 import { FlightWidget } from './flight-widget'
-import { PNRWidget } from './pnr-widget'
+// PNR widget 已移至團內操作（TourPnrToolDialog）
 
 // 小工具配置
 export const AVAILABLE_WIDGETS: Array<Omit<WidgetConfig, 'id'> & { id: string }> = [
@@ -25,13 +24,6 @@ export const AVAILABLE_WIDGETS: Array<Omit<WidgetConfig, 'id'> & { id: string }>
     name: '航班查詢',
     icon: Plane,
     component: FlightWidget,
-    span: 1
-  },
-  {
-    id: 'pnr',
-    name: 'PNR 解析',
-    icon: FileText,
-    component: PNRWidget,
     span: 1
   },
   {
