@@ -13,6 +13,88 @@
 
 ---
 
+## 🔍 Supabase 查詢三鐵律
+
+> **2026-02-27 建立** — 所有 Supabase 查詢必須遵守以下三條規則。
+
+### 鐵律一：禁止列表查詢用 select('*')
+
+```typescript
+// ❌ 列表頁拿全部欄位（tours 有 63 欄，但列表只顯示 10 欄）
+const { data } = await supabase.from('tours').select('*')
+
+// ✅ 只拿需要的欄位
+const TOUR_LIST_SELECT = 'id, code, name, status, departure_date, return_date, current_participants'
+const { data } = await supabase.from('tours').select(TOUR_LIST_SELECT)
+```
+
+**允許用 select('*') 的情況：**
+- `.single()` / `.maybeSingle()` — 單筆查詢，影響小
+- 表單編輯 — 需要全部欄位回寫
+- 建立後回傳 — `.insert().select('*').single()`
+
+**必須精簡 select 的情況：**
+- 列表頁（最常見的效能瓶頸）
+- 下拉選單（通常只需要 id + name）
+- 統計/分析（只需要計算用的欄位）
+- 任何可能回傳 >50 筆的查詢
+
+**做法：**
+1. 定義 `XXX_LIST_SELECT` 常數（放在 hook 或 service 頂部）
+2. 只列出 UI 實際渲染 + 過濾 + 排序需要的欄位
+3. 一定要包含 `id` 和 `workspace_id`
+
+### 鐵律二：所有查詢必須有 limit
+
+```typescript
+// ❌ 沒有 limit — 資料量暴增時直接卡死
+const { data } = await supabase.from('orders').select('*').eq('tour_id', tourId)
+
+// ✅ 加上合理的 limit
+const { data } = await supabase.from('orders').select('*').eq('tour_id', tourId).limit(200)
+```
+
+**Limit 建議值：**
+
+| 場景 | 建議 limit | 說明 |
+|------|-----------|------|
+| 列表頁 | 500 | 超過用分頁 |
+| 下拉選單 | 200 | 不可能選 200 個以上 |
+| 參考表（航空公司、機場）| 2000 | 全球也就這麼多 |
+| Dialog 內的子項目 | 500 | 一個團不會有 500 個需求 |
+| 統計查詢 | 1000 | 超過的用 DB aggregate |
+| 歷史紀錄 | 100 | 顯示最近的就好 |
+
+**唯一可以不加 limit 的情況：**
+- `.single()` / `.maybeSingle()` — 本身就是 limit 1
+- `.count()` / `.head()` — 不回傳資料
+
+### 鐵律三：create-store 工廠的 fetchLimit
+
+使用 `createStore` 建立的 store，預設 `fetchLimit: 1000`。如果你的表資料量可能超過 1000 筆，必須在 config 中明確設定：
+
+```typescript
+export const useXxxStore = createStore<XxxEntity>({
+  tableName: 'xxx',
+  fetchLimit: 2000,  // 明確設定
+  workspaceScoped: true,
+})
+```
+
+---
+
+## 📋 新增查詢的 Checklist
+
+每次寫新的 Supabase 查詢前，問自己：
+
+- [ ] 是列表查詢嗎？→ 必須精簡 select，定義 `XXX_LIST_SELECT` 常數
+- [ ] 有加 `.limit()` 嗎？→ 除了 `.single()` 之外都要加
+- [ ] 有 `.eq()` 或 `.in()` 過濾嗎？→ 沒有的話一定要有 limit
+- [ ] 下拉選單嗎？→ 只需要 `id, name` 或 `id, code, name`
+- [ ] 統計用嗎？→ 只拿計算需要的欄位
+
+---
+
 ## ❌ 絕對禁止的效能殺手
 
 ### 1. API route 內直接 createClient
