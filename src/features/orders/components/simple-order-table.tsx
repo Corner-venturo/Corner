@@ -83,7 +83,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
     }
   }
 
-  const gridCols = showTourInfo ? '1fr 1fr 1fr 1fr 100px 100px 100px 180px' : '1fr 1fr 1fr 100px 100px 100px 180px'
+  const gridCols = showTourInfo ? '1fr 1fr 1fr 1fr 100px 180px' : '1fr 1fr 1fr 100px 180px'
 
   return (
     <div
@@ -132,15 +132,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
           </div>
           <div className="text-right py-2.5 px-4 text-xs relative">
             <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
-            <span className="font-medium text-morandi-secondary">{COMP_ORDERS_LABELS.LABEL_TOTAL_AMOUNT}</span>
-          </div>
-          <div className="text-right py-2.5 px-4 text-xs relative">
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
             <span className="font-medium text-morandi-secondary">{COMP_ORDERS_LABELS.LABEL_PAID_AMOUNT}</span>
-          </div>
-          <div className="text-right py-2.5 px-4 text-xs relative">
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
-            <span className="font-medium text-morandi-secondary">{COMP_ORDERS_LABELS.LABEL_REMAINING_AMOUNT}</span>
           </div>
           <div className="text-left py-2.5 px-4 text-xs relative">
             <span className="font-medium text-morandi-secondary">{COMP_ORDERS_LABELS.ACTIONS}</span>
@@ -197,15 +189,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                 </div>
 
                 <div className="py-2 px-4 text-right">
-                  <CurrencyCell amount={order.total_amount || 0} />
-                </div>
-
-                <div className="py-2 px-4 text-right">
                   <CurrencyCell amount={order.paid_amount || 0} variant="income" />
-                </div>
-
-                <div className="py-2 px-4 text-right">
-                  <CurrencyCell amount={order.remaining_amount || 0} variant={order.remaining_amount ? 'expense' : 'default'} />
                 </div>
 
                 <div className="py-1 px-4">

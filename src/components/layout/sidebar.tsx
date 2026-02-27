@@ -78,8 +78,7 @@ const menuItems: MenuItem[] = [
       { href: '/finance/reports', label: COMP_LAYOUT_LABELS.報表管理, icon: BarChart3, requiredPermission: 'reports' },
     ],
   },
-  // V1: 簽證管理暫時隱藏
-  // { href: '/visas', label: COMP_LAYOUT_LABELS.簽證管理, icon: FileCheck, requiredPermission: 'visas' },
+  { href: '/visas', label: COMP_LAYOUT_LABELS.簽證管理, icon: FileCheck, requiredPermission: 'visas' },
   {
     href: '/design',
     label: COMP_LAYOUT_LABELS.設計,
