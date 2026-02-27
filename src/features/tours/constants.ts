@@ -202,6 +202,11 @@ export const TOUR_UNLOCK = {
   reason_placeholder: '例如：客戶要求變更行程日期',
   cancel: '取消',
   confirm: '確認解鎖',
+  error_enter_password: '請輸入密碼',
+  error_login_required: '請先登入',
+  error_unlock_failed: '解鎖失敗',
+  success_unlocked: '已解鎖，可進行修改',
+  error_generic: '發生錯誤，請稍後再試',
 } as const
 
 // ============================================================

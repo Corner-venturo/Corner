@@ -460,6 +460,12 @@ export const COMP_TOURS_LABELS = {
   LABEL_5498: '天空白行程。',
   ADD_1897: '新增的天數會使用預設模板，您可以稍後在行程表編輯器中修改內容。',
   LABEL_1982: '維持原樣',
+  UNIT_DAY: '天',
+  INCREASE_PREFIX: '增加',
+  DECREASE_PREFIX: '減少',
+  SELECT_DAYS_TO_REMOVE: '請選擇要移除的',
+  SELECT_EXACT_DAYS: (required: number, selected: number) => `請選擇剛好 ${required} 天（目前已選 ${selected} 天）`,
+  APPEND_BLANK_DAYS: '將在行程表末尾新增',
 
   MANAGE_972: '分配管理',
   LABEL_9712: '分房',

@@ -50,7 +50,7 @@ export const AddPaymentDialog = React.memo(function AddPaymentDialog({
                 <SelectValue placeholder={ADD_PAYMENT_LABELS.LABEL_9638} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="__none__">- 不關聯特定訂單 -</SelectItem>
+                <SelectItem value="__none__">{ADD_PAYMENT_LABELS.LABEL_9638}</SelectItem>
                 {tourOrders.map(order => (
                   <SelectItem key={order.id} value={order.id}>
                     {order.order_number} - {order.contact_person}

@@ -41,7 +41,7 @@ export function TourUnlockDialog({
 
   const handleUnlock = async () => {
     if (!password) {
-      setError('請輸入密碼')
+      setError(TOUR_UNLOCK.error_enter_password)
       return
     }
 
@@ -52,7 +52,7 @@ export function TourUnlockDialog({
       // 取得當前 session token
       const { data: { session } } = await supabase.auth.getSession()
       if (!session?.access_token) {
-        setError('請先登入')
+        setError(TOUR_UNLOCK.error_login_required)
         setSubmitting(false)
         return
       }
@@ -73,19 +73,19 @@ export function TourUnlockDialog({
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data.error || '解鎖失敗')
+        setError(data.error || TOUR_UNLOCK.error_unlock_failed)
         setSubmitting(false)
         return
       }
 
-      toast.success('已解鎖，可進行修改')
+      toast.success(TOUR_UNLOCK.success_unlocked)
       setPassword('')
       setReason('')
       onOpenChange(false)
       onUnlocked?.()
     } catch (err) {
       logger.error('解鎖錯誤:', err)
-      setError('發生錯誤，請稍後再試')
+      setError(TOUR_UNLOCK.error_generic)
     } finally{
       setSubmitting(false)
     }

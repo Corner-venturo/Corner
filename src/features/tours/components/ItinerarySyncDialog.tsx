@@ -113,11 +113,11 @@ export function ItinerarySyncDialog({
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">{COMP_TOURS_LABELS.LABEL_6069}</span>
-              <span className="font-medium">{syncInfo.currentDays} 天</span>
+              <span className="font-medium">{syncInfo.currentDays} {COMP_TOURS_LABELS.UNIT_DAY}</span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">{COMP_TOURS_LABELS.LABEL_357}</span>
-              <span className="font-medium text-primary">{syncInfo.newDays} 天</span>
+              <span className="font-medium text-primary">{syncInfo.newDays} {COMP_TOURS_LABELS.UNIT_DAY}</span>
             </div>
             <div className="flex items-center justify-between text-sm pt-2 border-t">
               <span className="text-muted-foreground">{COMP_TOURS_LABELS.LABEL_493}</span>
@@ -127,12 +127,12 @@ export function ItinerarySyncDialog({
                 {syncInfo.action === 'increase' ? (
                   <>
                     <Plus className="h-4 w-4" />
-                    增加 {syncInfo.newDays - syncInfo.currentDays} 天
+                    {COMP_TOURS_LABELS.INCREASE_PREFIX} {syncInfo.newDays - syncInfo.currentDays} {COMP_TOURS_LABELS.UNIT_DAY}
                   </>
                 ) : (
                   <>
                     <Minus className="h-4 w-4" />
-                    減少 {syncInfo.currentDays - syncInfo.newDays} 天
+                    {COMP_TOURS_LABELS.DECREASE_PREFIX} {syncInfo.currentDays - syncInfo.newDays} {COMP_TOURS_LABELS.UNIT_DAY}
                   </>
                 )}
               </span>
@@ -143,7 +143,7 @@ export function ItinerarySyncDialog({
           {syncInfo.action === 'decrease' && (
             <div className="space-y-3">
               <p className="text-sm text-muted-foreground">
-                請選擇要移除的 <span className="font-medium text-foreground">{daysToRemoveCount}</span> {COMP_TOURS_LABELS.LABEL_7016}
+                {COMP_TOURS_LABELS.SELECT_DAYS_TO_REMOVE} <span className="font-medium text-foreground">{daysToRemoveCount}</span> {COMP_TOURS_LABELS.LABEL_7016}
               </p>
               <div className="max-h-60 overflow-y-auto space-y-2 pr-2">
                 {dailyItinerary.map((day, idx) => (
@@ -175,7 +175,7 @@ export function ItinerarySyncDialog({
               </div>
               {selectedDays.length !== daysToRemoveCount && (
                 <p className="text-sm text-amber-600">
-                  請選擇剛好 {daysToRemoveCount} 天（目前已選 {selectedDays.length} 天）
+                  {COMP_TOURS_LABELS.SELECT_EXACT_DAYS(daysToRemoveCount, selectedDays.length)}
                 </p>
               )}
             </div>
@@ -185,7 +185,7 @@ export function ItinerarySyncDialog({
           {syncInfo.action === 'increase' && (
             <div className="space-y-3">
               <p className="text-sm text-muted-foreground">
-                將在行程表末尾新增 <span className="font-medium text-foreground">{syncInfo.newDays - syncInfo.currentDays}</span> {COMP_TOURS_LABELS.LABEL_5498}
+                {COMP_TOURS_LABELS.APPEND_BLANK_DAYS} <span className="font-medium text-foreground">{syncInfo.newDays - syncInfo.currentDays}</span> {COMP_TOURS_LABELS.LABEL_5498}
               </p>
               <p className="text-sm text-muted-foreground">
                 {COMP_TOURS_LABELS.ADD_1897}
