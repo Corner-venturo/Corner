@@ -88,8 +88,8 @@ const TABLE_CODE_PREFIX: Record<string, string> = {
 /**
  * 取得當前使用者的 workspace_id 和 role
  */
-function getCurrentUserContext(): { workspaceId: string | null; userRole: UserRole | null } {
-  if (typeof window === 'undefined') return { workspaceId: null, userRole: null }
+function getCurrentUserContext(): { workspaceId: string | null; userRole: UserRole | null; userId: string | null } {
+  if (typeof window === 'undefined') return { workspaceId: null, userRole: null, userId: null }
   try {
     const authData = localStorage.getItem('auth-storage')
     if (authData) {
@@ -100,12 +100,13 @@ function getCurrentUserContext(): { workspaceId: string | null; userRole: UserRo
       return {
         workspaceId: user?.workspace_id || null,
         userRole,
+        userId: user?.id || null,
       }
     }
   } catch {
     // 忽略解析錯誤
   }
-  return { workspaceId: null, userRole: null }
+  return { workspaceId: null, userRole: null, userId: null }
 }
 
 // ============================================
@@ -466,12 +467,12 @@ export function createEntityHook<T extends BaseEntity>(
 
     const now = new Date().toISOString()
 
-    // 自動注入 workspace_id
+    // 自動注入 workspace_id 和 created_by
     const dataRecord = data as Record<string, unknown>
+    const { workspaceId: ctxWorkspaceId, userId: ctxUserId } = getCurrentUserContext()
     let workspace_id = dataRecord.workspace_id
     if (isWorkspaceScoped && !workspace_id) {
-      const { workspaceId } = getCurrentUserContext()
-      workspace_id = workspaceId
+      workspace_id = ctxWorkspaceId
     }
 
     // 自動生成 code
@@ -515,6 +516,7 @@ export function createEntityHook<T extends BaseEntity>(
         updated_at: now,
         ...(isWorkspaceScoped && workspace_id ? { workspace_id } : {}),
         ...(generatedCode ? { code: generatedCode } : {}),
+        ...(ctxUserId ? { created_by: ctxUserId, updated_by: ctxUserId } : {}),
       }
 
       // 樂觀更新
@@ -567,9 +569,11 @@ export function createEntityHook<T extends BaseEntity>(
       config.updateSchema.parse(data)
     }
 
+    const { userId: currentUserId } = getCurrentUserContext()
     const updateData = {
       ...data,
       updated_at: new Date().toISOString(),
+      ...(currentUserId ? { updated_by: currentUserId } : {}),
     }
 
     // 樂觀更新
