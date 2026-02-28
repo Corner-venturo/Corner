@@ -33,6 +33,21 @@ import {
   EntityCreateData,
 } from './types'
 
+// UUID v4 生成（兼容瀏覽器）
+function generateUUID(): string {
+  // 優先用原生 API
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+  
+  // Fallback: 手動生成 UUID v4
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  })
+}
+
 // ============================================
 // Workspace 隔離配置
 // ============================================
@@ -511,7 +526,7 @@ export function createEntityHook<T extends BaseEntity>(
 
       const newItem = {
         ...data,
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         created_at: now,
         updated_at: now,
         ...(isWorkspaceScoped && workspace_id ? { workspace_id } : {}),

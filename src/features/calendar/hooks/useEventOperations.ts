@@ -183,9 +183,9 @@ export function useEventOperations() {
     const startParsed = parseToTaipeiDateTime(originalEvent.start)
     const startDate = startParsed.date
 
-    // 結束日期：如果有 end 就解析，否則用開始日期
-    let endDate = startDate
-    let endParsed = { date: startDate, time: '23:59' }
+    // 結束日期：只有真的有 end 才設定
+    let endDate = ''
+    let endParsed = { date: '', time: '23:59' }
     if (originalEvent.end) {
       endParsed = parseToTaipeiDateTime(originalEvent.end)
       endDate = endParsed.date
@@ -202,7 +202,7 @@ export function useEventOperations() {
       }
 
       // 只有非 23:59 才設定時間（23:59 是全天事件的預設結束時間）
-      if (endParsed.time !== '23:59') {
+      if (endParsed.time && endParsed.time !== '23:59') {
         endTime = endParsed.time
       }
     }

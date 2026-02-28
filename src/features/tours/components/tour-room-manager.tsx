@@ -160,7 +160,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
               {COMP_TOURS_LABELS.MANAGE_1448}
               {tourNights > 0 && (
                 <span className="text-sm font-normal text-morandi-muted">
-                  {tourNights + 1} 天 {tourNights} 夜
+                  {COMP_TOURS_LABELS.TOUR_DURATION(tourNights + 1, tourNights)}
                 </span>
               )}
             </DialogTitle>
@@ -182,7 +182,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
                       : "border-border text-morandi-secondary hover:border-morandi-gold"
                   )}
                 >
-                  第{nightNum}晚 ({nightRooms.length}房)
+                  {COMP_TOURS_LABELS.NIGHT_ROOMS(nightNum, nightRooms.length)}
                 </button>
               )
             })}
@@ -208,7 +208,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
             ) : (
               <>
                 <div className="text-xs text-morandi-muted mb-2">
-                  共 {currentNightRooms.length} 間房，容量 {totalCapacity} 人，已分配 {totalAssigned} 人
+                  {COMP_TOURS_LABELS.ROOM_SUMMARY(currentNightRooms.length, totalCapacity, totalAssigned)}
                 </div>
                 {currentNightRooms.map((room, index) => {
                   const roomTypeLabel = ROOM_TYPES.find(t => t.value === room.room_type)?.label || room.room_type
@@ -237,7 +237,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
                             ? "bg-morandi-green/10 text-morandi-green"
                             : "bg-morandi-container text-morandi-secondary"
                         )}>
-                          {room.assigned_count}/{room.capacity} 人
+                          {COMP_TOURS_LABELS.CAPACITY_DISPLAY(room.assigned_count, room.capacity)}
                         </span>
                       </div>
                       <Button
@@ -267,7 +267,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-morandi-primary">
               <Plus className="h-5 w-5 text-morandi-gold" />
-              新增房間（第{selectedNight}晚）
+              {COMP_TOURS_LABELS.ADD_ROOM_NIGHT(selectedNight)}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">

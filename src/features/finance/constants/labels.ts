@@ -201,6 +201,7 @@ export const BATCH_INVOICE_DIALOG_LABELS = {
   LABEL_7009: '聯絡人',
   LABEL_491: '可開金額',
   NOT_FOUND_8100: '此團沒有可開發票的訂單',
+  已選: '已選',
   LABEL_3592: '筆訂單',
   LABEL_3678: '合計可開金額',
   LABEL_8775: '發票資訊',

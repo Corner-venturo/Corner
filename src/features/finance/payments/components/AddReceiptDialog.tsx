@@ -304,7 +304,7 @@ export function AddReceiptDialog({
         onSuccess?.()
       }
     } catch (error) {
-      logger.error('❌ Create Receipt Error:', error)
+      logger.error('[AddReceiptDialog] Create Receipt Error:', error)
 
       // 解析錯誤訊息
       let errorMessage = ADD_RECEIPT_DIALOG_LABELS.發生未知錯誤_請檢查必填欄位是否完整
@@ -363,7 +363,7 @@ export function AddReceiptDialog({
       onOpenChange(false)
       onSuccess?.()
     } catch (error) {
-      logger.error('刪除收款單失敗:', error)
+      logger.error('[AddReceiptDialog] Delete receipt failed:', error)
       toast({
         title: ADD_RECEIPT_DIALOG_LABELS.刪除失敗,
         description: ADD_RECEIPT_DIALOG_LABELS.請稍後再試,

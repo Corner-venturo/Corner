@@ -21,4 +21,27 @@ export const MEMBERS_LABELS = {
   LABEL_2195: '性別',
   SELECT_4661: '點擊列即可選擇該顧客資料',
   LABEL_5836: '取消，手動輸入',
+
+  // MemberInfoCard
+  的護照: '的護照',
+  男: '男',
+  女: '女',
+
+  // MemberDocuments
+  重要提醒: '重要提醒',
+  OCR辨識待驗證提示: 'OCR 辨識的資料會自動標記為',
+  待驗證: '待驗證',
+  支援所有國家護照: '支援所有國家護照（TWN、USA、JPN 等）',
+  支援格式: '支援 JPG, PNG, PDF（可多選）',
+  已選擇N張圖片: (count: number) => `已選擇 ${count} 張圖片：`,
+  從PDF轉換: '(從 PDF 轉換)',
+  辨識中: '辨識中...',
+  辨識並建立N位成員: (count: number) => `辨識並建立 ${count} 位成員`,
+
+  // MemberPayments
+  找到N位相似顧客: (count: number, name: string) => `找到 ${count} 位相似顧客「${name}」`,
+  找到N位相同身分證: (count: number, idNumber: string) => `找到 ${count} 位相同身分證「${idNumber}」`,
+
+  // passport-utils
+  壓縮失敗: '壓縮失敗',
 }

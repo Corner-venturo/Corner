@@ -31,8 +31,8 @@ export function MemberPayments({
         <DialogHeader className="p-4 pb-2">
           <DialogTitle className="text-base">
             {matchType === 'name'
-              ? `找到 ${customers.length} 位相似顧客「${pendingMemberData?.name}」`
-              : `找到 ${customers.length} 位相同身分證「${pendingMemberData?.id_number}」`}
+              ? MEMBERS_LABELS.找到N位相似顧客(customers.length, pendingMemberData?.name || '')
+              : MEMBERS_LABELS.找到N位相同身分證(customers.length, pendingMemberData?.id_number || '')}
           </DialogTitle>
         </DialogHeader>
 
@@ -64,7 +64,7 @@ export function MemberPayments({
                   <td className="px-3 py-3 font-mono text-xs">{customer.passport_number || '-'}</td>
                   <td className="px-3 py-3">{customer.birth_date || '-'}</td>
                   <td className="px-3 py-3">
-                    {customer.gender === 'M' ? '男' : customer.gender === 'F' ? '女' : '-'}
+                    {customer.gender === 'M' ? MEMBERS_LABELS.男 : customer.gender === 'F' ? MEMBERS_LABELS.女 : '-'}
                   </td>
                 </tr>
               ))}

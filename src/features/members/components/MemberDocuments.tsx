@@ -40,11 +40,11 @@ export function MemberDocuments({
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="bg-morandi-primary/5 border border-morandi-primary/20 rounded-lg p-3">
-            <h4 className="text-xs font-semibold text-morandi-primary mb-2">⚠️ 重要提醒</h4>
+            <h4 className="text-xs font-semibold text-morandi-primary mb-2">⚠️ {MEMBERS_LABELS.重要提醒}</h4>
             <ul className="text-xs text-morandi-secondary space-y-1">
-              <li>• OCR 辨識的資料會自動標記為<strong>「待驗證」</strong></li>
+              <li>• {MEMBERS_LABELS.OCR辨識待驗證提示}<strong>「{MEMBERS_LABELS.待驗證}」</strong></li>
               <li>• 請務必<strong>{MEMBERS_LABELS.LABEL_809}</strong></li>
-              <li>• 支援所有國家護照（TWN、USA、JPN 等）</li>
+              <li>• {MEMBERS_LABELS.支援所有國家護照}</li>
             </ul>
           </div>
           <label
@@ -88,7 +88,7 @@ export function MemberDocuments({
                   <p className="text-sm text-morandi-primary">
                     <span className="font-semibold">{MEMBERS_LABELS.UPLOADING_9146}</span> {MEMBERS_LABELS.LABEL_591}
                   </p>
-                  <p className="text-xs text-morandi-secondary">支援 JPG, PNG, PDF（可多選）</p>
+                  <p className="text-xs text-morandi-secondary">{MEMBERS_LABELS.支援格式}</p>
                 </>
               )}
             </div>
@@ -105,7 +105,7 @@ export function MemberDocuments({
           {processedFiles.length > 0 && (
             <div className="space-y-2">
               <div className="text-xs text-morandi-secondary mb-2">
-                已選擇 {processedFiles.length} 張圖片：
+                {MEMBERS_LABELS.已選擇N張圖片(processedFiles.length)}
               </div>
               <div className="max-h-48 overflow-y-auto space-y-2">
                 {processedFiles.map((pf, index) => (
@@ -130,7 +130,7 @@ export function MemberDocuments({
                       </div>
                       <span className="text-xs text-morandi-secondary">
                         {(pf.file.size / 1024).toFixed(1)} KB
-                        {pf.isPdf && <span className="ml-1 text-morandi-red">(從 PDF 轉換)</span>}
+                        {pf.isPdf && <span className="ml-1 text-morandi-red">{MEMBERS_LABELS.從PDF轉換}</span>}
                       </span>
                     </div>
                     <Button
@@ -150,7 +150,7 @@ export function MemberDocuments({
                 disabled={isUploading}
                 className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
-                {isUploading ? '辨識中...' : `辨識並建立 ${processedFiles.length} 位成員`}
+                {isUploading ? MEMBERS_LABELS.辨識中 : MEMBERS_LABELS.辨識並建立N位成員(processedFiles.length)}
               </Button>
             </div>
           )}

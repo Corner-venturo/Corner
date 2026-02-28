@@ -40,7 +40,7 @@ export function CustomCostFieldsSection({
       <div className="flex items-center gap-2">
         <Coins size={16} className="text-morandi-gold" />
         <span className="text-sm font-medium text-morandi-primary">
-          自訂費用欄位 ({fields.length})
+          {COMP_ORDERS_LABELS.自訂費用欄位} ({fields.length})
         </span>
         <Button
           variant="ghost"

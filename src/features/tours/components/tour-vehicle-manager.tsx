@@ -139,7 +139,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
               {COMP_TOURS_LABELS.MANAGE_7961}
               {vehicles.length > 0 && (
                 <span className="text-sm font-normal text-morandi-muted">
-                  {vehicles.length} 輛車
+                  {COMP_TOURS_LABELS.VEHICLE_COUNT(vehicles.length)}
                 </span>
               )}
               <Button
@@ -165,7 +165,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
             ) : (
               <>
                 <div className="text-xs text-morandi-muted mb-2">
-                  共 {vehicles.length} 輛車，總容量 {totalCapacity} 人，已分配 {totalAssigned} 人
+                  {COMP_TOURS_LABELS.VEHICLE_SUMMARY(vehicles.length, totalCapacity, totalAssigned)}
                 </div>
                 {vehicles.map(vehicle => {
                   const vehicleTypeLabel = VEHICLE_TYPES.find(t => t.value === vehicle.vehicle_type)?.label || vehicle.vehicle_type
@@ -229,7 +229,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
                             "text-xs",
                             vehicle.is_full ? "text-morandi-green" : "text-morandi-secondary"
                           )}>
-                            {vehicle.assigned_count}/{vehicle.capacity} 人
+                            {COMP_TOURS_LABELS.CAPACITY_DISPLAY(vehicle.assigned_count, vehicle.capacity)}
                           </span>
                         </div>
                       </div>

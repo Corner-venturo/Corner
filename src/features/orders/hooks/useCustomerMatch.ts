@@ -26,13 +26,7 @@ export function useCustomerMatch(
     memberIndex: number,
     memberData: Partial<OrderMember>
   ) => {
-    logger.log('checkCustomerMatchByName called:', {
-      name,
-      memberIndex,
-      customersCount: customers.length,
-    })
     if (!name || name.length < 2) {
-      logger.log('Name too short, skipping search')
       return
     }
 
@@ -40,7 +34,6 @@ export function useCustomerMatch(
     const nameMatches = customers.filter(
       c => c.name?.includes(name) || name.includes(c.name || '')
     )
-    logger.log('Name matches found:', nameMatches.length)
 
     if (nameMatches.length > 0) {
       setMatchedCustomers(nameMatches)

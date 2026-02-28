@@ -566,6 +566,33 @@ export const COMP_TOURS_LABELS = {
 
   LABEL_4270: '尚未建立行程表',
   LABEL_4124: '建立行程表以展示旅遊行程內容',
+
+  // 分車/分房/分桌 動態文字
+  VEHICLE_COUNT: (n: number) => `${n} 輛車`,
+  VEHICLE_SUMMARY: (vehicles: number, capacity: number, assigned: number) =>
+    `共 ${vehicles} 輛車，總容量 ${capacity} 人，已分配 ${assigned} 人`,
+  CAPACITY_DISPLAY: (assigned: number, capacity: number) => `${assigned}/${capacity} 人`,
+  TOUR_DURATION: (days: number, nights: number) => `${days} 天 ${nights} 夜`,
+  NIGHT_ROOMS: (night: number, rooms: number) => `第${night}晚 (${rooms}房)`,
+  ROOM_SUMMARY: (rooms: number, capacity: number, assigned: number) =>
+    `共 ${rooms} 間房，容量 ${capacity} 人，已分配 ${assigned} 人`,
+  ADD_ROOM_NIGHT: (night: number) => `新增房間（第${night}晚）`,
+  MOVE_ITEM: (source: string, target: string) => `移動 ${source} 到 ${target}`,
+  TABLE_ADDED: (tableNumber: number, capacity: number) => `已新增 ${tableNumber} 桌 (${capacity}人)`,
+  TABLE_ENABLED_SUMMARY: (enabled: number, total: number) =>
+    `已啟用 ${enabled} 餐分桌，共 ${total} 桌`,
+  IMPORT_MEALS: (count: number) => `從行程帶入 ${count} 筆餐食`,
+  DAY_NUMBER: (day: number | string) => `第 ${day} 天`,
+  TABLE_STATS: (tables: number, assigned: number, capacity: number) =>
+    `${tables} 桌 / ${assigned}/${capacity} 人`,
+  TABLE_NUMBER: (n: number) => `${n} 桌`,
+  CAPACITY_SHORT: (n: number) => `${n}人`,
+  VEHICLE_COUNT_SHORT: (n: number) => `共 ${n} 輛車`,
+
+  // TourItineraryDialog
+  CREATE_PACKAGE_FAILED_LOG: '建立 proposal_package 失敗:',
+  UPDATE_TOUR_LINK_FAILED_LOG: '更新旅遊團關聯失敗:',
+  CREATE_PACKAGE_ERROR_LOG: '建立 package 錯誤:',
 };
 
 // CheckinSettings 模組的 UI 標籤

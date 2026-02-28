@@ -1,6 +1,6 @@
 'use client'
 
-import { logger } from '@/lib/utils/logger'
+import { MEMBERS_LABELS } from '../components/constants/labels'
 
 export async function convertPdfToImages(pdfFile: File): Promise<File[]> {
   // 動態載入 PDF.js
@@ -65,7 +65,7 @@ export async function compressImage(file: File, quality = 0.6): Promise<File> {
                 resolve(compressedFile)
               }
             } else {
-              reject(new Error('壓縮失敗'))
+              reject(new Error(MEMBERS_LABELS.壓縮失敗))
             }
           },
           'image/jpeg',

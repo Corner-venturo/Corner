@@ -36,7 +36,7 @@ export function CustomerMatchDialog({
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <Search size={20} className="text-morandi-blue" />
-            找到 {customers.length} 位符合的顧客（依 {matchTypeLabel}）
+            {COMP_ORDERS_LABELS.找到N位符合的顧客(customers.length, matchTypeLabel)}
           </DialogTitle>
         </DialogHeader>
 

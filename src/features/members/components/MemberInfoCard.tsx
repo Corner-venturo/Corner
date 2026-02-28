@@ -22,7 +22,7 @@ export function MemberInfoCard({ open, member, onClose }: MemberInfoCardProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ImageIcon size={20} />
-            {member.name || member.chinese_name} 的護照
+            {member.name || member.chinese_name}{MEMBERS_LABELS.的護照}
           </DialogTitle>
         </DialogHeader>
 
@@ -38,7 +38,7 @@ export function MemberInfoCard({ open, member, onClose }: MemberInfoCardProps) {
           {member.passport_image_url ? (
             <div className="relative w-full max-h-[70vh] overflow-auto">
               <img src={member.passport_image_url}
-                alt={`${member.name || member.chinese_name} 的護照`}
+                alt={`${member.name || member.chinese_name}${MEMBERS_LABELS.的護照}`}
                 className="w-full h-auto object-contain rounded-lg"
               />
             </div>
@@ -68,15 +68,15 @@ export function MemberInfoCard({ open, member, onClose }: MemberInfoCardProps) {
           </div>
           <div>
             <span className="font-medium text-morandi-secondary">{MEMBERS_LABELS.LABEL_94}</span>
-            <span>{member.birth_date || member.birth_date || '-'}</span>
+            <span>{member.birth_date || '-'}</span>
           </div>
           <div>
             <span className="font-medium text-morandi-secondary">{MEMBERS_LABELS.LABEL_8424}</span>
             <span>
               {member.gender === 'M'
-                ? '男'
+                ? MEMBERS_LABELS.男
                 : member.gender === 'F'
-                ? '女'
+                ? MEMBERS_LABELS.女
                 : '-'}
             </span>
           </div>

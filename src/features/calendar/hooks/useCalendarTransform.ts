@@ -124,7 +124,19 @@ export function useCalendarTransform(calendarEvents: CalendarEvent[]) {
 
         // 🔧 修正：全天事件只傳日期字串，避免 FullCalendar 時區轉換問題
         const startDate = event.all_day ? getDateInTaipei(event.start) : event.start
-        const endDate = event.end ? (event.all_day ? getDateInTaipei(event.end) : event.end) : undefined
+        
+        // FullCalendar 多日事件修正：全天事件的結束日期需要 +1 天
+        let endDate: string | undefined = undefined
+        if (event.end) {
+          if (event.all_day) {
+            const endInTaipei = getDateInTaipei(event.end)
+            const endDateObj = new Date(endInTaipei)
+            endDateObj.setDate(endDateObj.getDate() + 1)
+            endDate = endDateObj.toISOString().split('T')[0]
+          } else {
+            endDate = event.end
+          }
+        }
 
         return {
           id: event.id,
@@ -176,7 +188,19 @@ export function useCalendarTransform(calendarEvents: CalendarEvent[]) {
 
         // 🔧 修正：全天事件只傳日期字串，避免 FullCalendar 時區轉換問題
         const startDate = event.all_day ? getDateInTaipei(event.start) : event.start
-        const endDate = event.end ? (event.all_day ? getDateInTaipei(event.end) : event.end) : undefined
+        
+        // FullCalendar 多日事件修正：全天事件的結束日期需要 +1 天
+        let endDate: string | undefined = undefined
+        if (event.end) {
+          if (event.all_day) {
+            const endInTaipei = getDateInTaipei(event.end)
+            const endDateObj = new Date(endInTaipei)
+            endDateObj.setDate(endDateObj.getDate() + 1)
+            endDate = endDateObj.toISOString().split('T')[0]
+          } else {
+            endDate = event.end
+          }
+        }
 
         return {
           id: event.id,

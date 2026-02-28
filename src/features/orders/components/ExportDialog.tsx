@@ -33,12 +33,12 @@ const COLUMN_LABELS: Record<keyof ExportColumnsConfig, string> = {
   id_number: EXPORT_DIALOG_LABELS.COL_ID_NUMBER,
   passport_number: EXPORT_DIALOG_LABELS.COL_PASSPORT_NUMBER,
   passport_expiry: EXPORT_DIALOG_LABELS.COL_PASSPORT_EXPIRY,
-  special_meal: '特殊餐食',
+  special_meal: EXPORT_DIALOG_LABELS.COL_SPECIAL_MEAL,
   remarks: EXPORT_DIALOG_LABELS.COL_REMARKS,
   // 金額相關欄位放最後
-  total_payable: '應付金額',
-  deposit_amount: '已付訂金',
-  balance: '尾款',
+  total_payable: EXPORT_DIALOG_LABELS.COL_TOTAL_PAYABLE,
+  deposit_amount: EXPORT_DIALOG_LABELS.COL_DEPOSIT_AMOUNT,
+  balance: EXPORT_DIALOG_LABELS.COL_BALANCE,
 }
 
 export function ExportDialog({
@@ -150,7 +150,7 @@ export function ExportDialog({
         <body>
           <h1>{ORDERS_LABELS.LABEL_1942}</h1>
           <div class="info">
-            出發日期：${departureDate || '未設定'} | 總人數：${members.length} 人
+            ${EXPORT_DIALOG_LABELS.departure_date}${departureDate || EXPORT_DIALOG_LABELS.not_set} | ${EXPORT_DIALOG_LABELS.total_count}${members.length}${EXPORT_DIALOG_LABELS.people_unit}
           </div>
           <table>
             <thead>
@@ -256,7 +256,7 @@ export function ExportDialog({
           <div className="flex items-center justify-between">
             <span className="text-sm text-morandi-secondary">{ORDERS_LABELS.SELECT_6160}</span>
             <Button variant="ghost" size="sm" onClick={toggleAll}>
-              {Object.values(columns).every(v => v) ? '取消全選' : '全選'}
+              {Object.values(columns).every(v => v) ? EXPORT_DIALOG_LABELS.deselect_all : EXPORT_DIALOG_LABELS.select_all}
             </Button>
           </div>
 

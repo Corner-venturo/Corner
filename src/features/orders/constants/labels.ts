@@ -355,8 +355,6 @@ export const EXPORT_DIALOG_LABELS = {
   IDENTITY_CHILD: '小孩',
   IDENTITY_INFANT: '嬰兒',
   IDENTITY_CHILD_NO_BED: '小孩不佔床',
-  departure_date_label: '出發日期：',
-  total_count_label: '總人數：',
   EXPORT_FAILED: '匯出失敗',
   EXPORT_SUCCESS: '已匯出團員名單',
   VISA_CHILD: '兒童',
