@@ -1,32 +1,34 @@
 import { describe, it, expect } from 'vitest'
 import { calculateDayLabels, calculateDayDate, getDayOfWeek, isLastMainDay } from './itineraryLuxuryUtils'
+import type { DailyItinerary } from '@/components/editor/tour-form/types'
+
+/** Build a minimal DailyItinerary fixture for unit tests. */
+function makeDay(isAlternative: boolean): DailyItinerary {
+  return {
+    dayLabel: '',
+    date: '',
+    title: '',
+    activities: [],
+    recommendations: [],
+    meals: { breakfast: '', lunch: '', dinner: '' },
+    accommodation: '',
+    isAlternative,
+  }
+}
 
 describe('calculateDayLabels', () => {
   it('labels sequential days', () => {
-    const itinerary = [
-      { isAlternative: false },
-      { isAlternative: false },
-      { isAlternative: false },
-    ] as any
+    const itinerary = [makeDay(false), makeDay(false), makeDay(false)]
     expect(calculateDayLabels(itinerary)).toEqual(['Day 1', 'Day 2', 'Day 3'])
   })
 
   it('labels alternative days with suffix', () => {
-    const itinerary = [
-      { isAlternative: false },
-      { isAlternative: true },
-      { isAlternative: false },
-    ] as any
+    const itinerary = [makeDay(false), makeDay(true), makeDay(false)]
     expect(calculateDayLabels(itinerary)).toEqual(['Day 1', 'Day 1-B', 'Day 2'])
   })
 
   it('handles multiple alternatives', () => {
-    const itinerary = [
-      { isAlternative: false },
-      { isAlternative: true },
-      { isAlternative: true },
-      { isAlternative: false },
-    ] as any
+    const itinerary = [makeDay(false), makeDay(true), makeDay(true), makeDay(false)]
     expect(calculateDayLabels(itinerary)).toEqual(['Day 1', 'Day 1-B', 'Day 1-C', 'Day 2'])
   })
 
@@ -35,18 +37,12 @@ describe('calculateDayLabels', () => {
   })
 
   it('handles single day', () => {
-    const itinerary = [{ isAlternative: false }] as any
+    const itinerary = [makeDay(false)]
     expect(calculateDayLabels(itinerary)).toEqual(['Day 1'])
   })
 
   it('handles 5 days with alternatives', () => {
-    const itinerary = [
-      { isAlternative: false },
-      { isAlternative: false },
-      { isAlternative: false },
-      { isAlternative: true },
-      { isAlternative: false },
-    ] as any
+    const itinerary = [makeDay(false), makeDay(false), makeDay(false), makeDay(true), makeDay(false)]
     expect(calculateDayLabels(itinerary)).toEqual(['Day 1', 'Day 2', 'Day 3', 'Day 3-B', 'Day 4'])
   })
 })
@@ -114,43 +110,27 @@ describe('getDayOfWeek', () => {
 
 describe('isLastMainDay', () => {
   it('returns true for last day in simple itinerary', () => {
-    const itinerary = [
-      { isAlternative: false },
-      { isAlternative: false },
-      { isAlternative: false },
-    ] as any
+    const itinerary = [makeDay(false), makeDay(false), makeDay(false)]
     expect(isLastMainDay(itinerary, 2)).toBe(true)
   })
 
   it('returns false for non-last day', () => {
-    const itinerary = [
-      { isAlternative: false },
-      { isAlternative: false },
-      { isAlternative: false },
-    ] as any
+    const itinerary = [makeDay(false), makeDay(false), makeDay(false)]
     expect(isLastMainDay(itinerary, 0)).toBe(false)
   })
 
   it('returns true for alternative of last main day', () => {
-    const itinerary = [
-      { isAlternative: false },
-      { isAlternative: false },
-      { isAlternative: true },
-    ] as any
+    const itinerary = [makeDay(false), makeDay(false), makeDay(true)]
     expect(isLastMainDay(itinerary, 2)).toBe(true)
   })
 
   it('returns false for alternative of non-last main day', () => {
-    const itinerary = [
-      { isAlternative: false },
-      { isAlternative: true },
-      { isAlternative: false },
-    ] as any
+    const itinerary = [makeDay(false), makeDay(true), makeDay(false)]
     expect(isLastMainDay(itinerary, 1)).toBe(false)
   })
 
   it('handles single day', () => {
-    const itinerary = [{ isAlternative: false }] as any
+    const itinerary = [makeDay(false)]
     expect(isLastMainDay(itinerary, 0)).toBe(true)
   })
 })

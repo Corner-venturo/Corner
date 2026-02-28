@@ -9,12 +9,29 @@
 import { createClient } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
-import type { 
-  DailyItineraryDay, 
-  LeaderInfo, 
+import type {
+  DailyItineraryDay,
+  LeaderInfo,
   MeetingInfo,
   FlightInfo,
 } from '@/stores/types/tour.types'
+
+// === Labels ===
+const SYNC_LABELS = {
+  TOUR_NOT_FOUND: 'Tour not found for online sync',
+  UPDATE_TRIP_FAILED: 'Failed to update online trip',
+  UPDATE_TRIP_SUCCESS: 'Online trip updated',
+  CREATE_TRIP_FAILED: 'Failed to create online trip',
+  CREATE_TRIP_SUCCESS: 'Online trip created',
+  SYNC_ERROR: 'Error syncing to online',
+  SYNC_SUCCESS: 'Sync to online completed',
+  SYNC_FAILED: 'Sync to online failed',
+  SYNC_LEADER: 'Synced leader to online',
+  NO_ORDER_MEMBERS: 'No order members found',
+  SYNC_MEMBERS_FAILED: 'Failed to sync members to online',
+  SYNC_MEMBERS_SUCCESS: 'Members synced to online',
+  SYNC_MEMBERS_ERROR: 'Error syncing members to online',
+} as const
 
 interface SyncResult {
   success: boolean
@@ -60,18 +77,18 @@ export async function syncTripToOnline(tourId: string): Promise<SyncResult> {
     // 1. 取得旅遊團資料
     const { data: tour, error: tourError } = await supabase
       .from('tours')
-      .select('*')
+      .select('workspace_id, code, name, departure_date, return_date, location, outbound_flight, return_flight')
       .eq('id', tourId)
       .single()
 
     if (tourError || !tour) {
-      return { success: false, message: '找不到旅遊團資料' }
+      return { success: false, message: SYNC_LABELS.TOUR_NOT_FOUND }
     }
 
     // 2. 取得行程表資料
     const { data: itinerary } = await supabase
       .from('itineraries')
-      .select('*')
+      .select('id, daily_itinerary, leader, meeting_info')
       .eq('tour_id', tourId)
       .maybeSingle()
 
@@ -113,12 +130,12 @@ export async function syncTripToOnline(tourId: string): Promise<SyncResult> {
         .eq('id', existingTrip.id)
 
       if (updateError) {
-        logger.error('更新 Online 行程失敗:', updateError)
+        logger.error(SYNC_LABELS.UPDATE_TRIP_FAILED, updateError)
         return { success: false, message: updateError.message }
       }
 
       onlineTripId = existingTrip.id
-      logger.info(`行程已更新到 Online: ${onlineTripId}`)
+      logger.info(SYNC_LABELS.UPDATE_TRIP_SUCCESS, { onlineTripId })
     } else {
       // 建立新記錄
       const { data: newTrip, error: insertError } = await untypedSupabase
@@ -128,12 +145,12 @@ export async function syncTripToOnline(tourId: string): Promise<SyncResult> {
         .single<Pick<OnlineTrip, 'id'>>()
 
       if (insertError || !newTrip) {
-        logger.error('建立 Online 行程失敗:', insertError)
-        return { success: false, message: insertError?.message ?? '建立失敗' }
+        logger.error(SYNC_LABELS.CREATE_TRIP_FAILED, insertError)
+        return { success: false, message: insertError?.message ?? SYNC_LABELS.CREATE_TRIP_FAILED }
       }
 
       onlineTripId = newTrip.id
-      logger.info(`行程已同步到 Online: ${onlineTripId}`)
+      logger.info(SYNC_LABELS.CREATE_TRIP_SUCCESS, { onlineTripId })
     }
 
     // V2: 行程群組聊天室（conversations 表尚未建立）
@@ -176,12 +193,12 @@ export async function syncTripToOnline(tourId: string): Promise<SyncResult> {
 
     return {
       success: true,
-      message: '同步成功',
+      message: SYNC_LABELS.SYNC_SUCCESS,
       onlineTripId,
     }
   } catch (error) {
-    logger.error('同步到 Online 時發生錯誤:', error)
-    return { success: false, message: '同步失敗' }
+    logger.error(SYNC_LABELS.SYNC_ERROR, error)
+    return { success: false, message: SYNC_LABELS.SYNC_FAILED }
   }
 }
 
@@ -215,7 +232,7 @@ async function syncTripMembers(
           name: leaderInfo.name,
           phone: leaderInfo.domesticPhone || leaderInfo.overseasPhone || null,
         })
-        logger.info(`同步領隊: ${leaderInfo.name}`)
+        logger.info(SYNC_LABELS.SYNC_LEADER, { name: leaderInfo.name })
       }
       return
     }
@@ -229,7 +246,7 @@ async function syncTripMembers(
       .in('order_id', orderIds)
 
     if (!orderMembers || orderMembers.length === 0) {
-      logger.info('沒有訂單成員')
+      logger.info(SYNC_LABELS.NO_ORDER_MEMBERS)
       return
     }
 
@@ -337,12 +354,12 @@ async function syncTripMembers(
         .insert(membersToInsert)
 
       if (insertError) {
-        logger.error('同步團員失敗:', insertError)
+        logger.error(SYNC_LABELS.SYNC_MEMBERS_FAILED, insertError)
       } else {
-        logger.info(`成功同步 ${membersToInsert.length} 位成員到 Online（含分車分房）`)
+        logger.info(SYNC_LABELS.SYNC_MEMBERS_SUCCESS, { count: membersToInsert.length })
       }
     }
   } catch (error) {
-    logger.error('同步團員時發生錯誤:', error)
+    logger.error(SYNC_LABELS.SYNC_MEMBERS_ERROR, error)
   }
 }

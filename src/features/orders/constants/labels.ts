@@ -248,6 +248,9 @@ export const COMP_ORDERS_LABELS = {
   LABEL_9704: '電話：',
   LABEL_8424: '性別：',
 
+  自訂費用欄位: '自訂費用欄位',
+  找到N位符合的顧客: (count: number, matchTypeLabel: string) => `找到 ${count} 位符合的顧客（依 ${matchTypeLabel}）`,
+
   PLEASE_SELECT_2473: '請選擇要新增成員的訂單',
 
   LABEL_5560: '護照圖片增強',
@@ -336,6 +339,10 @@ export const EXPORT_DIALOG_LABELS = {
   COL_ROOM_TYPE: '房型',
   COL_COMPANION: '同房',
   COL_DIET: '餐食',
+  COL_SPECIAL_MEAL: '特殊餐食',
+  COL_TOTAL_PAYABLE: '應付金額',
+  COL_DEPOSIT_AMOUNT: '已付訂金',
+  COL_BALANCE: '尾款',
   COL_REMARKS: '備註',
   COL_VISA_STATUS: '簽證狀態',
   COL_PASSPORT_PINYIN: '護照拼音',
@@ -348,6 +355,8 @@ export const EXPORT_DIALOG_LABELS = {
   IDENTITY_CHILD: '小孩',
   IDENTITY_INFANT: '嬰兒',
   IDENTITY_CHILD_NO_BED: '小孩不佔床',
+  departure_date_label: '出發日期：',
+  total_count_label: '總人數：',
   EXPORT_FAILED: '匯出失敗',
   EXPORT_SUCCESS: '已匯出團員名單',
   VISA_CHILD: '兒童',
