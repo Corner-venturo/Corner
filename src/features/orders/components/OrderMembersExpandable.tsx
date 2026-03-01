@@ -6,7 +6,7 @@
  * - 6個 Hooks: useOrderMembersData, useRoomVehicleAssignments, useCustomerMatch, useMemberExport, useMemberEditDialog, usePassportUpload
  * - 9個組件: MemberRow, AddMemberDialog, MemberEditDialog, ExportDialog, PassportUploadZone, OrderSelectDialog, CustomerMatchDialog, CustomCostFieldsSection, MemberTableHeader
  *
- * 行數：< 300 行
+ * 功能：成員管理、分房分車、護照上傳、PNR 匹配、自訂費用
  */
 
 

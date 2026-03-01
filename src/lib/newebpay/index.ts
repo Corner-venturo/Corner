@@ -13,7 +13,7 @@
  * 測試加密：
  * import { testEncryption } from '@/lib/newebpay'
  * const result = testEncryption()
- * console.log(result.message)
+ * // 檢查 result.message
  */
 
 export * from './crypto'

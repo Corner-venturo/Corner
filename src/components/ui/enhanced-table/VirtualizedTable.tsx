@@ -37,7 +37,7 @@ export interface VirtualizedTableProps<T extends RowData = RowData> {
  *   data={largeDataset}
  *   height={600}
  *   estimateRowHeight={48}
- *   onRowClick={(row) => console.log(row)}
+ *   onRowClick={(row) => handleRowClick(row)}
  * />
  * ```
  */
