@@ -3,10 +3,11 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
-import { FileSignature, Edit2, Trash2, Eye, Mail, Plus } from 'lucide-react'
+import { FileSignature, Edit2, Trash2, Eye, Mail } from 'lucide-react'
 import { useToursSlim, updateTour } from '@/data'
 import { useToast } from '@/components/ui/use-toast'
 import { confirm } from '@/lib/ui/alert-dialog'
+import { logger } from '@/lib/utils/logger'
 import { Tour } from '@/stores/types'
 import { TableColumn } from '@/components/ui/enhanced-table'
 import { DateCell, ActionCell, NumberCell } from '@/components/table-cells'
@@ -163,6 +164,7 @@ export default function ContractsPage() {
           description: `已刪除「${tour.name}」的合約`,
         })
       } catch (error) {
+        logger.error('刪除合約失敗', error)
         toast({
           title: '刪除失敗',
           description: '刪除合約時發生錯誤，請稍後再試',

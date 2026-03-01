@@ -1,5 +1,4 @@
 import type { ConfirmationFormData, AccommodationData } from '@/types/confirmation.types'
-import Image from 'next/image'
 import { ACCOMMODATION_PREVIEW_LABELS } from '../constants/labels'
 
 interface AccommodationPreviewProps {
