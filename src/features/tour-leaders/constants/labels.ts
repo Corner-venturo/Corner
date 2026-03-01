@@ -84,6 +84,8 @@ export const TOUR_LEADERS_LABELS = {
   AVAILABILITY_SUFFIX: ' - 檔期管理',
   EDIT_AVAILABILITY: '編輯檔期',
   ADD_AVAILABILITY: '新增檔期',
+  START_DATE: '開始日期',
+  END_DATE: '結束日期',
   PLACEHOLDER_START_DATE: '選擇開始日期',
   PLACEHOLDER_END_DATE: '選擇結束日期',
   PLACEHOLDER_NOTES_OPTIONAL: '選填備註',
