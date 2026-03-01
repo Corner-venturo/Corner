@@ -456,8 +456,7 @@ export default function TodosPage() {
     >
 
       {/* 待辦事項列表 */}
-      <div className="flex-1 overflow-hidden">
-        <div className="h-full">
+      <div className="h-full overflow-hidden">
           <EnhancedTable
             columns={columns as unknown as Parameters<typeof EnhancedTable>[0]['columns']}
             data={filteredTodos as unknown as Parameters<typeof EnhancedTable>[0]['data']}
@@ -509,7 +508,6 @@ export default function TodosPage() {
             showFilters={false}
             initialPageSize={15}
           />
-        </div>
       </div>
 
       {/* 展開的待辦事項視圖 */}
