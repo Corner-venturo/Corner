@@ -31,9 +31,6 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
 
   headers: async () => [
     {
@@ -95,7 +92,7 @@ const nextConfig: NextConfig = {
 const sentryWebpackPluginOptions = {
   // 只在生產環境且有 Sentry DSN 時才上傳 source maps
   silent: true,
-  disableLogger: true,
+  // disableLogger: true, // Deprecated, use webpack.treeshake.removeDebugLogging instead
   // 僅在有 auth token 時上傳
   hideSourceMaps: true,
 }
