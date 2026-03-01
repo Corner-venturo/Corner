@@ -87,12 +87,12 @@ export default function LoginPage() {
 
     const trimmedCode = code.trim().toLowerCase()
     if (!trimmedCode) {
-      setError('請輸入公司代號')
+      setError(LABELS.ERROR_ENTER_CODE)
       return
     }
 
     if (!username.trim()) {
-      setError('請輸入帳號')
+      setError(LABELS.ERROR_ENTER_USERNAME)
       return
     }
 

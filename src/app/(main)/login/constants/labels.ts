@@ -1,6 +1,10 @@
 export const LABELS = {
   LOGIN_HINT: '請輸入代號和帳號密碼',
   PASSWORD: '密碼',
+  
+  // Validation
+  ERROR_ENTER_CODE: '請輸入公司代號',
+  ERROR_ENTER_USERNAME: '請輸入帳號',
 
   LABEL_7816: '公司',
   LABEL_6892: '輸入公司代號',
@@ -14,4 +18,4 @@ export const LABELS = {
   DEMO_LOADING: '正在進入體驗模式...',
   DEMO_DIVIDER: '或',
   SESSION_EXPIRED: '登入已過期，請重新登入',
-}
+};

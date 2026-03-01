@@ -74,7 +74,7 @@ function SaveAsDialog({
 
   const handleConfirm = () => {
     if (!name.trim()) {
-      void alert('請輸入檔案名稱', 'warning')
+      void alert(LABELS.ALERT_ENTER_FILENAME, 'warning')
       return
     }
     onConfirm(name.trim(), selectedTourId)
