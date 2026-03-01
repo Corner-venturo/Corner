@@ -4,10 +4,11 @@
  */
 
 import type { Metadata } from 'next'
+import { QUOTE_CONFIRM_PAGE_LABELS } from './[token]/constants/labels'
 
 export const metadata: Metadata = {
-  title: '報價確認 | Venturo Travel',
-  description: '確認您的旅遊報價單',
+  title: QUOTE_CONFIRM_PAGE_LABELS.METADATA_TITLE,
+  description: QUOTE_CONFIRM_PAGE_LABELS.METADATA_DESCRIPTION,
 }
 
 export default function ConfirmLayout({

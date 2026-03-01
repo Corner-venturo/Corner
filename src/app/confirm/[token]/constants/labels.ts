@@ -1,4 +1,8 @@
 export const QUOTE_CONFIRM_PAGE_LABELS = {
+  // 頁面 Metadata
+  METADATA_TITLE: '報價確認 | Venturo Travel',
+  METADATA_DESCRIPTION: '確認您的旅遊報價單',
+  
   // 頁面標題
   PAGE_TITLE: '報價確認',
   

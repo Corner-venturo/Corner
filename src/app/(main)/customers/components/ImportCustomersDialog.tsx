@@ -27,7 +27,7 @@ import {
 } from '@/lib/excel/import-parser'
 import { createCustomer, useCustomers } from '@/data'
 import type { Customer } from '@/types/customer.types'
-import { CUSTOMER_IMPORT_LABELS as L } from '../constants/labels'
+import { CUSTOMER_IMPORT_LABELS as L, CUSTOMER_LOGGER } from '../constants/labels'
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -162,7 +162,7 @@ export function ImportCustomersDialog({ open, onOpenChange }: ImportCustomersDia
         setParsedRows(rows_with_dup_check)
         setStep('preview')
       } catch (err) {
-        logger.error('客戶匯入解析失敗', err)
+        logger.error(CUSTOMER_LOGGER.IMPORT_PARSE_FAILED, err)
         toast.error(L.error_parse_failed)
       }
     },
@@ -245,7 +245,7 @@ export function ImportCustomersDialog({ open, onOpenChange }: ImportCustomersDia
       }
       handleClose()
     } catch (err) {
-      logger.error('客戶批次匯入失敗', err)
+      logger.error(CUSTOMER_LOGGER.IMPORT_BATCH_FAILED, err)
       toast.error(L.msg_import_failed)
     } finally {
       setIsImporting(false)

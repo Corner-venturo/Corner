@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import PublicViewClient from './client'
+import { PUBLIC_VIEW_LABELS } from './constants/labels'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -21,8 +22,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
     if (itinerary) {
       // LINE 預覽標題：只顯示團名
-      const title = itinerary.title || '行程表'
-      const description = itinerary.description || `${itinerary.title || '行程'} - 詳細行程資訊`
+      const title = itinerary.title || PUBLIC_VIEW_LABELS.METADATA_TITLE_FALLBACK
+      const description = itinerary.description || 
+        PUBLIC_VIEW_LABELS.METADATA_DESCRIPTION_TEMPLATE.replace(
+          '{title}',
+          itinerary.title || PUBLIC_VIEW_LABELS.ITINERARY_FALLBACK
+        )
 
       return {
         title,
@@ -40,8 +45,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   return {
-    title: '行程表',
-    description: '查看詳細行程資訊',
+    title: PUBLIC_VIEW_LABELS.METADATA_TITLE_FALLBACK,
+    description: PUBLIC_VIEW_LABELS.METADATA_DESCRIPTION_FALLBACK,
   }
 }
 

@@ -339,3 +339,11 @@ export const CUSTOMER_IMPORT_LABELS = {
   template_filename: '顧客匯入模板.xlsx',
   template_sheet: '顧客資料',
 }
+
+// ============================================================
+// Logger messages
+// ============================================================
+export const CUSTOMER_LOGGER = {
+  IMPORT_PARSE_FAILED: 'Customer import parsing failed',
+  IMPORT_BATCH_FAILED: 'Customer batch import failed',
+};

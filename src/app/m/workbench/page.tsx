@@ -26,47 +26,47 @@ import { WORKBENCH_LABELS } from './constants/labels'
 
 const CATEGORIES = [
   {
-    title: '常用功能',
+    title: WORKBENCH_LABELS.CAT_COMMON,
     items: [
-      { icon: MapPin, label: '旅遊團', href: '/m/tours', color: 'bg-blue-100 text-blue-600' },
-      { icon: ShoppingCart, label: '訂單', href: '/m/orders', color: 'bg-green-100 text-green-600' },
-      { icon: Users, label: '成員', href: '/m/members', color: 'bg-purple-100 text-purple-600' },
-      { icon: CheckCircle, label: '報到', href: '/m/checkin', color: 'bg-orange-100 text-orange-600' },
+      { icon: MapPin, label: WORKBENCH_LABELS.ITEM_TOURS, href: '/m/tours', color: 'bg-blue-100 text-blue-600' },
+      { icon: ShoppingCart, label: WORKBENCH_LABELS.ITEM_ORDERS, href: '/m/orders', color: 'bg-green-100 text-green-600' },
+      { icon: Users, label: WORKBENCH_LABELS.ITEM_MEMBERS, href: '/m/members', color: 'bg-purple-100 text-purple-600' },
+      { icon: CheckCircle, label: WORKBENCH_LABELS.ITEM_CHECKIN, href: '/m/checkin', color: 'bg-orange-100 text-orange-600' },
     ],
   },
   {
-    title: '財務相關',
+    title: WORKBENCH_LABELS.CAT_FINANCE,
     items: [
-      { icon: CreditCard, label: '請款', href: '/m/payments', color: 'bg-emerald-100 text-emerald-600' },
-      { icon: Wallet, label: '出納', href: '/m/treasury', color: 'bg-cyan-100 text-cyan-600' },
-      { icon: FileCheck, label: '收款', href: '/m/receipts', color: 'bg-teal-100 text-teal-600' },
-      { icon: BarChart3, label: '報表', href: '/finance/reports', color: 'bg-indigo-100 text-indigo-600' },
+      { icon: CreditCard, label: WORKBENCH_LABELS.ITEM_PAYMENTS, href: '/m/payments', color: 'bg-emerald-100 text-emerald-600' },
+      { icon: Wallet, label: WORKBENCH_LABELS.ITEM_TREASURY, href: '/m/treasury', color: 'bg-cyan-100 text-cyan-600' },
+      { icon: FileCheck, label: WORKBENCH_LABELS.ITEM_RECEIPTS, href: '/m/receipts', color: 'bg-teal-100 text-teal-600' },
+      { icon: BarChart3, label: WORKBENCH_LABELS.ITEM_REPORTS, href: '/finance/reports', color: 'bg-indigo-100 text-indigo-600' },
     ],
   },
   {
-    title: '報價與合約',
+    title: WORKBENCH_LABELS.CAT_QUOTE_CONTRACT,
     items: [
-      { icon: Calculator, label: '報價單', href: '/quotes', color: 'bg-amber-100 text-amber-600' },
-      { icon: FileText, label: '合約', href: '/contracts', color: 'bg-slate-100 text-slate-600' },
-      { icon: FileCheck, label: '確認單', href: '/m/confirmations', color: 'bg-lime-100 text-lime-600' },
+      { icon: Calculator, label: WORKBENCH_LABELS.ITEM_QUOTES, href: '/quotes', color: 'bg-amber-100 text-amber-600' },
+      { icon: FileText, label: WORKBENCH_LABELS.ITEM_CONTRACTS, href: '/contracts', color: 'bg-slate-100 text-slate-600' },
+      { icon: FileCheck, label: WORKBENCH_LABELS.ITEM_CONFIRMATIONS, href: '/m/confirmations', color: 'bg-lime-100 text-lime-600' },
     ],
   },
   {
-    title: '行政作業',
+    title: WORKBENCH_LABELS.CAT_ADMIN,
     items: [
-      { icon: Calendar, label: '行事曆', href: '/calendar', color: 'bg-red-100 text-red-600' },
-      { icon: Stamp, label: '簽證', href: '/m/visas', color: 'bg-yellow-100 text-yellow-600' },
+      { icon: Calendar, label: WORKBENCH_LABELS.ITEM_CALENDAR, href: '/calendar', color: 'bg-red-100 text-red-600' },
+      { icon: Stamp, label: WORKBENCH_LABELS.ITEM_VISAS, href: '/m/visas', color: 'bg-yellow-100 text-yellow-600' },
       // 旅伴通訊已整合到工作頻道中
       // { icon: MessageCircle, label: '通訊', href: '/traveler-chat', color: 'bg-pink-100 text-pink-600' },
     ],
   },
   {
-    title: '資料庫',
+    title: WORKBENCH_LABELS.CAT_DATABASE,
     items: [
-      { icon: Hotel, label: '飯店', href: '/database/hotels', color: 'bg-violet-100 text-violet-600' },
-      { icon: Truck, label: '供應商', href: '/database/suppliers', color: 'bg-morandi-container text-morandi-secondary' },
-      { icon: MapPinned, label: '景點', href: '/database/attractions', color: 'bg-green-100 text-green-600' },
-      { icon: UserCheck, label: '領隊', href: '/database/tour-leaders', color: 'bg-rose-100 text-rose-600' },
+      { icon: Hotel, label: WORKBENCH_LABELS.ITEM_HOTELS, href: '/database/hotels', color: 'bg-violet-100 text-violet-600' },
+      { icon: Truck, label: WORKBENCH_LABELS.ITEM_SUPPLIERS, href: '/database/suppliers', color: 'bg-morandi-container text-morandi-secondary' },
+      { icon: MapPinned, label: WORKBENCH_LABELS.ITEM_ATTRACTIONS, href: '/database/attractions', color: 'bg-green-100 text-green-600' },
+      { icon: UserCheck, label: WORKBENCH_LABELS.ITEM_TOUR_LEADERS, href: '/database/tour-leaders', color: 'bg-rose-100 text-rose-600' },
     ],
   },
 ]
@@ -99,15 +99,14 @@ export default function MobileWorkbenchPage() {
                 const Icon = item.icon
                 return (
                   <Link
-                    key={item.href}
+                    key={item.label}
                     href={item.href}
-                    className="flex flex-col items-center p-3 rounded-xl bg-card border border-border
-                               hover:border-morandi-gold/50 hover:shadow-sm transition-all"
+                    className="flex flex-col items-center gap-2 p-3 rounded-lg bg-card border border-border hover:bg-morandi-container transition-colors active:scale-95"
                   >
-                    <div className={cn('p-2.5 rounded-xl', item.color)}>
-                      <Icon size={22} />
+                    <div className={cn('w-12 h-12 rounded-full flex items-center justify-center', item.color)}>
+                      <Icon size={20} />
                     </div>
-                    <span className="text-xs mt-2 text-morandi-primary font-medium text-center">
+                    <span className="text-xs text-morandi-secondary text-center leading-tight">
                       {item.label}
                     </span>
                   </Link>
@@ -116,17 +115,6 @@ export default function MobileWorkbenchPage() {
             </div>
           </section>
         ))}
-      </div>
-
-      {/* 切換到桌面版 */}
-      <div className="p-4 mt-4">
-        <Link
-          href="/dashboard"
-          className="block w-full py-3 text-center text-sm text-morandi-secondary
-                     bg-morandi-container/50 rounded-xl hover:bg-morandi-container transition-colors"
-        >
-          {WORKBENCH_LABELS.LABEL_5896}
-        </Link>
       </div>
     </div>
   )
