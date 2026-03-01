@@ -102,6 +102,7 @@ export const SUPPLIER_IMPORT_LABELS = {
   // Errors
   error_no_file: '請選擇檔案',
   error_parse_failed: '檔案解析失敗',
+  error_no_data_to_import: '沒有可匯入的資料',
   // Messages
   msg_import_success: (count: number) => `成功匯入 ${count} 家供應商`,
   msg_import_partial: (success: number, total: number) =>

@@ -301,7 +301,7 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
 
   const handleOpenActivitiesImportDialog = useCallback(() => {
     if (!quote?.itinerary_id) {
-      toast.error('此報價單沒有關聯的行程表')
+      toast.error(QUOTE_DETAIL_EMBED_LABELS.此報價單沒有關聯的行程表)
       return
     }
     setShowImportActivitiesDialog(true)

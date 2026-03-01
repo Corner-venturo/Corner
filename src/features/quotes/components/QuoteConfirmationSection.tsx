@@ -120,7 +120,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
       }
     } catch (error) {
       logger.error('發送確認連結失敗:', error)
-      toast.error('發送失敗')
+      toast.error(QUOTE_CONFIRMATION_SECTION_LABELS.發送失敗)
     } finally {
       setIsLoading(false)
     }
@@ -143,7 +143,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
   // 業務確認
   const handleStaffConfirm = async () => {
     if (!staffId || !staffName) {
-      toast.error('請先登入')
+      toast.error(QUOTE_CONFIRMATION_SECTION_LABELS.請先登入)
       return
     }
 
@@ -173,7 +173,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
       setConfirmNotes('')
     } catch (error) {
       logger.error('業務確認失敗:', error)
-      toast.error('確認失敗')
+      toast.error(QUOTE_CONFIRMATION_SECTION_LABELS.確認失敗)
     } finally {
       setIsLoading(false)
     }

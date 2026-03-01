@@ -215,7 +215,7 @@ export function ImportSuppliersDialog({ open, onOpenChange }: ImportSuppliersDia
   const handleImport = useCallback(async () => {
     const valid_rows = parsed_rows.filter(r => Object.keys(r.errors).length === 0)
     if (valid_rows.length === 0) {
-      toast.error('沒有可匯入的資料')
+      toast.error(L.error_no_data_to_import)
       return
     }
 

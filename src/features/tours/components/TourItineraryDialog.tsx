@@ -16,6 +16,7 @@ import { PackageItineraryDialog } from '@/features/proposals/components/package-
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 import { TOUR_ITINERARY_DIALOG } from '../constants'
+import { COMP_TOURS_LABELS } from '../constants/labels'
 
 interface TourItineraryDialogProps {
   isOpen: boolean
@@ -96,7 +97,7 @@ export function TourItineraryDialog({
 
       if (error) {
         logger.error('建立 proposal_package 失敗:', error)
-        toast.error('建立行程表失敗')
+        toast.error(COMP_TOURS_LABELS.建立行程表失敗)
         return null
       }
 
@@ -112,7 +113,7 @@ export function TourItineraryDialog({
       return newPackage as ProposalPackage
     } catch (err) {
       logger.error('建立 package 錯誤:', err)
-      toast.error('建立行程表失敗')
+      toast.error(COMP_TOURS_LABELS.建立行程表失敗)
       return null
     }
   }, [tour])
