@@ -250,7 +250,7 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
                   className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
                 >
                   <Save size={16} />
-                  {editingId ? '儲存' : '新增'}
+                  {editingId ? TOUR_LEADERS_LABELS.SAVE : TOUR_LEADERS_LABELS.ADD}
                 </Button>
               </div>
             </div>

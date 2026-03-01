@@ -127,7 +127,7 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
             <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-morandi-primary">
-                  中文姓名 <span className="text-morandi-red">*</span>
+                  {TOUR_LEADERS_LABELS.CHINESE_NAME} <span className="text-morandi-red">*</span>
                 </label>
                 <Input
                   value={formData.name}

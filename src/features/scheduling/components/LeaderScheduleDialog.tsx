@@ -56,7 +56,7 @@ export const LeaderScheduleDialog: React.FC<LeaderScheduleDialogProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-morandi-primary">
-                選擇領隊 <span className="text-morandi-red">*</span>
+                {SCHEDULING_LABELS.SELECT_9576} <span className="text-morandi-red">*</span>
               </label>
               <Select
                 value={formData.leader_id}
@@ -90,7 +90,7 @@ export const LeaderScheduleDialog: React.FC<LeaderScheduleDialogProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-morandi-primary">
-                開始日期 <span className="text-morandi-red">*</span>
+                {SCHEDULING_LABELS.START_DATE} <span className="text-morandi-red">*</span>
               </label>
               <DatePicker
                 value={formData.start_date}
@@ -101,7 +101,7 @@ export const LeaderScheduleDialog: React.FC<LeaderScheduleDialogProps> = ({
             </div>
             <div>
               <label className="text-sm font-medium text-morandi-primary">
-                結束日期 <span className="text-morandi-red">*</span>
+                {SCHEDULING_LABELS.END_DATE} <span className="text-morandi-red">*</span>
               </label>
               <DatePicker
                 value={formData.end_date}

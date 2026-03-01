@@ -20,6 +20,7 @@ export const TOUR_LEADERS_LABELS = {
   PROFESSIONAL_INFO: '專業資料',
 
   // Labels
+  CHINESE_NAME: '中文姓名',
   ENGLISH_NICKNAME: '英文暱稱',
   DOMESTIC_PHONE: '國內電話',
   INTERNATIONAL_PHONE: '國外電話',

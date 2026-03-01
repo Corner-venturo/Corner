@@ -205,7 +205,7 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
             >
               <Plus size={16} />
-              新增 <span className="ml-1 text-xs opacity-70">(Enter)</span>
+              {QUOTE_DIALOG_LABELS.ADD} <span className="ml-1 text-xs opacity-70">(Enter)</span>
             </Button>
           </div>
         </form>

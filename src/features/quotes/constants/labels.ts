@@ -52,6 +52,7 @@ export const IMPORT_ACTIVITIES_DIALOG_LABELS = {
   LABEL_1519: '匯入景點',
   SELECT_9050: '從行程表選擇要匯入的景點',
   NOT_FOUND_2956: '行程表中沒有景點資料',
+  ADD: '新增',
   CANCEL: '取消',
 };
 
@@ -64,6 +65,7 @@ export const IMPORT_MEALS_DIALOG_LABELS = {
   SELECT_4642: '從行程表選擇要匯入的餐點',
   LABEL_9424: '包含早餐',
   NOT_FOUND_1124: '行程表中沒有餐飲資料',
+  ADD: '新增',
   CANCEL: '取消',
 };
 
@@ -263,6 +265,7 @@ export const QUOTE_DIALOG_LABELS = {
   COPYING_2742: '設為置頂範本（方便複製使用）',
   LABEL_9029: '商品編號（選填）',
   GENERATING_4057: '不填寫則自動生成 Q 開頭的編號',
+  ADD: '新增',
   CANCEL: '取消',
 };
 
@@ -411,6 +414,7 @@ export const QUICK_QUOTE_VERSION_PANEL_LABELS = {
   EDIT_4620: '尚無版本，進入編輯模式後點擊「儲存」創建第一個版本',
   LABEL_6621: '另存新版本',
   PLEASE_ENTER_793: '請輸入版本名稱，例如：「初稿」「修訂版」「最終版」',
+  ADD: '新增',
   CANCEL: '取消',
 };
 

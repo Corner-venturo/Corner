@@ -3,6 +3,8 @@ export const SCHEDULING_LABELS = {
   SELECT_9576: '選擇領隊',
   LABEL_9704: '電話：',
   LABEL_5968: '調度日期',
+  START_DATE: '開始日期',
+  END_DATE: '結束日期',
   SELECT_1716: '選擇開始日期',
   SELECT_8186: '選擇結束日期',
   LABEL_535: '團資訊',
