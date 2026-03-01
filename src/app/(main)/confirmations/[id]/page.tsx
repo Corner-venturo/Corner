@@ -32,7 +32,6 @@ export default function EditConfirmationPage() {
   const id = params.id as string
 
   const { items: confirmations, loading: isLoadingConfirmations } = useConfirmations()
-  const currentUser = useAuthStore(state => state.user)
 
   const [formData, setFormData] = useState<ConfirmationFormData>({
     type: 'flight',
