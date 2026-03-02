@@ -26,6 +26,7 @@ import { generateDisbursementPDF } from '@/lib/pdf/disbursement-pdf'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { DISBURSEMENT_LABELS } from '../constants/labels'
+import { updateDisbursementOrder } from '@/data'
 
 interface DisbursementPrintDialogProps {
   order: DisbursementOrder | null
@@ -188,7 +189,7 @@ export function DisbursementPrintDialog({
       if (!uploadError && uploadData) {
         const { data: urlData } = supabase.storage.from('documents').getPublicUrl(filename)
         if (urlData?.publicUrl) {
-          await supabase.from('disbursement_orders').update({ pdf_url: urlData.publicUrl } as Record<string, unknown>).eq('id', order.id)
+          await updateDisbursementOrder(order.id, { pdf_url: urlData.publicUrl })
         }
       } else if (uploadError) {
         logger.error('Upload disbursement PDF failed:', uploadError)

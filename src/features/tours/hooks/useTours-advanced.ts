@@ -12,6 +12,7 @@ import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
 import { generateUUID } from '@/lib/utils/uuid'
 import type { Database } from '@/lib/supabase/types'
 import { logger } from '@/lib/utils/logger'
+import { createTour as createTourData, deleteTour as deleteTourData } from '@/data'
 import { TOURS_ADVANCED_LABELS, TOUR_SERVICE_LABELS, TOUR_OPERATIONS_LABELS } from '../constants/labels'
 
 const TOURS_KEY = 'tours'
@@ -103,8 +104,7 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
 
     try {
       // Type assertion needed due to Tour type vs Database Insert type mismatch
-      const { error } = await supabase.from('tours').insert(newTour as unknown as Database['public']['Tables']['tours']['Insert'])
-      if (error) throw error
+      await createTourData(newTour as unknown as Parameters<typeof createTourData>[0])
 
       mutate(TOURS_KEY)
       return newTour
@@ -166,8 +166,7 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
     )
 
     try {
-      const { error } = await supabase.from('tours').delete().eq('id', id)
-      if (error) throw error
+      await deleteTourData(id)
 
       mutate(TOURS_KEY)
       return true
