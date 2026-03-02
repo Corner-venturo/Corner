@@ -3,10 +3,11 @@
 import { useState } from 'react'
 import { logger } from '@/lib/utils/logger'
 import {
-  parseAmadeusPNR,
+  parseAmadeusPNREnhanced,
   validateAmadeusPNR,
   extractImportantDates,
   isUrgent,
+  type EnhancedParsedPNR,
 } from '@/lib/pnr-parser'
 import { createPNR, createCalendarEvent } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
@@ -23,7 +24,7 @@ interface UsePnrQuickActionProps {
 export function usePnrQuickAction({ todo, onUpdate, onClose }: UsePnrQuickActionProps) {
   const [rawPNR, setRawPNR] = useState('')
   const [isParsing, setIsParsing] = useState(false)
-  const [parsedData, setParsedData] = useState<ReturnType<typeof parseAmadeusPNR> | null>(null)
+  const [parsedData, setParsedData] = useState<EnhancedParsedPNR | null>(null)
   const [showAdvanced, setShowAdvanced] = useState(false)
 
   const { user } = useAuthStore()
@@ -32,7 +33,7 @@ export function usePnrQuickAction({ todo, onUpdate, onClose }: UsePnrQuickAction
   // 即時驗證
   const validation = rawPNR.trim() ? validateAmadeusPNR(rawPNR) : null
 
-  // 解析電報
+  // 解析電報（使用增強型解析）
   const handleParse = () => {
     if (!rawPNR.trim()) {
       toast.error('請貼上電報內容')
@@ -46,15 +47,17 @@ export function usePnrQuickAction({ todo, onUpdate, onClose }: UsePnrQuickAction
 
     setIsParsing(true)
     try {
-      const parsed = parseAmadeusPNR(rawPNR)
+      const parsed = parseAmadeusPNREnhanced(rawPNR)
       logger.log('🔍 解析結果:', parsed)
       logger.log('📅 出票期限:', parsed.ticketingDeadline)
       logger.log('✈️ 航班數量:', parsed.segments.length)
-      logger.log('🎫 SSR數量:', parsed.specialRequests.length)
-      logger.log('ℹ️ OSI數量:', parsed.otherInfo.length)
+      logger.log('⚠️ 警告數量:', parsed.warnings)
       setParsedData(parsed)
 
-      if (parsed.validation.warnings.length > 0) {
+      // 顯示警告統計
+      if (parsed.warnings.total > 0) {
+        toast.warning(`解析成功，發現 ${parsed.warnings.total} 個警告`)
+      } else if (parsed.validation.warnings.length > 0) {
         toast.warning(`解析成功，但有 ${parsed.validation.warnings.length} 個警告`)
       } else {
         toast.success('電報解析成功！')

@@ -4,7 +4,7 @@ import React from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Plane, Calendar, AlertCircle, Clock,
-  Utensils, Crown, Phone, Heart, Shield, Info
+  Utensils, Crown, Phone, Heart, Shield, Info, AlertTriangle, Baby, Users
 } from 'lucide-react'
 import { formatDateChineseWithWeekday } from '@/lib/utils/format-date'
 import {
@@ -13,13 +13,13 @@ import {
   type EnhancedSSR,
   type EnhancedOSI,
   SSRCategory,
-  OSICategory
+  OSICategory,
+  type EnhancedParsedPNR,
 } from '@/lib/pnr-parser'
-import type { parseAmadeusPNR } from '@/lib/pnr-parser'
 import { PNR_LABELS } from './constants/labels'
 
 interface PnrPreviewProps {
-  parsedData: ReturnType<typeof parseAmadeusPNR>
+  parsedData: EnhancedParsedPNR
   showAdvanced: boolean
   onToggleAdvanced: () => void
   onReset: () => void
@@ -37,6 +37,9 @@ export function PnrPreview({
   onAddToCalendar,
   canAddDeadline,
 }: PnrPreviewProps) {
+  // 檢查是否有警告
+  const hasWarnings = parsedData.warnings && parsedData.warnings.total > 0
+
   return (
     <div className="space-y-3 bg-morandi-container/10 p-3 rounded-lg">
       <div className="flex items-center justify-between">
@@ -50,6 +53,93 @@ export function PnrPreview({
       </div>
 
       <div className="space-y-3 text-xs">
+        {/* ⚠️ 警告區塊（新增）*/}
+        {hasWarnings && (
+          <div className="space-y-2">
+            {/* 年齡警告 */}
+            {parsedData.ageValidations?.filter(v => !v.isValid).map((v, idx) => (
+              <div key={`age-${idx}`} className="bg-amber-50 border border-amber-200 p-2 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <Baby size={14} className="text-amber-600 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-amber-900 text-xs">{v.passengerName}</div>
+                    <div className="text-amber-700 text-xs mt-0.5">{v.warning}</div>
+                    {v.suggestion && (
+                      <div className="text-amber-600 text-xs mt-1 flex items-start gap-1">
+                        <Info size={12} className="mt-0.5 flex-shrink-0" />
+                        <span>{v.suggestion}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* 嬰兒/成人比例警告 */}
+            {parsedData.infantRatioCheck && !parsedData.infantRatioCheck.isValid && (
+              <div className="bg-red-50 border border-red-200 p-2 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <Users size={14} className="text-red-600 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-red-900 text-xs">嬰兒/成人比例錯誤</div>
+                    <div className="text-red-700 text-xs mt-0.5">{parsedData.infantRatioCheck.error}</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 轉機警告 */}
+            {parsedData.connections?.filter(c => !c.isSufficient).map((c, idx) => (
+              <div key={`conn-${idx}`} className="bg-red-50 border border-red-200 p-2 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle size={14} className="text-red-600 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-red-900 text-xs">轉機：{c.airportName}</div>
+                    <div className="text-red-700 text-xs mt-0.5">{c.warning}</div>
+                    {c.suggestion && (
+                      <div className="text-red-600 text-xs mt-1 flex items-start gap-1">
+                        <Info size={12} className="mt-0.5 flex-shrink-0" />
+                        <span>{c.suggestion}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* 轉機時間緊迫警告 */}
+            {parsedData.connections?.filter(c => c.isSufficient && c.warning).map((c, idx) => (
+              <div key={`conn-warn-${idx}`} className="bg-amber-50 border border-amber-200 p-2 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <Clock size={14} className="text-amber-600 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-amber-900 text-xs">轉機：{c.airportName}</div>
+                    <div className="text-amber-700 text-xs mt-0.5">{c.warning}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* 票號警告 */}
+            {parsedData.ticketValidations?.filter(tv => !tv.isValid || tv.warnings.length > 0).map((tv, idx) => (
+              <div key={`ticket-${idx}`} className="bg-amber-50 border border-amber-200 p-2 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <AlertCircle size={14} className="text-amber-600 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-amber-900 text-xs font-mono">{tv.ticketNumber}</div>
+                    {tv.errors.map((err, errIdx) => (
+                      <div key={errIdx} className="text-red-700 text-xs mt-0.5">{err}</div>
+                    ))}
+                    {tv.warnings.map((warn, warnIdx) => (
+                      <div key={warnIdx} className="text-amber-700 text-xs mt-0.5">{warn}</div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* 基本資訊 */}
         <div className="grid grid-cols-2 gap-2">
           <div>

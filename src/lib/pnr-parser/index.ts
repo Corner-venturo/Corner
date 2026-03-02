@@ -102,3 +102,12 @@ export function parseFlightConfirmation(input: string): ParsedHTMLConfirmation |
   // 否則當作 Amadeus 電報處理
   return parseAmadeusPNR(input);
 }
+
+// 匯出增強型解析器（2026-03-02 新增）
+export { parseAmadeusPNREnhanced, type EnhancedParsedPNR } from './parsers/amadeus-enhanced';
+
+// 匯出驗證器和分析器
+export { validateAllPassengerAges, validateInfantAdultRatio, type PassengerAgeValidation } from './validators/age-validator';
+export { enhanceAllSegmentsCabinClass, getCabinClassInfo, type CabinClassInfo, type EnhancedFlightSegment } from './enhancers/cabin-class-enhancer';
+export { analyzeAllConnections, type ConnectionInfo } from './analyzers/connection-analyzer';
+export { validateTicketNumbers, validateTicketNumber, type TicketNumberValidation } from './validators/ticket-validator';
