@@ -14,4 +14,7 @@ export const PNR_LABELS = {
   LABEL_5164: '其他服務資訊 (OSI)',
   ADD_4933: '新增期限',
   ADD_7463: '新增行事曆',
+
+  LABEL_2033: '嬰兒/成人比例錯誤',
+  LABEL_7874: '轉機：',
 }

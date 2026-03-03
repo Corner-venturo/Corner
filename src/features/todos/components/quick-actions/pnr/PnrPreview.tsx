@@ -81,7 +81,7 @@ export function PnrPreview({
                 <div className="flex items-start gap-2">
                   <Users size={14} className="text-red-600 mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-red-900 text-xs">嬰兒/成人比例錯誤</div>
+                    <div className="font-semibold text-red-900 text-xs">{PNR_LABELS.LABEL_2033}</div>
                     <div className="text-red-700 text-xs mt-0.5">{parsedData.infantRatioCheck.error}</div>
                   </div>
                 </div>
@@ -94,7 +94,7 @@ export function PnrPreview({
                 <div className="flex items-start gap-2">
                   <AlertTriangle size={14} className="text-red-600 mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-red-900 text-xs">轉機：{c.airportName}</div>
+                    <div className="font-semibold text-red-900 text-xs">{PNR_LABELS.LABEL_7874}{c.airportName}</div>
                     <div className="text-red-700 text-xs mt-0.5">{c.warning}</div>
                     {c.suggestion && (
                       <div className="text-red-600 text-xs mt-1 flex items-start gap-1">
