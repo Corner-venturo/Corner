@@ -177,16 +177,22 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
             // Place object
             const asset = selectedAssetRef.current
             const t = assetType(asset)
+            // Floor: use integer grid cell
+            const fc = Math.floor(s.col), fr = Math.floor(s.row)
             if (t === 'floor') {
-              if (s.col >= 0 && s.col < room.cols && s.row >= 0 && s.row < room.rows) {
-                room.floor[s.row][s.col] = asset
+              if (fc >= 0 && fc < room.cols && fr >= 0 && fr < room.rows) {
+                room.floor[fr][fc] = asset
               }
             } else if (t === 'wallL') {
-              const r = Math.round(s.row - 0.5)
-              if (r >= 0 && r < room.rows) room.leftWall[r] = asset
+              // Left wall: col near 0, row determines which wall segment
+              if (s.col < 1 && fr >= 0 && fr < room.rows) {
+                room.leftWall[fr] = asset
+              }
             } else if (t === 'wallB') {
-              const c = Math.round(s.col - 0.5)
-              if (c >= 0 && c < room.cols) room.backWall[c] = asset
+              // Back wall: row near 0, col determines which wall segment
+              if (s.row < 1 && fc >= 0 && fc < room.cols) {
+                room.backWall[fc] = asset
+              }
             } else {
               const obj: RoomObject = { id: room.nextId++, asset, col: s.col, row: s.row, offX: 0, offY: 0, flip: false }
               const m = getMeta(assetMeta, asset)
