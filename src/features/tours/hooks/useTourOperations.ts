@@ -10,6 +10,7 @@ import { OrderFormData } from '@/features/orders/components/add-order-form'
 import type { CreateInput, UpdateInput } from '@/stores/core/types'
 import { useCountries, useCities, updateCountry, updateCity, updateQuote } from '@/data'
 import { createOrder } from '@/data/entities/orders'
+import { useAuthStore } from '@/stores/auth-store'
 import { TOUR_OPERATIONS_LABELS } from '../constants/labels'
 import {
   checkTourDependencies,
@@ -195,6 +196,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
               paid_amount: 0,
               remaining_amount: totalAmount,
               code,
+              workspace_id: workspaceId,
             } as Parameters<typeof createOrder>[0])
           } catch (orderErr) {
             logger.warn('建立訂單失敗:', (orderErr as Error).message)

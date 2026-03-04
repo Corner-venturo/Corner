@@ -84,8 +84,6 @@ export default function TourDetailPage() {
           { label: TOUR_DETAIL_PAGE_LABELS.BREADCRUMB_TOURS, href: '/tours' },
           { label: code, href: `/tours/${code}` },
         ]}
-        showBackButton={true}
-        onBack={handleBack}
       >
         <div className="flex-1 flex items-center justify-center">
           <Loader2 className="animate-spin text-morandi-secondary" size={32} />
@@ -105,8 +103,6 @@ export default function TourDetailPage() {
           { label: TOUR_DETAIL_PAGE_LABELS.BREADCRUMB_TOURS, href: '/tours' },
           { label: code, href: `/tours/${code}` },
         ]}
-        showBackButton={true}
-        onBack={handleBack}
       >
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
@@ -127,8 +123,6 @@ export default function TourDetailPage() {
         { label: TOUR_DETAIL_PAGE_LABELS.BREADCRUMB_TOURS, href: '/tours' },
         { label: `${tour.code} ${tour.name}`, href: `/tours/${code}` },
       ]}
-      showBackButton={true}
-      onBack={handleBack}
       tabs={[...TOUR_TABS]}
       activeTab={activeTab}
       onTabChange={setActiveTab}

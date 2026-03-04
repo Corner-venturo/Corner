@@ -7,7 +7,6 @@
 import { createEntityHook } from '../core/createEntityHook'
 import { CACHE_PRESETS } from '../core/types'
 import type { PaymentRequest } from '@/stores/types'
-import { createPaymentRequestSchema, updatePaymentRequestSchema } from '@/lib/validations/entities'
 
 export const paymentRequestEntity = createEntityHook<PaymentRequest>('payment_requests', {
   list: {
@@ -19,8 +18,6 @@ export const paymentRequestEntity = createEntityHook<PaymentRequest>('payment_re
   },
   detail: { select: '*' },
   cache: CACHE_PRESETS.high,
-  createSchema: createPaymentRequestSchema,
-  updateSchema: updatePaymentRequestSchema,
 })
 
 export const usePaymentRequests = paymentRequestEntity.useList

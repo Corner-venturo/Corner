@@ -118,11 +118,11 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
       const orderNumber = `${tour.code}-O${nextOrderNumber.toString().padStart(2, '0')}`
 
       await createOrder({
+        code: orderNumber,
         order_number: orderNumber,
         tour_id: tour.id,
         tour_name: tour.name,
         contact_person: orderData.contact_person,
-        contact_phone: null,
         sales_person: orderData.sales_person,
         assistant: orderData.assistant,
         member_count: 0,
@@ -130,8 +130,7 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
         paid_amount: 0,
         payment_status: 'unpaid',
         remaining_amount: 0,
-        status: null,
-        notes: null,
+        status: 'pending',
         customer_id: null,
       } as Omit<Order, 'id' | 'created_at' | 'updated_at'>)
 

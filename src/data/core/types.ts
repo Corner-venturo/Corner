@@ -2,8 +2,6 @@
  * 統一資料層型別定義
  */
 
-import type { ZodSchema } from 'zod'
-
 // ============================================
 // 基礎型別
 // ============================================
@@ -113,10 +111,6 @@ export interface EntityConfig {
   cache?: CacheConfig
   /** 是否啟用 workspace 隔離（預設根據表格名稱自動判斷）*/
   workspaceScoped?: boolean
-  /** Zod schema for validating create data (defense-in-depth) */
-  createSchema?: ZodSchema
-  /** Zod schema for validating update data (defense-in-depth) */
-  updateSchema?: ZodSchema
 }
 
 // ============================================
