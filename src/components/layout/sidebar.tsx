@@ -122,7 +122,6 @@ const menuItems: MenuItem[] = [
   { href: '/tenants', label: COMP_LAYOUT_LABELS.租戶管理, icon: Building, requiredPermission: 'super_admin_only' },
   { href: '/scheduling', label: COMP_LAYOUT_LABELS.資源調度, icon: Calendar, requiredPermission: 'hr' },
   { href: '/database/fleet', label: COMP_LAYOUT_LABELS.車隊管理, icon: Bus, requiredPermission: 'hr' },
-  { href: '/game-office', label: COMP_LAYOUT_LABELS.遊戲辦公室, icon: Gamepad2, requiredPermission: 'office' },
   // { href: '/esims', label: COMP_LAYOUT_LABELS.網卡管理, icon: Wifi, requiredPermission: 'hr', restrictedFeature: 'esim' },
 ]
 
