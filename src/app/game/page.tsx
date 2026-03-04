@@ -21,7 +21,7 @@ export default function GameOfficePage() {
   const router = useRouter()
   const [showPanel, setShowPanel] = useState(true)
   const [fullscreen, setFullscreen] = useState(false)
-  const [editMode, setEditMode] = useState(false)
+  const [editMode, setEditMode] = useState(true)  // 預設編輯模式
   const { user, isAuthenticated } = useAuthStore()
 
   return (
