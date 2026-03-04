@@ -182,6 +182,28 @@ export default function RightPanel() {
         </div>
       )}
 
+      {/* 會議系統 */}
+      <div className="p-4 border-b border-gray-800">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-purple-400">🎙️</span>
+          <span className="text-xs text-gray-500 font-bold">會議室</span>
+        </div>
+        <div className="space-y-2">
+          <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs text-purple-400 font-bold">角落旅遊 會議室</span>
+              <span className="text-[10px] text-gray-600 bg-gray-800 px-1.5 py-0.5 rounded">0 人在線</span>
+            </div>
+            <button className="w-full py-1.5 text-xs text-gray-500 border border-dashed border-gray-700 rounded hover:border-purple-400 hover:text-purple-400 transition-colors">
+              🚧 即將開放
+            </button>
+          </div>
+          <div className="text-[10px] text-gray-600">
+            語音會議 · 螢幕分享 · 白板
+          </div>
+        </div>
+      </div>
+
       {/* 最新動態 */}
       <div className="p-4">
         <div className="flex items-center gap-2 mb-3">
