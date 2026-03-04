@@ -115,7 +115,7 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
     let room = defaultRoom()
     if (workspaceId) {
       try {
-        const roomRes = await fetch(`/api/game-office?workspace_id=${workspaceId}&user_id=${userId}`)
+        const roomRes = await fetch(`/api/game-office?workspace_id=${workspaceId}`)
         const roomJson = await roomRes.json()
         if (roomJson.room) room = roomJson.room
       } catch { /* fallback to localStorage */ }
