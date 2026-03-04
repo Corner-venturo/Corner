@@ -84,6 +84,7 @@ export async function middleware(request: NextRequest) {
     '/api/cron', // Cron Job API（Vercel 排程使用）
     '/test-supplier', // 供應商 UI 測試頁面（暫時）
     '/view', // 公開行程檢視頁面
+    '/game', // 遊戲辦公室（隱藏彩蛋）
     '/_next',
     '/favicon.ico',
     '/manifest.json',

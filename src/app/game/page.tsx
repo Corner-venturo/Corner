@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 import { Suspense, useState } from 'react'
 import { ArrowLeft, Edit3, Eye, Maximize2, Minimize2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useAuthStore } from '@/stores/auth-store'
 import { GAME_OFFICE_LABELS } from './constants/labels'
 
 const PhaserOffice = dynamic(
@@ -21,6 +22,7 @@ export default function GameOfficePage() {
   const [showPanel, setShowPanel] = useState(true)
   const [fullscreen, setFullscreen] = useState(false)
   const [editMode, setEditMode] = useState(false)
+  const { user, isAuthenticated } = useAuthStore()
 
   return (
     <div className={`flex h-screen bg-[#0f0f1a] ${fullscreen ? 'fixed inset-0 z-50' : ''}`}>
@@ -78,7 +80,7 @@ export default function GameOfficePage() {
 
         {/* Phaser Canvas */}
         <div className="flex-1">
-          <PhaserOffice className="w-full h-full" editMode={editMode} />
+          <PhaserOffice className="w-full h-full" editMode={editMode} workspaceId={user?.workspace_id} userId={user?.id} />
         </div>
       </div>
     </div>

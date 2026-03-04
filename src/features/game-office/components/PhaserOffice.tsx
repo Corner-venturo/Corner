@@ -29,6 +29,8 @@ interface AssetMeta {
 interface PhaserOfficeProps {
   className?: string
   editMode?: boolean
+  workspaceId?: string
+  userId?: string
   onReady?: () => void
 }
 
@@ -48,6 +50,13 @@ function defaultRoom(): RoomData {
     if (i < cols) backWall[i] = i % 2 === 0 ? 'Wall_5_Tile(64)_L' : 'Wall_3_Tile(64)_L'
   }
   return { v: 2, cols, rows, floor, leftWall, backWall, objects: [], nextId: 1 }
+}
+
+async function saveRoom(room: RoomData, wid?: string, uid?: string) {
+  localStorage.setItem('vo-game-office', JSON.stringify(room))
+  if (wid) {
+    fetch('/api/game-office', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ workspace_id: wid, room_data: room, user_id: uid }) }).catch(() => {})
+  }
 }
 
 function getMeta(assetMeta: Record<string, AssetMeta>, name: string): AssetMeta {
@@ -80,7 +89,7 @@ function findBestSlot(room: RoomData, assetMeta: Record<string, AssetMeta>, pare
   return null
 }
 
-export default function PhaserOffice({ className, editMode = false, onReady }: PhaserOfficeProps) {
+export default function PhaserOffice({ className, editMode = false, workspaceId, userId, onReady }: PhaserOfficeProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const gameRef = useRef<unknown>(null)
   const sceneRef = useRef<unknown>(null)
@@ -108,8 +117,17 @@ export default function PhaserOffice({ className, editMode = false, onReady }: P
     if (destroyRef.current) return
 
     let room = defaultRoom()
-    const saved = localStorage.getItem('vo-game-office')
-    if (saved) { try { room = JSON.parse(saved) } catch { /* default */ } }
+    if (workspaceId) {
+      try {
+        const roomRes = await fetch(`/api/game-office?workspace_id=${workspaceId}`)
+        const roomJson = await roomRes.json()
+        if (roomJson.room) room = roomJson.room
+      } catch { /* fallback to localStorage */ }
+    }
+    if (!workspaceId) {
+      const saved = localStorage.getItem('vo-game-office')
+      if (saved) { try { room = JSON.parse(saved) } catch { /* default */ } }
+    }
 
     function assetType(name: string): 'floor' | 'wallL' | 'wallB' | 'object' {
       if (name.startsWith('Floor_')) return 'floor'
@@ -133,7 +151,7 @@ export default function PhaserOffice({ className, editMode = false, onReady }: P
 
         // Auto-save
         this.time.addEvent({ delay: 30000, loop: true, callback: () => {
-          localStorage.setItem('vo-game-office', JSON.stringify(room))
+          saveRoom(room, workspaceId, userId)
         }})
 
         // Zoom
@@ -188,7 +206,7 @@ export default function PhaserOffice({ className, editMode = false, onReady }: P
               room.objects.push(obj)
               this.selObjId = obj.id
             }
-            localStorage.setItem('vo-game-office', JSON.stringify(room))
+            saveRoom(room, workspaceId, userId)
             this.rebuildAll()
           } else {
             // Select existing object
@@ -226,7 +244,7 @@ export default function PhaserOffice({ className, editMode = false, onReady }: P
           panning = false
           if (this.dragging) {
             this.dragging = false
-            localStorage.setItem('vo-game-office', JSON.stringify(room))
+            saveRoom(room, workspaceId, userId)
           }
         })
 
@@ -239,7 +257,7 @@ export default function PhaserOffice({ className, editMode = false, onReady }: P
           const delIds = new Set([this.selObjId, ...kids.map(k => k.id)])
           room.objects = room.objects.filter(o => !delIds.has(o.id))
           this.selObjId = null
-          localStorage.setItem('vo-game-office', JSON.stringify(room))
+          saveRoom(room, workspaceId, userId)
           this.rebuildAll()
         })
 
