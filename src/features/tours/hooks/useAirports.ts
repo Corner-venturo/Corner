@@ -161,22 +161,19 @@ export function useAirports(options: UseAirportsOptions = {}) {
     [airports]
   )
 
-  // 新增機場到 ref_airports
+  // 新增機場到 ref_airports（透過 API route 使用 admin client 繞過 RLS）
   const addAirport = useCallback(
     async (params: { iata_code: string; city_name_zh: string; country_code: string }) => {
-      const { error } = await supabase
-        .from('ref_airports')
-        .insert({
-          iata_code: params.iata_code,
-          city_name_zh: params.city_name_zh,
-          country_code: params.country_code,
-          usage_count: 1,
-          is_favorite: false,
-        })
+      const res = await fetch('/api/airports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params),
+      })
 
-      if (error) {
-        logger.error('新增機場失敗:', error)
-        throw error
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        logger.error('新增機場失敗:', data.error || res.statusText)
+        throw new Error(data.error || '新增機場失敗')
       }
 
       await mutate(AIRPORTS_CACHE_KEY)
