@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { Suspense, useState } from 'react'
+import { Suspense, useState, useCallback } from 'react'
 import { Grid3X3, Edit3, Eye } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -15,10 +15,30 @@ const RightPanel = dynamic(
   { ssr: false }
 )
 
+// Map game assets to ERP routes
+const ASSET_ROUTES: Record<string, { label: string; path: string }> = {
+  'BendedScreen_A_Tile': { label: '訂單管理', path: '/workspace/orders' },
+  'OldPC_A_Tile': { label: '訂單管理', path: '/workspace/orders' },
+  'OldPC_B_Tile': { label: '訂單管理', path: '/workspace/orders' },
+  'PcTower_Tile': { label: '系統設定', path: '/workspace/settings' },
+  'RotationScreen_A_Tile': { label: '團體管理', path: '/workspace/tours' },
+  'RotationScreen_B_Tile': { label: '團體管理', path: '/workspace/tours' },
+  'RotationScreen_C_Tile': { label: '報表', path: '/workspace/reports' },
+}
+
 export default function GameOfficePage() {
   const { user } = useAuthStore()
   const [editMode, setEditMode] = useState(true)
   const [showGrid, setShowGrid] = useState(true)
+  const [tooltip, setTooltip] = useState<{ label: string; path: string } | null>(null)
+
+  const handleInteract = useCallback((asset: string) => {
+    const route = ASSET_ROUTES[asset]
+    if (route) {
+      setTooltip(route)
+      setTimeout(() => setTooltip(null), 3000)
+    }
+  }, [])
 
   return (
     <div className="flex flex-col h-screen bg-[#0d1117]">
@@ -51,7 +71,20 @@ export default function GameOfficePage() {
             editMode={editMode}
             workspaceId={user?.workspace_id}
             userId={user?.id}
+            onInteract={handleInteract}
           />
+
+          {/* Interaction tooltip */}
+          {tooltip && (
+            <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-50 animate-bounce">
+              <a
+                href={tooltip.path}
+                className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg shadow-lg hover:bg-emerald-500 transition-colors text-sm font-bold"
+              >
+                🖥️ 開啟{tooltip.label}
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Right Panel - Dashboard (hidden in edit mode, asset panel takes over) */}

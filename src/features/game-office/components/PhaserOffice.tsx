@@ -32,6 +32,7 @@ interface PhaserOfficeProps {
   workspaceId?: string
   userId?: string
   onReady?: () => void
+  onInteract?: (asset: string) => void
 }
 
 function defaultRoom(): RoomData {
@@ -130,12 +131,14 @@ function findBestSlot(room: RoomData, assetMeta: Record<string, AssetMeta>, pare
   return null
 }
 
-export default function PhaserOffice({ className, editMode = false, workspaceId, userId, onReady }: PhaserOfficeProps) {
+export default function PhaserOffice({ className, editMode = false, workspaceId, userId, onReady, onInteract }: PhaserOfficeProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const gameRef = useRef<unknown>(null)
   const sceneRef = useRef<unknown>(null)
   const destroyRef = useRef(false)
   const editModeRef = useRef(editMode)
+  const onInteractRef = useRef(onInteract)
+  useEffect(() => { onInteractRef.current = onInteract }, [onInteract])
   const [catalog, setCatalog] = useState<AssetCatalogEntry[]>([])
   const [selectedAsset, setSelectedAsset] = useState<string | null>(null)
   const [filterCat, setFilterCat] = useState('全部')
@@ -208,7 +211,21 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
             panning = true; psx = ptr.x; psy = ptr.y; pox = this.panX; poy = this.panY
             return
           }
-          if (!editModeRef.current) return
+          if (!editModeRef.current) {
+            // Browse mode: find clicked object and trigger interaction
+            const wp2 = this.cameras.main.getWorldPoint(ptr.x, ptr.y)
+            const g2 = this.grd(wp2.x, wp2.y)
+            let closest: RoomObject | null = null; let cDist = 0.8
+            for (const o of room.objects) {
+              const dx = g2.col - o.col, dy = g2.row - o.row
+              const dist = Math.sqrt(dx * dx + dy * dy)
+              if (dist < cDist) { cDist = dist; closest = o }
+            }
+            if (closest && onInteractRef.current) {
+              onInteractRef.current(closest.asset)
+            }
+            return
+          }
 
           const wp = this.cameras.main.getWorldPoint(ptr.x, ptr.y)
           const g = this.grd(wp.x, wp.y)
