@@ -8,34 +8,32 @@ function getSupabase() {
   return createClient(supabaseUrl, supabaseServiceKey)
 }
 
-// GET: Load room for a workspace
 export async function GET(req: NextRequest) {
   const workspaceId = req.nextUrl.searchParams.get('workspace_id')
-  if (!workspaceId) {
-    return NextResponse.json({ error: 'workspace_id required' }, { status: 400 })
+  const userId = req.nextUrl.searchParams.get('user_id')
+  if (!workspaceId || !userId) {
+    return NextResponse.json({ error: 'workspace_id and user_id required' }, { status: 400 })
   }
 
   const supabase = getSupabase()
   const { data, error } = await supabase
     .from('game_office_rooms')
-    .select('room_data, updated_at, updated_by')
+    .select('room_data, updated_at')
     .eq('workspace_id', workspaceId)
+    .eq('user_id', userId)
     .single()
 
   if (error && error.code !== 'PGRST116') {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json({ room: data?.room_data || null, updated_at: data?.updated_at })
+  return NextResponse.json({ room: data?.room_data || null })
 }
 
-// POST: Save room for a workspace
 export async function POST(req: NextRequest) {
-  const body = await req.json()
-  const { workspace_id, room_data, user_id } = body
-
-  if (!workspace_id || !room_data) {
-    return NextResponse.json({ error: 'workspace_id and room_data required' }, { status: 400 })
+  const { workspace_id, user_id, room_data } = await req.json()
+  if (!workspace_id || !user_id || !room_data) {
+    return NextResponse.json({ error: 'workspace_id, user_id, room_data required' }, { status: 400 })
   }
 
   const supabase = getSupabase()
@@ -43,10 +41,11 @@ export async function POST(req: NextRequest) {
     .from('game_office_rooms')
     .upsert({
       workspace_id,
+      user_id,
       room_data,
-      updated_by: user_id || null,
+      updated_by: user_id,
       updated_at: new Date().toISOString(),
-    }, { onConflict: 'workspace_id' })
+    }, { onConflict: 'workspace_id,user_id' })
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
