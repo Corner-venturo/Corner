@@ -237,6 +237,20 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
             // Place object
             const asset = selectedAssetRef.current
             const t = assetType(asset)
+            // If a wall/floor is selected, replace it with new asset of same type
+            if (this.selWall && (t === 'wallL' || t === 'wallB')) {
+              if (this.selWall.type === 'L' && t === 'wallL') room.leftWall[this.selWall.index] = asset
+              if (this.selWall.type === 'B' && t === 'wallB') room.backWall[this.selWall.index] = asset
+              saveRoom(room, workspaceId, userId)
+              this.rebuildAll()
+              return
+            }
+            if (this.selFloor && t === 'floor') {
+              room.floor[this.selFloor.row][this.selFloor.col] = asset
+              saveRoom(room, workspaceId, userId)
+              this.rebuildAll()
+              return
+            }
             // Floor: use integer grid cell
             const fc = Math.floor(s.col), fr = Math.floor(s.row)
             if (t === 'floor') {
@@ -256,12 +270,12 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
               }
             } else if (t === 'wallL') {
               // Left wall: col near 0, row determines which wall segment
-              if (s.col < 1 && fr >= 0 && fr < room.rows) {
+              if (s.col < 1.5 && fr >= 0 && fr < room.rows) {
                 room.leftWall[fr] = asset
               }
             } else if (t === 'wallB') {
               // Back wall: row near 0, col determines which wall segment
-              if (s.row < 1 && fc >= 0 && fc < room.cols) {
+              if (s.row < 1.5 && fc >= 0 && fc < room.cols) {
                 room.backWall[fc] = asset
               }
             } else {
@@ -289,14 +303,14 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
             // Check if clicking on a wall tile
             this.selWall = null
             const fc = Math.floor(s.col), fr = Math.floor(s.row)
-            if (s.col < 0.3 && fr >= 0 && fr < room.rows && room.leftWall[fr]) {
+            if (s.col < 0.8 && fr >= 0 && fr < room.rows && room.leftWall[fr]) {
               this.selWall = { type: 'L', index: fr }
               this.selObjId = null
               this.selFloor = null
               this.rebuildAll()
               return
             }
-            if (s.row < 0.3 && fc >= 0 && fc < room.cols && room.backWall[fc]) {
+            if (s.row < 0.8 && fc >= 0 && fc < room.cols && room.backWall[fc]) {
               this.selWall = { type: 'B', index: fc }
               this.selObjId = null
               this.selFloor = null
