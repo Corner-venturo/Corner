@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 
 const TW = 64, TH = 32
 const ANCHORS = { floor: { x: 32, y: 16 }, wallL: { x: 15, y: 62 }, wallB: { x: 47, y: 62 } }
@@ -21,8 +21,14 @@ interface AssetCatalogEntry {
   name: string; file: string; label: string; cat: string; sub: string; w: number; h: number
 }
 
+interface AssetMeta {
+  placement: string; sizeClass: string; footprint: [number, number]; hasSurface: boolean
+  surfaceOffsetY?: number; maxItems?: number; acceptSizes?: string[]; slots?: { x: number; y: number }[]
+}
+
 interface PhaserOfficeProps {
   className?: string
+  editMode?: boolean
   onReady?: () => void
 }
 
@@ -44,10 +50,48 @@ function defaultRoom(): RoomData {
   return { v: 2, cols, rows, floor, leftWall, backWall, objects: [], nextId: 1 }
 }
 
-export default function PhaserOffice({ className, onReady }: PhaserOfficeProps) {
+function getMeta(assetMeta: Record<string, AssetMeta>, name: string): AssetMeta {
+  return assetMeta[name] || { placement: 'floor', sizeClass: 'medium', footprint: [1, 1], hasSurface: false }
+}
+
+function findSurfaceParent(room: RoomData, assetMeta: Record<string, AssetMeta>, col: number, row: number, excludeId: number) {
+  let best: RoomObject | null = null, bestDist = Infinity
+  for (const o of room.objects) {
+    if (o.id === excludeId) continue
+    const m = getMeta(assetMeta, o.asset)
+    if (!m.hasSurface) continue
+    const dist = Math.sqrt((col - o.col) ** 2 + (row - o.row) ** 2)
+    if (dist < 1.5 && dist < bestDist) { bestDist = dist; best = o }
+  }
+  return best
+}
+
+function findBestSlot(room: RoomData, assetMeta: Record<string, AssetMeta>, parent: RoomObject, childAsset: string) {
+  const pm = getMeta(assetMeta, parent.asset)
+  if (!pm.hasSurface || !pm.slots) return null
+  const cm = getMeta(assetMeta, childAsset)
+  if (pm.acceptSizes && !pm.acceptSizes.includes(cm.sizeClass)) return null
+  const children = room.objects.filter(o => o.parentId === parent.id)
+  if (children.length >= (pm.maxItems || 99)) return null
+  const usedSlots = new Set(children.map(o => o.slotIndex))
+  for (let i = 0; i < pm.slots.length; i++) {
+    if (!usedSlots.has(i)) return { index: i, slot: pm.slots[i] }
+  }
+  return null
+}
+
+export default function PhaserOffice({ className, editMode = false, onReady }: PhaserOfficeProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const gameRef = useRef<unknown>(null)
+  const sceneRef = useRef<unknown>(null)
   const destroyRef = useRef(false)
+  const editModeRef = useRef(editMode)
+  const [catalog, setCatalog] = useState<AssetCatalogEntry[]>([])
+  const [selectedAsset, setSelectedAsset] = useState<string | null>(null)
+  const [filterCat, setFilterCat] = useState('全部')
+  const [searchText, setSearchText] = useState('')
+
+  useEffect(() => { editModeRef.current = editMode }, [editMode])
 
   const initGame = useCallback(async () => {
     if (destroyRef.current) return
@@ -58,48 +102,167 @@ export default function PhaserOffice({ className, onReady }: PhaserOfficeProps) 
       fetch('/game-office/asset-catalog.json'),
       fetch('/game-office/asset-meta.json'),
     ])
-    const catalog: AssetCatalogEntry[] = await catalogRes.json()
+    const catalogData: AssetCatalogEntry[] = await catalogRes.json()
+    const assetMeta: Record<string, AssetMeta> = await metaRes.json()
+    setCatalog(catalogData)
     if (destroyRef.current) return
 
     let room = defaultRoom()
     const saved = localStorage.getItem('vo-game-office')
     if (saved) { try { room = JSON.parse(saved) } catch { /* default */ } }
 
+    function assetType(name: string): 'floor' | 'wallL' | 'wallB' | 'object' {
+      if (name.startsWith('Floor_')) return 'floor'
+      if (/_L[_(.)]/.test(name) || name.endsWith('_L')) return 'wallB'
+      if (name.startsWith('Wall_')) return 'wallL'
+      return 'object'
+    }
+
     class OfficeScene extends Phaser.Scene {
-      private Z = 1; private panX = 0; private panY = 0; private OX = 0; private OY = 0
+      Z = 1; panX = 0; panY = 0; OX = 0; OY = 0
+      selObjId: number | null = null; dragging = false
       constructor() { super({ key: 'OfficeScene' }) }
 
       preload() {
-        catalog.forEach(a => this.load.image(a.name, `/game-office/assets/${a.file}`))
+        catalogData.forEach(a => this.load.image(a.name, `/game-office/assets/${a.file}`))
       }
 
       create() {
         this.OX = this.cameras.main.width / 2; this.OY = 120
         this.rebuildAll()
+
+        // Auto-save
         this.time.addEvent({ delay: 30000, loop: true, callback: () => {
           localStorage.setItem('vo-game-office', JSON.stringify(room))
         }})
+
+        // Zoom
         this.input.on('wheel', (_p: unknown, _gx: unknown, _gy: unknown, _gz: unknown, e: WheelEvent) => {
           this.Z = Phaser.Math.Clamp(this.Z + (e.deltaY > 0 ? -0.1 : 0.1), 0.3, 3)
           this.rebuildAll()
         })
+
+        // Pan + place/select
         let panning = false, psx = 0, psy = 0, pox = 0, poy = 0
         this.input.on('pointerdown', (ptr: Phaser.Input.Pointer) => {
           if (ptr.middleButtonDown() || ptr.rightButtonDown()) {
             panning = true; psx = ptr.x; psy = ptr.y; pox = this.panX; poy = this.panY
+            return
+          }
+          if (!editModeRef.current) return
+
+          const wp = this.cameras.main.getWorldPoint(ptr.x, ptr.y)
+          const g = this.grd(wp.x, wp.y)
+          const s = this.snap(g.col, g.row)
+
+          if (selectedAssetRef.current) {
+            // Place object
+            const asset = selectedAssetRef.current
+            const t = assetType(asset)
+            if (t === 'floor') {
+              if (s.col >= 0 && s.col < room.cols && s.row >= 0 && s.row < room.rows) {
+                room.floor[s.row][s.col] = asset
+              }
+            } else if (t === 'wallL') {
+              const r = Math.round(s.row - 0.5)
+              if (r >= 0 && r < room.rows) room.leftWall[r] = asset
+            } else if (t === 'wallB') {
+              const c = Math.round(s.col - 0.5)
+              if (c >= 0 && c < room.cols) room.backWall[c] = asset
+            } else {
+              const obj: RoomObject = { id: room.nextId++, asset, col: s.col, row: s.row, offX: 0, offY: 0, flip: false }
+              const m = getMeta(assetMeta, asset)
+              if (m.placement === 'surface') {
+                const parent = findSurfaceParent(room, assetMeta, s.col, s.row, -1)
+                if (parent) {
+                  const slotInfo = findBestSlot(room, assetMeta, parent, asset)
+                  if (slotInfo) {
+                    const pm = getMeta(assetMeta, parent.asset)
+                    obj.parentId = parent.id; obj.slotIndex = slotInfo.index
+                    obj.col = parent.col; obj.row = parent.row
+                    obj.offX = slotInfo.slot.x; obj.offY = (pm.surfaceOffsetY || -30) + (slotInfo.slot.y || 0)
+                  }
+                }
+              }
+              if (m.placement === 'carpet') obj.depthOffset = -0.5
+              room.objects.push(obj)
+              this.selObjId = obj.id
+            }
+            localStorage.setItem('vo-game-office', JSON.stringify(room))
+            this.rebuildAll()
+          } else {
+            // Select existing object
+            let found: RoomObject | null = null
+            let minDist = 0.8
+            for (const o of room.objects) {
+              const dx = s.col - o.col, dy = s.row - o.row
+              const dist = Math.sqrt(dx * dx + dy * dy)
+              if (dist < minDist) { minDist = dist; found = o }
+            }
+            this.selObjId = found ? found.id : null
+            if (found) this.dragging = true
+            this.rebuildAll()
           }
         })
+
         this.input.on('pointermove', (ptr: Phaser.Input.Pointer) => {
           if (panning && ptr.isDown) {
             this.panX = pox + (ptr.x - psx); this.panY = poy + (ptr.y - psy); this.rebuildAll()
           }
+          if (this.dragging && this.selObjId !== null && ptr.isDown) {
+            const wp = this.cameras.main.getWorldPoint(ptr.x, ptr.y)
+            const g = this.grd(wp.x, wp.y); const s = this.snap(g.col, g.row)
+            const o = room.objects.find(x => x.id === this.selObjId)
+            if (o) {
+              o.col = s.col; o.row = s.row
+              // Move children
+              room.objects.filter(x => x.parentId === o.id).forEach(x => { x.col = s.col; x.row = s.row })
+              this.rebuildAll()
+            }
+          }
         })
-        this.input.on('pointerup', () => { panning = false })
+
+        this.input.on('pointerup', () => {
+          panning = false
+          if (this.dragging) {
+            this.dragging = false
+            localStorage.setItem('vo-game-office', JSON.stringify(room))
+          }
+        })
+
         this.input.mouse?.disableContextMenu()
+
+        // Keyboard shortcuts
+        this.input.keyboard?.on('keydown-DELETE', () => {
+          if (!editModeRef.current || this.selObjId === null) return
+          const kids = room.objects.filter(o => o.parentId === this.selObjId)
+          const delIds = new Set([this.selObjId, ...kids.map(k => k.id)])
+          room.objects = room.objects.filter(o => !delIds.has(o.id))
+          this.selObjId = null
+          localStorage.setItem('vo-game-office', JSON.stringify(room))
+          this.rebuildAll()
+        })
+
+        this.input.keyboard?.on('keydown-F', () => {
+          if (!editModeRef.current || this.selObjId === null) return
+          const o = room.objects.find(x => x.id === this.selObjId)
+          if (o) { o.flip = !o.flip; this.rebuildAll() }
+        })
+
         if (onReady) onReady()
+        sceneRef.current = this
       }
 
-      private scr(c: number, r: number) {
+      grd(sx: number, sy: number) {
+        const rx = sx - this.OX - this.panX, ry = sy - this.OY - this.panY
+        return { col: (rx / (32 * this.Z) + ry / (16 * this.Z)) / 2, row: (ry / (16 * this.Z) - rx / (32 * this.Z)) / 2 }
+      }
+
+      snap(c: number, r: number) {
+        return { col: Math.round(c * 2) / 2, row: Math.round(r * 2) / 2 }
+      }
+
+      scr(c: number, r: number) {
         return {
           x: this.OX + (c - r) * 32 * this.Z + this.panX,
           y: this.OY + (c + r) * 16 * this.Z + this.panY,
@@ -118,36 +281,28 @@ export default function PhaserOffice({ className, onReady }: PhaserOfficeProps) 
           const a = this.scr(c, 0), b = this.scr(c, room.rows)
           gfx.lineBetween(a.x, a.y, b.x, b.y)
         }
+        // Floors
         for (let r = 0; r < room.rows; r++) {
           for (let c = 0; c < room.cols; c++) {
             const tile = room.floor[r]?.[c]
             if (!tile) continue
             const p = this.scr(c + 0.5, r + 0.5)
-            try {
-              this.add.image(p.x, p.y, tile)
-                .setOrigin(ANCHORS.floor.x / 64, ANCHORS.floor.y / 64)
-                .setScale(this.Z).setDepth(1)
-            } catch { /* skip */ }
+            try { this.add.image(p.x, p.y, tile).setOrigin(ANCHORS.floor.x / 64, ANCHORS.floor.y / 64).setScale(this.Z).setDepth(1) } catch {}
           }
         }
+        // Left walls
         room.leftWall.forEach((tile, r) => {
           if (!tile) return
           const p = this.scr(0, r + 0.5)
-          try {
-            this.add.image(p.x, p.y, tile)
-              .setOrigin(ANCHORS.wallL.x / 64, ANCHORS.wallL.y / 64)
-              .setScale(this.Z).setDepth(2 + r * 0.01)
-          } catch { /* skip */ }
+          try { this.add.image(p.x, p.y, tile).setOrigin(ANCHORS.wallL.x / 64, ANCHORS.wallL.y / 64).setScale(this.Z).setDepth(2 + r * 0.01) } catch {}
         })
+        // Back walls
         room.backWall.forEach((tile, c) => {
           if (!tile) return
           const p = this.scr(c + 0.5, 0)
-          try {
-            this.add.image(p.x, p.y, tile)
-              .setOrigin(ANCHORS.wallB.x / 64, ANCHORS.wallB.y / 64)
-              .setScale(this.Z).setDepth(2 + c * 0.01)
-          } catch { /* skip */ }
+          try { this.add.image(p.x, p.y, tile).setOrigin(ANCHORS.wallB.x / 64, ANCHORS.wallB.y / 64).setScale(this.Z).setDepth(2 + c * 0.01) } catch {}
         })
+        // Objects
         const sorted = [...room.objects].sort((a, b) => {
           const da = a.col + a.row + (a.depthOffset || 0) + (a.parentId ? 0.1 : 0)
           const db = b.col + b.row + (b.depthOffset || 0) + (b.parentId ? 0.1 : 0)
@@ -160,10 +315,21 @@ export default function PhaserOffice({ className, onReady }: PhaserOfficeProps) 
             spr.setDepth(10 + o.col + o.row + (o.depthOffset || 0) + (o.parentId ? 0.1 : 0))
               .setScale(this.Z).setOrigin(0.5)
             if (o.flip) spr.setFlipX(true)
-          } catch { /* skip */ }
+            // Selection highlight
+            if (editModeRef.current && o.id === this.selObjId) {
+              const sg = this.add.graphics().setDepth(999)
+              sg.lineStyle(2, 0x4ecca3, 0.8)
+              const cx = p.x + (o.offX || 0) * this.Z, cy = p.y + (o.offY || 0) * this.Z
+              sg.strokeRect(cx - 20 * this.Z, cy - 20 * this.Z, 40 * this.Z, 40 * this.Z)
+            }
+          } catch {}
         })
       }
     }
+
+    // Ref for selected asset from React
+    const selectedAssetRef = { current: null as string | null }
+    ;((window as unknown) as Record<string, unknown>).__gameSelectedAsset = selectedAssetRef
 
     const game = new Phaser.Game({
       type: Phaser.AUTO,
@@ -179,6 +345,12 @@ export default function PhaserOffice({ className, onReady }: PhaserOfficeProps) 
     gameRef.current = game
   }, [onReady])
 
+  // Sync selectedAsset to Phaser ref
+  useEffect(() => {
+    const ref = ((window as unknown) as Record<string, unknown>).__gameSelectedAsset as { current: string | null } | undefined
+    if (ref) ref.current = selectedAsset
+  }, [selectedAsset])
+
   useEffect(() => {
     destroyRef.current = false
     initGame()
@@ -191,5 +363,90 @@ export default function PhaserOffice({ className, onReady }: PhaserOfficeProps) 
     }
   }, [initGame])
 
-  return <div ref={containerRef} className={className} style={{ width: '100%', height: '100%' }} />
+  // Get unique categories
+  const categories = ['全部', ...Array.from(new Set(catalog.map(a => a.cat))).sort()]
+  const filteredAssets = catalog.filter(a => {
+    if (!a.name.startsWith('Floor_') && !a.name.startsWith('Wall_')) {
+      // objects only
+    }
+    if (filterCat !== '全部' && a.cat !== filterCat) return false
+    if (searchText && !a.label.toLowerCase().includes(searchText.toLowerCase()) && !a.name.toLowerCase().includes(searchText.toLowerCase())) return false
+    return true
+  }).filter(a => {
+    // Only show 64px tiles for floors/walls
+    if (a.name.startsWith('Floor_') && !a.name.includes('(64)')) return false
+    if (a.name.startsWith('Wall_') && !a.name.includes('(64)')) return false
+    return true
+  })
+
+  return (
+    <div className={`relative ${className}`} style={{ width: '100%', height: '100%' }}>
+      <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
+
+      {/* Edit mode asset palette */}
+      {editMode && (
+        <div className="absolute right-0 top-0 bottom-0 w-64 bg-[#0f0f1a]/95 border-l border-gray-800 flex flex-col overflow-hidden">
+          <div className="p-2 border-b border-gray-800">
+            <div className="text-xs font-bold text-emerald-400 mb-2">🎨 素材庫</div>
+            <input
+              type="text"
+              placeholder="搜尋..."
+              value={searchText}
+              onChange={e => setSearchText(e.target.value)}
+              className="w-full px-2 py-1 text-xs bg-gray-900 border border-gray-700 rounded text-white"
+            />
+          </div>
+          {/* Categories */}
+          <div className="flex flex-wrap gap-1 p-2 border-b border-gray-800">
+            {categories.slice(0, 12).map(c => (
+              <button
+                key={c}
+                onClick={() => setFilterCat(c)}
+                className={`text-[10px] px-1.5 py-0.5 rounded ${filterCat === c ? 'bg-emerald-600 text-white' : 'bg-gray-800 text-gray-400'}`}
+              >
+                {c.length > 6 ? c.slice(0, 2) : c}
+              </button>
+            ))}
+          </div>
+          {/* Asset list */}
+          <div className="flex-1 overflow-y-auto p-1">
+            {/* Deselect button */}
+            {selectedAsset && (
+              <button
+                onClick={() => setSelectedAsset(null)}
+                className="w-full text-xs text-center py-1 mb-1 bg-red-900/30 text-red-400 rounded"
+              >
+                ✕ 取消選取 (選取模式)
+              </button>
+            )}
+            {filteredAssets.map(a => (
+              <button
+                key={a.name}
+                onClick={() => setSelectedAsset(selectedAsset === a.name ? null : a.name)}
+                className={`flex items-center gap-2 w-full p-1 rounded text-left text-xs transition-colors ${
+                  selectedAsset === a.name ? 'bg-emerald-600/20 text-emerald-400' : 'hover:bg-gray-800 text-gray-300'
+                }`}
+              >
+                <img
+                  src={`/game-office/assets/${a.file}`}
+                  alt={a.label}
+                  className="w-8 h-8 object-contain"
+                  style={{ imageRendering: 'pixelated' }}
+                />
+                <div>
+                  <div className="truncate" style={{ maxWidth: '150px' }}>{a.label}</div>
+                  <div className="text-[10px] text-gray-600">{a.w}×{a.h}</div>
+                </div>
+              </button>
+            ))}
+          </div>
+          {/* Help */}
+          <div className="p-2 border-t border-gray-800 text-[10px] text-gray-600">
+            點擊素材 → 點擊場景放置<br />
+            Del 刪除 | F 翻轉 | 滾輪縮放
+          </div>
+        </div>
+      )}
+    </div>
+  )
 }

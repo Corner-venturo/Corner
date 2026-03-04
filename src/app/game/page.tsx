@@ -20,6 +20,7 @@ export default function GameOfficePage() {
   const router = useRouter()
   const [showPanel, setShowPanel] = useState(true)
   const [fullscreen, setFullscreen] = useState(false)
+  const [editMode, setEditMode] = useState(false)
 
   return (
     <div className={`flex h-screen bg-[#0f0f1a] ${fullscreen ? 'fixed inset-0 z-50' : ''}`}>
@@ -46,6 +47,16 @@ export default function GameOfficePage() {
             </button>
             <span className="text-gray-700">|</span>
             <span className="text-sm font-bold text-emerald-400">🎮 {GAME_OFFICE_LABELS.遊戲辦公室}</span>
+            <span className="text-gray-700">|</span>
+            <button
+              onClick={() => setEditMode(!editMode)}
+              className={`flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors ${
+                editMode ? 'text-amber-400 bg-amber-400/10' : 'text-gray-500 hover:text-white'
+              }`}
+            >
+              {editMode ? <Eye className="w-3 h-3" /> : <Edit3 className="w-3 h-3" />}
+              {editMode ? GAME_OFFICE_LABELS.瀏覽模式 : GAME_OFFICE_LABELS.編輯模式}
+            </button>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -67,7 +78,7 @@ export default function GameOfficePage() {
 
         {/* Phaser Canvas */}
         <div className="flex-1">
-          <PhaserOffice className="w-full h-full" />
+          <PhaserOffice className="w-full h-full" editMode={editMode} />
         </div>
       </div>
     </div>
