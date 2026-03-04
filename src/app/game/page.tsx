@@ -70,8 +70,8 @@ export default function GameOfficePage() {
             editMode ? 'text-amber-400 bg-amber-400/10' : 'text-gray-400 hover:text-white'
           }`}
         >
-          {editMode ? <Eye className="w-3 h-3" /> : <Edit3 className="w-3 h-3" />}
-          {editMode ? '瀏覽模式' : '編輯模式'}
+          {editMode ? <Edit3 className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+          {editMode ? '✏️ 編輯中' : '👁️ 瀏覽中'}
         </button>
         <span className="text-gray-700">|</span>
         <span>🏢 辦公室模式</span>
