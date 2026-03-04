@@ -155,8 +155,8 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
         }})
 
         // Zoom
-        this.input.on('wheel', (_p: unknown, _gx: unknown, _gy: unknown, _gz: unknown, e: WheelEvent) => {
-          this.Z = Phaser.Math.Clamp(this.Z + (e.deltaY > 0 ? -0.1 : 0.1), 0.3, 3)
+        this.input.on('wheel', (_p: unknown, _go: unknown[], dx: number, dy: number) => {
+          this.Z = Phaser.Math.Clamp(this.Z + (dy > 0 ? -0.1 : 0.1), 0.3, 3)
           this.rebuildAll()
         })
 
