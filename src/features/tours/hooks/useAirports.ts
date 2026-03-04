@@ -161,6 +161,30 @@ export function useAirports(options: UseAirportsOptions = {}) {
     [airports]
   )
 
+  // 新增機場到 ref_airports
+  const addAirport = useCallback(
+    async (params: { iata_code: string; city_name_zh: string; country_code: string }) => {
+      const { error } = await supabase
+        .from('ref_airports')
+        .insert({
+          iata_code: params.iata_code,
+          city_name_zh: params.city_name_zh,
+          country_code: params.country_code,
+          usage_count: 1,
+          is_favorite: false,
+        })
+
+      if (error) {
+        logger.error('新增機場失敗:', error)
+        throw error
+      }
+
+      await mutate(AIRPORTS_CACHE_KEY)
+      return params.iata_code
+    },
+    []
+  )
+
   // 標記機場為常用（增加 usage_count）
   const markAsUsed = useCallback(
     async (iataCode: string) => {
@@ -200,12 +224,14 @@ export function useAirports(options: UseAirportsOptions = {}) {
   return {
     airports,
     countries,
+    countryNameToCode,
     destinations, // 相容舊格式
     loading,
     error,
     getAirportsByCountry,
     getAirport,
     getAirportDisplayName,
+    addAirport,
     markAsUsed,
     refresh: () => mutate(AIRPORTS_CACHE_KEY),
   }

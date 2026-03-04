@@ -2,6 +2,8 @@
 
 import { useState, useMemo, useCallback } from 'react'
 import { Combobox } from '@/components/ui/combobox'
+import { Input } from '@/components/ui/input'
+import { FormDialog } from '@/components/dialog/form-dialog'
 import { useAirports, type Airport } from '@/features/tours/hooks/useAirports'
 import { SELECTORS_LABELS } from './constants/labels'
 
@@ -40,13 +42,18 @@ export function CountryAirportSelector({
 }: CountryAirportSelectorProps) {
   const {
     countries: hookCountries,
+    countryNameToCode,
     getAirportsByCountry,
     getAirport,
+    addAirport,
     loading,
   } = useAirports({ enabled: true })
 
-  // 搜尋狀態
-  const [searchQuery, setSearchQuery] = useState('')
+  // 新增機場 Dialog 狀態
+  const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [newCityName, setNewCityName] = useState('')
+  const [newIataCode, setNewIataCode] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // 國家選項（優先使用外部傳入的）
   const countryOptions = useMemo(() => {
@@ -90,6 +97,38 @@ export function CountryAirportSelector({
     onAirportChange(code, cityName)
   }, [getAirport, onAirportChange])
 
+  // 處理快速新增機場（Combobox onCreate 回調）
+  const handleCreateAirport = useCallback(async (searchText: string) => {
+    setNewCityName(searchText)
+    setNewIataCode('')
+    setCreateDialogOpen(true)
+    return null // 不自動選取，等 Dialog 提交後手動處理
+  }, [])
+
+  // 提交新增機場
+  const handleDialogSubmit = async () => {
+    const code = newIataCode.trim().toUpperCase()
+    if (code.length !== 3) return
+
+    const countryCode = countryNameToCode[country]
+    if (!countryCode) return
+
+    setIsSubmitting(true)
+    try {
+      await addAirport({
+        iata_code: code,
+        city_name_zh: newCityName.trim(),
+        country_code: countryCode,
+      })
+      handleAirportChange(code)
+      setCreateDialogOpen(false)
+    } catch {
+      // addAirport 內部已記錄錯誤
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   const isTaiwan = isTaiwanCountry(country)
 
   return (
@@ -132,6 +171,7 @@ export function CountryAirportSelector({
               showClearButton
               disabled={!country}
               disablePortal={disablePortal}
+              onCreate={country ? handleCreateAirport : undefined}
             />
           </div>
         ) : (
@@ -148,6 +188,43 @@ export function CountryAirportSelector({
           團號城市代碼：<span className="font-mono font-semibold">{airportCode}</span>
         </p>
       )}
+
+      {/* 新增機場 Dialog */}
+      <FormDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        title="新增機場"
+        subtitle={`國家：${country}`}
+        onSubmit={handleDialogSubmit}
+        submitLabel="新增"
+        loading={isSubmitting}
+        submitDisabled={newIataCode.trim().length !== 3}
+        maxWidth="sm"
+      >
+        <div>
+          <label className="text-sm font-medium text-morandi-primary mb-2 block">
+            城市名稱
+          </label>
+          <Input
+            value={newCityName}
+            onChange={e => setNewCityName(e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="text-sm font-medium text-morandi-primary mb-2 block">
+            IATA 機場代碼
+          </label>
+          <Input
+            value={newIataCode}
+            onChange={e => setNewIataCode(e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3))}
+            placeholder="例如：XIY"
+            maxLength={3}
+          />
+          <p className="text-xs text-morandi-secondary mt-1">
+            3 碼大寫英文，例如 XIY（西安咸陽機場）
+          </p>
+        </div>
+      </FormDialog>
     </div>
   )
 }
