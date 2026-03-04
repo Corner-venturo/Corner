@@ -3,7 +3,7 @@ import { getServerAuth } from '@/lib/auth/server-auth'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 import { checkRateLimit } from '@/lib/rate-limit'
-import { callOcrSpace, callGoogleVision } from './ocr-clients'
+import { callOcrSpace, callGoogleVision, type GoogleVisionResult } from './ocr-clients'
 import { getGoogleVisionKeys, checkGoogleVisionUsage, updateGoogleVisionUsage } from './google-vision-usage'
 import { parsePassportText } from './passport-parser'
 
@@ -74,15 +74,23 @@ export async function POST(request: NextRequest) {
     )
 
     // 批次辨識所有護照
+    let googleVisionError: string | null = null
+
     const results = await Promise.all(
       base64Images.map(async (img) => {
         try {
-          const [ocrSpaceResult, googleVisionResult] = await Promise.all([
+          const noVision: GoogleVisionResult = { text: '', error: undefined }
+          const [ocrSpaceResult, gvResult] = await Promise.all([
             ocrSpaceKey ? callOcrSpace(img.data, ocrSpaceKey) : Promise.resolve(''),
-            (availableKey && canUseGoogleVision) ? callGoogleVision(img.data, availableKey) : Promise.resolve(null),
+            (availableKey && canUseGoogleVision) ? callGoogleVision(img.data, availableKey) : Promise.resolve(noVision),
           ])
 
-          const customerData = parsePassportText(ocrSpaceResult, googleVisionResult, img.name)
+          // 記錄 Google Vision 錯誤（只記一次）
+          if (gvResult.error && !googleVisionError) {
+            googleVisionError = gvResult.error
+          }
+
+          const customerData = parsePassportText(ocrSpaceResult, gvResult.text, img.name)
 
           return {
             success: true,
@@ -112,6 +120,7 @@ export async function POST(request: NextRequest) {
       total: base64Images.length,
       successful: results.filter(r => r.success).length,
       usageWarning: warning,
+      googleVisionError,
       googleVisionUsage: {
         current: currentUsage + (canUseGoogleVision ? base64Images.length : 0),
         limit: totalLimit,

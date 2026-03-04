@@ -21,8 +21,9 @@ describe('createCustomerSchema', () => {
     expect(createCustomerSchema.safeParse({ ...validCustomer, name: 'x'.repeat(101) }).success).toBe(false)
   })
 
-  it('should reject empty phone', () => {
-    expect(createCustomerSchema.safeParse({ ...validCustomer, phone: '' }).success).toBe(false)
+  it('should accept empty or missing phone', () => {
+    expect(createCustomerSchema.safeParse({ ...validCustomer, phone: '' }).success).toBe(true)
+    expect(createCustomerSchema.safeParse({ ...validCustomer, phone: undefined }).success).toBe(true)
   })
 
   it('should reject invalid email', () => {

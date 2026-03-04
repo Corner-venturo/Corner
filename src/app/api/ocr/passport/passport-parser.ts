@@ -542,7 +542,7 @@ export function parsePassportText(
   }
 
   if (!customerData.name) {
-    customerData.name = fileName.replace(/\.(jpg|jpeg|png|gif)$/i, '')
+    customerData.name = customerData.english_name || '未命名'
   }
 
   return customerData

@@ -34,6 +34,7 @@ interface OcrApiResponse {
   results: OcrResult[]
   successful: number
   total: number
+  googleVisionError?: string | null
 }
 
 interface ExistingMember {

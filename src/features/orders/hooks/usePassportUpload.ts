@@ -268,6 +268,9 @@ export function usePassportUpload({
       if (duplicateCount > 0) {
         message += `\n\n跳過 ${duplicateCount} 位重複成員：\n${duplicateItems.join('\n')}`
       }
+      if (result.googleVisionError) {
+        message += `\n\n⚠️ 中文名辨識失敗：${result.googleVisionError}\n• 請至 Google Cloud Console 更新 API Key`
+      }
       message += `\n\n重要提醒：\n• OCR 資料已標記為「待驗證」\n• 請務必人工檢查護照資訊`
       if (failedItems.length > 0) {
         message += `\n\n失敗項目：\n${failedItems.join('\n')}`

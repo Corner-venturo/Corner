@@ -72,8 +72,25 @@ export default function CustomersPage() {
 
   // 處理點擊行
   const handleRowClick = useCallback(async (customer: Customer) => {
-    // 如果顧客沒有護照圖片，嘗試從關聯的 order_members 取得
+    // 如果顧客沒有護照圖片（列表查詢不含此欄位），先從 customers 表直接撈
     let passportImageUrl = customer.passport_image_url
+    if (!passportImageUrl) {
+      try {
+        const { data: customerDetail } = await supabase
+          .from('customers')
+          .select('passport_image_url')
+          .eq('id', customer.id)
+          .single()
+
+        if (customerDetail?.passport_image_url) {
+          passportImageUrl = customerDetail.passport_image_url
+        }
+      } catch {
+        // 忽略錯誤
+      }
+    }
+
+    // 仍然沒有的話，嘗試從關聯的 order_members 取得
     if (!passportImageUrl) {
       try {
         const { data: member } = await supabase

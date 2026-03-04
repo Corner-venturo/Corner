@@ -32,10 +32,15 @@ export async function callOcrSpace(base64Image: string, apiKey: string): Promise
   return data.ParsedResults?.[0]?.ParsedText || ''
 }
 
+export interface GoogleVisionResult {
+  text: string
+  error?: string
+}
+
 /**
  * 呼叫 Google Vision API（辨識中文）
  */
-export async function callGoogleVision(base64Image: string, apiKey: string): Promise<string> {
+export async function callGoogleVision(base64Image: string, apiKey: string): Promise<GoogleVisionResult> {
   // 移除 data:image/xxx;base64, 前綴
   const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, '')
 
@@ -61,9 +66,10 @@ export async function callGoogleVision(base64Image: string, apiKey: string): Pro
   const data = await response.json()
 
   if (data.error) {
+    const msg = data.error.message || 'Google Vision API 錯誤'
     logger.error('Google Vision 錯誤:', data.error)
-    return ''
+    return { text: '', error: msg }
   }
 
-  return data.responses?.[0]?.fullTextAnnotation?.text || ''
+  return { text: data.responses?.[0]?.fullTextAnnotation?.text || '' }
 }

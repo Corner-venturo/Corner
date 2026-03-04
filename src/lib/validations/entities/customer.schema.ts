@@ -14,7 +14,7 @@ export const createCustomerSchema = z.object({
   name: z.string().min(1, '姓名為必填').max(100, '姓名不得超過 100 字'),
   english_name: z.string().max(200).optional(),
   nickname: z.string().max(50).optional(),
-  phone: z.string().min(1, '電話為必填'),
+  phone: z.string().optional(),
   alternative_phone: z.string().optional(),
   email: z.string().email('Email 格式錯誤').optional().or(z.literal('')),
   address: z.string().optional(),

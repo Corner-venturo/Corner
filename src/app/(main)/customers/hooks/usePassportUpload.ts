@@ -254,6 +254,7 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
       }
 
       logger.log(`📤 開始處理 ${allFiles.length} 個檔案`)
+      let googleVisionError: string | null = null
 
       // === 階段 2: OCR 辨識所有檔案並分類 ===
       for (let i = 0; i < allFiles.length; i++) {
@@ -279,6 +280,8 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
           }
 
           const ocrResult = await ocrResponse.json()
+          const gvErr = ocrResult.data?.googleVisionError || ocrResult.googleVisionError
+          if (gvErr && !googleVisionError) googleVisionError = gvErr
           const results = ocrResult.data?.results || ocrResult.results
 
           if (results?.[0]?.success && results[0].customer) {
@@ -353,7 +356,7 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
 
             if (uploadError) throw uploadError
 
-            const { data: urlData, error: urlError } = await supabase.storage.from('passport-images').createSignedUrl(storageFileName, 3600)
+            const { data: urlData, error: urlError } = await supabase.storage.from('passport-images').createSignedUrl(storageFileName, 3600 * 24 * 365)
             if (urlError || !urlData?.signedUrl) throw urlError || new Error('Failed to create signed URL')
 
             // 檢查與現有資料的差異
@@ -590,6 +593,9 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
       }
       if (duplicateItems.length > 0) {
         message += CPL.SKIPPED_DUPLICATE(duplicateItems.length)
+      }
+      if (googleVisionError) {
+        message += `\n\n⚠️ 中文名辨識失敗：${googleVisionError}\n• 請至 Google Cloud Console 更新 API Key`
       }
       message += CPL.VERIFY_REMINDER
       if (failedItems.length > 0) {
