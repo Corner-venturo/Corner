@@ -384,17 +384,19 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
   // Get unique categories
   const categories = ['全部', ...Array.from(new Set(catalog.map(a => a.cat))).sort()]
   const filteredAssets = catalog.filter(a => {
-    if (!a.name.startsWith('Floor_') && !a.name.startsWith('Wall_')) {
-      // objects only
-    }
-    if (filterCat !== '全部' && a.cat !== filterCat) return false
+    // Search filter
     if (searchText && !a.label.toLowerCase().includes(searchText.toLowerCase()) && !a.name.toLowerCase().includes(searchText.toLowerCase())) return false
-    return true
-  }).filter(a => {
-    // Only show 64px tiles for floors/walls
+    // Only 64px tiles
     if (a.name.startsWith('Floor_') && !a.name.includes('(64)')) return false
     if (a.name.startsWith('Wall_') && !a.name.includes('(64)')) return false
-    return true
+    // Category filter
+    if (filterCat === '全部') return true
+    if (filterCat === 'floor') return a.name.startsWith('Floor_')
+    if (filterCat === 'wallL') return a.name.startsWith('Wall_') && !a.name.endsWith('_L')
+    if (filterCat === 'wallB') return a.name.startsWith('Wall_') && a.name.endsWith('_L')
+    if (filterCat === 'object') return !a.name.startsWith('Floor_') && !a.name.startsWith('Wall_')
+    // Sub-category (emoji prefix)
+    return a.cat === filterCat
   })
 
   return (
@@ -414,18 +416,38 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
               className="w-full px-2 py-1 text-xs bg-gray-900 border border-gray-700 rounded text-white"
             />
           </div>
-          {/* Categories */}
-          <div className="flex flex-wrap gap-1 p-2 border-b border-gray-800">
-            {categories.slice(0, 12).map(c => (
+          {/* Quick filter tabs */}
+          <div className="flex gap-1 p-2 border-b border-gray-800">
+            {[
+              { id: '全部', label: '全部' },
+              { id: 'floor', label: '🏠地板' },
+              { id: 'wallL', label: '🧱左牆' },
+              { id: 'wallB', label: '🧱後牆' },
+              { id: 'object', label: '🪑物件' },
+            ].map(t => (
               <button
-                key={c}
-                onClick={() => setFilterCat(c)}
-                className={`text-[10px] px-1.5 py-0.5 rounded ${filterCat === c ? 'bg-emerald-600 text-white' : 'bg-gray-800 text-gray-400'}`}
+                key={t.id}
+                onClick={() => setFilterCat(t.id)}
+                className={`text-[10px] px-2 py-1 rounded font-bold ${filterCat === t.id ? 'bg-emerald-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}
               >
-                {c.length > 6 ? c.slice(0, 2) : c}
+                {t.label}
               </button>
             ))}
           </div>
+          {/* Sub-categories for objects */}
+          {filterCat === 'object' && (
+            <div className="flex flex-wrap gap-1 px-2 pb-2 border-b border-gray-800">
+              {categories.filter(c => c !== '全部' && c !== '🏠 地板/牆壁').map(c => (
+                <button
+                  key={c}
+                  onClick={() => setFilterCat(c)}
+                  className={`text-[10px] px-1.5 py-0.5 rounded ${filterCat === c ? 'bg-emerald-600 text-white' : 'bg-gray-800 text-gray-400'}`}
+                >
+                  {c.slice(0, 4)}
+                </button>
+              ))}
+            </div>
+          )}
           {/* Asset list */}
           <div className="flex-1 overflow-y-auto p-1">
             {/* Deselect button */}
