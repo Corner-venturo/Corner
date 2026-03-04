@@ -256,13 +256,23 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
             saveRoom(room, workspaceId, userId)
             this.rebuildAll()
           } else {
-            // Select existing object
-            let found: RoomObject | null = null
-            let minDist = 0.8
+            // Select existing object — cycle through nearby on re-click
+            const nearby: RoomObject[] = []
             for (const o of room.objects) {
               const dx = s.col - o.col, dy = s.row - o.row
               const dist = Math.sqrt(dx * dx + dy * dy)
-              if (dist < minDist) { minDist = dist; found = o }
+              if (dist < 0.8) nearby.push(o)
+            }
+            let found: RoomObject | null = null
+            if (nearby.length > 0) {
+              const curIdx = nearby.findIndex(o => o.id === this.selObjId)
+              if (curIdx >= 0) {
+                // Re-click same area: cycle to next object
+                found = nearby[(curIdx + 1) % nearby.length]
+              } else {
+                // First click: prefer children (surface items) over parents
+                found = nearby.find(o => o.parentId != null) || nearby[0]
+              }
             }
             this.selObjId = found ? found.id : null
             if (found) this.dragging = true
@@ -279,6 +289,10 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
             const g = this.grd(wp.x, wp.y); const s = this.snap(g.col, g.row)
             const o = room.objects.find(x => x.id === this.selObjId)
             if (o) {
+              if (o.parentId != null) {
+                // Detach from parent surface when dragged
+                delete o.parentId; delete o.slotIndex; o.offX = 0; o.offY = 0
+              }
               o.col = s.col; o.row = s.row
               // Move children
               room.objects.filter(x => x.parentId === o.id).forEach(x => { x.col = s.col; x.row = s.row })
