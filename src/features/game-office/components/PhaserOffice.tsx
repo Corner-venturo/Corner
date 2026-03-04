@@ -183,6 +183,7 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
     class OfficeScene extends Phaser.Scene {
       Z = 1; panX = 0; panY = 0; OX = 0; OY = 0
       selObjId: number | null = null; dragging = false
+      selWall: { type: 'L' | 'B'; index: number } | null = null
       constructor() { super({ key: 'OfficeScene' }) }
 
       preload() {
@@ -273,6 +274,21 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
             saveRoom(room, workspaceId, userId)
             this.rebuildAll()
           } else {
+            // Check if clicking on a wall tile
+            this.selWall = null
+            const fc = Math.floor(s.col), fr = Math.floor(s.row)
+            if (s.col < 0.3 && fr >= 0 && fr < room.rows && room.leftWall[fr]) {
+              this.selWall = { type: 'L', index: fr }
+              this.selObjId = null
+              this.rebuildAll()
+              return
+            }
+            if (s.row < 0.3 && fc >= 0 && fc < room.cols && room.backWall[fc]) {
+              this.selWall = { type: 'B', index: fc }
+              this.selObjId = null
+              this.rebuildAll()
+              return
+            }
             // Select existing object — cycle through nearby on re-click
             const nearby: RoomObject[] = []
             for (const o of room.objects) {
@@ -292,6 +308,7 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
               }
             }
             this.selObjId = found ? found.id : null
+            this.selWall = null
             if (found) this.dragging = true
             this.rebuildAll()
           }
@@ -330,7 +347,16 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
 
         // Keyboard shortcuts
         this.input.keyboard?.on('keydown-DELETE', () => {
-          if (!editModeRef.current || this.selObjId === null) return
+          if (!editModeRef.current) return
+          if (this.selWall) {
+            if (this.selWall.type === 'L') room.leftWall[this.selWall.index] = null
+            else room.backWall[this.selWall.index] = null
+            this.selWall = null
+            saveRoom(room, workspaceId, userId)
+            this.rebuildAll()
+            return
+          }
+          if (this.selObjId === null) return
           const kids = room.objects.filter(o => o.parentId === this.selObjId)
           const delIds = new Set([this.selObjId, ...kids.map(k => k.id)])
           room.objects = room.objects.filter(o => !delIds.has(o.id))
@@ -398,6 +424,18 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
           const p = this.scr(c + 0.5, 0)
           try { this.add.image(p.x, p.y, tile).setOrigin(ANCHORS.wallB.x / 64, ANCHORS.wallB.y / 64).setScale(this.Z).setDepth(2 + c * 0.01) } catch {}
         })
+        // Wall selection highlight
+        if (editModeRef.current && this.selWall) {
+          const sg = this.add.graphics().setDepth(999)
+          sg.lineStyle(2, 0x4ecca3, 0.9)
+          if (this.selWall.type === 'L') {
+            const p = this.scr(0, this.selWall.index + 0.5)
+            sg.strokeRect(p.x - 25 * this.Z, p.y - 25 * this.Z, 50 * this.Z, 50 * this.Z)
+          } else {
+            const p = this.scr(this.selWall.index + 0.5, 0)
+            sg.strokeRect(p.x - 25 * this.Z, p.y - 25 * this.Z, 50 * this.Z, 50 * this.Z)
+          }
+        }
         // Objects
         const sorted = [...room.objects].sort((a, b) => {
           const da = a.col + a.row + (a.depthOffset || 0) + (a.parentId ? 0.1 : 0)
