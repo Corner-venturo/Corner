@@ -216,17 +216,29 @@ export function TourPnrToolDialog({
     try {
       const { supabase } = await import('@/lib/supabase/client')
 
-      // 找到這個團的第一個 order_id
-      const orderId = members[0]?.order_id
+      // 找到這個團的第一個 order_id（優先從 members，沒有的話從 tour 查）
+      let orderId: string | undefined = members[0]?.order_id
+      
       if (!orderId) {
-        toast.error(LABELS.找不到訂單)
-        return
+        // 從 tour 查詢第一個訂單
+        const { data: orders } = await supabase
+          .from('orders')
+          .select('id')
+          .eq('tour_id', tourId)
+          .limit(1)
+        
+        orderId = orders?.[0]?.id
+        
+        if (!orderId) {
+          toast.error(LABELS.找不到訂單)
+          return
+        }
       }
 
       const { data, error: insertError } = await supabase
         .from('order_members')
         .insert({
-          order_id: orderId,
+          order_id: orderId!,
           customer_id: suggestion.customer_id,
           chinese_name: suggestion.name,
           passport_name: suggestion.passport_name,
@@ -250,13 +262,16 @@ export function TourPnrToolDialog({
       }))
 
       toast.success(LABELS.已加入訂單(suggestion.name || suggestion.passport_name || ''))
+      
+      // 通知上層重新載入團員資料
+      onSuccess?.()
     } catch (err) {
       logger.error('[PNR] 加入訂單失敗:', err)
       toast.error(LABELS.加入訂單失敗)
     } finally {
       setAddingMember(null)
     }
-  }, [user, members])
+  }, [user, members, onSuccess])
 
   // 新增團員（從 PNR 姓名）
   const handleAddNewMember = useCallback(async (pnrIndex: number, pnrName: string) => {
@@ -266,16 +281,29 @@ export function TourPnrToolDialog({
     try {
       const { supabase } = await import('@/lib/supabase/client')
 
-      const orderId = members[0]?.order_id
+      // 找到這個團的第一個 order_id（優先從 members，沒有的話從 tour 查）
+      let orderId: string | undefined = members[0]?.order_id
+      
       if (!orderId) {
-        toast.error(LABELS.找不到訂單)
-        return
+        // 從 tour 查詢第一個訂單
+        const { data: orders } = await supabase
+          .from('orders')
+          .select('id')
+          .eq('tour_id', tourId)
+          .limit(1)
+        
+        orderId = orders?.[0]?.id
+        
+        if (!orderId) {
+          toast.error(LABELS.找不到訂單)
+          return
+        }
       }
 
       const { data, error: insertError } = await supabase
         .from('order_members')
         .insert({
-          order_id: orderId,
+          order_id: orderId!,
           passport_name: pnrName,
           member_type: 'adult',
           workspace_id: user.workspace_id,

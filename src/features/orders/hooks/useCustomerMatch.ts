@@ -45,7 +45,7 @@ export function useCustomerMatch(
   }
 
   // 根據身分證字號搜尋顧客（5字以上觸發）
-  const checkCustomerMatchByIdNumber = (
+  const checkCustomerMatchByIdNumber = async (
     idNumber: string,
     memberIndex: number,
     memberData: Partial<OrderMember>
@@ -68,11 +68,45 @@ export function useCustomerMatch(
     })
 
     if (idMatches.length > 0) {
+      // 有找到顧客資料 → 彈出對話框選擇
       setMatchedCustomers(idMatches)
       setMatchType('id_number')
       setPendingMemberIndex(memberIndex)
       setPendingMemberData(memberData)
       setShowCustomerMatchDialog(true)
+    } else if (normalizedInput.length >= 10) {
+      // 沒有顧客資料 + 身分證字號完整 → 自動辨識性別
+      const secondChar = normalizedInput.charAt(1)
+      let gender: string | null = null
+      
+      if (secondChar === '1') {
+        gender = 'M' // 男性
+      } else if (secondChar === '2') {
+        gender = 'F' // 女性
+      }
+      
+      if (gender) {
+        const member = members[memberIndex]
+        if (!member) return
+        
+        // 更新本地狀態
+        const updatedMembers = members.map((m, idx) => 
+          idx === memberIndex ? { ...m, gender } : m
+        )
+        setMembers(updatedMembers)
+        
+        // 儲存到資料庫
+        const { error } = await supabase
+          .from('order_members')
+          .update({ gender })
+          .eq('id', member.id)
+        
+        if (error) {
+          logger.error(COMP_ORDERS_LABELS.更新成員資料失敗, error)
+        } else {
+          logger.info(`自動辨識性別：${gender === 'M' ? '男性' : '女性'}`)
+        }
+      }
     }
   }
 
