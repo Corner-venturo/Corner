@@ -54,12 +54,14 @@ export default function GameOfficePage() {
           />
         </div>
 
-        {/* Right Panel - Dashboard */}
-        <div className="w-80 flex-shrink-0">
-          <Suspense fallback={<div className="w-80 bg-[#0d1117]" />}>
-            <RightPanel />
-          </Suspense>
-        </div>
+        {/* Right Panel - Dashboard (hidden in edit mode, asset panel takes over) */}
+        {!editMode && (
+          <div className="w-80 flex-shrink-0">
+            <Suspense fallback={<div className="w-80 bg-[#0d1117]" />}>
+              <RightPanel />
+            </Suspense>
+          </div>
+        )}
       </div>
 
       {/* Bottom Bar */}
