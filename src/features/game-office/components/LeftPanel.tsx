@@ -53,7 +53,7 @@ export default function LeftPanel() {
         <>
           {/* User info */}
           <div className="px-3 py-2 border-b border-gray-800 text-xs text-gray-500">
-            👤 {user?.name || '使用者'}
+            👤 {user?.display_name || user?.chinese_name || '使用者'}
           </div>
 
           {/* Tabs */}
@@ -98,19 +98,19 @@ function StatsPanel() {
         const { count: activeTours } = await supabase
           .from('tours')
           .select('*', { count: 'exact', head: true })
-          .in('status', ['confirmed', 'in_progress'])
+          .in('status', ['confirmed', 'in_progress']).eq('workspace_id', useAuthStore.getState().user?.workspace_id || '')
 
         // Pending orders
         const { count: pendingOrders } = await supabase
           .from('orders')
           .select('*', { count: 'exact', head: true })
-          .eq('status', 'pending_deposit')
+          .eq('status', 'pending_deposit').eq('workspace_id', useAuthStore.getState().user?.workspace_id || '')
 
         // Recent tours
         const { data: recentToursData } = await supabase
           .from('tours')
           .select('tour_code, destination, current_participants')
-          .in('status', ['confirmed', 'in_progress'])
+          .in('status', ['confirmed', 'in_progress']).eq('workspace_id', useAuthStore.getState().user?.workspace_id || '')
           .order('departure_date', { ascending: true })
           .limit(5) as unknown as { data: { tour_code: string | null; destination: string | null; current_participants: number | null }[] | null }
 
@@ -181,7 +181,7 @@ function TodosPanel() {
       const { data } = await supabase
         .from('todos')
         .select('id, title, completed')
-        .eq('completed', false)
+        .eq('completed', false).eq('workspace_id', useAuthStore.getState().user?.workspace_id || '')
         .order('created_at', { ascending: false })
         .limit(10)
       if (data) {

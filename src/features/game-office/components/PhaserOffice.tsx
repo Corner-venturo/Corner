@@ -39,7 +39,7 @@ function defaultRoom(): RoomData {
   const backWall: (string | null)[] = []
   for (let i = 0; i < Math.max(cols, rows); i++) {
     if (i < rows) leftWall[i] = i % 2 === 0 ? 'Wall_3_Tile(64)' : 'Wall_5_Tile(64)'
-    if (i < cols) backWall[i] = i % 2 === 0 ? 'Wall_5_Tile(64)' : 'Wall_3_Tile(64)'
+    if (i < cols) backWall[i] = i % 2 === 0 ? 'Wall_5_Tile(64)_L' : 'Wall_3_Tile(64)_L'
   }
   return { v: 2, cols, rows, floor, leftWall, backWall, objects: [], nextId: 1 }
 }
