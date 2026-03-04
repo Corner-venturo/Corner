@@ -35,17 +35,62 @@ interface PhaserOfficeProps {
 }
 
 function defaultRoom(): RoomData {
-  const cols = 8, rows = 8
+  const cols = 10, rows = 10
   const floor: (string | null)[][] = []
   for (let r = 0; r < rows; r++) {
     floor[r] = []
     for (let c = 0; c < cols; c++) {
-      floor[r][c] = null  // 空地板，自己鋪
+      floor[r][c] = (r + c) % 3 === 0 ? 'Floor_3_Tile(64)' : 'Floor_5_Tile(64)'
     }
   }
-  const leftWall: (string | null)[] = new Array(rows).fill(null)  // 空牆，自己選
-  const backWall: (string | null)[] = new Array(cols).fill(null)
-  return { v: 2, cols, rows, floor, leftWall, backWall, objects: [], nextId: 1 }
+  const leftWall: (string | null)[] = []
+  const backWall: (string | null)[] = []
+  for (let i = 0; i < 10; i++) {
+    leftWall.push(i % 2 === 0 ? 'Wall_5_Tile(64)' : 'Wall_3_Tile(64)')
+    backWall.push(i % 2 === 0 ? 'Wall_5_Tile(64)_L' : 'Wall_3_Tile(64)_L')
+  }
+  return { v: 2, cols, rows, floor, leftWall, backWall, nextId: 30, objects: [
+    // William 的桌子
+    {id:1,asset:'Desk_1_Tile',col:3,row:2,offX:0,offY:0,flip:false},
+    {id:2,asset:'NewImac_A_Tile',col:3,row:2,offX:-10,offY:-36,flip:false,parentId:1,slotIndex:0},
+    {id:3,asset:'NewKeyboard_Tile',col:3,row:2,offX:10,offY:-30,flip:false,parentId:1,slotIndex:1},
+    {id:4,asset:'Mug_15',col:3,row:2,offX:20,offY:-34,flip:false,parentId:1,slotIndex:2},
+    {id:5,asset:'Chair_2_A_Tile',col:4,row:3,offX:0,offY:0,flip:false},
+    // 同事桌
+    {id:6,asset:'Desk_1_B_Tile',col:3,row:5,offX:0,offY:0,flip:false},
+    {id:7,asset:'Macbook_1_Open_Tile',col:3,row:5,offX:0,offY:-32,flip:false,parentId:6,slotIndex:0},
+    {id:8,asset:'Lamp_8_A_Tile',col:3,row:5,offX:-14,offY:-38,flip:false,parentId:6,slotIndex:1},
+    {id:9,asset:'Chair_2_B_Tile',col:4,row:6,offX:0,offY:0,flip:false},
+    // 設計師桌
+    {id:10,asset:'Desk_1_Tile',col:7,row:2,offX:0,offY:0,flip:true},
+    {id:11,asset:'OldImac_A_Tile',col:7,row:2,offX:-8,offY:-36,flip:false,parentId:10,slotIndex:0},
+    {id:12,asset:'WacomTablet',col:7,row:2,offX:12,offY:-32,flip:false,parentId:10,slotIndex:1},
+    {id:13,asset:'Chair_2_C_Tile',col:6,row:3,offX:0,offY:0,flip:false},
+    // 會議桌
+    {id:14,asset:'Table_10',col:6,row:6,offX:0,offY:0,flip:false},
+    {id:15,asset:'Chair_2_D_Tile',col:5,row:6,offX:0,offY:0,flip:false},
+    {id:16,asset:'Chair_2_A_Tile',col:7,row:6,offX:0,offY:0,flip:true},
+    {id:17,asset:'Chair_2_B_Tile',col:6,row:5,offX:0,offY:0,flip:false},
+    {id:18,asset:'Chair_2_C_Tile',col:6,row:7,offX:0,offY:0,flip:false},
+    // 書架
+    {id:19,asset:'shelving_6',col:1,row:1,offX:0,offY:0,flip:false},
+    {id:20,asset:'shelving_7',col:9,row:1,offX:0,offY:0,flip:false},
+    // 植物
+    {id:21,asset:'Plant_2',col:1,row:9,offX:0,offY:0,flip:false},
+    {id:22,asset:'Bonsai',col:9,row:9,offX:0,offY:0,flip:false},
+    {id:23,asset:'Sun_Flower',col:1,row:5,offX:0,offY:0,flip:false},
+    // 沙發區
+    {id:24,asset:'Sofa_3_A_Tile',col:8,row:5,offX:0,offY:0,flip:false},
+    {id:25,asset:'SmallTable_5',col:8,row:7,offX:0,offY:0,flip:false},
+    // 貓
+    {id:26,asset:'Cat_99_2_A',col:5,row:4,offX:0,offY:0,flip:false},
+    // 地毯
+    {id:27,asset:'Carpet_3_Tile',col:5.5,row:5.5,offX:0,offY:0,flip:false,depthOffset:-0.5},
+    // 冰箱
+    {id:28,asset:'Fridge_2_A_Tile',col:9,row:3,offX:0,offY:0,flip:false},
+    // 窗戶
+    {id:29,asset:'Window_7_A_Tile',col:5,row:0.5,offX:0,offY:0,flip:false},
+  ]}
 }
 
 async function saveRoom(room: RoomData, wid?: string, uid?: string) {
