@@ -184,6 +184,7 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
       Z = 1; panX = 0; panY = 0; OX = 0; OY = 0
       selObjId: number | null = null; dragging = false
       selWall: { type: 'L' | 'B'; index: number } | null = null
+      selFloor: { row: number; col: number } | null = null
       constructor() { super({ key: 'OfficeScene' }) }
 
       preload() {
@@ -239,7 +240,18 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
             // Floor: use integer grid cell
             const fc = Math.floor(s.col), fr = Math.floor(s.row)
             if (t === 'floor') {
-              if (fc >= 0 && fc < room.cols && fr >= 0 && fr < room.rows) {
+              // Expand room if placing outside current bounds
+              while (fr >= room.rows) {
+                room.floor.push(new Array(room.cols).fill(null))
+                room.leftWall.push(null)
+                room.rows++
+              }
+              while (fc >= room.cols) {
+                room.floor.forEach(row => row.push(null))
+                room.backWall.push(null)
+                room.cols++
+              }
+              if (fc >= 0 && fr >= 0) {
                 room.floor[fr][fc] = asset
               }
             } else if (t === 'wallL') {
@@ -280,14 +292,31 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
             if (s.col < 0.3 && fr >= 0 && fr < room.rows && room.leftWall[fr]) {
               this.selWall = { type: 'L', index: fr }
               this.selObjId = null
+              this.selFloor = null
               this.rebuildAll()
               return
             }
             if (s.row < 0.3 && fc >= 0 && fc < room.cols && room.backWall[fc]) {
               this.selWall = { type: 'B', index: fc }
               this.selObjId = null
+              this.selFloor = null
               this.rebuildAll()
               return
+            }
+            // Check if clicking on floor tile
+            if (fc >= 0 && fc < room.cols && fr >= 0 && fr < room.rows && room.floor[fr]?.[fc]) {
+              // Only select floor if no objects nearby
+              const hasObj = room.objects.some(o => {
+                const dx = s.col - o.col, dy = s.row - o.row
+                return Math.sqrt(dx*dx+dy*dy) < 0.6
+              })
+              if (!hasObj) {
+                this.selFloor = { row: fr, col: fc }
+                this.selObjId = null
+                this.selWall = null
+                this.rebuildAll()
+                return
+              }
             }
             // Select existing object — cycle through nearby on re-click
             const nearby: RoomObject[] = []
@@ -309,6 +338,7 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
             }
             this.selObjId = found ? found.id : null
             this.selWall = null
+            this.selFloor = null
             if (found) this.dragging = true
             this.rebuildAll()
           }
@@ -348,6 +378,13 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
         // Keyboard shortcuts
         this.input.keyboard?.on('keydown-DELETE', () => {
           if (!editModeRef.current) return
+          if (this.selFloor) {
+            room.floor[this.selFloor.row][this.selFloor.col] = null
+            this.selFloor = null
+            saveRoom(room, workspaceId, userId)
+            this.rebuildAll()
+            return
+          }
           if (this.selWall) {
             if (this.selWall.type === 'L') room.leftWall[this.selWall.index] = null
             else room.backWall[this.selWall.index] = null
@@ -424,6 +461,13 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
           const p = this.scr(c + 0.5, 0)
           try { this.add.image(p.x, p.y, tile).setOrigin(ANCHORS.wallB.x / 64, ANCHORS.wallB.y / 64).setScale(this.Z).setDepth(2 + c * 0.01) } catch {}
         })
+        // Floor selection highlight
+        if (editModeRef.current && this.selFloor) {
+          const sg = this.add.graphics().setDepth(999)
+          sg.lineStyle(2, 0x4ecca3, 0.9)
+          const p = this.scr(this.selFloor.col + 0.5, this.selFloor.row + 0.5)
+          sg.strokeRect(p.x - 22 * this.Z, p.y - 12 * this.Z, 44 * this.Z, 24 * this.Z)
+        }
         // Wall selection highlight
         if (editModeRef.current && this.selWall) {
           const sg = this.add.graphics().setDepth(999)
