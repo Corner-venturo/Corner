@@ -38,6 +38,7 @@ import {
   Mail,
   Truck,
   LineChart,
+  Gamepad2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
@@ -121,7 +122,7 @@ const menuItems: MenuItem[] = [
   { href: '/tenants', label: COMP_LAYOUT_LABELS.租戶管理, icon: Building, requiredPermission: 'super_admin_only' },
   { href: '/scheduling', label: COMP_LAYOUT_LABELS.資源調度, icon: Calendar, requiredPermission: 'hr' },
   { href: '/database/fleet', label: COMP_LAYOUT_LABELS.車隊管理, icon: Bus, requiredPermission: 'hr' },
-  // V1: 網卡管理暫時隱藏
+  { href: '/game-office', label: COMP_LAYOUT_LABELS.遊戲辦公室, icon: Gamepad2, requiredPermission: 'office' },
   // { href: '/esims', label: COMP_LAYOUT_LABELS.網卡管理, icon: Wifi, requiredPermission: 'hr', restrictedFeature: 'esim' },
 ]
 
@@ -131,7 +132,6 @@ const supplierMenuItems: MenuItem[] = [
   { href: '/supplier/requests', label: COMP_LAYOUT_LABELS.需求收件匣, icon: ClipboardList },
   { href: '/supplier/dispatch', label: COMP_LAYOUT_LABELS.派單管理, icon: Truck }, // 車行專用
   { href: '/database/fleet', label: COMP_LAYOUT_LABELS.車隊管理, icon: Bus }, // 車行專用
-  { href: '/supplier/finance', label: COMP_LAYOUT_LABELS.財務報表, icon: LineChart },
 ]
 
 const personalToolItems: MenuItem[] = []
@@ -223,7 +223,6 @@ export function Sidebar() {
     if (isSupplierWorkspace) {
       return supplierMenuItems.filter(item => {
         // 車隊管理只給車行看
-        if (item.href === '/database/fleet' && !isVehicleSupplier) return false
         return true
       })
     }

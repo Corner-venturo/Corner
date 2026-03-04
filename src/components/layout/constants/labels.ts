@@ -72,4 +72,6 @@ export const COMP_LAYOUT_LABELS = {
   SAVE: '儲存',
 
   FILTER_4998: '清除篩選',
+  遊戲辦公室: '遊戲辦公室',
 };
+
