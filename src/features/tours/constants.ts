@@ -19,7 +19,7 @@ export const TOUR_FILTERS = {
   tab_archived: '封存',
   add_button: '新增',
   add_proposal: '新增提案',
-  add_tour_direct: '直接開團',
+  add_tour_direct: '開團',
 } as const
 
 // ============================================================
