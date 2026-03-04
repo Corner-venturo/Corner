@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+interface MeetingMessage {
+  user: string;
+  message: string;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { messages } = await req.json();
 
     // 整理會議記錄
-    const transcript = messages
-      .map((m: any) => `${m.user}: ${m.message}`)
+    const transcript = (messages as MeetingMessage[])
+      .map((m) => `${m.user}: ${m.message}`)
       .join('\n');
 
     // 呼叫 OpenClaw 生成摘要
@@ -51,7 +56,7 @@ ${transcript}`,
       timestamp: new Date().toISOString(),
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Summary API error:', error);
     return NextResponse.json(
       { 

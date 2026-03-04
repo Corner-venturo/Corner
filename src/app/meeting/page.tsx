@@ -12,6 +12,13 @@ interface Message {
   isAI?: boolean;
 }
 
+interface AIResponse {
+  aiId: string;
+  aiName: string;
+  aiEmoji: string;
+  message: string;
+}
+
 export default function MeetingRoomPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -65,7 +72,7 @@ export default function MeetingRoomPage() {
 
       if (data.needsAI && data.responses) {
         // 處理多個 AI 回應
-        data.responses.forEach((aiResponse: any, index: number) => {
+        data.responses.forEach((aiResponse: AIResponse, index: number) => {
           const aiMessage: Message = {
             id: (Date.now() + index + 1).toString(),
             user: `${aiResponse.aiEmoji} ${aiResponse.aiName}`,

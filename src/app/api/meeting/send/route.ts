@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
       timestamp: new Date().toISOString(),
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Meeting API error:', error);
     
     return NextResponse.json(
