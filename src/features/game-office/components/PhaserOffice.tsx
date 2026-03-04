@@ -296,6 +296,12 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
               if (m.placement === 'carpet') obj.depthOffset = -0.5
               room.objects.push(obj)
               this.selObjId = obj.id
+              this.dragging = true
+            }
+            // Clear selected asset after placing (one-shot placement)
+            selectedAssetRef.current = null
+            if ((window as unknown as Record<string,unknown>).__gameSetSelectedAsset) {
+              ((window as unknown as Record<string,unknown>).__gameSetSelectedAsset as (v: string|null)=>void)(null)
             }
             saveRoom(room, workspaceId, userId)
             this.rebuildAll()
@@ -522,6 +528,7 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
     // Ref for selected asset from React
     const selectedAssetRef = { current: null as string | null }
     ;((window as unknown) as Record<string, unknown>).__gameSelectedAsset = selectedAssetRef
+    ;((window as unknown) as Record<string, unknown>).__gameSetSelectedAsset = setSelectedAsset
 
     const game = new Phaser.Game({
       type: Phaser.AUTO,
