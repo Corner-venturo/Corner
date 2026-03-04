@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useCallback, useState } from 'react'
+import { GAME_OFFICE_LABELS } from './constants/labels'
 
 const TW = 64, TH = 32
 const ANCHORS = { floor: { x: 32, y: 16 }, wallL: { x: 15, y: 62 }, wallB: { x: 47, y: 62 } }
@@ -591,7 +592,7 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
             <div className="text-xs font-bold text-emerald-400 mb-2">🎨 素材庫</div>
             <input
               type="text"
-              placeholder="搜尋..."
+              placeholder={GAME_OFFICE_LABELS.SEARCH_6779}
               value={searchText}
               onChange={e => setSearchText(e.target.value)}
               className="w-full px-2 py-1 text-xs bg-gray-900 border border-gray-700 rounded text-white"

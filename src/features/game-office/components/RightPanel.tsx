@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/stores/auth-store'
 import { supabase } from '@/lib/supabase/client'
+import { GAME_OFFICE_LABELS } from './constants/labels'
 
 interface TourInfo {
   tour_code: string
@@ -131,13 +132,13 @@ export default function RightPanel() {
       <div className="p-4 border-b border-gray-800">
         <div className="flex items-center gap-2 mb-3">
           <span className="text-blue-400">📊</span>
-          <span className="text-xs text-gray-500 font-bold">今日概覽</span>
+          <span className="text-xs text-gray-500 font-bold">{GAME_OFFICE_LABELS.LABEL_8131}</span>
         </div>
         <div className="space-y-2">
-          <Row label="出發團數" value={`${stats.tours} 團`} color="text-emerald-400" />
-          <Row label="待確認訂單" value={`${stats.orders} 筆`} color="text-yellow-400" />
-          <Row label="待處理需求單" value={`${stats.requests} 筆`} color="text-orange-400" />
-          <Row label="今日收款" value={stats.revenue ? `NT$ ${stats.revenue.toLocaleString()}` : '-'} color="text-emerald-400" />
+          <Row label={GAME_OFFICE_LABELS.LABEL_8538} value={`${stats.tours} 團`} color="text-emerald-400" />
+          <Row label={GAME_OFFICE_LABELS.CONFIRM_173} value={`${stats.orders} 筆`} color="text-yellow-400" />
+          <Row label={GAME_OFFICE_LABELS.PROCESSING_7916} value={`${stats.requests} 筆`} color="text-orange-400" />
+          <Row label={GAME_OFFICE_LABELS.LABEL_5096} value={stats.revenue ? `NT$ ${stats.revenue.toLocaleString()}` : '-'} color="text-emerald-400" />
         </div>
       </div>
 
@@ -146,7 +147,7 @@ export default function RightPanel() {
         <div className="p-4 border-b border-gray-800">
           <div className="flex items-center gap-2 mb-3">
             <span className="text-blue-400">👥</span>
-            <span className="text-xs text-gray-500 font-bold">團隊狀態</span>
+            <span className="text-xs text-gray-500 font-bold">{GAME_OFFICE_LABELS.LABEL_6017}</span>
           </div>
           <div className="space-y-2">
             {teamMembers.map((m, i) => (
@@ -167,7 +168,7 @@ export default function RightPanel() {
         <div className="p-4 border-b border-gray-800">
           <div className="flex items-center gap-2 mb-3">
             <span className="text-blue-400">✈</span>
-            <span className="text-xs text-gray-500 font-bold">今日出團</span>
+            <span className="text-xs text-gray-500 font-bold">{GAME_OFFICE_LABELS.LABEL_2938}</span>
           </div>
           <div className="space-y-2">
             {todayTours.map((t, i) => (
@@ -186,12 +187,12 @@ export default function RightPanel() {
       <div className="p-4 border-b border-gray-800">
         <div className="flex items-center gap-2 mb-3">
           <span className="text-purple-400">🎙️</span>
-          <span className="text-xs text-gray-500 font-bold">會議室</span>
+          <span className="text-xs text-gray-500 font-bold">{GAME_OFFICE_LABELS.LABEL_1006}</span>
         </div>
         <div className="space-y-2">
           <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-purple-400 font-bold">角落旅遊 會議室</span>
+              <span className="text-xs text-purple-400 font-bold">{GAME_OFFICE_LABELS.LABEL_8236}</span>
               <span className="text-[10px] text-gray-600 bg-gray-800 px-1.5 py-0.5 rounded">0 人在線</span>
             </div>
             <button className="w-full py-1.5 text-xs text-gray-500 border border-dashed border-gray-700 rounded hover:border-purple-400 hover:text-purple-400 transition-colors">
@@ -199,7 +200,7 @@ export default function RightPanel() {
             </button>
           </div>
           <div className="text-[10px] text-gray-600">
-            語音會議 · 螢幕分享 · 白板
+            {GAME_OFFICE_LABELS.LABEL_9095}
           </div>
         </div>
       </div>
@@ -208,7 +209,7 @@ export default function RightPanel() {
       <div className="p-4">
         <div className="flex items-center gap-2 mb-3">
           <span className="text-yellow-400">🔔</span>
-          <span className="text-xs text-gray-500 font-bold">最新動態</span>
+          <span className="text-xs text-gray-500 font-bold">{GAME_OFFICE_LABELS.LABEL_4511}</span>
         </div>
         <div className="space-y-2">
           {activities.map((a, i) => (

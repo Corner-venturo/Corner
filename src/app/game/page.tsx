@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 import { Suspense, useState, useCallback } from 'react'
 import { Grid3X3, Edit3, Eye } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
+import { GAME_OFFICE_LABELS } from './constants/labels'
 
 const PhaserOffice = dynamic(
   () => import('@/features/game-office/components/PhaserOffice'),
@@ -63,7 +64,7 @@ export default function GameOfficePage() {
             }`}
           >
             <Grid3X3 className="w-3 h-3" />
-            格線 ON/OFF
+            {GAME_OFFICE_LABELS.LABEL_330}
           </button>
 
           <PhaserOffice
@@ -111,7 +112,7 @@ export default function GameOfficePage() {
         <span className="text-gray-700">|</span>
         <span>🏢 辦公室模式</span>
         <span className="text-gray-700">|</span>
-        <span>點擊物件互動</span>
+        <span>{GAME_OFFICE_LABELS.LABEL_3801}</span>
         <span className="text-gray-700">|</span>
         <span className="text-yellow-500/70">💡 提示：點電腦打開訂單管理</span>
       </div>

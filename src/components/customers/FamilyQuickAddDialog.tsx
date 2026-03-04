@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { Users, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useCustomerFamily } from '@/hooks/useCustomerFamily'
 import type { Customer } from '@/stores/types'
+import { CUSTOMERS_LABELS } from './constants/labels'
 
 interface FamilyQuickAddDialogProps {
   /** 觸發的客戶 ID */
@@ -87,10 +88,10 @@ export function FamilyQuickAddDialog({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              載入家庭成員...
+              {CUSTOMERS_LABELS.LOADING_3991}
             </DialogTitle>
           </DialogHeader>
-          <div className="py-8 text-center text-muted-foreground">載入中...</div>
+          <div className="py-8 text-center text-muted-foreground">{CUSTOMERS_LABELS.LOADING_6991}</div>
         </DialogContent>
       </Dialog>
     )
@@ -103,7 +104,7 @@ export function FamilyQuickAddDialog({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              沒有可加入的家人
+              {CUSTOMERS_LABELS.NOT_FOUND_563}
             </DialogTitle>
           </DialogHeader>
           <div className="py-8 text-center text-muted-foreground">
@@ -112,7 +113,7 @@ export function FamilyQuickAddDialog({
           </div>
           <div className="flex justify-end">
             <Button variant="outline" onClick={onClose}>
-              關閉
+              {CUSTOMERS_LABELS.CLOSE}
             </Button>
           </div>
         </DialogContent>
@@ -138,10 +139,10 @@ export function FamilyQuickAddDialog({
             </div>
             <div className="flex gap-2">
               <Button variant="ghost" size="sm" onClick={selectAll} disabled={selectedIds.length === availableMembers.length}>
-                全選
+                {CUSTOMERS_LABELS.LABEL_7782}
               </Button>
               <Button variant="ghost" size="sm" onClick={clearSelection} disabled={selectedIds.length === 0}>
-                清除
+                {CUSTOMERS_LABELS.CLEAR}
               </Button>
             </div>
           </div>
@@ -167,27 +168,27 @@ export function FamilyQuickAddDialog({
                         <span className="font-medium">{customer.name}</span>
                         {member.role === 'leader' && (
                           <Badge variant="secondary" className="text-xs">
-                            主要聯絡人
+                            {CUSTOMERS_LABELS.LABEL_6239}
                           </Badge>
                         )}
                       </div>
                       <div className="mt-1 text-sm text-muted-foreground space-y-0.5">
                         {customer.passport_number && (
                           <div className="flex items-center gap-1">
-                            <span className="text-xs">護照：</span>
+                            <span className="text-xs">{CUSTOMERS_LABELS.LABEL_9194}</span>
                             <span>{customer.passport_number}</span>
                           </div>
                         )}
                         {customer.birth_date && (
                           <div className="flex items-center gap-1">
-                            <span className="text-xs">生日：</span>
+                            <span className="text-xs">{CUSTOMERS_LABELS.LABEL_3937}</span>
                             <span>{customer.birth_date}</span>
                           </div>
                         )}
                         {missingInfo && (
                           <div className="flex items-center gap-1 text-amber-600">
                             <AlertCircle className="h-3 w-3" />
-                            <span className="text-xs">缺少護照或生日資料</span>
+                            <span className="text-xs">{CUSTOMERS_LABELS.LABEL_2476}</span>
                           </div>
                         )}
                       </div>
@@ -199,7 +200,7 @@ export function FamilyQuickAddDialog({
               {/* 已在名單的成員 */}
               {existingMembers.length > 0 && (
                 <>
-                  <div className="pt-4 pb-2 text-sm font-medium text-muted-foreground">已在名單</div>
+                  <div className="pt-4 pb-2 text-sm font-medium text-muted-foreground">{CUSTOMERS_LABELS.LABEL_4017}</div>
                   {existingMembers.map((member: { id: string; customer: Customer }) => {
                     const customer = member.customer
                     return (
@@ -225,7 +226,7 @@ export function FamilyQuickAddDialog({
           {/* 底部按鈕 */}
           <div className="flex justify-end gap-2 pt-4 border-t">
             <Button variant="outline" onClick={onClose}>
-              取消
+              {CUSTOMERS_LABELS.CANCEL}
             </Button>
             <Button onClick={handleConfirm} disabled={selectedIds.length === 0}>
               加入已選 ({selectedIds.length} 人)

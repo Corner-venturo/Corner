@@ -113,7 +113,7 @@ export function PnrPreview({
                 <div className="flex items-start gap-2">
                   <Clock size={14} className="text-amber-600 mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-amber-900 text-xs">轉機：{c.airportName}</div>
+                    <div className="font-semibold text-amber-900 text-xs">{PNR_LABELS.LABEL_7874}{c.airportName}</div>
                     <div className="text-amber-700 text-xs mt-0.5">{c.warning}</div>
                   </div>
                 </div>

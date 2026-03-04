@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { AI_ENDPOINTS } from '@/lib/meeting/ai-endpoints';
+import { MEETING_LABELS } from './constants/labels'
 
 interface Message {
   id: string;
@@ -160,8 +161,8 @@ export default function MeetingRoomPage() {
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.length === 0 && (
             <div className="text-center text-gray-500 mt-10">
-              <p>會議室已準備就緒</p>
-              <p className="text-sm mt-2">輸入訊息開始討論...</p>
+              <p>{MEETING_LABELS.LABEL_203}</p>
+              <p className="text-sm mt-2">{MEETING_LABELS.LABEL_8633}</p>
             </div>
           )}
 
@@ -206,20 +207,20 @@ export default function MeetingRoomPage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-              placeholder="輸入訊息... (輸入 @悠月 可以呼叫 AI)"
+              placeholder={MEETING_LABELS.LABEL_8571}
               className="flex-1 px-4 py-3 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               onClick={sendMessage}
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
             >
-              發送
+              {MEETING_LABELS.SENDING_8105}
             </button>
             <button
               onClick={endMeeting}
               className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
             >
-              結束會議
+              {MEETING_LABELS.LABEL_5569}
             </button>
           </div>
           <div className="mt-2 text-xs text-gray-500">

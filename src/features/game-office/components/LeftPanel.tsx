@@ -5,6 +5,7 @@ import { MessageSquare, BarChart3, CheckSquare, Bell, Gamepad2, LogIn } from 'lu
 import { useAuthStore } from '@/stores/auth-store'
 import { supabase } from '@/lib/supabase/client'
 import Link from 'next/link'
+import { GAME_OFFICE_LABELS } from './constants/labels'
 
 const TABS = [
   { id: 'stats', label: '數據', icon: BarChart3 },
@@ -32,22 +33,22 @@ export default function LeftPanel() {
       {/* Header */}
       <div className="flex items-center gap-2 p-3 border-b border-gray-800">
         <Gamepad2 className="w-5 h-5 text-emerald-400" />
-        <span className="text-sm font-bold text-emerald-400">遊戲辦公室</span>
+        <span className="text-sm font-bold text-emerald-400">{GAME_OFFICE_LABELS.LABEL_4906}</span>
       </div>
 
       {!isAuthenticated ? (
         /* Not logged in */
         <div className="flex-1 flex flex-col items-center justify-center p-4 gap-4">
           <div className="text-4xl">🎮</div>
-          <p className="text-sm text-gray-400 text-center">登入後可查看即時營運數據</p>
+          <p className="text-sm text-gray-400 text-center">{GAME_OFFICE_LABELS.LABEL_6922}</p>
           <Link
             href="/login"
             className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-sm rounded-lg hover:bg-emerald-500 transition-colors"
           >
             <LogIn className="w-4 h-4" />
-            登入 ERP
+            {GAME_OFFICE_LABELS.LABEL_2142}
           </Link>
-          <p className="text-xs text-gray-600 mt-2">不登入也可以自由佈置辦公室</p>
+          <p className="text-xs text-gray-600 mt-2">{GAME_OFFICE_LABELS.LABEL_4923}</p>
         </div>
       ) : (
         <>
@@ -132,11 +133,11 @@ function StatsPanel() {
     fetchStats()
   }, [])
 
-  if (loading) return <div className="text-xs text-gray-500 animate-pulse">載入中...</div>
+  if (loading) return <div className="text-xs text-gray-500 animate-pulse">{GAME_OFFICE_LABELS.LOADING_6991}</div>
 
   return (
     <div className="space-y-4">
-      <h3 className="text-xs font-bold text-gray-500 uppercase">今日概況</h3>
+      <h3 className="text-xs font-bold text-gray-500 uppercase">{GAME_OFFICE_LABELS.LABEL_3241}</h3>
       <div className="grid grid-cols-2 gap-2">
         {[
           { label: '進行中的團', value: String(stats?.activeTours || 0), color: 'text-blue-400' },
@@ -152,7 +153,7 @@ function StatsPanel() {
       </div>
       {stats?.recentTours && stats.recentTours.length > 0 && (
         <>
-          <h3 className="text-xs font-bold text-gray-500 uppercase mt-4">近期出團</h3>
+          <h3 className="text-xs font-bold text-gray-500 uppercase mt-4">{GAME_OFFICE_LABELS.LABEL_8724}</h3>
           <div className="space-y-2">
             {stats.recentTours.map(t => (
               <div key={t} className="bg-gray-900/50 rounded px-2 py-1.5 text-xs">{t}</div>
@@ -167,7 +168,7 @@ function StatsPanel() {
 function ChatPanel() {
   return (
     <div className="space-y-3">
-      <h3 className="text-xs font-bold text-gray-500 uppercase">辦公室聊天</h3>
+      <h3 className="text-xs font-bold text-gray-500 uppercase">{GAME_OFFICE_LABELS.LABEL_4689}</h3>
       <div className="text-xs text-gray-500 text-center py-8">即將推出 💬</div>
     </div>
   )
@@ -197,7 +198,7 @@ function TodosPanel() {
 
   return (
     <div className="space-y-3">
-      <h3 className="text-xs font-bold text-gray-500 uppercase">今日待辦</h3>
+      <h3 className="text-xs font-bold text-gray-500 uppercase">{GAME_OFFICE_LABELS.LABEL_4477}</h3>
       {todos.map(t => (
         <label key={t.id} className="flex items-center gap-2 text-xs cursor-pointer hover:text-white">
           <input type="checkbox" className="rounded border-gray-600" />
@@ -211,7 +212,7 @@ function TodosPanel() {
 function AlertsPanel() {
   return (
     <div className="space-y-3">
-      <h3 className="text-xs font-bold text-gray-500 uppercase">通知</h3>
+      <h3 className="text-xs font-bold text-gray-500 uppercase">{GAME_OFFICE_LABELS.LABEL_514}</h3>
       <div className="text-xs text-gray-500 text-center py-8">目前沒有新通知 ✅</div>
     </div>
   )

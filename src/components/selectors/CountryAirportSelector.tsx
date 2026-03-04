@@ -193,7 +193,7 @@ export function CountryAirportSelector({
       <FormDialog
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
-        title="新增機場"
+        title={SELECTORS_LABELS.ADD_1468}
         subtitle={`國家：${country}`}
         onSubmit={handleDialogSubmit}
         submitLabel="新增"
@@ -203,7 +203,7 @@ export function CountryAirportSelector({
       >
         <div>
           <label className="text-sm font-medium text-morandi-primary mb-2 block">
-            城市名稱
+            {SELECTORS_LABELS.LABEL_7192}
           </label>
           <Input
             value={newCityName}
@@ -217,7 +217,7 @@ export function CountryAirportSelector({
           <Input
             value={newIataCode}
             onChange={e => setNewIataCode(e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3))}
-            placeholder="例如：XIY"
+            placeholder={SELECTORS_LABELS.EXAMPLE_7494}
             maxLength={3}
           />
           <p className="text-xs text-morandi-secondary mt-1">
