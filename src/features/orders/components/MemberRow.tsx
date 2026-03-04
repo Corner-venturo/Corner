@@ -61,6 +61,7 @@ interface MemberRowProps {
   onRoomAssign?: (memberId: string, hotelName: string, roomId: string | null, memberBirthDate?: string | null) => void
   onRemoveMemberFromRoom?: (memberId: string, hotelName: string) => void  // 移除單一成員（不影響室友）
   onSetAsLeader?: (memberId: string) => void
+  onAddFamily?: (customerId: string) => void  // 家人快速加入
 }
 
 export function MemberRow({
@@ -100,6 +101,7 @@ export function MemberRow({
   onRoomAssign,
   onRemoveMemberFromRoom,
   onSetAsLeader,
+  onAddFamily,
 }: MemberRowProps) {
   const [isComposing, setIsComposing] = useState(false)
 
@@ -417,6 +419,7 @@ export function MemberRow({
         onEdit={onEdit}
         onDelete={onDelete}
         onSetAsLeader={onSetAsLeader}
+        onAddFamily={onAddFamily}
       />
     </tr>
   )

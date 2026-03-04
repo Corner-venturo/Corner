@@ -68,6 +68,8 @@ import {
 } from './'
 import dynamic from 'next/dynamic'
 import { PassportConflictDialog } from './PassportConflictDialog'
+import { FamilyQuickAddDialog } from '@/components/customers/FamilyQuickAddDialog'
+import type { Customer } from '@/stores/types'
 
 const TourPrintDialog = dynamic(() => import('@/features/tours/components/TourPrintDialog').then(m => m.TourPrintDialog), { ssr: false })
 import type { OrderMember, OrderMembersExpandableProps, CustomCostField } from '../types/order-member.types'
@@ -279,6 +281,9 @@ export function OrderMembersExpandable({
   const [isComposing, setIsComposing] = useState(false)
   const [previewMember, setPreviewMember] = useState<OrderMember | null>(null)
   const [customCostFields, setCustomCostFields] = useState<CustomCostField[]>([])
+  // 家庭快速加入對話框
+  const [familyDialogOpen, setFamilyDialogOpen] = useState(false)
+  const [familyDialogCustomerId, setFamilyDialogCustomerId] = useState<string | null>(null)
 
   // 從 DB 載入自訂費用欄位定義和值
   useEffect(() => {
@@ -521,6 +526,55 @@ export function OrderMembersExpandable({
       toast.error(COMP_ORDERS_LABELS.設定領隊失敗)
     }
   }, [membersData])
+
+  // 家庭快速加入
+  const handleAddFamily = useCallback((customerId: string) => {
+    setFamilyDialogCustomerId(customerId)
+    setFamilyDialogOpen(true)
+  }, [])
+
+  // 批次加入家庭成員
+  const handleAddFamilyMembers = useCallback(async (customers: Customer[]) => {
+    if (!effectiveOrderId) {
+      toast.error('無法取得訂單 ID，請重新整理頁面')
+      return
+    }
+
+    try {
+      for (const customer of customers) {
+        // 建立新成員（複製 AddMemberDialog 的邏輯）
+        const newMember = {
+          order_id: effectiveOrderId,
+          customer_id: customer.id,
+          chinese_name: customer.name || '',
+          passport_name: customer.passport_name || '',
+          birth_date: customer.birth_date || null,
+          gender: customer.gender || '',
+          id_number: customer.national_id || '',
+          passport_number: customer.passport_number || '',
+          passport_expiry: customer.passport_expiry || null,
+          special_meal: customer.dietary_restrictions || '',
+          identity: COMP_ORDERS_LABELS.大人,
+          member_type: 'adult' as const,
+          sort_order: membersData.members.length,
+          workspace_id: workspaceId,
+          customer_verification_status: customer.verification_status || 'unverified',
+        }
+
+        const { error } = await supabase
+          .from('order_members')
+          .insert(newMember)
+
+        if (error) throw error
+      }
+
+      toast.success(`已成功加入 ${customers.length} 位家庭成員`)
+      membersData.loadMembers()
+    } catch (error) {
+      logger.error('批次加入家庭成員失敗', error)
+      toast.error('加入家庭成員時發生錯誤')
+    }
+  }, [effectiveOrderId, membersData, workspaceId])
 
   const handleUpdateField = useCallback(async (memberId: string, field: keyof OrderMember, value: string | number | null) => {
     // 對於開票期限，同步更新同 PNR 的所有成員
@@ -960,6 +1014,7 @@ export function OrderMembersExpandable({
                   customerMatch.checkCustomerMatchByIdNumber(value, memberIndex, membersData.members[memberIndex])
                 }}
                 onSetAsLeader={handleSetAsLeader}
+                onAddFamily={handleAddFamily}
                   />
                 ))}
               </tbody>
@@ -1041,6 +1096,14 @@ export function OrderMembersExpandable({
           }}
         />
       )}
+      {/* 家庭快速加入 Dialog */}
+      <FamilyQuickAddDialog
+        customerId={familyDialogCustomerId || ''}
+        existingCustomerIds={membersData.members.map(m => m.customer_id).filter(Boolean) as string[]}
+        open={familyDialogOpen}
+        onClose={() => setFamilyDialogOpen(false)}
+        onAddMembers={handleAddFamilyMembers}
+      />
       <MemberEditDialog
         isOpen={memberEdit.isEditDialogOpen}
         editMode={memberEdit.editMode}
