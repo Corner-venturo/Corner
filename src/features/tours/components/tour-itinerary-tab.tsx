@@ -14,7 +14,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { DatePicker } from '@/components/ui/date-picker'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import {
   Dialog,
   DialogContent,
@@ -177,117 +176,6 @@ function AccommodationDialog({
 }
 
 // ============================================================
-// DayScheduleEditor — single day editing UI
-// ============================================================
-interface DayScheduleEditorProps {
-  day: DailyScheduleItem
-  index: number
-  isFirst: boolean
-  isLast: boolean
-  dateLabel: string
-  onUpdate: (index: number, field: string, value: string | boolean) => void
-}
-
-function DayScheduleEditor({ day, index, isFirst, isLast, dateLabel, onUpdate }: DayScheduleEditorProps) {
-  return (
-    <div className="space-y-3">
-      {/* Route / title */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <span className="bg-morandi-gold text-white text-xs font-bold px-2 py-0.5 rounded">
-              Day {day.day}
-            </span>
-            {dateLabel && <span className="text-xs text-muted-foreground">({dateLabel})</span>}
-          </div>
-          {/* Symbol buttons */}
-          <div className="flex items-center gap-0.5">
-            <button type="button" onClick={() => onUpdate(index, 'route', (day.route || '') + ' → ')}
-              className="p-1 bg-muted/50 hover:bg-morandi-gold/20 rounded transition-colors" title={COMP_TOURS_LABELS.插入箭頭}>
-              <ArrowRight size={12} className="text-morandi-secondary" />
-            </button>
-            <button type="button" onClick={() => onUpdate(index, 'route', (day.route || '') + ' ⇀ ')}
-              className="px-1.5 py-0.5 text-[10px] bg-muted/50 hover:bg-morandi-gold/20 rounded transition-colors font-medium text-morandi-secondary" title={COMP_TOURS_LABELS.插入鉤箭頭}>
-              ⇀
-            </button>
-            <button type="button" onClick={() => onUpdate(index, 'route', (day.route || '') + ' · ')}
-              className="px-1.5 py-0.5 text-[10px] bg-muted/50 hover:bg-morandi-gold/20 rounded transition-colors font-medium text-morandi-secondary" title={COMP_TOURS_LABELS.插入間隔點}>
-              ·
-            </button>
-            <button type="button" onClick={() => onUpdate(index, 'route', (day.route || '') + ' | ')}
-              className="p-1 bg-muted/50 hover:bg-morandi-gold/20 rounded transition-colors" title={COMP_TOURS_LABELS.插入直線}>
-              <Minus size={12} className="text-morandi-secondary" />
-            </button>
-            <button type="button" onClick={() => onUpdate(index, 'route', (day.route || '') + ' ⭐ ')}
-              className="p-1 bg-muted/50 hover:bg-morandi-gold/20 rounded transition-colors" title={COMP_TOURS_LABELS.插入星號}>
-              <Sparkles size={12} className="text-morandi-gold" />
-            </button>
-            <button type="button" onClick={() => onUpdate(index, 'route', (day.route || '') + ' ✈ ')}
-              className="px-1.5 py-0.5 text-[10px] bg-muted/50 hover:bg-morandi-gold/20 rounded transition-colors text-morandi-secondary" title={COMP_TOURS_LABELS.插入飛機}>
-              ✈
-            </button>
-          </div>
-        </div>
-        <Input
-          value={day.route || ''}
-          onChange={e => onUpdate(index, 'route', e.target.value)}
-          placeholder={isFirst ? COMP_TOURS_LABELS.抵達目的地 : isLast ? COMP_TOURS_LABELS.返回台灣 : COMP_TOURS_LABELS.今日行程標題}
-          className="h-8 text-sm"
-        />
-      </div>
-
-      {/* Meals (3 columns) */}
-      <div className="grid grid-cols-3 gap-2 text-xs">
-        {/* Breakfast */}
-        <div className="relative">
-          <Input
-            value={day.hotelBreakfast ? COMP_TOURS_LABELS.飯店早餐 : (day.meals.breakfast || '')}
-            onChange={e => onUpdate(index, 'meals.breakfast', e.target.value)}
-            placeholder={COMP_TOURS_LABELS.早餐}
-            className={`h-8 text-xs ${!isFirst ? 'pr-7' : ''}`}
-            disabled={day.hotelBreakfast}
-          />
-          {!isFirst && (
-            <button type="button" onClick={() => onUpdate(index, 'hotelBreakfast', !day.hotelBreakfast)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer" title={COMP_TOURS_LABELS.飯店早餐}>
-              <Check size={14} className={`transition-opacity ${day.hotelBreakfast ? 'text-morandi-gold opacity-100' : 'text-morandi-secondary opacity-30 hover:opacity-60'}`} />
-            </button>
-          )}
-        </div>
-        {/* Lunch */}
-        <div className="relative">
-          <Input
-            value={day.lunchSelf ? COMP_TOURS_LABELS.敬請自理 : (day.meals.lunch || '')}
-            onChange={e => onUpdate(index, 'meals.lunch', e.target.value)}
-            placeholder={COMP_TOURS_LABELS.午餐}
-            className="h-8 text-xs pr-7"
-            disabled={day.lunchSelf}
-          />
-          <button type="button" onClick={() => onUpdate(index, 'lunchSelf', !day.lunchSelf)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer" title={COMP_TOURS_LABELS.敬請自理}>
-            <Check size={14} className={`transition-opacity ${day.lunchSelf ? 'text-morandi-gold opacity-100' : 'text-morandi-secondary opacity-30 hover:opacity-60'}`} />
-          </button>
-        </div>
-        {/* Dinner */}
-        <div className="relative">
-          <Input
-            value={day.dinnerSelf ? COMP_TOURS_LABELS.敬請自理 : (day.meals.dinner || '')}
-            onChange={e => onUpdate(index, 'meals.dinner', e.target.value)}
-            placeholder={COMP_TOURS_LABELS.晚餐}
-            className="h-8 text-xs pr-7"
-            disabled={day.dinnerSelf}
-          />
-          <button type="button" onClick={() => onUpdate(index, 'dinnerSelf', !day.dinnerSelf)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer" title={COMP_TOURS_LABELS.敬請自理}>
-            <Check size={14} className={`transition-opacity ${day.dinnerSelf ? 'text-morandi-gold opacity-100' : 'text-morandi-secondary opacity-30 hover:opacity-60'}`} />
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ============================================================
 // Main Component
 // ============================================================
 export function TourItineraryTab({ tour }: TourItineraryTabProps) {
@@ -299,7 +187,6 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
   const [saving, setSaving] = useState(false)
   const [currentItineraryId, setCurrentItineraryId] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'edit' | 'preview'>('edit')
-  const [activeDay, setActiveDay] = useState('0')
   const [accommodationOpen, setAccommodationOpen] = useState(false)
 
   // Form data
@@ -404,12 +291,6 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
       }
       // Remove days
       return prev.slice(0, numDays).map((d, i) => ({ ...d, day: i + 1 }))
-    })
-    // Clamp activeDay
-    setActiveDay(prev => {
-      const n = parseInt(prev, 10)
-      if (n >= numDays) return String(numDays - 1)
-      return prev
     })
   }, [numDays])
 
@@ -727,201 +608,253 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
   }
 
   // ============================================================
-  // Edit mode — top/bottom layout
+  // Edit mode — Excel spreadsheet layout
   // ============================================================
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      {/* ── Top section: tour-level info ── */}
-      <div className="p-4 border-b border-border space-y-4">
-        {/* Header row */}
-        <div className="flex items-center justify-between">
-          <h3 className="flex items-center gap-2 text-sm font-bold text-morandi-primary">
-            <FileText className="w-4 h-4 text-morandi-gold" />
-            {currentItineraryId ? COMP_TOURS_LABELS.編輯行程表 : COMP_TOURS_LABELS.建立行程表}
-          </h3>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => setViewMode('preview')} className="h-7 px-2 text-xs gap-1">
-              <Eye size={12} />
-              {TOUR_ITINERARY_TAB_LABELS.預覽}
-            </Button>
-            <Button size="sm" onClick={handleSave} disabled={saving || !title.trim()} className="h-7 px-3 text-xs bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1">
-              {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
-              {currentItineraryId ? COMP_TOURS_LABELS.更新行程 : COMP_TOURS_LABELS.建立行程}
-            </Button>
-          </div>
+      {/* ── Header ── */}
+      <div className="px-4 py-2 flex items-center justify-between">
+        <h3 className="flex items-center gap-2 text-sm font-bold text-morandi-primary">
+          <FileText className="w-4 h-4 text-morandi-gold" />
+          {currentItineraryId ? COMP_TOURS_LABELS.編輯行程表 : COMP_TOURS_LABELS.建立行程表}
+          <span className="font-normal text-xs text-muted-foreground ml-1">— {tour.name || COMP_TOURS_LABELS.未設定}</span>
+        </h3>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => setViewMode('preview')} className="h-7 px-2 text-xs gap-1">
+            <Eye size={12} />
+            {TOUR_ITINERARY_TAB_LABELS.預覽}
+          </Button>
+          <Button size="sm" onClick={handleSave} disabled={saving || !title.trim()} className="h-7 px-3 text-xs bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1">
+            {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
+            {currentItineraryId ? COMP_TOURS_LABELS.更新行程 : COMP_TOURS_LABELS.建立行程}
+          </Button>
         </div>
+      </div>
 
-        {/* Tour name (read-only display) */}
-        <div className="text-sm text-muted-foreground">
-          {tour.name || COMP_TOURS_LABELS.未設定}
-        </div>
-
-        {/* Row: title + days */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div className="md:col-span-2 space-y-1">
-            <Label className="text-xs text-morandi-primary">{TOUR_ITINERARY_TAB_LABELS.行程標題_必填}</Label>
-            <Input
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              placeholder={TOUR_ITINERARY_TAB_LABELS.行程表標題}
-              className="h-8 text-sm"
-            />
+      {/* ── Scrollable content ── */}
+      <div className="flex-1 overflow-y-auto px-4 pb-4">
+        {/* Info row: title + days + accommodation */}
+        <div className="flex items-end gap-3 mb-3">
+          <div className="flex-1 space-y-1">
+            <Label className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.行程標題_必填}</Label>
+            <Input value={title} onChange={e => setTitle(e.target.value)}
+              placeholder={TOUR_ITINERARY_TAB_LABELS.行程表標題} className="h-8 text-sm" />
           </div>
-          <div className="space-y-1">
-            <Label className="text-xs text-morandi-primary">{TOUR_ITINERARY_TAB_LABELS.調整天數}</Label>
-            <Input
-              type="number"
-              min={1}
-              max={30}
-              value={numDays}
-              onChange={e => {
-                const v = parseInt(e.target.value, 10)
-                if (v >= 1 && v <= 30) setNumDays(v)
-              }}
-              className="h-8 text-sm w-full"
-            />
+          <div className="w-20 space-y-1">
+            <Label className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.調整天數}</Label>
+            <Input type="number" min={1} max={30} value={numDays}
+              onChange={e => { const v = parseInt(e.target.value, 10); if (v >= 1 && v <= 30) setNumDays(v) }}
+              className="h-8 text-sm" />
           </div>
-        </div>
-
-        {/* Row: flights + accommodation button */}
-        <div className="flex flex-wrap items-end gap-3">
-          {/* Flights (hidden for domestic) */}
-          {!isDomestic && (
-            <>
-              {/* Outbound flight */}
-              <div className="flex-1 min-w-[200px] border rounded-lg p-2 space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Plane size={10} />
-                    {TOUR_ITINERARY_TAB_LABELS.去程}
-                  </span>
-                  {outboundFlight && (
-                    <button type="button" onClick={() => setOutboundFlight(null)} className="text-destructive hover:text-destructive/80 p-0.5">
-                      <Trash2 size={10} />
-                    </button>
-                  )}
-                </div>
-                {outboundFlight ? (
-                  <div className="bg-muted/50 rounded p-1.5 text-xs">
-                    <span className="font-bold">{outboundFlight.flightNumber}</span>
-                    <span className="text-muted-foreground ml-1">{outboundFlight.airline}</span>
-                    <div className="text-muted-foreground">
-                      {outboundFlight.departureAirport} → {outboundFlight.arrivalAirport}
-                      <span className="ml-1">{outboundFlight.departureTime} - {outboundFlight.arrivalTime}</span>
-                    </div>
-                  </div>
-                ) : outboundSegments.length > 0 ? (
-                  <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.此航班有多個航段_請選擇}</p>
-                    {outboundSegments.map((seg, i) => (
-                      <button key={i} type="button" onClick={() => handleSelectOutboundSegment(seg)}
-                        className="w-full text-left p-1.5 rounded border hover:border-morandi-gold hover:bg-morandi-gold/5 transition-colors text-xs">
-                        {seg.departureAirport} → {seg.arrivalAirport}
-                        <span className="text-muted-foreground ml-1">{seg.departureTime} - {seg.arrivalTime}</span>
-                      </button>
-                    ))}
-                    <button type="button" onClick={clearOutboundSegments} className="text-xs text-muted-foreground hover:text-foreground">{COMP_TOURS_LABELS.取消}</button>
-                  </div>
-                ) : (
-                  <div className="flex gap-1">
-                    <Input value={outboundFlightNumber} onChange={e => setOutboundFlightNumber(e.target.value.toUpperCase())}
-                      placeholder={COMP_TOURS_LABELS.航班號碼_如_BR108} className="h-7 text-xs flex-1"
-                      onKeyDown={e => e.key === 'Enter' && handleSearchOutboundFlight()} />
-                    <DatePicker value={outboundFlightDate} onChange={date => setOutboundFlightDate(date || '')}
-                      placeholder={COMP_TOURS_LABELS.日期} className="h-7 text-xs w-24" />
-                    <Button type="button" size="sm" onClick={handleSearchOutboundFlight} disabled={searchingOutbound}
-                      className="h-7 px-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white">
-                      {searchingOutbound ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
-                    </Button>
-                  </div>
-                )}
-              </div>
-
-              {/* Return flight */}
-              <div className="flex-1 min-w-[200px] border rounded-lg p-2 space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Plane size={10} />
-                    {TOUR_ITINERARY_TAB_LABELS.回程}
-                  </span>
-                  {returnFlight && (
-                    <button type="button" onClick={() => setReturnFlight(null)} className="text-destructive hover:text-destructive/80 p-0.5">
-                      <Trash2 size={10} />
-                    </button>
-                  )}
-                </div>
-                {returnFlight ? (
-                  <div className="bg-muted/50 rounded p-1.5 text-xs">
-                    <span className="font-bold">{returnFlight.flightNumber}</span>
-                    <span className="text-muted-foreground ml-1">{returnFlight.airline}</span>
-                    <div className="text-muted-foreground">
-                      {returnFlight.departureAirport} → {returnFlight.arrivalAirport}
-                      <span className="ml-1">{returnFlight.departureTime} - {returnFlight.arrivalTime}</span>
-                    </div>
-                  </div>
-                ) : returnSegments.length > 0 ? (
-                  <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.此航班有多個航段_請選擇}</p>
-                    {returnSegments.map((seg, i) => (
-                      <button key={i} type="button" onClick={() => handleSelectReturnSegment(seg)}
-                        className="w-full text-left p-1.5 rounded border hover:border-morandi-gold hover:bg-morandi-gold/5 transition-colors text-xs">
-                        {seg.departureAirport} → {seg.arrivalAirport}
-                        <span className="text-muted-foreground ml-1">{seg.departureTime} - {seg.arrivalTime}</span>
-                      </button>
-                    ))}
-                    <button type="button" onClick={clearReturnSegments} className="text-xs text-muted-foreground hover:text-foreground">{COMP_TOURS_LABELS.取消}</button>
-                  </div>
-                ) : (
-                  <div className="flex gap-1">
-                    <Input value={returnFlightNumber} onChange={e => setReturnFlightNumber(e.target.value.toUpperCase())}
-                      placeholder={COMP_TOURS_LABELS.航班號碼_如_BR107} className="h-7 text-xs flex-1"
-                      onKeyDown={e => e.key === 'Enter' && handleSearchReturnFlight()} />
-                    <DatePicker value={returnFlightDate} onChange={date => setReturnFlightDate(date || '')}
-                      placeholder={COMP_TOURS_LABELS.日期} className="h-7 text-xs w-24" />
-                    <Button type="button" size="sm" onClick={handleSearchReturnFlight} disabled={searchingReturn}
-                      className="h-7 px-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white">
-                      {searchingReturn ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-
-          {/* Accommodation button */}
           <Button variant="outline" size="sm" onClick={() => setAccommodationOpen(true)} className="h-8 gap-1">
             <Hotel size={14} />
             {TOUR_ITINERARY_TAB_LABELS.住宿設定}
           </Button>
         </div>
-      </div>
 
-      {/* ── Bottom section: daily tabs ── */}
-      <div className="flex-1 overflow-hidden">
-        <Tabs value={activeDay} onValueChange={setActiveDay} className="flex flex-col h-full">
-          <div className="border-b px-4 overflow-x-auto">
-            <TabsList className="h-9">
-              {dailySchedule.map((_, idx) => (
-                <TabsTrigger key={idx} value={String(idx)} className="text-xs px-3">
-                  {TOUR_ITINERARY_TAB_LABELS.DAY_LABEL(idx + 1)}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+        {/* Flights row (hidden for domestic) */}
+        {!isDomestic && (
+          <div className="flex gap-4 mb-3">
+            {/* Outbound flight */}
+            <div className="flex-1 space-y-1">
+              <div className="flex items-center gap-1.5 text-xs">
+                <Plane size={10} className="text-morandi-gold" />
+                <span className="text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.去程}</span>
+                {outboundFlight && (
+                  <button type="button" onClick={() => setOutboundFlight(null)} className="text-destructive hover:text-destructive/80 ml-auto">
+                    <Trash2 size={10} />
+                  </button>
+                )}
+              </div>
+              {outboundFlight ? (
+                <div className="text-xs text-muted-foreground">
+                  <span className="font-bold text-foreground">{outboundFlight.flightNumber}</span>
+                  <span className="ml-1">{outboundFlight.airline}</span>
+                  <span className="ml-2">{outboundFlight.departureAirport} → {outboundFlight.arrivalAirport}</span>
+                  <span className="ml-1">{outboundFlight.departureTime} - {outboundFlight.arrivalTime}</span>
+                </div>
+              ) : outboundSegments.length > 0 ? (
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.此航班有多個航段_請選擇}</p>
+                  {outboundSegments.map((seg, i) => (
+                    <button key={i} type="button" onClick={() => handleSelectOutboundSegment(seg)}
+                      className="w-full text-left p-1 rounded hover:bg-morandi-gold/10 transition-colors text-xs">
+                      {seg.departureAirport} → {seg.arrivalAirport}
+                      <span className="text-muted-foreground ml-1">{seg.departureTime} - {seg.arrivalTime}</span>
+                    </button>
+                  ))}
+                  <button type="button" onClick={clearOutboundSegments} className="text-xs text-muted-foreground hover:text-foreground">{COMP_TOURS_LABELS.取消}</button>
+                </div>
+              ) : (
+                <div className="flex gap-1">
+                  <Input value={outboundFlightNumber} onChange={e => setOutboundFlightNumber(e.target.value.toUpperCase())}
+                    placeholder={COMP_TOURS_LABELS.航班號碼_如_BR108} className="h-7 text-xs flex-1"
+                    onKeyDown={e => e.key === 'Enter' && handleSearchOutboundFlight()} />
+                  <DatePicker value={outboundFlightDate} onChange={date => setOutboundFlightDate(date || '')}
+                    placeholder={COMP_TOURS_LABELS.日期} className="h-7 text-xs w-24" />
+                  <Button type="button" size="sm" onClick={handleSearchOutboundFlight} disabled={searchingOutbound}
+                    className="h-7 px-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white">
+                    {searchingOutbound ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Return flight */}
+            <div className="flex-1 space-y-1">
+              <div className="flex items-center gap-1.5 text-xs">
+                <Plane size={10} className="text-morandi-gold" />
+                <span className="text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.回程}</span>
+                {returnFlight && (
+                  <button type="button" onClick={() => setReturnFlight(null)} className="text-destructive hover:text-destructive/80 ml-auto">
+                    <Trash2 size={10} />
+                  </button>
+                )}
+              </div>
+              {returnFlight ? (
+                <div className="text-xs text-muted-foreground">
+                  <span className="font-bold text-foreground">{returnFlight.flightNumber}</span>
+                  <span className="ml-1">{returnFlight.airline}</span>
+                  <span className="ml-2">{returnFlight.departureAirport} → {returnFlight.arrivalAirport}</span>
+                  <span className="ml-1">{returnFlight.departureTime} - {returnFlight.arrivalTime}</span>
+                </div>
+              ) : returnSegments.length > 0 ? (
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.此航班有多個航段_請選擇}</p>
+                  {returnSegments.map((seg, i) => (
+                    <button key={i} type="button" onClick={() => handleSelectReturnSegment(seg)}
+                      className="w-full text-left p-1 rounded hover:bg-morandi-gold/10 transition-colors text-xs">
+                      {seg.departureAirport} → {seg.arrivalAirport}
+                      <span className="text-muted-foreground ml-1">{seg.departureTime} - {seg.arrivalTime}</span>
+                    </button>
+                  ))}
+                  <button type="button" onClick={clearReturnSegments} className="text-xs text-muted-foreground hover:text-foreground">{COMP_TOURS_LABELS.取消}</button>
+                </div>
+              ) : (
+                <div className="flex gap-1">
+                  <Input value={returnFlightNumber} onChange={e => setReturnFlightNumber(e.target.value.toUpperCase())}
+                    placeholder={COMP_TOURS_LABELS.航班號碼_如_BR107} className="h-7 text-xs flex-1"
+                    onKeyDown={e => e.key === 'Enter' && handleSearchReturnFlight()} />
+                  <DatePicker value={returnFlightDate} onChange={date => setReturnFlightDate(date || '')}
+                    placeholder={COMP_TOURS_LABELS.日期} className="h-7 text-xs w-24" />
+                  <Button type="button" size="sm" onClick={handleSearchReturnFlight} disabled={searchingReturn}
+                    className="h-7 px-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white">
+                    {searchingReturn ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
+        )}
 
-          {dailySchedule.map((day, idx) => (
-            <TabsContent key={idx} value={String(idx)} className="flex-1 overflow-y-auto p-4 mt-0">
-              <DayScheduleEditor
-                day={day}
-                index={idx}
-                isFirst={idx === 0}
-                isLast={idx === dailySchedule.length - 1}
-                dateLabel={getDateLabel(idx)}
-                onUpdate={updateDaySchedule}
-              />
-            </TabsContent>
-          ))}
-        </Tabs>
+        {/* ── Daily schedule table ── */}
+        <table className="w-full border-collapse text-sm">
+          <thead className="sticky top-0 z-10">
+            <tr className="bg-morandi-gold text-white text-xs">
+              <th className="px-2 py-1.5 text-left w-16 font-medium">{TOUR_ITINERARY_TAB_LABELS.日期_表頭}</th>
+              <th className="px-2 py-1.5 text-left font-medium">{TOUR_ITINERARY_TAB_LABELS.行程內容}</th>
+              <th className="px-1 py-1.5 text-center w-[120px] font-medium">{TOUR_ITINERARY_TAB_LABELS.早餐_表頭}</th>
+              <th className="px-1 py-1.5 text-center w-[120px] font-medium">{TOUR_ITINERARY_TAB_LABELS.午餐_表頭}</th>
+              <th className="px-1 py-1.5 text-center w-[120px] font-medium">{TOUR_ITINERARY_TAB_LABELS.晚餐_表頭}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {dailySchedule.map((day, idx) => {
+              const isFirst = idx === 0
+              const isLast = idx === dailySchedule.length - 1
+              return (
+                <tr key={idx} className={`${idx % 2 === 1 ? 'bg-muted/10' : ''} group`}>
+                  {/* Day + date */}
+                  <td className="px-2 py-1.5 border-b border-border/20 align-top">
+                    <div className="font-semibold text-morandi-gold text-xs">Day {day.day}</div>
+                    {getDateLabel(idx) && <div className="text-[10px] text-muted-foreground">{getDateLabel(idx)}</div>}
+                  </td>
+                  {/* Route + symbol buttons */}
+                  <td className="px-2 py-1.5 border-b border-border/20 align-top">
+                    <div className="flex items-center gap-1">
+                      <Input
+                        value={day.route || ''}
+                        onChange={e => updateDaySchedule(idx, 'route', e.target.value)}
+                        placeholder={isFirst ? COMP_TOURS_LABELS.抵達目的地 : isLast ? COMP_TOURS_LABELS.返回台灣 : COMP_TOURS_LABELS.今日行程標題}
+                        className="h-7 text-xs flex-1"
+                      />
+                      <div className="flex items-center gap-px shrink-0 opacity-40 group-hover:opacity-100 transition-opacity">
+                        <button type="button" onClick={() => updateDaySchedule(idx, 'route', (day.route || '') + ' → ')}
+                          className="p-0.5 hover:bg-morandi-gold/20 rounded" title={COMP_TOURS_LABELS.插入箭頭}>
+                          <ArrowRight size={10} className="text-muted-foreground" />
+                        </button>
+                        <button type="button" onClick={() => updateDaySchedule(idx, 'route', (day.route || '') + ' ⇀ ')}
+                          className="px-1 py-0.5 text-[9px] hover:bg-morandi-gold/20 rounded text-muted-foreground" title={COMP_TOURS_LABELS.插入鉤箭頭}>⇀</button>
+                        <button type="button" onClick={() => updateDaySchedule(idx, 'route', (day.route || '') + ' · ')}
+                          className="px-1 py-0.5 text-[9px] hover:bg-morandi-gold/20 rounded text-muted-foreground" title={COMP_TOURS_LABELS.插入間隔點}>·</button>
+                        <button type="button" onClick={() => updateDaySchedule(idx, 'route', (day.route || '') + ' | ')}
+                          className="p-0.5 hover:bg-morandi-gold/20 rounded" title={COMP_TOURS_LABELS.插入直線}>
+                          <Minus size={10} className="text-muted-foreground" />
+                        </button>
+                        <button type="button" onClick={() => updateDaySchedule(idx, 'route', (day.route || '') + ' ⭐ ')}
+                          className="p-0.5 hover:bg-morandi-gold/20 rounded" title={COMP_TOURS_LABELS.插入星號}>
+                          <Sparkles size={10} className="text-muted-foreground" />
+                        </button>
+                        <button type="button" onClick={() => updateDaySchedule(idx, 'route', (day.route || '') + ' ✈ ')}
+                          className="px-1 py-0.5 text-[9px] hover:bg-morandi-gold/20 rounded text-muted-foreground" title={COMP_TOURS_LABELS.插入飛機}>✈</button>
+                      </div>
+                    </div>
+                  </td>
+                  {/* Breakfast */}
+                  <td className="px-1 py-1.5 border-b border-border/20 align-top">
+                    <div className="relative">
+                      <Input
+                        value={day.hotelBreakfast ? COMP_TOURS_LABELS.飯店早餐 : (day.meals.breakfast || '')}
+                        onChange={e => updateDaySchedule(idx, 'meals.breakfast', e.target.value)}
+                        placeholder={COMP_TOURS_LABELS.早餐}
+                        className={`h-7 text-xs ${!isFirst ? 'pr-6' : ''}`}
+                        disabled={day.hotelBreakfast}
+                      />
+                      {!isFirst && (
+                        <button type="button" onClick={() => updateDaySchedule(idx, 'hotelBreakfast', !day.hotelBreakfast)}
+                          className="absolute right-1.5 top-1/2 -translate-y-1/2" title={COMP_TOURS_LABELS.飯店早餐}>
+                          <Check size={12} className={`transition-opacity ${day.hotelBreakfast ? 'text-morandi-gold opacity-100' : 'text-muted-foreground opacity-30 hover:opacity-60'}`} />
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                  {/* Lunch */}
+                  <td className="px-1 py-1.5 border-b border-border/20 align-top">
+                    <div className="relative">
+                      <Input
+                        value={day.lunchSelf ? COMP_TOURS_LABELS.敬請自理 : (day.meals.lunch || '')}
+                        onChange={e => updateDaySchedule(idx, 'meals.lunch', e.target.value)}
+                        placeholder={COMP_TOURS_LABELS.午餐}
+                        className="h-7 text-xs pr-6"
+                        disabled={day.lunchSelf}
+                      />
+                      <button type="button" onClick={() => updateDaySchedule(idx, 'lunchSelf', !day.lunchSelf)}
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2" title={COMP_TOURS_LABELS.敬請自理}>
+                        <Check size={12} className={`transition-opacity ${day.lunchSelf ? 'text-morandi-gold opacity-100' : 'text-muted-foreground opacity-30 hover:opacity-60'}`} />
+                      </button>
+                    </div>
+                  </td>
+                  {/* Dinner */}
+                  <td className="px-1 py-1.5 border-b border-border/20 align-top">
+                    <div className="relative">
+                      <Input
+                        value={day.dinnerSelf ? COMP_TOURS_LABELS.敬請自理 : (day.meals.dinner || '')}
+                        onChange={e => updateDaySchedule(idx, 'meals.dinner', e.target.value)}
+                        placeholder={COMP_TOURS_LABELS.晚餐}
+                        className="h-7 text-xs pr-6"
+                        disabled={day.dinnerSelf}
+                      />
+                      <button type="button" onClick={() => updateDaySchedule(idx, 'dinnerSelf', !day.dinnerSelf)}
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2" title={COMP_TOURS_LABELS.敬請自理}>
+                        <Check size={12} className={`transition-opacity ${day.dinnerSelf ? 'text-morandi-gold opacity-100' : 'text-muted-foreground opacity-30 hover:opacity-60'}`} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </div>
 
       {/* Accommodation Dialog */}
