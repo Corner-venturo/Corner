@@ -170,26 +170,32 @@ function ItineraryPrintContent() {
             <div className="mb-6 p-4 bg-morandi-container/30 rounded-lg">
               <h3 className="text-sm font-semibold text-morandi-primary mb-2">{PRINT_LABELS.FLIGHT_INFO}</h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
-                {itinerary.outbound_flight && (
-                  <div>
-                    <span className="text-morandi-secondary">{PRINT_LABELS.OUTBOUND}</span>
-                    <span className="ml-2">
-                      {itinerary.outbound_flight.airline} {itinerary.outbound_flight.flightNumber}
-                      {' '}
-                      {itinerary.outbound_flight.departureTime} - {itinerary.outbound_flight.arrivalTime}
-                    </span>
-                  </div>
-                )}
-                {itinerary.return_flight && (
-                  <div>
-                    <span className="text-morandi-secondary">{PRINT_LABELS.RETURN}</span>
-                    <span className="ml-2">
-                      {itinerary.return_flight.airline} {itinerary.return_flight.flightNumber}
-                      {' '}
-                      {itinerary.return_flight.departureTime} - {itinerary.return_flight.arrivalTime}
-                    </span>
-                  </div>
-                )}
+                {itinerary.outbound_flight && (() => {
+                  const flight = Array.isArray(itinerary.outbound_flight) ? itinerary.outbound_flight[0] : itinerary.outbound_flight
+                  return flight ? (
+                    <div>
+                      <span className="text-morandi-secondary">{PRINT_LABELS.OUTBOUND}</span>
+                      <span className="ml-2">
+                        {flight.airline} {flight.flightNumber}
+                        {' '}
+                        {flight.departureTime} - {flight.arrivalTime}
+                      </span>
+                    </div>
+                  ) : null
+                })()}
+                {itinerary.return_flight && (() => {
+                  const flight = Array.isArray(itinerary.return_flight) ? itinerary.return_flight[0] : itinerary.return_flight
+                  return flight ? (
+                    <div>
+                      <span className="text-morandi-secondary">{PRINT_LABELS.RETURN}</span>
+                      <span className="ml-2">
+                        {flight.airline} {flight.flightNumber}
+                        {' '}
+                        {flight.departureTime} - {flight.arrivalTime}
+                      </span>
+                    </div>
+                  ) : null
+                })()}
               </div>
             </div>
           )}

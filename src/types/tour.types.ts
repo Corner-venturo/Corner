@@ -286,9 +286,9 @@ export interface Itinerary {
   price?: string | null // 價格（如：39,800）
   price_note?: string | null // 價格備註（如：起、/人）
 
-  // 航班資訊
-  outbound_flight?: FlightInfo
-  return_flight?: FlightInfo
+  // 航班資訊（支援多航段轉機）
+  outbound_flight?: FlightInfo | FlightInfo[]
+  return_flight?: FlightInfo | FlightInfo[]
   flight_info?: {
     outbound?: {
       flightNumber: string
@@ -450,9 +450,9 @@ export interface Tour extends BaseEntity {
   enable_checkin?: boolean | null // 是否開啟報到功能
   checkin_qrcode?: string | null // 團體報到 QR Code 內容
 
-  // 航班資訊
-  outbound_flight?: FlightInfo | null // 去程航班
-  return_flight?: FlightInfo | null // 回程航班
+  // 航班資訊（支援多航段轉機）
+  outbound_flight?: FlightInfo | FlightInfo[] | null // 去程航班
+  return_flight?: FlightInfo | FlightInfo[] | null // 回程航班
 
   // 版本鎖定欄位已移除 - 公司規範：一團一份，不需版本鎖定
 

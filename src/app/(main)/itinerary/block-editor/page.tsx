@@ -70,11 +70,11 @@ function BlockEditorPageContent() {
           city: itinerary.city || '',
           price: itinerary.price,
           priceNote: itinerary.price_note,
-          outboundFlight: itinerary.outbound_flight || {
+          outboundFlight: (Array.isArray(itinerary.outbound_flight) ? itinerary.outbound_flight[0] : itinerary.outbound_flight) || {
             airline: '', flightNumber: '', departureAirport: '',
             departureTime: '', arrivalAirport: '', arrivalTime: '',
           },
-          returnFlight: itinerary.return_flight || {
+          returnFlight: (Array.isArray(itinerary.return_flight) ? itinerary.return_flight[0] : itinerary.return_flight) || {
             airline: '', flightNumber: '', departureAirport: '',
             departureTime: '', arrivalAirport: '', arrivalTime: '',
           },

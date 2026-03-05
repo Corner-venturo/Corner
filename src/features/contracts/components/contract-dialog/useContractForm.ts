@@ -255,28 +255,31 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
                   gatherDay = departureDate.getDate().toString()
                 }
               }
-            } else if (itinerary.outbound_flight?.departureTime) {
+            } else {
               // 從航班計算集合時間（起飛前3小時）
-              const [hourStr, minuteStr] = itinerary.outbound_flight.departureTime.split(':')
-              let hour = parseInt(hourStr) - 3
-              if (hour < 0) hour += 24
-              gatherHour = hour.toString().padStart(2, '0')
-              gatherMinute = minuteStr.padStart(2, '0')
+              const outboundFlight = Array.isArray(itinerary.outbound_flight) ? itinerary.outbound_flight[0] : itinerary.outbound_flight
+              if (outboundFlight?.departureTime) {
+                const [hourStr, minuteStr] = outboundFlight.departureTime.split(':')
+                let hour = parseInt(hourStr) - 3
+                if (hour < 0) hour += 24
+                gatherHour = hour.toString().padStart(2, '0')
+                gatherMinute = minuteStr.padStart(2, '0')
 
-              if (tour.departure_date) {
-                const departureDate = new Date(tour.departure_date)
-                gatherYear = departureDate.getFullYear().toString()
-                gatherMonth = (departureDate.getMonth() + 1).toString()
-                gatherDay = departureDate.getDate().toString()
+                if (tour.departure_date) {
+                  const departureDate = new Date(tour.departure_date)
+                  gatherYear = departureDate.getFullYear().toString()
+                  gatherMonth = (departureDate.getMonth() + 1).toString()
+                  gatherDay = departureDate.getDate().toString()
+                }
               }
-            }
 
-            // 根據航空公司判斷航廈
-            if (!gatherLocation && itinerary.outbound_flight?.airline) {
-              const airline = itinerary.outbound_flight.airline.toUpperCase()
-              const terminal2Airlines = [COMP_CONTRACTS_LABELS.中華航空, 'CI', 'CHINA AIRLINES', COMP_CONTRACTS_LABELS.華航, COMP_CONTRACTS_LABELS.長榮航空, 'BR', 'EVA', COMP_CONTRACTS_LABELS.星宇航空, 'JX', 'STARLUX', COMP_CONTRACTS_LABELS.台灣虎航, 'IT', 'TIGERAIR', COMP_CONTRACTS_LABELS.樂桃航空, 'MM', 'PEACH', COMP_CONTRACTS_LABELS.捷星航空, 'GK', 'JETSTAR', COMP_CONTRACTS_LABELS.酷航, 'TR', 'SCOOT', COMP_CONTRACTS_LABELS.亞洲航空, 'AK', 'D7', 'AIRASIA']
-              const isTerminal2 = terminal2Airlines.some(t => airline.includes(t.toUpperCase()))
-              gatherLocation = isTerminal2 ? COMP_CONTRACTS_LABELS.桃園國際機場第二航廈 : ''
+              // 根據航空公司判斷航廈
+              if (!gatherLocation && outboundFlight?.airline) {
+                const airline = outboundFlight.airline.toUpperCase()
+                const terminal2Airlines = [COMP_CONTRACTS_LABELS.中華航空, 'CI', 'CHINA AIRLINES', COMP_CONTRACTS_LABELS.華航, COMP_CONTRACTS_LABELS.長榮航空, 'BR', 'EVA', COMP_CONTRACTS_LABELS.星宇航空, 'JX', 'STARLUX', COMP_CONTRACTS_LABELS.台灣虎航, 'IT', 'TIGERAIR', COMP_CONTRACTS_LABELS.樂桃航空, 'MM', 'PEACH', COMP_CONTRACTS_LABELS.捷星航空, 'GK', 'JETSTAR', COMP_CONTRACTS_LABELS.酷航, 'TR', 'SCOOT', COMP_CONTRACTS_LABELS.亞洲航空, 'AK', 'D7', 'AIRASIA']
+                const isTerminal2 = terminal2Airlines.some(t => airline.includes(t.toUpperCase()))
+                gatherLocation = isTerminal2 ? COMP_CONTRACTS_LABELS.桃園國際機場第二航廈 : ''
+              }
             }
           } else if (tour.departure_date) {
             // 沒有行程表，只帶入出發日期

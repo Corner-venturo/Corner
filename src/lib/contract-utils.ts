@@ -183,30 +183,33 @@ export function prepareContractData(
           gatherDay = departureDate.getDate().toString()
         }
       }
-    } else if (itinerary.outbound_flight?.departureTime) {
+    } else {
       // 沒有設定集合時間，從航班資訊計算（起飛前3小時）
-      const gatherTime = calculateGatherTime(itinerary.outbound_flight.departureTime)
-      gatherHour = gatherTime.hour
-      gatherMinute = gatherTime.minute
+      const outboundFlight = Array.isArray(itinerary.outbound_flight) ? itinerary.outbound_flight[0] : itinerary.outbound_flight
+      if (outboundFlight?.departureTime) {
+        const gatherTime = calculateGatherTime(outboundFlight.departureTime)
+        gatherHour = gatherTime.hour
+        gatherMinute = gatherTime.minute
 
-      // 從旅遊團出發日期取得集合日期
-      if (tour.departure_date) {
+        // 從旅遊團出發日期取得集合日期
+        if (tour.departure_date) {
+          const departureDate = new Date(tour.departure_date)
+          gatherYear = departureDate.getFullYear().toString()
+          gatherMonth = (departureDate.getMonth() + 1).toString()
+          gatherDay = departureDate.getDate().toString()
+        }
+      } else if (tour.departure_date) {
+        // 沒有集合時間也沒有航班資訊，只帶入出發日期
         const departureDate = new Date(tour.departure_date)
         gatherYear = departureDate.getFullYear().toString()
         gatherMonth = (departureDate.getMonth() + 1).toString()
         gatherDay = departureDate.getDate().toString()
       }
-    } else if (tour.departure_date) {
-      // 沒有集合時間也沒有航班資訊，只帶入出發日期
-      const departureDate = new Date(tour.departure_date)
-      gatherYear = departureDate.getFullYear().toString()
-      gatherMonth = (departureDate.getMonth() + 1).toString()
-      gatherDay = departureDate.getDate().toString()
-    }
 
-    // 如果沒有設定集合地點，根據航空公司判斷航廈
-    if (!gatherLocation && itinerary.outbound_flight?.airline) {
-      gatherLocation = getTerminalByAirline(itinerary.outbound_flight.airline)
+      // 如果沒有設定集合地點，根據航空公司判斷航廈
+      if (!gatherLocation && outboundFlight?.airline) {
+        gatherLocation = getTerminalByAirline(outboundFlight.airline)
+      }
     }
   } else if (tour.departure_date) {
     // 沒有行程表，只帶入出發日期，時間和地點留空

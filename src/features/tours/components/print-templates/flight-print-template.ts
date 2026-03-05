@@ -1,6 +1,7 @@
 import type { Tour } from '@/stores/types'
 import type { OrderMember } from '@/features/orders/types/order-member.types'
 import type { PNR, PNRSegment } from '@/types/pnr.types'
+import type { FlightInfo } from '@/types/flight.types'
 import { SSRCategory } from '@/lib/pnr-parser/types'
 import type { EnhancedSSR, EnhancedOSI } from '@/lib/pnr-parser'
 import { CLASS_NAMES } from '../tour-print-constants'
@@ -209,7 +210,7 @@ function buildFlightCard(
 }
 
 function buildTourFlightCard(
-  flight: NonNullable<Tour['outbound_flight']>,
+  flight: FlightInfo,
   date: string,
   segIndex: number,
   getAirportName: (c: string) => string
@@ -282,12 +283,14 @@ export function generateFlightPrintContent({
       })
     } else if (tour.outbound_flight || tour.return_flight) {
       let idx = 0
-      if (tour.outbound_flight) {
-        flightCards.push(buildTourFlightCard(tour.outbound_flight, tour.departure_date || '', idx, getAirportName))
+      const outbound = Array.isArray(tour.outbound_flight) ? tour.outbound_flight[0] : tour.outbound_flight
+      const returnFlt = Array.isArray(tour.return_flight) ? tour.return_flight[0] : tour.return_flight
+      if (outbound) {
+        flightCards.push(buildTourFlightCard(outbound, tour.departure_date || '', idx, getAirportName))
         idx++
       }
-      if (tour.return_flight) {
-        flightCards.push(buildTourFlightCard(tour.return_flight, tour.return_date || '', idx, getAirportName))
+      if (returnFlt) {
+        flightCards.push(buildTourFlightCard(returnFlt, tour.return_date || '', idx, getAirportName))
       }
     }
 

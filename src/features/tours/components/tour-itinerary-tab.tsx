@@ -201,9 +201,9 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
   const [dailySchedule, setDailySchedule] = useState<DailyScheduleItem[]>([])
   const [numDays, setNumDays] = useState(5)
 
-  // Flight info
-  const [outboundFlight, setOutboundFlight] = useState<FlightInfo | null>(null)
-  const [returnFlight, setReturnFlight] = useState<FlightInfo | null>(null)
+  // Flight info - 支援多航段（轉機）
+  const [outboundFlights, setOutboundFlights] = useState<FlightInfo[]>([])
+  const [returnFlights, setReturnFlights] = useState<FlightInfo[]>([])
   const [outboundFlightNumber, setOutboundFlightNumber] = useState('')
   const [outboundFlightDate, setOutboundFlightDate] = useState('')
   const [returnFlightNumber, setReturnFlightNumber] = useState('')
@@ -252,12 +252,18 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
   } = useFlightSearch({
     outboundFlight: searchOutboundFlight,
     setOutboundFlight: (flight) => {
-      setOutboundFlight(flight)
+      // 加入陣列（支援多航段轉機）
+      if (flight) {
+        setOutboundFlights(prev => [...prev, flight])
+      }
       setOutboundFlightNumber('')
     },
     returnFlight: searchReturnFlight,
     setReturnFlight: (flight) => {
-      setReturnFlight(flight)
+      // 加入陣列（支援多航段轉機）
+      if (flight) {
+        setReturnFlights(prev => [...prev, flight])
+      }
       setReturnFlightNumber('')
     },
     departureDate: outboundFlightDate || tour.departure_date || '',
@@ -312,11 +318,22 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
           setCurrentItineraryId(itinerary.id)
           setTitle(itinerary.title || tour.name || '')
 
+          // 載入航班資料（兼容舊格式：單一物件 / 新格式：陣列）
           if (itinerary.outbound_flight) {
-            setOutboundFlight(itinerary.outbound_flight as FlightInfo)
+            const outbound = itinerary.outbound_flight
+            if (Array.isArray(outbound)) {
+              setOutboundFlights(outbound as FlightInfo[])
+            } else {
+              setOutboundFlights([outbound as FlightInfo])
+            }
           }
           if (itinerary.return_flight) {
-            setReturnFlight(itinerary.return_flight as FlightInfo)
+            const returnFlt = itinerary.return_flight
+            if (Array.isArray(returnFlt)) {
+              setReturnFlights(returnFlt as FlightInfo[])
+            } else {
+              setReturnFlights([returnFlt as FlightInfo])
+            }
           }
 
           if (itinerary.daily_itinerary && Array.isArray(itinerary.daily_itinerary)) {
@@ -464,26 +481,27 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
         features: [],
         focus_cards: [],
         daily_itinerary: formattedDailyItinerary,
-        outbound_flight: outboundFlight ? {
-          airline: outboundFlight.airline || '',
-          flightNumber: outboundFlight.flightNumber || '',
-          departureAirport: outboundFlight.departureAirport || '',
-          departureTime: outboundFlight.departureTime || '',
+        // 支援多航段（轉機）- 儲存為陣列
+        outbound_flight: outboundFlights.length > 0 ? outboundFlights.map(f => ({
+          airline: f.airline || '',
+          flightNumber: f.flightNumber || '',
+          departureAirport: f.departureAirport || '',
+          departureTime: f.departureTime || '',
           departureDate: '',
-          arrivalAirport: outboundFlight.arrivalAirport || '',
-          arrivalTime: outboundFlight.arrivalTime || '',
+          arrivalAirport: f.arrivalAirport || '',
+          arrivalTime: f.arrivalTime || '',
           duration: '',
-        } : undefined,
-        return_flight: returnFlight ? {
-          airline: returnFlight.airline || '',
-          flightNumber: returnFlight.flightNumber || '',
-          departureAirport: returnFlight.departureAirport || '',
-          departureTime: returnFlight.departureTime || '',
+        })) : undefined,
+        return_flight: returnFlights.length > 0 ? returnFlights.map(f => ({
+          airline: f.airline || '',
+          flightNumber: f.flightNumber || '',
+          departureAirport: f.departureAirport || '',
+          departureTime: f.departureTime || '',
           departureDate: '',
-          arrivalAirport: returnFlight.arrivalAirport || '',
-          arrivalTime: returnFlight.arrivalTime || '',
+          arrivalAirport: f.arrivalAirport || '',
+          arrivalTime: f.arrivalTime || '',
           duration: '',
-        } : undefined,
+        })) : undefined,
       }
 
       if (currentItineraryId) {
@@ -529,7 +547,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
     printWindow.document.write(printContent)
     printWindow.document.close()
     printWindow.print()
-  }, [getPreviewDailyData, title, outboundFlight, returnFlight, tour.departure_date, tour.location, currentUser?.workspace_code, isDomestic])
+  }, [getPreviewDailyData, title, outboundFlights, returnFlights, tour.departure_date, tour.location, currentUser?.workspace_code, isDomestic])
 
   // Compute date label for a given day index
   const getDateLabel = useCallback((idx: number) => {
@@ -683,36 +701,54 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
         {/* Flights row (hidden for domestic) */}
         {!isDomestic && (
           <div className="flex gap-4 mb-3">
-            {/* Outbound flight */}
+            {/* Outbound flights - 支援多航段（轉機） */}
             <div className="flex-1 space-y-1">
               <div className="flex items-center gap-1.5 text-xs">
                 <Plane size={10} className="text-morandi-gold" />
                 <span className="text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.去程}</span>
-                {outboundFlight && (
-                  <button type="button" onClick={() => setOutboundFlight(null)} className="text-destructive hover:text-destructive/80 ml-auto">
-                    <Trash2 size={10} />
+                {outboundFlights.length > 0 && (
+                  <button type="button" onClick={() => setOutboundFlights([])} className="text-destructive hover:text-destructive/80 ml-auto text-xs">
+                    清除全部
                   </button>
                 )}
               </div>
-              {outboundFlight ? (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="text-xs text-muted-foreground cursor-help">
-                        <span className="font-bold text-foreground">{outboundFlight.flightNumber}</span>
-                        <span className="ml-2">{outboundFlight.departureAirport} → {outboundFlight.arrivalAirport}</span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <div className="space-y-1">
-                        <div><span className="font-semibold">航空公司：</span>{outboundFlight.airline}</div>
-                        <div><span className="font-semibold">起飞时间：</span>{outboundFlight.departureTime}</div>
-                        <div><span className="font-semibold">抵达时间：</span>{outboundFlight.arrivalTime}</div>
-                      </div>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              ) : outboundSegments.length > 0 ? (
+              
+              {/* 已選擇的航段列表 */}
+              {outboundFlights.length > 0 && (
+                <div className="space-y-1">
+                  {outboundFlights.map((flight, index) => (
+                    <div key={index} className="flex items-center gap-2 text-xs">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="cursor-help flex-1">
+                              <span className="font-bold text-foreground">{flight.flightNumber}</span>
+                              <span className="ml-2 text-muted-foreground">{flight.departureAirport} → {flight.arrivalAirport}</span>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <div className="space-y-1">
+                              <div><span className="font-semibold">航空公司：</span>{flight.airline}</div>
+                              <div><span className="font-semibold">起飛時間：</span>{flight.departureTime}</div>
+                              <div><span className="font-semibold">抵達時間：</span>{flight.arrivalTime}</div>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <button 
+                        type="button" 
+                        onClick={() => setOutboundFlights(prev => prev.filter((_, i) => i !== index))}
+                        className="text-destructive hover:text-destructive/80"
+                      >
+                        <Trash2 size={10} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* 航段選擇（搜尋結果） */}
+              {outboundSegments.length > 0 ? (
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.此航班有多個航段_請選擇}</p>
                   {outboundSegments.map((seg, i) => (
@@ -725,9 +761,11 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                   <button type="button" onClick={clearOutboundSegments} className="text-xs text-muted-foreground hover:text-foreground">{COMP_TOURS_LABELS.取消}</button>
                 </div>
               ) : (
+                /* 新增航段輸入框 */
                 <div className="flex gap-1">
                   <Input value={outboundFlightNumber} onChange={e => setOutboundFlightNumber(e.target.value.toUpperCase())}
-                    placeholder={COMP_TOURS_LABELS.航班號碼_如_BR108} className="h-7 text-xs flex-1"
+                    placeholder={outboundFlights.length > 0 ? '增加轉機航班' : COMP_TOURS_LABELS.航班號碼_如_BR108} 
+                    className="h-7 text-xs flex-1"
                     onKeyDown={e => e.key === 'Enter' && handleSearchOutboundFlight()} />
                   <DatePicker value={outboundFlightDate} onChange={date => setOutboundFlightDate(date || '')}
                     placeholder={COMP_TOURS_LABELS.日期} className="h-7 text-xs w-24" />
@@ -739,36 +777,54 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
               )}
             </div>
 
-            {/* Return flight */}
+            {/* Return flights - 支援多航段（轉機） */}
             <div className="flex-1 space-y-1">
               <div className="flex items-center gap-1.5 text-xs">
                 <Plane size={10} className="text-morandi-gold" />
                 <span className="text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.回程}</span>
-                {returnFlight && (
-                  <button type="button" onClick={() => setReturnFlight(null)} className="text-destructive hover:text-destructive/80 ml-auto">
-                    <Trash2 size={10} />
+                {returnFlights.length > 0 && (
+                  <button type="button" onClick={() => setReturnFlights([])} className="text-destructive hover:text-destructive/80 ml-auto text-xs">
+                    清除全部
                   </button>
                 )}
               </div>
-              {returnFlight ? (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="text-xs text-muted-foreground cursor-help">
-                        <span className="font-bold text-foreground">{returnFlight.flightNumber}</span>
-                        <span className="ml-2">{returnFlight.departureAirport} → {returnFlight.arrivalAirport}</span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <div className="space-y-1">
-                        <div><span className="font-semibold">航空公司：</span>{returnFlight.airline}</div>
-                        <div><span className="font-semibold">起飞时间：</span>{returnFlight.departureTime}</div>
-                        <div><span className="font-semibold">抵达时间：</span>{returnFlight.arrivalTime}</div>
-                      </div>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              ) : returnSegments.length > 0 ? (
+              
+              {/* 已選擇的航段列表 */}
+              {returnFlights.length > 0 && (
+                <div className="space-y-1">
+                  {returnFlights.map((flight, index) => (
+                    <div key={index} className="flex items-center gap-2 text-xs">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="cursor-help flex-1">
+                              <span className="font-bold text-foreground">{flight.flightNumber}</span>
+                              <span className="ml-2 text-muted-foreground">{flight.departureAirport} → {flight.arrivalAirport}</span>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <div className="space-y-1">
+                              <div><span className="font-semibold">航空公司：</span>{flight.airline}</div>
+                              <div><span className="font-semibold">起飛時間：</span>{flight.departureTime}</div>
+                              <div><span className="font-semibold">抵達時間：</span>{flight.arrivalTime}</div>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <button 
+                        type="button" 
+                        onClick={() => setReturnFlights(prev => prev.filter((_, i) => i !== index))}
+                        className="text-destructive hover:text-destructive/80"
+                      >
+                        <Trash2 size={10} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* 航段選擇（搜尋結果） */}
+              {returnSegments.length > 0 ? (
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.此航班有多個航段_請選擇}</p>
                   {returnSegments.map((seg, i) => (
@@ -781,9 +837,11 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                   <button type="button" onClick={clearReturnSegments} className="text-xs text-muted-foreground hover:text-foreground">{COMP_TOURS_LABELS.取消}</button>
                 </div>
               ) : (
+                /* 新增航段輸入框 */
                 <div className="flex gap-1">
                   <Input value={returnFlightNumber} onChange={e => setReturnFlightNumber(e.target.value.toUpperCase())}
-                    placeholder={COMP_TOURS_LABELS.航班號碼_如_BR107} className="h-7 text-xs flex-1"
+                    placeholder={returnFlights.length > 0 ? '增加轉機航班' : COMP_TOURS_LABELS.航班號碼_如_BR107} 
+                    className="h-7 text-xs flex-1"
                     onKeyDown={e => e.key === 'Enter' && handleSearchReturnFlight()} />
                   <DatePicker value={returnFlightDate} onChange={date => setReturnFlightDate(date || '')}
                     placeholder={COMP_TOURS_LABELS.日期} className="h-7 text-xs w-24" />

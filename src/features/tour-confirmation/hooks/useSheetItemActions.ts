@@ -122,7 +122,8 @@ export function useSheetItemActions({
     setSavingNew(true)
     try {
       if (tour.outbound_flight) {
-        const outbound = tour.outbound_flight
+        const outbound = Array.isArray(tour.outbound_flight) ? tour.outbound_flight[0] : tour.outbound_flight
+        if (!outbound) return
         await addItem({
           sheet_id: sheetId,
           category: 'transport',
@@ -148,7 +149,8 @@ export function useSheetItemActions({
         })
       }
       if (tour.return_flight) {
-        const returnFlight = tour.return_flight
+        const returnFlight = Array.isArray(tour.return_flight) ? tour.return_flight[0] : tour.return_flight
+        if (!returnFlight) return
         await addItem({
           sheet_id: sheetId,
           category: 'transport',

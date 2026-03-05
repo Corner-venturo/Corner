@@ -149,24 +149,30 @@ export function ItineraryVersionPicker({
         country: countryName,
         features: [],
         focus_cards: [],
-        outbound_flight: tour.outbound_flight ? {
-          airline: tour.outbound_flight.airline || '',
-          flightNumber: tour.outbound_flight.flightNumber || '',
-          departureAirport: tour.outbound_flight.departureAirport || 'TPE',
-          departureTime: tour.outbound_flight.departureTime || '',
-          arrivalAirport: tour.outbound_flight.arrivalAirport || '',
-          arrivalTime: tour.outbound_flight.arrivalTime || '',
-          departureDate: tour.outbound_flight.departureDate || '',
-        } : undefined,
-        return_flight: tour.return_flight ? {
-          airline: tour.return_flight.airline || '',
-          flightNumber: tour.return_flight.flightNumber || '',
-          departureAirport: tour.return_flight.departureAirport || '',
-          departureTime: tour.return_flight.departureTime || '',
-          arrivalAirport: tour.return_flight.arrivalAirport || 'TPE',
-          arrivalTime: tour.return_flight.arrivalTime || '',
-          departureDate: tour.return_flight.departureDate || '',
-        } : undefined,
+        outbound_flight: (() => {
+          const flight = Array.isArray(tour.outbound_flight) ? tour.outbound_flight[0] : tour.outbound_flight
+          return flight ? {
+            airline: flight.airline || '',
+            flightNumber: flight.flightNumber || '',
+            departureAirport: flight.departureAirport || 'TPE',
+            departureTime: flight.departureTime || '',
+            arrivalAirport: flight.arrivalAirport || '',
+            arrivalTime: flight.arrivalTime || '',
+            departureDate: flight.departureDate || '',
+          } : undefined
+        })(),
+        return_flight: (() => {
+          const flight = Array.isArray(tour.return_flight) ? tour.return_flight[0] : tour.return_flight
+          return flight ? {
+            airline: flight.airline || '',
+            flightNumber: flight.flightNumber || '',
+            departureAirport: flight.departureAirport || '',
+            departureTime: flight.departureTime || '',
+            arrivalAirport: flight.arrivalAirport || 'TPE',
+            arrivalTime: flight.arrivalTime || '',
+            departureDate: flight.departureDate || '',
+          } : undefined
+        })(),
       } as unknown as Omit<Itinerary, 'id' | 'created_at' | 'updated_at'>)
 
       if (newItinerary?.id) {

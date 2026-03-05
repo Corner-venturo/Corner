@@ -161,26 +161,29 @@ function FlightAddContent({
   onSetManualFlight: React.Dispatch<React.SetStateAction<ManualFlightData>>
   onCancel: () => void
 }) {
-  if (tour.outbound_flight || tour.return_flight) {
+  const outboundFlight = Array.isArray(tour.outbound_flight) ? tour.outbound_flight[0] : tour.outbound_flight
+  const returnFlight = Array.isArray(tour.return_flight) ? tour.return_flight[0] : tour.return_flight
+
+  if (outboundFlight || returnFlight) {
     return (
       <div className="flex items-center gap-4">
         <div className="text-sm space-x-4">
-          {tour.outbound_flight && (
+          {outboundFlight && (
             <span>
               <span className="text-morandi-green">
                 {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.去程}
               </span>{' '}
-              {tour.outbound_flight.airline} {tour.outbound_flight.flightNumber}{' '}
-              {tour.outbound_flight.departureAirport}→{tour.outbound_flight.arrivalAirport}
+              {outboundFlight.airline} {outboundFlight.flightNumber}{' '}
+              {outboundFlight.departureAirport}→{outboundFlight.arrivalAirport}
             </span>
           )}
-          {tour.return_flight && (
+          {returnFlight && (
             <span>
               <span className="text-morandi-gold">
                 {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.回程}
               </span>{' '}
-              {tour.return_flight.airline} {tour.return_flight.flightNumber}{' '}
-              {tour.return_flight.departureAirport}→{tour.return_flight.arrivalAirport}
+              {returnFlight.airline} {returnFlight.flightNumber}{' '}
+              {returnFlight.departureAirport}→{returnFlight.arrivalAirport}
             </span>
           )}
         </div>
