@@ -5,7 +5,7 @@
  */
 
 import { useCallback } from 'react'
-import { MoreVertical, Archive, ArchiveRestore, Trash2 } from 'lucide-react'
+import { MoreVertical, Archive, ArchiveRestore, Trash2, Edit } from 'lucide-react'
 import { Tour, User } from '@/stores/types'
 import type { Proposal } from '@/types/proposal.types'
 import { TOUR_ACTIONS } from '../constants'
@@ -48,6 +48,7 @@ interface UseTourActionButtonsParams {
 export function useTourActionButtons(params: UseTourActionButtonsParams) {
   const {
     operations,
+    onEditTour,
     setDeleteConfirm,
     onOpenArchiveDialog,
     onProposalArchive,
@@ -109,6 +110,10 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+            <DropdownMenuItem onClick={() => onEditTour(tour)}>
+              <Edit size={14} className="mr-2" />
+              編輯
+            </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => {
                 if (tour.archived) {
@@ -143,7 +148,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
         </DropdownMenu>
       )
     },
-    [operations, setDeleteConfirm, onOpenArchiveDialog, onProposalArchive, onProposalDelete]
+    [operations, onEditTour, setDeleteConfirm, onOpenArchiveDialog, onProposalArchive, onProposalDelete]
   )
 
   return {
