@@ -120,7 +120,7 @@ const defaultColumnVisibility: ColumnVisibility = {
   flight_cost: false,   // 機票金額預設關閉
   room: true,   // 分房欄位預設顯示（有資料時）
   vehicle: true,  // 分車欄位預設顯示（有資料時）
-  surcharges: true,  // 附加費用預設顯示
+  surcharges: false,  // 附加費用預設隱藏
 }
 
 // 欄位標籤對照
