@@ -9,7 +9,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { Loader2, FileText, Save, Eye, Edit2, Printer, Plane, Search, Trash2, Check, ArrowRight, Minus, Sparkles, Hotel } from 'lucide-react'
+import { Loader2, FileText, Save, Eye, Edit2, Printer, Plane, Search, Trash2, Check, ArrowRight, Minus, Sparkles, Hotel, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -698,159 +698,153 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
           </Button>
         </div>
 
-        {/* Flights row (hidden for domestic) */}
+        {/* Flights row (hidden for domestic) - Excel 風格可編輯欄位 */}
         {!isDomestic && (
           <div className="flex gap-4 mb-3">
-            {/* Outbound flights - 支援多航段（轉機） */}
-            <div className="flex-1 space-y-1">
+            {/* Outbound flights - Excel 風格 */}
+            <div className="flex-1 space-y-2">
               <div className="flex items-center gap-1.5 text-xs">
                 <Plane size={10} className="text-morandi-gold" />
                 <span className="text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.去程}</span>
-                {outboundFlights.length > 0 && (
-                  <button type="button" onClick={() => setOutboundFlights([])} className="text-destructive hover:text-destructive/80 ml-auto text-xs">
-                    清除全部
-                  </button>
-                )}
               </div>
               
-              {/* 已選擇的航段列表 */}
-              {outboundFlights.length > 0 && (
-                <div className="space-y-1">
-                  {outboundFlights.map((flight, index) => (
-                    <div key={index} className="flex items-center gap-2 text-xs">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="cursor-help flex-1">
-                              <span className="font-bold text-foreground">{flight.flightNumber}</span>
-                              <span className="ml-2 text-muted-foreground">{flight.departureAirport} → {flight.arrivalAirport}</span>
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <div className="space-y-1">
-                              <div><span className="font-semibold">航空公司：</span>{flight.airline}</div>
-                              <div><span className="font-semibold">起飛時間：</span>{flight.departureTime}</div>
-                              <div><span className="font-semibold">抵達時間：</span>{flight.arrivalTime}</div>
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <button 
-                        type="button" 
-                        onClick={() => setOutboundFlights(prev => prev.filter((_, i) => i !== index))}
-                        className="text-destructive hover:text-destructive/80"
-                      >
-                        <Trash2 size={10} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              {/* 航段選擇（搜尋結果） */}
-              {outboundSegments.length > 0 ? (
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.此航班有多個航段_請選擇}</p>
-                  {outboundSegments.map((seg, i) => (
-                    <button key={i} type="button" onClick={() => handleSelectOutboundSegment(seg)}
-                      className="w-full text-left p-1 rounded hover:bg-morandi-gold/10 transition-colors text-xs">
-                      {seg.departureAirport} → {seg.arrivalAirport}
-                      <span className="text-muted-foreground ml-1">{seg.departureTime} - {seg.arrivalTime}</span>
+              {/* 航段列表 - 每個航段都是可編輯的 */}
+              <div className="space-y-2">
+                {outboundFlights.map((flight, index) => (
+                  <div key={index} className="flex items-center gap-1 text-xs border border-border/50 rounded p-1.5 bg-muted/20">
+                    <span className="text-muted-foreground w-4">{index + 1}.</span>
+                    <Input value={flight.airline || ''} 
+                      onChange={e => setOutboundFlights(prev => prev.map((f, i) => i === index ? {...f, airline: e.target.value} : f))}
+                      placeholder="航空" className="h-6 text-xs w-12 px-1" />
+                    <Input value={flight.flightNumber || ''} 
+                      onChange={e => setOutboundFlights(prev => prev.map((f, i) => i === index ? {...f, flightNumber: e.target.value.toUpperCase()} : f))}
+                      placeholder="航班號" className="h-6 text-xs w-16 px-1" />
+                    <Input value={flight.departureAirport || ''} 
+                      onChange={e => setOutboundFlights(prev => prev.map((f, i) => i === index ? {...f, departureAirport: e.target.value.toUpperCase()} : f))}
+                      placeholder="起飛" className="h-6 text-xs w-12 px-1" />
+                    <Input value={flight.departureTime || ''} 
+                      onChange={e => setOutboundFlights(prev => prev.map((f, i) => i === index ? {...f, departureTime: e.target.value} : f))}
+                      placeholder="時間" className="h-6 text-xs w-14 px-1" />
+                    <span className="text-muted-foreground">→</span>
+                    <Input value={flight.arrivalAirport || ''} 
+                      onChange={e => setOutboundFlights(prev => prev.map((f, i) => i === index ? {...f, arrivalAirport: e.target.value.toUpperCase()} : f))}
+                      placeholder="抵達" className="h-6 text-xs w-12 px-1" />
+                    <Input value={flight.arrivalTime || ''} 
+                      onChange={e => setOutboundFlights(prev => prev.map((f, i) => i === index ? {...f, arrivalTime: e.target.value} : f))}
+                      placeholder="時間" className="h-6 text-xs w-14 px-1" />
+                    <button type="button" onClick={() => setOutboundFlights(prev => prev.filter((_, i) => i !== index))}
+                      className="text-destructive hover:text-destructive/80 p-0.5">
+                      <Trash2 size={12} />
                     </button>
-                  ))}
-                  <button type="button" onClick={clearOutboundSegments} className="text-xs text-muted-foreground hover:text-foreground">{COMP_TOURS_LABELS.取消}</button>
-                </div>
-              ) : (
-                /* 新增航段輸入框 */
-                <div className="flex gap-1">
-                  <Input value={outboundFlightNumber} onChange={e => setOutboundFlightNumber(e.target.value.toUpperCase())}
-                    placeholder={outboundFlights.length > 0 ? '增加轉機航班' : COMP_TOURS_LABELS.航班號碼_如_BR108} 
-                    className="h-7 text-xs flex-1"
-                    onKeyDown={e => e.key === 'Enter' && handleSearchOutboundFlight()} />
-                  <DatePicker value={outboundFlightDate} onChange={date => setOutboundFlightDate(date || '')}
-                    placeholder={COMP_TOURS_LABELS.日期} className="h-7 text-xs w-24" />
-                  <Button type="button" size="sm" onClick={handleSearchOutboundFlight} disabled={searchingOutbound}
-                    className="h-7 px-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white">
-                    {searchingOutbound ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
-                  </Button>
-                </div>
-              )}
+                  </div>
+                ))}
+                
+                {/* 新增航段列 - 搜尋或手動輸入 */}
+                {outboundSegments.length > 0 ? (
+                  <div className="space-y-1 p-1.5 border border-morandi-gold/30 rounded bg-morandi-gold/5">
+                    <p className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.此航班有多個航段_請選擇}</p>
+                    {outboundSegments.map((seg, i) => (
+                      <button key={i} type="button" onClick={() => handleSelectOutboundSegment(seg)}
+                        className="w-full text-left p-1 rounded hover:bg-morandi-gold/10 transition-colors text-xs">
+                        {seg.departureAirport} → {seg.arrivalAirport}
+                        <span className="text-muted-foreground ml-1">{seg.departureTime} - {seg.arrivalTime}</span>
+                      </button>
+                    ))}
+                    <button type="button" onClick={clearOutboundSegments} className="text-xs text-muted-foreground hover:text-foreground">{COMP_TOURS_LABELS.取消}</button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 text-xs">
+                    <span className="text-muted-foreground w-4">+</span>
+                    <Input value={outboundFlightNumber} onChange={e => setOutboundFlightNumber(e.target.value.toUpperCase())}
+                      placeholder="輸入航班號搜尋，或直接新增空白列" className="h-6 text-xs flex-1 px-1"
+                      onKeyDown={e => e.key === 'Enter' && (outboundFlightNumber ? handleSearchOutboundFlight() : setOutboundFlights(prev => [...prev, { airline: '', flightNumber: '', departureAirport: '', departureTime: '', arrivalAirport: '', arrivalTime: '' }]))} />
+                    <DatePicker value={outboundFlightDate} onChange={date => setOutboundFlightDate(date || '')}
+                      placeholder="日期" className="h-6 text-xs w-20" />
+                    <Button type="button" size="sm" onClick={handleSearchOutboundFlight} disabled={searchingOutbound || !outboundFlightNumber}
+                      className="h-6 px-1.5 bg-morandi-gold hover:bg-morandi-gold-hover text-white" title="搜尋航班">
+                      {searchingOutbound ? <Loader2 size={10} className="animate-spin" /> : <Search size={10} />}
+                    </Button>
+                    <Button type="button" size="sm" variant="outline" 
+                      onClick={() => setOutboundFlights(prev => [...prev, { airline: '', flightNumber: '', departureAirport: '', departureTime: '', arrivalAirport: '', arrivalTime: '' }])}
+                      className="h-6 px-1.5 text-xs" title="新增空白列">
+                      <Plus size={10} />
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Return flights - 支援多航段（轉機） */}
-            <div className="flex-1 space-y-1">
+            {/* Return flights - Excel 風格 */}
+            <div className="flex-1 space-y-2">
               <div className="flex items-center gap-1.5 text-xs">
                 <Plane size={10} className="text-morandi-gold" />
                 <span className="text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.回程}</span>
-                {returnFlights.length > 0 && (
-                  <button type="button" onClick={() => setReturnFlights([])} className="text-destructive hover:text-destructive/80 ml-auto text-xs">
-                    清除全部
-                  </button>
-                )}
               </div>
               
-              {/* 已選擇的航段列表 */}
-              {returnFlights.length > 0 && (
-                <div className="space-y-1">
-                  {returnFlights.map((flight, index) => (
-                    <div key={index} className="flex items-center gap-2 text-xs">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="cursor-help flex-1">
-                              <span className="font-bold text-foreground">{flight.flightNumber}</span>
-                              <span className="ml-2 text-muted-foreground">{flight.departureAirport} → {flight.arrivalAirport}</span>
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <div className="space-y-1">
-                              <div><span className="font-semibold">航空公司：</span>{flight.airline}</div>
-                              <div><span className="font-semibold">起飛時間：</span>{flight.departureTime}</div>
-                              <div><span className="font-semibold">抵達時間：</span>{flight.arrivalTime}</div>
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <button 
-                        type="button" 
-                        onClick={() => setReturnFlights(prev => prev.filter((_, i) => i !== index))}
-                        className="text-destructive hover:text-destructive/80"
-                      >
-                        <Trash2 size={10} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              {/* 航段選擇（搜尋結果） */}
-              {returnSegments.length > 0 ? (
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.此航班有多個航段_請選擇}</p>
-                  {returnSegments.map((seg, i) => (
-                    <button key={i} type="button" onClick={() => handleSelectReturnSegment(seg)}
-                      className="w-full text-left p-1 rounded hover:bg-morandi-gold/10 transition-colors text-xs">
-                      {seg.departureAirport} → {seg.arrivalAirport}
-                      <span className="text-muted-foreground ml-1">{seg.departureTime} - {seg.arrivalTime}</span>
+              {/* 航段列表 - 每個航段都是可編輯的 */}
+              <div className="space-y-2">
+                {returnFlights.map((flight, index) => (
+                  <div key={index} className="flex items-center gap-1 text-xs border border-border/50 rounded p-1.5 bg-muted/20">
+                    <span className="text-muted-foreground w-4">{index + 1}.</span>
+                    <Input value={flight.airline || ''} 
+                      onChange={e => setReturnFlights(prev => prev.map((f, i) => i === index ? {...f, airline: e.target.value} : f))}
+                      placeholder="航空" className="h-6 text-xs w-12 px-1" />
+                    <Input value={flight.flightNumber || ''} 
+                      onChange={e => setReturnFlights(prev => prev.map((f, i) => i === index ? {...f, flightNumber: e.target.value.toUpperCase()} : f))}
+                      placeholder="航班號" className="h-6 text-xs w-16 px-1" />
+                    <Input value={flight.departureAirport || ''} 
+                      onChange={e => setReturnFlights(prev => prev.map((f, i) => i === index ? {...f, departureAirport: e.target.value.toUpperCase()} : f))}
+                      placeholder="起飛" className="h-6 text-xs w-12 px-1" />
+                    <Input value={flight.departureTime || ''} 
+                      onChange={e => setReturnFlights(prev => prev.map((f, i) => i === index ? {...f, departureTime: e.target.value} : f))}
+                      placeholder="時間" className="h-6 text-xs w-14 px-1" />
+                    <span className="text-muted-foreground">→</span>
+                    <Input value={flight.arrivalAirport || ''} 
+                      onChange={e => setReturnFlights(prev => prev.map((f, i) => i === index ? {...f, arrivalAirport: e.target.value.toUpperCase()} : f))}
+                      placeholder="抵達" className="h-6 text-xs w-12 px-1" />
+                    <Input value={flight.arrivalTime || ''} 
+                      onChange={e => setReturnFlights(prev => prev.map((f, i) => i === index ? {...f, arrivalTime: e.target.value} : f))}
+                      placeholder="時間" className="h-6 text-xs w-14 px-1" />
+                    <button type="button" onClick={() => setReturnFlights(prev => prev.filter((_, i) => i !== index))}
+                      className="text-destructive hover:text-destructive/80 p-0.5">
+                      <Trash2 size={12} />
                     </button>
-                  ))}
-                  <button type="button" onClick={clearReturnSegments} className="text-xs text-muted-foreground hover:text-foreground">{COMP_TOURS_LABELS.取消}</button>
-                </div>
-              ) : (
-                /* 新增航段輸入框 */
-                <div className="flex gap-1">
-                  <Input value={returnFlightNumber} onChange={e => setReturnFlightNumber(e.target.value.toUpperCase())}
-                    placeholder={returnFlights.length > 0 ? '增加轉機航班' : COMP_TOURS_LABELS.航班號碼_如_BR107} 
-                    className="h-7 text-xs flex-1"
-                    onKeyDown={e => e.key === 'Enter' && handleSearchReturnFlight()} />
-                  <DatePicker value={returnFlightDate} onChange={date => setReturnFlightDate(date || '')}
-                    placeholder={COMP_TOURS_LABELS.日期} className="h-7 text-xs w-24" />
-                  <Button type="button" size="sm" onClick={handleSearchReturnFlight} disabled={searchingReturn}
-                    className="h-7 px-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white">
-                    {searchingReturn ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
-                  </Button>
-                </div>
-              )}
+                  </div>
+                ))}
+                
+                {/* 新增航段列 - 搜尋或手動輸入 */}
+                {returnSegments.length > 0 ? (
+                  <div className="space-y-1 p-1.5 border border-morandi-gold/30 rounded bg-morandi-gold/5">
+                    <p className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.此航班有多個航段_請選擇}</p>
+                    {returnSegments.map((seg, i) => (
+                      <button key={i} type="button" onClick={() => handleSelectReturnSegment(seg)}
+                        className="w-full text-left p-1 rounded hover:bg-morandi-gold/10 transition-colors text-xs">
+                        {seg.departureAirport} → {seg.arrivalAirport}
+                        <span className="text-muted-foreground ml-1">{seg.departureTime} - {seg.arrivalTime}</span>
+                      </button>
+                    ))}
+                    <button type="button" onClick={clearReturnSegments} className="text-xs text-muted-foreground hover:text-foreground">{COMP_TOURS_LABELS.取消}</button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 text-xs">
+                    <span className="text-muted-foreground w-4">+</span>
+                    <Input value={returnFlightNumber} onChange={e => setReturnFlightNumber(e.target.value.toUpperCase())}
+                      placeholder="輸入航班號搜尋，或直接新增空白列" className="h-6 text-xs flex-1 px-1"
+                      onKeyDown={e => e.key === 'Enter' && (returnFlightNumber ? handleSearchReturnFlight() : setReturnFlights(prev => [...prev, { airline: '', flightNumber: '', departureAirport: '', departureTime: '', arrivalAirport: '', arrivalTime: '' }]))} />
+                    <DatePicker value={returnFlightDate} onChange={date => setReturnFlightDate(date || '')}
+                      placeholder="日期" className="h-6 text-xs w-20" />
+                    <Button type="button" size="sm" onClick={handleSearchReturnFlight} disabled={searchingReturn || !returnFlightNumber}
+                      className="h-6 px-1.5 bg-morandi-gold hover:bg-morandi-gold-hover text-white" title="搜尋航班">
+                      {searchingReturn ? <Loader2 size={10} className="animate-spin" /> : <Search size={10} />}
+                    </Button>
+                    <Button type="button" size="sm" variant="outline" 
+                      onClick={() => setReturnFlights(prev => [...prev, { airline: '', flightNumber: '', departureAirport: '', departureTime: '', arrivalAirport: '', arrivalTime: '' }])}
+                      className="h-6 px-1.5 text-xs" title="新增空白列">
+                      <Plus size={10} />
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
