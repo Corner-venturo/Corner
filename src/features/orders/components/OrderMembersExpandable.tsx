@@ -917,9 +917,12 @@ export function OrderMembersExpandable({
               )}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button variant="default" size="sm" className="h-8 px-3" onClick={membersData.handleAddMember}>
-            <Plus size={14} className="mr-1" />{COMP_ORDERS_LABELS.新增}
-          </Button>
+          {/* 只在訂單模式下顯示「新增」按鈕，團體模式下應該在訂單詳細頁面新增 */}
+          {mode === 'order' && (
+            <Button variant="default" size="sm" className="h-8 px-3" onClick={membersData.handleAddMember}>
+              <Plus size={14} className="mr-1" />{COMP_ORDERS_LABELS.新增}
+            </Button>
+          )}
         </div>
       </div>
 

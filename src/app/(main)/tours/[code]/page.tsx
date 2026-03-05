@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import useSWR from 'swr'
 import { useParams, useRouter } from 'next/navigation'
@@ -44,8 +44,38 @@ export default function TourDetailPage() {
     code ? `tour-id-${code}` : null,
     () => fetchTourIdByCode(code)
   )
-  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'members')
+  
+  // 分頁記憶：優先順序 URL > localStorage > 預設值
+  const getInitialTab = (): string => {
+    // 1. 優先使用 URL query
+    const urlTab = searchParams.get('tab')
+    if (urlTab) return urlTab
+    
+    // 2. 其次使用 localStorage
+    if (typeof window !== 'undefined') {
+      const lastTab = localStorage.getItem(`tour-${code}-lastTab`)
+      if (lastTab) return lastTab
+    }
+    
+    // 3. 最後使用預設值
+    return 'members'
+  }
+  
+  const [activeTab, setActiveTab] = useState(getInitialTab())
   const [forceShowPnr, setForceShowPnr] = useState(false)
+  
+  // 監聽分頁變更，更新 URL 和 localStorage
+  useEffect(() => {
+    // 更新 URL（不增加瀏覽器歷史記錄）
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('tab', activeTab)
+    router.replace(`/tours/${code}?${params.toString()}`, { scroll: false })
+    
+    // 更新 localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`tour-${code}-lastTab`, activeTab)
+    }
+  }, [activeTab, code, router, searchParams])
 
   // 需求單 Dialog 狀態
   const [showRequestDialog, setShowRequestDialog] = useState(false)
