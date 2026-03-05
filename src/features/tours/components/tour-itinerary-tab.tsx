@@ -20,6 +20,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { Combobox } from '@/components/ui/combobox'
 import type { ComboboxOption } from '@/components/ui/combobox'
 import { logger } from '@/lib/utils/logger'
@@ -689,12 +695,23 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                 )}
               </div>
               {outboundFlight ? (
-                <div className="text-xs text-muted-foreground">
-                  <span className="font-bold text-foreground">{outboundFlight.flightNumber}</span>
-                  <span className="ml-1">{outboundFlight.airline}</span>
-                  <span className="ml-2">{outboundFlight.departureAirport} → {outboundFlight.arrivalAirport}</span>
-                  <span className="ml-1">{outboundFlight.departureTime} - {outboundFlight.arrivalTime}</span>
-                </div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="text-xs text-muted-foreground cursor-help">
+                        <span className="font-bold text-foreground">{outboundFlight.flightNumber}</span>
+                        <span className="ml-2">{outboundFlight.departureAirport} → {outboundFlight.arrivalAirport}</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <div className="space-y-1">
+                        <div><span className="font-semibold">航空公司：</span>{outboundFlight.airline}</div>
+                        <div><span className="font-semibold">起飞时间：</span>{outboundFlight.departureTime}</div>
+                        <div><span className="font-semibold">抵达时间：</span>{outboundFlight.arrivalTime}</div>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               ) : outboundSegments.length > 0 ? (
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.此航班有多個航段_請選擇}</p>
@@ -734,12 +751,23 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                 )}
               </div>
               {returnFlight ? (
-                <div className="text-xs text-muted-foreground">
-                  <span className="font-bold text-foreground">{returnFlight.flightNumber}</span>
-                  <span className="ml-1">{returnFlight.airline}</span>
-                  <span className="ml-2">{returnFlight.departureAirport} → {returnFlight.arrivalAirport}</span>
-                  <span className="ml-1">{returnFlight.departureTime} - {returnFlight.arrivalTime}</span>
-                </div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="text-xs text-muted-foreground cursor-help">
+                        <span className="font-bold text-foreground">{returnFlight.flightNumber}</span>
+                        <span className="ml-2">{returnFlight.departureAirport} → {returnFlight.arrivalAirport}</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <div className="space-y-1">
+                        <div><span className="font-semibold">航空公司：</span>{returnFlight.airline}</div>
+                        <div><span className="font-semibold">起飞时间：</span>{returnFlight.departureTime}</div>
+                        <div><span className="font-semibold">抵达时间：</span>{returnFlight.arrivalTime}</div>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               ) : returnSegments.length > 0 ? (
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.此航班有多個航段_請選擇}</p>
