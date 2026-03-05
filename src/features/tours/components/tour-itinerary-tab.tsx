@@ -26,6 +26,7 @@ import { logger } from '@/lib/utils/logger'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores'
 import { useItineraries, createItinerary, updateItinerary } from '@/data'
+import { updateTour } from '@/data/entities/tours'
 import { useFlightSearch } from '@/hooks'
 import { supabase } from '@/lib/supabase/client'
 import { syncItineraryToQuote } from '@/lib/utils/itinerary-quote-sync'
@@ -643,7 +644,28 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
           <div className="w-20 space-y-1">
             <Label className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.調整天數}</Label>
             <Input type="number" min={1} max={30} value={numDays}
-              onChange={e => { const v = parseInt(e.target.value, 10); if (v >= 1 && v <= 30) setNumDays(v) }}
+              onChange={e => {
+                const v = parseInt(e.target.value, 10)
+                if (v >= 1 && v <= 30) {
+                  setNumDays(v)
+                  // 自动同步团的回程日期
+                  if (tour.departure_date && tour.id) {
+                    const start = new Date(tour.departure_date)
+                    const newReturnDate = new Date(start)
+                    newReturnDate.setDate(start.getDate() + v - 1)
+                    const returnDateStr = newReturnDate.toISOString().split('T')[0]
+                    
+                    updateTour(tour.id, { return_date: returnDateStr })
+                      .then(() => {
+                        toast.success(`已同步更新团的回程日期为 ${returnDateStr}`)
+                      })
+                      .catch(err => {
+                        logger.error('更新团回程日期失败', err)
+                        toast.error('更新回程日期失败')
+                      })
+                  }
+                }
+              }}
               className="h-8 text-sm" />
           </div>
           <Button variant="outline" size="sm" onClick={() => setAccommodationOpen(true)} className="h-8 gap-1">
