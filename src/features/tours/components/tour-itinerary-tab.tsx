@@ -715,20 +715,20 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                     <span className="text-muted-foreground w-4">{index + 1}.</span>
                     <Input value={flight.airline || ''} 
                       onChange={e => setOutboundFlights(prev => prev.map((f, i) => i === index ? {...f, airline: e.target.value} : f))}
-                      placeholder="航空" className="h-6 text-xs w-12 px-1" />
+                      placeholder={TOUR_ITINERARY_TAB_LABELS.LABEL_5176} className="h-6 text-xs w-12 px-1" />
                     <Input value={flight.flightNumber || ''} 
                       onChange={e => setOutboundFlights(prev => prev.map((f, i) => i === index ? {...f, flightNumber: e.target.value.toUpperCase()} : f))}
-                      placeholder="航班號" className="h-6 text-xs w-16 px-1" />
+                      placeholder={TOUR_ITINERARY_TAB_LABELS.LABEL_3349} className="h-6 text-xs w-16 px-1" />
                     <Input value={flight.departureAirport || ''} 
                       onChange={e => setOutboundFlights(prev => prev.map((f, i) => i === index ? {...f, departureAirport: e.target.value.toUpperCase()} : f))}
-                      placeholder="起飛" className="h-6 text-xs w-12 px-1" />
+                      placeholder={TOUR_ITINERARY_TAB_LABELS.LABEL_7681} className="h-6 text-xs w-12 px-1" />
                     <Input value={flight.departureTime || ''} 
                       onChange={e => setOutboundFlights(prev => prev.map((f, i) => i === index ? {...f, departureTime: e.target.value} : f))}
-                      placeholder="時間" className="h-6 text-xs w-14 px-1" />
+                      placeholder={TOUR_ITINERARY_TAB_LABELS.TIME} className="h-6 text-xs w-14 px-1" />
                     <span className="text-muted-foreground">→</span>
                     <Input value={flight.arrivalAirport || ''} 
                       onChange={e => setOutboundFlights(prev => prev.map((f, i) => i === index ? {...f, arrivalAirport: e.target.value.toUpperCase()} : f))}
-                      placeholder="抵達" className="h-6 text-xs w-12 px-1" />
+                      placeholder={TOUR_ITINERARY_TAB_LABELS.抵達} className="h-6 text-xs w-12 px-1" />
                     <Input value={flight.arrivalTime || ''} 
                       onChange={e => setOutboundFlights(prev => prev.map((f, i) => i === index ? {...f, arrivalTime: e.target.value} : f))}
                       placeholder="時間" className="h-6 text-xs w-14 px-1" />
@@ -756,17 +756,17 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                   <div className="flex items-center gap-1 text-xs">
                     <span className="text-muted-foreground w-4">+</span>
                     <Input value={outboundFlightNumber} onChange={e => setOutboundFlightNumber(e.target.value.toUpperCase())}
-                      placeholder="輸入航班號搜尋，或直接新增空白列" className="h-6 text-xs flex-1 px-1"
+                      placeholder={TOUR_ITINERARY_TAB_LABELS.SEARCH_8458} className="h-6 text-xs flex-1 px-1"
                       onKeyDown={e => e.key === 'Enter' && (outboundFlightNumber ? handleSearchOutboundFlight() : setOutboundFlights(prev => [...prev, { airline: '', flightNumber: '', departureAirport: '', departureTime: '', arrivalAirport: '', arrivalTime: '' }]))} />
                     <DatePicker value={outboundFlightDate} onChange={date => setOutboundFlightDate(date || '')}
-                      placeholder="日期" className="h-6 text-xs w-20" />
+                      placeholder={TOUR_ITINERARY_TAB_LABELS.日期_表頭} className="h-6 text-xs w-20" />
                     <Button type="button" size="sm" onClick={handleSearchOutboundFlight} disabled={searchingOutbound || !outboundFlightNumber}
-                      className="h-6 px-1.5 bg-morandi-gold hover:bg-morandi-gold-hover text-white" title="搜尋航班">
+                      className="h-6 px-1.5 bg-morandi-gold hover:bg-morandi-gold-hover text-white" title={TOUR_ITINERARY_TAB_LABELS.SEARCH_3338}>
                       {searchingOutbound ? <Loader2 size={10} className="animate-spin" /> : <Search size={10} />}
                     </Button>
                     <Button type="button" size="sm" variant="outline" 
                       onClick={() => setOutboundFlights(prev => [...prev, { airline: '', flightNumber: '', departureAirport: '', departureTime: '', arrivalAirport: '', arrivalTime: '' }])}
-                      className="h-6 px-1.5 text-xs" title="新增空白列">
+                      className="h-6 px-1.5 text-xs" title={TOUR_ITINERARY_TAB_LABELS.ADD_9636}>
                       <Plus size={10} />
                     </Button>
                   </div>

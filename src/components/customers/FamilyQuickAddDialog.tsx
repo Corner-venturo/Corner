@@ -212,7 +212,7 @@ export function FamilyQuickAddDialog({
                         <div className="flex-1 min-w-0">
                           <div className="font-medium">{customer.name}</div>
                           <div className="text-sm text-muted-foreground">
-                            {customer.passport_number && <div>護照：{customer.passport_number}</div>}
+                            {customer.passport_number && <div>{CUSTOMERS_LABELS.LABEL_9194}{customer.passport_number}</div>}
                           </div>
                         </div>
                       </div>

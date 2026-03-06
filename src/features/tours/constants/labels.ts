@@ -870,6 +870,14 @@ export const TOUR_ITINERARY_TAB_LABELS = {
 
   PRINT_5670: '列印功能暫時停用',
   PRINT_5535: '正在重新實作列印功能...',
+
+  LABEL_5176: '航空',
+  LABEL_3349: '航班號',
+  LABEL_7681: '起飛',
+  TIME: '時間',
+  SEARCH_8458: '輸入航班號搜尋，或直接新增空白列',
+  SEARCH_3338: '搜尋航班',
+  ADD_9636: '新增空白列',
 };
 
 // TourCosts 模組的 UI 標籤

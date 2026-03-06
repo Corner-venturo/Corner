@@ -15,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { TOURS_LABELS } from './constants/labels'
 
 // 擴展 Tour 類型，增加提案標記
 type TourOrProposal = Tour & {
@@ -112,7 +113,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
           <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
             <DropdownMenuItem onClick={() => onEditTour(tour)}>
               <Edit size={14} className="mr-2" />
-              編輯
+              {TOURS_LABELS.EDIT}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => {
