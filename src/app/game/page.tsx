@@ -25,6 +25,9 @@ const ASSET_ROUTES: Record<string, { label: string; path: string }> = {
   'RotationScreen_A_Tile': { label: '團體管理', path: '/workspace/tours' },
   'RotationScreen_B_Tile': { label: '團體管理', path: '/workspace/tours' },
   'RotationScreen_C_Tile': { label: '報表', path: '/workspace/reports' },
+  'MeetingTable_Tile': { label: '會議室', path: '/meeting' },
+  'Whiteboard_Tile': { label: '會議室', path: '/meeting' },
+  'ConferenceTable_Tile': { label: '會議室', path: '/meeting' },
 }
 
 export default function GameOfficePage() {

@@ -1,37 +1,24 @@
 // AI Endpoints 設定
-// 所有 OpenClaw 都在同一個網域（Tailscale 或內網）
+// 透過 OpenClaw Gateway WebSocket 呼叫 AI
+
+import WebSocket from 'ws';
 
 export interface AIEndpoint {
   id: string;
   name: string;
-  url: string;
   emoji: string;
-  triggers: string[]; // 觸發關鍵字
+  triggers: string[];
+  agentId: string;
 }
 
 export const AI_ENDPOINTS: AIEndpoint[] = [
   {
     id: 'yuzuki',
     name: '悠月',
-    url: 'http://100.89.92.46:3067',
     emoji: '🌙',
     triggers: ['@悠月', '@yuzuki', '查詢', '幫我', '建議'],
+    agentId: 'william',
   },
-  // 未來加入其他 AI
-  // {
-  //   id: 'carson-ai',
-  //   name: 'Carson AI',
-  //   url: 'http://100.x.x.x:3067',
-  //   emoji: '💼',
-  //   triggers: ['@Carson', '業務', '客戶'],
-  // },
-  // {
-  //   id: 'accounting-ai',
-  //   name: '會計 AI',
-  //   url: 'http://100.x.x.x:3067',
-  //   emoji: '💰',
-  //   triggers: ['@會計', '財務', '預算', '成本'],
-  // },
 ];
 
 /**
@@ -46,34 +33,105 @@ export function getTriggeredAIs(message: string): AIEndpoint[] {
 }
 
 /**
- * 呼叫單一 AI
+ * 透過 OpenClaw Gateway WebSocket 呼叫 AI
  */
 export async function callAI(
   endpoint: AIEndpoint, 
   message: string,
-  context?: string
 ): Promise<string> {
-  try {
-    const response = await fetch(`${endpoint.url}/api/sessions/send`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionKey: 'meeting',
-        message: context ? `${context}\n\n${message}` : message,
-      }),
-    });
+  const GATEWAY_URL = process.env.OPENCLAW_GATEWAY_URL || 'ws://127.0.0.1:18789';
+  const GATEWAY_TOKEN = process.env.OPENCLAW_GATEWAY_TOKEN || '';
+  
+  return new Promise((resolve) => {
+    const timeout = setTimeout(() => {
+      resolve(`⚠️ ${endpoint.name} 回應逾時`);
+    }, 30000);
 
-    if (!response.ok) {
-      throw new Error(`AI ${endpoint.name} 回應失敗`);
+    try {
+      const wsUrl = GATEWAY_TOKEN 
+        ? `${GATEWAY_URL}?token=${GATEWAY_TOKEN}`
+        : GATEWAY_URL;
+      
+      const ws = new WebSocket(wsUrl);
+      let replied = false;
+
+      ws.on('open', () => {
+        // Send hello
+        ws.send(JSON.stringify({
+          jsonrpc: '2.0',
+          method: 'hello',
+          id: 1,
+          params: {
+            clientId: `meeting-${Date.now()}`,
+            mode: 'api',
+          },
+        }));
+      });
+
+      ws.on('message', (data: WebSocket.Data) => {
+        try {
+          const msg = JSON.parse(data.toString());
+          
+          // After hello response, send the message
+          if (msg.id === 1 && msg.result) {
+            ws.send(JSON.stringify({
+              jsonrpc: '2.0',
+              method: 'sessions.turn',
+              id: 2,
+              params: {
+                agentId: endpoint.agentId,
+                sessionKey: `meeting-${Date.now()}`,
+                message: `[會議室訊息] ${message}`,
+              },
+            }));
+          }
+
+          // Collect the response
+          if (msg.id === 2 && msg.result && !replied) {
+            replied = true;
+            clearTimeout(timeout);
+            const reply = msg.result.reply || msg.result.text || msg.result.message || '';
+            ws.close();
+            resolve(reply || `${endpoint.emoji} ${endpoint.name} 收到了`);
+          }
+
+          // Handle streaming - collect text
+          if (msg.method === 'sessions.stream' && msg.params?.text && !replied) {
+            // For streaming, we wait for the final result
+          }
+
+          // Handle errors
+          if (msg.error) {
+            replied = true;
+            clearTimeout(timeout);
+            ws.close();
+            resolve(`⚠️ ${endpoint.name}: ${msg.error.message || '未知錯誤'}`);
+          }
+        } catch {
+          // ignore parse errors
+        }
+      });
+
+      ws.on('error', () => {
+        if (!replied) {
+          replied = true;
+          clearTimeout(timeout);
+          resolve(`⚠️ 無法連接 ${endpoint.name}（Gateway 離線？）`);
+        }
+      });
+
+      ws.on('close', () => {
+        if (!replied) {
+          replied = true;
+          clearTimeout(timeout);
+          resolve(`⚠️ ${endpoint.name} 連線中斷`);
+        }
+      });
+    } catch {
+      clearTimeout(timeout);
+      resolve(`⚠️ 無法連接 ${endpoint.name}`);
     }
-
-    const data = await response.json();
-    return data.reply || `${endpoint.emoji} ${endpoint.name} 正在思考...`;
-
-  } catch (error) {
-    console.error(`呼叫 ${endpoint.name} 失敗:`, error);
-    return `⚠️ 無法連接 ${endpoint.name}`;
-  }
+  });
 }
 
 /**
@@ -82,11 +140,10 @@ export async function callAI(
 export async function callMultipleAIs(
   endpoints: AIEndpoint[],
   message: string,
-  context?: string
 ): Promise<Record<string, string>> {
   const promises = endpoints.map(async (endpoint) => ({
     id: endpoint.id,
-    response: await callAI(endpoint, message, context),
+    response: await callAI(endpoint, message),
   }));
 
   const results = await Promise.all(promises);

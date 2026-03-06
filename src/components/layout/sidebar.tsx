@@ -39,6 +39,7 @@ import {
   Truck,
   LineChart,
   Gamepad2,
+  MessagesSquare,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
@@ -118,6 +119,7 @@ const menuItems: MenuItem[] = [
       { href: '/database/archive-management', label: COMP_LAYOUT_LABELS.封存管理, icon: Archive, requiredPermission: 'database' },
     ],
   },
+  { href: '/meeting', label: COMP_LAYOUT_LABELS.會議室, icon: MessagesSquare },
   { href: '/hr', label: COMP_LAYOUT_LABELS.人資管理, icon: UserCog, requiredPermission: 'hr' },
   { href: '/tenants', label: COMP_LAYOUT_LABELS.租戶管理, icon: Building, requiredPermission: 'super_admin_only' },
   { href: '/scheduling', label: COMP_LAYOUT_LABELS.資源調度, icon: Calendar, requiredPermission: 'hr' },
