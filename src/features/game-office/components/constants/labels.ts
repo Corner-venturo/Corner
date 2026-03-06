@@ -12,6 +12,17 @@ export const GAME_OFFICE_LABELS = {
 
   SEARCH_6779: '搜尋...',
 
+  // Context menu
+  CTX_DELETE: '刪除',
+  CTX_FLIP: '翻轉',
+  CTX_COPY: '複製',
+
+  // Editor UI
+  ASSET_PALETTE: '素材庫',
+  DESELECT_BTN: '取消選取 (選取模式)',
+  HELP_PLACE: '點擊素材 → 點擊場景放置 (可連續)',
+  HELP_SHORTCUTS: 'Del 刪除 | F 翻轉 | Esc 取消 | Ctrl+Z 復原',
+
   LABEL_8131: '今日概覽',
   LABEL_8538: '出發團數',
   CONFIRM_173: '待確認訂單',
