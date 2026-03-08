@@ -569,7 +569,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                 <label className="text-sm font-medium text-morandi-primary">{ADD_REQUEST_FORM_LABELS.備註}</label>
                 <Input
                   value={formData.notes}
-                  onChange={e => setFormData(prev => ({ ...prev, note: e.target.value }))}
+                  onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
                   placeholder={ADD_REQUEST_DIALOG_LABELS.輸入備註_可選}
                   className="mt-1"
                 />
@@ -820,7 +820,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                   <label className="text-sm font-medium text-morandi-primary">{ADD_REQUEST_FORM_LABELS.備註}</label>
                   <Input
                     value={formData.notes}
-                    onChange={e => setFormData(prev => ({ ...prev, note: e.target.value }))}
+                    onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
                     placeholder={ADD_REQUEST_DIALOG_LABELS.輸入備註_可選}
                     className="mt-1"
                   />

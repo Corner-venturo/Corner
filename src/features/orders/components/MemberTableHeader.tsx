@@ -347,7 +347,7 @@ export function MemberTableHeader({
         ))}
 
         {/* 操作 */}
-        <th className={`${thBaseClass} text-center`} style={{ minWidth: '80px' }}>
+        <th className={`${thBaseClass} text-left`} style={{ minWidth: '80px' }}>
           {L.actions}
         </th>
       </tr>

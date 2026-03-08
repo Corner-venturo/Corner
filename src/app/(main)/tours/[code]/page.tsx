@@ -67,15 +67,13 @@ export default function TourDetailPage() {
   // 監聽分頁變更，更新 URL 和 localStorage
   useEffect(() => {
     // 更新 URL（不增加瀏覽器歷史記錄）
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(window.location.search)
     params.set('tab', activeTab)
     router.replace(`/tours/${code}?${params.toString()}`, { scroll: false })
-    
+
     // 更新 localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(`tour-${code}-lastTab`, activeTab)
-    }
-  }, [activeTab, code, router, searchParams])
+    localStorage.setItem(`tour-${code}-lastTab`, activeTab)
+  }, [activeTab, code, router])
 
   // 需求單 Dialog 狀態
   const [showRequestDialog, setShowRequestDialog] = useState(false)

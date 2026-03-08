@@ -30,8 +30,8 @@ export function MemberActions({
   const { hasFamily, memberCount, isLoading } = useHasFamily(member.customer_id)
   
   return (
-    <td className="border border-morandi-gold/20 px-2 py-1 bg-card text-center">
-      <div className="flex items-center justify-center gap-1">
+    <td className="border border-morandi-gold/20 px-2 py-1 bg-card">
+      <div className="flex items-center gap-1">
         {/* 警告按鈕（待驗證時顯示） */}
         {member.customer_verification_status === 'unverified' && (
           <button
