@@ -15,6 +15,7 @@ import { InvoiceDialog } from '@/features/finance/components/invoice-dialog'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { AddOrderForm, type OrderFormData } from '@/features/orders/components/add-order-form'
+import { OrderEditDialog } from '@/features/orders/components/order-edit-dialog'
 import { createOrder } from '@/data'
 import { recalculateParticipants } from '@/features/tours/services/tour-stats.service'
 import { Plus } from 'lucide-react'
@@ -43,6 +44,10 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
   // 請款對話框狀態
   const [requestDialogOpen, setRequestDialogOpen] = useState(false)
   const [selectedOrderForRequest, setSelectedOrderForRequest] = useState<Order | null>(null)
+
+  // 編輯對話框狀態
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [selectedOrderForEdit, setSelectedOrderForEdit] = useState<Order | null>(null)
 
   // 發票對話框狀態
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false)
@@ -83,6 +88,12 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
   const handleQuickPaymentRequest = useCallback((order: Order) => {
     setSelectedOrderForRequest(order)
     setRequestDialogOpen(true)
+  }, [])
+
+  // 處理編輯訂單
+  const handleEdit = useCallback((order: Order) => {
+    setSelectedOrderForEdit(order)
+    setEditDialogOpen(true)
   }, [])
 
   // 處理開發票
@@ -171,6 +182,7 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
         onQuickReceipt={handleQuickReceipt}
         onQuickPaymentRequest={handleQuickPaymentRequest}
         onQuickInvoice={handleQuickInvoice}
+        onEdit={handleEdit}
         onAdd={() => setAddDialogOpen(true)}
       />
 
@@ -201,6 +213,21 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
           <AddOrderForm tourId={tour.id} onSubmit={handleAddOrder} onCancel={() => setAddDialogOpen(false)} />
         </DialogContent>
       </Dialog>
+
+      {/* 編輯訂單對話框 */}
+      {selectedOrderForEdit && (
+        <OrderEditDialog
+          open={editDialogOpen}
+          onOpenChange={(open) => {
+            setEditDialogOpen(open)
+            if (!open) {
+              setSelectedOrderForEdit(null)
+              handleReceiptSuccess()
+            }
+          }}
+          order={selectedOrderForEdit as OrderType}
+        />
+      )}
 
       {/* 發票對話框 */}
       <InvoiceDialog

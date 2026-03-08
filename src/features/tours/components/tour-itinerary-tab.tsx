@@ -202,8 +202,9 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
   const [numDays, setNumDays] = useState(5)
 
   // Flight info - 支援多航段（轉機）
-  const [outboundFlights, setOutboundFlights] = useState<FlightInfo[]>([])
-  const [returnFlights, setReturnFlights] = useState<FlightInfo[]>([])
+  const defaultEmptyFlight: FlightInfo = { airline: '', flightNumber: '', departureAirport: '', departureTime: '', arrivalAirport: '', arrivalTime: '' }
+  const [outboundFlights, setOutboundFlights] = useState<FlightInfo[]>([{ ...defaultEmptyFlight }])
+  const [returnFlights, setReturnFlights] = useState<FlightInfo[]>([{ ...defaultEmptyFlight }])
   const [outboundFlightNumber, setOutboundFlightNumber] = useState('')
   const [outboundFlightDate, setOutboundFlightDate] = useState('')
   const [returnFlightNumber, setReturnFlightNumber] = useState('')
@@ -319,6 +320,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
           setTitle(itinerary.title || tour.name || '')
 
           // 載入航班資料（兼容舊格式：單一物件 / 新格式：陣列）
+          const emptyFlight: FlightInfo = { airline: '', flightNumber: '', departureAirport: '', departureTime: '', arrivalAirport: '', arrivalTime: '' }
           if (itinerary.outbound_flight) {
             const outbound = itinerary.outbound_flight
             if (Array.isArray(outbound)) {
@@ -326,6 +328,8 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
             } else {
               setOutboundFlights([outbound as FlightInfo])
             }
+          } else {
+            setOutboundFlights([{ ...emptyFlight }])
           }
           if (itinerary.return_flight) {
             const returnFlt = itinerary.return_flight
@@ -334,6 +338,8 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
             } else {
               setReturnFlights([returnFlt as FlightInfo])
             }
+          } else {
+            setReturnFlights([{ ...emptyFlight }])
           }
 
           if (itinerary.daily_itinerary && Array.isArray(itinerary.daily_itinerary)) {
@@ -700,48 +706,58 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
 
         {/* Flights row (hidden for domestic) - Excel 風格可編輯欄位 */}
         {!isDomestic && (
-          <div className="flex gap-4 mb-3">
-            {/* Outbound flights - Excel 風格 */}
-            <div className="flex-1 space-y-2">
-              <div className="flex items-center gap-1.5 text-xs">
-                <Plane size={10} className="text-morandi-gold" />
-                <span className="text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.去程}</span>
+          <div className="flex gap-6 mb-3">
+            {/* Outbound flights */}
+            <div className="flex-1">
+              <div className="flex items-center gap-1.5 text-xs mb-1.5">
+                <Plane size={12} className="text-morandi-gold" />
+                <span className="text-muted-foreground font-medium">{TOUR_ITINERARY_TAB_LABELS.去程}</span>
               </div>
-              
-              {/* 航段列表 - 每個航段都是可編輯的 */}
-              <div className="space-y-2">
+              <div className="border border-border/50 rounded overflow-hidden">
+                {/* 表頭 */}
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/30 px-2 py-1.5 border-b border-border/30">
+                  <span className="w-16">{TOUR_ITINERARY_TAB_LABELS.LABEL_5176}</span>
+                  <span className="w-20">{TOUR_ITINERARY_TAB_LABELS.LABEL_3349}</span>
+                  <span className="w-14">{TOUR_ITINERARY_TAB_LABELS.LABEL_7681}</span>
+                  <span className="w-16">{TOUR_ITINERARY_TAB_LABELS.TIME}</span>
+                  <span className="w-4"></span>
+                  <span className="w-14">{TOUR_ITINERARY_TAB_LABELS.抵達}</span>
+                  <span className="w-16">{TOUR_ITINERARY_TAB_LABELS.TIME}</span>
+                  <span className="flex-1"></span>
+                </div>
+                {/* 資料列 */}
                 {outboundFlights.map((flight, index) => (
-                  <div key={index} className="flex items-center gap-1 text-xs border border-border/50 rounded p-1.5 bg-muted/20">
-                    <span className="text-muted-foreground w-4">{index + 1}.</span>
-                    <Input value={flight.airline || ''} 
+                  <div key={index} className="flex items-center gap-1.5 text-sm px-2 py-1 border-b border-border/20 hover:bg-muted/10 group">
+                    <Input value={flight.airline || ''} placeholder="—"
                       onChange={e => setOutboundFlights(prev => prev.map((f, i) => i === index ? {...f, airline: e.target.value} : f))}
-                      placeholder={TOUR_ITINERARY_TAB_LABELS.LABEL_5176} className="h-6 text-xs w-12 px-1" />
-                    <Input value={flight.flightNumber || ''} 
+                      className="h-7 text-sm w-16 px-1 border-0 border-b border-border/30 rounded-none bg-transparent focus-visible:bg-white focus-visible:border focus-visible:rounded" />
+                    <Input value={flight.flightNumber || ''} placeholder="—"
                       onChange={e => setOutboundFlights(prev => prev.map((f, i) => i === index ? {...f, flightNumber: e.target.value.toUpperCase()} : f))}
-                      placeholder={TOUR_ITINERARY_TAB_LABELS.LABEL_3349} className="h-6 text-xs w-16 px-1" />
-                    <Input value={flight.departureAirport || ''} 
+                      className="h-7 text-sm w-20 px-1 border-0 border-b border-border/30 rounded-none bg-transparent focus-visible:bg-white focus-visible:border focus-visible:rounded" />
+                    <Input value={flight.departureAirport || ''} placeholder="—"
                       onChange={e => setOutboundFlights(prev => prev.map((f, i) => i === index ? {...f, departureAirport: e.target.value.toUpperCase()} : f))}
-                      placeholder={TOUR_ITINERARY_TAB_LABELS.LABEL_7681} className="h-6 text-xs w-12 px-1" />
-                    <Input value={flight.departureTime || ''} 
+                      className="h-7 text-sm w-14 px-1 border-0 border-b border-border/30 rounded-none bg-transparent focus-visible:bg-white focus-visible:border focus-visible:rounded" />
+                    <Input value={flight.departureTime || ''} placeholder="—"
                       onChange={e => setOutboundFlights(prev => prev.map((f, i) => i === index ? {...f, departureTime: e.target.value} : f))}
-                      placeholder={TOUR_ITINERARY_TAB_LABELS.TIME} className="h-6 text-xs w-14 px-1" />
-                    <span className="text-muted-foreground">→</span>
-                    <Input value={flight.arrivalAirport || ''} 
+                      className="h-7 text-sm w-16 px-1 border-0 border-b border-border/30 rounded-none bg-transparent focus-visible:bg-white focus-visible:border focus-visible:rounded" />
+                    <span className="text-muted-foreground w-4 text-center text-xs">→</span>
+                    <Input value={flight.arrivalAirport || ''} placeholder="—"
                       onChange={e => setOutboundFlights(prev => prev.map((f, i) => i === index ? {...f, arrivalAirport: e.target.value.toUpperCase()} : f))}
-                      placeholder={TOUR_ITINERARY_TAB_LABELS.抵達} className="h-6 text-xs w-12 px-1" />
-                    <Input value={flight.arrivalTime || ''} 
+                      className="h-7 text-sm w-14 px-1 border-0 border-b border-border/30 rounded-none bg-transparent focus-visible:bg-white focus-visible:border focus-visible:rounded" />
+                    <Input value={flight.arrivalTime || ''} placeholder="—"
                       onChange={e => setOutboundFlights(prev => prev.map((f, i) => i === index ? {...f, arrivalTime: e.target.value} : f))}
-                      placeholder="時間" className="h-6 text-xs w-14 px-1" />
-                    <button type="button" onClick={() => setOutboundFlights(prev => prev.filter((_, i) => i !== index))}
-                      className="text-destructive hover:text-destructive/80 p-0.5">
-                      <Trash2 size={12} />
-                    </button>
+                      className="h-7 text-sm w-16 px-1 border-0 border-b border-border/30 rounded-none bg-transparent focus-visible:bg-white focus-visible:border focus-visible:rounded" />
+                    <div className="flex-1 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button type="button" onClick={() => setOutboundFlights(prev => prev.filter((_, i) => i !== index))}
+                        className="text-destructive/60 hover:text-destructive p-0.5">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </div>
                 ))}
-                
-                {/* 新增航段列 - 搜尋或手動輸入 */}
+                {/* 搜尋 / 新增列（表格最後一行） */}
                 {outboundSegments.length > 0 ? (
-                  <div className="space-y-1 p-1.5 border border-morandi-gold/30 rounded bg-morandi-gold/5">
+                  <div className="space-y-1 px-2 py-1.5 bg-morandi-gold/5">
                     <p className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.此航班有多個航段_請選擇}</p>
                     {outboundSegments.map((seg, i) => (
                       <button key={i} type="button" onClick={() => handleSelectOutboundSegment(seg)}
@@ -753,68 +769,77 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                     <button type="button" onClick={clearOutboundSegments} className="text-xs text-muted-foreground hover:text-foreground">{COMP_TOURS_LABELS.取消}</button>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-1 text-xs">
-                    <span className="text-muted-foreground w-4">+</span>
+                  <div className="flex items-center gap-1.5 text-sm px-2 py-1.5 bg-muted/5 border-t border-dashed border-border/30">
                     <Input value={outboundFlightNumber} onChange={e => setOutboundFlightNumber(e.target.value.toUpperCase())}
-                      placeholder={TOUR_ITINERARY_TAB_LABELS.SEARCH_8458} className="h-6 text-xs flex-1 px-1"
+                      placeholder={TOUR_ITINERARY_TAB_LABELS.SEARCH_8458} className="h-7 text-sm w-40 px-1"
                       onKeyDown={e => e.key === 'Enter' && (outboundFlightNumber ? handleSearchOutboundFlight() : setOutboundFlights(prev => [...prev, { airline: '', flightNumber: '', departureAirport: '', departureTime: '', arrivalAirport: '', arrivalTime: '' }]))} />
                     <DatePicker value={outboundFlightDate} onChange={date => setOutboundFlightDate(date || '')}
-                      placeholder={TOUR_ITINERARY_TAB_LABELS.日期_表頭} className="h-6 text-xs w-20" />
+                      placeholder={TOUR_ITINERARY_TAB_LABELS.日期_表頭} className="h-7 text-sm w-28" />
                     <Button type="button" size="sm" onClick={handleSearchOutboundFlight} disabled={searchingOutbound || !outboundFlightNumber}
-                      className="h-6 px-1.5 bg-morandi-gold hover:bg-morandi-gold-hover text-white" title={TOUR_ITINERARY_TAB_LABELS.SEARCH_3338}>
-                      {searchingOutbound ? <Loader2 size={10} className="animate-spin" /> : <Search size={10} />}
+                      className="h-7 px-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white" title={TOUR_ITINERARY_TAB_LABELS.SEARCH_3338}>
+                      {searchingOutbound ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
                     </Button>
-                    <Button type="button" size="sm" variant="outline" 
+                    <Button type="button" size="sm" variant="outline"
                       onClick={() => setOutboundFlights(prev => [...prev, { airline: '', flightNumber: '', departureAirport: '', departureTime: '', arrivalAirport: '', arrivalTime: '' }])}
-                      className="h-6 px-1.5 text-xs" title={TOUR_ITINERARY_TAB_LABELS.ADD_9636}>
-                      <Plus size={10} />
+                      className="h-7 px-2 text-xs" title={TOUR_ITINERARY_TAB_LABELS.ADD_9636}>
+                      <Plus size={12} />
                     </Button>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Return flights - Excel 風格 */}
-            <div className="flex-1 space-y-2">
-              <div className="flex items-center gap-1.5 text-xs">
-                <Plane size={10} className="text-morandi-gold" />
-                <span className="text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.回程}</span>
+            {/* Return flights */}
+            <div className="flex-1">
+              <div className="flex items-center gap-1.5 text-xs mb-1.5">
+                <Plane size={12} className="text-morandi-gold" />
+                <span className="text-muted-foreground font-medium">{TOUR_ITINERARY_TAB_LABELS.回程}</span>
               </div>
-              
-              {/* 航段列表 - 每個航段都是可編輯的 */}
-              <div className="space-y-2">
+              <div className="border border-border/50 rounded overflow-hidden">
+                {/* 表頭 */}
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/30 px-2 py-1.5 border-b border-border/30">
+                  <span className="w-16">{TOUR_ITINERARY_TAB_LABELS.LABEL_5176}</span>
+                  <span className="w-20">{TOUR_ITINERARY_TAB_LABELS.LABEL_3349}</span>
+                  <span className="w-14">{TOUR_ITINERARY_TAB_LABELS.LABEL_7681}</span>
+                  <span className="w-16">{TOUR_ITINERARY_TAB_LABELS.TIME}</span>
+                  <span className="w-4"></span>
+                  <span className="w-14">{TOUR_ITINERARY_TAB_LABELS.抵達}</span>
+                  <span className="w-16">{TOUR_ITINERARY_TAB_LABELS.TIME}</span>
+                  <span className="flex-1"></span>
+                </div>
+                {/* 資料列 */}
                 {returnFlights.map((flight, index) => (
-                  <div key={index} className="flex items-center gap-1 text-xs border border-border/50 rounded p-1.5 bg-muted/20">
-                    <span className="text-muted-foreground w-4">{index + 1}.</span>
-                    <Input value={flight.airline || ''} 
+                  <div key={index} className="flex items-center gap-1.5 text-sm px-2 py-1 border-b border-border/20 hover:bg-muted/10 group">
+                    <Input value={flight.airline || ''} placeholder="—"
                       onChange={e => setReturnFlights(prev => prev.map((f, i) => i === index ? {...f, airline: e.target.value} : f))}
-                      placeholder="航空" className="h-6 text-xs w-12 px-1" />
-                    <Input value={flight.flightNumber || ''} 
+                      className="h-7 text-sm w-16 px-1 border-0 border-b border-border/30 rounded-none bg-transparent focus-visible:bg-white focus-visible:border focus-visible:rounded" />
+                    <Input value={flight.flightNumber || ''} placeholder="—"
                       onChange={e => setReturnFlights(prev => prev.map((f, i) => i === index ? {...f, flightNumber: e.target.value.toUpperCase()} : f))}
-                      placeholder="航班號" className="h-6 text-xs w-16 px-1" />
-                    <Input value={flight.departureAirport || ''} 
+                      className="h-7 text-sm w-20 px-1 border-0 border-b border-border/30 rounded-none bg-transparent focus-visible:bg-white focus-visible:border focus-visible:rounded" />
+                    <Input value={flight.departureAirport || ''} placeholder="—"
                       onChange={e => setReturnFlights(prev => prev.map((f, i) => i === index ? {...f, departureAirport: e.target.value.toUpperCase()} : f))}
-                      placeholder="起飛" className="h-6 text-xs w-12 px-1" />
-                    <Input value={flight.departureTime || ''} 
+                      className="h-7 text-sm w-14 px-1 border-0 border-b border-border/30 rounded-none bg-transparent focus-visible:bg-white focus-visible:border focus-visible:rounded" />
+                    <Input value={flight.departureTime || ''} placeholder="—"
                       onChange={e => setReturnFlights(prev => prev.map((f, i) => i === index ? {...f, departureTime: e.target.value} : f))}
-                      placeholder="時間" className="h-6 text-xs w-14 px-1" />
-                    <span className="text-muted-foreground">→</span>
-                    <Input value={flight.arrivalAirport || ''} 
+                      className="h-7 text-sm w-16 px-1 border-0 border-b border-border/30 rounded-none bg-transparent focus-visible:bg-white focus-visible:border focus-visible:rounded" />
+                    <span className="text-muted-foreground w-4 text-center text-xs">→</span>
+                    <Input value={flight.arrivalAirport || ''} placeholder="—"
                       onChange={e => setReturnFlights(prev => prev.map((f, i) => i === index ? {...f, arrivalAirport: e.target.value.toUpperCase()} : f))}
-                      placeholder="抵達" className="h-6 text-xs w-12 px-1" />
-                    <Input value={flight.arrivalTime || ''} 
+                      className="h-7 text-sm w-14 px-1 border-0 border-b border-border/30 rounded-none bg-transparent focus-visible:bg-white focus-visible:border focus-visible:rounded" />
+                    <Input value={flight.arrivalTime || ''} placeholder="—"
                       onChange={e => setReturnFlights(prev => prev.map((f, i) => i === index ? {...f, arrivalTime: e.target.value} : f))}
-                      placeholder="時間" className="h-6 text-xs w-14 px-1" />
-                    <button type="button" onClick={() => setReturnFlights(prev => prev.filter((_, i) => i !== index))}
-                      className="text-destructive hover:text-destructive/80 p-0.5">
-                      <Trash2 size={12} />
-                    </button>
+                      className="h-7 text-sm w-16 px-1 border-0 border-b border-border/30 rounded-none bg-transparent focus-visible:bg-white focus-visible:border focus-visible:rounded" />
+                    <div className="flex-1 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button type="button" onClick={() => setReturnFlights(prev => prev.filter((_, i) => i !== index))}
+                        className="text-destructive/60 hover:text-destructive p-0.5">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </div>
                 ))}
-                
-                {/* 新增航段列 - 搜尋或手動輸入 */}
+                {/* 搜尋 / 新增列（表格最後一行） */}
                 {returnSegments.length > 0 ? (
-                  <div className="space-y-1 p-1.5 border border-morandi-gold/30 rounded bg-morandi-gold/5">
+                  <div className="space-y-1 px-2 py-1.5 bg-morandi-gold/5">
                     <p className="text-xs text-muted-foreground">{TOUR_ITINERARY_TAB_LABELS.此航班有多個航段_請選擇}</p>
                     {returnSegments.map((seg, i) => (
                       <button key={i} type="button" onClick={() => handleSelectReturnSegment(seg)}
@@ -826,21 +851,20 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                     <button type="button" onClick={clearReturnSegments} className="text-xs text-muted-foreground hover:text-foreground">{COMP_TOURS_LABELS.取消}</button>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-1 text-xs">
-                    <span className="text-muted-foreground w-4">+</span>
+                  <div className="flex items-center gap-1.5 text-sm px-2 py-1.5 bg-muted/5 border-t border-dashed border-border/30">
                     <Input value={returnFlightNumber} onChange={e => setReturnFlightNumber(e.target.value.toUpperCase())}
-                      placeholder="輸入航班號搜尋，或直接新增空白列" className="h-6 text-xs flex-1 px-1"
+                      placeholder={TOUR_ITINERARY_TAB_LABELS.SEARCH_8458} className="h-7 text-sm w-40 px-1"
                       onKeyDown={e => e.key === 'Enter' && (returnFlightNumber ? handleSearchReturnFlight() : setReturnFlights(prev => [...prev, { airline: '', flightNumber: '', departureAirport: '', departureTime: '', arrivalAirport: '', arrivalTime: '' }]))} />
                     <DatePicker value={returnFlightDate} onChange={date => setReturnFlightDate(date || '')}
-                      placeholder="日期" className="h-6 text-xs w-20" />
+                      placeholder={TOUR_ITINERARY_TAB_LABELS.日期_表頭} className="h-7 text-sm w-28" />
                     <Button type="button" size="sm" onClick={handleSearchReturnFlight} disabled={searchingReturn || !returnFlightNumber}
-                      className="h-6 px-1.5 bg-morandi-gold hover:bg-morandi-gold-hover text-white" title="搜尋航班">
-                      {searchingReturn ? <Loader2 size={10} className="animate-spin" /> : <Search size={10} />}
+                      className="h-7 px-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white" title={TOUR_ITINERARY_TAB_LABELS.SEARCH_3338}>
+                      {searchingReturn ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
                     </Button>
-                    <Button type="button" size="sm" variant="outline" 
+                    <Button type="button" size="sm" variant="outline"
                       onClick={() => setReturnFlights(prev => [...prev, { airline: '', flightNumber: '', departureAirport: '', departureTime: '', arrivalAirport: '', arrivalTime: '' }])}
-                      className="h-6 px-1.5 text-xs" title="新增空白列">
-                      <Plus size={10} />
+                      className="h-7 px-2 text-xs" title={TOUR_ITINERARY_TAB_LABELS.ADD_9636}>
+                      <Plus size={12} />
                     </Button>
                   </div>
                 )}
