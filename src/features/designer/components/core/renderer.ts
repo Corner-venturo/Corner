@@ -665,7 +665,7 @@ async function renderGroupElement(
         fontFamily: textEl.style?.fontFamily || 'Noto Sans TC',
         fontWeight: textEl.style?.fontWeight || '400',
         fontStyle: (textEl.style?.fontStyle || 'normal') as 'normal' | 'italic' | 'oblique',
-        fill: textEl.style?.color || '#000000',
+        fill: textEl.style?.color || 'var(--morandi-primary)',
         textAlign: textEl.style?.textAlign || 'left',
         lineHeight: textEl.style?.lineHeight || 1.2,
         name: textEl.name,
@@ -676,7 +676,7 @@ async function renderGroupElement(
         left: shapeEl.x,
         top: shapeEl.y,
         radius: Math.min(shapeEl.width, shapeEl.height) / 2,
-        fill: shapeEl.fill || '#000000',
+        fill: shapeEl.fill || 'var(--morandi-primary)',
         opacity: shapeEl.opacity ?? 1,
         name: shapeEl.name,
       })
@@ -687,7 +687,7 @@ async function renderGroupElement(
         top: shapeEl.y,
         width: shapeEl.width,
         height: shapeEl.height,
-        fill: shapeEl.fill || '#000000',
+        fill: shapeEl.fill || 'var(--morandi-primary)',
         opacity: shapeEl.opacity ?? 1,
         name: shapeEl.name,
       })

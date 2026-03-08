@@ -44,7 +44,7 @@ export function FlightSegmentCard({
   return (
     <div className="bg-[#F9F8F6] p-4 rounded-lg space-y-3 border border-[#E8E4E0]">
       <div className="flex items-center justify-between">
-        <h3 className="font-bold text-sm text-[#333333]">{title}</h3>
+        <h3 className="font-bold text-sm text-[var(--morandi-primary)]">{title}</h3>
         <div className="flex items-center gap-3">
           <label className="flex items-center gap-1.5 cursor-pointer">
             <input

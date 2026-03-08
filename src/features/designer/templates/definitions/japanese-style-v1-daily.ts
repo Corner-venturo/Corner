@@ -121,7 +121,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
         opacity: 0.25,
         locked: false,
         visible: true,
-        fill: '#000000',
+        fill: 'var(--morandi-primary)',
         stroke: 'transparent',
         strokeWidth: 0,
         cornerRadius: 8,

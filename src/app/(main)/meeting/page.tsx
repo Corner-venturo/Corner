@@ -127,7 +127,7 @@ export default function MeetingRoomPage() {
   return (
     <div className="flex h-screen bg-gray-900">
       {/* 左側：成員列表 */}
-      <aside className="w-64 bg-gray-800 p-4 border-r border-gray-700">
+      <aside className="w-64 bg-gray-800 p-4 border-r border-[var(--border)]">
         <h2 className="text-white text-lg font-bold mb-4">👥 在線成員</h2>
         
         <div className="space-y-2">
@@ -160,7 +160,7 @@ export default function MeetingRoomPage() {
       {/* 右側：聊天區域 */}
       <main className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="bg-gray-800 p-4 border-b border-gray-700">
+        <header className="bg-gray-800 p-4 border-b border-[var(--border)]">
           <h1 className="text-white text-xl font-bold">💬 Venturo 團隊會議室</h1>
         </header>
 
@@ -207,7 +207,7 @@ export default function MeetingRoomPage() {
         </div>
 
         {/* 輸入框 */}
-        <div className="border-t border-gray-700 p-4 bg-gray-800">
+        <div className="border-t border-[var(--border)] p-4 bg-gray-800">
           <div className="flex gap-2">
             <input
               type="text"

@@ -56,7 +56,7 @@ function BoardingPassCard({
 
   return (
     <motion.div
-      className="relative bg-card border-2 border-black overflow-hidden"
+      className="relative bg-card border-2 border-[var(--morandi-primary)] overflow-hidden"
       style={{
         boxShadow: '8px 8px 0px 0px rgba(0,0,0,1)',
         transform: isOutbound ? 'rotate(-1deg)' : 'rotate(1deg)',
@@ -79,7 +79,7 @@ function BoardingPassCard({
 
       {/* 頂部標題列 */}
       <div
-        className="relative z-10 px-4 py-2 border-b-2 border-black flex items-center justify-between"
+        className="relative z-10 px-4 py-2 border-b-2 border-[var(--morandi-primary)] flex items-center justify-between"
         style={{ backgroundColor: accentColor }}
       >
         <div className="flex items-center gap-2">
@@ -92,7 +92,7 @@ function BoardingPassCard({
       {/* 主體內容 */}
       <div className={`relative z-10 ${isMobile ? 'p-4' : 'p-6'}`}>
         {/* 航班資訊 */}
-        <div className="flex items-center justify-between mb-4 pb-4 border-b-2 border-dashed border-black/20">
+        <div className="flex items-center justify-between mb-4 pb-4 border-b-2 border-dashed border-[var(--morandi-primary)]/20">
           <div>
             <div className="text-xs text-morandi-secondary uppercase tracking-widest">Flight</div>
             <div className="text-lg font-bold">{flightInfo}</div>
@@ -120,16 +120,16 @@ function BoardingPassCard({
 
           {/* 飛行箭頭 */}
           <div className="flex-1 flex items-center justify-center px-4">
-            <div className="flex-1 border-t-2 border-dashed border-black/30" />
+            <div className="flex-1 border-t-2 border-dashed border-[var(--morandi-primary)]/30" />
             <motion.div
-              className="mx-2 w-10 h-10 rounded-full flex items-center justify-center border-2 border-black"
+              className="mx-2 w-10 h-10 rounded-full flex items-center justify-center border-2 border-[var(--morandi-primary)]"
               style={{ backgroundColor: POP.yellow }}
               animate={{ x: [0, 5, 0] }}
               transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
             >
               <Plane className="w-5 h-5 text-black" />
             </motion.div>
-            <div className="flex-1 border-t-2 border-dashed border-black/30" />
+            <div className="flex-1 border-t-2 border-dashed border-[var(--morandi-primary)]/30" />
           </div>
 
           {/* 抵達 */}
@@ -148,9 +148,9 @@ function BoardingPassCard({
 
         {/* 底部資訊 */}
         {flight.duration && (
-          <div className="mt-4 pt-4 border-t-2 border-dashed border-black/20 text-center">
+          <div className="mt-4 pt-4 border-t-2 border-dashed border-[var(--morandi-primary)]/20 text-center">
             <span
-              className="inline-block px-3 py-1 text-xs font-bold border-2 border-black"
+              className="inline-block px-3 py-1 text-xs font-bold border-2 border-[var(--morandi-primary)]"
               style={{ backgroundColor: POP.lime }}
             >
               {flight.duration}
@@ -160,7 +160,7 @@ function BoardingPassCard({
       </div>
 
       {/* 右側撕票區 */}
-      <div className="absolute top-0 right-0 w-12 h-full border-l-2 border-dashed border-black/30 flex flex-col items-center justify-center bg-muted">
+      <div className="absolute top-0 right-0 w-12 h-full border-l-2 border-dashed border-[var(--morandi-primary)]/30 flex flex-col items-center justify-center bg-muted">
         <div
           className="text-xs font-bold uppercase tracking-widest"
           style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
@@ -224,7 +224,7 @@ export function CollageFlightSection({ outboundFlight, returnFlight, departureDa
           transition={{ duration: 0.5 }}
         >
           <div
-            className="inline-block px-4 py-2 border-2 border-black mb-4"
+            className="inline-block px-4 py-2 border-2 border-[var(--morandi-primary)] mb-4"
             style={{
               backgroundColor: POP.yellow,
               boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)',
@@ -256,13 +256,13 @@ export function CollageFlightSection({ outboundFlight, returnFlight, departureDa
           transition={{ duration: 0.5, delay: 0.6 }}
         >
           <span
-            className="px-3 py-1 text-xs font-bold border-2 border-black"
+            className="px-3 py-1 text-xs font-bold border-2 border-[var(--morandi-primary)]"
             style={{ backgroundColor: POP.pink, color: 'white', transform: 'rotate(-3deg)' }}
           >
             BON VOYAGE
           </span>
           <span
-            className="px-3 py-1 text-xs font-bold border-2 border-black"
+            className="px-3 py-1 text-xs font-bold border-2 border-[var(--morandi-primary)]"
             style={{ backgroundColor: POP.blue, color: 'white', transform: 'rotate(2deg)' }}
           >
             HAVE FUN

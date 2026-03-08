@@ -220,7 +220,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
                       >
                         CONFIRMATION
                       </div>
-                      <h1 className="text-xl font-bold" style={{ color: '#333333' }}>
+                      <h1 className="text-xl font-bold" style={{ color: 'var(--morandi-primary)' }}>
                         {title}
                       </h1>
                     </div>
@@ -315,7 +315,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
                 >
                   CONFIRMATION
                 </div>
-                <h1 className="text-xl font-bold" style={{ color: '#333333' }}>
+                <h1 className="text-xl font-bold" style={{ color: 'var(--morandi-primary)' }}>
                   {title}
                 </h1>
               </div>
@@ -396,13 +396,13 @@ const FlightConfirmationContent: React.FC<{ data: FlightData }> = ({ data }) => 
               borderBottom: '2px dashed #B8A99A',
               backgroundColor: '#FFFBF0'
             }}>
-              <th className="py-3 text-center font-semibold" style={{ width: '120px', color: '#333333' }}>
+              <th className="py-3 text-center font-semibold" style={{ width: '120px', color: 'var(--morandi-primary)' }}>
                 {LABELS.DATE}
               </th>
-              <th className="py-3 text-left font-semibold" style={{ color: '#333333' }}>
+              <th className="py-3 text-left font-semibold" style={{ color: 'var(--morandi-primary)' }}>
                 {LABELS.TIME_FLIGHT}
               </th>
-              <th className="py-3 text-left font-semibold" colSpan={2} style={{ color: '#333333' }}>
+              <th className="py-3 text-left font-semibold" colSpan={2} style={{ color: 'var(--morandi-primary)' }}>
                 {LABELS.OTHER_INFO}
               </th>
             </tr>

@@ -199,7 +199,7 @@ export default function ModulesManagementPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-lg font-semibold text-[#333333]">
+              <div className="text-lg font-semibold text-[var(--morandi-primary)]">
                 {currentWorkspace?.name || MODULES_PAGE_LABELS.UNKNOWN_WORKSPACE}
               </div>
               <div className="text-sm text-[#8C8C8C] mt-1">
@@ -274,7 +274,7 @@ export default function ModulesManagementPage() {
                           showIcon={true}
                           className={cn(
                             'font-medium',
-                            status.expired ? 'text-status-danger' : 'text-[#333333]'
+                            status.expired ? 'text-status-danger' : 'text-[var(--morandi-primary)]'
                           )}
                         />
                       </div>

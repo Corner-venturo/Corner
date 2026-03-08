@@ -93,7 +93,7 @@ export const themes: Record<TourStyle, TourTheme> = {
       background: '#F2F0E9',   // 紙色
       surface: '#FFFFFF',
       text: '#1C1C1C',
-      muted: '#666666',
+      muted: '#8b8680',
       border: '#1C1C1C',
     },
     fonts: {
@@ -141,7 +141,7 @@ export const themes: Record<TourStyle, TourTheme> = {
       background: '#FFFCF2',
       surface: '#FFFFFF',
       text: '#1A1A2E',
-      muted: '#666666',
+      muted: '#8b8680',
       border: '#1A1A2E',
     },
     fonts: {

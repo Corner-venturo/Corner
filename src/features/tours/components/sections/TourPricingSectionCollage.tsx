@@ -24,7 +24,7 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
   }
 
   return (
-    <section className="py-24 relative overflow-hidden bg-card/50 border-t-4 border-black border-dashed">
+    <section className="py-24 relative overflow-hidden bg-card/50 border-t-4 border-[var(--morandi-primary)] border-dashed">
       {/* 背景點狀圖案 */}
       <div
         className="absolute inset-0 opacity-20 pointer-events-none"
@@ -43,7 +43,7 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
           className="text-center mb-24 relative"
         >
           <h2
-            className="text-6xl lg:text-8xl inline-block bg-[#C6FF00] text-black px-8 py-4 transform -rotate-3 border-4 border-black z-10 relative"
+            className="text-6xl lg:text-8xl inline-block bg-[#C6FF00] text-black px-8 py-4 transform -rotate-3 border-4 border-[var(--morandi-primary)] z-10 relative"
             style={{
               fontFamily: "'Permanent Marker', cursive",
               boxShadow: '8px 8px 0px 0px rgba(0,0,0,1)',
@@ -66,7 +66,7 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
               className="text-2xl text-morandi-secondary -ml-4 -rotate-[5deg] mb-[-20px] relative z-20 w-max"
               style={{ fontFamily: "'Gloria Hallelujah', cursive" }}
             >
-              <span className="bg-[#FFEB3B] px-2 border border-black">Pick a Plan!</span>
+              <span className="bg-[#FFEB3B] px-2 border border-[var(--morandi-primary)]">Pick a Plan!</span>
             </div>
 
             {/* 價格卡片 */}
@@ -77,11 +77,11 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
-                  className="w-full bg-card border-2 border-black p-6 transform -rotate-2 hover:rotate-0 hover:z-20 transition-all duration-300 relative group"
+                  className="w-full bg-card border-2 border-[var(--morandi-primary)] p-6 transform -rotate-2 hover:rotate-0 hover:z-20 transition-all duration-300 relative group"
                   style={{ boxShadow: '10px 10px 0px 0px rgba(0,0,0,1)' }}
                 >
                   {/* 圖釘 */}
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-red-500 border border-black shadow-sm z-20" />
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-red-500 border border-[var(--morandi-primary)] shadow-sm z-20" />
                   {/* 膠帶 */}
                   <div
                     className="absolute -top-2 left-1/2 -translate-x-1/2 w-20 h-6"
@@ -94,7 +94,7 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
 
                   <div className="flex justify-between items-start mb-4">
                     <span
-                      className="text-xs font-bold bg-morandi-container px-2 py-1 border border-black rounded-full"
+                      className="text-xs font-bold bg-morandi-container px-2 py-1 border border-[var(--morandi-primary)] rounded-full"
                       style={{ fontFamily: "'Space Mono', monospace" }}
                     >
                       SMALL GROUP
@@ -132,7 +132,7 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
                   )}
 
                   <button
-                    className="w-full py-3 border-2 border-black font-bold hover:bg-black hover:text-white transition-colors uppercase tracking-widest"
+                    className="w-full py-3 border-2 border-[var(--morandi-primary)] font-bold hover:bg-black hover:text-white transition-colors uppercase tracking-widest"
                     style={{ fontFamily: "'Space Mono', monospace" }}
                   >
                     {TOURS_LABELS.SELECT_2483}
@@ -143,7 +143,7 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
               {/* OR 分隔 */}
               {priceTiers.length > 1 && (
                 <div
-                  className={`bg-[#FFEB3B] w-12 h-12 rounded-full border-2 border-black flex items-center justify-center z-30 shadow-sm ${
+                  className={`bg-[#FFEB3B] w-12 h-12 rounded-full border-2 border-[var(--morandi-primary)] flex items-center justify-center z-30 shadow-sm ${
                     isMobile ? '-mt-4 -mb-4' : 'md:-ml-6 md:-mr-6'
                   } relative`}
                   style={{ fontFamily: "'Permanent Marker', cursive" }}
@@ -158,11 +158,11 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
                   initial={{ opacity: 0, x: 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
-                  className="w-full bg-[#121212] text-white border-2 border-black p-6 transform rotate-1 hover:rotate-0 hover:z-20 transition-all duration-300 relative group"
+                  className="w-full bg-[#121212] text-white border-2 border-[var(--morandi-primary)] p-6 transform rotate-1 hover:rotate-0 hover:z-20 transition-all duration-300 relative group"
                   style={{ boxShadow: '10px 10px 0px 0px rgba(0,0,0,1)' }}
                 >
                   {/* 圖釘 */}
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-[#00E5FF] border border-black shadow-sm z-20" />
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-[#00E5FF] border border-[var(--morandi-primary)] shadow-sm z-20" />
                   {/* 膠帶 */}
                   <div
                     className="absolute -top-2 left-1/2 -translate-x-1/2 w-20 h-6 rotate-2"
@@ -213,7 +213,7 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
                   )}
 
                   <button
-                    className="w-full py-3 bg-[#C6FF00] text-black border-2 border-black font-bold hover:bg-card transition-colors uppercase tracking-widest"
+                    className="w-full py-3 bg-[#C6FF00] text-black border-2 border-[var(--morandi-primary)] font-bold hover:bg-card transition-colors uppercase tracking-widest"
                     style={{ fontFamily: "'Space Mono', monospace" }}
                   >
                     {TOURS_LABELS.SELECT_2483}
@@ -236,7 +236,7 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
             className={`mt-16 grid ${isMobile ? 'grid-cols-1' : 'md:grid-cols-2'} gap-8`}
           >
             {/* 費用包含 */}
-            <div className="bg-card border-2 border-black p-6 transform -rotate-1" style={{ boxShadow: '6px 6px 0px 0px rgba(0,0,0,1)' }}>
+            <div className="bg-card border-2 border-[var(--morandi-primary)] p-6 transform -rotate-1" style={{ boxShadow: '6px 6px 0px 0px rgba(0,0,0,1)' }}>
               <h4 className="font-bold text-xl mb-4 flex items-center gap-2 text-green-600" style={{ fontFamily: "'Permanent Marker', cursive" }}>
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
@@ -256,7 +256,7 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
             </div>
 
             {/* 費用不含 */}
-            <div className="bg-card border-2 border-black p-6 transform rotate-1" style={{ boxShadow: '6px 6px 0px 0px rgba(0,0,0,1)' }}>
+            <div className="bg-card border-2 border-[var(--morandi-primary)] p-6 transform rotate-1" style={{ boxShadow: '6px 6px 0px 0px rgba(0,0,0,1)' }}>
               <h4 className="font-bold text-xl mb-4 flex items-center gap-2 text-[#FF0080]" style={{ fontFamily: "'Permanent Marker', cursive" }}>
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />

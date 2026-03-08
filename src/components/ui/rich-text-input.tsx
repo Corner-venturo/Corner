@@ -22,7 +22,7 @@ interface RichTextInputProps {
 
 // 預設顏色選項
 const COLORS = [
-  { label: '黑色', value: '#000000' },
+  { label: '深棕灰', value: '#3a3633' },
   { label: '白色', value: '#FFFFFF' },
   { label: '紅色', value: '#E53935' },
   { label: '橙色', value: '#FB8C00' },

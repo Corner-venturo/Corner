@@ -41,7 +41,7 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
       {data.segments && data.segments.length > 0 && (
         <div>
           <div className="border-t border-b py-2" style={{ borderColor: '#d4af37', borderStyle: 'dashed' }}>
-            <div className="grid grid-cols-12 gap-2 font-medium" style={{ color: '#333333' }}>
+            <div className="grid grid-cols-12 gap-2 font-medium" style={{ color: 'var(--morandi-primary)' }}>
               <div className="col-span-2 text-center">{FLIGHT_PREVIEW_LABELS.DATE_HEADER}</div>
               <div className="col-span-6">{FLIGHT_PREVIEW_LABELS.TIME_FLIGHT_HEADER}</div>
               <div className="col-span-4">{FLIGHT_PREVIEW_LABELS.OTHER_INFO_HEADER}</div>

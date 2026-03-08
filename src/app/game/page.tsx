@@ -47,7 +47,7 @@ export default function GameOfficePage() {
   return (
     <div className="flex flex-col h-screen bg-[#0d1117]">
       {/* Top Bar */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-gray-800">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--border)]">
         <div className="flex items-center gap-2">
           <span className="text-lg">🏢</span>
           <span className="text-sm font-bold text-white tracking-wider">VENTURO OFFICE</span>
@@ -63,7 +63,7 @@ export default function GameOfficePage() {
           <button
             onClick={() => setShowGrid(!showGrid)}
             className={`absolute top-3 left-3 z-10 flex items-center gap-1 px-3 py-1.5 text-xs rounded border transition-colors ${
-              showGrid ? 'border-gray-600 text-white bg-gray-800/80' : 'border-gray-700 text-gray-500 bg-gray-900/80'
+              showGrid ? 'border-[var(--border)] text-white bg-gray-800/80' : 'border-[var(--border)] text-gray-500 bg-gray-900/80'
             }`}
           >
             <Grid3X3 className="w-3 h-3" />
@@ -102,7 +102,7 @@ export default function GameOfficePage() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="flex items-center gap-4 px-4 py-2 border-t border-gray-800 text-xs text-gray-500">
+      <div className="flex items-center gap-4 px-4 py-2 border-t border-[var(--border)] text-xs text-gray-500">
         <button
           onClick={() => setEditMode(!editMode)}
           className={`flex items-center gap-1 px-2 py-1 rounded transition-colors ${

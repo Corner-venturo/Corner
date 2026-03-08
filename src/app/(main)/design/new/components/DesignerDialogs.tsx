@@ -182,7 +182,7 @@ export function createBlockInsertHandler(canvas: fabric.Canvas | null) {
           fontSize: textEl.style?.fontSize || 12,
           fontFamily: textEl.style?.fontFamily || 'Noto Sans TC',
           fontWeight: textEl.style?.fontWeight || 'normal',
-          fill: textEl.style?.color || '#000',
+          fill: textEl.style?.color || 'var(--morandi-primary)',
           textAlign: textEl.style?.textAlign || 'left',
         })
         canvas.add(text)

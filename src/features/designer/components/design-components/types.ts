@@ -22,8 +22,8 @@ export interface StylePalette {
 
 /** 中性預設色盤（使用者可在屬性面板自行調整） */
 export const DEFAULT_PALETTE: StylePalette = {
-  primary: '#333333',
-  secondary: '#666666',
+  primary: '#3a3633',
+  secondary: '#8b8680',
   accent: '#c9aa7c',
   background: '#ffffff',
   lightBg: '#f5f5f5',

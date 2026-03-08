@@ -134,7 +134,7 @@ function SolidColorPicker({
     '#3a3633', '#8b8680', '#b8b2aa', '#d4c4b0',
     '#c9aa7c', '#b8996b', '#c08374', '#e8b4a8',
     '#9fa68f', '#c5cdb8', '#a8c0b9', '#b4c4d0',
-    '#e8e5e0', '#f6f4f1', '#ffffff', '#000000',
+    '#e8e5e0', '#f6f4f1', '#ffffff', '#3a3633',
   ]
 
   return (

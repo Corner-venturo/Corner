@@ -177,7 +177,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
           .title {
             font-size: 20px;
             font-weight: bold;
-            color: #333333;
+            color: var(--morandi-primary);
           }
 
           .info-grid {
@@ -211,7 +211,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
           .section-title {
             font-size: 16px;
             font-weight: 600;
-            color: #333333;
+            color: var(--morandi-primary);
             margin-bottom: 8px;
           }
 
@@ -231,7 +231,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
             padding: 10px 12px;
             text-align: left;
             font-weight: 600;
-            color: #333333;
+            color: var(--morandi-primary);
             border-bottom: 1px solid #E5E7EB;
           }
 
@@ -255,7 +255,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
 
           .text-center { text-align: center; }
           .text-right { text-align: right; }
-          .font-bold { font-weight: 600; color: #333333; }
+          .font-bold { font-weight: 600; color: var(--morandi-primary); }
 
           .summary-box {
             background-color: #FAF7F2;
@@ -278,13 +278,13 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
           .summary-label {
             font-size: 11px;
             font-weight: 600;
-            color: #333333;
+            color: var(--morandi-primary);
           }
 
           .summary-value {
             font-size: 18px;
             font-weight: bold;
-            color: #333333;
+            color: var(--morandi-primary);
           }
 
           .summary-value.red { color: #DC2626; }
@@ -308,7 +308,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
 
           .payment-title {
             font-weight: 600;
-            color: #333333;
+            color: var(--morandi-primary);
             margin-bottom: 8px;
           }
 
@@ -451,7 +451,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
               <div className="subtitle" style={{ fontSize: '12px', letterSpacing: '3px', color: '#B8A99A', fontWeight: 500, marginBottom: '4px' }}>
                 QUOTATION
               </div>
-              <h1 className="title" style={{ fontSize: '20px', fontWeight: 'bold', color: '#333333', margin: 0 }}>
+              <h1 className="title" style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--morandi-primary)', margin: 0 }}>
                 {PRINTABLE_QUICK_QUOTE_LABELS.報價請款單}
               </h1>
             </div>
@@ -486,17 +486,17 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
           </div>
 
           {/* 收費明細表 */}
-          <div className="section-title" style={{ fontSize: '16px', fontWeight: 600, color: '#333333', marginBottom: '8px' }}>
+          <div className="section-title" style={{ fontSize: '16px', fontWeight: 600, color: 'var(--morandi-primary)', marginBottom: '8px' }}>
             {PRINTABLE_QUICK_QUOTE_LABELS.收費明細表}
           </div>
           <table className="items-table" style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, border: '1px solid #E5E7EB', borderRadius: '8px', overflow: 'hidden', marginBottom: '20px', fontSize: '13px' }}>
             <thead>
               <tr style={{ backgroundColor: '#FAF7F2' }}>
-                <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 600, color: '#333333', borderBottom: '1px solid #E5E7EB', width: '35%' }}>{PRINTABLE_QUICK_QUOTE_LABELS.摘要}</th>
-                <th style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, color: '#333333', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '10%' }}>{PRINTABLE_QUICK_QUOTE_LABELS.數量}</th>
-                <th style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, color: '#333333', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '15%' }}>{ACCOMMODATION_ITEM_ROW_LABELS.單價}</th>
-                <th style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, color: '#333333', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '15%' }}>{QUOTES_PAGE_LABELS.金額}</th>
-                <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 600, color: '#333333', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '25%' }}>{ACCOMMODATION_ITEM_ROW_LABELS.備註}</th>
+                <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 600, color: 'var(--morandi-primary)', borderBottom: '1px solid #E5E7EB', width: '35%' }}>{PRINTABLE_QUICK_QUOTE_LABELS.摘要}</th>
+                <th style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, color: 'var(--morandi-primary)', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '10%' }}>{PRINTABLE_QUICK_QUOTE_LABELS.數量}</th>
+                <th style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, color: 'var(--morandi-primary)', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '15%' }}>{ACCOMMODATION_ITEM_ROW_LABELS.單價}</th>
+                <th style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, color: 'var(--morandi-primary)', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '15%' }}>{QUOTES_PAGE_LABELS.金額}</th>
+                <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 600, color: 'var(--morandi-primary)', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '25%' }}>{ACCOMMODATION_ITEM_ROW_LABELS.備註}</th>
               </tr>
             </thead>
             <tbody>
@@ -511,7 +511,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
                   <td style={{ padding: '8px 12px', textAlign: 'right', color: '#4B5563', borderBottom: index === items.length - 1 ? 'none' : '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB' }}>
                     {item.unit_price && item.unit_price !== 0 ? (item.unit_price || 0).toLocaleString() : '\u00A0'}
                   </td>
-                  <td style={{ padding: '8px 12px', textAlign: 'right', color: '#333333', fontWeight: 600, borderBottom: index === items.length - 1 ? 'none' : '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB' }}>
+                  <td style={{ padding: '8px 12px', textAlign: 'right', color: 'var(--morandi-primary)', fontWeight: 600, borderBottom: index === items.length - 1 ? 'none' : '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB' }}>
                     {item.amount && item.amount !== 0 ? (item.amount || 0).toLocaleString() : '\u00A0'}
                   </td>
                   <td style={{ padding: '8px 12px', color: '#4B5563', borderBottom: index === items.length - 1 ? 'none' : '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB' }}>
@@ -532,7 +532,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
           {/* 費用說明 - 只有有資料才顯示 */}
           {quote.expense_description && (
             <div style={{ marginBottom: '20px', padding: '12px 16px', backgroundColor: '#FAF7F2', border: '1px solid #E5E7EB', borderRadius: '8px' }}>
-              <div style={{ fontWeight: 600, color: '#333333', marginBottom: '8px', fontSize: '14px' }}>{PRINTABLE_QUICK_QUOTE_LABELS.費用說明}</div>
+              <div style={{ fontWeight: 600, color: 'var(--morandi-primary)', marginBottom: '8px', fontSize: '14px' }}>{PRINTABLE_QUICK_QUOTE_LABELS.費用說明}</div>
               <div style={{ color: '#4B5563', fontSize: '13px', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
                 {quote.expense_description}
               </div>
@@ -544,24 +544,24 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
             {quote.received_amount && quote.received_amount > 0 ? (
               <>
                 <div className="summary-item" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span className="summary-label" style={{ fontSize: '11px', fontWeight: 600, color: '#333333' }}>{PRINTABLE_QUICK_QUOTE_LABELS.應收金額}</span>
-                  <span className="summary-value" style={{ fontSize: '18px', fontWeight: 'bold', color: '#333333' }}>NT$ {totalAmount.toLocaleString()}</span>
+                  <span className="summary-label" style={{ fontSize: '11px', fontWeight: 600, color: 'var(--morandi-primary)' }}>{PRINTABLE_QUICK_QUOTE_LABELS.應收金額}</span>
+                  <span className="summary-value" style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--morandi-primary)' }}>NT$ {totalAmount.toLocaleString()}</span>
                 </div>
                 <div className="divider" style={{ width: '1px', height: '24px', backgroundColor: '#D1D5DB' }} />
                 <div className="summary-item" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span className="summary-label" style={{ fontSize: '11px', fontWeight: 600, color: '#333333' }}>{PRINTABLE_QUICK_QUOTE_LABELS.已收金額}</span>
-                  <span className="summary-value" style={{ fontSize: '18px', fontWeight: 'bold', color: '#333333' }}>NT$ {(quote.received_amount || 0).toLocaleString()}</span>
+                  <span className="summary-label" style={{ fontSize: '11px', fontWeight: 600, color: 'var(--morandi-primary)' }}>{PRINTABLE_QUICK_QUOTE_LABELS.已收金額}</span>
+                  <span className="summary-value" style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--morandi-primary)' }}>NT$ {(quote.received_amount || 0).toLocaleString()}</span>
                 </div>
                 <div className="divider" style={{ width: '1px', height: '24px', backgroundColor: '#D1D5DB' }} />
                 <div className="summary-item" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span className="summary-label" style={{ fontSize: '11px', fontWeight: 600, color: '#333333' }}>{PRINTABLE_QUICK_QUOTE_LABELS.應收餘額}</span>
+                  <span className="summary-label" style={{ fontSize: '11px', fontWeight: 600, color: 'var(--morandi-primary)' }}>{PRINTABLE_QUICK_QUOTE_LABELS.應收餘額}</span>
                   <span className="summary-value" style={{ fontSize: '18px', fontWeight: 'bold', color: balanceAmount > 0 ? '#DC2626' : '#059669' }}>NT$ {balanceAmount.toLocaleString()}</span>
                 </div>
               </>
             ) : (
               <>
-                <span className="summary-label" style={{ fontSize: '11px', fontWeight: 600, color: '#333333' }}>{PRINTABLE_QUICK_QUOTE_LABELS.應收金額}</span>
-                <span className="summary-value" style={{ fontSize: '18px', fontWeight: 'bold', color: '#333333' }}>NT$ {totalAmount.toLocaleString()}</span>
+                <span className="summary-label" style={{ fontSize: '11px', fontWeight: 600, color: 'var(--morandi-primary)' }}>{PRINTABLE_QUICK_QUOTE_LABELS.應收金額}</span>
+                <span className="summary-value" style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--morandi-primary)' }}>NT$ {totalAmount.toLocaleString()}</span>
               </>
             )}
           </div>
@@ -569,7 +569,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
           {/* 付款資訊 */}
           <div className="payment-section" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', paddingTop: '16px', borderTop: '1px solid #F3F4F6', marginBottom: '16px', fontSize: '13px' }}>
             <div>
-              <div className="payment-title" style={{ fontWeight: 600, color: '#333333', marginBottom: '8px' }}>{PRINTABLE_QUICK_QUOTE_LABELS.匯款資訊}</div>
+              <div className="payment-title" style={{ fontWeight: 600, color: 'var(--morandi-primary)', marginBottom: '8px' }}>{PRINTABLE_QUICK_QUOTE_LABELS.匯款資訊}</div>
               <div className="payment-info" style={{ color: '#4B5563', lineHeight: 1.8 }}>
                 {hasBankInfo ? (
                   <>
@@ -584,7 +584,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
               </div>
             </div>
             <div>
-              <div className="payment-title" style={{ fontWeight: 600, color: '#333333', marginBottom: '8px' }}>{PRINTABLE_QUICK_QUOTE_LABELS.支票資訊}</div>
+              <div className="payment-title" style={{ fontWeight: 600, color: 'var(--morandi-primary)', marginBottom: '8px' }}>{PRINTABLE_QUICK_QUOTE_LABELS.支票資訊}</div>
               <div className="payment-info" style={{ color: '#4B5563', lineHeight: 1.8 }}>
                 <div>{PRINTABLE_QUICK_QUOTE_LABELS.抬頭前綴}{companyFullName}</div>
                 <div className="warning" style={{ color: '#DC2626', fontWeight: 600 }}>{PRINTABLE_QUICK_QUOTE_LABELS.禁止背書轉讓}</div>
@@ -595,7 +595,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
 
           {/* 收據資訊 */}
           <div className="receipt-section" style={{ paddingTop: '16px', borderTop: '1px solid #F3F4F6', marginBottom: '24px', fontSize: '13px' }}>
-            <div className="payment-title" style={{ fontWeight: 600, color: '#333333', marginBottom: '8px' }}>{PRINTABLE_QUICK_QUOTE_LABELS.收據資訊}</div>
+            <div className="payment-title" style={{ fontWeight: 600, color: 'var(--morandi-primary)', marginBottom: '8px' }}>{PRINTABLE_QUICK_QUOTE_LABELS.收據資訊}</div>
             <div className="receipt-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '8px' }}>
               <div className="receipt-row" style={{ display: 'flex' }}>
                 <span className="receipt-label" style={{ fontWeight: 600, color: '#4B5563', width: '130px', flexShrink: 0 }}>{PRINTABLE_QUICK_QUOTE_LABELS.開立代收轉付抬頭}</span>

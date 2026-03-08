@@ -162,7 +162,7 @@ export function CountriesSection({
       {primaryCountry && (
         <div className="p-4 bg-[#F9F8F6] border-2 border-[#C6B9AC] rounded-lg">
           <div className="flex items-center justify-between mb-3">
-            <label className="text-sm font-semibold text-[#333333]">{COMP_EDITOR_LABELS.LABEL_2736}</label>
+            <label className="text-sm font-semibold text-[var(--morandi-primary)]">{COMP_EDITOR_LABELS.LABEL_2736}</label>
             <span className="text-xs bg-[#B8A99A] text-white px-2 py-0.5 rounded">{COMP_EDITOR_LABELS.LABEL_4022}</span>
           </div>
 
@@ -266,7 +266,7 @@ export function CountriesSection({
       {/* 新增按鈕 */}
       <button
         onClick={addCountry}
-        className="w-full px-4 py-2.5 border-2 border-dashed border-[#E8E4E0] rounded-lg text-sm text-morandi-secondary hover:border-[#B8A99A] hover:text-[#333333] hover:bg-[#F9F8F6] transition-colors"
+        className="w-full px-4 py-2.5 border-2 border-dashed border-[#E8E4E0] rounded-lg text-sm text-morandi-secondary hover:border-[#B8A99A] hover:text-[var(--morandi-primary)] hover:bg-[#F9F8F6] transition-colors"
       >
         + 新增其他國家
       </button>

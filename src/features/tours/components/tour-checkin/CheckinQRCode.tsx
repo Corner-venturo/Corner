@@ -99,11 +99,11 @@ export function CheckinQRCode({ tour }: CheckinQRCodeProps) {
               font-size: 24px;
               font-weight: bold;
               margin-bottom: 8px;
-              color: #333;
+              color: var(--morandi-primary);
             }
             .info {
               font-size: 14px;
-              color: #666;
+              color: var(--morandi-secondary);
               margin-bottom: 20px;
             }
             .qr-wrapper {
@@ -122,7 +122,7 @@ export function CheckinQRCode({ tour }: CheckinQRCodeProps) {
             .instructions {
               margin-top: 20px;
               font-size: 14px;
-              color: #666;
+              color: var(--morandi-secondary);
               text-align: left;
               padding: 16px;
               background: #f5f5f5;

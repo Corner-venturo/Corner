@@ -179,7 +179,7 @@ function DiptychCard({
         style={{
           boxShadow: `
             0 0 0 12px #ffffff,
-            0 0 0 14px #000000,
+            0 0 0 14px var(--morandi-primary),
             12px 18px 30px rgba(0,0,0,0.2)
           `,
         }}
@@ -411,7 +411,7 @@ function RecipeCard({
       </div>
 
       {/* 內容區 */}
-      <div className="p-4 border-t border-black">
+      <div className="p-4 border-t border-[var(--morandi-primary)]">
         {/* 標題 */}
         <div className="flex justify-between items-start mb-2">
           <div>
@@ -424,7 +424,7 @@ function RecipeCard({
             <h3 className="font-bold text-base mt-1">{feature.title}</h3>
           </div>
           <div
-            className="w-7 h-7 rounded-full border border-black flex items-center justify-center group-hover:bg-black group-hover:text-white transition-colors"
+            className="w-7 h-7 rounded-full border border-[var(--morandi-primary)] flex items-center justify-center group-hover:bg-black group-hover:text-white transition-colors"
           >
             →
           </div>

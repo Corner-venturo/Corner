@@ -54,7 +54,7 @@ interface BlockOptions {
 const COLORS = {
   gold: '#c9aa7c',
   black: '#181511',
-  gray: '#666666',
+  gray: '#8b8680',
   lightGray: '#e8e4df',
 }
 

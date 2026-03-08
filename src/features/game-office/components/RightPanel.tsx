@@ -116,9 +116,9 @@ export default function RightPanel() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#0d1117] text-gray-300 font-mono text-sm border-l border-gray-800 overflow-y-auto">
+    <div className="flex flex-col h-full bg-[#0d1117] text-gray-300 font-mono text-sm border-l border-[var(--border)] overflow-y-auto">
       {/* Online + Clock */}
-      <div className="p-4 border-b border-gray-800">
+      <div className="p-4 border-b border-[var(--border)]">
         <div className="flex items-center gap-2 mb-2">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-emerald-400 text-xs font-bold tracking-wider">ONLINE</span>
@@ -129,7 +129,7 @@ export default function RightPanel() {
       </div>
 
       {/* 今日概覽 */}
-      <div className="p-4 border-b border-gray-800">
+      <div className="p-4 border-b border-[var(--border)]">
         <div className="flex items-center gap-2 mb-3">
           <span className="text-blue-400">📊</span>
           <span className="text-xs text-gray-500 font-bold">{GAME_OFFICE_LABELS.LABEL_8131}</span>
@@ -144,7 +144,7 @@ export default function RightPanel() {
 
       {/* 團隊狀態 */}
       {teamMembers.length > 0 && (
-        <div className="p-4 border-b border-gray-800">
+        <div className="p-4 border-b border-[var(--border)]">
           <div className="flex items-center gap-2 mb-3">
             <span className="text-blue-400">👥</span>
             <span className="text-xs text-gray-500 font-bold">{GAME_OFFICE_LABELS.LABEL_6017}</span>
@@ -165,7 +165,7 @@ export default function RightPanel() {
 
       {/* 今日出團 */}
       {todayTours.length > 0 && (
-        <div className="p-4 border-b border-gray-800">
+        <div className="p-4 border-b border-[var(--border)]">
           <div className="flex items-center gap-2 mb-3">
             <span className="text-blue-400">✈</span>
             <span className="text-xs text-gray-500 font-bold">{GAME_OFFICE_LABELS.LABEL_2938}</span>
@@ -184,18 +184,18 @@ export default function RightPanel() {
       )}
 
       {/* 會議系統 */}
-      <div className="p-4 border-b border-gray-800">
+      <div className="p-4 border-b border-[var(--border)]">
         <div className="flex items-center gap-2 mb-3">
           <span className="text-purple-400">🎙️</span>
           <span className="text-xs text-gray-500 font-bold">{GAME_OFFICE_LABELS.LABEL_1006}</span>
         </div>
         <div className="space-y-2">
-          <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800">
+          <div className="bg-gray-900/50 rounded-lg p-3 border border-[var(--border)]">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs text-purple-400 font-bold">{GAME_OFFICE_LABELS.LABEL_8236}</span>
               <span className="text-[10px] text-gray-600 bg-gray-800 px-1.5 py-0.5 rounded">0 人在線</span>
             </div>
-            <button className="w-full py-1.5 text-xs text-gray-500 border border-dashed border-gray-700 rounded hover:border-purple-400 hover:text-purple-400 transition-colors">
+            <button className="w-full py-1.5 text-xs text-gray-500 border border-dashed border-[var(--border)] rounded hover:border-purple-400 hover:text-purple-400 transition-colors">
               🚧 即將開放
             </button>
           </div>

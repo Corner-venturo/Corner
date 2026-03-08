@@ -56,7 +56,7 @@ export function generateMembersPrintContent({ tour, members, columns }: MembersP
           th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
           th { background: #f5f5f5; }
           h1 { font-size: 18px; margin-bottom: 10px; }
-          .info { font-size: 12px; color: #666; margin-bottom: 15px; }
+          .info { font-size: 12px; color: var(--morandi-secondary); margin-bottom: 15px; }
           @media print { body { padding: 0; } }
         </style>
       </head>

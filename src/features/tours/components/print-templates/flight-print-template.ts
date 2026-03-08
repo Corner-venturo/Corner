@@ -426,7 +426,7 @@ const FLIGHT_PRINT_STYLES = `
     --accent-light: rgba(227, 217, 198, 0.1);
     --linen: #FCFBF9;
     --text: #131316;
-    --text-light: #666;
+    --text-light: var(--morandi-secondary);
     --text-muted: #999;
     --text-faint: #bbb;
     --border: #e8e4dc;

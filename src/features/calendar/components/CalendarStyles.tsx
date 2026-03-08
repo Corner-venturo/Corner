@@ -9,7 +9,7 @@ export function CalendarStyles() {
       .fc .fc-toolbar-title {
         font-size: 1.5rem;
         font-weight: 600;
-        color: #333333;
+        color: var(--morandi-primary);
       }
 
       .fc .fc-button {
@@ -89,7 +89,7 @@ export function CalendarStyles() {
       }
 
       .fc .fc-daygrid-day-number {
-        color: #333333;
+        color: var(--morandi-primary);
         padding: 2px 4px;
         font-size: 14px;
         font-weight: 500;
@@ -156,7 +156,7 @@ export function CalendarStyles() {
         transition: all 0.2s ease;
         margin: 0 2px !important;
         background-color: rgba(184, 169, 154, 0.1);
-        color: #333333;
+        color: var(--morandi-primary);
       }
 
       .fc-event .fc-event-main {

@@ -29,9 +29,9 @@ export default function LeftPanel() {
   const { user, isAuthenticated } = useAuthStore()
 
   return (
-    <div className="flex flex-col h-full bg-[#0f0f1a] border-r border-gray-800">
+    <div className="flex flex-col h-full bg-[#0f0f1a] border-r border-[var(--border)]">
       {/* Header */}
-      <div className="flex items-center gap-2 p-3 border-b border-gray-800">
+      <div className="flex items-center gap-2 p-3 border-b border-[var(--border)]">
         <Gamepad2 className="w-5 h-5 text-emerald-400" />
         <span className="text-sm font-bold text-emerald-400">{GAME_OFFICE_LABELS.LABEL_4906}</span>
       </div>
@@ -53,12 +53,12 @@ export default function LeftPanel() {
       ) : (
         <>
           {/* User info */}
-          <div className="px-3 py-2 border-b border-gray-800 text-xs text-gray-500">
+          <div className="px-3 py-2 border-b border-[var(--border)] text-xs text-gray-500">
             👤 {user?.display_name || user?.chinese_name || '使用者'}
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-gray-800">
+          <div className="flex border-b border-[var(--border)]">
             {TABS.map(tab => (
               <button
                 key={tab.id}
@@ -201,7 +201,7 @@ function TodosPanel() {
       <h3 className="text-xs font-bold text-gray-500 uppercase">{GAME_OFFICE_LABELS.LABEL_4477}</h3>
       {todos.map(t => (
         <label key={t.id} className="flex items-center gap-2 text-xs cursor-pointer hover:text-white">
-          <input type="checkbox" className="rounded border-gray-600" />
+          <input type="checkbox" className="rounded border-[var(--border)]" />
           {t.title}
         </label>
       ))}

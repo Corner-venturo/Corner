@@ -421,12 +421,12 @@ export function PropertiesPanel({
                 <Label className="text-[10px] text-morandi-muted w-8">{DESIGNER_LABELS.邊框}</Label>
                 <input
                   type="color"
-                  value={String(properties.stroke || '#000000')}
+                  value={String(properties.stroke || 'var(--morandi-primary)')}
                   onChange={(e) => updateProperty('stroke', e.target.value)}
                   className="w-8 h-8 rounded cursor-pointer"
                 />
                 <Input
-                  value={String(properties.stroke || '#000000')}
+                  value={String(properties.stroke || 'var(--morandi-primary)')}
                   onChange={(e) => updateProperty('stroke', e.target.value)}
                   className="flex-1 text-sm h-8"
                 />

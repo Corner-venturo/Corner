@@ -85,7 +85,7 @@ export function generateHotelPrintContent({ tour, members }: HotelPrintOptions):
           .page { padding: 20px; }
           .header { margin-bottom: 20px; }
           .company { font-size: 18px; font-weight: bold; }
-          .address { font-size: 12px; color: #666; margin-top: 4px; }
+          .address { font-size: 12px; color: var(--morandi-secondary); margin-top: 4px; }
           h2 { text-align: center; margin: 30px 0 20px; font-size: 20px; }
           .info-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; }
           .guest-info { padding: 15px; background: #f9f9f9; margin-bottom: 20px; line-height: 1.8; }

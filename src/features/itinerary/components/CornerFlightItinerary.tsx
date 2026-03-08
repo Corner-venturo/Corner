@@ -11,7 +11,7 @@ import React from 'react'
 const CORNER_COLORS = {
   orange: '#F89A1E', // Corner 橘色
   gold: '#B8A99A',   // 金色（次要）
-  brown: '#333333',  // 深棕色
+  brown: '#3a3633',  // 深棕色
   lightBrown: '#FAF7F2', // 淺棕背景
   gray: '#4B5563',
   lightGray: '#9CA3AF',

@@ -196,12 +196,12 @@ export function TourHeroCollage({ data, viewMode }: TourHeroCollageProps) {
             {coverImage ? (
               <img src={coverImage}
                 alt={data.title}
-                className="w-full h-full object-cover border border-black"
+                className="w-full h-full object-cover border border-[var(--morandi-primary)]"
                 style={{ filter: 'grayscale(100%) contrast(1.25)' }}
               />
             ) : (
               <div
-                className="w-full h-full border border-black"
+                className="w-full h-full border border-[var(--morandi-primary)]"
                 style={{ background: `repeating-linear-gradient(45deg, ${POP.yellow}22, ${POP.yellow}22 10px, ${POP.pink}11 10px, ${POP.pink}11 20px)` }}
               />
             )}
@@ -234,7 +234,7 @@ export function TourHeroCollage({ data, viewMode }: TourHeroCollageProps) {
           {/* 裝飾色塊 - 藍色方塊 */}
           {!isMobile && (
             <div
-              className="absolute top-10 -right-10 w-64 h-64 border-2 border-black hidden md:block"
+              className="absolute top-10 -right-10 w-64 h-64 border-2 border-[var(--morandi-primary)] hidden md:block"
               style={{
                 backgroundColor: POP.blue,
                 transform: 'rotate(12deg)',
@@ -245,7 +245,7 @@ export function TourHeroCollage({ data, viewMode }: TourHeroCollageProps) {
           {/* 裝飾色塊 - 綠色圓形 */}
           {!isMobile && (
             <div
-              className="absolute -bottom-10 -left-10 w-64 h-64 border-2 border-black rounded-full hidden md:block"
+              className="absolute -bottom-10 -left-10 w-64 h-64 border-2 border-[var(--morandi-primary)] rounded-full hidden md:block"
               style={{
                 backgroundColor: POP.lime,
                 transform: 'rotate(-6deg)',
@@ -264,7 +264,7 @@ export function TourHeroCollage({ data, viewMode }: TourHeroCollageProps) {
           {/* 日期標籤 */}
           {dateFormatted && (
             <div
-              className="px-4 py-2 border-2 border-black"
+              className="px-4 py-2 border-2 border-[var(--morandi-primary)]"
               style={{
                 backgroundColor: POP.yellow,
                 boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)',
@@ -280,7 +280,7 @@ export function TourHeroCollage({ data, viewMode }: TourHeroCollageProps) {
           {/* 天數標籤 */}
           {dayCount > 0 && (
             <div
-              className="px-4 py-2 border-2 border-black"
+              className="px-4 py-2 border-2 border-[var(--morandi-primary)]"
               style={{
                 backgroundColor: POP.blue,
                 boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)',
@@ -295,7 +295,7 @@ export function TourHeroCollage({ data, viewMode }: TourHeroCollageProps) {
           {/* 價格標籤 */}
           {data.price && (
             <div
-              className="px-4 py-2 border-2 border-black text-white"
+              className="px-4 py-2 border-2 border-[var(--morandi-primary)] text-white"
               style={{
                 backgroundColor: POP.pink,
                 boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)',

@@ -890,19 +890,19 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
 
       {/* Edit mode asset palette */}
       {editMode && (
-        <div className="absolute right-0 top-0 bottom-0 w-64 bg-[#0f0f1a]/95 border-l border-gray-800 flex flex-col overflow-hidden">
-          <div className="p-2 border-b border-gray-800">
+        <div className="absolute right-0 top-0 bottom-0 w-64 bg-[#0f0f1a]/95 border-l border-[var(--border)] flex flex-col overflow-hidden">
+          <div className="p-2 border-b border-[var(--border)]">
             <div className="text-xs font-bold text-emerald-400 mb-2">🎨 {GAME_OFFICE_LABELS.ASSET_PALETTE}</div>
             <input
               type="text"
               placeholder={GAME_OFFICE_LABELS.SEARCH_6779}
               value={searchText}
               onChange={e => setSearchText(e.target.value)}
-              className="w-full px-2 py-1 text-xs bg-gray-900 border border-gray-700 rounded text-white"
+              className="w-full px-2 py-1 text-xs bg-gray-900 border border-[var(--border)] rounded text-white"
             />
           </div>
           {/* Quick filter tabs */}
-          <div className="flex gap-1 p-2 border-b border-gray-800">
+          <div className="flex gap-1 p-2 border-b border-[var(--border)]">
             {[
               { id: '全部', label: '全部' },
               { id: 'floor', label: '🏠地板' },
@@ -921,7 +921,7 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
           </div>
           {/* Sub-categories for objects */}
           {filterCat === 'object' && (
-            <div className="flex flex-wrap gap-1 px-2 pb-2 border-b border-gray-800">
+            <div className="flex flex-wrap gap-1 px-2 pb-2 border-b border-[var(--border)]">
               {categories.filter(c => c !== '全部' && c !== '🏠 地板/牆壁').map(c => (
                 <button
                   key={c}
@@ -966,7 +966,7 @@ export default function PhaserOffice({ className, editMode = false, workspaceId,
             ))}
           </div>
           {/* Help */}
-          <div className="p-2 border-t border-gray-800 text-[10px] text-gray-600">
+          <div className="p-2 border-t border-[var(--border)] text-[10px] text-gray-600">
             {GAME_OFFICE_LABELS.HELP_PLACE}<br />
             {GAME_OFFICE_LABELS.HELP_SHORTCUTS}
           </div>

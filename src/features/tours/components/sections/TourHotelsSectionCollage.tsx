@@ -35,7 +35,7 @@ export function TourHotelsSectionCollage({ data, viewMode }: TourHotelsSectionCo
   }
 
   return (
-    <section className="py-24 bg-[#fdfbf7] relative border-t-4 border-black border-dashed">
+    <section className="py-24 bg-[#fdfbf7] relative border-t-4 border-[var(--morandi-primary)] border-dashed">
       <div className="max-w-7xl mx-auto px-6">
         {/* 標題 */}
         <motion.div
@@ -45,7 +45,7 @@ export function TourHotelsSectionCollage({ data, viewMode }: TourHotelsSectionCo
           className="mb-16 text-center"
         >
           <h2
-            className="text-6xl inline-block bg-[#FFEB3B] px-4 transform rotate-1 border-2 border-black"
+            className="text-6xl inline-block bg-[#FFEB3B] px-4 transform rotate-1 border-2 border-[var(--morandi-primary)]"
             style={{
               fontFamily: "'Permanent Marker', cursive",
               boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)',
@@ -86,7 +86,7 @@ export function TourHotelsSectionCollage({ data, viewMode }: TourHotelsSectionCo
               >
                 {/* 圖釘 */}
                 <div
-                  className={`absolute -top-4 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full ${pushpinColor} shadow-sm z-20 border border-black/20`}
+                  className={`absolute -top-4 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full ${pushpinColor} shadow-sm z-20 border border-[var(--morandi-primary)]/20`}
                 />
 
                 {/* 圖片區 */}

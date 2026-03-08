@@ -479,7 +479,7 @@ async function renderSticker(doc: jsPDF, el: StickerElement): Promise<void> {
       await renderSvgPath(doc, {
         pathData: stickerDef.path,
         x, y, width, height,
-        fill: el.primaryColor ?? stickerDef.defaultColor ?? '#000000',
+        fill: el.primaryColor ?? stickerDef.defaultColor ?? 'var(--morandi-primary)',
         opacity: el.opacity,
         viewBox: `0 0 ${vb.width} ${vb.height}`,
       })

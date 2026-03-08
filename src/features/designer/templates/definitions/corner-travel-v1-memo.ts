@@ -17,7 +17,7 @@ const A5_HEIGHT = 794
 const COLORS = {
   gold: '#c9aa7c',
   black: '#181511',
-  gray: '#666666',
+  gray: '#8b8680',
   lightGray: '#f5f5f5',
   white: '#ffffff',
 }
