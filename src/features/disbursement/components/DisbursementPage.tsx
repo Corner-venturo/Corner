@@ -7,6 +7,8 @@
  * - 列表顯示「出納單」，不是請款單
  * - 點「新增」進入選擇請款單的流程
  * - 出納單包含多張請款單
+ * - 點 pending 出納單 → 編輯模式（同新增頁面）
+ * - 點 paid 出納單 → 確認出帳詳情
  */
 
 
@@ -14,7 +16,7 @@ import { useCallback, useState, useMemo } from 'react'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { FileText, Eye, Trash2, Calendar, Clock, List } from 'lucide-react'
+import { FileText, Eye, Pencil, Trash2 } from 'lucide-react'
 import {
   usePaymentRequests,
   useDisbursementOrders,
@@ -40,6 +42,7 @@ export function DisbursementPage() {
 
   // 狀態
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [editingOrder, setEditingOrder] = useState<DisbursementOrder | null>(null)
   const [selectedOrder, setSelectedOrder] = useState<DisbursementOrder | null>(null)
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false)
@@ -59,12 +62,35 @@ export function DisbursementPage() {
     )
   }, [payment_requests, disbursement_orders])
 
+  // 編輯模式用的請款單列表：pending + 目前編輯中出納單包含的 billed 請款單
+  const editableRequests = useMemo(() => {
+    if (!editingOrder) return pendingRequests
+
+    const editingIds = new Set(editingOrder.payment_request_ids || [])
+
+    // 收集其他出納單中的請款單 ID（排除當前編輯的）
+    const usedByOthers = new Set<string>()
+    disbursement_orders.forEach(order => {
+      if (order.id === editingOrder.id) return
+      order.payment_request_ids?.forEach(id => usedByOthers.add(id))
+    })
+
+    // 可選的請款單：
+    // 1. 屬於當前出納單的（billed 狀態，顯示為已勾選）
+    // 2. pending 且不在其他出納單中的
+    return payment_requests.filter(r =>
+      editingIds.has(r.id) ||
+      (r.status === 'pending' && !usedByOthers.has(r.id))
+    )
+  }, [editingOrder, pendingRequests, payment_requests, disbursement_orders])
+
   // 表格欄位
   const columns = useMemo(() => [
     {
       key: 'order_number' as const,
       label: DISBURSEMENT_LABELS.出納單號,
       sortable: true,
+      width: '140px',
       render: (value: unknown) => (
         <div className="font-medium text-morandi-primary">{String(value || DISBURSEMENT_LABELS.自動產生)}</div>
       ),
@@ -73,6 +99,7 @@ export function DisbursementPage() {
       key: 'disbursement_date' as const,
       label: DISBURSEMENT_LABELS.出帳日期,
       sortable: true,
+      width: '110px',
       render: (value: unknown) => (
         <DateCell date={value as string | null} showIcon={false} className="text-morandi-secondary" />
       ),
@@ -80,6 +107,7 @@ export function DisbursementPage() {
     {
       key: 'payment_request_ids' as const,
       label: DISBURSEMENT_LABELS.請款單數,
+      width: '80px',
       render: (value: unknown) => (
         <div className="text-center">
           {Array.isArray(value) ? value.length : 0} {DISBURSEMENT_LABELS.筆}
@@ -90,6 +118,7 @@ export function DisbursementPage() {
       key: 'amount' as const,
       label: DISBURSEMENT_LABELS.總金額,
       sortable: true,
+      width: '120px',
       render: (value: unknown) => (
         <div className="text-right">
           <CurrencyCell amount={Number(value) || 0} className="font-semibold text-morandi-gold" />
@@ -100,6 +129,7 @@ export function DisbursementPage() {
       key: 'status' as const,
       label: DISBURSEMENT_LABELS.狀態,
       sortable: true,
+      width: '80px',
       render: (value: unknown) => {
         const status = DISBURSEMENT_STATUS[value as keyof typeof DISBURSEMENT_STATUS] || DISBURSEMENT_STATUS.pending
         return (
@@ -109,17 +139,22 @@ export function DisbursementPage() {
         )
       },
     },
-    {
-      key: 'created_at' as const,
-      label: DISBURSEMENT_LABELS.建立時間,
-      sortable: true,
-      render: (value: unknown) => (
-        <DateCell date={value as string | null} showIcon={false} className="text-morandi-secondary" />
-      ),
-    },
   ], [])
 
-  // 查看詳情
+  // 點擊列：pending → 編輯模式，paid → 詳情
+  const handleRowClick = useCallback((order: DisbursementOrder) => {
+    if (order.status === 'pending') {
+      // 編輯模式：開啟 CreateDisbursementDialog
+      setEditingOrder(order)
+      setIsCreateDialogOpen(true)
+    } else {
+      // 已出帳：開啟詳情（確認出帳用）
+      setSelectedOrder(order)
+      setIsDetailDialogOpen(true)
+    }
+  }, [])
+
+  // 查看詳情（Eye 按鈕，永遠可用）
   const handleViewDetail = useCallback((order: DisbursementOrder) => {
     setSelectedOrder(order)
     setIsDetailDialogOpen(true)
@@ -148,9 +183,10 @@ export function DisbursementPage() {
     }
   }, [])
 
-  // 新增出納單成功後
+  // 新增/編輯出納單成功後
   const handleCreateSuccess = useCallback(async () => {
     setIsCreateDialogOpen(false)
+    setEditingOrder(null)
     // SWR 快取失效，自動重新載入
     await Promise.all([
       invalidateDisbursementOrders(),
@@ -158,58 +194,50 @@ export function DisbursementPage() {
     ])
   }, [])
 
-  // 週次計算
-  const getWeekRange = useCallback((offset: number) => {
+  // 新增按鈕（清除編輯狀態）
+  const handleAdd = useCallback(() => {
+    setEditingOrder(null)
+    setIsCreateDialogOpen(true)
+  }, [])
+
+  // 關閉建立/編輯對話框
+  const handleCreateDialogClose = useCallback((open: boolean) => {
+    setIsCreateDialogOpen(open)
+    if (!open) {
+      setEditingOrder(null)
+    }
+  }, [])
+
+  // 統計：本週（週一～週日）
+  const thisWeekOrders = useMemo(() => {
     const now = new Date()
-    const dayOfWeek = now.getDay() // 0=日, 1=一, ..., 4=四
-    // 本週一
+    const dayOfWeek = now.getDay()
     const monday = new Date(now)
-    monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1) + offset * 7)
+    monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1))
     monday.setHours(0, 0, 0, 0)
-    // 本週日
     const sunday = new Date(monday)
     sunday.setDate(monday.getDate() + 6)
     sunday.setHours(23, 59, 59, 999)
-    return { start: monday, end: sunday }
-  }, [])
 
-  // 為出納單加上 _weekTag 供 tab 篩選
-  const taggedOrders = useMemo(() => {
-    const thisWeek = getWeekRange(0)
-    const lastWeek = getWeekRange(-1)
-
-    return disbursement_orders.map(o => {
+    return disbursement_orders.filter(o => {
       const date = new Date(o.disbursement_date || o.created_at || '')
-      let _weekTag = 'older'
-      if (date >= thisWeek.start && date <= thisWeek.end) _weekTag = 'this_week'
-      else if (date >= lastWeek.start && date <= lastWeek.end) _weekTag = 'last_week'
-      return { ...o, _weekTag }
+      return date >= monday && date <= sunday
     })
-  }, [disbursement_orders, getWeekRange])
-
-  // 統計
-  const thisWeekOrders = useMemo(() => taggedOrders.filter(o => o._weekTag === 'this_week'), [taggedOrders])
+  }, [disbursement_orders])
   const thisWeekAmount = useMemo(() => thisWeekOrders.reduce((sum, o) => sum + (o.amount || 0), 0), [thisWeekOrders])
 
   return (
     <>
-      <ListPageLayout<DisbursementOrder & { _weekTag: string }>
+      <ListPageLayout<DisbursementOrder>
         title={DISBURSEMENT_LABELS.出納單管理}
-        data={taggedOrders}
+        data={disbursement_orders}
         columns={columns}
         searchFields={['order_number']}
         searchPlaceholder={DISBURSEMENT_LABELS.搜尋出納單號}
-        onAdd={() => setIsCreateDialogOpen(true)}
+        onAdd={handleAdd}
         addLabel={DISBURSEMENT_LABELS.新增出納單}
-        onRowClick={handleViewDetail}
+        onRowClick={handleRowClick}
         initialPageSize={20}
-        statusTabs={[
-          { value: 'this_week', label: DISBURSEMENT_LABELS.本週, icon: Calendar },
-          { value: 'last_week', label: DISBURSEMENT_LABELS.上週, icon: Clock },
-          { value: 'all', label: DISBURSEMENT_LABELS.全部, icon: List },
-        ]}
-        statusField="_weekTag"
-        defaultStatusTab="this_week"
         headerChildren={
           <div className="flex items-center gap-6 text-sm">
             <div className="text-right">
@@ -228,6 +256,20 @@ export function DisbursementPage() {
         }
         renderActions={(row: DisbursementOrder) => (
           <div className="flex items-center gap-2">
+            {row.status === 'pending' && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setEditingOrder(row)
+                  setIsCreateDialogOpen(true)
+                }}
+                className="h-8 w-8 p-0"
+              >
+                <Pencil size={16} className="text-morandi-secondary" />
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="sm"
@@ -267,15 +309,16 @@ export function DisbursementPage() {
         )}
       />
 
-      {/* 新增出納單對話框 */}
+      {/* 新增/編輯出納單對話框 */}
       <CreateDisbursementDialog
         open={isCreateDialogOpen}
-        onOpenChange={setIsCreateDialogOpen}
-        pendingRequests={pendingRequests}
+        onOpenChange={handleCreateDialogClose}
+        pendingRequests={editingOrder ? editableRequests : pendingRequests}
         onSuccess={handleCreateSuccess}
+        editingOrder={editingOrder}
       />
 
-      {/* 出納單詳情對話框 */}
+      {/* 出納單詳情對話框（確認出帳） */}
       <DisbursementDetailDialog
         order={selectedOrder}
         open={isDetailDialogOpen}

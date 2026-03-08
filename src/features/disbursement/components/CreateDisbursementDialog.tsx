@@ -1,12 +1,12 @@
 'use client'
 /**
  * CreateDisbursementDialog
- * 新增出納單對話框
+ * 新增/編輯出納單對話框
  *
  * 參考 cornerERP 設計：
  * - 上方：出帳日期、出納單號、狀態篩選
  * - 中間：請款編號列表，可搜尋、可勾選
- * - 下方：建立出納單按鈕
+ * - 下方：建立/儲存出納單按鈕
  */
 
 
@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { X } from 'lucide-react'
-import { PaymentRequest } from '@/stores/types'
+import { PaymentRequest, DisbursementOrder } from '@/stores/types'
 import { useCreateDisbursement } from '../hooks/useCreateDisbursement'
 import { DisbursementForm } from './create-dialog/DisbursementForm'
 import { DisbursementItemList } from './create-dialog/DisbursementItemList'
@@ -31,6 +31,7 @@ interface CreateDisbursementDialogProps {
   onOpenChange: (open: boolean) => void
   pendingRequests: PaymentRequest[]
   onSuccess: () => void
+  editingOrder?: DisbursementOrder | null
 }
 
 export function CreateDisbursementDialog({
@@ -38,9 +39,11 @@ export function CreateDisbursementDialog({
   onOpenChange,
   pendingRequests,
   onSuccess,
+  editingOrder,
 }: CreateDisbursementDialogProps) {
   // 使用自定義 Hook 管理狀態和邏輯
   const {
+    isEditMode,
     disbursementDate,
     selectedRequestIds,
     searchTerm,
@@ -58,8 +61,9 @@ export function CreateDisbursementDialog({
     setToday,
     clearFilters,
     handleCreate,
+    handleUpdate,
     resetForm,
-  } = useCreateDisbursement({ pendingRequests, onSuccess })
+  } = useCreateDisbursement({ pendingRequests, onSuccess, editingOrder })
 
   // 關閉時重置
   const handleClose = useCallback((isOpen: boolean) => {
@@ -69,11 +73,19 @@ export function CreateDisbursementDialog({
     onOpenChange(isOpen)
   }, [onOpenChange, resetForm])
 
+  const handleSubmit = isEditMode ? handleUpdate : handleCreate
+  const title = isEditMode
+    ? `${DISBURSEMENT_LABELS.編輯出納單} ${editingOrder?.order_number || ''}`
+    : DISBURSEMENT_LABELS.新增出納單
+  const submitLabel = isEditMode
+    ? (isSubmitting ? DISBURSEMENT_LABELS.儲存中 : DISBURSEMENT_LABELS.儲存變更.replace('{count}', selectedRequestIds.length.toString()))
+    : (isSubmitting ? DISBURSEMENT_LABELS.建立中 : DISBURSEMENT_LABELS.建立出納單數量.replace('{count}', selectedRequestIds.length.toString()))
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent level={1} size="full" className="h-[85vh] overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0">
-          <DialogTitle className="text-xl">{DISBURSEMENT_LABELS.新增出納單}</DialogTitle>
+          <DialogTitle className="text-xl">{title}</DialogTitle>
         </DialogHeader>
 
         <div className="flex-1 min-h-0 flex flex-col space-y-4">
@@ -107,11 +119,11 @@ export function CreateDisbursementDialog({
             {DISBURSEMENT_LABELS.取消}
           </Button>
           <Button
-            onClick={handleCreate}
+            onClick={handleSubmit}
             disabled={selectedRequestIds.length === 0 || isSubmitting}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
-            {isSubmitting ? DISBURSEMENT_LABELS.建立中 : DISBURSEMENT_LABELS.建立出納單數量.replace('{count}', selectedRequestIds.length.toString())}
+            {submitLabel}
           </Button>
         </DialogFooter>
       </DialogContent>

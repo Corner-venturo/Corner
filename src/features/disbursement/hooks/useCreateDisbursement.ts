@@ -1,17 +1,19 @@
 /**
  * useCreateDisbursement Hook
- * 管理建立出納單的狀態與邏輯
+ * 管理建立/編輯出納單的狀態與邏輯
  */
 
 'use client'
 
 import { getTodayString, formatDate } from '@/lib/utils/format-date'
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { PaymentRequest, DisbursementOrder } from '@/stores/types'
 import {
   useDisbursementOrders,
   updatePaymentRequest as updatePaymentRequestApi,
+  updateDisbursementOrder as updateDisbursementOrderApi,
   invalidateDisbursementOrders,
+  invalidatePaymentRequests,
 } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { dynamicFrom } from '@/lib/supabase/typed-client'
@@ -58,12 +60,15 @@ async function generateDisbursementNumber(existingOrders: DisbursementOrder[]): 
 interface UseCreateDisbursementProps {
   pendingRequests: PaymentRequest[]
   onSuccess: () => void
+  editingOrder?: DisbursementOrder | null
 }
 
-export function useCreateDisbursement({ pendingRequests, onSuccess }: UseCreateDisbursementProps) {
+export function useCreateDisbursement({ pendingRequests, onSuccess, editingOrder }: UseCreateDisbursementProps) {
   // 使用 @/data hooks（SWR 自動載入）
   const { items: disbursement_orders } = useDisbursementOrders()
   const user = useAuthStore(state => state.user)
+
+  const isEditMode = !!editingOrder
 
   // 狀態
   const [disbursementDate, setDisbursementDate] = useState(
@@ -74,6 +79,14 @@ export function useCreateDisbursement({ pendingRequests, onSuccess }: UseCreateD
   const [dateFilter, setDateFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // 編輯模式：初始化表單值
+  useEffect(() => {
+    if (editingOrder) {
+      setDisbursementDate(editingOrder.disbursement_date || formatDate(getNextThursday()))
+      setSelectedRequestIds(editingOrder.payment_request_ids || [])
+    }
+  }, [editingOrder])
 
   // 篩選請款單
   const filteredRequests = useMemo(() => {
@@ -216,6 +229,86 @@ export function useCreateDisbursement({ pendingRequests, onSuccess }: UseCreateD
     onSuccess,
   ])
 
+  // 更新出納單（編輯模式）
+  const handleUpdate = useCallback(async () => {
+    if (!editingOrder) return
+
+    const validation = createDisbursementSchema.safeParse({
+      selectedRequestIds,
+      disbursementDate,
+    })
+    if (!validation.success) {
+      void alert(validation.error.issues[0].message, 'warning')
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const oldIds = new Set(editingOrder.payment_request_ids || [])
+      const newIds = new Set(selectedRequestIds)
+
+      // 找出新增和移除的請款單
+      const addedIds = selectedRequestIds.filter(id => !oldIds.has(id))
+      const removedIds = (editingOrder.payment_request_ids || []).filter(id => !newIds.has(id))
+
+      // 更新出納單
+      await updateDisbursementOrderApi(editingOrder.id, {
+        payment_request_ids: selectedRequestIds,
+        amount: selectedAmount,
+        disbursement_date: disbursementDate,
+      })
+
+      const tour_ids_to_recalculate = new Set<string>()
+
+      // 新增的請款單：狀態改為 billed
+      for (const id of addedIds) {
+        await updatePaymentRequestApi(id, { status: 'billed' })
+        const req = pendingRequests.find(r => r.id === id)
+        if (req?.tour_id) {
+          tour_ids_to_recalculate.add(req.tour_id)
+        }
+      }
+
+      // 移除的請款單：狀態改回 confirmed
+      for (const id of removedIds) {
+        await updatePaymentRequestApi(id, { status: 'confirmed' })
+        const req = pendingRequests.find(r => r.id === id)
+        if (req?.tour_id) {
+          tour_ids_to_recalculate.add(req.tour_id)
+        }
+      }
+
+      // 重算相關團的成本
+      for (const tour_id of tour_ids_to_recalculate) {
+        await recalculateExpenseStats(tour_id)
+      }
+
+      // SWR 快取失效
+      await Promise.all([
+        invalidateDisbursementOrders(),
+        invalidatePaymentRequests(),
+      ])
+
+      await alert(DISBURSEMENT_LABELS.出納單已更新(editingOrder.order_number || ''), 'success')
+
+      resetForm()
+      onSuccess()
+    } catch (error) {
+      logger.error(DISBURSEMENT_LABELS.更新出納單失敗_2, error)
+      const errorMessage = error instanceof Error ? error.message : DISBURSEMENT_LABELS.未知錯誤
+      await alert(DISBURSEMENT_LABELS.更新出納單失敗_hook(errorMessage), 'error')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }, [
+    editingOrder,
+    selectedRequestIds,
+    selectedAmount,
+    disbursementDate,
+    pendingRequests,
+    onSuccess,
+  ])
+
   // 重置表單
   const resetForm = useCallback(() => {
     setSelectedRequestIds([])
@@ -226,6 +319,7 @@ export function useCreateDisbursement({ pendingRequests, onSuccess }: UseCreateD
 
   return {
     // 狀態
+    isEditMode,
     disbursementDate,
     selectedRequestIds,
     searchTerm,
@@ -247,6 +341,7 @@ export function useCreateDisbursement({ pendingRequests, onSuccess }: UseCreateD
     setToday,
     clearFilters,
     handleCreate,
+    handleUpdate,
     resetForm,
   }
 }

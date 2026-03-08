@@ -137,6 +137,12 @@ export const DISBURSEMENT_LABELS = {
   CONFIRM_DELETE_PREFIX: '確定要刪除出納單 ',
   CONFIRM_DELETE_SUFFIX: ' 嗎？',
   建立人員: '建立人員',
+  // Edit mode
+  編輯出納單: '編輯出納單',
+  儲存變更: '儲存變更（{count} 筆）',
+  儲存中: '儲存中...',
+  出納單已更新: (orderNumber: string) => `出納單 ${orderNumber} 已更新`,
+  更新出納單失敗_hook: (errorMessage: string) => `更新出納單失敗: ${errorMessage}`,
 };
 
 
